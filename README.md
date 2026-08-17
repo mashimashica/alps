@@ -24,7 +24,7 @@ A useful description lets a reader understand why the work exists, what success 
 
 ALPS separates questions that are often mixed together in ordinary descriptions.
 
-| Plain-language question | ALPS concept |
+| Plain-language question | ALPS term |
 |---|---|
 | Why does the work exist? | **Purpose** |
 | What condition counts as success? | **Outcome** |
