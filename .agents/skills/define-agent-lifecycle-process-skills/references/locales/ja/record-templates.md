@@ -14,7 +14,7 @@
 - ステークホルダーと期待:
 - 想定利用文脈:
 - 反復性または影響度:
-- 既存Skillとの重複・隣接・隙間:
+- 既存Skillとの重複・隣接領域・未充足領域:
 - 期待便益:
 - リスク:
 - 費用または制約:
@@ -33,9 +33,9 @@ Outcome参照およびTask参照には、安定ID、短い名称、見出し、�
 
 確認観点:
 
-- Activityおよび分離されたSkillの集合で、すべてのOutcomeを網羅する必要がある。
-- Outcome、ActivityおよびTaskの対応関係を識別できるのが望ましい。
-- 外部授受では、提供側Outputと受領側Inputの名称、意味および範囲を整合させるのが望ましい。
+- Activityと、必要に応じて独立したSkillとして分離された部分との集合で、すべてのOutcomeを網羅する必要がある。
+- Outcome、ActivityおよびTaskの対応関係を識別するのが望ましい。
+- 外部との授受では、提供側のOutputと受領側のInputの名称、意味および範囲を整合させるのが望ましい。
 - Outputの変更が他のSkillのInputに影響する場合、影響を受けるSkillおよび対応関係を識別し、必要な再評価を行うのが望ましい。
 
 ## 3. 検証記録
@@ -50,7 +50,7 @@ Outcome参照およびTask参照には、安定ID、短い名称、見出し、�
 - Conformance基準:
   - 記述: 適用するALPS箇条
   - Full: Outcome / Task / 双方
-  - Tailored: TailoringしたSkillまたはProcessおよびその適用範囲、残存Outcome、Activity・Taskに含まれる要求事項
+  - Tailored: TailoringしたSkillまたはProcessおよびその適用範囲、適用範囲に残るOutcome、Activity・Taskに含まれる要求事項
 - 適用規範・Control:
 - レビュー基準:
 - 独立した観点:

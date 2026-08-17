@@ -5,7 +5,7 @@
 > of application to particulars.”
 >
 > 「言い換えれば、プラグマティズムは、意味を習慣の形成と同一視する。
-> ここで習慣とは、可能なかぎり高い一般性、すなわち個々の事例へ適用できる
+> ここで習慣とは、可能なかぎり高い一般性、すなわち個々の事例に適用できる
 > 最も広い範囲をもつ行為の仕方である。」
 >
 > — John Dewey, “The Pragmatism of Peirce” (1916), p. 711.
@@ -13,13 +13,13 @@
 
 ## 目的および優先関係
 
-作業は、適用状況が変われば異なる形を取り得る。それでも実行主体や方法を固定せず、意図と境界を理解可能に保つことが、その記述の再利用可能性を支える。
+作業は、適用状況が変われば異なる形を取り得る。それでも実行主体や方法を固定せず、意図と境界を理解できる状態に保つことが、その記述の再利用可能性を支える。
 
 このFrameworkは、Processを一つの実行主体、ツールまたは実行形態に固定することなく、その意図、境界、作業内容、適用状況、関係および評価を記述し理解するための共通かつ再利用可能な基盤を定める。
 
 このFrameworkは、適用分野を問わず使用できる。一つのライフサイクルまたは方法を規定することなく、Processの記述、適用、評価および改善を支援する。
 
-ALPSは、このFrameworkをAgent Skillへ適用する。ALPSの規定がこのFrameworkと競合する場合は、このFrameworkが優先する必要がある。
+ALPSは、このFrameworkをAgent Skillに適用する。ALPSの規定がこのFrameworkと競合する場合は、このFrameworkが優先する必要がある。
 
 この日本語版では、「〜する必要がある」は要求を、「〜してはならない」は禁止を示す。「〜するのが望ましい」は推奨を、「〜しないのが望ましい」は非推奨を示す。「〜してよい」は許可を示す。「通常」などの表現は、要求を設けることなく、通例の実務を示す。「〜できる」「〜され得る」は、可能性または能力を述べる記述であって、規範属性を持たない。これらの語を大文字で表記する形式は用いない。
 
@@ -33,7 +33,7 @@ ALPSは、このFrameworkをAgent Skillへ適用する。ALPSの規定がこのF
 
 ### 1.1 作業、記述および適用
 
-**Process**は、明示したPurposeの下で、一つ以上のOutcomeを成立させるために実行する関連作業である。ProcessはInputに作用してOutputを生み出し、ActivityとTaskを一つのまとまりへ組み合わせる。Processの実行は、ステークホルダーへ便益を提供することを意図している。Processが果たす機能は、Purpose、OutcomeならびにActivityとTaskの集合によって定まる。
+**Process**は、明示されたPurposeの下で、一つ以上のOutcomeを成立させるために実行される、相互に関連する作業である。ProcessはInputに作用してOutputを生み出し、ActivityとTaskを一つのまとまりに組み合わせる。Processの実行は、ステークホルダーに便益を提供することを意図している。Processが果たす機能は、Purpose、OutcomeならびにActivityとTaskの集合によって定まる。
 
 **Process Description**はProcessを説明する。Description自体はProcessの実行ではない。一般Processまたは特定のInstanceを表現できる。
 
@@ -49,13 +49,13 @@ Descriptionは詳細さを増しても、意味の中心を変えずに保つこ
 
 Activity、Task、Input、Output、Control、Constraint、Enabler、Entry Criteria、Exit Criteriaおよび参考情報は任意である。DescriptionのPurposeと必要な詳細さに応じて含める。
 
-Processは共通の属性によっても特徴付けることができる。選択した詳細さは、Processの成熟度、Capabilityまたは品質水準を特徴付けるために役立ち得る。
+Processは共通の属性によっても特徴付けられる。選択した詳細さは、Processの成熟度、Capabilityまたは品質水準を特徴付けるために役立ち得る。
 
 ### 1.3 読者に応じた層
 
-読者がProcessを読む理由は、理解する、適用する、評価する、改善するなど様々である。層を設けることで、Processを異なる意味へ分けることなく、各読者が必要な深さから読み始められる。
+読者がProcessを読む目的には、Processを理解すること、適用すること、評価すること、改善することなどがある。層を設けることで、Processの意味を分岐させることなく、各読者が必要な深さで読み始められる。
 
-共通の記述形式では、概要と詳細記述の二部構成を用いることができる。概要には、Purpose、説明、InputとOutput、Activity、Common Approach、実務上の助言および優れた実務の要約情報を含めることができる。Activityは何を実行するかを示し、Common Approachと実務上の助言は適用を導く。
+共通の記述形式では、概要と詳細記述の二部構成を用いることができる。概要には、Purpose、説明、InputとOutput、Activity、Common Approach、実務上の助言および優れた実務に関する要約を含めることができる。Activityは何を実行するかを示し、Common Approachと実務上の助言は適用を導く。
 
 詳細部は、そのProcessに固有の事項を扱う。複数のProcessを横断する事項は、個別Processの詳細記述とは別に扱う。この二部構成は任意であり、必須の意味の中核を置き換えない。
 
@@ -69,7 +69,7 @@ Process Descriptionは、Name、Purpose、Outcome、ActivityおよびTaskの機�
 
 各文は一つの意味を担うのが望ましい。文章を短くするためだけに、独立した目的、結果または行為を結合することは避けるのが望ましい。各記述は、単独で参照しても意味を保つために十分な文脈を含むのが望ましい。補足説明は、注記または他の参考情報として分離できる。
 
-一般ProcessのDescriptionは、特定の方法、技法、ツール、測定量、管理方法または実行順序を要求してはならない。方法と例は、Process要求とせずに手引きとして提供できる。
+一般ProcessのDescriptionは、特定の方法、技法、ツール、測定量、管理方法または実行順序を要求してはならない。方法と例は、Processの要求事項とせず、手引きとして提供できる。
 
 Procedureは、順序付けた手順を規定する。ActivityとTaskはProcessの作業を記述するものであり、記載順だけを理由として手順上の段階として解釈してはならない。
 
@@ -79,29 +79,29 @@ Procedureは、順序付けた手順を規定する。ActivityとTaskはProcess�
 
 ## 2. 意図、成功および作業内容
 
-Instanceが始まる前から、言葉は作業に見分けられる輪郭を与える。Nameは作業を指し示し、Purposeは存在理由を説明し、Outcomeは成功によって成立する状態を示し、ActivityとTaskはどの作業が属するかを表す。
+Instanceが始まる前から、言葉は、作業に識別できる輪郭を与える。Nameは作業を指し示し、Purposeは存在理由を説明し、Outcomeは成功によって成立する状態を示し、ActivityとTaskは、どの作業がそのProcessに属するかを表す。
 
 ### 2.1 作業とその理由の命名
 
 Nameは作業を指し示し、Purposeはその理由を与える。両者の機能を分ければ、説明できない目的を名称だけに背負わせずに済む。
 
-**Name**はProcessを識別し、Process Model内の他のProcessと区別する。Nameは簡潔な名詞句でなければならず、Processの中心的な関心を表さなければならず、Purposeの要約であってはならない。英語ではNameを“process”という語へつなげるのが望ましいが、これは意味上の要求ではなく言語上の規約である。
+**Name**はProcessを識別し、Process Model内の他のProcessと区別する。Nameは簡潔な名詞句である必要があり、Processの中心的な関心を表す必要がある。Nameは、Purposeの要約であってはならない。英語では、Nameに“process”という語を結び付けるのが望ましいが、これは意味上の要求ではなく言語上の規約である。
 
-**Purpose**は、Processを実行する、まとまりをもつ一つまたは複数の上位目的を示す必要がある。Purposeは、有効な実施によって期待するOutcomeを包含する。
+**Purpose**は、Processを実行するための、相互に関連する一つまたは複数の上位目的を示す必要がある。Purposeは、有効な実施によって期待するOutcomeを包含する。
 
-隣接するProcessの範囲が重なって見える場合、PurposeはProcess境界も明確にするのが望ましい。Purposeは簡潔にし、可能な限り一文とするのが望ましい。ActivityまたはOutcomeを要約したり、独立した目的を結合したりすることは避けるのが望ましい。補足説明は参考情報へ置くことができる。
+隣接するProcessの範囲が重なって見える場合、Purposeは、Processの境界も明確にするのが望ましい。Purposeは簡潔にし、可能な限り一文とするのが望ましい。ActivityまたはOutcomeを要約したり、独立した目的を結合したりすることは避けるのが望ましい。補足説明は参考情報に置くことができる。
 
 ### 2.2 成功と生み出すものの区別
 
 成功と生産はしばしば連れ立つが、答える問いは異なる。
 
-**Outcome**は、Processによって達成する測定可能で具体的な結果状態である。Outcomeは観察可能かつ評価可能である必要がある。OutcomeはOutputではなく、文書、記録または情報項目を作成したことだけをOutcomeとして記述してはならない。
+**Outcome**は、Processの実行によって達成される、測定可能で具体的な結果状態である。Outcomeは観察可能かつ評価可能である必要がある。OutcomeはOutputではなく、文書、記録または情報項目を作成したことだけをOutcomeとして記述してはならない。
 
-各Outcomeは、一つの肯定的で観察可能な状態を宣言文で確立する必要がある。英語のOutcomeでは現在時制の動詞を用いる必要がある。独立した複数の結果を一つのOutcomeへ結合してはならない。
+各Outcomeは、一つの肯定的で観察可能な状態を、宣言文として記述する必要がある。英語のOutcomeでは現在時制の動詞を用いる必要がある。独立した複数の結果を一つのOutcomeに結合してはならない。
 
-一般ProcessのOutcomeは、そのProcessを適用できる全範囲で意味を保つ必要がある。Outcomeの集合はPurposeに対して十分でなければならず、各OutcomeはPurposeに関係する必要がある。各Outcomeは、単独で読んでも意味を保つのが望ましい。
+一般ProcessのOutcomeは、そのProcessを適用できる全範囲で意味を保つ必要がある。Outcomeの集合は、Purposeに対して十分である必要がある。各OutcomeはPurposeに関係する必要がある。各Outcomeは、単独で読んでも意味を保つのが望ましい。
 
-Outcomeは簡潔にするのが望ましい。ただし、簡潔さよりも一つの明確な意味を優先する。Outcomeの数は、固定された個数ではなく、Purposeの達成に必要な結果が定める。便益はOutcomeと区別することが望ましく、Purposeに関連付けた参考的な注記で説明できる。
+Outcomeは簡潔にするのが望ましい。ただし、簡潔さよりも一つの明確な意味を優先する。Outcomeの数は固定せず、Purposeの達成に必要な結果に応じて定める。便益をOutcomeと区別するのが望ましく、Purposeに関連付けた参考的な注記で説明できる。
 
 **Output**は、Processによって生み出される製品、結果またはサービスである。OutputとOutcomeは関連し得るが、相互に置き換えることはできない。Outputは生み出されるものであり、Outcomeは達成を評価する結果状態である。あるProcessのOutputは、別のProcessのInputになり得る。
 
@@ -111,39 +111,39 @@ Outcomeは簡潔にするのが望ましい。ただし、簡潔さよりも一�
 
 個々の行為をまとめながら全体への寄与を失わないとき、作業は理解可能になる。
 
-**Activity**は、Process内のまとまりあるTaskの集合である。Activityは、関連する行為がProcessへどのように寄与するかを理解し、伝達できるように整理する。
+**Activity**は、Process内のまとまりあるTaskの集合である。Activityは、関連する行為を、それらがProcessにどのように寄与するかを理解し、伝達できるように整理する。
 
 十分な凝集性と詳細をもつActivityは、固有のPurposeとOutcomeをもつSub-processとして扱うことができる。ActivityとSub-processの集合は、すべてのProcess Outcomeを網羅し、Process Purposeを満たす必要がある。ActivityとOutcomeを一対一に対応させる必要はない。
 
 一つのActivity内のTaskは、そのActivity外のTaskよりも相互に強く関連するのが望ましい。Activityは、Process全体よりも狭い連続的または反復的な機能として扱う必要がある。Activityの集合はすべてのOutcomeを扱うのが望ましいが、Purposeを満たすための最小限の作業を超えてよい。
 
-**Task**は、一つ以上のOutcomeを支援するための個別の行為を示す。各Taskは、その行為が要求、推奨、許可または通常の実務のいずれであるかを明確にする必要がある。Activityへ割り当てたTaskが、そのActivityの境界内で可能なすべての行為を列挙する必要はない。
+**Task**は、一つ以上のOutcomeを支援するための個別の行為を示す。各Taskは、その行為が要求、推奨、許可または通常の実務のいずれであるかを明確にする必要がある。Activityに割り当てるTaskは、そのActivityの境界内で可能な行為をすべて列挙する必要はない。
 
 1.4の時期および順序に関する規則は、ActivityとTaskの双方に適用する。
 
 ## 3. Process境界の設定
 
-有用な境界は、恣意的な線でも壁でもない。互いに属する作業をまとめ、他のProcessとの授受を見えるままにする。
+有用な境界は、恣意的な線でも壁でもない。互いに属する作業をまとめ、他のProcessとの授受を明示された状態に保つ。
 
 ### 3.1 粒度および凝集性
 
-Process、Sub-processおよびActivityの大きさに普遍的な境界はない。多数のTaskを含む重要なActivityは、別個に扱うことが有用な場合、Processとして記述できる。
+Process、Sub-processおよびActivityの粒度に、普遍的な基準はない。多数のTaskを含む重要なActivityは、別個に扱うことが有用な場合、Processとして記述できる。
 
 通常は、主要なOutputとOutcomeを境界の判断に用いる。Activityの中間Outputは、通常、Process境界を定めない。
 
-人の介入をほとんど必要としない密接に結び付いた自動化作業は、一つのProcess Descriptionへまとめることができる。分解は、境界、責務または関係の理解を改善するあいだは有用である。理解または利用を損なうことになる階層の追加は行わない。
+人の介入をほとんど必要としない密接に結び付いた自動化作業は、一つのProcess Descriptionにまとめることができる。分解は、境界、責務または関係の理解を改善するあいだは有用である。理解または利用を損なうことになる階層の追加は行わない。
 
-境界内のOutcome、ActivityおよびTaskは、その作業が一つにまとまる理由を凝集した形で説明する。他のProcessへの依存は、実行可能な限り減らす。
+境界内のOutcome、ActivityおよびTaskは、その作業が一つにまとまる理由を、一貫した説明として形づくる。他のProcessへの依存は、実行可能な限り減らす。
 
 ### 3.2 一般Processが選択に委ねる事項
 
-一般性は、作業を曖昧に残すことではなく、その機能を一つの実行主体または実施方法へ割り当てずに記述することで保たれる。
+一般性は、作業を曖昧に残すことではなく、その機能を一つの実行主体または実施方法に割り当てずに記述することで保たれる。
 
 一般Processは、実行主体の構造または作業の各部分を誰が実行するかを規定しない。Processの実行に必要な機能上の関係を記述する。
 
 Processを適用するときは、Purposeに応じてProcess、ActivityおよびTaskを選択できる。一つのProcessまたは複数のProcessの組合せを実行できる。
 
-実行主体と実施方法を選択に委ねることは、一般Processの再利用可能性の一部であり、Process境界を不完全にはしない。
+実行主体と実施方法を選択に委ねることは、一般Processの再利用可能性の一部であり、Processの境界を不完全にするものではない。
 
 ## 4. 境界を越え、方向付け、制限し、または支援するもの
 
@@ -153,7 +153,7 @@ Processを適用するときは、Purposeに応じてProcess、Activityおよび
 
 InputとOutputは、Processとその外部環境との接続を表す。Process DescriptionのPurposeと必要な詳細さに応じて用いる。
 
-**Input**は、ProcessがOutputへ変換する項目である。Inputは、別のProcess、利用可能な情報源またはProcess外部の源から得ることができる。必須または代表的なInputの指定は任意である。
+**Input**は、ProcessがOutputに変換する項目である。Inputは、別のProcess、利用可能な情報源またはProcess外部の源から得ることができる。必須または代表的なInputの指定は任意である。
 
 Processを実行する人、Agent、自動化、ツールおよび実行環境は、Inputではなく資源である。Process Descriptionで要素として表す場合は、Enablerとして扱う。
 
@@ -167,7 +167,7 @@ Processを実行する人、Agent、自動化、ツールおよび実行環境�
 
 | Processにおける機能 | 分類 |
 |---|---|
-| ProcessがOutputへ変換する。 | Input |
+| ProcessがOutputに変換する。 | Input |
 | 実行または判断根拠を方向付ける。 | Control |
 | 許容される実行を制限する。 | Constraint |
 | 実行を可能にし、または支援する。 | Enabler |
@@ -182,9 +182,9 @@ Outcomeの達成を実証できる場合、Outputの指定は任意である。O
 
 代表的な変換の説明は、Input、ActivityおよびOutputを関連付ける。ActivityがInputを変換し、Enablerがその変換を支援し、Controlが実行を方向付け、または制約する。
 
-Process群の結果は、文書、Artifactまたはモデルへ記録されることが多い。Outputに名称を付けただけでは、文書の作成を要求しない。
+Process群の結果は、文書、Artifactまたはモデルに記録されることが多い。Outputに名称を付けるだけでは、文書の作成を要求したことにはならない。
 
-代表的なInputとOutputは、実行可能な一つの方法を示す。唯一の方法を規定しない。Processは、代表的な流れだけでなくProcess Description全体から理解するのが望ましい。
+代表的なInputとOutputは、一つの実行方法の例を示す。唯一の方法を規定しない。Processは、代表的な流れだけでなくProcess Description全体から理解するのが望ましい。
 
 ### 4.3 適用の両端にある条件
 
@@ -198,7 +198,7 @@ Entry CriteriaとExit Criteriaは、Process DescriptionのPurposeと必要な詳
 
 Processは単独で完結するとは限らない。そのOutputは別のProcessのInputになり、Trace linkはそれらの関係を見える状態に保つ。
 
-Trace linkは、Outcome、Activity、Taskおよび情報項目を対象とするのが望ましい。これらは、Process要素間の整合性を示す。このTraceの証拠は、Process Assessmentに用いるツールの設計にも利用できる。
+Trace linkは、Outcome、Activity、Taskおよび情報項目を対象とするのが望ましい。このようなTrace linkは、Process要素間の整合性を示す。Trace linkによって得られる証拠は、Process Assessmentに用いるツールの設計にも利用できる。
 
 有用な対応付けには、TaskとOutcome、InputとOutcome、およびOutputとOutcomeの関係がある。
 
@@ -210,7 +210,7 @@ Process間の受け渡しは、提供側のOutputと受領側のInputを対応�
 
 FrameworkレベルのControlは、宣言した範囲内のProcessを方向付け、または制約する。FrameworkレベルのEnablerは、宣言した範囲内のProcessを支援する。
 
-共通のControlまたはEnablerごとに、適用範囲、例外およびTailoringの可否を示す必要がある。Frameworkに属するという事実だけでは、共通要素がすべてのProcessへ適用されない。
+共通のControlまたはEnablerごとに、適用範囲、例外およびTailoringの可否を示す必要がある。Frameworkに属するという事実だけでは、共通要素がすべてのProcessに適用されることにはならない。
 
 宣言した範囲で共通するControlまたはEnablerは、各Process Descriptionで繰り返さず、一度だけ記述してよい。
 
@@ -227,20 +227,20 @@ FrameworkレベルのControlは、宣言した範囲内のProcessを方向付け
 | 構成体 | 機能 |
 |---|---|
 | **Process Model** | 相互に関係するProcessのFrameworkであり、複数のProcessから構成できる。 |
-| **Process Reference Model** | 各ProcessをPurposeとOutcomeによって定義し、それらの関係を明示的な構造へ配置する。 |
+| **Process Reference Model** | 各ProcessをPurposeとOutcomeによって定義し、それらの関係を明示的な構造に配置する。 |
 | **Process Framework** | 適用分野に対応するProcessの集合と用語であり、Process Modelの構成と、Purposeに応じたProcessの部分集合の選択に用いる。 |
 
 Process Frameworkは、望ましいProcess環境の確立、確立済み環境内での選択と組合せ、およびProcessとActivityに関する合意の基礎として使用できる。ライフサイクルモデルの構成にも使用できる。AssessmentではProcess Reference Modelとしても使用できる。このFrameworkは、Process Assessmentと改善の双方を支援する。
 
 ### 5.2 ライフサイクルモデルおよび適用状況の変化
 
-ライフサイクルモデルは、選択した適用に応じてProcess間の関係へ順序を与える。それを記述する文書の箇条順が、それだけで時間上の順序へ変わるわけではない。
+ライフサイクルモデルは、選択した適用に応じてProcess間の関係に順序を与える。それを記述する文書の箇条順が、それだけで時間上の順序に変わるわけではない。
 
-**ライフサイクルモデル**は、ライフサイクルProcessとActivityを、意思疎通と理解に用いる共通の基礎へまとめる。その詳細は、Process、Outcome、Process間の関係および順序によって表現する。
+**ライフサイクルモデル**は、ライフサイクルProcessとActivityを、意思疎通と理解に用いる共通の基礎にまとめる。その詳細は、Process、Outcome、Process間の関係および順序によって表現される。
 
 実際のProcess順序は、適用の目的と選択したライフサイクルモデルによって定まる。文書内の箇条の順序は、実行順序を規定しない。
 
-対象または適用状況が変化したときは、Processの選択と時期の継続的な見直しを要する。Processの利用は、内外の影響に応じて動的に変化し得る。
+対象または適用状況が変化したときは、Processの選択と実施時期を継続的に見直す必要がある。Processの利用は、内外の影響に応じて動的に変化し得る。
 
 ### 5.3 Process View
 
@@ -258,7 +258,7 @@ Process Viewには、次のいずれかの出所をもつActivityとTaskを含�
 | Process ModelからAdaptation | 出所を識別し、Adaptationであることを示す。Adaptationは出所のProcess Modelを変更しない。 |
 | View専用に作成 | 新設であることを示す。View専用の要素は出所のProcess Modelを変更しない。 |
 
-Viewは、各ActivityとTaskの出所を明示し、選択、Adaptationまたは新設のいずれかを示す必要がある。Adaptationした要素とView専用の要素は、Tailoringまたは正式な採用によってそのProcessへ取り込まない限り、出所ProcessへのConformanceには寄与しない。
+Viewは、各ActivityとTaskの出所を明示し、選択、Adaptationまたは新設のいずれかを示す必要がある。Adaptationした要素とView専用の要素は、Tailoringまたは正式な採用によってそのProcessに取り込まない限り、出所ProcessへのConformanceには寄与しない。
 
 Process Frameworkは、Process Modelに既に存在するActivityとTaskだけを使用するようProcess Viewを制限してよい。制限されたViewには、View専用のActivityまたはTaskを含めてはならない。
 
@@ -281,7 +281,7 @@ Processは一本の線に沿って進むとは限らない。同じ水準で並�
 
 Iterationは水準を変えずに戻り、RecursionはProcessまたはProcess群を構造水準間で反復する。Concurrencyが共存を扱うのに対し、Integrationは完全性と整合性を扱う。
 
-Processの実行は直列の形態に限定されない。Iterationは、Outputを段階的に洗練し、判断と理解の進展を取り込み、Constraintを扱い、トレードオフを解消する。Iterationは単に許容されるのではなく、期待される。Processから生じる問題が解決するまで継続するのが望ましい。
+Processの実行は直列の形態に限定されない。Iterationは、Outputを段階的に洗練し、判断と理解の進展を取り込み、Constraintを扱い、トレードオフを解消する。Iterationは単に許容されるのではなく、期待される。Processから生じる問題が解決されるまで継続するのが望ましい。
 
 Recursionでは、ある水準のOutputが、次の水準で適用するProcessのInputになり得る。
 
@@ -297,17 +297,17 @@ IterationまたはRecursionがOutputを変更すると、影響を受けるProce
 
 ### 7.1 Adaptationおよび厳密さ
 
-**Tailoring**は、ライフサイクルモデルまたはProcessを、宣言した適用状況のニーズと条件へ適合させる統制されたAdaptationである。このようなモデルとProcessは、通常、すべての適用状況へ変更せずに適用できない。
+**Tailoring**は、ライフサイクルモデルまたはProcessを、宣言した適用状況のニーズと条件に適合させる統制されたAdaptationである。このようなモデルやProcessは、通常、変更なしですべての適用状況に適用できるものではない。
 
-Tailoringは、Activityを受容可能なリスク水準で実行するために十分な厳密さを設定する。厳密さが不足すると問題の可能性が高まり、過剰な厳密さはコストまたは日程のリスクを高め得る。
+Tailoringは、Activityを受容可能なリスク水準で実行するために十分な厳密さを設定する。厳密さが不足すると、問題が生じる可能性が高まり、過剰な厳密さはコストまたは日程のリスクを高め得る。
 
 Tailoringは、通常、リスクと適用状況の変化に応じて適用期間を通して動的に継続する。その運用をレビューし、条件が必要とするときに改訂するのが望ましい。
 
 ### 7.2 Tailoringが変更できるもの
 
-**共通水準のTailoring**は、外部規格を、意図する適用分野で共有されるニーズへ適合させる。
+**共通水準のTailoring**は、外部規格を、意図する適用分野で共有されるニーズに適合させる。
 
-**個別水準のTailoring**は、得られた共通Processを一つの適用対象へ適合させる。
+**個別水準のTailoring**は、得られた共通Processを一つの適用対象に適合させる。
 
 Tailoringでは、Outcome、Activity、Task、代表的なInputおよび代表的なOutputを削除、変更または追加できる。
 
@@ -319,7 +319,7 @@ Tailoringでは、適用上のリスク、要求、複雑さ、利用可能な�
 
 候補Processまたはライフサイクルモデルは、適用条件、利用可能な専門性と経験、ステークホルダーの期待または要求、およびリスク許容度を用いて評価する必要がある。
 
-Tailoringでは、影響を受ける当事者からInputを得なければならず、適用されるControlとConstraintに従う必要がある。
+Tailoringでは、影響を受ける当事者からInputを得る必要がある。適用されるControlとConstraintに従う必要がある。
 
 Tailoringの判断は、事実と証拠に基づくのが望ましい。範囲を明示するのが望ましい。前提およびCriteriaを識別するのが望ましい。Processまたはライフサイクルモデルを選択した根拠を記録し、維持するのが望ましい。
 
@@ -331,7 +331,7 @@ Tailoringには、宣言した適用状況を失わせる落とし穴がある�
 
 品質リスクに照らして詳細化が正当化される場合、**Process Instantiation**は、特定の対象と適用状況に対応するProcess Instanceを記述する。
 
-Instantiationは、要求からInstance固有の成功Criteriaを導出し、それを達成するActivityとTaskを識別する。Processと個別要求との関係は、品質リスクの管理を支援する。
+Instantiationは、要求からInstance固有の成功Criteriaを導出し、そのCriteriaを満たすActivityとTaskを識別する。Processと個別要求との関係は、品質リスクの管理を支援する。
 
 Tailoringは、適用するProcessまたはライフサイクルモデルを変更する。Instantiationは、適用するProcessの一回の適用を詳しく記述する。この区別は、TailoringしたProcessをInstantiationすることを妨げない。
 
@@ -345,11 +345,11 @@ Gateは判断を明示するが、Process Descriptionの一段階になるわけ
 
 **Decision Gate**はProcessの適用を統制する判断機構であり、Process Descriptionの構成要素ではない。
 
-Decision Gateでは、後続のActivityへ進むこと、またはProcessの状態を変更することに伴う不確実性とリスクが受容可能かをDecision Criteriaによって判断する。Purpose、Outcome、適用条件およびリスク評価をCriteriaの根拠にできる。
+Decision Gateでは、後続のActivityに進むこと、またはProcessの状態を変更することに伴う不確実性とリスクが受容可能かをDecision Criteriaによって判断する。Purpose、Outcome、適用条件およびリスク評価をCriteriaの根拠にできる。
 
 Gateの頻度、範囲および形式性は、適用状況に合わせて調整できる。Gateの頻度が高い場合は、範囲を狭め、形式性を下げることができる。
 
-Gateでの判断は、明示して記録するのが望ましい。選択肢には、継続、保留、変更、再実行または終了を含めることができる。それまでの結果の品質と、進行に伴うリスクを判断に用いる。
+Gateでの判断は、明示的に記録するのが望ましい。選択肢には、継続、保留、変更、再実行または終了を含めることができる。それまでの結果の品質と、進行に伴うリスクを判断に用いる。
 
 Gateの前には、必要な専門性と関係するInputを用いてReviewを実施するのが望ましい。Gateの通過は、Decision Criteriaを満たす証拠に基づくのが望ましい。適用状況の変化に応じて各GateでCriteriaを更新し、再評価するのが望ましい。
 
@@ -363,13 +363,13 @@ Reviewは、作業とその結果が合意したCriteriaに照らしてどのよ
 
 **Audit**は、Process、Outputおよび要求へのConformanceを示す証拠を詳細に調べる。必須属性と適用要求を満たしているか確認する。
 
-ReviewとAuditは適用計画へ反映し、対象と方法に合わせてTailoringするのが望ましい。開始条件と完了条件を明確にし、予定だけでなくリスクまたは事象によって開始することは優れた実務である。
+ReviewとAuditは適用計画に反映し、対象と方法に合わせてTailoringするのが望ましい。開始条件と完了条件を明確にし、予定だけでなくリスクまたは事象によって開始することは優れた実務である。
 
-準備、実施および受入れの方法と条件を明確にし、必要な専門性と独立した観点を含めることは優れた実務である。問題を検出したときは、期限と完了条件をもつ明確な処置を設定し、追跡することも優れた実務である。
+準備、実施および受入れの方法と条件を明確にし、必要な専門性と独立した観点を確保することは、優れた実務である。問題を検出したときは、期限と完了条件をもつ明確な処置を設定し、追跡することも優れた実務である。
 
 ### 8.3 Full Conformanceの主張
 
-Conformanceの主張は、単にProcessへ従ったと述べるものではない。選択した基準は、その主張が実証する条件を識別する。
+Conformanceの主張は、単にProcessに従ったと述べるものではない。選択した基準は、その主張が実証する条件を識別する。
 
 ProcessへのFull Conformanceは、Outcome Conformance、Task Conformanceまたはその両方として主張する必要がある。Conformanceの主張は、選択した基準を識別する必要がある。両方の基準を主張する場合は、両方の条件を満たす必要がある。
 
@@ -390,13 +390,13 @@ Conformanceの主張に必要な範囲を超えてOutcomeを達成し、Activity
 
 ### 8.5 CapabilityおよびProcess Assessment
 
-CapabilityとConformanceは、異なる評価軸である。指定されたActivityとTaskの実行には、Outcomeの達成だけよりも高いCapability水準が必要になり得る。CapabilityだけではConformanceを確立せず、ConformanceだけではCapabilityを決定しない。
+CapabilityとConformanceは、異なる評価軸である。指定されたActivityとTaskを実行する場合には、Outcomeだけを達成する場合よりも高いCapability水準が必要になり得る。CapabilityだけではConformanceを確立せず、ConformanceだけではCapabilityを決定しない。
 
 Process Outcomeは、Assessmentと改善で使用するProcess Reference Modelになり得る。Process PurposeとOutcomeは実施目標を示すため、単純な適合性評価以外の方法でも有効性を評価できる。
 
 ## 9. Processを有用に保つ
 
-経験は、測定、教訓、比較および変更を通してProcessへ戻る。
+経験は、測定、教訓、比較および変更を通してProcessに戻る。
 
 ### 9.1 管理および適用
 
@@ -404,24 +404,24 @@ Processの管理では、Processをどのように統制し、利用可能にす
 
 Processの有効性と効率の指標を設け、それらを実績評価に用いるのが望ましい。
 
-適用するProcessを識別するのが望ましい。その実施と保守を文書化するのが望ましい。確立された支援方法と技法を使用し、特定のニーズにTailoring手引きを適用するのが望ましい。
+適用するProcessを識別するのが望ましい。その実施と保守を文書化するのが望ましい。確立された支援方法と技法を使用し、特定のニーズに応じてTailoring手引きを適用するのが望ましい。
 
-管理上の手引きの変更は、影響を受ける利用者へ伝えるのが望ましい。改善機会を継続的に識別し、優先順位を付け、実施するのが望ましい。
+管理上の手引きの変更は、影響を受ける利用者に伝えるのが望ましい。改善機会を継続的に識別し、優先順位を付け、実施するのが望ましい。
 
 ### 9.2 標準Processおよび比較
 
-複数の適用対象で標準Processを一貫して用いることは、反復可能で予測可能な実績を支援する。実証された実務と教訓を後続の適用へ利用し、新しい適用の開始を助け、継続的改善を進めることもできる。
+複数の適用対象で標準Processを一貫して用いることは、反復可能で予測可能な実績を支援する。実証された実務と教訓を後続の適用に利用し、新しい適用の開始を助け、継続的改善を進めることもできる。
 
-Processのベンチマーキングは、実績を宣言したCriteria、適用される規格または他の比較対象と比較し、改善機会を見つける。比較では、実績、有効性、Conformance、便益およびコストを扱うのが望ましい。
+Processのベンチマーキングは、実績を、宣言したCriteria、適用される規格または他の比較対象に照らして評価し、改善機会を見つける。比較では、実績、有効性、Conformance、便益およびコストを扱うのが望ましい。
 
 ### 9.3 測定、Assessmentおよび学習
 
-測定はパターンを示し、教訓はそのパターンに文脈を与え、改善は両者を処置へ結び付ける。
+測定はパターンを示し、教訓はそのパターンに文脈を与え、改善は両者を処置に結び付ける。
 
 Processの強みと弱みを評価し、ReviewとAuditを確立するのが望ましい。
 
 Processの実績と有効性を把握するための測定を設けるのが望ましい。それらの測定を分析し、有効性を判断するのが望ましい。
 
-教訓を収集して処置へ結び付け、Process変更の候補を分析する仕組みを設けるのが望ましい。
+教訓を収集して処置に結び付け、Process変更の候補を分析する仕組みを設けるのが望ましい。
 
 教訓は実行期間を通して収集し、計画したマイルストーンでも収集するのが望ましい。Processと実務を改善するため、教訓と測定を定期的にReviewするのが望ましい。

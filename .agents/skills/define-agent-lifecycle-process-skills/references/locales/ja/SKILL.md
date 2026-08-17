@@ -1,6 +1,6 @@
 ---
 name: define-agent-lifecycle-process-skills
-description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適合する評価可能なSkill Descriptionを設計・検証する。新しいSkillの構想、既存Skillの再定義、Purpose・Outcome・Activity・Taskの設計、記述適合性レビュー、代表的文脈での試行、トレーサビリティまたは採用判断の証拠を求められたときに使用する。採用、変更統制または廃止だけを扱う場合は管理Processを使用する。ALPS準拠。
+description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適合する評価可能なSkill Descriptionを設計・検証する。新しいSkillの構想、既存Skillの再定義、Purpose・Outcome・Activity・Taskの設計、記述適合性レビュー、代表的文脈での試行、トレーサビリティまたは採用判断の証拠を求められたときに使用する。採用、変更の統制または廃止だけを扱う場合は管理Processを使用する。ALPS準拠。
 ---
 
 > 本書は日本語ローカライズである。基準となる英語版は[SKILL.md](../../../SKILL.md)であり、内容が矛盾する場合は英語版を優先する。
@@ -24,30 +24,30 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 
 ## Activities & Tasks
 
-以下の見出し、Activity、Taskおよび番号は、内容を読みやすく示すためのものであり、手順または実行順序を定めない。Entry Criteriaは発動前の判定条件、Exit Criteriaは完了宣言前の判定条件であり、ControlsおよびConstraintsは記載位置にかかわらず適用される。Iteration、Concurrencyおよび必要な再設計を、適用状況に応じて用いる。
+以下の見出し、Activity、Taskおよび番号は、内容を読みやすく示すためのものであり、手順または実行順序を定めない。Entry Criteriaは発動前の判定条件、Exit Criteriaは完了宣言前の判定条件であり、ControlsおよびConstraintsは記載位置にかかわらず適用される。IterationおよびConcurrencyを、適用状況に応じて用いる。必要に応じて再設計する。
 
 ### Skillニーズ識別
 
-このActivityは、Skillとして扱う候補を探索し、定義対象とするニーズを選定する。主にOutcomes a)およびb)へ寄与する。
+このActivityは、Skillとして扱う候補を探索し、定義対象とするニーズを選定する。主にOutcomes a)およびb)に寄与する。
 
 1. 通常、反復的に生じるTask、収集された教訓および失敗事例から、Skill化の機会を収集する。
 2. 想定される利用者およびステークホルダーの期待を識別する必要がある。
-3. 既存のSkill資産を調査し、重複、隣接または隙間を識別するのが望ましい。
+3. 既存のSkill資産を調査し、重複、隣接領域または未充足領域を識別するのが望ましい。
 4. 候補ごとに、期待される便益、リスクおよび費用を評価するのが望ましい。
 5. 選定および見送りの根拠を記録するのが望ましい。
 6. 選定にあたって、利用頻度または影響度による優先順位付けを行ってよい。
 
 ### Skill設計
 
-このActivityは、選定されたニーズを満たすSkill Descriptionの構造および内容を定める。主にOutcomes b)、c)およびd)へ寄与する。
+このActivityは、選定されたニーズを満たすSkill Descriptionの構造および内容を定める。主にOutcomes b)、c)およびd)に寄与する。
 
 1. Skillの境界を、主要なOutputおよびOutcomeに基づいて定める必要がある。
 2. 他のSkillへの依存を、実行可能な限り縮小する必要がある。
 3. 二層構造（発見層および実行層）を採るのが望ましい。
-4. 詳細に扱うことが有用な重要Activityは、別のSkillとして分離してよい。
+4. 詳細に扱うことが有用な重要なActivityは、別のSkillとして分離してよい。
 5. Name、PurposeおよびOutcomeを、適用される記述規則に従って記述する必要がある。
 6. 各Taskは、一つ以上のOutcomeの達成を支援する個別の行為を表すことを主たる機能とし、その行為の対象と動作を判別できるように記述する必要がある。
-7. 各記述を、その主たる機能に対応するSkill要素へ分類する必要がある。
+7. 各記述を、その主たる機能に対応するSkill要素として分類する必要がある。
 8. 各Taskに、要求事項、推奨事項、許容される行為または通常実施される行為の規範属性を付与する必要がある。
 9. 適用方法に関する指針は、Common Approachおよび実務上のヒントとして分離して記述するのが望ましい。
 10. Activityの集合が全Outcomeを網羅し、Purposeを満たすことを確認する必要がある。
@@ -58,7 +58,7 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 
 ### Skill検証
 
-このActivityは、Skill Descriptionの記述適合性と、意図したOutcomeの達成可能性を確認する。主にOutcomes c)、d)、e)およびf)へ寄与する。
+このActivityは、Skill Descriptionの記述適合性と、意図したOutcomeの達成可能性を確認する。主にOutcomes c)、d)、e)およびf)に寄与する。
 
 1. 合意された基準を用いて、Skill Descriptionをレビューする必要がある。
 2. 各Taskが、一つ以上のOutcomeの達成を支援する個別の行為を表すことを主たる機能とし、その行為の対象と動作を判別できることを確認する必要がある。
@@ -71,19 +71,19 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 9. Skill Discovery Descriptionを含む発見層の情報だけで適用可否を判別できるかを評価するのが望ましい。
 10. 想定利用文脈の境界事例を評価に含めてよい。
 11. 検出された欠陥を記録し、期限と完了条件を伴う対応を設定するのが望ましい。
-12. 欠陥処置の完了は、採用の判断（Decision Gate）に先立って確認するのが望ましい。
+12. 欠陥処置が完了したことを、採用の判断（Decision Gate）に先立って確認するのが望ましい。
 13. Skill Descriptionが他のSkillまたはProcessとの授受を示す場合、Outputが想定される受領側のInputとして利用可能であるかを評価するのが望ましい。
-14. Skill Packageを検証対象に含める場合、基準となるSkill Descriptionの存在、必須参照先の解決可能性、付随資源の役割および利用条件、ならびにSkill Descriptionと付随資源との整合性を評価する必要がある。
+14. Skill Packageを検証対象に含める場合、基準となるSkill Descriptionの存在、必須の参照先を対象環境から特定して取得できること、付随資源の役割および利用条件、ならびにSkill Descriptionと付随資源との整合性を評価する必要がある。
 
 ## Inputs
 
-次は代表的なInputであり、唯一の実行方法を規定しない。
+次に示すのは代表的なInputであり、唯一の実行方法を規定するものではない。
 
 ステークホルダーの期待、教訓、実行実績に関する情報、適用されるControlおよびConstraint、既存のSkill資産に関する情報、検証基準ならびに代表的な適用文脈。
 
 ## Outputs
 
-次は代表的なOutputであり、唯一の実行方法を規定しない。
+次に示すのは代表的なOutputであり、唯一の実行方法を規定するものではない。
 
 選定されたSkillニーズおよび選定根拠、検証済みのSkill Description、要素間対応の記録、検証結果ならびに欠陥処置の記録。
 
@@ -98,20 +98,20 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 
 - 選択したConformance基準に対する達成状況が、観察可能な証拠とともに判定されている。
 - 未解決の欠陥、制限、前提および境界事例が記録されている。
-- 検証済みSkill Description、トレーサビリティおよび検証結果を、採用判断または管理へ引き渡せる。
+- 検証済みSkill Description、トレーサビリティおよび検証結果を、採用判断または管理側に引き渡せる。
 - 完了は採用または公開を意味しない。採用可否を判断できる状態を意味する。
 
 ## Controls
 
-- Process FrameworkとALPSを適用する。両者が矛盾する場合はProcess Frameworkを優先する必要がある。
-- 規範語とその意味は、Process Frameworkが定めるものによる。本Skillはこれらを再定義しない。
+- Process FrameworkとALPSを適用する必要がある。両者が矛盾する場合はProcess Frameworkを優先する必要がある。
+- 規範語とその意味は、Process Frameworkの定めによる。本Skillはこれらを再定義しない。
 - Process FrameworkまたはALPSの要求解釈、規範属性の確認、Conformance判定または本Skillの変更には、[process-framework.md](process-framework.md)および[ALPS-SPEC.md](ALPS-SPEC.md)の該当箇条を参照する必要がある。
 - Nameを、他のSkillと区別できる短い名詞句にする必要がある。NameをPurposeの要約にしてはならない。
-- Purposeは、まとまりをもつ一つまたは複数の上位目的を示す必要がある。
+- Purposeは、相互に関連する一つまたは複数の上位目的を示す必要がある。
 - Purposeは、可能な限り一文で簡潔に記述するのが望ましい。
-- Outcomeを、Outputの作成ではなく、肯定的、観察可能かつ評価可能な一結果の成立状態として記述する必要がある。
+- Outcomeは、Outputの作成ではなく、一つの肯定的で観察可能かつ評価可能な結果状態として記述する必要がある。
 - Outcomeの集合は、Purposeの達成に必要な結果を過不足なく含む必要がある。
-- Activityおよび分離されたSkillの集合で全Outcomeを網羅する必要がある。OutcomeとActivityの一対一対応を仮定しなくてよい。
+- Activity、および必要に応じて独立したSkillとして分離された部分は、全体としてすべてのOutcomeを網羅する必要がある。OutcomeとActivityの一対一対応を仮定しなくてよい。
 - 一つの文では一つの意味だけを扱うのが望ましい。
 - 参考情報によって主要要素の意味または規範上の強さを変更してはならない。
 - 適用法令、規制要求、方針、任意規格および合意を、宣言された適用範囲で適用する必要がある。
@@ -122,7 +122,7 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 - 一般Skillは、特定の実行主体、Taskの割当て、方法、ツール、測定指標または実行順序を規範として固定してはならない。
 - Agent、モデル、ツールおよび実行環境をInputとして扱ってはならない。これらはEnablerとして扱う必要がある。
 - Decision GateをSkill Descriptionの構成要素として扱ってはならない。採用、保留、変更、再実行または終了を制御する別個の意思決定機構として扱う必要がある。
-- 必須参照先は解決可能である必要がある。Skill Descriptionと付随資源のあいだに不要な重複または矛盾を生じさせてはならない。
+- 必須の参照先は、対象環境から特定し、取得できる必要がある。Skill Descriptionと付随資源のあいだに不要な重複または矛盾を生じさせてはならない。
 
 ## Enablers
 
@@ -138,7 +138,7 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 - OutcomeへのFull Conformanceでは、Outcomes節に列挙したすべてのOutcomeの達成を示す必要がある。ActivityおよびTaskは指針として扱う。
 - TaskへのFull Conformanceでは、ActivityおよびTaskにおいて「〜する必要がある」または「〜してはならない」で示されたすべての要求事項の充足を示す必要がある。Outcomeは指針として扱う。
 - 選択したFull Conformance基準を満たさないSkillまたはProcessには、Tailored Conformanceを主張してよい。その主張では、ALPS管理ProcessのSkill Tailoringに従ってTailoringしたSkillまたはProcessと、その適用範囲とを宣言する必要がある。また、その範囲に残るOutcomeならびにActivityおよびTaskに含まれる要求事項の充足を示す必要がある。
-- 個別Activityだけに、独立したProcess Outcome Conformanceを主張してはならない。
+- 個別のActivityについてのみ、独立したProcess Outcome Conformanceを主張してはならない。
 
 ## Interfaces & Traceability
 
@@ -166,9 +166,9 @@ Outputが他のSkillのInputになる場合、名称、意味および適用範�
 
 この節は参考情報であり、規範上の強さを持たない。
 
-- ニーズ、失敗事例および既存資産の隙間を、一つの候補台帳で比較すると選定根拠を残しやすい。
-- OutcomeからActivityおよびTaskへ逆向きに分解し、その後にTaskからOutcomeへ追跡すると、過不足を見つけやすい。
-- 発見層だけを第三者へ提示する選択テストと、実行層を用いる代表タスクの試行とを分けると、二層それぞれを評価しやすい。
+- ニーズ、失敗事例および既存資産の未充足領域を、一つの候補台帳で比較すると選定根拠を残しやすい。
+- OutcomeからActivityおよびTaskに逆向きに分解し、その後にTaskからOutcomeに追跡すると、過不足を見つけやすい。
+- 発見層だけを第三者に提示する選択テストと、実行層を用いる代表タスクの試行とを分けると、二層それぞれを評価しやすい。
 - 境界事例、曖昧なInput、欠落したEnablerおよび相反するControlを試行に含めると、発動条件と制限を精緻化しやすい。
 - 実行のたびに挙動が変わり得る場合、単一の実行ではなく反復した試行からOutcomeの達成可能性を判断し、観察された変動と証拠の限界を記録すると、採用判断の根拠を確かめやすい。
 - 一意の期待結果を定められない場合、許容条件、禁止条件または評価方法を定めると、検証に観察可能な根拠を与えやすい。

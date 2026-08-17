@@ -1,6 +1,6 @@
 ---
 name: manage-agent-lifecycle-process-skills
-description: Agent Skill、Skill Package、Skill ModelまたはSkill Viewについて、採用、発見可能性、変更、廃止、Tailoring、評価および改善を統制する。Skill資産の登録・更新・無効化、Tailoring判断、実績評価、改善候補の優先順位付け、変更影響、周知または再検証を管理するときに使用する。新しいSkill Descriptionの定義だけ、または選択済みSkillの実行だけが目的の場合は、それぞれ定義Processまたは適用Processを使用する。ALPS準拠。
+description: Agent Skill、Skill Package、Skill ModelまたはSkill Viewについて、採用、発見可能性、変更、廃止、Tailoring、評価および改善を統制する。Skill資産の登録・更新・無効化、Tailoringの判断、実績の評価、改善候補の優先順位付け、変更の影響、周知または再検証を管理するときに使用する。新しいSkill Descriptionの定義だけ、または選択済みSkillの実行だけが目的の場合は、それぞれ定義Processまたは適用Processを使用する。ALPS準拠。
 ---
 
 > 本書は日本語ローカライズである。基準となる英語版は[SKILL.md](../../../SKILL.md)であり、内容が矛盾する場合は英語版を優先する。
@@ -18,7 +18,7 @@ description: Agent Skill、Skill Package、Skill ModelまたはSkill Viewにつ�
 - a) Skillの管理、展開およびTailoringに用いる方針および指針が確立されている。
 - b) 採用されたSkillが、管理された状態で発見可能である。
 - c) Skillの変更および廃止が、関係する利用者への影響を含めて統制されている。
-- d) Tailoringの判断および根拠が、適用されるControlおよびConstraintへ追跡可能である。
+- d) Tailoringの判断および根拠と、適用されるControlおよびConstraintとの対応を追跡できる。
 - e) Skillの実績および有効性が、定められた基準に照らして評価されている。
 - f) 改善機会が、収集された教訓および評価結果に基づいて優先順位付けされている。
 - g) 決定された改善が実現されている。
@@ -29,38 +29,38 @@ description: Agent Skill、Skill Package、Skill ModelまたはSkill Viewにつ�
 
 ### Skill資産管理
 
-このActivityは、Skill資産の採用、発見可能性、変更周知、構成および廃止を管理する。主にa)、b)、c)およびg)のOutcomeへ寄与する。
+このActivityは、Skill資産の採用、発見可能性、変更の周知、構成および廃止を管理する。主にa)、b)、c)およびg)のOutcomeに寄与する。
 
 1. Skillを管理し展開する仕組みとTailoring指針を確立するのが望ましい。
 2. FrameworkレベルのControlおよびEnablerを、適用範囲、例外およびTailoringの可否とともに宣言する必要がある。
 3. Skillの採用に先立ち、定義ProcessのSkill検証による証拠を確認するのが望ましい。
-4. 管理指針またはSkillに変更があったなら、その内容を関係する利用者へ周知するのが望ましい。
+4. 管理指針またはSkillに変更があったなら、その内容を関係する利用者に周知するのが望ましい。
 5. ニーズがなくなったSkillまたは有害となったSkillを識別し、廃止する必要がある。
 6. 廃止したSkillの記述を、参照のために保存してよい。
-7. Skill Model内の重複および隙間を、継続的に識別するのが望ましい。
+7. Skill Model内の重複および未充足領域を、継続的に識別するのが望ましい。
 8. 標準として定めたSkillを複数の適用対象で一貫して用いるのが望ましい。
 9. Skill Packageの構成要素を変更した場合、影響を受けるSkill Descriptionおよび付随資源を識別し、必要な再検証を行うのが望ましい。
 
 ### Skill Tailoring
 
-このActivityは、SkillおよびSkill Modelを、特定の適用状況のニーズ、条件およびリスクに適合させる。主にa)およびd)のOutcomeへ寄与する。
+このActivityは、SkillおよびSkill Modelを、特定の適用状況のニーズ、条件およびリスクに適合させる。主にa)およびd)のOutcomeに寄与する。
 
 1. 適用に関係するリスク、要求事項、複雑性、利用可能な能力および資源、ならびに関連規格を識別する必要がある。
 2. 適用条件、利用可能な専門知識および経験、ステークホルダーの期待または要求事項、ならびにリスク許容度を考慮し、候補となるSkillまたはライフサイクルモデルを評価する必要がある。
-3. Tailoringの意思決定は、事実と証拠とに基づくのが望ましい。
+3. Tailoringの意思決定は、事実と証拠に基づくのが望ましい。
 4. Outcome、Activity、Task、代表的なInputおよび代表的なOutputについて、削除、変更または追加を行ってよい。
 5. Tailoringは、適用されるControlおよびConstraintに従う必要がある。
 6. 影響を受ける当事者からInputを得る必要がある。
-7. Activityを許容可能なリスク水準で実行できるだけの厳密さを備えるよう、Skillの適用の厳密さをリスクに基づいて設定するのが望ましい。
+7. Activityを許容可能なリスク水準で実行できるよう、Skillの適用に必要な厳密さをリスクに基づいて設定するのが望ましい。
 8. Tailoringの範囲を明確にするのが望ましい。前提および基準を特定し、意思決定の根拠を記録するのが望ましい。
-9. 通常、Tailoringをリスクと適用状況とに応じて、適用期間全体を通じて動的に実施する。
+9. 通常、リスクおよび適用状況の変化に応じ、適用期間全体を通じてTailoringを動的に継続する。
 10. Tailoringの運用を適用期間中に繰り返し見直し、状況に応じて改めるのが望ましい。
 11. Tailoring済みSkillの実績を継続的に評価する手段を確立するのが望ましい。
 12. InputおよびOutputならびにそれらの授受を記述する詳細度を、Skill間の依存関係、並行的または反復的な適用、および品質リスクに応じて調整するのが望ましい。
 
 ### Skill評価・改善
 
-このActivityは、Skillの実績および有効性を評価し、改善へ結び付ける。主にe)、f)およびg)のOutcomeへ寄与する。
+このActivityは、Skillの実績および有効性を評価し、改善に結び付ける。主にe)、f)およびg)のOutcomeに寄与する。
 
 1. Skillの実績と有効性について洞察を得るための測定指標を設けるのが望ましい。
 2. 教訓を、Skillの実行期間全体を通じて特定し、収集するのが望ましい。
@@ -69,19 +69,19 @@ description: Agent Skill、Skill Package、Skill ModelまたはSkill Viewにつ�
 5. Skillの強みと弱みを評価し、レビューおよび監査を設けるのが望ましい。
 6. Skillの実績を、定められた基準、適用規格または比較対象と照合し、改善機会を特定してよい。比較にあたっては、実績、有効性、適合性、便益および費用を分析するのが望ましい。
 7. 改善機会を継続的に特定し、優先順位を付けて実現するのが望ましい。
-8. 教訓を収集して対応へと結び付ける仕組みと、改善に向けた変更候補を分析する仕組みとを設けるのが望ましい。
+8. 教訓を収集して対応に結び付ける仕組みと、改善に向けた変更候補を分析する仕組みとを設けるのが望ましい。
 9. 変更されたSkillは、定義ProcessのSkill検証による確認を経るのが望ましい。
 10. Skill間の授受に起因する不整合および再作業を、改善機会の識別に用いてよい。
 
 ## Inputs
 
-次は代表的なInputであり、唯一の実行方法を規定しない。
+次に示すのは代表的なInputであり、唯一の実行方法を規定するものではない。
 
 検証済みのSkill Description、変更要求、適用状況、Tailoring指針、影響当事者からのInput、実行および意思決定の記録、教訓ならびに測定結果。
 
 ## Outputs
 
-次は代表的なOutputであり、唯一の実行方法を規定しない。
+次に示すのは代表的なOutputであり、唯一の実行方法を規定するものではない。
 
 管理されたSkill資産、Tailoring済みSkill、Tailoringの決定および根拠、評価結果、優先順位付けされた改善機会、Skillへの変更要求ならびに廃止の決定。
 
@@ -102,11 +102,11 @@ description: Agent Skill、Skill Package、Skill ModelまたはSkill Viewにつ�
 
 ## Controls
 
-- Process FrameworkとALPSを適用する。両者が矛盾する場合はProcess Frameworkを優先する必要がある。
-- 規範語とその意味は、Process Frameworkが定めるものによる。本Skillはこれらを再定義しない。
-- 適用法令、方針、契約、情報管理要求、安全要求および利用者が指定した変更範囲を適用する必要がある。
+- Process FrameworkとALPSを適用する必要がある。両者が矛盾する場合はProcess Frameworkを優先する必要がある。
+- 規範語とその意味は、Process Frameworkの定めによる。本Skillはこれらを再定義しない。
+- 適用される法令、方針、契約、情報管理要求、安全要求、および利用者が指定した変更範囲に従う必要がある。
 - FrameworkレベルのControlおよびEnablerには、適用範囲、例外およびTailoringの可否を明示する必要がある。
-- 実行環境で有効なSkill管理、変更、保持、参照、復旧および削除に関するControlおよびConstraintに従う必要がある。これらの要求はALPS自体ではなく実行環境に由来し、適用される場合は宣言した実行範囲および評価の一部となる。
+- 実行環境において有効なSkill管理、変更、保持、参照、復旧および削除に関するControlおよびConstraintに従う必要がある。これらの要求はALPS自体ではなく実行環境に由来し、適用される場合は宣言した実行範囲および評価の一部となる。
 
 ## Constraints
 
@@ -128,8 +128,8 @@ description: Agent Skill、Skill Package、Skill ModelまたはSkill Viewにつ�
 - OutcomeへのFull Conformanceでは、Outcomes節に列挙したすべてのOutcomeの達成を示す必要がある。
 - TaskへのFull Conformanceでは、ActivityおよびTaskにおいて「〜する必要がある」または「〜してはならない」で示されたすべての要求事項の充足を示す必要がある。
 - 選択したFull Conformance基準を満たさない場合にTailored Conformanceを主張するには、TailoringしたProcessとその適用範囲を宣言し、その適用範囲に残されたOutcomeおよびActivity・Taskに含まれる要求事項の充足を示す必要がある。
-- 個別Activityだけに、独立したProcess Outcome Conformanceを主張してはならない。
-- CapabilityとConformanceを別の評価次元として扱う必要がある。
+- 個別のActivityについてのみ、独立したProcess Outcome Conformanceを主張してはならない。
+- CapabilityはConformanceとは分けて評価する必要がある。
 
 ## Interfaces & Traceability
 
@@ -146,14 +146,14 @@ description: Agent Skill、Skill Package、Skill ModelまたはSkill Viewにつ�
 
 この節は参考情報であり、特定の実行方法を要求しない。
 
-- [management-records.md](management-records.md)は、資産管理、Tailoring、評価・改善、Decision Gate、変更、廃止および授受のための、人間可読な任意ブロックを提供する。必要なブロックを汎用Process Instance Recordへ含めるか、参照される管理Outputとして別に保持できる。
+- [management-records.md](management-records.md)は、資産管理、Tailoring、評価・改善、Decision Gate、変更、廃止および授受のための、人間可読な任意ブロックを提供する。必要なブロックを汎用Process Instance Recordに含めるか、参照される管理Outputとして別に保持できる。
 
 ## Common Approach
 
 この節は参考情報であり、規範上の強さを持たない。
 
-- 管理契機を資産管理、Tailoring、評価・改善の一つ以上へ分類すると、必要な証拠と受領先を整理しやすい。
-- 対象、基準版、適用範囲、Control、Constraint、関係者および証拠を一つの管理記録で対応付けると、変更影響を追跡しやすい。
+- 管理契機を資産管理、Tailoring、評価・改善のいずれか一つ以上に分類すると、必要な証拠と受領先を整理しやすい。
+- 対象、基準版、適用範囲、Control、Constraint、関係者および証拠を一つの管理記録で対応付けると、変更の影響を追跡しやすい。
 - 不可逆的または高影響の管理判断では、適用状況とリスクに応じたDecision Gateを用いるとよい。
 - 廃止では、新規発動、依存先・利用者への影響、必要な参照記録の保持および復旧条件を、適用状況に応じて確認するとよい。
 - 適用Processから受け取る監督の記録（承認および介入、検出されなかった失敗、不十分だった説明またはログ、automation biasの兆候、監督者の負荷、Decision Gateの過不足）は、Skill評価・改善へのInputとして利用できる。

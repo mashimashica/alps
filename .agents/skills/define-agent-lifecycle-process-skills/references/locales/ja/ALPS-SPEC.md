@@ -6,7 +6,7 @@
 
 本規格 ALPS（Agent Lifecycle Process Skills）は、Process Framework（以下「PF」という）をAgent Skillsに適用する。Agent Skillの記述粒度、規範上の強さ、ライフサイクル管理および適合基準には、作成者間のばらつきがある。共通のSkill Description構造は、結果の一貫性を高め、Skillの導入、Tailoring、改善およびAssessmentを支援する。Name、PurposeおよびOutcomeは、Skillの実行とAssessmentの双方で用いる共通の参照点となる（PF 1.2）。このため、本規格は、Skillの記述、ライフサイクル管理および適合に共通する規則を定める。
 
-本規格は、SkillをProcess Descriptionとして扱い、PFの設計原則をSkillの全ライフサイクルへ適用する。
+本規格は、SkillをProcess Descriptionとして扱い、PFの設計原則をSkillの全ライフサイクルに適用する。
 
 ---
 
@@ -47,7 +47,7 @@ d) Skillに適用されるControl、ConstraintおよびEnablerの宣言と扱い
 
 e) SkillのTailoringおよびInstantiationの規則（箇条11）、ならびに本規格およびSkillへのConformanceの主張基準とCapabilityの扱い（箇条12）。
 
-f) Skill Descriptionと、その理解、実行またはOutputの作成を支援する付随資源とからなるSkill Packageの論理的な構成および整合性（5.7）。
+f) Skill Description、およびその理解・実行・Output作成を支援する付随資源から構成されるSkill Packageの論理的な構成および整合性（5.7）。
 
 ### 1.2 本規格が規定しない事項
 
@@ -63,7 +63,7 @@ d) Skillが記述する個々の業務領域の内容。
 
 ### 1.3 想定利用者
 
-本規格は、Skillを起草する者、Skill資産を管理する者、Skillを実行するAgentの提供者および運用者、ならびにSkillまたはその実行のConformanceを評価する者による利用を想定する。
+本規格は、Skillを起草する者、Skill資産を管理する者、Skillを実行するAgentの提供者および運用者、ならびにSkillまたはその実行のConformanceを評価する者が利用することを想定する。
 
 ## 2. 引用規格および優先関係
 
@@ -71,7 +71,7 @@ d) Skillが記述する個々の業務領域の内容。
 
 - **Process Framework**（process-framework.md）。本文中では「PF」と略記し、「PF 4.3」のように箇条番号で参照する。
 
-本規格とPFが矛盾する場合は、PFを優先する。本規格は、PFの要求事項を緩和し、または禁止事項を許容してはならない。PFの構成概念のAgent Skill向けの特殊化は、5.8に示す。
+本規格とPFが矛盾する場合は、PFを優先する。本規格は、PFの要求事項を緩和し、または禁止事項を許容してはならない。PFの構成概念をAgent Skill向けに特殊化した内容は、5.8に示す。
 
 ## 3. 用語および定義
 
@@ -90,10 +90,10 @@ Skillの内容をなすProcess Description。Name、PurposeおよびOutcomeを�
 Skill Descriptionを二部構成（PF 1.3にいう概要と詳細説明）で記述する場合の、それぞれの部分。発見層はSkillの発見および適用可否の判別に用いる概要であり、実行層はSkillの実行に用いる詳細説明である（5.5参照）。
 
 **3.5 Skill Model**
-特定の適用領域のために選択され、または定義されたSkillの集合と、それらのあいだの関係を定義したProcess Model。
+特定の適用領域のために選択され、または定義されたSkillの集合、およびSkill間の関係からなるProcess Model。
 
 **3.6 ALPS Reference Model**
-本規格の箇条7が、ALPS定義Process、ALPS適用ProcessおよびALPS管理Processを、それぞれのPurposeおよびOutcomeによって定義するProcess Reference Model。各Processは三つのActivityによって構成される。Skillライフサイクルの評価および改善の参照枠として利用できる。
+本規格の箇条7において、ALPS定義Process、ALPS適用ProcessおよびALPS管理Processを、それぞれのPurposeおよびOutcomeによって定義したProcess Reference Model。各Processは三つのActivityによって構成される。Skillライフサイクルの評価および改善の参照枠として利用できる。
 
 **3.7 Skill View**
 複数のSkillにまたがるActivityおよびTaskを、特定の関心またはPurposeに基づいて構成したProcess View（8.3参照）。
@@ -113,13 +113,13 @@ Entry Criteriaの成立を判定し、Skill Instanceの実行を開始するこ�
 AgentがSkillを発見し、その適用可否を判別するために用いる、発見層の簡潔な参考情報。Skillが行うことと、そのSkillを使用する状況とを示す。
 
 **3.12 Skill Package**
-一つのSkill Descriptionと、その理解、実行またはOutputの作成を支援する任意の付随資源とを、一体として管理する単位。
+一つのSkill Description、およびその理解・実行・Output作成を支援する任意の付随資源を、一体として管理する単位。
 
 ## 4. 規範語および表記法
 
 ### 4.1 規範語
 
-本規格およびSkill Descriptionで用いる規範語とその意味は、PFが定めるものによる。本規格はこれらを再定義しない。規範上の意味を混同させないため（PF 1.4）、本規格およびSkill Descriptionでは、これらの語を用いて記述の規範属性を判別可能にする必要がある。
+本規格およびSkill Descriptionで用いる規範語とその意味は、PFの定めによる。本規格はこれらを再定義しない。規範上の意味を混同させないため（PF 1.4）、本規格およびSkill Descriptionでは、これらの語を用いて記述の規範属性を判別可能にする必要がある。
 
 次の表は、PFの規範語を参考情報として再掲するものであり、その意味を変更しない。
 
@@ -152,11 +152,11 @@ Skill、AgentおよびツールはInputではなく、Enablerとして扱う必�
 
 ### 5.3 実行主体の非規定
 
-Skill Descriptionは、実行主体の構造またはTaskの割当てを規定してはならない。実行に必要な能力または条件は、Taskを割り当てずにEnablerまたはConstraintとして明示するのが望ましい（PF 3.2）。
+Skill Descriptionは、実行主体の構造またはTaskの割当てを規定してはならない。実行主体にTaskを割り当てるのではなく、実行に必要な能力または条件をEnablerまたはConstraintとして明示するのが望ましい（PF 3.2）。
 
 ### 5.4 Skillの境界および粒度
 
-Skillの境界は、Activityの中間Outputによってではなく、主要なOutputおよびOutcomeに基づいて定めることを通常の実務とする（PF 3.1）。Skillにおいては、Outcome、ActivityおよびTaskのあいだに強い関係を持たせるとともに、他のSkillへの依存を、実行可能な限り縮小する。
+Skillの境界は、Activityの中間Outputによってではなく、主要なOutputおよびOutcomeに基づいて定めることを通常の実務とする（PF 3.1）。Skillにおいては、Outcome、ActivityおよびTaskを強く関連付けるとともに、他のSkillへの依存を可能な限り減らす。
 
 多数のTaskを含む重要なActivityは、独立したPurposeとOutcomeを持つ別のSkillとして記述してよい（PF 3.1）。
 
@@ -168,21 +168,21 @@ Skill Descriptionは、発見層（概要）と実行層（詳細説明）の二
 
 a) **発見層**には、NameおよびSkill Discovery Descriptionを含めるのが望ましい。Skill Discovery Descriptionは、Skillが行うこと、使用する状況および適用可否の判別に必要な情報を示す必要がある。
 
-b) **実行層**には、PurposeおよびOutcomeの全文、ActivityおよびTask、ならびに6.1に掲げるその他の要素と参考情報を、必要な詳細度で含める。
+b) **実行層**には、PurposeおよびOutcomeの全文、ActivityおよびTask、ならびに6.1に掲げるその他の要素と参考情報を、必要な詳細度で含める必要がある。
 
-c) 複数のSkillにまたがる論点は、個々のSkillの実行層から分離して扱う（PF 1.3）。共通のControlおよびEnablerは、Frameworkレベルの共通要素として宣言できる（9.1参照）。
+c) 複数のSkillにまたがる論点は、個々のSkillの実行層から分離して扱う必要がある（PF 1.3）。共通のControlおよびEnablerは、Frameworkレベルの共通要素として宣言できる（9.1参照）。
 
 注記: 発見層は、候補Skillの識別と適用可否の判別のために、すべてのSkill Descriptionの全文を読み込む必要を減らす。
 
 ### 5.6 Skill Modelとライフサイクルモデル
 
-Skill Modelは、相互に関係するSkillからなるFrameworkであり、ライフサイクルモデルを含むProcess Modelを構成するための基盤になり得る（PF 5.1）。Skill Modelの中からは、Purposeに応じて部分集合を選択し、適用できる。Skillの選択とその実行時期は、適用対象または適用状況に作用する変化に応じて、継続的な見直しを要する（PF 5.2）。
+Skill Modelは、相互に関係するSkillからなるFrameworkであり、ライフサイクルモデルを含むProcess Modelを構成するための基盤になり得る（PF 5.1）。Skill Modelの中からは、Purposeに応じて部分集合を選択し、適用できる。Skillの選択とその実行時期は、適用対象または適用状況の変化に応じて、継続的な見直しを要する（PF 5.2）。
 
 ### 5.7 Skill Packageおよび付随資源
 
 Skill Packageは、Skillの基準となるSkill Descriptionを一つ含む必要がある。
 
-Skill Packageには、Skillの理解、実行またはOutputの作成を支援する参考情報、実行資源および成果物用資源を、必要に応じて含めてよい。付随資源を含める場合、その役割および利用条件をSkill Descriptionから識別できるようにする必要がある。必須の参照先は、解決可能である必要がある。
+Skill Packageには、Skillの理解、実行またはOutputの作成を支援する参考情報、実行資源および成果物用資源を、必要に応じて含めてよい。付随資源を含める場合、その役割および利用条件をSkill Descriptionから識別できるようにする必要がある。必須の参照先は、対象環境から特定し、取得できる必要がある。
 
 Skill Descriptionと付随資源とのあいだに、不要な重複または矛盾を生じさせてはならない。付随資源は、その格納場所ではなく、Skillの実行において果たす機能に基づいて、参考情報、Input、Output、Control、ConstraintまたはEnablerとして扱う必要がある（9.1）。
 
@@ -200,7 +200,7 @@ ALPSは、PFの一般的な構成概念をAgent Skill向けに特殊化する。
 | Process View | Skill View（3.7） |
 | Processを実行または支援する資源 | Agent、モデル、ツールおよび実行環境として具体化し、Enablerとして扱う（5.2、9.3） |
 
-ALPSは、PFの規則をAgent文脈に合わせて具体化し、必要に応じて強めることができる。ただし、PFの概念の意味を変更し、PFの要求事項を弱め、または異なる概念へ置き換えてはならない（箇条2参照）。
+ALPSは、PFの規則をAgent文脈に合わせて具体化し、必要に応じて強めることができる。ただし、PFの概念の意味を変更し、PFの要求事項を弱め、または異なる概念に置き換えてはならない（箇条2参照）。
 
 ## 6. Skill Descriptionの要求事項
 
@@ -214,7 +214,7 @@ Activity、Task、Input、Output、Control、Constraint、Enabler、Entry Criter
 
 a) Name、Purpose、Outcome、ActivityおよびTaskの役割を区別し、それらのあいだに整合性を持たせる必要がある（PF 1.4）。
 
-b) 一つの文では一つの意味だけを扱い、独立した目標、結果または行為を、一つの文のうちに結び合わせないのが望ましい。それぞれの記述は、そのSkill Descriptionの中で単独で参照されても意味が通るよう、必要な文脈を備えるのが望ましい。補足が必要な場合は、主要な記述に意味を重ねるのではなく、参考文または注記として分離することができる。
+b) 一つの文では、一つの意味だけを扱うのが望ましい。独立した目標、結果または行為は、一つの文に結合しないのが望ましい。それぞれの記述は、そのSkill Descriptionの中で単独で参照されても意味が通るよう、必要な文脈を備えるのが望ましい。補足が必要な場合は、主要な記述に意味を重ねるのではなく、参考文または注記として分離することができる。
 
 c) 一般Skillは、特定の方法、技法、ツール、測定指標、管理方法または実行順序を要求してはならない。必要な時間的関係はConstraintとして明示するのが望ましい。
 
@@ -232,25 +232,25 @@ Skill Nameは、Skillの見出しとなる簡潔な名詞句で記述する必�
 
 #### 6.3.2 Purpose
 
-Skill Purposeは、まとまりをもつ一つ以上の上位目的を記述する必要がある。Purposeは、可能な限り一文で簡潔に記述するのが望ましい。Purposeの中でActivityやOutcomeを要約することは、避けるのが望ましい。独立した複数のPurposeを一つの文に併記することも、避けるのが望ましい。追加の説明が必要であれば、参考文または注記に配置することができる。Skill間で範囲が重複して見える場合は、PurposeによってSkillの範囲または境界を特徴付けるのが望ましい（PF 2.1）。
+Skill Purposeは、相互に関連する一つまたは複数の上位目的を記述する必要がある。Purposeは、可能な限り一文で簡潔に記述するのが望ましい。Purposeの中でActivityやOutcomeを要約することは、避けるのが望ましい。独立した複数のPurposeを一つの文に併記することも、避けるのが望ましい。追加の説明が必要であれば、参考文または注記に配置することができる。Skill間で範囲が重複して見える場合は、PurposeによってSkillの範囲または境界を特徴付けるのが望ましい（PF 2.1）。
 
 #### 6.3.3 Outcome
 
-Skill Outcomeは、Skillが達成する、測定可能かつ有形の結果を表す。Outcomeは観察可能かつ評価可能でなければならず、Outputとは明確に区別する必要がある。文書、記録または情報項目の作成そのものをOutcomeとして記述してはならない（PF 2.2）。
+Skill Outcomeは、Skillの実行によって達成される、測定可能かつ具体的な結果状態を表す。Outcomeは観察可能かつ評価可能である必要があり、Outputとは明確に区別する必要がある。文書、記録または情報項目の作成そのものをOutcomeとして記述してはならない（PF 2.2）。
 
-Outcomeは、肯定的かつ観察可能な結果が成立している状態を宣言する文として記述する必要がある。一つのOutcomeには一つの結果だけを記述し、独立した複数の結果を接続詞によって結合することは、避ける必要がある。一般SkillのOutcomeは、該当し得るどの適用範囲でも意味を持つように記述する必要がある。
+Outcomeは、肯定的かつ観察可能な結果が成立している状態を宣言する文として記述する必要がある。一つのOutcomeには一つの結果だけを記述し、独立した複数の結果を接続詞によって結合することは、避ける必要がある。一般SkillのOutcomeは、想定されるすべての適用範囲で意味を保つように記述する必要がある。
 
-Outcomeを全体として達成すればSkill Purposeへ到達でき、かつ各Outcomeがその到達に関係するようにする必要がある。各Outcomeは、単独で読まれても意味が通るのが望ましい。簡潔さよりも、意味の単一性と明瞭性を優先する。Outcomeの集合の大きさは、Purposeへの到達に必要な結果によって定まる。Skillの便益はOutcomeと区別し、有用であれば、Purposeに付随する非規範的な注記として別に説明できる。
+Outcomeの集合を達成すればSkill Purposeを達成でき、かつ各Outcomeがその達成に関係するようにする必要がある。各Outcomeは、単独で読まれても意味が通るのが望ましい。簡潔さよりも、意味の単一性と明瞭性を優先する。Outcomeの数は、Purposeの達成に必要な結果によって定まる。Skillの便益はOutcomeと区別し、有用であれば、Purposeに付随する非規範的な注記として別に説明できる。
 
 #### 6.3.4 Activity
 
 Activityは、Skillを達成または実行するための行為の集合を記述するとともに、関連するTaskを分類する構成概念として機能する。一つのActivityには、相互の関係が強く、他のActivityまたはSkillに属するTaskとの関係が弱いTaskを含めるのが望ましい。
 
-Activityと分離されたSkillは、全体としてすべてのOutcomeを網羅し、Skill Purposeを満たす必要がある。個々のActivityを個々のOutcomeへ対応させる必要はない（PF 2.3）。
+Activity、および必要に応じて独立したSkillとして分離された部分は、全体としてすべてのOutcomeを網羅し、Skill Purposeを満たす必要がある。個々のActivityを個々のOutcomeに対応させる必要はない（PF 2.3）。
 
 #### 6.3.5 Task
 
-Taskは、一つ以上のOutcomeの達成を支援する個別の行為を表すことを主たる機能とし、その行為の対象と動作を判別できるように記述する必要がある。主たる機能が個別の行為ではない記述は、Taskとして扱わず、その機能に対応する要素へ置く必要がある。一つひとつのTaskには規範属性を付与し、その行為が要求事項、推奨事項、許容される行為、または通常実施される行為のいずれであるかを、4.1の規範語によって明確にする必要がある。Activityに属するTaskだけで、そのActivityの境界内にあるすべての行為を列挙する必要はない。6.2 c)およびd)の規則は、ActivityとTaskの双方に適用する。
+Taskは、一つ以上のOutcomeの達成を支援する個別の行為を表すことを主たる機能とし、その行為の対象と動作を判別できるように記述する必要がある。主たる機能が個別の行為ではない記述は、Taskとして扱わず、その機能に対応する要素に置く必要がある。一つひとつのTaskには規範属性を付与し、その行為が要求事項、推奨事項、許容される行為、または通常実施される行為のいずれであるかを、4.1の規範語によって明確にする必要がある。Activityに属するTaskだけで、そのActivityの境界内にあるすべての行為を列挙する必要はない。6.2 c)およびd)の規則は、ActivityとTaskの双方に適用する。
 
 #### 6.3.6 InputおよびOutput
 
@@ -270,7 +270,7 @@ Entry Criteriaの要約を発見層に置く場合、実行層のEntry Criteria�
 
 概要、説明、Common Approach、実務上のヒント、注記および例は、Skillの理解または適用を支援する参考情報として用いる。参考情報は、主要なSkill要素の意味または規範上の強さを変更してはならない（PF 1.4）。
 
-Skill Discovery Descriptionは、発見層に置く参考情報として、Skillが行うことと使用する状況とを簡潔に記述する必要がある。Skill Discovery Descriptionは、Name、Purpose、Outcome、適用範囲、Entry CriteriaおよびConstraintと整合しなければならず、これらの要素を置き換え、またはその規範上の意味を変更してはならない。Skillを使用する状況の判別に必要な情報を、実行層だけに置いてはならない。
+Skill Discovery Descriptionは、発見層に置く参考情報として、Skillが行うことと、そのSkillを使用する状況とを簡潔に記述する必要がある。Skill Discovery Descriptionは、Name、Purpose、Outcome、適用範囲、Entry CriteriaおよびConstraintと整合する必要がある。これらの要素を置き換え、またはその規範上の意味を変更してはならない。Skillを使用する状況の判別に必要な情報を、実行層だけに置いてはならない。
 
 本規格への記述適合を主張するSkillのSkill Discovery Descriptionは、その記述言語による短いALPS準拠表示で終わる必要がある。英語では`ALPS-conformant.`、日本語では`ALPS準拠。`を正確に用いる必要がある。この表示は、対象を当該Skill Description、基準を12.1 a)の記述適合とする標準化された簡略主張であり、Reference Model適合または実行適合を主張するものではない。
 
@@ -294,7 +294,7 @@ e) **廃止Stage** — 不要または不適切となったSkillが利用から�
 
 ### 7.2 Reference Modelの構成と読み方
 
-ALPS Reference Modelは、次の三つのProcessからなる。各Processは、PurposeおよびOutcomeによって定義し、三つのActivityによって構成する（PF 1.1および5.1）。
+ALPS Reference Modelは、次の三つのProcessからなる。各Processは、PurposeおよびOutcomeによって定義され、三つのActivityによって構成される（PF 1.1および5.1）。
 
 | Process | Activity |
 |---|---|
@@ -357,7 +357,7 @@ a) 通常、反復的に生じるTask、収集された教訓および失敗事�
 
 b) 想定される利用者およびステークホルダーの期待を識別する必要がある。
 
-c) 既存のSkill資産を調査し、重複、隣接または隙間を識別するのが望ましい。
+c) 既存のSkill資産を調査し、重複、隣接領域または未充足領域を識別するのが望ましい。
 
 d) 候補ごとに、期待される便益、リスクおよび費用を評価するのが望ましい。
 
@@ -375,13 +375,13 @@ b) 他のSkillへの依存を、実行可能な限り縮小する必要がある
 
 c) 二層構造（発見層および実行層）を採るのが望ましい（5.5）。
 
-d) 詳細に扱うことが有用な重要Activityは、別のSkillとして分離してよい。
+d) 詳細に扱うことが有用な重要なActivityは、別のSkillとして分離してよい。
 
 e) Name、PurposeおよびOutcomeを、6.3.1〜6.3.3に従って記述する必要がある。
 
 f) 各Taskは、一つ以上のOutcomeの達成を支援する個別の行為を表すことを主たる機能とし、その行為の対象と動作を判別できるように記述する必要がある（6.3.5）。
 
-g) 各記述を、その主たる機能に対応するSkill要素へ分類する必要がある（6.2 a)、6.3）。
+g) 各記述を、その主たる機能に対応するSkill要素として分類する必要がある（6.2 a)、6.3）。
 
 h) 各Taskに規範属性を付与する必要がある（6.3.5）。
 
@@ -423,11 +423,11 @@ j) 想定利用文脈の境界事例を評価に含めてよい。
 
 k) 検出された欠陥を記録し、期限と完了条件を伴う対応を設定するのが望ましい（PF 8.2）。
 
-l) 欠陥処置の完了は、採用の判断（Decision Gate）に先立って確認するのが望ましい。
+l) 欠陥処置が完了したことを、採用の判断（Decision Gate）に先立って確認するのが望ましい。
 
 m) Skill Descriptionが他のSkillまたはProcessとの授受を示す場合、Outputが想定される受領側のInputとして利用可能であるかを評価するのが望ましい。
 
-n) Skill Packageを検証対象に含める場合、基準となるSkill Descriptionの存在、必須参照先の解決可能性、付随資源の役割および利用条件、ならびにSkill Descriptionと付随資源との整合性を評価する必要がある（5.7）。
+n) Skill Packageを検証対象に含める場合、基準となるSkill Descriptionの存在、必須の参照先を対象環境から特定して取得できること、付随資源の役割および利用条件、ならびにSkill Descriptionと付随資源との整合性を評価する必要がある（5.7）。
 
 **代表的なInput**: ステークホルダーの期待、教訓、実行実績に関する情報、適用されるControlおよびConstraint、既存のSkill資産に関する情報、検証基準ならびに代表的な適用文脈。
 
@@ -437,7 +437,7 @@ n) Skill Packageを検証対象に含める場合、基準となるSkill Descrip
 
 ### 7.4 ALPS適用Process（ALPS application process）
 
-**Purpose**: 本Processは、適用状況に適合するSkillの単独または複合的な適用によって、意図されたOutcomeを達成する。
+**Purpose**: 本Processは、適用状況に適合するSkillを単独で、または組み合わせて適用することにより、意図されたOutcomeを達成する。
 
 **Outcomes**: 本Processの成功によって、次の状態が成立している。
 
@@ -461,7 +461,7 @@ g) Skill構成の完全性および一貫性が確立されている。
 | Skill実行 | c)、d)、e) |
 | Skill編成 | e)、f)、g) |
 
-注記: 「いずれのSkillも適用しない」という決定も、適用状況に対する正当な判断になり得る。この判断によって本ProcessのOutcomeの一部が適用されない場合、本ProcessへのFull Conformanceを主張してはならない。適用しないOutcomeを宣言し、12.3のTailored Conformanceを用いる必要がある。
+注記: 「いずれのSkillも適用しない」という決定も、適用状況に対する正当な判断になり得る。この判断によって、本ProcessのOutcomeの一部を達成対象としない場合、本ProcessへのFull Conformanceを主張してはならない。達成対象としないOutcomeを宣言し、12.3のTailored Conformanceを用いる必要がある。
 
 **ActivityおよびTask**:
 
@@ -477,7 +477,7 @@ c) 通常、Skill Discovery Descriptionを含む発見層の情報に基づい�
 
 d) 候補間の重複がある場合、Purposeによって範囲を判別するのが望ましい（6.3.2）。
 
-e) 適合する候補がない場合、そのニーズをALPS定義ProcessのSkillニーズ識別へ引き渡してよい。
+e) 適合する候補がない場合、そのニーズをALPS定義ProcessのSkillニーズ識別に引き渡してよい。
 
 f) 適用の決定に伴う不確実性とリスクが許容可能であるかを判断する必要がある（箇条10）。
 
@@ -487,13 +487,13 @@ g) 決定の根拠を記録するのが望ましい。
 
 このActivityは、選択されたSkillのInstanceを実行し、宣言されたOutcomeを達成する。
 
-a) Entry Criteriaの成立を判定してからSkillを発動する必要がある。成立しない場合は、発動を見合わせるか、不足の解消を先行させる必要がある。
+a) Entry Criteriaの成立を判定してからSkillを発動する必要がある。成立しない場合は、発動を見合わせるか、不足している条件を満たすことを先行させる必要がある。
 
 b) 必要なInputおよびEnablerの利用可能性を確認するのが望ましい。
 
 c) 適用されるControl、ConstraintおよびTailoringの決定を識別する必要がある。
 
-d) Skill DescriptionのActivityおよびTaskを、付与された規範属性に従って実行する必要がある。要求事項のTaskは、Tailoringによる正当な変更（箇条11）がない限り、省略してはならない。
+d) Skill DescriptionのActivityおよびTaskを、付与された規範属性に従って実行する必要がある。要求事項として記述されたTaskは、Tailoringによる正当な変更（箇条11）がない限り、省略してはならない。
 
 e) Constraintが明示されていない限り、特定の実行順序を仮定しなくてよい（6.2 c)）。
 
@@ -505,15 +505,15 @@ h) Exit Criteriaに照らして完了を判定する必要がある。
 
 i) Outcomeの達成状況を、観察可能な証拠に基づいて判定するのが望ましい。
 
-j) Outputを受領側へ、授受の定義（8.2）に従って引き渡すのが望ましい。引渡しに適用される品質条件が定められている場合、その充足を確認するのが望ましい。
+j) Outputは、授受の定義（8.2）に従って受領側に引き渡すのが望ましい。引渡しに適用される品質条件が定められている場合、その充足を確認するのが望ましい。
 
 k) 実行上の重要な意思決定、その根拠および前提を記録し、必要な変更管理のもとに置くのが望ましい（PF 8.1）。
 
-l) 実行から得られた教訓を、ALPS管理ProcessのSkill評価・改善へ引き渡してよい。
+l) 実行から得られた教訓を、ALPS管理ProcessのSkill評価・改善に引き渡してよい。
 
 #### 7.4.3 Skill編成（skill orchestration）
 
-このActivityは、複数のSkillを組み合わせ、そのインターフェース、授受および全体整合を管理する。
+このActivityは、複数のSkillを組み合わせ、そのインターフェース、授受および構成全体の整合性を管理する。
 
 a) 目標とするOutcomeの集合を識別する必要がある。
 
@@ -553,7 +553,7 @@ b) 採用されたSkillが、管理された状態で発見可能である。
 
 c) Skillの変更および廃止が、関係する利用者への影響を含めて統制されている。
 
-d) Tailoringの判断および根拠が、適用されるControlおよびConstraintへ追跡可能である。
+d) Tailoringの判断および根拠と、適用されるControlおよびConstraintとの対応を追跡できる。
 
 e) Skillの実績および有効性が、定められた基準に照らして評価されている。
 
@@ -571,7 +571,7 @@ g) 決定された改善が実現されている。
 
 #### 7.5.1 Skill資産管理（skill asset management）
 
-このActivityは、Skill資産の採用、発見可能性、変更周知、構成および廃止を管理する。
+このActivityは、Skill資産の採用、発見可能性、変更の周知、構成および廃止を管理する。
 
 a) Skillを管理し展開する仕組みとTailoring指針を確立するのが望ましい（PF 9.1）。
 
@@ -579,13 +579,13 @@ b) FrameworkレベルのControlおよびEnablerを、適用範囲、例外およ
 
 c) Skillの採用に先立ち、ALPS定義ProcessのSkill検証による証拠を確認するのが望ましい。
 
-d) 管理指針またはSkillに変更があったなら、その内容を関係する利用者へ周知するのが望ましい（PF 9.1）。
+d) 管理指針またはSkillに変更があったなら、その内容を関係する利用者に周知するのが望ましい（PF 9.1）。
 
 e) ニーズがなくなったSkillまたは有害となったSkillを識別し、廃止する必要がある。
 
 f) 廃止したSkillの記述を、参照のために保存してよい。
 
-g) Skill Model内の重複および隙間を、継続的に識別するのが望ましい。
+g) Skill Model内の重複および未充足領域を、継続的に識別するのが望ましい。
 
 h) 標準として定めたSkillを複数の適用対象で一貫して用いるのが望ましい（PF 9.2）。
 
@@ -599,7 +599,7 @@ a) 適用に関係するリスク、要求事項、複雑性、利用可能な�
 
 b) 適用条件、利用可能な専門知識および経験、ステークホルダーの期待または要求事項、ならびにリスク許容度を考慮し、候補となるSkillまたはライフサイクルモデルを評価する必要がある（PF 7.3）。
 
-c) Tailoringの意思決定は、事実と証拠とに基づくのが望ましい（PF 7.3）。
+c) Tailoringの意思決定は、事実と証拠に基づくのが望ましい（PF 7.3）。
 
 d) Outcome、Activity、Task、代表的なInputおよび代表的なOutputについて、削除、変更または追加を行ってよい（PF 7.2）。
 
@@ -607,11 +607,11 @@ e) Tailoringは、適用されるControlおよびConstraintに従う必要があ
 
 f) 影響を受ける当事者からInputを得る必要がある（PF 7.3）。
 
-g) Activityを許容可能なリスク水準で実行できるだけの厳密さを備えるよう、Skillの適用の厳密さをリスクに基づいて設定するのが望ましい（PF 7.1）。
+g) Activityを許容可能なリスク水準で実行できるよう、Skillの適用に必要な厳密さをリスクに基づいて設定するのが望ましい（PF 7.1）。
 
 h) Tailoringの範囲を明確にするのが望ましい。前提および基準を特定し、意思決定の根拠を記録するのが望ましい（PF 7.3）。
 
-i) 通常、Tailoringをリスクと適用状況とに応じて、適用期間全体を通じて動的に実施する（PF 7.1）。
+i) 通常、リスクおよび適用状況の変化に応じ、適用期間全体を通じてTailoringを動的に継続する（PF 7.1）。
 
 j) Tailoringの運用を適用期間中に繰り返し見直し、状況に応じて改めるのが望ましい。
 
@@ -621,7 +621,7 @@ l) InputおよびOutputならびにそれらの授受を記述する詳細度を
 
 #### 7.5.3 Skill評価・改善（skill assessment and improvement）
 
-このActivityは、Skillの実績および有効性を評価し、改善へ結び付ける。
+このActivityは、Skillの実績および有効性を評価し、改善に結び付ける。
 
 a) Skillの実績と有効性について洞察を得るための測定指標を設けるのが望ましい（PF 9.3）。
 
@@ -637,7 +637,7 @@ f) Skillの実績を、定められた基準、適用規格または比較対象
 
 g) 改善機会を継続的に特定し、優先順位を付けて実現するのが望ましい（PF 9.1）。
 
-h) 教訓を収集して対応へと結び付ける仕組みと、改善に向けた変更候補を分析する仕組みとを設けるのが望ましい（PF 9.3）。
+h) 教訓を収集して対応に結び付ける仕組みと、改善に向けた変更候補を分析する仕組みとを設けるのが望ましい（PF 9.3）。
 
 i) 変更されたSkillは、ALPS定義ProcessのSkill検証による確認を経るのが望ましい。
 
@@ -661,15 +661,15 @@ c) **Recursion** — 適用対象の連続する構造階層に、同じSkillま
 
 d) **Integration** — 同じ階層のうちでの完全性と、異なる階層のあいだでの一貫性とを確保すること。
 
-これらの関係は実行順序を規定しない。実際の流れはTailoringによって定め、Outputの変更が他のSkillのInputへ及ぼす影響を考慮する（PF 6.2）。
+これらの関係は実行順序を規定しない。実際の流れはTailoringによって定め、Outputの変更が他のSkillのInputに及ぼす影響を考慮する（PF 6.2）。
 
 ### 8.2 Skill間のインターフェース、授受およびトレーサビリティ
 
-Skill間のインターフェースおよび授受は、提供側のOutputと受領側のInputとの対応として扱う。インターフェースは独立したSkill要素ではなく、未定義の授受はTailoringによって追加できる（PF 4.4）。
+Skill間のインターフェースおよび授受は、提供側のOutputと受領側のInputとの対応として扱う。インターフェースは、独立したSkill要素ではない。あらかじめ定義されていない授受は、Tailoringによって追加できる（PF 4.4）。
 
 複数のSkillを構成して適用する場合、提供側のOutputと受領側のInputとの対応を明示する必要がある（7.4.3 d)）。
 
-Skillを並行的、反復的または再帰的に適用する場合、共有され、または相互に依存する情報項目と、それらに対する参照または変更の関係を、適用上必要な範囲で識別するのが望ましい。同一の情報項目が複数のSkillによって変更される場合、その情報項目の整合性、状態および変更の取扱いを、品質リスクに応じて定める必要がある。
+Skillを並行的、反復的または再帰的に適用する場合、共有される情報項目または相互依存する情報項目と、それらを参照または変更する関係を、適用上必要な範囲で識別するのが望ましい。同一の情報項目が複数のSkillによって変更される場合、その情報項目の整合性、状態および変更の取扱いを、品質リスクに応じて定める必要がある。
 
 Outputの変更が他のSkillのInputに影響する場合、影響を受けるSkillおよび対応関係を識別し、必要な再評価を行うのが望ましい。
 
@@ -695,7 +695,7 @@ d) Skill Viewでは、各ActivityおよびTaskの出典と、それが選択、�
 
 e) 適応した要素およびSkill Viewに固有の要素は、元のSkill Modelを変更したものとしては扱わない。これらの要素は、TailoringまたはSkill Modelへの正式な採用が行われない限り、元のSkillへのConformanceには算入しない。
 
-f) 特定のSkill Modelの運用は、既存SkillのActivityおよびTaskだけを用いる、制限付きのSkill Viewを採用してよい。この方式のもとでは、Skill Viewに固有のActivityおよびTaskを含めてはならない。
+f) 特定のSkill Modelを運用する際には、既存SkillのActivityおよびTaskだけを用いる、制限付きのSkill Viewを採用してよい。この方式のもとでは、Skill Viewに固有のActivityおよびTaskを含めてはならない。
 
 g) Skill Viewには、Skillのあいだの接続と、その構成に用いたSkillの出典を示してよい。
 
@@ -713,7 +713,7 @@ FrameworkレベルのControlおよびEnablerには、適用範囲、例外およ
 
 ControlおよびConstraintは、Skillの実行に方向または境界を与える。Controlは、適用法令または規制要求、方針、任意規格への準拠、あるいは合意から生まれ得る。Constraintは、Skillの外部にある環境要因または適用条件から生まれ得る（PF 4.1および4.5）。
 
-これらは、Skill Descriptionの中に独立した節を設けて記述することもできれば、他のSkill要素に対する注記として記述することもできる。一般Skillにおいて必要な時間的関係は、Constraintとして明示するのが望ましい（6.2 c)）。
+これらは、Skill Descriptionの中に独立した節としても、他のSkill要素に対する注記としても記述できる。一般Skillにおいて必要な時間的関係は、Constraintとして明示するのが望ましい（6.2 c)）。
 
 ### 9.3 Enabler、能力およびツール
 
@@ -741,15 +741,15 @@ b) Decision Gateの頻度、範囲および形式性は、適用状況に応じ�
 
 c) 意思決定、その根拠および前提を記録するのが望ましい（PF 8.1）。
 
-d) 通過判断は証拠に基づき、Decision Criteriaは適用状況の変化に応じて再評価するのが望ましい。
+d) 通過の判断は、証拠に基づくのが望ましい。Decision Criteriaは、適用状況の変化に応じて再評価するのが望ましい。
 
-注記: 不可逆的または高影響の行為に先立つ確認および人間へのエスカレーションは、Decision Gateの適用形態である。Decision Gateは、そのような外部作用が生じる前に、保留、変更または中止を判断できる統制点を適用に与える。既存要素によるHuman Oversightの構成は、付録Dに示す。
+注記: 不可逆的または高影響の行為に先立つ確認および人間へのエスカレーションは、Decision Gateの適用形態である。Decision Gateは、そのような外部作用が生じる前に、保留、変更または中止を判断できる統制点を適用に設ける。既存要素によるHuman Oversightの構成は、付録Dに示す。
 
 ### 10.3 レビューおよび監査
 
-レビューは、合意された基準を用いて、Skillの実績、OutputおよびOutcomeの達成状況を評価する。監査には、Skill、Outputおよび要求事項への適合を示す証拠を対象とする詳細なレビューが含まれ、必須属性および適用される要求事項が満たされていることを確認する（PF 8.2）。
+レビューは、合意された基準を用いて、Skillの実績、OutputおよびOutcomeの達成状況を評価する。監査は、Skill、Outputおよび要求事項への適合を示す証拠を詳細に調べ、必須属性および適用される要求事項が満たされていることを確認する（PF 8.2）。
 
-Outputが別のSkillまたはステークホルダーへ引き渡される場合、そのOutputが意図されたInputまたは成果として利用可能であることを、適用される基準に照らして評価するのが望ましい。
+Outputが別のSkillまたはステークホルダーに引き渡される場合、そのOutputが意図されたInputまたは成果として利用可能であることを、適用される基準に照らして評価するのが望ましい。
 
 レビューおよび監査は、適用先のニーズとリスクに応じてTailoringし、Entry Criteria、Exit Criteriaおよび問題への対応を定めるのが望ましい（PF 8.2）。
 
@@ -757,13 +757,13 @@ Outputが別のSkillまたはステークホルダーへ引き渡される場合
 
 ### 11.1 Tailoringの規律
 
-Tailoringは、ALPS管理ProcessのSkill Tailoring（7.5.2）に従って実施しなければならず、その要求事項はTailored Conformance（12.3）の前提となる。
+Tailoringは、ALPS管理ProcessのSkill Tailoring（7.5.2）に従って実施する必要がある。その要求事項は、Tailored Conformance（12.3）の前提となる。
 
-注記: TailoringにALPS管理Processを経由させることは、Skillの意味、規範上の強さまたは適用可能性が記録なく変更されることを防ぐ。
+注記: TailoringをALPS管理Processを通じて実施することは、Skillの意味、規範上の強さまたは適用可能性が記録なく変更されることを防ぐ。
 
 ### 11.2 Tailoringの水準
 
-共通水準のTailoringでは、外部規格（本規格を含む）を、想定する適用領域に共通するニーズへと適合させる。個別水準のTailoringでは、その共通Skillを、特定の適用対象のニーズへと適合させる（PF 7.2）。
+共通水準のTailoringでは、外部規格（本規格を含む）を、想定する適用領域に共通するニーズに適合させる。個別水準のTailoringでは、その共通Skillを、特定の適用対象のニーズに適合させる（PF 7.2）。
 
 ### 11.3 Skill Instantiation
 
@@ -779,7 +779,7 @@ a) **記述適合** — Skill Description（またはSkill View）が、箇条4�
 
 b) **Reference Model適合** — Skill Modelの定義、適用または管理について、箇条7の三つのProcessのうち宣言したProcessに対するConformance（12.2、12.3）が成立すること。
 
-c) **実行適合** — Skillの実行（Skill Instance）が、宣言されたSkillに対するConformance（12.2、12.3）として成立すること。
+c) **実行適合** — Skillの実行（Skill Instance）が、宣言されたSkillに対するConformanceの基準（12.2、12.3）を満たすこと。
 
 ### 12.2 Full Conformance
 
@@ -799,11 +799,11 @@ Reference ModelのProcessを構成するActivityの一部だけを適用する�
 
 ### 12.4 CapabilityおよびAssessment
 
-Capabilityは、Conformanceとは別の評価次元として扱う。ActivityおよびTaskを具体的に実行する場合には、Outcomeだけを達成する場合よりも、高いCapability水準を要求されることがある。ただし、Capability水準だけによってConformanceが成立するものではなく、ConformanceだけによってCapability水準が定まるものでもない（PF 8.5）。
+Capabilityは、Conformanceとは別の評価次元として扱う。ActivityおよびTaskを具体的に実行する場合には、Outcomeだけを達成する場合よりも、より高いCapability水準が必要となることがある。ただし、Capability水準だけによってConformanceが成立するものではなく、ConformanceだけによってCapability水準が定まるものでもない（PF 8.5）。
 
 SkillのOutcomeならびに三つのProcessのPurposeおよびOutcomeは、Process Assessmentと有効性評価に利用できる（PF 8.5、7.5.3）。
 
-Skill PackageのAssessmentでは、基準となるSkill Descriptionの存在、必須参照先の解決可能性、Skill Descriptionと付随資源との整合性、付随資源の役割および利用条件、ならびに変更後の再検証を評価対象にできる（5.7、7.3.3、7.5.1）。
+Skill PackageのAssessmentでは、基準となるSkill Descriptionの存在、必須の参照先を対象環境から特定して取得できること、Skill Descriptionと付随資源との整合性、付随資源の役割および利用条件、ならびに変更後の再検証を評価対象にできる（5.7、7.3.3、7.5.1）。
 
 ---
 
@@ -849,7 +849,7 @@ d) 整備された内容と元の記録との対応が追跡可能である。
 ## Exit Criteria
 
 - すべてのOutcomeの達成状況が判定されている。
-- Outputが受領側へ引き渡されている。
+- Outputが受領側に引き渡されている。
 
 ## 代表的なInput
 
@@ -873,7 +873,7 @@ d) 整備された内容と元の記録との対応が追跡可能である。
 
 - 決定事項、実行事項および未決事項を区別して識別する必要がある。
 - 各実行事項に期限を対応付けるのが望ましい。
-- 事項に重要度の分類を付してよい。
+- 各事項を重要度別に分類してよい。
 
 ### 確認可能性の確立
 
@@ -882,7 +882,7 @@ d) 整備された内容と元の記録との対応が追跡可能である。
 
 ## Constraint
 
-- 元の記録に存在しない決定を、Outputに含めてはならない。
+- 元の記録に記載のない決定事項を、Outputに含めてはならない。
 - 受領側への引き渡しは、抽出した事項と元の記録との対応が確立された後に行う必要がある。
 
 ## Control
@@ -903,7 +903,7 @@ d) 整備された内容と元の記録との対応が追跡可能である。
 - 長大な記録では、議題単位のIterationによって段階的に精緻化できる。
 ```
 
-注記1: `description`は、Skillが行うことと使用する状況を記述し、Skillの選択前に利用できるようにする（3.11）。
+注記1: `description`は、Skillが行うことと、そのSkillを使用する状況とを記述し、Skillの選択前に利用できるようにする（3.11）。
 
 注記2: 「整備済み議事録」はOutputであって、Outcomeではない（6.3.3）。また、Constraintに示す後段の規定は、必要な時間的関係を明示したものである（6.2 c)）。EnablerはInputではなく（9.3）、本Skillは実行主体を規定しない（5.3）。
 
@@ -955,11 +955,11 @@ d) 整備された内容と元の記録との対応が追跡可能である。
 
 ### C.1 Agent Skills Specification
 
-[Agent Skills Specification](https://agentskills.io/specification)は、`SKILL.md`を中心とし、スクリプト、参考資料および資産のための任意のディレクトリを伴う、ファイルベースの公開形式を定義する。この形式をALPS Skillに用いる場合、この形式はSkill Packageの実装形態を提供し、ALPSはProcess Descriptionの意味論、ライフサイクルおよびConformanceの規則を提供する。ALPSは、この実装形態を要求しない（1.2 a)）。
+[Agent Skills Specification](https://agentskills.io/specification)は、`SKILL.md`を中心とし、スクリプト、参考資料および資産のための任意のディレクトリを伴う、ファイルベースの公開形式を定義する。この形式をALPS準拠のSkillに用いる場合、この形式はSkill Packageの実装形態を提供し、ALPSはProcess Descriptionの意味論、ライフサイクルおよびConformanceの規則を提供する。ALPSは、この実装形態を要求しない（1.2 a)）。
 
 ### C.2 AGENTS.md
 
-[AGENTS.md](https://agents.md/)は、リポジトリの適用範囲に応じた文脈および指示をコーディングAgentへ提供するための公開形式である。`AGENTS.md`は、ALPS準拠Skillの発見、選択、適用および管理をAgentへ指示し、リポジトリのControlおよびConstraintを示すことができる。`AGENTS.md`自体はSkill Descriptionではなく、Process Framework、本規格またはSkill Descriptionの意味も規範上の強さも変更しない。
+[AGENTS.md](https://agents.md/)は、リポジトリの適用範囲に応じた文脈および指示をコーディングAgentに提供するための公開形式である。`AGENTS.md`は、ALPS準拠Skillの発見、選択、適用および管理をAgentに指示し、リポジトリのControlおよびConstraintを示すことができる。`AGENTS.md`自体はSkill Descriptionではなく、Process Framework、本規格またはSkill Descriptionの意味も規範上の強さも変更しない。
 
 ### C.3 ライフサイクルProcessおよびProcess記述に関する規格
 
@@ -969,7 +969,7 @@ d) 整備された内容と元の記録との対応が追跡可能である。
 - ISO/IEC/IEEE 12207 — ソフトウェアのライフサイクルProcess
 - ISO/IEC/IEEE TR 24774 — Processの記述に関する指針
 
-これらは、これらの文書も併せて用いる読者のために挙げる。本規格およびProcess Frameworkの表現は独立に作成したものであり、これらの規格の本文、図、表、例または翻訳を転載していない。ALPSは、これらを発行する機関によって策定、承認または認証されたものではない。
+これらの規格は、当該文書を併せて用いる読者のために挙げる。本規格およびProcess Frameworkの表現は独立に作成したものであり、これらの規格の本文、図、表、例または翻訳を転載していない。ALPSは、これらを発行する機関によって策定、承認または認証されたものではない。
 
 ## 付録D（参考）Agent文脈におけるHuman Oversight、Accountabilityおよび証拠
 
@@ -989,7 +989,7 @@ Human Oversightは、Skill Descriptionの独立した要素ではない。監督
 - 実行および意思決定の記録
 - ALPS適用ProcessおよびALPS管理Processにおける判断
 
-監督の形態、介入の粒度および条件、決定権限ならびにエスカレーション先は、適用状況のリスク、関係する作用の影響および可逆性、存在する不確実性、ならびに関係する人間およびAgent双方のCapabilityに基づいて、適用文脈ごとに選択する。
+監督の形態、介入の粒度および条件、決定権限ならびにエスカレーション先は、適用状況のリスク、関係する作用の影響および可逆性、不確実性の程度、ならびに関係する人間およびAgent双方のCapabilityに基づいて、適用文脈ごとに選択する。
 
 非決定性、創発的挙動、監督者の認知負荷、automation biasおよび責任関係の不明確さは、監督の実施を難しくし得る。これらはAgent文脈に属する論点であり、本付録で扱う。PFの一般意味論の一部ではない。
 
@@ -997,7 +997,7 @@ Human Oversightは、Skill Descriptionの独立した要素ではない。監督
 
 Traceabilityは、Input、判断、Task、Output、証拠および変更のあいだの関係を追跡できる性質である。
 
-Accountabilityは、特定のSkill Instanceにおいて、誰が決定権限、監督責任または応答責任を負うかを定める関係である。
+Accountabilityは、特定のSkill Instanceにおける意思決定および監督に関する責任と権限の所在を明らかにする関係である。
 
 TraceabilityはAccountabilityを支援するが、それ自体で責任を割り当てない。一般的なProcess Descriptionは、実行者も組織構造も固定しない。具体的なProcess InstanceまたはSkill Instanceでは、必要な責任、権限、承認者およびエスカレーション先を定めることができる。ログおよび監査証拠は、事後の検証を支援し、責任関係の明確化を助ける。
 
@@ -1022,9 +1022,9 @@ Outcomeの定義および適合基準は変更されない。次の指針は、�
 
 非決定性および期待結果を一意に定めることの難しさは、検証とHuman Oversightの双方を難しくし得る。
 
-### D.6 監督の結果をALPS管理Processへ戻す
+### D.6 監督の結果をALPS管理Processに戻す
 
-次は、ALPS適用Processが、実行記録および教訓としてALPS管理ProcessのSkill評価・改善へ引き渡せる代表的な情報項目である。
+次に示すのは、ALPS適用Processが、実行記録および教訓としてALPS管理ProcessのSkill評価・改善に引き渡すことのできる代表的な情報項目である。
 
 - 人間による承認および介入の記録
 - 介入を必要とした条件
