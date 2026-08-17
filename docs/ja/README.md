@@ -33,7 +33,7 @@ ALPSは、通常の記述では混ざりやすい問いを分けて扱います�
 | どの作業がProcessに属するか？ | **ActivityとTask** |
 | 何が作業を方向付け、制限し、または支援するか？ | **Control、ConstraintおよびEnabler** |
 | いつ作業を開始でき、いつ完了とみなせるか？ | **Entry CriteriaとExit Criteria** |
-| Processはどこに適用されるか？ | **境界と適用状況** |
+| Processの範囲はどこまでで、どの状況に適用されるか？ | **境界と適用状況** |
 | 誰が実行するか？ | 一般Processは固定しません。 |
 | どのように実装するか？ | 一般Process Descriptionは規定しません。 |
 
@@ -42,7 +42,7 @@ ALPSは、通常の記述では混ざりやすい問いを分けて扱います�
 Agent Skillが会議記録を処理する場合を考えます。
 
 - **Purpose** — 会議後も議論を利用できるようにする。
-- **Outcome** — 意思決定、実行事項および未解決事項を識別できる。
+- **Outcome** — 意思決定、実行事項および未解決事項が識別されている。
 - **Input** — 会議メモ、書き起こしまたは提供資料。
 - **Output** — 構造化された会議要約。
 - **ActivityとTask** — 関係する記述を識別し、分類し、出所との対応を維持する。
@@ -55,7 +55,7 @@ Outputは、生み出される要約です。Outcomeは、Processが成功した
 
 ## Process Framework
 
-Process Frameworkは、これらの区別を形式化し、意図、作業内容、変換の適用状況、Process間の関係、TailoringおよびAssessmentを扱う再利用可能な語彙をALPSへ提供します。
+Process Frameworkは、これらの区別を形式化し、意図、作業内容、変換、適用状況、Process間の関係、TailoringおよびAssessmentを扱う再利用可能な語彙をALPSに提供します。
 
 ```mermaid
 flowchart TD
@@ -72,13 +72,13 @@ flowchart TD
     OPEN["誰が、どのように?<br/>適用時に選択"] -.-> PROCESS
 ```
 
-`Name`、`Purpose`および`Outcomes`は、Process Descriptionの必須要素です。ActivityとTaskは作業内容を記述し、記載順だけを理由に実装方法や手順上の段階とはなりません。InputはOutputへ変換される項目です。人、Agent、ツールおよび実行環境はInputではなく、資源またはEnablerです。
+`Name`、`Purpose`および`Outcomes`は、Process Descriptionの必須要素です。ActivityとTaskは作業内容を記述し、記載順だけを理由として、実装方法や手順上の段階として解釈されるものではありません。InputはOutputに変換される項目です。人、Agent、ツールおよび実行環境はInputではなく、資源またはEnablerです。
 
-ALPSは、このFrameworkをSkillの記述、ライフサイクル管理、Tailoring、AssessmentおよびConformanceへ適用します。Frameworkは、ライフサイクル、段階の順序または特定の実装方法を規定しません。
+ALPSは、このFrameworkをSkillの記述、ライフサイクル管理、Tailoring、AssessmentおよびConformanceに適用します。Frameworkは、ライフサイクル、段階の順序または特定の実装方法を規定しません。
 
 ## ALPS参照モデル
 
-ALPSは、Skillのライフサイクルを三つのProcessによって定義します。これらは固定された段階ではなく、必要に応じて並行的、反復的または再帰的に適用できます。矢印は代表的なOutput/Inputの受け渡しを示します。
+ALPSは、Skillのライフサイクルを三つのProcessによって定義します。これらは固定された段階ではなく、必要に応じて並行的、反復的または再帰的に適用できます。矢印は代表的なOutputとInputの受け渡しを示します。
 
 このリポジトリは、ALPSの規格文書と、これらのProcessを実装する三つのAgent Skillを提供します。英語を基準言語とし、各Skillに日本語版を収録します。
 
@@ -108,8 +108,8 @@ ALPS規格は、この参照モデルに加えて、Skill Description、Skill Pa
 
 ## ライセンスと再利用
 
-明示した第三者資料を除き、本リポジトリには[Apache License, Version 2.0](../../LICENSE)を適用する。ライセンスの対象は、規格、文書、Skill Package、スクリプトおよび本プロジェクトが作成したアイコン一点である。帰属およびリポジトリのライセンスから除外される資料については、[NOTICE](../../NOTICE)を参照されたい。
+明示した第三者資料を除き、本リポジトリには[Apache License, Version 2.0](../../LICENSE)を適用します。ライセンスの対象は、規格、文書、Skill Package、スクリプトおよび本プロジェクトが作成したアイコン一点です。帰属表示が必要な資料、および本リポジトリのライセンス対象外となる資料については、[NOTICE](../../NOTICE)を参照してください。
 
 ## 貢献
 
-貢献は、リポジトリのライセンスおよび[Developer Certificate of Origin 1.1](../../DCO)に基づいて受け入れる。貢献するすべてのコミットには`Signed-off-by`トレーラーが必要である。変更を提出する前に[CONTRIBUTING.md](CONTRIBUTING.md)を確認されたい。
+貢献は、リポジトリのライセンスおよび[Developer Certificate of Origin 1.1](../../DCO)に基づいて受け入れます。貢献するすべてのコミットには`Signed-off-by`トレーラーが必要です。変更を提出する前に[CONTRIBUTING.md](CONTRIBUTING.md)を確認してください。
