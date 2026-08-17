@@ -18,7 +18,7 @@ description: Agent Skill、Skill Package、Skill ModelまたはSkill Viewにつ�
 - a) Skillの管理、展開およびTailoringに用いる方針および指針が確立されている。
 - b) 採用されたSkillが、管理された状態で発見可能である。
 - c) Skillの変更および廃止が、関係する利用者への影響を含めて統制されている。
-- d) Tailoringの判断および根拠が、適用されるControlおよびConstraintに追跡可能である。
+- d) Tailoringの判断および根拠と、適用されるControlおよびConstraintとの対応を追跡できる。
 - e) Skillの実績および有効性が、定められた基準に照らして評価されている。
 - f) 改善機会が、収集された教訓および評価結果に基づいて優先順位付けされている。
 - g) 決定された改善が実現されている。

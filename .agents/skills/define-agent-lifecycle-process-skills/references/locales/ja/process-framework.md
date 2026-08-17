@@ -143,7 +143,7 @@ Process、Sub-processおよびActivityの粒度に、普遍的な基準はない
 
 Processを適用するときは、Purposeに応じてProcess、ActivityおよびTaskを選択できる。一つのProcessまたは複数のProcessの組合せを実行できる。
 
-実行主体と実施方法を選択に委ねても、一般Processの再利用可能性は損なわれず、Processの境界が不完全になるわけではない。
+実行主体と実施方法を選択に委ねることは、一般Processの再利用可能性の一部であり、Processの境界を不完全にするものではない。
 
 ## 4. 境界を越え、方向付け、制限し、または支援するもの
 
