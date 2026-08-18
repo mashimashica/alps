@@ -54,6 +54,6 @@ Version `1.0.0`は、最初の安定したCompatibility Boundaryを宣言しま�
 2. 完了した項目を`CHANGELOG.md`の`Unreleased`から日付付きのRelease節へ移します。
 3. `docs/releases/`にRelease Noteを用意します。
 4. Release準備Pull Requestを`main`へMergeします。
-5. Merge Commitに`vMAJOR.MINOR.PATCH`形式のAnnotated Tagを作成します。
+5. Merge Commitに`vMAJOR.MINOR.PATCH`形式のTagを作成します。
 6. 用意したRelease Noteを用いて、そのTagからGitHub Releaseを公開します。
 7. Tagが意図したCommitを指していることを確認し、その不変性を維持します。

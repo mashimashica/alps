@@ -54,6 +54,6 @@ The `main` branch represents ongoing development. Changes not yet assigned to a 
 2. Move completed entries from `Unreleased` into the dated release section in `CHANGELOG.md`.
 3. Prepare release notes under `docs/releases/`.
 4. Merge the release-preparation pull request into `main`.
-5. Create an annotated tag named `vMAJOR.MINOR.PATCH` on the merge commit.
+5. Create a tag named `vMAJOR.MINOR.PATCH` on the merge commit.
 6. Publish a GitHub Release from that tag using the prepared release notes.
 7. Confirm that the tag resolves to the intended commit and remains immutable.
