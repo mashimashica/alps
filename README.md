@@ -100,8 +100,8 @@ Beyond this Reference Model, ALPS specifies rules for Skill Descriptions, Skill 
 
 | Resource | English | Japanese |
 | --- | --- | --- |
-| Process Framework | [process-framework.md](.agents/skills/define-agent-lifecycle-process-skills/references/process-framework.md) | [process-framework.md](.agents/skills/define-agent-lifecycle-process-skills/references/locales/ja/process-framework.md) |
-| ALPS Specification | [ALPS-SPEC.md](.agents/skills/define-agent-lifecycle-process-skills/references/ALPS-SPEC.md) | [ALPS-SPEC.md](.agents/skills/define-agent-lifecycle-process-skills/references/locales/ja/ALPS-SPEC.md) |
+| Process Framework | [process-framework.md](.alps/spec/process-framework.md) | [process-framework.md](.alps/spec/locales/ja/process-framework.md) |
+| ALPS Specification | [ALPS-SPEC.md](.alps/spec/ALPS-SPEC.md) | [ALPS-SPEC.md](.alps/spec/locales/ja/ALPS-SPEC.md) |
 | Agent Lifecycle Process Skill Definition | [SKILL.md](.agents/skills/define-agent-lifecycle-process-skills/SKILL.md) | [SKILL.md](.agents/skills/define-agent-lifecycle-process-skills/references/locales/ja/SKILL.md) |
 | Agent Lifecycle Process Skill Application | [SKILL.md](.agents/skills/apply-agent-lifecycle-process-skills/SKILL.md) | [SKILL.md](.agents/skills/apply-agent-lifecycle-process-skills/references/locales/ja/SKILL.md) |
 | Agent Lifecycle Process Skill Management | [SKILL.md](.agents/skills/manage-agent-lifecycle-process-skills/SKILL.md) | [SKILL.md](.agents/skills/manage-agent-lifecycle-process-skills/references/locales/ja/SKILL.md) |

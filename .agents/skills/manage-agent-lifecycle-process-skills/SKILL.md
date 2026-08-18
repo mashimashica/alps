@@ -140,6 +140,12 @@ Managed Skill assets, tailored Skills, Tailoring decisions and rationale, assess
 
 When multiple Skills are composed for application, the correspondence between provider Outputs and recipient Inputs must be explicit. The provider and recipient should align the name, meaning, and scope of information items handed off. When the same information item is changed by multiple Skills, its integrity, state, and change handling must be determined according to quality risk.
 
+## Shared Normative References
+
+This section is informative and has no normative force.
+
+- When interpretation of the Process Framework or ALPS, conflict resolution, normative attributes, Conformance, or Tailoring requires the governing texts, use the repository-shared [Process Framework](../../../.alps/spec/process-framework.md) and [ALPS Specification](../../../.alps/spec/ALPS-SPEC.md). These documents are repository-level normative assets and are not owned by this Skill Package.
+
 ## Bundled Resources
 
 This section is informative and does not require a specific method of execution.
