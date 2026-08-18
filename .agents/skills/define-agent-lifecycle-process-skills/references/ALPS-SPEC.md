@@ -87,7 +87,9 @@ A unit consisting of a reusable Process Description, and accompanying resources 
 The Process Description constituting the content of a Skill. It has Name, Purpose, and Outcomes as mandatory elements and can include optional elements and reference information (see Clause 6).
 
 **3.4 Discovery Layer and Execution Layer**
-The respective parts of a Skill Description when it is written in the two-part form of overview and detailed description in PF 1.3. The discovery layer is the overview used to discover the Skill and determine its applicability; the execution layer is the detailed description used to execute the Skill (see 5.5).
+ALPS-specific functional presentation layers through which a Skill Description is made available to an Agent. The discovery layer presents the Name and concise reference information used to discover the Skill and determine its applicability before the complete Skill Description is loaded. The execution layer presents the authoritative Process Description elements and reference information used to execute and assess the Skill.
+
+These layers do not add Process Description elements and do not require a particular physical separation, file format, or storage structure.
 
 **3.5 Skill Model**
 A Process Model defining a set of Skills selected or defined for a particular application domain and the relationships among them.
@@ -110,7 +112,7 @@ Determining that Entry Criteria are satisfied and beginning execution of a Skill
 The totality of adopted and managed Skills, Skill Models, and Skill Views.
 
 **3.11 Skill Discovery Description**
-Concise reference information in the discovery layer that an Agent uses to discover a Skill and determine its applicability. It states what the Skill does and when the Skill is used.
+Concise reference information placed in the ALPS-specific discovery layer that an Agent uses to discover a Skill and determine its applicability before loading the complete Skill Description. It states what the Skill does, when the Skill is used, and the information needed to determine applicability.
 
 **3.12 Skill Package**
 A unit managed as a whole that contains one Skill Description and any accompanying resources that support understanding or executing the Skill or creating its Outputs.
@@ -162,17 +164,19 @@ A significant Activity containing many Tasks may be described as a separate Skil
 
 When the definition, maintenance, assessment, or change handling of an information item spanning multiple Skills has an independent Purpose and Outcomes and mutually cohesive Activities, and can be bounded as one Process, it may be described as a separate Skill. By contrast, when no independent Process boundary is established and relationships among existing Skills are presented as a cross-cutting concern, it can be described as a Skill View (8.3).
 
-### 5.5 Two-Layer Structure and Progressive Disclosure
+### 5.5 Functional Layers and Progressive Disclosure
 
-A Skill Description should adopt a two-part structure (PF 1.3) comprising a discovery layer (overview) and an execution layer (detailed description).
+PF 1.3 permits a Process Description to present information in layers for readers with different needs. For Agent Skills, ALPS defines a discovery layer and an execution layer as functional presentation layers for progressive disclosure. The names and functions of these layers are specific to ALPS and are not PF constructs.
 
-a) The **discovery layer** should contain the Name and Skill Discovery Description. The Skill Discovery Description must state what the Skill does, when it is used, and the information needed to determine applicability.
+A Skill Description claiming Description Conformance must provide both layers and make their functions distinguishable. The layers may be represented together or separately, provided that one authoritative Skill Description remains identifiable and mandatory references are resolvable.
 
-b) The **execution layer** contains, at the necessary level of detail, the full Purpose and Outcomes, Activities and Tasks, and the other elements and reference information listed in 6.1.
+a) The **discovery layer** must present the Name and Skill Discovery Description. The Skill Discovery Description must state what the Skill does, when it is used, and the information needed to determine applicability.
 
-c) Issues spanning multiple Skills are treated separately from individual Skill execution layers (PF 1.3). Common Controls and Enablers can be declared as common Framework-level elements (see 9.1).
+b) The **execution layer** must present or provide access to the complete Skill Description used for execution and Assessment. It includes Name, Purpose, and Outcomes, together with any optional elements and reference information included under 6.1.
 
-NOTE: The discovery layer lets an Agent identify candidate Skills and judge applicability without loading every full Skill Description.
+c) Matters that cut across multiple Skills should be treated separately from an individual Skill's execution layer. Common Controls and Enablers may be declared as Framework-level elements.
+
+NOTE: These functional layers support progressive disclosure without requiring two files, two sections, or another particular physical structure.
 
 ### 5.6 Skill Models and Life Cycle Models
 
@@ -262,15 +266,17 @@ Representative Inputs and Outputs do not prescribe the only manner of execution.
 
 #### 6.3.7 Control, Constraint, Enabler, Entry Criteria, and Exit Criteria
 
-Controls and Constraints govern Skill execution by directing or bounding it. Enablers make Skill execution possible or assist it. Entry Criteria state conditions under which a Skill can be invoked; Exit Criteria state conditions under which a Skill Instance can be completed. These elements are used according to the Purpose of the description and the required level of detail. Details are given in Clauses 9 and 10.
+Controls and Constraints declare conditions that direct or limit Skill execution. Enablers make Skill execution possible or assist it. Entry Criteria state conditions under which a Skill can be invoked; Exit Criteria state conditions under which a Skill Instance can be completed. These elements are used according to the Purpose of the description and the required level of detail. Details are given in Clauses 9 and 10.
 
-When a summary of Entry Criteria is placed in the discovery layer, it must not conflict with the Entry Criteria in the execution layer.
+The primary function of a Control or Constraint statement must be to declare a condition that directs or limits execution. A statement whose primary function is an individual action must be classified as a Task.
+
+When a summary of Entry Criteria is placed in the discovery layer, it must not conflict with the Entry Criteria available through the execution layer.
 
 #### 6.3.8 Reference Information
 
 Overviews, descriptions, Common Approach, practical tips, notes, and examples are used as reference information to support understanding or application of a Skill. Reference information must not alter the meaning or normative force of primary Skill elements (PF 1.4).
 
-As reference information placed in the discovery layer, a Skill Discovery Description must state concisely what the Skill does and when it is used. The Skill Discovery Description must be consistent with the Name, Purpose, Outcomes, scope, Entry Criteria, and Constraints and must not replace those elements or alter their normative meanings. Information needed to determine when to use the Skill must not be placed only in the execution layer.
+As reference information placed in the ALPS-specific discovery layer, a Skill Discovery Description must state concisely what the Skill does, when it is used, and the information needed to determine applicability. It must be consistent with the authoritative Name, Purpose, Outcomes, scope, Entry Criteria, and Constraints available through the execution layer and must not replace those elements or alter their normative meanings.
 
 The Skill Discovery Description of a Skill claiming Description Conformance to this specification must end with a short ALPS conformance marker in the language of the description. The marker must be exactly `ALPS-conformant.` in English and `ALPS準拠。` in Japanese. This marker is a standardized shorthand claim whose subject is the containing Skill Description and whose criteria are Description Conformance under 12.1 a); it does not assert Reference Model Conformance or Execution Conformance.
 
@@ -373,7 +379,7 @@ a) The Skill boundary must be established from the primary Outputs and Outcomes 
 
 b) Dependencies on other Skills must be reduced as far as practicable.
 
-c) A two-layer structure comprising a discovery layer and an execution layer should be adopted (5.5).
+c) The Skill Description must provide distinguishable discovery-layer and execution-layer information. Their physical separation is not required (5.5).
 
 d) A significant Activity that benefits from detailed treatment may be separated into another Skill.
 
@@ -405,13 +411,13 @@ a) The Skill Description must be reviewed using agreed criteria (Clause 10).
 
 b) It must be confirmed that each Task has the primary function of expressing an individual action that supports achievement of one or more Outcomes and that the object and operation of that action are distinguishable (6.3.5, 8.2).
 
-c) It must be confirmed that the element classification of each statement is consistent with its primary function (6.2 a), 6.3).
+c) It must be confirmed that the element classification of each statement is consistent with its primary function, including the distinction between conditions declared by Controls and Constraints and individual actions expressed by Tasks (6.2 a), 6.3.5, 6.3.7, 9.2).
 
 d) It must be confirmed that normative attributes are distinguishable (4.1).
 
 e) When a general Skill is verified, it must be confirmed that its normative part does not require a specific method, technique, tool, or execution sequence (6.2 c)).
 
-f) When discovery and execution layers are used, it must be confirmed that their descriptions are consistent (5.5, 6.3.8).
+f) It must be confirmed that the discovery-layer and execution-layer information are consistent (5.5, 6.3.8).
 
 g) The review should incorporate a perspective independent of the Skill author.
 
@@ -513,7 +519,7 @@ l) Lessons learned through execution may be transferred to Skill Assessment and 
 
 #### 7.4.3 Skill Orchestration
 
-This Activity combines multiple Skills and manages their interfaces, exchanges, and overall integrity.
+This Activity combines multiple Skills and manages their interfaces, exchanges, and the completeness and consistency of the composition as a whole.
 
 a) The target set of Outcomes must be identified.
 
@@ -711,9 +717,11 @@ Information resources that apply in common to multiple Skills can be declared as
 
 ### 9.2 Skill-Level Controls and Constraints
 
-Controls and Constraints govern Skill execution by directing or bounding it. Controls can arise from applicable laws or regulatory requirements, policies, conformance to voluntary standards, or agreements. Constraints can arise from environmental factors or conditions of application external to the Skill (PF 4.1 and 4.5).
+Controls and Constraints declare conditions or permissible boundaries for Skill execution. Controls can arise from applicable laws or regulatory requirements, policies, conformance to voluntary standards, or agreements. Constraints can arise from environmental factors or conditions of application external to the Skill (PF 4.1 and 4.5).
 
-Controls and Constraints can be described in separate sections of a Skill Description or as notes to other Skill elements. Any temporal relationship needed in a general Skill should be stated explicitly as a Constraint (6.2 c)).
+A Control or Constraint statement must be classified according to its primary function as specified in 6.3.7.
+
+Controls and Constraints can be described in separate sections of a Skill Description or as conditions associated with other Skill elements. Any temporal relationship needed in a general Skill should be declared explicitly as a Constraint (6.2 c)).
 
 ### 9.3 Enablers, Capabilities, and Tools
 
@@ -727,7 +735,7 @@ NOTE: Treating Agents, models, tools, and execution environments as Enablers kee
 
 ### 10.1 Entry Criteria and Exit Criteria
 
-a) Entry Criteria state conditions under which a Skill can be invoked. A summary should be placed in the discovery layer (5.5).
+a) Entry Criteria state conditions under which a Skill can be invoked. A summary should be placed in the discovery layer as reference information for determining applicability (5.5).
 
 b) Exit Criteria state conditions under which a Skill Instance can be completed. Exit Criteria should be related to determining achievement of the Outcomes.
 
@@ -785,9 +793,11 @@ c) **Execution Conformance** — Execution of a Skill, as a Skill Instance, esta
 
 Full Conformance must be claimed as Conformance to Outcomes, Tasks, or both, and the selected criteria must be stated. When both are selected, both must be satisfied (PF 8.3).
 
+
 a) **Full Conformance to Outcomes** requires achievement of all mandatory Outcomes in the declared Skill or Reference Model Process. This approach provides greater freedom in how the conformant Process is implemented; Activities and Tasks are treated as guidance.
 
 b) **Full Conformance to Tasks** requires satisfaction of every requirement stated with **must** or **must not** by an Activity or Task in the declared Skill or Reference Model Process. Recommendations, permissible actions, and typical actions are not, solely by virtue of those attributes, mandatory conditions for Full Conformance to Tasks. When this approach is selected, Outcomes are treated as guidance.
+
 
 For Conformance to the Reference Model, the units for which Outcome Conformance to a Process can be claimed are the ALPS definition process, ALPS application process, and ALPS management process. Independent Outcome Conformance must not be claimed for an individual constituent Activity.
 
@@ -867,27 +877,30 @@ The order shown below does not prescribe execution order.
 
 - The scope of consolidation and gaps in the records must be identified.
 - Unclear statements must not be completed by conjecture.
+- Applicable policies for handling confidential information must be applied.
 - The list of participants and agenda items is typically confirmed.
 
 ### Item Extraction
 
 - Decisions, action items, and open issues must be distinguished and identified.
+- A decision not present in the source records must not be included in the Output.
 - Each action item should be associated with a due date.
 - Items may be assigned a priority classification.
 
 ### Establishment of Verifiability
 
 - Mappings between extracted items and the source records must be maintained.
+- The Output must be transferred only after mappings between extracted items and the source records have been established.
 - Items that cannot be confirmed from the source records should be marked as requiring confirmation.
 
 ## Constraints
 
-- A decision not present in the source records must not be included in the Output.
-- Transfer to the recipient must occur after mappings between extracted items and the source records have been established.
+- The Output is limited to decisions, action items, and open issues supported by the source records.
+- Transfer is permitted only after mappings between extracted items and the source records have been established.
 
 ## Controls
 
-- Applicable policies for handling confidential information must be followed.
+- Applicable policies for handling confidential information.
 
 ## Enablers
 
@@ -905,11 +918,11 @@ This section is reference information and has no normative force.
 
 NOTE 1: `description` states what the Skill does and when it is used, making that information available before Skill selection (3.11).
 
-NOTE 2: “Consolidated meeting minutes” is an Output, not an Outcome (6.3.3). The latter provision under Constraints states a necessary temporal relationship (6.2 c)). Enablers are not Inputs (9.3), and this Skill does not prescribe a performer (5.3).
+NOTE 2: “Consolidated meeting minutes” is an Output, not an Outcome (6.3.3). The Constraint declares the permitted transfer condition, while the corresponding transfer action is stated as a Task (6.3.7, 9.2). Enablers are not Inputs (9.3), and this Skill does not prescribe a performer (5.3).
 
 ### A.3 Example Composition of a File-Based Skill Package
 
-The following is an informative example of applying 5.7 to a file-based Skill Package. This composition and these names are not requirements (1.2). Storage groupings other than `SKILL.md` are optional and are established only when necessary accompanying resources exist.
+The following is an informative example of applying 5.7 through a file-based Environment Binding. This composition and these names are not requirements (1.2). Storage groupings other than `SKILL.md` are optional and are established only when necessary accompanying resources exist. The authoritative Skill Description remains the semantic source for both discovery-layer and execution-layer information; an Environment Binding may project discovery information into frontmatter or a separate registration record without changing its meaning or normative force.
 
 ```text
 <skill-name>/
@@ -922,7 +935,7 @@ The following is an informative example of applying 5.7 to a file-based Skill Pa
 
 | Component | ALPS treatment |
 |---|---|
-| `SKILL.md` | Authoritative Skill Description for the Skill. Frontmatter serves the discovery layer, and the body primarily serves the execution layer. |
+| `SKILL.md` | Authoritative Skill Description for the Skill. In this representative Environment Binding, frontmatter projects discovery-layer information and the body provides execution-layer information; ALPS does not require this physical arrangement. |
 | `references/` | Reference information loaded as needed. Individual filenames are not prescribed. |
 | `scripts/` | Execution resources that support reproducibility or reliability. They are typically treated as Enablers. |
 | `assets/` | Resources used to create Outputs. They are treated as Inputs, Outputs, or Enablers according to function. |
@@ -955,7 +968,7 @@ The following documents are related to ALPS. They are informative references, no
 
 ### C.1 Agent Skills Specification
 
-The [Agent Skills Specification](https://agentskills.io/specification) defines an open, file-based format centered on `SKILL.md`, with optional directories for scripts, references, and assets. When this format is used for an ALPS Skill, it supplies an implementation form for the Skill Package; ALPS supplies the Process Description semantics, life cycle, and Conformance rules. ALPS does not require this implementation form (1.2 a)).
+The [Agent Skills Specification](https://agentskills.io/specification) defines an open, file-based format centered on `SKILL.md`, with optional directories for scripts, references, and assets. When this format is used for an ALPS-conformant Skill, it supplies an implementation form for the Skill Package; ALPS supplies the Process Description semantics, life cycle, and Conformance rules. ALPS does not require this implementation form (1.2 a)).
 
 ### C.2 AGENTS.md
 
@@ -967,7 +980,7 @@ The following standards address life cycle processes and the description of proc
 
 - ISO/IEC/IEEE 15288 — system life cycle processes
 - ISO/IEC/IEEE 12207 — software life cycle processes
-- ISO/IEC/IEEE TR 24774 — guidance for describing processes
+- ISO/IEC/IEEE 24774:2021 — specification for process description
 
 They are listed for readers who also work with those documents. The wording of this specification and of the Process Framework was created independently, and no text, figure, table, example, or translation from those standards is reproduced here. ALPS is not developed, approved, or certified by the organizations that publish them.
 

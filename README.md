@@ -42,7 +42,7 @@ ALPS separates questions that are often mixed together in ordinary descriptions.
 Suppose an Agent Skill processes meeting notes.
 
 - **Purpose** — make the discussion usable after the meeting.
-- **Outcome** — decisions, action items, and unresolved questions can be identified.
+- **Outcome** — decisions, action items, and unresolved questions are identified.
 - **Input** — meeting notes, a transcript, or supplied materials.
 - **Output** — a structured meeting summary.
 - **Activities and Tasks** — identify relevant statements, classify them, and preserve links to the source.
@@ -55,7 +55,7 @@ The Skill does not require the work to be performed by one particular person, Ag
 
 ## Process Framework
 
-The Process Framework formalizes these distinctions and gives ALPS a reusable vocabulary for intent, work content, transformation context, Process relationships, Tailoring, and Assessment.
+The Process Framework formalizes these distinctions and gives ALPS a reusable vocabulary for intent, work content, transformation, application context, Process relationships, Tailoring, and Assessment.
 
 ```mermaid
 flowchart TD

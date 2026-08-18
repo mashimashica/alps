@@ -6,13 +6,13 @@
 
 このリポジトリには、ALPS（Agent Lifecycle Process Skills）規格に準拠するSkillが含まれます。
 
-ALPSは、Purposeと達成すべきOutcomeを中心に業務を捉えるProcess FrameworkをAgent Skillに適用し、各Skillの内容をProcess Descriptionとして記述するための共通規則を定めます。ActivityはOutcomeの達成に寄与するTaskのまとまりであり、ProcessはActivityを通じてInputをOutputに変換します。
+ALPSは、Purposeと意図するOutcomeを中心に業務を捉えるProcess FrameworkをAgent Skillに適用し、各Skillの内容をProcess Descriptionとして記述するための共通規則を定めます。ActivityはOutcomeの達成に寄与するTaskのまとまりであり、ProcessはActivityを通じてInputをOutputに変換します。
 
-ALPSは、Skillの定義・適用・管理を一つのライフサイクルとして捉えます。その全体像を三つのProcessとその関係で示すものを、ALPS Reference Modelと呼びます。これらのProcessは固定された工程ではなく、必要に応じて選択し、組み合わせます。
+ALPSは、Skillの定義・適用・管理を一つのライフサイクルとして捉えます。その全体像を三つのProcessとその関係で示すものを、ALPS Reference Modelと呼びます。これらのProcessは固定された段階ではなく、必要に応じて選択し、組み合わせます。
 
 ### ALPSの使い方
 
-- 独立した作業要求ごとに、ALPS Reference Modelを基準として、該当する参照モデル上のProcessと必要なALPS準拠Skillを選択します。
+- 実質的な作業依頼ごとに、ALPS Reference Modelを基準として、該当する参照モデル上のProcessと必要なALPS準拠Skillを選択します。
 - 準拠Skillは`description`末尾のALPS準拠表示で識別し、その内容から、依頼された作業に適しているかを判断します。
 - 選択した各Skillの`SKILL.md`を最後まで読んで適用します。
 - 複数のSkillを使用する場合は、OutputとInputの授受を明確にして編成します。

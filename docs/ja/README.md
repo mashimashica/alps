@@ -80,7 +80,7 @@ ALPSは、このFrameworkをSkillの記述、ライフサイクル管理、Tailo
 
 ALPSは、Skillのライフサイクルを三つのProcessによって定義します。これらは固定された段階ではなく、必要に応じて並行的、反復的または再帰的に適用できます。矢印は代表的なOutputとInputの受け渡しを示します。
 
-このリポジトリは、ALPSの規格文書と、これらのProcessを実装する三つのAgent Skillを提供します。英語を基準言語とし、各Skillに日本語版を収録します。
+このリポジトリは、ALPSの規格文書と、これらのProcessを実装する三つのAgent Skillを提供します。英語版を正本とし、各Skillに日本語ローカライズを収録します。
 
 ```mermaid
 flowchart LR

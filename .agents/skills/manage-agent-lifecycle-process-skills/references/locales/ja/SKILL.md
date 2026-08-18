@@ -104,7 +104,7 @@ description: Agent Skill、Skill Package、Skill ModelまたはSkill Viewにつ�
 
 - Process FrameworkとALPSを適用する必要がある。両者が矛盾する場合はProcess Frameworkを優先する必要がある。
 - 規範語とその意味は、Process Frameworkの定めによる。本Skillはこれらを再定義しない。
-- 適用される法令、方針、契約、情報管理要求、安全要求、および利用者が指定した変更範囲に従う必要がある。
+- 適用される法令、規制要求、方針、契約、情報管理要求、安全要求、および利用者が指定した変更範囲に従う必要がある。
 - FrameworkレベルのControlおよびEnablerには、適用範囲、例外およびTailoringの可否を明示する必要がある。
 - 実行環境において有効なSkill管理、変更、保持、参照、復旧および削除に関するControlおよびConstraintに従う必要がある。これらの要求はALPS自体ではなく実行環境に由来し、適用される場合は宣言した実行範囲および評価の一部となる。
 

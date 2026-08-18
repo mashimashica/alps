@@ -1,6 +1,6 @@
 ---
 name: apply-agent-lifecycle-process-skills
-description: Select Agent Skills suited to an application situation's needs, conditions, and risks; assess Entry/Exit Criteria and applicable Control, Constraint, and Tailoring decisions; execute the Skills singly or in combination; and manage Output/Input handoffs and overall integrity. Use when work applies existing Skills, composes multiple Skills, or requires evidence of the application rationale or Outcome achievement. Do not use when the work only defines a new Skill or only adopts, changes, or retires Skill assets. ALPS-conformant.
+description: Select Agent Skills suited to an application situation's needs, conditions, and risks; assess Entry/Exit Criteria and applicable Control, Constraint, and Tailoring decisions; execute the Skills singly or in combination; and manage Output/Input handoffs and the completeness and consistency of the composition as a whole. Use when work applies existing Skills, composes multiple Skills, or requires evidence of the application rationale or Outcome achievement. Do not use when the work only defines a new Skill or only adopts, changes, or retires Skill assets. ALPS-conformant.
 ---
 
 # Agent Lifecycle Process Skill Application
@@ -56,7 +56,7 @@ This Activity executes Instances of the selected Skills and achieves their decla
 
 ### Skill Orchestration
 
-This Activity combines multiple Skills and manages their interfaces, handoffs, and overall integrity. It contributes primarily to e), f), and g).
+This Activity combines multiple Skills and manages their interfaces, handoffs, and the completeness and consistency of the composition as a whole. It contributes primarily to e), f), and g).
 
 1. The target set of Outcomes must be identified.
 2. The provenance of each Skill used in the composition should be identified.
@@ -124,12 +124,12 @@ Typical Enablers include managed Skill assets, Agent capabilities, required tool
 
 ## Interfaces & Traceability
 
-| Provider | Output or information item | Receiver Input | Related information |
+| Provider | Output or information item | Receiver | Related information |
 |---|---|---|---|
-| Management Process | Managed Skill information, Tailoring decisions, application conditions | Skill Selection and Skill Execution | Asset, version, status, scope, and conditions. |
-| Skill A | Declared Output | Declared Input of Skill B | Name, meaning, scope, quality conditions, and state. |
-| This application Process | Execution records, decisions, lessons learned, measurement results | Management Process | Skill Instances, evidence, limitations, and proposed changes. |
-| This application Process | Unmet need | Definition Process | Context, expectations, rationale for the absence of a candidate, and risks. |
+| Management Process | Managed Skill information, Tailoring decisions, application conditions | Application Process | Recipient Activities: Skill Selection and Skill Execution. Asset, version, status, scope, and conditions. |
+| Skill A | Declared Output | Skill B | Recipient Input: declared Input of Skill B. Name, meaning, scope, quality conditions, and state. |
+| This application Process | Execution records, decisions, lessons learned, measurement results | Management Process | Recipient Activity: Skill Assessment and Improvement. Skill Instances, evidence, limitations, and proposed changes. |
+| This application Process | Unmet need | Definition Process | Recipient Activity: Skill Need Identification. Context, expectations, rationale for the absence of a candidate, and risks. |
 
 When a change to an Output affects another Skill's Input, the affected Skill and Input should be identified and the necessary reevaluation should be performed.
 
