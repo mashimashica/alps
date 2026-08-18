@@ -192,11 +192,11 @@ Process群の結果は、文書、Artifactまたはモデルに記録される�
 
 **Entry Criteria**は、Processを開始できる条件を示す。**Exit Criteria**は、Processを完了できる条件を示す。Process DescriptionのPurposeと必要な詳細度に照らしてEntry CriteriaおよびExit Criteriaが必要な場合、関係するInputおよびOutputとともに含めるのが望ましい。
 
-### 4.4 受け渡しおよびTrace link
+### 4.4 受け渡しおよびTraceability
 
-Processは単独で完結するとは限らない。そのOutputは別のProcessのInputになり、Trace linkはそれらの関係を見える状態に保つ。
+Processは単独で完結するとは限らない。そのOutputは別のProcessのInputになり、Traceabilityはそれらの関係を見える状態に保つ。
 
-Trace linkは、Outcome、Activity、Taskおよび情報項目を対象とするのが望ましい。このようなTrace linkは、Process要素間の整合性を示す。Trace linkによって得られる証拠は、Process Assessmentに用いるツールの設計にも利用できる。
+Traceabilityは、Outcome、Activity、Taskおよび情報項目を対象とするのが望ましい。Traceabilityは、Process要素間の整合性を示す。Traceabilityによって得られる証拠は、Process Assessmentに用いるツールの設計にも利用できる。
 
 有用な対応付けには、TaskとOutcome、InputとOutcome、およびOutputとOutcomeの関係がある。
 
