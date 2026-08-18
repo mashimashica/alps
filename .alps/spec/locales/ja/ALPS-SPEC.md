@@ -681,7 +681,7 @@ Outputの変更が他のSkillのInputに影響する場合、影響を受けるS
 
 Outputの品質が後続のOutcomeまたはステークホルダーによる受入れに影響する場合、その判定条件および必要な証拠を、Entry Criteria、Exit Criteria、レビューまたはDecision Gateに関連付けるのが望ましい。
 
-トレース関係は、Outcome、Activity、Taskおよび情報項目を対象とするのが望ましい。この対応関係は、整合性およびProcess Assessmentの根拠となる（PF 4.4）。
+Traceabilityは、Outcome、Activity、Taskおよび情報項目を対象とするのが望ましい。この対応関係は、整合性およびProcess Assessmentの根拠となる（PF 4.4）。
 
 注記: 授受の対応を明示することは、情報項目の意味、範囲、状態および品質条件が、Skill間の受け渡しで失われることを防ぐ。
 

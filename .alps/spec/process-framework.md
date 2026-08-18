@@ -187,11 +187,11 @@ Beginning and completion are marked by conditions, not merely positions in time.
 
 **Entry Criteria** state the conditions under which a Process can begin. **Exit Criteria** state the conditions under which it can be completed. When Entry Criteria and Exit Criteria are needed for the Purpose of a Process Description and its required level of detail, they should be included together with relevant Inputs and Outputs.
 
-### 4.4 Handoffs and Trace Links
+### 4.4 Handoffs and Traceability
 
-A Process need not stand alone. Its Outputs can become another Process's Inputs, and trace links keep those relationships visible.
+A Process need not stand alone. Its Outputs can become another Process's Inputs, and Traceability keeps those relationships visible.
 
-Trace links should cover Outcomes, Activities, Tasks, and information items. They show consistency among Process elements. This trace evidence can also inform the design of tools used for Process Assessment.
+Traceability should cover Outcomes, Activities, Tasks, and information items. It shows consistency among Process elements. This evidence can also inform the design of tools used for Process Assessment.
 
 Useful mappings include Tasks to Outcomes, Inputs to Outcomes, and Outputs to Outcomes.
 

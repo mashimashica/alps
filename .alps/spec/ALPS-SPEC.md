@@ -681,7 +681,7 @@ When a change to an Output affects an Input to another Skill, the affected Skill
 
 When Output quality affects a subsequent Outcome or stakeholder acceptance, the determination conditions and necessary evidence should be related to Entry Criteria, Exit Criteria, a review, or a Decision Gate.
 
-Trace links should cover Outcomes, Activities, Tasks, and information items. These mappings provide a basis for integrity and Process Assessment (PF 4.4).
+Traceability should cover Outcomes, Activities, Tasks, and information items. These mappings provide a basis for integrity and Process Assessment (PF 4.4).
 
 NOTE: Explicit exchange mappings keep the meaning, scope, state, and quality conditions of an information item from being lost as it passes between Skills.
 
