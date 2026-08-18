@@ -105,7 +105,7 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 
 - Process FrameworkとALPSを適用する必要がある。両者が矛盾する場合はProcess Frameworkを優先する必要がある。
 - 規範語とその意味は、Process Frameworkの定めによる。本Skillはこれらを再定義しない。
-- Process FrameworkまたはALPSの要求解釈、規範属性の確認、Conformance判定または本Skillの変更には、[process-framework.md](process-framework.md)および[ALPS-SPEC.md](ALPS-SPEC.md)の該当箇条を参照する必要がある。
+- Process FrameworkまたはALPSの要求解釈、規範属性の確認、Conformance判定または本Skillの変更には、[process-framework.md](../../../../../../.alps/spec/locales/ja/process-framework.md)および[ALPS-SPEC.md](../../../../../../.alps/spec/locales/ja/ALPS-SPEC.md)の該当箇条を参照する必要がある。
 - Nameを、他のSkillと区別できる短い名詞句にする必要がある。NameをPurposeの要約にしてはならない。
 - Purposeは、相互に関連する一つまたは複数の上位目的を示す必要がある。
 - Purposeは、可能な限り一文で簡潔に記述するのが望ましい。
@@ -151,12 +151,17 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 
 Outputが他のSkillのInputになる場合、名称、意味および適用範囲を整合させるのが望ましい。
 
+## Shared Normative References
+
+この節は、リポジトリ共通の規範資産を示す参考情報であり、特定の実行方法を要求しない。
+
+- リポジトリ共通の[Process Framework](../../../../../../.alps/spec/locales/ja/process-framework.md)を、Process Descriptionの上位規範として利用する。ALPSと矛盾する場合は、Process Frameworkを優先する。
+- リポジトリ共通の[ALPS Specification](../../../../../../.alps/spec/locales/ja/ALPS-SPEC.md)を、ALPSの規範要求の確認に利用する。必要な解釈に応じて、該当する箇条を参照する。
+
 ## Bundled Resources
 
 この節は参考情報であり、特定の実行方法を要求しない。
 
-- [process-framework.md](process-framework.md)は、Process Descriptionの上位規範を正確に確認するためのControlとして利用する。ALPSと矛盾する場合は、この文書を優先する。
-- [ALPS-SPEC.md](ALPS-SPEC.md)は、ALPSの規範要求を正確に確認するためのControlとして利用する。全文を常時読み込まず、対象となる箇条を参照する。
 - ALPS準拠のSkill Descriptionを起草する場合は、[SKILL-template.md](SKILL-template.md)を参考例として利用できる。適用する構成は、Purposeと必要な詳細度に応じて選ぶ。
 - Skill Packageの構成と付随資源の役割を設計する場合は、[skill-package-format.md](skill-package-format.md)を参考例として利用できる。必要な資源だけを採用する。
 - 正式なニーズ記録、Skill Description、トレーサビリティ表、検証記録または採用判断記録を作る場合は、[record-templates.md](record-templates.md)を適用対象に合わせてTailoringして利用できる。
