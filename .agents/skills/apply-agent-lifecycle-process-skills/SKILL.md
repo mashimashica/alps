@@ -133,6 +133,12 @@ Typical Enablers include managed Skill assets, Agent capabilities, required tool
 
 When a change to an Output affects another Skill's Input, the affected Skill and Input should be identified and the necessary reevaluation should be performed.
 
+## Shared Normative References
+
+This section is informative and has no normative force.
+
+- When ambiguity, conflict, normative-attribute interpretation, Conformance, or Tailoring requires consultation of the governing texts, use the repository-shared [Process Framework](../../../.alps/spec/process-framework.md) and [ALPS Specification](../../../.alps/spec/ALPS-SPEC.md). Routine application continues to use the selected authoritative Skill Description, applicable Framework-level declarations, and managed Tailoring decisions as its direct basis.
+
 ## Bundled Resources
 
 This section is informative and does not require a particular method of execution.

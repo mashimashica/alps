@@ -142,6 +142,12 @@ description: Agent Skill、Skill Package、Skill ModelまたはSkill Viewにつ�
 
 複数のSkillを構成して適用する場合、提供側のOutputと受領側のInputとの対応を明示する必要がある。授受する情報項目の名称、意味および適用範囲は、提供側と受領側で整合させるのが望ましい。同一の情報項目が複数のSkillによって変更される場合、その情報項目の整合性、状態および変更の取扱いを、品質リスクに応じて定める必要がある。
 
+## Shared Normative References
+
+この節は参考情報であり、規範上の強さを持たない。
+
+- Process FrameworkまたはALPSの解釈、競合解決、規範属性、ConformanceまたはTailoringに正本が必要な場合は、リポジトリ共通の[Process Framework](../../../../../../.alps/spec/locales/ja/process-framework.md)および[ALPS Specification](../../../../../../.alps/spec/locales/ja/ALPS-SPEC.md)を参照する。これらはリポジトリ共通の規範資産であり、本Skill Packageが所有する文書ではない。
+
 ## Bundled Resources
 
 この節は参考情報であり、特定の実行方法を要求しない。

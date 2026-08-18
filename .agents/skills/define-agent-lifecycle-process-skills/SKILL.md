@@ -103,7 +103,7 @@ The selected Skill need and selection rationale, verified Skill Description, rec
 
 - Apply the Process Framework and ALPS. If they conflict, the Process Framework must take precedence.
 - The normative words and their meanings are those defined in the Process Framework. This Skill does not redefine them.
-- The applicable clauses of [process-framework.md](references/process-framework.md) and [ALPS-SPEC.md](references/ALPS-SPEC.md) must be consulted when interpreting a Process Framework or ALPS requirement, confirming a normative attribute, determining Conformance, or changing this Skill.
+- The applicable clauses of [process-framework.md](../../../.alps/spec/process-framework.md) and [ALPS-SPEC.md](../../../.alps/spec/ALPS-SPEC.md) must be consulted when interpreting a Process Framework or ALPS requirement, confirming a normative attribute, determining Conformance, or changing this Skill.
 - The Name must be a short noun phrase that distinguishes the Skill from other Skills. The Name must not summarize the Purpose.
 - The Purpose must state the high-level objective or objectives that belong together.
 - The Purpose should be stated concisely in one sentence wherever possible.
@@ -149,13 +149,18 @@ The selected Skill need and selection rationale, verified Skill Description, rec
 
 When an Output becomes another Skill's Input, their names, meanings, and scopes should be aligned.
 
+## Shared Normative References
+
+This section identifies repository-level normative assets and does not require a specific manner of execution.
+
+- Use the repository-shared [Process Framework](../../../.alps/spec/process-framework.md) as the higher-order normative source for Process Descriptions. It takes precedence if it conflicts with ALPS.
+- Use the repository-shared [ALPS Specification](../../../.alps/spec/ALPS-SPEC.md) to confirm ALPS normative requirements. Consult the relevant clauses according to the interpretation needed.
+
 ## Bundled Resources
 
 This section is reference information and does not require a specific manner of execution.
 
 - This root `SKILL.md` is the authoritative English Skill Description. For Japanese-language work, use the [Japanese localization](references/locales/ja/SKILL.md) and its adjacent localized resources. Respond in the user's language; if the localization conflicts with this file, this English description governs.
-- Use [process-framework.md](references/process-framework.md) as a Control for accurately confirming the higher-order norms for Process Descriptions. This document takes precedence if it conflicts with ALPS.
-- Use [ALPS-SPEC.md](references/ALPS-SPEC.md) as a Control for accurately confirming ALPS normative requirements. Consult only the relevant clauses rather than loading the whole document routinely.
 - When drafting an ALPS-conformant Skill Description, [SKILL-template.md](references/SKILL-template.md) can be used as an informative example. Select the structure to apply according to the Purpose and required level of detail.
 - When designing the composition of a Skill Package and the roles of accompanying resources, [skill-package-format.md](references/skill-package-format.md) can be used as an informative example. Adopt only the resources that are needed.
 - When producing a formal need record, Skill Description, traceability table, verification record, or adoption-decision record, [record-templates.md](references/record-templates.md) can be tailored to the subject of application.

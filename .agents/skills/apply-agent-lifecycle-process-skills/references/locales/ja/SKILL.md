@@ -135,6 +135,12 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 
 Outputの変更が他のSkillのInputに影響する場合、影響を受けるSkillとInputを識別し、必要な再評価を行うのが望ましい。
 
+## Shared Normative References
+
+この節は参考情報であり、規範上の強さを持たない。
+
+- 曖昧性、競合、規範属性、ConformanceまたはTailoringの解釈に正本が必要な場合は、リポジトリ共通の[Process Framework](../../../../../../.alps/spec/locales/ja/process-framework.md)および[ALPS Specification](../../../../../../.alps/spec/locales/ja/ALPS-SPEC.md)を参照する。通常の適用では、選択済みの正本Skill Description、適用されるFrameworkレベルの宣言および管理済みTailoring判断を直接の基礎として用いる。
+
 ## Bundled Resources
 
 この節は参考情報であり、特定の実行方法を要求しない。
