@@ -8,6 +8,11 @@
   <img src="../../assets/icon.svg" alt="ALPS アイコン" width="160">
 </p>
 
+<p align="center">
+  <strong>Version 0.1.0</strong><br>
+  初期開発版
+</p>
+
 ## ALPSとは
 
 ALPSは、再利用可能なAgent Skillを記述するための共通言語です。
@@ -106,10 +111,14 @@ ALPS規格は、この参照モデルに加えて、Skill Description、Skill Pa
 | Agent Lifecycle Process Skillの適用 | [SKILL.md](../../.agents/skills/apply-agent-lifecycle-process-skills/SKILL.md) | [SKILL.md](../../.agents/skills/apply-agent-lifecycle-process-skills/references/locales/ja/SKILL.md) |
 | Agent Lifecycle Process Skillの管理 | [SKILL.md](../../.agents/skills/manage-agent-lifecycle-process-skills/SKILL.md) | [SKILL.md](../../.agents/skills/manage-agent-lifecycle-process-skills/references/locales/ja/SKILL.md) |
 
+## バージョン管理
+
+ALPSは、リポジトリ全体を一つのリリース単位としてバージョン管理します。現在のVersionは**0.1.0**であり、初期開発段階にあります。Releaseの正確な内容は、Git TagとCommitによって特定します。[CHANGELOG.md](../../CHANGELOG.md)および[バージョン管理方針](versioning.md)を参照してください。
+
 ## ライセンスと再利用
 
 明示した第三者資料を除き、本リポジトリには[Apache License, Version 2.0](../../LICENSE)を適用します。ライセンスの対象は、規格、文書、Skill Package、スクリプトおよび本プロジェクトが作成したアイコン一点です。帰属表示が必要な資料、および本リポジトリのライセンス対象外となる資料については、[NOTICE](../../NOTICE)を参照してください。
 
 ## 貢献
 
-貢献は、リポジトリのライセンスおよび[Developer Certificate of Origin 1.1](../../DCO)に基づいて受け入れます。貢献するすべてのコミットには`Signed-off-by`トレーラーが必要です。変更を提出する前に[CONTRIBUTING.md](CONTRIBUTING.md)を確認してください。
+貢献は、リポジトリのライセンスおよび[Developer Certificate of Origin 1.1](../../DCO)に基づいて受け入れます。貢献するすべてのコミットには`Signed-off-by`トレーラーが必要です。変更を提出する前に[CONTRIBUTING.md](../../CONTRIBUTING.md)を確認してください。

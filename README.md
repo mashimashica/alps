@@ -8,6 +8,11 @@
   <img src="assets/icon.svg" alt="ALPS icon" width="160">
 </p>
 
+<p align="center">
+  <strong>Version 0.1.0</strong><br>
+  Initial development
+</p>
+
 ## What is ALPS?
 
 ALPS is a common language for describing reusable Agent Skills.
@@ -105,6 +110,10 @@ Beyond this Reference Model, ALPS specifies rules for Skill Descriptions, Skill 
 | Agent Lifecycle Process Skill Definition | [SKILL.md](.agents/skills/define-agent-lifecycle-process-skills/SKILL.md) | [SKILL.md](.agents/skills/define-agent-lifecycle-process-skills/references/locales/ja/SKILL.md) |
 | Agent Lifecycle Process Skill Application | [SKILL.md](.agents/skills/apply-agent-lifecycle-process-skills/SKILL.md) | [SKILL.md](.agents/skills/apply-agent-lifecycle-process-skills/references/locales/ja/SKILL.md) |
 | Agent Lifecycle Process Skill Management | [SKILL.md](.agents/skills/manage-agent-lifecycle-process-skills/SKILL.md) | [SKILL.md](.agents/skills/manage-agent-lifecycle-process-skills/references/locales/ja/SKILL.md) |
+
+## Versioning
+
+ALPS is versioned as a single repository-wide release unit. The current version is **0.1.0**, and it remains in initial development. The exact contents of a release are identified by its Git tag and commit. See [CHANGELOG.md](CHANGELOG.md) for release history and [Versioning](docs/versioning.md) for compatibility and release rules.
 
 ## License and Reuse
 
