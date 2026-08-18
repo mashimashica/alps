@@ -1,6 +1,6 @@
 ---
 name: apply-agent-lifecycle-process-skills
-description: 適用状況のニーズ、条件およびリスクに合うAgent Skillを選択し、Entry/Exit Criteria、Control、ConstraintおよびTailoringの決定を確認する。Skillを単独で、または組み合わせて実行する。さらに、Skill間におけるOutputとInputの授受、および構成全体の整合性を管理する。既存Skillを使う作業、複数Skillの編成、適用根拠またはOutcome達成の証拠を求められたときに使用する。新規Skillの定義だけ、またはSkill資産の採用・変更・廃止だけを行う場合は使用しない。ALPS準拠。
+description: 適用状況のニーズ、条件およびリスクに合うAgent Skillを選択し、Entry/Exit Criteria、Control、ConstraintおよびTailoringの決定を確認する。Skillを単独で、または組み合わせて実行する。さらに、Skill間におけるOutputとInputの授受、および構成全体の完全性および一貫性を管理する。既存Skillを使う作業、複数Skillの編成、適用根拠またはOutcome達成の証拠を求められたときに使用する。新規Skillの定義だけ、またはSkill資産の採用・変更・廃止だけを行う場合は使用しない。ALPS準拠。
 ---
 
 > 本書は日本語ローカライズである。基準となる英語版は[SKILL.md](../../../SKILL.md)であり、内容が矛盾する場合は英語版を優先する。
@@ -58,7 +58,7 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 
 ### Skill編成
 
-このActivityは、複数のSkillを組み合わせ、そのインターフェース、授受および構成全体の整合性を管理する。主にe)、f)およびg)に寄与する。
+このActivityは、複数のSkillを組み合わせ、そのインターフェース、授受および構成全体の完全性および一貫性を管理する。主にe)、f)およびg)に寄与する。
 
 1. 目標とするOutcomeの集合を識別する必要がある。
 2. 構成に用いる各Skillの出典を識別するのが望ましい。
@@ -91,7 +91,7 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 - ニーズ、条件、選択結果、適用形態およびリスク判断が記録されている。
 - 選択した各SkillのEntry/Exit Criteria、要求事項として記述されたTask、Outcomeの証拠および未解決事項が判定されている。
 - 複合適用では、OutputとInputの対応、共有情報の状態およびIntegrationが確認されている。
-- Outputの引渡し、保留、定義Processへのニーズの引渡し、管理ProcessへのTailoring依頼、または終了したことが明示されている。
+- Outputを引き渡したか、保留したか、ニーズを定義Processに引き渡したか、管理ProcessにTailoring判断を依頼したか、または終了したかが明示されている。
 - Conformanceを主張する場合、その基準と証拠が検証されている。
 
 ## Controls
@@ -120,7 +120,7 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 - Conformanceを主張する場合、対象、適用範囲、およびOutcome、Taskまたは双方のどれを基準にするかを明示する必要がある。
 - OutcomeへのFull Conformanceでは、Outcomes節に列挙したすべてのOutcomeの達成を示す必要がある。
 - TaskへのFull Conformanceでは、ActivityおよびTaskにおいて「〜する必要がある」または「〜してはならない」で示されたすべての要求事項の充足を示す必要がある。
-- 「いずれのSkillも適用しない」と決定してOutcomeの一部を達成対象としない場合、そのOutcomeを宣言し、Full Conformanceを主張せず、ALPS 12.3のTailored Conformanceを用いる必要がある。
+- 「いずれのSkillも適用しない」と決定してOutcomeの一部が適用対象外となる場合、適用対象外となるOutcomeを宣言し、Full Conformanceを主張せず、ALPS 12.3のTailored Conformanceを用いる必要がある。
 - 変更または除外の結果、選択したFull Conformance基準を満たさない場合、Tailored Conformanceの主張では、管理ProcessでTailoringしたSkillまたはProcessとその適用範囲を宣言し、その適用範囲に残されたOutcomeおよびActivity・Taskに含まれる要求事項の充足を示す必要がある。
 - 個別のActivityについてのみ、独立したProcess Outcome Conformanceを主張してはならない。
 
@@ -128,10 +128,10 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 
 | 提供元 | Outputまたは情報項目 | 受領先 | 関連情報 |
 |---|---|---|---|
-| 管理Process | 管理されたSkill情報、Tailoring決定、適用条件 | Skill選択・実行 | 資産、版、状態、範囲および条件。 |
-| Skill A | 宣言されたOutput | Skill Bの宣言されたInput | 名称、意味、範囲、品質条件および状態。 |
-| 本適用Process | 実行記録、意思決定、教訓、測定結果 | 管理Process | Skill Instance、証拠、制限および変更候補。 |
-| 本適用Process | 未充足ニーズ | 定義Process | 文脈、期待、候補不在の根拠およびリスク。 |
+| 管理Process | 管理されたSkill情報、Tailoring決定、適用条件 | 適用Process | 受領Activity: Skill選択およびSkill実行。資産、版、状態、範囲および条件。 |
+| Skill A | 宣言されたOutput | Skill B | 受領側Input: Skill Bの宣言されたInput。名称、意味、範囲、品質条件および状態。 |
+| 本適用Process | 実行記録、意思決定、教訓、測定結果 | 管理Process | 受領Activity: Skill評価・改善。Skill Instance、証拠、制限および変更候補。 |
+| 本適用Process | 未充足ニーズ | 定義Process | 受領Activity: Skillニーズ識別。文脈、期待、候補不在の根拠およびリスク。 |
 
 Outputの変更が他のSkillのInputに影響する場合、影響を受けるSkillとInputを識別し、必要な再評価を行うのが望ましい。
 

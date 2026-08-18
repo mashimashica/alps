@@ -19,7 +19,7 @@
 
 このFrameworkは、適用分野を問わず使用できる。一つのライフサイクルまたは方法を規定することなく、Processの記述、適用、評価および改善を支援する。
 
-ALPSは、このFrameworkをAgent Skillに適用する。ALPSの規定がこのFrameworkと競合する場合は、このFrameworkが優先する必要がある。
+ALPSは、このFrameworkをAgent Skillに適用する。ALPSの規定がこのFrameworkと競合する場合は、このFrameworkを優先する必要がある。
 
 この日本語版では、「〜する必要がある」は要求を、「〜してはならない」は禁止を示す。「〜するのが望ましい」は推奨を、「〜しないのが望ましい」は非推奨を示す。「〜してよい」は許可を示す。「通常」などの表現は、要求を設けることなく、通例の実務を示す。「〜できる」「〜され得る」は、可能性または能力を述べる記述であって、規範属性を持たない。これらの語を大文字で表記する形式は用いない。
 
@@ -87,7 +87,7 @@ Nameは作業を指し示し、Purposeはその理由を与える。両者の機
 
 **Name**はProcessを識別し、Process Model内の他のProcessと区別する。Nameは簡潔な名詞句である必要があり、Processの中心的な関心を表す必要がある。Nameは、Purposeの要約であってはならない。英語では、Nameに“process”という語を結び付けるのが望ましいが、これは意味上の要求ではなく言語上の規約である。
 
-**Purpose**は、Processを実行するための、相互に関連する一つまたは複数の上位目的を示す必要がある。Purposeは、有効な実施によって期待するOutcomeを包含する。
+**Purpose**は、Processを実行するための、相互に関連する一つまたは複数の上位目的を示す必要がある。Purposeは、有効な実施によって期待されるOutcomeを包含する。
 
 隣接するProcessの範囲が重なって見える場合、Purposeは、Processの境界も明確にするのが望ましい。Purposeは簡潔にし、可能な限り一文とするのが望ましい。ActivityまたはOutcomeを要約したり、独立した目的を結合したりすることは避けるのが望ましい。補足説明は参考情報に置くことができる。
 
@@ -111,7 +111,7 @@ Outcomeは簡潔にするのが望ましい。ただし、簡潔さよりも一�
 
 個々の行為をまとめながら全体への寄与を失わないとき、作業は理解可能になる。
 
-**Activity**は、Process内のまとまりあるTaskの集合である。Activityは、関連する行為を、それらがProcessにどのように寄与するかを理解し、伝達できるように整理する。
+**Activity**は、Process内のまとまりあるTaskの集合である。Activityは、関連する行為を、そのProcessへの寄与を理解し、伝達できるように整理する。
 
 十分な凝集性と詳細をもつActivityは、固有のPurposeとOutcomeをもつSub-processとして扱うことができる。ActivityとSub-processの集合は、すべてのProcess Outcomeを網羅し、Process Purposeを満たす必要がある。ActivityとOutcomeを一対一に対応させる必要はない。
 
@@ -131,7 +131,7 @@ Process、Sub-processおよびActivityの粒度に、普遍的な基準はない
 
 通常は、主要なOutputとOutcomeを境界の判断に用いる。Activityの中間Outputは、通常、Process境界を定めない。
 
-人の介入をほとんど必要としない密接に結び付いた自動化作業は、一つのProcess Descriptionにまとめることができる。分解は、境界、責務または関係の理解を改善するあいだは有用である。理解または利用を損なうことになる階層の追加は行わない。
+人の介入をほとんど必要としない密接に結び付いた自動化作業は、一つのProcess Descriptionにまとめることができる。分解は、境界、責務または関係の理解を改善する限り有用である。理解または利用を損なうことになる階層の追加は行わない。
 
 境界内のOutcome、ActivityおよびTaskは、その作業が一つにまとまる理由を、一貫した説明として形づくる。他のProcessへの依存は、実行可能な限り減らす。
 
@@ -190,9 +190,7 @@ Process群の結果は、文書、Artifactまたはモデルに記録される�
 
 開始と完了は、単なる時間上の位置ではなく、条件によって区切られる。
 
-**Entry Criteria**は、Processを開始できる条件を示す。**Exit Criteria**は、Processを完了できる条件を示す。適切に構成したProcess Descriptionは、関係するInputとOutputに加えて、これらのCriteriaを含む。
-
-Entry CriteriaとExit Criteriaは、Process DescriptionのPurposeと必要な詳細さに応じて用いる。
+**Entry Criteria**は、Processを開始できる条件を示す。**Exit Criteria**は、Processを完了できる条件を示す。Process DescriptionのPurposeと必要な詳細度に照らしてEntry CriteriaおよびExit Criteriaが必要な場合、関係するInputおよびOutputとともに含めるのが望ましい。
 
 ### 4.4 受け渡しおよびTrace link
 
@@ -234,7 +232,7 @@ Process Frameworkは、望ましいProcess環境の確立、確立済み環境�
 
 ### 5.2 ライフサイクルモデルおよび適用状況の変化
 
-ライフサイクルモデルは、選択した適用に応じてProcess間の関係に順序を与える。それを記述する文書の箇条順が、それだけで時間上の順序に変わるわけではない。
+ライフサイクルモデルは、選択した適用に応じてProcess間の関係に順序を与える。それを記述する文書の箇条順が、それだけで時間的な順序を意味するわけではない。
 
 **ライフサイクルモデル**は、ライフサイクルProcessとActivityを、意思疎通と理解に用いる共通の基礎にまとめる。その詳細は、Process、Outcome、Process間の関係および順序によって表現される。
 
@@ -301,7 +299,7 @@ IterationまたはRecursionがOutputを変更すると、影響を受けるProce
 
 Tailoringは、Activityを受容可能なリスク水準で実行するために十分な厳密さを設定する。厳密さが不足すると、問題が生じる可能性が高まり、過剰な厳密さはコストまたは日程のリスクを高め得る。
 
-Tailoringは、通常、リスクと適用状況の変化に応じて適用期間を通して動的に継続する。その運用をレビューし、条件が必要とするときに改訂するのが望ましい。
+Tailoringは、通常、リスクと適用状況の変化に応じて適用期間を通して動的に継続する。その運用をレビューし、状況に応じて改訂するのが望ましい。
 
 ### 7.2 Tailoringが変更できるもの
 

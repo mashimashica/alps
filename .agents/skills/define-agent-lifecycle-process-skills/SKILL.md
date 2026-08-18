@@ -41,7 +41,7 @@ This Activity determines the structure and content of a Skill Description that s
 
 1. The Skill boundary must be established from the primary Outputs and Outcomes.
 2. Dependencies on other Skills must be reduced as far as practicable.
-3. A two-layer structure comprising a discovery layer and an execution layer should be adopted.
+3. The Skill Description must provide distinguishable discovery-layer and execution-layer information. Their physical separation is not required.
 4. A significant Activity that benefits from detailed treatment may be separated into another Skill.
 5. Name, Purpose, and Outcomes must be written in accordance with the applicable description rules.
 6. Each Task must have the primary function of expressing an individual action that supports achievement of one or more Outcomes and must be written so that the object and operation of that action are distinguishable.
@@ -63,7 +63,7 @@ This Activity confirms the descriptive conformance of the Skill Description and 
 3. It must be confirmed that the element classification of each statement is consistent with its primary function.
 4. It must be confirmed that normative attributes are distinguishable.
 5. When a general Skill is verified, it must be confirmed that its normative part does not require a specific method, technique, tool, or execution sequence.
-6. When discovery and execution layers are used, it must be confirmed that their descriptions are consistent.
+6. It must be confirmed that the discovery-layer and execution-layer information are consistent.
 7. The review should incorporate a perspective independent of the Skill author.
 8. The achievability of the Outcomes should be evaluated through trials in representative contexts of use.
 9. It should be evaluated whether applicability can be determined from discovery-layer information alone, including the Skill Discovery Description.

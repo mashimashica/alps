@@ -185,9 +185,7 @@ Representative Inputs and Outputs show one possible manner of performance. They 
 
 Beginning and completion are marked by conditions, not merely positions in time.
 
-**Entry Criteria** state the conditions under which a Process can begin. **Exit Criteria** state the conditions under which it can be completed. A well-formed Process Description includes them along with relevant Inputs and Outputs.
-
-Entry and Exit Criteria are used according to the Purpose of the Process Description and the detail needed.
+**Entry Criteria** state the conditions under which a Process can begin. **Exit Criteria** state the conditions under which it can be completed. When Entry Criteria and Exit Criteria are needed for the Purpose of a Process Description and its required level of detail, they should be included together with relevant Inputs and Outputs.
 
 ### 4.4 Handoffs and Trace Links
 

@@ -1,6 +1,6 @@
 # Representative Template for an ALPS-Conformant `SKILL.md`
 
-This material is an informative example for drafting a readable Skill Description. It does not require particular headings, order, clause numbers, or identifiers. Give precedence to the Process Framework, ALPS, and the rules of the applicable execution environment.
+This material is an informative example for drafting a readable Skill Description. It does not require a physical split between the discovery layer and execution layer. It does not require particular headings, order, clause numbers, or identifiers. Give precedence to the Process Framework, ALPS, and the rules of the applicable execution environment.
 
 ## Template
 
