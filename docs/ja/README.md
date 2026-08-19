@@ -25,29 +25,29 @@ ALPSでは、次のように区別します。
 
 有用な記述によって、読者は、作業がなぜ存在するか、何を成功とみなすか、どの作業がProcessに属するか、何が入り何が出るか、どの条件が適用されるかを理解できます。特定の実行主体または実装方法を一つに固定する必要はありません。
 
-## Agent Plugin Package
-
-本リポジトリは、[Agent Plugins](https://agent-plugins.org/) v1のPackageです。リポジトリ直下の[`plugin.json`](../../plugin.json)がPackageを識別し、三つの可搬なAgent Skillを[`skills/`](../../skills/)の直下に配置します。リポジトリ共通の規範資産は[`.alps/`](../../.alps/)に保持し、各Skillから参照します。
-
-参照Skillの識別子には、`<verb>-alps`の簡潔な命名規則を用います。
-
-- `define-alps` — 再利用可能なSkillを定義・検証する。
-- `apply-alps` — Skillを選択・実行・編成する。
-- `manage-alps` — Skill資産およびその適用を統制・改善する。
+ALPSは、Agent Skillの定義・適用・管理を扱う三つの参照Skillも提供します。
 
 ## ALPSを利用する
 
 ### Pluginをインストールする
 
-Node.js 18以降が利用できる環境で、[`plugins` CLI](https://www.npmjs.com/package/plugins)からALPSをインストールします。
+ALPSは、[Agent Plugins](https://agent-plugins.org/) v1のPackageとして配布します。Node.js 18以降が利用できる環境で、[`plugins` CLI](https://www.npmjs.com/package/plugins)からインストールします。
 
 ```console
 npx plugins add mashimashica/alps
 ```
 
-インストーラーはAgent PluginのPackageを検出し、対応するAgentクライアントを判別し、確認後にインストールします。インストール後は、Skillを再読み込みできるよう、対象クライアントを再起動してください。
+インストーラーはPackageを検出し、対応するAgentクライアントを判別し、確認後にインストールします。インストール後は、Skillを再読み込みできるよう、対象クライアントを再起動してください。
 
-上記のコマンドでインストールすると、`plugins` CLIは[`.alps/`](../../.alps/)を含むPackage全体を保持するため、各Skillから共通規範文書への参照を解決できます。`skills/`だけをコピーしても、完全なALPSのインストールにはなりません。
+このコマンドでは[`.alps/`](../../.alps/)を含むPackage全体が保持されるため、各Skillから共通規範文書への参照を解決できます。`skills/`だけをコピーしても、完全なALPSのインストールにはなりません。
+
+### 参照Skillを選択する
+
+| Skill | 使用する状況 |
+| --- | --- |
+| `define-alps` | Skillニーズが満たされていない場合、またはSkillを設計、再定義もしくは検証する場合。 |
+| `apply-alps` | 既存Skillを選択、実行、編成または授受する場合。 |
+| `manage-alps` | Skillを採用、Tailoring、評価、変更、改善または廃止する場合。 |
 
 ### 参照Skillを明示的に呼び出す
 
@@ -76,6 +76,26 @@ ALPSを継続的に利用するリポジトリでは、以後のAgentセッシ�
 - 既存Skillを適用する作業には`apply-alps`、未充足ニーズまたはSkillの再定義には`define-alps`、採用、Tailoring、評価、変更または廃止には`manage-alps`を用います。
 - 複数Skillを組み合わせる場合は、すべてのOutput/Inputの授受を明示します。
 ```
+
+## ALPS参照モデル
+
+ALPSは、Skillのライフサイクルを三つのProcessによって定義します。これらは固定された段階ではなく、必要に応じて並行的、反復的または再帰的に適用できます。矢印は代表的なOutputとInputの受け渡しを示します。
+
+このリポジトリは、ALPSの規格文書と、これらのProcessを実装する三つのAgent Skillを提供します。英語版を正本とし、各Skillに日本語ローカライズを収録します。
+
+```mermaid
+flowchart LR
+    DEFINE["Definition Process<br/>Skillを定義・検証する"]
+    MANAGE["Management Process<br/>Skill資産を統制・改善する"]
+    APPLY["Application Process<br/>Skillを選択・実行・編成する"]
+
+    DEFINE -->|"検証済みのSkill Description"| MANAGE
+    MANAGE -->|"管理されたSkill・適用条件"| APPLY
+    APPLY -->|"実行記録・教訓・測定結果"| MANAGE
+    MANAGE -->|"変更・再検証要求"| DEFINE
+```
+
+ALPS規格は、この参照モデルに加えて、Skill Description、Skill Package、複数Skillの組合せと受け渡し、Control、Constraint、Enabler、Entry/Exit Criteria、Decision Gate、TailoringおよびConformanceの規則を定めます。
 
 ## Skillの読み方
 
@@ -132,26 +152,6 @@ flowchart TD
 `Name`、`Purpose`および`Outcomes`は、Process Descriptionの必須要素です。ActivityとTaskは作業内容を記述し、記載順だけを理由として、実装方法や手順上の段階として解釈されるものではありません。InputはOutputに変換される項目です。人、Agent、ツールおよび実行環境はInputではなく、資源またはEnablerです。
 
 ALPSは、このFrameworkをSkillの記述、ライフサイクル管理、Tailoring、AssessmentおよびConformanceに適用します。Frameworkは、ライフサイクル、段階の順序または特定の実装方法を規定しません。
-
-## ALPS参照モデル
-
-ALPSは、Skillのライフサイクルを三つのProcessによって定義します。これらは固定された段階ではなく、必要に応じて並行的、反復的または再帰的に適用できます。矢印は代表的なOutputとInputの受け渡しを示します。
-
-このリポジトリは、ALPSの規格文書と、これらのProcessを実装する三つのAgent Skillを提供します。英語版を正本とし、各Skillに日本語ローカライズを収録します。
-
-```mermaid
-flowchart LR
-    DEFINE["Definition Process<br/>Skillを定義・検証する"]
-    MANAGE["Management Process<br/>Skill資産を統制・改善する"]
-    APPLY["Application Process<br/>Skillを選択・実行・編成する"]
-
-    DEFINE -->|"検証済みのSkill Description"| MANAGE
-    MANAGE -->|"管理されたSkill・適用条件"| APPLY
-    APPLY -->|"実行記録・教訓・測定結果"| MANAGE
-    MANAGE -->|"変更・再検証要求"| DEFINE
-```
-
-ALPS規格は、この参照モデルに加えて、Skill Description、Skill Package、複数Skillの組合せと受け渡し、Control、Constraint、Enabler、Entry/Exit Criteria、Decision Gate、TailoringおよびConformanceの規則を定めます。
 
 ## 収録内容
 
