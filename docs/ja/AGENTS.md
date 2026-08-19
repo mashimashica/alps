@@ -12,10 +12,11 @@ ALPSは、Skillの定義・適用・管理を一つのライフサイクルと�
 
 ### ALPSの使い方
 
-- 実質的な作業依頼ごとに、ALPS Reference Modelを基準として、該当する参照モデル上のProcessと必要なALPS準拠Skillを選択します。
-- 準拠Skillは`description`末尾のALPS準拠表示で識別し、その内容から、依頼された作業に適しているかを判断します。
-- 選択した各Skillの`SKILL.md`を最後まで読んで適用します。
-- 複数のSkillを使用する場合は、OutputとInputの授受を明確にして編成します。
+- 実質的な依頼ごとに、ALPS Reference Modelを基準として、`define-alps`、`apply-alps`および`manage-alps`から適用する参照Skillを選択します。
+- その他のALPS準拠Skillは、`description`末尾の`ALPS準拠。`表示によって識別し、発見用の記述から依頼への適合性を判断します。
+- 選択した各Skillの`SKILL.md`を、適用前に最後まで読みます。
+- 既存Skillを適用する作業には`apply-alps`、未充足ニーズまたはSkillの再定義には`define-alps`、採用、Tailoring、評価、変更または廃止には`manage-alps`を用います。
+- 複数Skillを組み合わせる場合は、すべてのOutput/Inputの授受を明示します。
 
 ## リポジトリの作業フロー
 
