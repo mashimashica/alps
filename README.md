@@ -47,6 +47,8 @@ npx plugins add mashimashica/alps
 
 The installer discovers the Agent Plugin package, detects supported agent clients, and asks for confirmation before installation. Restart the affected clients after installation so they reload the Skills.
 
+The package is installed as a unit, including [`.alps/`](.alps/), so the Skills' shared normative references remain resolvable. Copying only `skills/` is not a complete ALPS installation.
+
 ### Invoke a reference Skill explicitly
 
 Clients may select a Skill from its discovery description. When a particular ALPS Process is intended, name the Skill identifier directly in the request. This natural-language form does not depend on client-specific slash-command syntax.
@@ -61,14 +63,14 @@ Use `manage-alps` to assess this Skill from its execution records and propose co
 
 ### Add repository guidance
 
-For a repository that uses ALPS regularly, add a short policy to [AGENTS.md](https://agents.md/) so later agent sessions apply the same selection and composition rules:
+For a repository that uses ALPS regularly, add a short policy to [AGENTS.md](https://agents.md/) so later agent sessions apply the same selection and composition rules. The block below is a minimal policy for a consumer repository. ALPS's own [`AGENTS.md`](AGENTS.md) applies the same core policy and adds repository-maintenance instructions.
 
 ```md
 ## ALPS
 
 This repository uses the ALPS Reference Model.
 
-- For each substantive request, select the applicable reference Skills from `define-alps`, `apply-alps`, and `manage-alps`.
+- For each substantive request, use the ALPS Reference Model to select the applicable reference Skills from `define-alps`, `apply-alps`, and `manage-alps`.
 - Identify other ALPS-conformant Skills by the `ALPS-conformant.` marker at the end of `description`, then assess their fit from the discovery description.
 - Read each selected Skill's complete `SKILL.md` before applying it.
 - Use `apply-alps` for existing Skills, `define-alps` for an unmet need or Skill redefinition, and `manage-alps` for adoption, Tailoring, assessment, change, or retirement.
