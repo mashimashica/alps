@@ -1,0 +1,93 @@
+name: Temporary ALPS install layout validation
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the pull request
+        uses: actions/checkout@v5
+
+      - name: Show supported targets
+        run: npx --yes plugins targets
+
+      - name: Install ALPS for VS Code
+        run: |
+          mkdir -p "$RUNNER_TEMP/alps-consumer"
+          cd "$RUNNER_TEMP/alps-consumer"
+          npx --yes plugins add "$GITHUB_WORKSPACE" --target vscode --scope project --yes
+
+      - name: Inspect installed package and shared references
+        run: |
+          python3 - <<'PY'
+          from __future__ import annotations
+
+          import os
+          from pathlib import Path
+
+          roots = [Path.home(), Path(os.environ["RUNNER_TEMP"]), Path(os.environ["GITHUB_WORKSPACE"])]
+          seen: set[Path] = set()
+          skills: list[Path] = []
+          specs: list[Path] = []
+          manifests: list[Path] = []
+
+          for root in roots:
+              if not root.exists():
+                  continue
+              for path in root.rglob("SKILL.md"):
+                  if path.parts[-2:] == ("define-alps", "SKILL.md") and path not in seen:
+                      seen.add(path)
+                      skills.append(path)
+              for path in root.rglob("ALPS-SPEC.md"):
+                  if path not in seen:
+                      seen.add(path)
+                      specs.append(path)
+              for path in root.rglob("plugin.json"):
+                  try:
+                      text = path.read_text(encoding="utf-8")
+                  except (OSError, UnicodeDecodeError):
+                      continue
+                  if '"name": "alps"' in text and path not in seen:
+                      seen.add(path)
+                      manifests.append(path)
+
+          print("DEFINE SKILLS")
+          for skill in skills:
+              expected = (skill.parent / "../../.alps/spec/ALPS-SPEC.md").resolve()
+              print(f"- {skill}")
+              print(f"  expected shared spec: {expected}")
+              print(f"  resolves: {expected.is_file()}")
+
+          print("ALPS SPECS")
+          for path in specs:
+              print(f"- {path}")
+
+          print("ALPS MANIFESTS")
+          for path in manifests:
+              print(f"- {path}")
+
+          installed = [skill for skill in skills if not skill.is_relative_to(Path(os.environ["GITHUB_WORKSPACE"]))]
+          if not installed:
+              raise SystemExit("No installed define-alps/SKILL.md was found outside the checkout")
+          broken = [
+              skill
+              for skill in installed
+              if not (skill.parent / "../../.alps/spec/ALPS-SPEC.md").resolve().is_file()
+          ]
+          if broken:
+              raise SystemExit(
+                  "Installed Skill shared-reference resolution failed:\n"
+                  + "\n".join(str(path) for path in broken)
+              )
+
+          print("Every installed define-alps Skill resolves the shared ALPS specification.")
+          PY
