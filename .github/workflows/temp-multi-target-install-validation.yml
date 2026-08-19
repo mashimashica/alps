@@ -155,12 +155,15 @@ jobs:
           print("README and AGENTS guidance is aligned in English and Japanese.")
           PY
 
-      - name: Install and inspect every supported target
+      - name: Install GitHub Copilot CLI for native plugin validation
+        run: npm install -g @github/copilot
+
+      - name: Install and inspect available client targets
         run: |
           set -u
           failures=0
 
-          for target in claude-code cursor codex grok-build kimi-code github-copilot vscode; do
+          for target in claude-code cursor codex github-copilot vscode; do
             echo "::group::Target ${target}"
             home="$RUNNER_TEMP/home-${target}"
             source_parent="$RUNNER_TEMP/source-${target}"
