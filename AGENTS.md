@@ -12,8 +12,6 @@ ALPS treats Skill definition, application, and management as a single lifecycle.
 
 ### Using ALPS
 
-Keep the core policy in this section aligned with the canonical consumer-repository template in [README.md](README.md#add-repository-guidance). Repository-specific workflow rules belong in the separate section below.
-
 - For each substantive request, use the ALPS Reference Model to select the applicable reference Skills from `define-alps`, `apply-alps`, and `manage-alps`.
 - Identify other ALPS-conformant Skills by the `ALPS-conformant.` marker at the end of `description`, then assess their fit from the discovery description.
 - Read each selected Skill's complete `SKILL.md` before applying it.
