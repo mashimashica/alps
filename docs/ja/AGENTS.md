@@ -12,6 +12,8 @@ ALPSは、Skillの定義・適用・管理を一つのライフサイクルと�
 
 ### ALPSの使い方
 
+本リポジトリではALPS Reference Modelを使用します。
+
 - 実質的な依頼ごとに、ALPS Reference Modelを基準として、`define-alps`、`apply-alps`および`manage-alps`から適用する参照Skillを選択します。
 - その他のALPS準拠Skillは、`description`末尾の`ALPS準拠。`表示によって識別し、発見用の記述から依頼への適合性を判断します。
 - 選択した各Skillの`SKILL.md`を、適用前に最後まで読みます。
