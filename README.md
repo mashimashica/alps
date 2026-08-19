@@ -63,7 +63,7 @@ Use `manage-alps` to assess this Skill from its execution records and propose co
 
 ### Add repository guidance
 
-For a repository that uses ALPS regularly, add a short policy to [AGENTS.md](https://agents.md/) so later agent sessions apply the same selection and composition rules. The block below is a minimal policy for a consumer repository. ALPS's own [`AGENTS.md`](AGENTS.md) applies the same core policy and adds repository-maintenance instructions.
+For a repository that uses ALPS regularly, add a short policy to [AGENTS.md](https://agents.md/) so later agent sessions apply the same selection and composition rules. The block below is the canonical minimal policy for a consumer repository. ALPS's own [`AGENTS.md`](AGENTS.md) applies the same core policy and adds repository-maintenance instructions.
 
 ```md
 ## ALPS
