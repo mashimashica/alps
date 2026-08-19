@@ -29,6 +29,8 @@ A useful description lets a reader understand why the work exists, what success 
 
 This repository is an [Agent Plugins](https://agent-plugins.org/) v1 package. The root [`plugin.json`](plugin.json) identifies the package, and the three portable Agent Skills are immediate children of [`skills/`](skills/). Repository-shared normative assets remain under [`.alps/`](.alps/) and are referenced by the Skills.
 
+The package is installable through Claude Code, Cursor, Codex, GitHub Copilot CLI, and Visual Studio Code. Client-native adapters keep presentation metadata where each client supports it: Claude Code uses [`.claude-plugin/plugin.json`](.claude-plugin/plugin.json), Cursor uses [`.cursor-plugin/plugin.json`](.cursor-plugin/plugin.json), and Codex uses [`.codex-plugin/plugin.json`](.codex-plugin/plugin.json) plus each Skill's `agents/openai.yaml`. The root manifest remains the source of truth for portable package identity and component discovery.
+
 The reference Skills use concise identifiers following the `<verb>-alps` convention:
 
 - `define-alps` — defines and verifies reusable Skills;

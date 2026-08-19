@@ -1,0 +1,21 @@
+{
+  "name": "alps",
+  "version": "0.2.0",
+  "description": "Agent Lifecycle Process Skills: a process-based framework and reference model for defining, applying, and managing reusable Agent Skills.",
+  "author": {
+    "name": "mashimashica"
+  },
+  "homepage": "https://github.com/mashimashica/alps",
+  "repository": "https://github.com/mashimashica/alps",
+  "license": "Apache-2.0",
+  "keywords": [
+    "agent-plugins",
+    "agent-skills",
+    "process",
+    "lifecycle",
+    "governance",
+    "alps"
+  ],
+  "logo": "assets/icon.svg",
+  "skills": "skills/"
+}
