@@ -1,5 +1,5 @@
 ---
-name: define-agent-lifecycle-process-skills
+name: define-alps
 description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適合する評価可能なSkill Descriptionを設計・検証する。新しいSkillの構想、既存Skillの再定義、Purpose・Outcome・Activity・Taskの設計、記述適合性レビュー、代表的文脈での試行、トレーサビリティまたは採用判断の証拠を求められたときに使用する。採用、変更の統制または廃止だけを扱う場合は管理Processを使用する。ALPS準拠。
 ---
 
@@ -105,7 +105,7 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 
 - Process FrameworkとALPSを適用する必要がある。両者が矛盾する場合はProcess Frameworkを優先する必要がある。
 - 規範語とその意味は、Process Frameworkの定めによる。本Skillはこれらを再定義しない。
-- Process FrameworkまたはALPSの要求解釈、規範属性の確認、Conformance判定または本Skillの変更には、[process-framework.md](../../../../../../.alps/spec/locales/ja/process-framework.md)および[ALPS-SPEC.md](../../../../../../.alps/spec/locales/ja/ALPS-SPEC.md)の該当箇条を参照する必要がある。
+- Process FrameworkまたはALPSの要求解釈、規範属性の確認、Conformance判定または本Skillの変更には、[process-framework.md](../../../../../.alps/spec/locales/ja/process-framework.md)および[ALPS-SPEC.md](../../../../../.alps/spec/locales/ja/ALPS-SPEC.md)の該当箇条を参照する必要がある。
 - Nameを、他のSkillと区別できる短い名詞句にする必要がある。NameをPurposeの要約にしてはならない。
 - Purposeは、相互に関連する一つまたは複数の上位目的を示す必要がある。
 - Purposeは、可能な限り一文で簡潔に記述するのが望ましい。
@@ -155,8 +155,8 @@ Outputが他のSkillのInputになる場合、名称、意味および適用範�
 
 この節は、リポジトリ共通の規範資産を示す参考情報であり、特定の実行方法を要求しない。
 
-- リポジトリ共通の[Process Framework](../../../../../../.alps/spec/locales/ja/process-framework.md)を、Process Descriptionの上位規範として利用する。ALPSと矛盾する場合は、Process Frameworkを優先する。
-- リポジトリ共通の[ALPS Specification](../../../../../../.alps/spec/locales/ja/ALPS-SPEC.md)を、ALPSの規範要求の確認に利用する。必要な解釈に応じて、該当する箇条を参照する。
+- リポジトリ共通の[Process Framework](../../../../../.alps/spec/locales/ja/process-framework.md)を、Process Descriptionの上位規範として利用する。ALPSと矛盾する場合は、Process Frameworkを優先する。
+- リポジトリ共通の[ALPS Specification](../../../../../.alps/spec/locales/ja/ALPS-SPEC.md)を、ALPSの規範要求の確認に利用する。必要な解釈に応じて、該当する箇条を参照する。
 
 ## Bundled Resources
 

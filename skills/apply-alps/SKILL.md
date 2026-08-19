@@ -1,5 +1,5 @@
 ---
-name: apply-agent-lifecycle-process-skills
+name: apply-alps
 description: Select Agent Skills suited to an application situation's needs, conditions, and risks; assess Entry/Exit Criteria and applicable Control, Constraint, and Tailoring decisions; execute the Skills singly or in combination; and manage Output/Input handoffs and the completeness and consistency of the composition as a whole. Use when work applies existing Skills, composes multiple Skills, or requires evidence of the application rationale or Outcome achievement. Do not use when the work only defines a new Skill or only adopts, changes, or retires Skill assets. ALPS-conformant.
 ---
 
@@ -137,7 +137,7 @@ When a change to an Output affects another Skill's Input, the affected Skill and
 
 This section is informative and has no normative force.
 
-- When ambiguity, conflict, normative-attribute interpretation, Conformance, or Tailoring requires consultation of the governing texts, use the repository-shared [Process Framework](../../../.alps/spec/process-framework.md) and [ALPS Specification](../../../.alps/spec/ALPS-SPEC.md). Routine application continues to use the selected authoritative Skill Description, applicable Framework-level declarations, and managed Tailoring decisions as its direct basis.
+- When ambiguity, conflict, normative-attribute interpretation, Conformance, or Tailoring requires consultation of the governing texts, use the repository-shared [Process Framework](../../.alps/spec/process-framework.md) and [ALPS Specification](../../.alps/spec/ALPS-SPEC.md). Routine application continues to use the selected authoritative Skill Description, applicable Framework-level declarations, and managed Tailoring decisions as its direct basis.
 
 ## Bundled Resources
 

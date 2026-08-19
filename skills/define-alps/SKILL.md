@@ -1,5 +1,5 @@
 ---
-name: define-agent-lifecycle-process-skills
+name: define-alps
 description: Identify Skill needs; design and verify assessable Skill Descriptions that conform to ALPS and the Process Framework. Use when conceiving a new Skill, redefining an existing Skill, designing its Purpose, Outcomes, Activities, or Tasks, reviewing description conformance, trialing it in representative contexts, establishing traceability, or producing evidence for an adoption decision. Use the management process when the work concerns only adoption, change control, or retirement. ALPS-conformant.
 ---
 
@@ -103,7 +103,7 @@ The selected Skill need and selection rationale, verified Skill Description, rec
 
 - Apply the Process Framework and ALPS. If they conflict, the Process Framework must take precedence.
 - The normative words and their meanings are those defined in the Process Framework. This Skill does not redefine them.
-- The applicable clauses of [process-framework.md](../../../.alps/spec/process-framework.md) and [ALPS-SPEC.md](../../../.alps/spec/ALPS-SPEC.md) must be consulted when interpreting a Process Framework or ALPS requirement, confirming a normative attribute, determining Conformance, or changing this Skill.
+- The applicable clauses of [process-framework.md](../../.alps/spec/process-framework.md) and [ALPS-SPEC.md](../../.alps/spec/ALPS-SPEC.md) must be consulted when interpreting a Process Framework or ALPS requirement, confirming a normative attribute, determining Conformance, or changing this Skill.
 - The Name must be a short noun phrase that distinguishes the Skill from other Skills. The Name must not summarize the Purpose.
 - The Purpose must state the high-level objective or objectives that belong together.
 - The Purpose should be stated concisely in one sentence wherever possible.
@@ -153,8 +153,8 @@ When an Output becomes another Skill's Input, their names, meanings, and scopes 
 
 This section identifies repository-level normative assets and does not require a specific manner of execution.
 
-- Use the repository-shared [Process Framework](../../../.alps/spec/process-framework.md) as the higher-order normative source for Process Descriptions. It takes precedence if it conflicts with ALPS.
-- Use the repository-shared [ALPS Specification](../../../.alps/spec/ALPS-SPEC.md) to confirm ALPS normative requirements. Consult the relevant clauses according to the interpretation needed.
+- Use the repository-shared [Process Framework](../../.alps/spec/process-framework.md) as the higher-order normative source for Process Descriptions. It takes precedence if it conflicts with ALPS.
+- Use the repository-shared [ALPS Specification](../../.alps/spec/ALPS-SPEC.md) to confirm ALPS normative requirements. Consult the relevant clauses according to the interpretation needed.
 
 ## Bundled Resources
 

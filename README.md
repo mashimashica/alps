@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <strong>Version 0.1.0</strong><br>
+  <strong>Version 0.2.0</strong><br>
   Initial development
 </p>
 
@@ -24,6 +24,58 @@ In ALPS:
 - an **Agent Skill** is treated as a Process Description.
 
 A useful description lets a reader understand why the work exists, what success means, what work belongs to it, what enters and leaves it, and what conditions apply. It does not require one particular performer or implementation method.
+
+## Agent Plugin Package
+
+This repository is an [Agent Plugins](https://agent-plugins.org/) v1 package. The root [`plugin.json`](plugin.json) identifies the package, and the three portable Agent Skills are immediate children of [`skills/`](skills/). Repository-shared normative assets remain under [`.alps/`](.alps/) and are referenced by the Skills.
+
+The reference Skills use concise identifiers following the `<verb>-alps` convention:
+
+- `define-alps` — defines and verifies reusable Skills;
+- `apply-alps` — selects, executes, and composes Skills; and
+- `manage-alps` — governs and improves Skill assets and their application.
+
+## Using ALPS
+
+### Install the plugin
+
+With Node.js 18 or later available, install ALPS through the [`plugins` CLI](https://www.npmjs.com/package/plugins):
+
+```console
+npx plugins add mashimashica/alps
+```
+
+The installer discovers the Agent Plugin package, detects supported agent clients, and asks for confirmation before installation. Restart the affected clients after installation so they reload the Skills.
+
+When installed with the command above, the `plugins` CLI preserves the complete package, including [`.alps/`](.alps/), so the Skills' shared normative references remain resolvable. Copying only `skills/` is not a complete ALPS installation.
+
+### Invoke a reference Skill explicitly
+
+Clients may select a Skill from its discovery description. When a particular ALPS Process is intended, name the Skill identifier directly in the request. This natural-language form does not depend on client-specific slash-command syntax.
+
+```text
+Use `define-alps` to design and verify an ALPS-conformant Skill for this recurring incident-review workflow.
+
+Use `apply-alps` to select and compose the Skills for this request, with every Output/Input handoff made explicit.
+
+Use `manage-alps` to assess this Skill from its execution records and propose controlled improvements.
+```
+
+### Add repository guidance
+
+For a repository that uses ALPS regularly, add a short policy to [AGENTS.md](https://agents.md/) so later agent sessions apply the same selection and composition rules. The block below is the canonical minimal policy for a consumer repository. ALPS's own [`AGENTS.md`](AGENTS.md) applies the same core policy and adds repository-maintenance instructions.
+
+```md
+## ALPS
+
+This repository uses the ALPS Reference Model.
+
+- For each substantive request, use the ALPS Reference Model to select the applicable reference Skills from `define-alps`, `apply-alps`, and `manage-alps`.
+- Identify other ALPS-conformant Skills by the `ALPS-conformant.` marker at the end of `description`, then assess their fit from the discovery description.
+- Read each selected Skill's complete `SKILL.md` before applying it.
+- Use `apply-alps` for existing Skills, `define-alps` for an unmet need or Skill redefinition, and `manage-alps` for adoption, Tailoring, assessment, change, or retirement.
+- When combining Skills, make every Output/Input handoff explicit.
+```
 
 ## Reading a Skill
 
@@ -107,13 +159,13 @@ Beyond this Reference Model, ALPS specifies rules for Skill Descriptions, Skill 
 | --- | --- | --- |
 | Process Framework | [process-framework.md](.alps/spec/process-framework.md) | [process-framework.md](.alps/spec/locales/ja/process-framework.md) |
 | ALPS Specification | [ALPS-SPEC.md](.alps/spec/ALPS-SPEC.md) | [ALPS-SPEC.md](.alps/spec/locales/ja/ALPS-SPEC.md) |
-| Agent Lifecycle Process Skill Definition | [SKILL.md](.agents/skills/define-agent-lifecycle-process-skills/SKILL.md) | [SKILL.md](.agents/skills/define-agent-lifecycle-process-skills/references/locales/ja/SKILL.md) |
-| Agent Lifecycle Process Skill Application | [SKILL.md](.agents/skills/apply-agent-lifecycle-process-skills/SKILL.md) | [SKILL.md](.agents/skills/apply-agent-lifecycle-process-skills/references/locales/ja/SKILL.md) |
-| Agent Lifecycle Process Skill Management | [SKILL.md](.agents/skills/manage-agent-lifecycle-process-skills/SKILL.md) | [SKILL.md](.agents/skills/manage-agent-lifecycle-process-skills/references/locales/ja/SKILL.md) |
+| `define-alps` — Definition Process | [SKILL.md](skills/define-alps/SKILL.md) | [SKILL.md](skills/define-alps/references/locales/ja/SKILL.md) |
+| `apply-alps` — Application Process | [SKILL.md](skills/apply-alps/SKILL.md) | [SKILL.md](skills/apply-alps/references/locales/ja/SKILL.md) |
+| `manage-alps` — Management Process | [SKILL.md](skills/manage-alps/SKILL.md) | [SKILL.md](skills/manage-alps/references/locales/ja/SKILL.md) |
 
 ## Versioning
 
-ALPS is versioned as a single repository-wide release unit. The current version is **0.1.0**, and it remains in initial development. The exact contents of a release are identified by its Git tag and commit. See [CHANGELOG.md](CHANGELOG.md) for release history and [Versioning](docs/versioning.md) for compatibility and release rules.
+ALPS is versioned as a single repository-wide release unit. The current version is **0.2.0**, and it remains in initial development. The exact contents of a release are identified by its Git tag and commit. See [CHANGELOG.md](CHANGELOG.md) for release history and [Versioning](docs/versioning.md) for compatibility and release rules.
 
 ## License and Reuse
 

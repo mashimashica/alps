@@ -1,5 +1,5 @@
 ---
-name: manage-agent-lifecycle-process-skills
+name: manage-alps
 description: Govern the adoption, discoverability, change, retirement, tailoring, assessment, and improvement of Agent Skills, Skill Packages, Skill Models, or Skill Views. Use when managing Skill asset registration, updates, deactivation, tailoring decisions, performance assessment, improvement prioritization, change impacts, communication, or reverification. Use the definition Process instead when only defining a new Skill Description, and the application Process when only executing a selected Skill. ALPS-conformant.
 ---
 
@@ -144,7 +144,7 @@ When multiple Skills are composed for application, the correspondence between pr
 
 This section is informative and has no normative force.
 
-- When interpretation of the Process Framework or ALPS, conflict resolution, normative attributes, Conformance, or Tailoring requires the governing texts, use the repository-shared [Process Framework](../../../.alps/spec/process-framework.md) and [ALPS Specification](../../../.alps/spec/ALPS-SPEC.md). These documents are repository-level normative assets and are not owned by this Skill Package.
+- When interpretation of the Process Framework or ALPS, conflict resolution, normative attributes, Conformance, or Tailoring requires the governing texts, use the repository-shared [Process Framework](../../.alps/spec/process-framework.md) and [ALPS Specification](../../.alps/spec/ALPS-SPEC.md). These documents are repository-level normative assets and are not owned by this Skill Package.
 
 ## Bundled Resources
 

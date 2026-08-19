@@ -1,5 +1,5 @@
 ---
-name: manage-agent-lifecycle-process-skills
+name: manage-alps
 description: Agent Skill、Skill Package、Skill ModelまたはSkill Viewについて、採用、発見可能性、変更、廃止、Tailoring、評価および改善を統制する。Skill資産の登録・更新・無効化、Tailoringの判断、実績の評価、改善候補の優先順位付け、変更の影響、周知または再検証を管理するときに使用する。新しいSkill Descriptionの定義だけ、または選択済みSkillの実行だけが目的の場合は、それぞれ定義Processまたは適用Processを使用する。ALPS準拠。
 ---
 
@@ -146,7 +146,7 @@ description: Agent Skill、Skill Package、Skill ModelまたはSkill Viewにつ�
 
 この節は参考情報であり、規範上の強さを持たない。
 
-- Process FrameworkまたはALPSの解釈、競合解決、規範属性、ConformanceまたはTailoringに正本が必要な場合は、リポジトリ共通の[Process Framework](../../../../../../.alps/spec/locales/ja/process-framework.md)および[ALPS Specification](../../../../../../.alps/spec/locales/ja/ALPS-SPEC.md)を参照する。これらはリポジトリ共通の規範資産であり、本Skill Packageが所有する文書ではない。
+- Process FrameworkまたはALPSの解釈、競合解決、規範属性、ConformanceまたはTailoringに正本が必要な場合は、リポジトリ共通の[Process Framework](../../../../../.alps/spec/locales/ja/process-framework.md)および[ALPS Specification](../../../../../.alps/spec/locales/ja/ALPS-SPEC.md)を参照する。これらはリポジトリ共通の規範資産であり、本Skill Packageが所有する文書ではない。
 
 ## Bundled Resources
 

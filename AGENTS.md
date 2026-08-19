@@ -12,10 +12,13 @@ ALPS treats Skill definition, application, and management as a single lifecycle.
 
 ### Using ALPS
 
-- For each substantive request, use the ALPS Reference Model as a frame of reference to select the relevant Reference Model Processes and ALPS-conformant Skills.
-- Identify conformant Skills by the ALPS conformance marker at the end of `description`, and assess their fit from the description.
-- Read each selected Skill's `SKILL.md` completely before applying it.
-- When using multiple Skills, compose them with explicit Output/Input handoffs.
+This repository uses the ALPS Reference Model.
+
+- For each substantive request, use the ALPS Reference Model to select the applicable reference Skills from `define-alps`, `apply-alps`, and `manage-alps`.
+- Identify other ALPS-conformant Skills by the `ALPS-conformant.` marker at the end of `description`, then assess their fit from the discovery description.
+- Read each selected Skill's complete `SKILL.md` before applying it.
+- Use `apply-alps` for existing Skills, `define-alps` for an unmet need or Skill redefinition, and `manage-alps` for adoption, Tailoring, assessment, change, or retirement.
+- When combining Skills, make every Output/Input handoff explicit.
 
 ## Repository Workflow
 
