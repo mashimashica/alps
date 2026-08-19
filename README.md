@@ -25,29 +25,29 @@ In ALPS:
 
 A useful description lets a reader understand why the work exists, what success means, what work belongs to it, what enters and leaves it, and what conditions apply. It does not require one particular performer or implementation method.
 
-## Agent Plugin Package
-
-This repository is an [Agent Plugins](https://agent-plugins.org/) v1 package. The root [`plugin.json`](plugin.json) identifies the package, and the three portable Agent Skills are immediate children of [`skills/`](skills/). Repository-shared normative assets remain under [`.alps/`](.alps/) and are referenced by the Skills.
-
-The reference Skills use concise identifiers following the `<verb>-alps` convention:
-
-- `define-alps` — defines and verifies reusable Skills;
-- `apply-alps` — selects, executes, and composes Skills; and
-- `manage-alps` — governs and improves Skill assets and their application.
+ALPS also provides a three-Skill Reference Model for defining, applying, and managing Agent Skills.
 
 ## Using ALPS
 
 ### Install the plugin
 
-With Node.js 18 or later available, install ALPS through the [`plugins` CLI](https://www.npmjs.com/package/plugins):
+ALPS is distributed as an [Agent Plugins](https://agent-plugins.org/) v1 package. With Node.js 18 or later available, install it through the [`plugins` CLI](https://www.npmjs.com/package/plugins):
 
 ```console
 npx plugins add mashimashica/alps
 ```
 
-The installer discovers the Agent Plugin package, detects supported agent clients, and asks for confirmation before installation. Restart the affected clients after installation so they reload the Skills.
+The installer discovers the package, detects supported agent clients, and asks for confirmation before installation. Restart the affected clients after installation so they reload the Skills.
 
-When installed with the command above, the `plugins` CLI preserves the complete package, including [`.alps/`](.alps/), so the Skills' shared normative references remain resolvable. Copying only `skills/` is not a complete ALPS installation.
+The command preserves the complete package, including [`.alps/`](.alps/), so the Skills' shared normative references remain resolvable. Copying only `skills/` is not a complete ALPS installation.
+
+### Choose a reference Skill
+
+| Skill | Use it when |
+| --- | --- |
+| `define-alps` | A Skill need is unmet, or a Skill must be designed, redefined, or verified. |
+| `apply-alps` | Existing Skills must be selected, executed, composed, or handed off. |
+| `manage-alps` | Skills must be adopted, tailored, assessed, changed, improved, or retired. |
 
 ### Invoke a reference Skill explicitly
 
@@ -76,6 +76,26 @@ This repository uses the ALPS Reference Model.
 - Use `apply-alps` for existing Skills, `define-alps` for an unmet need or Skill redefinition, and `manage-alps` for adoption, Tailoring, assessment, change, or retirement.
 - When combining Skills, make every Output/Input handoff explicit.
 ```
+
+## ALPS Reference Model
+
+ALPS defines the Skill life cycle through three Processes. They are not fixed phases and may be applied concurrently, iteratively, or recursively as needed. The arrows show representative Output/Input handoffs.
+
+This repository contains the ALPS specification and three Agent Skills that implement these Processes. English is authoritative, with Japanese localizations bundled in each Skill.
+
+```mermaid
+flowchart LR
+    DEFINE["Definition Process<br/>Defines and verifies Skills"]
+    MANAGE["Management Process<br/>Governs and improves Skill assets"]
+    APPLY["Application Process<br/>Selects, executes, and composes Skills"]
+
+    DEFINE -->|"Verified Skill Description"| MANAGE
+    MANAGE -->|"Managed Skills and application conditions"| APPLY
+    APPLY -->|"Execution records, lessons, and measurements"| MANAGE
+    MANAGE -->|"Change or reverification request"| DEFINE
+```
+
+Beyond this Reference Model, ALPS specifies rules for Skill Descriptions, Skill Packages, composition and handoffs across multiple Skills, Controls, Constraints, Enablers, Entry/Exit Criteria, Decision Gates, Tailoring, and Conformance.
 
 ## Reading a Skill
 
@@ -132,26 +152,6 @@ flowchart TD
 `Name`, `Purpose`, and `Outcomes` are required in a Process Description. Activities and Tasks describe work content; they are not implementation methods or procedural steps merely because they appear in an order. Inputs are items transformed into Outputs. People, Agents, tools, and execution environments are resources or Enablers rather than Inputs.
 
 ALPS applies this Framework to Skill description, life cycle management, Tailoring, Assessment, and Conformance. The Framework does not prescribe a life cycle, a sequence of phases, or one implementation method.
-
-## ALPS Reference Model
-
-ALPS defines the Skill life cycle through three Processes. They are not fixed phases and may be applied concurrently, iteratively, or recursively as needed. The arrows show representative Output/Input handoffs.
-
-This repository contains the ALPS specification and three Agent Skills that implement these Processes. English is authoritative, with Japanese localizations bundled in each Skill.
-
-```mermaid
-flowchart LR
-    DEFINE["Definition Process<br/>Defines and verifies Skills"]
-    MANAGE["Management Process<br/>Governs and improves Skill assets"]
-    APPLY["Application Process<br/>Selects, executes, and composes Skills"]
-
-    DEFINE -->|"Verified Skill Description"| MANAGE
-    MANAGE -->|"Managed Skills and application conditions"| APPLY
-    APPLY -->|"Execution records, lessons, and measurements"| MANAGE
-    MANAGE -->|"Change or reverification request"| DEFINE
-```
-
-Beyond this Reference Model, ALPS specifies rules for Skill Descriptions, Skill Packages, composition and handoffs across multiple Skills, Controls, Constraints, Enablers, Entry/Exit Criteria, Decision Gates, Tailoring, and Conformance.
 
 ## Repository Contents
 
