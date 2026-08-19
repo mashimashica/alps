@@ -1,0 +1,192 @@
+name: Temporary README structure validation
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the pull request
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Fetch the base branch
+        run: git fetch --no-tags origin main
+
+      - name: Validate Skill Descriptions
+        run: |
+          python3 skills/define-alps/scripts/check_skill_description.py skills/define-alps/SKILL.md
+          python3 skills/define-alps/scripts/check_skill_description.py skills/apply-alps/SKILL.md
+          python3 skills/define-alps/scripts/check_skill_description.py skills/manage-alps/SKILL.md
+          python3 skills/define-alps/scripts/check_skill_description.py --locale ja skills/define-alps/references/locales/ja/SKILL.md
+          python3 skills/define-alps/scripts/check_skill_description.py --locale ja skills/apply-alps/references/locales/ja/SKILL.md
+          python3 skills/define-alps/scripts/check_skill_description.py --locale ja skills/manage-alps/references/locales/ja/SKILL.md
+
+      - name: Check the pull request diff
+        run: git diff --check origin/main...HEAD
+
+      - name: Verify README structure and pairing
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          english = Path("README.md").read_text(encoding="utf-8")
+          japanese = Path("docs/ja/README.md").read_text(encoding="utf-8")
+
+          failures: list[str] = []
+          forbidden = (
+              "## Agent Plugin Package",
+              ".claude-plugin/plugin.json",
+              ".cursor-plugin/plugin.json",
+              ".codex-plugin/plugin.json",
+          )
+          for value in forbidden:
+              if value in english:
+                  failures.append(f"README.md still contains {value!r}")
+              if value in japanese:
+                  failures.append(f"docs/ja/README.md still contains {value!r}")
+
+          pairs = (
+              (
+                  "README.md",
+                  english,
+                  (
+                      "## What is ALPS?",
+                      "## Using ALPS",
+                      "### Install the plugin",
+                      "### Choose a reference Skill",
+                      "### Invoke a reference Skill explicitly",
+                      "### Add repository guidance",
+                      "## ALPS Reference Model",
+                      "## Reading a Skill",
+                      "## Process Framework",
+                      "## Repository Contents",
+                  ),
+              ),
+              (
+                  "docs/ja/README.md",
+                  japanese,
+                  (
+                      "## ALPSとは",
+                      "## ALPSを利用する",
+                      "### Pluginをインストールする",
+                      "### 参照Skillを選択する",
+                      "### 参照Skillを明示的に呼び出す",
+                      "### AGENTS.mdに利用方針を記載する",
+                      "## ALPS参照モデル",
+                      "## Skillの読み方",
+                      "## Process Framework",
+                      "## 収録内容",
+                  ),
+              ),
+          )
+
+          for filename, text, headings in pairs:
+              position = -1
+              for heading in headings:
+                  next_position = text.find(heading)
+                  if next_position < 0:
+                      failures.append(f"{filename}: missing {heading!r}")
+                      continue
+                  if next_position <= position:
+                      failures.append(f"{filename}: out-of-order {heading!r}")
+                  position = next_position
+
+          shared = (
+              "npx plugins add mashimashica/alps",
+              "`define-alps`",
+              "`apply-alps`",
+              "`manage-alps`",
+              "`skills/`",
+              "`.alps/`",
+          )
+          for value in shared:
+              if value not in english:
+                  failures.append(f"README.md: missing {value!r}")
+              if value not in japanese:
+                  failures.append(f"docs/ja/README.md: missing {value!r}")
+
+          if failures:
+              raise SystemExit("\n".join(failures))
+
+          print("README structure is concise, ordered, and paired in English and Japanese.")
+          PY
+
+      - name: Verify relative links in changed Markdown files
+        run: |
+          python3 - <<'PY'
+          from __future__ import annotations
+
+          import re
+          import subprocess
+          import sys
+          from pathlib import Path
+          from urllib.parse import unquote
+
+          changed = subprocess.check_output(
+              [
+                  "git", "diff", "--name-only", "--diff-filter=ACMRT",
+                  "origin/main...HEAD", "--", "*.md",
+              ],
+              text=True,
+          ).splitlines()
+
+          link_pattern = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]+)\)")
+          scheme_pattern = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
+          fence_pattern = re.compile(r"^\s*(```|~~~)")
+          errors: list[str] = []
+
+          for filename in changed:
+              source = Path(filename)
+              if not source.is_file():
+                  continue
+              in_fence = False
+              fence = ""
+              for line_number, line in enumerate(
+                  source.read_text(encoding="utf-8").splitlines(), start=1
+              ):
+                  fence_match = fence_pattern.match(line)
+                  if fence_match:
+                      marker = fence_match.group(1)
+                      if not in_fence:
+                          in_fence = True
+                          fence = marker
+                      elif marker == fence:
+                          in_fence = False
+                          fence = ""
+                      continue
+                  if in_fence:
+                      continue
+                  for match in link_pattern.finditer(line):
+                      raw_target = match.group(1).strip()
+                      if raw_target.startswith("<") and raw_target.endswith(">"):
+                          raw_target = raw_target[1:-1].strip()
+                      if not raw_target:
+                          continue
+                      target = raw_target.split(maxsplit=1)[0]
+                      if target.startswith(("#", "/", "//")) or scheme_pattern.match(target):
+                          continue
+                      local_path = unquote(target.split("#", 1)[0].split("?", 1)[0])
+                      if local_path and not (source.parent / local_path).resolve().exists():
+                          errors.append(
+                              f"{filename}:{line_number}: unresolved relative link {target!r}"
+                          )
+
+          if errors:
+              print("\n".join(errors), file=sys.stderr)
+              raise SystemExit(1)
+
+          print(f"Validated relative links in {len(changed)} changed Markdown file(s).")
+          PY
+
+      - name: Discover the Agent Plugin package
+        run: npx --yes plugins discover .
