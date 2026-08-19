@@ -47,6 +47,8 @@ npx plugins add mashimashica/alps
 
 インストーラーはAgent PluginのPackageを検出し、対応するAgentクライアントを判別し、確認後にインストールします。インストール後は、Skillを再読み込みできるよう、対象クライアントを再起動してください。
 
+Packageは[`.alps/`](../../.alps/)を含む一つの単位としてインストールされるため、各Skillから共通規範文書への参照を解決できます。`skills/`だけをコピーしても、完全なALPSのインストールにはなりません。
+
 ### 参照Skillを明示的に呼び出す
 
 クライアントは、発見用の記述からSkillを選択できます。特定のALPS Processを用いる場合は、依頼の中でSkill識別子を直接指定します。この自然言語形式は、クライアント固有のスラッシュコマンド構文に依存しません。
@@ -61,18 +63,18 @@ npx plugins add mashimashica/alps
 
 ### AGENTS.mdに利用方針を記載する
 
-ALPSを継続的に利用するリポジトリでは、以後のAgentセッションでも同じ選択・編成規則を適用できるように、[AGENTS.md](https://agents.md/)へ次のような短い方針を追加します。
+ALPSを継続的に利用するリポジトリでは、以後のAgentセッションでも同じ選択・編成規則を適用できるように、[AGENTS.md](https://agents.md/)へ短い方針を追加します。以下は利用側リポジトリ向けの最小方針です。ALPS自身の[`AGENTS.md`](../../AGENTS.md)も同じ中核方針を適用し、リポジトリ保守の作業規則を追加しています。
 
 ```md
 ## ALPS
 
-本リポジトリではALPS Reference Modelを使用する。
+本リポジトリではALPS Reference Modelを使用します。
 
-- 各実質的な依頼では、`define-alps`、`apply-alps`および`manage-alps`から、適用する参照Skillを選択する。
-- その他のALPS準拠Skillは、`description`末尾の`ALPS準拠。`によって識別し、発見用の記述から適合性を判断する。
-- 選択した各Skillの`SKILL.md`を、適用前に最後まで読む。
-- 既存Skillを適用する作業には`apply-alps`、未充足ニーズまたはSkillの再定義には`define-alps`、採用、Tailoring、評価、変更または廃止には`manage-alps`を用いる。
-- 複数Skillを組み合わせる場合、すべてのOutput/Inputの授受を明示する。
+- 実質的な依頼ごとに、ALPS Reference Modelを基準として、`define-alps`、`apply-alps`および`manage-alps`から適用する参照Skillを選択します。
+- その他のALPS準拠Skillは、`description`末尾の`ALPS準拠。`表示によって識別し、発見用の記述から依頼への適合性を判断します。
+- 選択した各Skillの`SKILL.md`を、適用前に最後まで読みます。
+- 既存Skillを適用する作業には`apply-alps`、未充足ニーズまたはSkillの再定義には`define-alps`、採用、Tailoring、評価、変更または廃止には`manage-alps`を用います。
+- 複数Skillを組み合わせる場合は、すべてのOutput/Inputの授受を明示します。
 ```
 
 ## Skillの読み方
