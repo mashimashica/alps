@@ -35,6 +35,46 @@ The reference Skills use concise identifiers following the `<verb>-alps` convent
 - `apply-alps` — selects, executes, and composes Skills; and
 - `manage-alps` — governs and improves Skill assets and their application.
 
+## Using ALPS
+
+### Install the plugin
+
+With Node.js 18 or later available, install ALPS through the [`plugins` CLI](https://www.npmjs.com/package/plugins):
+
+```console
+npx plugins add mashimashica/alps
+```
+
+The installer discovers the Agent Plugin package, detects supported agent clients, and asks for confirmation before installation. Restart the affected clients after installation so they reload the Skills.
+
+### Invoke a reference Skill explicitly
+
+Clients may select a Skill from its discovery description. When a particular ALPS Process is intended, name the Skill identifier directly in the request. This natural-language form does not depend on client-specific slash-command syntax.
+
+```text
+Use `define-alps` to design and verify an ALPS-conformant Skill for this recurring incident-review workflow.
+
+Use `apply-alps` to select and compose the Skills for this request, with every Output/Input handoff made explicit.
+
+Use `manage-alps` to assess this Skill from its execution records and propose controlled improvements.
+```
+
+### Add repository guidance
+
+For a repository that uses ALPS regularly, add a short policy to [AGENTS.md](https://agents.md/) so later agent sessions apply the same selection and composition rules:
+
+```md
+## ALPS
+
+This repository uses the ALPS Reference Model.
+
+- For each substantive request, select the applicable reference Skills from `define-alps`, `apply-alps`, and `manage-alps`.
+- Identify other ALPS-conformant Skills by the `ALPS-conformant.` marker at the end of `description`, then assess their fit from the discovery description.
+- Read each selected Skill's complete `SKILL.md` before applying it.
+- Use `apply-alps` for existing Skills, `define-alps` for an unmet need or Skill redefinition, and `manage-alps` for adoption, Tailoring, assessment, change, or retirement.
+- When combining Skills, make every Output/Input handoff explicit.
+```
+
 ## Reading a Skill
 
 ALPS separates questions that are often mixed together in ordinary descriptions.
