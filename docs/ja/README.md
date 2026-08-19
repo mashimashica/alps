@@ -45,11 +45,11 @@ Node.js 18以降が利用できる環境で、[`plugins` CLI](https://www.npmjs.
 npx plugins add mashimashica/alps
 ```
 
-インストーラーはAgent Plugin Packageを検出し、対応するAgent Clientを判別し、確認後にインストールします。インストール後は、Skillを再読込できるように対象Clientを再起動してください。
+インストーラーはAgent PluginのPackageを検出し、対応するAgentクライアントを判別し、確認後にインストールします。インストール後は、Skillを再読み込みできるよう、対象クライアントを再起動してください。
 
 ### 参照Skillを明示的に呼び出す
 
-Clientは、発見用の記述からSkillを選択できます。特定のALPS Processを用いる場合は、依頼の中でSkill識別子を直接指定します。この自然言語形式は、Client固有のslash command構文に依存しません。
+クライアントは、発見用の記述からSkillを選択できます。特定のALPS Processを用いる場合は、依頼の中でSkill識別子を直接指定します。この自然言語形式は、クライアント固有のスラッシュコマンド構文に依存しません。
 
 ```text
 `define-alps`を使って、この反復的なインシデントレビュー作業をALPS準拠のSkillとして設計・検証してください。
@@ -61,7 +61,7 @@ Clientは、発見用の記述からSkillを選択できます。特定のALPS P
 
 ### AGENTS.mdに利用方針を記載する
 
-ALPSを継続的に利用するリポジトリでは、後続のAgent sessionでも同じ選択・編成規則を適用できるように、[AGENTS.md](https://agents.md/)へ次のような短い方針を追加します。
+ALPSを継続的に利用するリポジトリでは、以後のAgentセッションでも同じ選択・編成規則を適用できるように、[AGENTS.md](https://agents.md/)へ次のような短い方針を追加します。
 
 ```md
 ## ALPS
