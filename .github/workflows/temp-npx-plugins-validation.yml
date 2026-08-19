@@ -1,0 +1,28 @@
+name: Temporary npx plugins validation
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the pull request
+        uses: actions/checkout@v5
+
+      - name: Discover the Agent Plugin package
+        run: npx --yes plugins discover .
+
+      - name: Install ALPS into a scratch project
+        run: |
+          mkdir -p "$RUNNER_TEMP/alps-consumer"
+          cd "$RUNNER_TEMP/alps-consumer"
+          npx --yes plugins add "$GITHUB_WORKSPACE" --target vscode --scope project --yes
+          find . -maxdepth 5 -type f -print | sort
