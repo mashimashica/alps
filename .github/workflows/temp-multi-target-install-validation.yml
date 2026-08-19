@@ -144,6 +144,10 @@ jobs:
               failures.append("README.md: missing complete-package installation warning")
           if "`skills/`だけをコピーしても、完全なALPSのインストールにはなりません。" not in japanese:
               failures.append("docs/ja/README.md: missing complete-package installation warning")
+          if "canonical minimal policy" not in english:
+              failures.append("README.md: missing canonical consumer policy declaration")
+          if "正本となる最小方針" not in japanese:
+              failures.append("docs/ja/README.md: missing canonical consumer policy declaration")
 
           if failures:
               raise SystemExit("\n".join(failures))
@@ -151,15 +155,16 @@ jobs:
           print("README and AGENTS guidance is aligned in English and Japanese.")
           PY
 
-      - name: Install and inspect supported targets
+      - name: Install and inspect every supported target
         run: |
           set -u
           failures=0
 
-          for target in claude-code cursor codex vscode; do
+          for target in claude-code cursor codex grok-build kimi-code github-copilot vscode; do
             echo "::group::Target ${target}"
             home="$RUNNER_TEMP/home-${target}"
-            source="$RUNNER_TEMP/source-${target}"
+            source_parent="$RUNNER_TEMP/source-${target}"
+            source="$source_parent/alps"
             consumer="$RUNNER_TEMP/consumer-${target}"
             mkdir -p "$home" "$source" "$consumer"
             cp -a "$GITHUB_WORKSPACE/." "$source/"
@@ -169,7 +174,7 @@ jobs:
               cd "$consumer"
               npx --yes plugins add "$source" --target "$target" --scope user --yes
             ); then
-              rm -rf "$source"
+              rm -rf "$source_parent"
               TARGET="$target" TEST_HOME="$home" TEST_CONSUMER="$consumer" python3 - <<'PY'
           from __future__ import annotations
 
