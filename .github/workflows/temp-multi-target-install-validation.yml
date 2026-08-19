@@ -12,40 +12,39 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        target: [claude-code, cursor, codex, vscode]
-    env:
-      HOME: ${{ runner.temp }}/home-${{ matrix.target }}
 
     steps:
       - name: Check out the pull request
         uses: actions/checkout@v5
 
-      - name: Prepare isolated source and home
+      - name: Install and inspect supported targets
         run: |
-          mkdir -p "$HOME" "$RUNNER_TEMP/source-${{ matrix.target }}" "$RUNNER_TEMP/consumer-${{ matrix.target }}"
-          cp -a "$GITHUB_WORKSPACE/." "$RUNNER_TEMP/source-${{ matrix.target }}/"
+          set -u
+          failures=0
 
-      - name: Install ALPS
-        working-directory: ${{ runner.temp }}/consumer-${{ matrix.target }}
-        run: |
-          npx --yes plugins add "$RUNNER_TEMP/source-${{ matrix.target }}" --target "${{ matrix.target }}" --scope user --yes
+          for target in claude-code cursor codex vscode; do
+            echo "::group::Target ${target}"
+            home="$RUNNER_TEMP/home-${target}"
+            source="$RUNNER_TEMP/source-${target}"
+            consumer="$RUNNER_TEMP/consumer-${target}"
+            mkdir -p "$home" "$source" "$consumer"
+            cp -a "$GITHUB_WORKSPACE/." "$source/"
 
-      - name: Remove the source copy
-        run: rm -rf "$RUNNER_TEMP/source-${{ matrix.target }}"
-
-      - name: Inspect installed package and shared references
-        run: |
-          python3 - <<'PY'
+            if (
+              export HOME="$home"
+              cd "$consumer"
+              npx --yes plugins add "$source" --target "$target" --scope user --yes
+            ); then
+              rm -rf "$source"
+              TARGET="$target" TEST_HOME="$home" TEST_CONSUMER="$consumer" python3 - <<'PY'
           from __future__ import annotations
 
           import os
           from pathlib import Path
 
-          home = Path(os.environ["HOME"])
-          consumer = Path(os.environ["RUNNER_TEMP"]) / "consumer-${{ matrix.target }}"
+          target = os.environ["TARGET"]
+          home = Path(os.environ["TEST_HOME"])
+          consumer = Path(os.environ["TEST_CONSUMER"])
           skills: list[Path] = []
           specs: list[Path] = []
           manifests: list[Path] = []
@@ -67,7 +66,7 @@ jobs:
                   if '"name": "alps"' in text:
                       manifests.append(path)
 
-          print("TARGET: ${{ matrix.target }}")
+          print(f"TARGET: {target}")
           print("DEFINE SKILLS")
           for skill in skills:
               expected = (skill.parent / "../../.alps/spec/ALPS-SPEC.md").resolve()
@@ -110,3 +109,16 @@ jobs:
 
           print("Every installed define-alps Skill resolves the shared ALPS specification.")
           PY
+              inspect_status=$?
+              if [ "$inspect_status" -ne 0 ]; then
+                failures=$((failures + 1))
+              fi
+            else
+              echo "Install failed for target ${target}"
+              failures=$((failures + 1))
+            fi
+
+            echo "::endgroup::"
+          done
+
+          exit "$failures"
