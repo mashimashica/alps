@@ -1,0 +1,7 @@
+interface:
+  display_name: "Manage ALPS"
+  short_description: "Govern and improve ALPS Skill assets"
+  icon_small: "./assets/alps.svg"
+  icon_large: "./assets/alps.svg"
+  brand_color: "#4DB2FF"
+  default_prompt: "Use $manage-alps to govern, assess, or improve ALPS Skill assets."

@@ -29,6 +29,8 @@ ALPSでは、次のように区別します。
 
 本リポジトリは、[Agent Plugins](https://agent-plugins.org/) v1のPackageです。リポジトリ直下の[`plugin.json`](../../plugin.json)がPackageを識別し、三つの可搬なAgent Skillを[`skills/`](../../skills/)の直下に配置します。リポジトリ共通の規範資産は[`.alps/`](../../.alps/)に保持し、各Skillから参照します。
 
+このPackageは、Claude Code、Cursor、Codex、GitHub Copilot CLIおよびVisual Studio Codeからインストールできます。各クライアントが対応する表示メタデータは、クライアント固有のAdapterに分離しています。Claude Codeは[`.claude-plugin/plugin.json`](../../.claude-plugin/plugin.json)、Cursorは[`.cursor-plugin/plugin.json`](../../.cursor-plugin/plugin.json)、Codexは[`.codex-plugin/plugin.json`](../../.codex-plugin/plugin.json)と各Skillの`agents/openai.yaml`を使用します。rootのManifestは、可搬なPackageの識別情報とComponent発見における唯一のSource of Truthです。
+
 参照Skillの識別子には、`<verb>-alps`の簡潔な命名規則を用います。
 
 - `define-alps` — 再利用可能なSkillを定義・検証する。

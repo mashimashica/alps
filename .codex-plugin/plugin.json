@@ -1,0 +1,43 @@
+{
+  "name": "alps",
+  "version": "0.2.0",
+  "description": "A process-based framework and reference model for defining, applying, and managing reusable Agent Skills.",
+  "author": {
+    "name": "mashimashica",
+    "url": "https://github.com/mashimashica"
+  },
+  "homepage": "https://github.com/mashimashica/alps",
+  "repository": "https://github.com/mashimashica/alps",
+  "license": "Apache-2.0",
+  "keywords": [
+    "agent-plugins",
+    "agent-skills",
+    "process",
+    "lifecycle",
+    "governance",
+    "alps"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "ALPS",
+    "shortDescription": "Agent Lifecycle Process Skills",
+    "longDescription": "A process-based framework and reference model for defining, applying, and managing reusable Agent Skills.",
+    "developerName": "mashimashica",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/mashimashica/alps",
+    "defaultPrompt": [
+      "Apply the ALPS framework to this task.",
+      "Define a reusable Agent Skill using ALPS.",
+      "Review an Agent Skill for ALPS conformance."
+    ],
+    "brandColor": "#4DB2FF",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/icon.svg",
+    "logoDark": "./assets/icon.svg",
+    "screenshots": []
+  }
+}
