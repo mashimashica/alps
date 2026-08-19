@@ -35,6 +35,46 @@ ALPSでは、次のように区別します。
 - `apply-alps` — Skillを選択・実行・編成する。
 - `manage-alps` — Skill資産およびその適用を統制・改善する。
 
+## ALPSを利用する
+
+### Pluginをインストールする
+
+Node.js 18以降が利用できる環境で、[`plugins` CLI](https://www.npmjs.com/package/plugins)からALPSをインストールします。
+
+```console
+npx plugins add mashimashica/alps
+```
+
+インストーラーはAgent Plugin Packageを検出し、対応するAgent Clientを判別し、確認後にインストールします。インストール後は、Skillを再読込できるように対象Clientを再起動してください。
+
+### 参照Skillを明示的に呼び出す
+
+Clientは、発見用の記述からSkillを選択できます。特定のALPS Processを用いる場合は、依頼の中でSkill識別子を直接指定します。この自然言語形式は、Client固有のslash command構文に依存しません。
+
+```text
+`define-alps`を使って、この反復的なインシデントレビュー作業をALPS準拠のSkillとして設計・検証してください。
+
+`apply-alps`を使って、この依頼に必要なSkillを選択・編成し、すべてのOutput/Inputの授受を明示してください。
+
+`manage-alps`を使って、このSkillを実行記録に基づいて評価し、統制された改善案を提示してください。
+```
+
+### AGENTS.mdに利用方針を記載する
+
+ALPSを継続的に利用するリポジトリでは、後続のAgent sessionでも同じ選択・編成規則を適用できるように、[AGENTS.md](https://agents.md/)へ次のような短い方針を追加します。
+
+```md
+## ALPS
+
+本リポジトリではALPS Reference Modelを使用する。
+
+- 各実質的な依頼では、`define-alps`、`apply-alps`および`manage-alps`から、適用する参照Skillを選択する。
+- その他のALPS準拠Skillは、`description`末尾の`ALPS準拠。`によって識別し、発見用の記述から適合性を判断する。
+- 選択した各Skillの`SKILL.md`を、適用前に最後まで読む。
+- 既存Skillを適用する作業には`apply-alps`、未充足ニーズまたはSkillの再定義には`define-alps`、採用、Tailoring、評価、変更または廃止には`manage-alps`を用いる。
+- 複数Skillを組み合わせる場合、すべてのOutput/Inputの授受を明示する。
+```
+
 ## Skillの読み方
 
 ALPSは、通常の記述では混ざりやすい問いを分けて扱います。
