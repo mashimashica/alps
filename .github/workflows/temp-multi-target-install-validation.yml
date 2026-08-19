@@ -1,0 +1,112 @@
+name: Temporary ALPS multi-target install validation
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [claude-code, cursor, codex, vscode]
+    env:
+      HOME: ${{ runner.temp }}/home-${{ matrix.target }}
+
+    steps:
+      - name: Check out the pull request
+        uses: actions/checkout@v5
+
+      - name: Prepare isolated source and home
+        run: |
+          mkdir -p "$HOME" "$RUNNER_TEMP/source-${{ matrix.target }}" "$RUNNER_TEMP/consumer-${{ matrix.target }}"
+          cp -a "$GITHUB_WORKSPACE/." "$RUNNER_TEMP/source-${{ matrix.target }}/"
+
+      - name: Install ALPS
+        working-directory: ${{ runner.temp }}/consumer-${{ matrix.target }}
+        run: |
+          npx --yes plugins add "$RUNNER_TEMP/source-${{ matrix.target }}" --target "${{ matrix.target }}" --scope user --yes
+
+      - name: Remove the source copy
+        run: rm -rf "$RUNNER_TEMP/source-${{ matrix.target }}"
+
+      - name: Inspect installed package and shared references
+        run: |
+          python3 - <<'PY'
+          from __future__ import annotations
+
+          import os
+          from pathlib import Path
+
+          home = Path(os.environ["HOME"])
+          consumer = Path(os.environ["RUNNER_TEMP"]) / "consumer-${{ matrix.target }}"
+          skills: list[Path] = []
+          specs: list[Path] = []
+          manifests: list[Path] = []
+
+          for root in (home, consumer):
+              if not root.exists():
+                  continue
+              skills.extend(
+                  path
+                  for path in root.rglob("SKILL.md")
+                  if path.parts[-2:] == ("define-alps", "SKILL.md")
+              )
+              specs.extend(root.rglob("ALPS-SPEC.md"))
+              for path in root.rglob("plugin.json"):
+                  try:
+                      text = path.read_text(encoding="utf-8")
+                  except (OSError, UnicodeDecodeError):
+                      continue
+                  if '"name": "alps"' in text:
+                      manifests.append(path)
+
+          print("TARGET: ${{ matrix.target }}")
+          print("DEFINE SKILLS")
+          for skill in skills:
+              expected = (skill.parent / "../../.alps/spec/ALPS-SPEC.md").resolve()
+              print(f"- {skill}")
+              print(f"  expected shared spec: {expected}")
+              print(f"  resolves: {expected.is_file()}")
+
+          print("ALPS SPECS")
+          for path in specs:
+              print(f"- {path}")
+
+          print("ALPS MANIFESTS")
+          for path in manifests:
+              print(f"- {path}")
+
+          print("CONFIG FILES REFERENCING ALPS")
+          for path in home.rglob("*"):
+              if not path.is_file() or path.stat().st_size > 1_000_000:
+                  continue
+              try:
+                  text = path.read_text(encoding="utf-8")
+              except (OSError, UnicodeDecodeError):
+                  continue
+              if "alps" in text.lower():
+                  print(f"- {path}")
+
+          if not skills:
+              raise SystemExit("No installed define-alps/SKILL.md was found after removing the source copy")
+
+          broken = [
+              skill
+              for skill in skills
+              if not (skill.parent / "../../.alps/spec/ALPS-SPEC.md").resolve().is_file()
+          ]
+          if broken:
+              raise SystemExit(
+                  "Installed Skill shared-reference resolution failed:\n"
+                  + "\n".join(str(path) for path in broken)
+              )
+
+          print("Every installed define-alps Skill resolves the shared ALPS specification.")
+          PY
