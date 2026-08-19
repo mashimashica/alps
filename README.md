@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <strong>Version 0.1.0</strong><br>
+  <strong>Version 0.2.0</strong><br>
   Initial development
 </p>
 
@@ -24,6 +24,16 @@ In ALPS:
 - an **Agent Skill** is treated as a Process Description.
 
 A useful description lets a reader understand why the work exists, what success means, what work belongs to it, what enters and leaves it, and what conditions apply. It does not require one particular performer or implementation method.
+
+## Agent Plugin Package
+
+This repository is an [Agent Plugins](https://agent-plugins.org/) v1 package. The root [`plugin.json`](plugin.json) identifies the package, and the three portable Agent Skills are immediate children of [`skills/`](skills/). Repository-shared normative assets remain under [`.alps/`](.alps/) and are referenced by the Skills.
+
+The reference Skills use concise identifiers following the `<verb>-alps` convention:
+
+- `define-alps` — defines and verifies reusable Skills;
+- `apply-alps` — selects, executes, and composes Skills; and
+- `manage-alps` — governs and improves Skill assets and their application.
 
 ## Reading a Skill
 
@@ -107,13 +117,13 @@ Beyond this Reference Model, ALPS specifies rules for Skill Descriptions, Skill 
 | --- | --- | --- |
 | Process Framework | [process-framework.md](.alps/spec/process-framework.md) | [process-framework.md](.alps/spec/locales/ja/process-framework.md) |
 | ALPS Specification | [ALPS-SPEC.md](.alps/spec/ALPS-SPEC.md) | [ALPS-SPEC.md](.alps/spec/locales/ja/ALPS-SPEC.md) |
-| Agent Lifecycle Process Skill Definition | [SKILL.md](.agents/skills/define-agent-lifecycle-process-skills/SKILL.md) | [SKILL.md](.agents/skills/define-agent-lifecycle-process-skills/references/locales/ja/SKILL.md) |
-| Agent Lifecycle Process Skill Application | [SKILL.md](.agents/skills/apply-agent-lifecycle-process-skills/SKILL.md) | [SKILL.md](.agents/skills/apply-agent-lifecycle-process-skills/references/locales/ja/SKILL.md) |
-| Agent Lifecycle Process Skill Management | [SKILL.md](.agents/skills/manage-agent-lifecycle-process-skills/SKILL.md) | [SKILL.md](.agents/skills/manage-agent-lifecycle-process-skills/references/locales/ja/SKILL.md) |
+| `define-alps` — Definition Process | [SKILL.md](skills/define-alps/SKILL.md) | [SKILL.md](skills/define-alps/references/locales/ja/SKILL.md) |
+| `apply-alps` — Application Process | [SKILL.md](skills/apply-alps/SKILL.md) | [SKILL.md](skills/apply-alps/references/locales/ja/SKILL.md) |
+| `manage-alps` — Management Process | [SKILL.md](skills/manage-alps/SKILL.md) | [SKILL.md](skills/manage-alps/references/locales/ja/SKILL.md) |
 
 ## Versioning
 
-ALPS is versioned as a single repository-wide release unit. The current version is **0.1.0**, and it remains in initial development. The exact contents of a release are identified by its Git tag and commit. See [CHANGELOG.md](CHANGELOG.md) for release history and [Versioning](docs/versioning.md) for compatibility and release rules.
+ALPS is versioned as a single repository-wide release unit. The current version is **0.2.0**, and it remains in initial development. The exact contents of a release are identified by its Git tag and commit. See [CHANGELOG.md](CHANGELOG.md) for release history and [Versioning](docs/versioning.md) for compatibility and release rules.
 
 ## License and Reuse
 

@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <strong>Version 0.1.0</strong><br>
+  <strong>Version 0.2.0</strong><br>
   初期開発版
 </p>
 
@@ -24,6 +24,16 @@ ALPSでは、次のように区別します。
 - **Agent Skill**は、Process Descriptionとして扱います。
 
 有用な記述によって、読者は、作業がなぜ存在するか、何を成功とみなすか、どの作業がProcessに属するか、何が入り何が出るか、どの条件が適用されるかを理解できます。特定の実行主体または実装方法を一つに固定する必要はありません。
+
+## Agent Plugin Package
+
+本リポジトリは、[Agent Plugins](https://agent-plugins.org/) v1のPackageです。リポジトリ直下の[`plugin.json`](../../plugin.json)がPackageを識別し、三つの可搬なAgent Skillを[`skills/`](../../skills/)の直下に配置します。リポジトリ共通の規範資産は[`.alps/`](../../.alps/)に保持し、各Skillから参照します。
+
+参照Skillの識別子には、`<verb>-alps`の簡潔な命名規則を用います。
+
+- `define-alps` — 再利用可能なSkillを定義・検証する。
+- `apply-alps` — Skillを選択・実行・編成する。
+- `manage-alps` — Skill資産およびその適用を統制・改善する。
 
 ## Skillの読み方
 
@@ -107,13 +117,13 @@ ALPS規格は、この参照モデルに加えて、Skill Description、Skill Pa
 | --- | --- | --- |
 | Process Framework | [process-framework.md](../../.alps/spec/process-framework.md) | [process-framework.md](../../.alps/spec/locales/ja/process-framework.md) |
 | ALPS Specification | [ALPS-SPEC.md](../../.alps/spec/ALPS-SPEC.md) | [ALPS-SPEC.md](../../.alps/spec/locales/ja/ALPS-SPEC.md) |
-| Agent Lifecycle Process Skillの定義 | [SKILL.md](../../.agents/skills/define-agent-lifecycle-process-skills/SKILL.md) | [SKILL.md](../../.agents/skills/define-agent-lifecycle-process-skills/references/locales/ja/SKILL.md) |
-| Agent Lifecycle Process Skillの適用 | [SKILL.md](../../.agents/skills/apply-agent-lifecycle-process-skills/SKILL.md) | [SKILL.md](../../.agents/skills/apply-agent-lifecycle-process-skills/references/locales/ja/SKILL.md) |
-| Agent Lifecycle Process Skillの管理 | [SKILL.md](../../.agents/skills/manage-agent-lifecycle-process-skills/SKILL.md) | [SKILL.md](../../.agents/skills/manage-agent-lifecycle-process-skills/references/locales/ja/SKILL.md) |
+| `define-alps` — 定義Process | [SKILL.md](../../skills/define-alps/SKILL.md) | [SKILL.md](../../skills/define-alps/references/locales/ja/SKILL.md) |
+| `apply-alps` — 適用Process | [SKILL.md](../../skills/apply-alps/SKILL.md) | [SKILL.md](../../skills/apply-alps/references/locales/ja/SKILL.md) |
+| `manage-alps` — 管理Process | [SKILL.md](../../skills/manage-alps/SKILL.md) | [SKILL.md](../../skills/manage-alps/references/locales/ja/SKILL.md) |
 
 ## バージョン管理
 
-ALPSは、リポジトリ全体を一つのリリース単位としてバージョン管理します。現在のVersionは**0.1.0**であり、初期開発段階にあります。Releaseの正確な内容は、Git TagとCommitによって特定します。[CHANGELOG.md](../../CHANGELOG.md)および[バージョン管理方針](versioning.md)を参照してください。
+ALPSは、リポジトリ全体を一つのリリース単位としてバージョン管理します。現在のVersionは**0.2.0**であり、初期開発段階にあります。Releaseの正確な内容は、Git TagとCommitによって特定します。[CHANGELOG.md](../../CHANGELOG.md)および[バージョン管理方針](versioning.md)を参照してください。
 
 ## ライセンスと再利用
 

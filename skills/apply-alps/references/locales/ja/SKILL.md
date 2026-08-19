@@ -1,5 +1,5 @@
 ---
-name: apply-agent-lifecycle-process-skills
+name: apply-alps
 description: 適用状況のニーズ、条件およびリスクに合うAgent Skillを選択し、Entry/Exit Criteria、Control、ConstraintおよびTailoringの決定を確認する。Skillを単独で、または組み合わせて実行する。さらに、Skill間におけるOutputとInputの授受、および構成全体の完全性および一貫性を管理する。既存Skillを使う作業、複数Skillの編成、適用根拠またはOutcome達成の証拠を求められたときに使用する。新規Skillの定義だけ、またはSkill資産の採用・変更・廃止だけを行う場合は使用しない。ALPS準拠。
 ---
 
@@ -139,7 +139,7 @@ Outputの変更が他のSkillのInputに影響する場合、影響を受けるS
 
 この節は参考情報であり、規範上の強さを持たない。
 
-- 曖昧性、競合、規範属性、ConformanceまたはTailoringの解釈に正本が必要な場合は、リポジトリ共通の[Process Framework](../../../../../../.alps/spec/locales/ja/process-framework.md)および[ALPS Specification](../../../../../../.alps/spec/locales/ja/ALPS-SPEC.md)を参照する。通常の適用では、選択済みの正本Skill Description、適用されるFrameworkレベルの宣言および管理済みTailoring判断を直接の基礎として用いる。
+- 曖昧性、競合、規範属性、ConformanceまたはTailoringの解釈に正本が必要な場合は、リポジトリ共通の[Process Framework](../../../../../.alps/spec/locales/ja/process-framework.md)および[ALPS Specification](../../../../../.alps/spec/locales/ja/ALPS-SPEC.md)を参照する。通常の適用では、選択済みの正本Skill Description、適用されるFrameworkレベルの宣言および管理済みTailoring判断を直接の基礎として用いる。
 
 ## Bundled Resources
 
