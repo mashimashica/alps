@@ -11,20 +11,38 @@ permissions:
 
 jobs:
   validate:
+    name: validate-${{ matrix.target }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - claude-code
+          - cursor
+          - codex
+          - vscode
+    env:
+      HOME: ${{ runner.temp }}/home-${{ matrix.target }}
 
     steps:
       - name: Check out the pull request
         uses: actions/checkout@v5
 
-      - name: Show supported targets
-        run: npx --yes plugins targets
-
-      - name: Install ALPS for VS Code
+      - name: Prepare isolated source and home
         run: |
-          mkdir -p "$RUNNER_TEMP/alps-consumer"
-          cd "$RUNNER_TEMP/alps-consumer"
-          npx --yes plugins add "$GITHUB_WORKSPACE" --target vscode --scope project --yes
+          mkdir -p "$HOME" "$RUNNER_TEMP/source-${{ matrix.target }}" "$RUNNER_TEMP/consumer-${{ matrix.target }}"
+          cp -a "$GITHUB_WORKSPACE/." "$RUNNER_TEMP/source-${{ matrix.target }}/"
+
+      - name: Install ALPS
+        working-directory: ${{ runner.temp }}/consumer-${{ matrix.target }}
+        run: |
+          npx --yes plugins add "$RUNNER_TEMP/source-${{ matrix.target }}" \
+            --target "${{ matrix.target }}" \
+            --scope user \
+            --yes
+
+      - name: Remove the source copy
+        run: rm -rf "$RUNNER_TEMP/source-${{ matrix.target }}"
 
       - name: Inspect installed package and shared references
         run: |
@@ -34,8 +52,9 @@ jobs:
           import os
           from pathlib import Path
 
-          roots = [Path.home(), Path(os.environ["RUNNER_TEMP"]), Path(os.environ["GITHUB_WORKSPACE"])]
-          seen: set[Path] = set()
+          home = Path(os.environ["HOME"])
+          consumer = Path(os.environ["RUNNER_TEMP"]) / "consumer-${{ matrix.target }}"
+          roots = [home, consumer]
           skills: list[Path] = []
           specs: list[Path] = []
           manifests: list[Path] = []
@@ -44,20 +63,16 @@ jobs:
               if not root.exists():
                   continue
               for path in root.rglob("SKILL.md"):
-                  if path.parts[-2:] == ("define-alps", "SKILL.md") and path not in seen:
-                      seen.add(path)
+                  if path.parts[-2:] == ("define-alps", "SKILL.md"):
                       skills.append(path)
               for path in root.rglob("ALPS-SPEC.md"):
-                  if path not in seen:
-                      seen.add(path)
-                      specs.append(path)
+                  specs.append(path)
               for path in root.rglob("plugin.json"):
                   try:
                       text = path.read_text(encoding="utf-8")
                   except (OSError, UnicodeDecodeError):
                       continue
-                  if '"name": "alps"' in text and path not in seen:
-                      seen.add(path)
+                  if '"name": "alps"' in text:
                       manifests.append(path)
 
           print("DEFINE SKILLS")
@@ -75,12 +90,23 @@ jobs:
           for path in manifests:
               print(f"- {path}")
 
-          installed = [skill for skill in skills if not skill.is_relative_to(Path(os.environ["GITHUB_WORKSPACE"]))]
-          if not installed:
-              raise SystemExit("No installed define-alps/SKILL.md was found outside the checkout")
+          print("CONFIG FILES REFERENCING ALPS")
+          for path in home.rglob("*"):
+              if not path.is_file() or path.stat().st_size > 1_000_000:
+                  continue
+              try:
+                  text = path.read_text(encoding="utf-8")
+              except (OSError, UnicodeDecodeError):
+                  continue
+              if "alps" in text.lower():
+                  print(f"- {path}")
+
+          if not skills:
+              raise SystemExit("No installed define-alps/SKILL.md was found after removing the source copy")
+
           broken = [
               skill
-              for skill in installed
+              for skill in skills
               if not (skill.parent / "../../.alps/spec/ALPS-SPEC.md").resolve().is_file()
           ]
           if broken:
