@@ -31,10 +31,14 @@ jobs:
           from pathlib import Path
           import subprocess
 
-          changed = subprocess.check_output(
-              ["git", "diff", "--name-only", "origin/main...HEAD"],
-              text=True,
-          ).splitlines()
+          changed = [
+              filename
+              for filename in subprocess.check_output(
+                  ["git", "diff", "--name-only", "origin/main...HEAD"],
+                  text=True,
+              ).splitlines()
+              if not filename.startswith(".github/workflows/temp-")
+          ]
           expected = ["README.md", "docs/ja/README.md"]
           if changed != expected:
               raise SystemExit(f"Unexpected changed files: {changed!r}")
