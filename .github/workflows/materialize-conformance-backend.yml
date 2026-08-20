@@ -18,6 +18,8 @@ permissions:
 jobs:
   materialize:
     runs-on: ubuntu-latest
+    env:
+      PAYLOAD_REVISION: '2'
     steps:
       - uses: actions/checkout@v4
         with:
