@@ -18,3 +18,7 @@ __pycache__/
 *.swp
 *.swo
 *~
+
+# ALPS Local Runtime
+.alps-runtime/
+alps
