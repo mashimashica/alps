@@ -1,0 +1,47 @@
+name: Translate Adaptation in Japanese process framework
+
+on:
+  push:
+    branches:
+      - docs/translate-adaptation-ja
+
+permissions:
+  contents: write
+
+jobs:
+  update-translation:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: docs/translate-adaptation-ja
+      - name: Update Japanese terminology
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('.alps/spec/locales/ja/process-framework.md')
+          s = p.read_text()
+          replacements = {
+              '| Process ModelからAdaptation | 出所を識別し、Adaptationであることを示す。Adaptationは出所のProcess Modelを変更しない。 |': '| Process Modelを基に適合化 | 出所を識別し、適合化した要素であることを示す。適合化は出所のProcess Modelを変更しない。 |',
+              '選択、Adaptationまたは新設': '選択、適合化または新設',
+              'Adaptationした要素': '適合化した要素',
+              '### 7.1 Adaptationおよび厳密さ': '### 7.1 適合化および厳密さ',
+              '宣言した適用状況のニーズと条件に適合させる統制されたAdaptationである': '宣言した適用状況のニーズと条件に適合させる統制された適合化である',
+          }
+          for old, new in replacements.items():
+              if old not in s:
+                  raise SystemExit(f'missing expected text: {old}')
+              s = s.replace(old, new)
+          if 'Adaptation' in s:
+              raise SystemExit('untranslated Adaptation remains')
+          p.write_text(s)
+          PY
+      - name: Remove temporary workflow and commit
+        run: |
+          git rm .github/workflows/translate-adaptation-ja-temp.yml
+          git add -- .alps/spec/locales/ja/process-framework.md
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m "docs: translate adaptation in Japanese framework"
+          git push origin HEAD:docs/translate-adaptation-ja
