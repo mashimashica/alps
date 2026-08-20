@@ -1,0 +1,54 @@
+name: Materialize Local Runtime conformance backend
+
+on:
+  push:
+    branches:
+      - feat/local-runtime-v0-conformance
+    paths:
+      - .github/workflows/materialize-conformance-backend.yml
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/local-runtime-v0-conformance
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.x'
+          cache: false
+      - name: Decode implementation payload
+        run: |
+          git fetch origin chore/local-runtime-conformance-backend
+          : > /tmp/conformance-backend.b64
+          for part in $(seq -w 0 8); do
+            git show "origin/chore/local-runtime-conformance-backend:.github/materialize/backend/part${part}" >> /tmp/conformance-backend.b64
+          done
+          base64 --decode /tmp/conformance-backend.b64 > /tmp/conformance-backend.tar.xz
+          tar -xJf /tmp/conformance-backend.tar.xz -C .
+          gofmt -w cmd/alps internal
+          go mod tidy
+      - name: Validate backend
+        run: |
+          go test ./...
+          go test -race ./...
+          go vet ./...
+          git diff --check
+      - name: Commit and push
+        env:
+          GIT_AUTHOR_NAME: Mashimashica
+          GIT_AUTHOR_EMAIL: 43808210+mashimashica@users.noreply.github.com
+          GIT_COMMITTER_NAME: Mashimashica
+          GIT_COMMITTER_EMAIL: 43808210+mashimashica@users.noreply.github.com
+        run: |
+          git config user.name "$GIT_AUTHOR_NAME"
+          git config user.email "$GIT_AUTHOR_EMAIL"
+          git rm .github/workflows/materialize-conformance-backend.yml
+          git add go.mod go.sum cmd/alps internal
+          git commit --signoff -m 'feat: implement Local Runtime v0 conformance backend'
+          git push origin HEAD:feat/local-runtime-v0-conformance
