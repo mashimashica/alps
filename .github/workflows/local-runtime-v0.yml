@@ -6,6 +6,7 @@ on:
       - cmd/alps/**
       - internal/**
       - scripts/local-runtime-*.sh
+      - README.local-runtime.md
       - go.mod
       - go.sum
       - .github/workflows/local-runtime-v0.yml
@@ -16,6 +17,7 @@ on:
       - cmd/alps/**
       - internal/**
       - scripts/local-runtime-*.sh
+      - README.local-runtime.md
       - go.mod
       - go.sum
       - .github/workflows/local-runtime-v0.yml
