@@ -39,8 +39,6 @@ npx plugins add mashimashica/alps
 
 インストーラーはPackageを検出し、対応するAgentクライアントを判別し、確認後にインストールします。インストール後は、Skillを再読み込みできるよう、対象クライアントを再起動してください。
 
-このコマンドでは[`.alps/`](../../.alps/)を含むPackage全体が保持されるため、各Skillから共通規範文書への参照を解決できます。`skills/`だけをコピーしても、完全なALPSのインストールにはなりません。
-
 ### 参照Skillを選択する
 
 | Skill | 使用する状況 |
@@ -79,7 +77,7 @@ ALPSを継続的に利用するリポジトリでは、以後のAgentセッシ�
 
 ## ALPS参照モデル
 
-ALPSは、Skillのライフサイクルを三つのProcessによって定義します。これらは固定された段階ではなく、必要に応じて並行的、反復的または再帰的に適用できます。矢印は代表的なOutputとInputの受け渡しを示します。
+ALPSは、Skillのライフサイクルを三つのProcessによって定義します。これらは固定された段階ではなく、必要に応じて並行的、反復的または再帰的に適用できます。矢印は代表的なOutput/Inputの授受を示します。
 
 このリポジトリは、ALPSの規格文書と、これらのProcessを実装する三つのAgent Skillを提供します。英語版を正本とし、各Skillに日本語ローカライズを収録します。
 
@@ -95,7 +93,7 @@ flowchart LR
     MANAGE -->|"変更・再検証要求"| DEFINE
 ```
 
-ALPS規格は、この参照モデルに加えて、Skill Description、Skill Package、複数Skillの組合せと受け渡し、Control、Constraint、Enabler、Entry/Exit Criteria、Decision Gate、TailoringおよびConformanceの規則を定めます。
+ALPS規格は、この参照モデルに加えて、Skill Description、Skill Package、複数Skillの組合せと授受、Control、Constraint、Enabler、Entry/Exit Criteria、Decision Gate、TailoringおよびConformanceの規則を定めます。
 
 ## Skillの読み方
 
