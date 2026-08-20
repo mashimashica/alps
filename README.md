@@ -39,8 +39,6 @@ npx plugins add mashimashica/alps
 
 The installer discovers the package, detects supported agent clients, and asks for confirmation before installation. Restart the affected clients after installation so they reload the Skills.
 
-The command preserves the complete package, including [`.alps/`](.alps/), so the Skills' shared normative references remain resolvable. Copying only `skills/` is not a complete ALPS installation.
-
 ### Choose a reference Skill
 
 | Skill | Use it when |
