@@ -5,7 +5,7 @@ on:
     paths:
       - cmd/alps/**
       - internal/**
-      - scripts/local-runtime-smoke.sh
+      - scripts/local-runtime-*.sh
       - go.mod
       - go.sum
       - .github/workflows/local-runtime-v0.yml
@@ -15,7 +15,7 @@ on:
     paths:
       - cmd/alps/**
       - internal/**
-      - scripts/local-runtime-smoke.sh
+      - scripts/local-runtime-*.sh
       - go.mod
       - go.sum
       - .github/workflows/local-runtime-v0.yml
@@ -31,19 +31,36 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.24.x'
-          cache: true
+          cache: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Download modules
-        run: go mod download
+      - name: Resolve and normalize modules
+        run: |
+          go mod tidy
+          echo '--- go.sum ---'
+          cat go.sum
+          echo '--- end go.sum ---'
       - name: Test Go packages
         run: go test ./...
+      - name: Test Go packages with race detector
+        run: go test -race ./...
       - name: Vet Go packages
         run: go vet ./...
       - name: Check JavaScript syntax
         run: node --check internal/web/static/app.js
       - name: Check shell syntax
-        run: bash -n scripts/local-runtime-smoke.sh
+        run: |
+          bash -n scripts/local-runtime-smoke.sh
+          if [[ -f scripts/local-runtime-acceptance.sh ]]; then
+            bash -n scripts/local-runtime-acceptance.sh
+          fi
+      - name: Run smoke test
+        run: bash scripts/local-runtime-smoke.sh
+      - name: Run acceptance test when present
+        run: |
+          if [[ -f scripts/local-runtime-acceptance.sh ]]; then
+            bash scripts/local-runtime-acceptance.sh
+          fi
       - name: Check whitespace
         run: git diff --check
