@@ -253,10 +253,10 @@ Process Viewには、次のいずれかの出所をもつActivityとTaskを含�
 | Viewにおける出所 | 扱い |
 |---|---|
 | Process Modelから選択 | 出所を識別し、選択であることを示し、その出所を維持する。 |
-| Process ModelからAdaptation | 出所を識別し、Adaptationであることを示す。Adaptationは出所のProcess Modelを変更しない。 |
+| Process Modelを基に適合化 | 出所を識別し、適合化した要素であることを示す。適合化は出所のProcess Modelを変更しない。 |
 | View専用に作成 | 新設であることを示す。View専用の要素は出所のProcess Modelを変更しない。 |
 
-Viewは、各ActivityとTaskの出所を明示し、選択、Adaptationまたは新設のいずれかを示す必要がある。Adaptationした要素とView専用の要素は、Tailoringまたは正式な採用によってそのProcessに取り込まない限り、出所ProcessへのConformanceには寄与しない。
+Viewは、各ActivityとTaskの出所を明示し、選択、適合化または新設のいずれかを示す必要がある。適合化した要素とView専用の要素は、Tailoringまたは正式な採用によってそのProcessに取り込まない限り、出所ProcessへのConformanceには寄与しない。
 
 Process Frameworkは、Process Modelに既に存在するActivityとTaskだけを使用するようProcess Viewを制限してよい。制限されたViewには、View専用のActivityまたはTaskを含めてはならない。
 
@@ -293,9 +293,9 @@ IterationまたはRecursionがOutputを変更すると、影響を受けるProce
 
 一般Processは、二つの方法で具体化される。一つは適用形態をTailoringする方法、もう一つは一回の適用をInstantiationする方法である。両者は同時に行われ得るが、同じ変更を指すものではない。
 
-### 7.1 Adaptationおよび厳密さ
+### 7.1 適合化および厳密さ
 
-**Tailoring**は、ライフサイクルモデルまたはProcessを、宣言した適用状況のニーズと条件に適合させる統制されたAdaptationである。このようなモデルやProcessは、通常、変更なしですべての適用状況に適用できるものではない。
+**Tailoring**は、ライフサイクルモデルまたはProcessを、宣言した適用状況のニーズと条件に適合させる統制された適合化である。このようなモデルやProcessは、通常、変更なしですべての適用状況に適用できるものではない。
 
 Tailoringは、Activityを受容可能なリスク水準で実行するために十分な厳密さを設定する。厳密さが不足すると、問題が生じる可能性が高まり、過剰な厳密さはコストまたは日程のリスクを高め得る。
 
