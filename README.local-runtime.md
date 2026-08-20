@@ -4,7 +4,7 @@ This branch contains a locally runnable vertical slice of the ALPS Runtime. It i
 
 ## Run locally
 
-Requirements: Go 1.24 or later.
+Requirements: Go 1.24 or later. The Runtime uses a pure-Go SQLite implementation and does not require a system SQLite installation.
 
 ```console
 go mod download
@@ -36,6 +36,19 @@ The current vertical slice provides:
 - a minimal MCP stdio adapter;
 - SQLite backup and Run audit export commands.
 
+## Validate locally
+
+The smoke test exercises a Run and Human Decision Gate. The acceptance test additionally checks discovery, adoption, package isolation, Artifacts, usage, Atlas, SSE, MCP, backup, export, restart persistence, authentication, Origin validation, path traversal protection, and stale Decision rejection.
+
+```console
+go test ./...
+go test -race ./...
+go vet ./...
+node --check internal/web/static/app.js
+bash scripts/local-runtime-smoke.sh
+bash scripts/local-runtime-acceptance.sh
+```
+
 ## Useful commands
 
 ```console
@@ -43,7 +56,6 @@ go run ./cmd/alps scan
 go run ./cmd/alps mcp
 go run ./cmd/alps backup
 go run ./cmd/alps export --run <run-id>
-go test ./...
 ```
 
 `alps mcp`, `alps scan`, `alps backup`, and `alps export` expect `alps serve` to be running with the same workspace.
