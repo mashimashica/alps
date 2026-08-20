@@ -19,7 +19,7 @@ jobs:
   materialize:
     runs-on: ubuntu-latest
     env:
-      PAYLOAD_REVISION: '2'
+      PAYLOAD_COMMIT: c3d87c8bc182046cce95452dbf3d50d26ed25904
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,13 +31,73 @@ jobs:
           cache: false
       - name: Decode implementation payload
         run: |
-          git fetch origin chore/local-runtime-conformance-backend
+          git fetch origin "$PAYLOAD_COMMIT"
           : > /tmp/conformance-backend.b64
           for part in $(seq -f '%02g' 0 8); do
-            git show "origin/chore/local-runtime-conformance-backend:.github/materialize/backend/part${part}" >> /tmp/conformance-backend.b64
+            git show "$PAYLOAD_COMMIT:.github/materialize/backend/part${part}" >> /tmp/conformance-backend.b64
           done
           base64 --decode /tmp/conformance-backend.b64 > /tmp/conformance-backend.tar.xz
           tar -xJf /tmp/conformance-backend.tar.xz -C .
+      - name: Apply compile corrections
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          path = Path('internal/mcp/mcp.go')
+          value = path.read_text()
+          replacements = {
+              'return nil, client.get(ctx, "/v1/catalog")': 'return client.get(ctx, "/v1/catalog")',
+              'return nil, client.get(ctx, "/v1/assets/"+in.AssetID)': 'return client.get(ctx, "/v1/assets/"+in.AssetID)',
+              'return nil, client.post(ctx, "/v1/runs", in)': 'return client.post(ctx, "/v1/runs", in)',
+              'return nil, client.get(ctx, "/v1/runs/"+in.RunID)': 'return client.get(ctx, "/v1/runs/"+in.RunID)',
+              'return nil, client.post(ctx, "/v1/runs/"+in.RunID+"/reports", withoutRunID(in))': 'return client.post(ctx, "/v1/runs/"+in.RunID+"/reports", withoutRunID(in))',
+              'return nil, client.post(ctx, "/v1/runs/"+in.RunID+"/completion-requests", map[string]any{"expectedVersion": in.ExpectedVersion})': 'return client.post(ctx, "/v1/runs/"+in.RunID+"/completion-requests", map[string]any{"expectedVersion": in.ExpectedVersion})',
+              'return nil, client.post(ctx, "/v1/runs/"+in.RunID+"/artifacts", payload)': 'return client.post(ctx, "/v1/runs/"+in.RunID+"/artifacts", payload)',
+              'return nil, client.post(ctx, "/v1/runs/"+in.RunID+"/gates", withoutRunID(in))': 'return client.post(ctx, "/v1/runs/"+in.RunID+"/gates", withoutRunID(in))',
+              'return nil, client.get(ctx, "/v1/gates/"+in.GateID)': 'return client.get(ctx, "/v1/gates/"+in.GateID)',
+              'return nil, client.post(ctx, "/v1/assessments", in)': 'return client.post(ctx, "/v1/assessments", in)',
+              'return nil, client.post(ctx, "/v1/handoffs", in)': 'return client.post(ctx, "/v1/handoffs", in)',
+              'return nil, client.post(ctx, "/v1/model-invocations", in)': 'return client.post(ctx, "/v1/model-invocations", in)',
+              'return nil, client.post(ctx, "/v1/usage-observations", in)': 'return client.post(ctx, "/v1/usage-observations", in)',
+              'func (client *httpClient) get(ctx context.Context, path string) (any, error) {\n\treturn client.do(ctx, http.MethodGet, path, nil)\n}\n\nfunc (client *httpClient) post(ctx context.Context, path string, input any) (any, error) {\n\treturn client.do(ctx, http.MethodPost, path, input)\n}': 'func (client *httpClient) get(ctx context.Context, path string) (*mcpsdk.CallToolResult, any, error) {\n\tresult, err := client.do(ctx, http.MethodGet, path, nil)\n\treturn nil, result, err\n}\n\nfunc (client *httpClient) post(ctx context.Context, path string, input any) (*mcpsdk.CallToolResult, any, error) {\n\tresult, err := client.do(ctx, http.MethodPost, path, input)\n\treturn nil, result, err\n}',
+          }
+          for old, new in replacements.items():
+              if old not in value:
+                  raise SystemExit(f'missing MCP correction pattern: {old[:80]}')
+              value = value.replace(old, new)
+          path.write_text(value)
+
+          changes = {
+              'internal/runtime/assessment.go': [
+                  ('\t\tevent, err = appendEventTx(ctx, tx, actor, "run", handoff.ProviderRunID, "handoff.updated", handoff.ProviderRunID, id, "v1", handoff)\n\t\treturn err', '\t\tvar appendErr error\n\t\tevent, appendErr = appendEventTx(ctx, tx, actor, "run", handoff.ProviderRunID, "handoff.updated", handoff.ProviderRunID, id, "v1", handoff)\n\t\treturn appendErr'),
+              ],
+              'internal/runtime/hosts.go': [
+                  ('\t\tevent, err = appendEventTx(ctx, tx, actor, "host", inventory.Host, "host.inventory_registered", contextValue.ID, "", "v1", map[string]any{"context": contextValue, "skillRoots": inventory.SkillRoots, "pluginRoots": inventory.PluginRoots})\n\t\treturn err', '\t\tvar appendErr error\n\t\tevent, appendErr = appendEventTx(ctx, tx, actor, "host", inventory.Host, "host.inventory_registered", contextValue.ID, "", "v1", map[string]any{"context": contextValue, "skillRoots": inventory.SkillRoots, "pluginRoots": inventory.PluginRoots})\n\t\treturn appendErr'),
+                  ('\t\tevent, err := appendEventTx(ctx, tx, actor, "hook", id, "hook_binding.recorded", id, "", "v1", map[string]any{"id": id, "binding": binding, "digest": digest})\n\t\treturn err', '\t\tvar appendErr error\n\t\tevent, appendErr = appendEventTx(ctx, tx, actor, "hook", id, "hook_binding.recorded", id, "", "v1", map[string]any{"id": id, "binding": binding, "digest": digest})\n\t\treturn appendErr'),
+                  ('\t\tevent, err = appendEventTx(ctx, tx, actor, "host-observation", streamID, "host.observed", envelope.RunID, observation.ID, "v1", observation)\n\t\treturn err', '\t\tvar appendErr error\n\t\tevent, appendErr = appendEventTx(ctx, tx, actor, "host-observation", streamID, "host.observed", envelope.RunID, observation.ID, "v1", observation)\n\t\treturn appendErr'),
+              ],
+              'internal/runtime/inference.go': [
+                  ('\t\tevent, err := appendEventTx(ctx, tx, actor, "model-catalog", snapshot.ID, "model_catalog.recorded", snapshot.ID, "", "v1", snapshot)\n\t\treturn err', '\t\tvar appendErr error\n\t\tevent, appendErr = appendEventTx(ctx, tx, actor, "model-catalog", snapshot.ID, "model_catalog.recorded", snapshot.ID, "", "v1", snapshot)\n\t\treturn appendErr'),
+              ],
+          }
+          for filename, file_replacements in changes.items():
+              path = Path(filename)
+              value = path.read_text()
+              for old, new in file_replacements:
+                  if old not in value:
+                      raise SystemExit(f'missing correction pattern in {filename}: {old[:80]}')
+                  value = value.replace(old, new)
+              path.write_text(value)
+
+          path = Path('internal/runtime/events.go')
+          value = path.read_text()
+          value = value.replace('"go.opentelemetry.io/otel/attribute"', '"go.opentelemetry.io/otel/attribute"\n\t"go.opentelemetry.io/otel/metric"')
+          old = '\t\t\tr.telemetry.OutboxExports.Add(ctx, 1,\n\t\t\t\tattribute.Int64("alps.event.sequence", current.sequence),\n\t\t\t\tattribute.String("alps.mapping.revision", "alps-domain-event/1"),\n\t\t\t)'
+          new = '\t\t\tr.telemetry.OutboxExports.Add(ctx, 1, metric.WithAttributes(\n\t\t\t\tattribute.Int64("alps.event.sequence", current.sequence),\n\t\t\t\tattribute.String("alps.mapping.revision", "alps-domain-event/1"),\n\t\t\t))'
+          if old not in value:
+              raise SystemExit('missing OTel metric correction pattern')
+          path.write_text(value.replace(old, new))
+          PY
           gofmt -w cmd/alps internal
           go mod tidy
       - name: Validate backend
