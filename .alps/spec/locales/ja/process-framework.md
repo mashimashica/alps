@@ -29,25 +29,25 @@ ALPSは、このFrameworkをAgent Skillに適用する。ALPSの規定がこのF
 
 ## 1. 作業およびその記述
 
-最初の区別は、作業と、その作業についての記述との間にある。一方は実行され、他方はその実行を異なる適用状況でも理解可能にする。
+最初に、作業そのものと、その作業についての記述とを区別する。作業は実行され、記述は、その作業の実行内容を異なる適用状況でも理解できるようにする。
 
 ### 1.1 作業、記述および適用
 
 **Process**は、明示されたPurposeの下で、一つ以上のOutcomeを成立させるために実行される、相互に関連する作業である。ProcessはInputに作用してOutputを生み出し、ActivityとTaskを一つのまとまりに組み合わせる。Processの実行は、ステークホルダーに便益を提供することを意図している。Processが果たす機能は、Purpose、OutcomeならびにActivityとTaskの集合によって定まる。
 
-**Process Description**はProcessを説明する。Description自体はProcessの実行ではない。一般Processまたは特定のInstanceを表現できる。
+**Process Description**は、Processを説明する。その記述自体は、Processの実行ではない。Process Descriptionは、一般的なProcessまたは特定のProcess Instanceを表現できる。
 
 **Process Instance**は、特定の適用状況におけるProcessの一回の適用である。Instance固有のDescriptionでは、必要な能力と資源、必須の受取項目と引渡項目、適用するControlとConstraint、および関係する時期を識別できる。
 
-### 1.2 Descriptionに必要な中核
+### 1.2 Process Descriptionに必要な中核
 
-Descriptionは詳細さを増しても、意味の中心を変えずに保つことができる。
+Process Descriptionは、詳細を追加しても、意味上の中核を維持できる。
 
 明示的で体系的なProcess Descriptionは、結果の一貫性を支援する。共通の記述構造は、標準Processの展開、Tailoring、改善およびProcess Assessmentも支援し、適用分野を問わず任意のProcess Modelに使用できる。
 
 すべてのProcess Descriptionは、Name、PurposeおよびOutcomeを含む必要がある。これらの要素は、構造的な分解を要求せずに意図する結果を記述し、実施とAssessmentに共通の基準点を提供する。
 
-Activity、Task、Input、Output、Control、Constraint、Enabler、Entry Criteria、Exit Criteriaおよび参考情報は任意である。DescriptionのPurposeと必要な詳細さに応じて含める。
+Activity、Task、Input、Output、Control、Constraint、Enabler、Entry Criteria、Exit Criteriaおよび参考情報は任意である。Process DescriptionのPurposeと必要な詳細さに応じて含める。
 
 Processは共通の属性によっても特徴付けられる。選択した詳細さは、Processの成熟度、Capabilityまたは品質水準を特徴付けるために役立ち得る。
 
@@ -63,13 +63,13 @@ Processは共通の属性によっても特徴付けられる。選択した詳�
 
 ### 1.4 記述を読むための規則
 
-文書上の順序は実行上の順序ではなく、流暢な表現は意味の区別に代わるものではない。
+文書上の記載順は、実行順序を意味しない。また、文章が自然に読めることは、意味上の区別を明示することの代わりにはならない。
 
 Process Descriptionは、Name、Purpose、Outcome、ActivityおよびTaskの機能を区別し、それらの内部整合性を維持する必要がある。
 
 各文は一つの意味を担うのが望ましい。文章を短くするためだけに、独立した目的、結果または行為を結合することは避けるのが望ましい。各記述は、単独で参照しても意味を保つために十分な文脈を含むのが望ましい。補足説明は、注記または他の参考情報として分離できる。
 
-一般ProcessのDescriptionは、特定の方法、技法、ツール、測定量、管理方法または実行順序を要求してはならない。方法と例は、Processの要求事項とせず、手引きとして提供できる。
+一般的なProcessを記述するProcess Descriptionは、特定の方法、技法、ツール、測定量、管理方法または実行順序を要求してはならない。方法と例は、Processの要求事項とせず、手引きとして提供できる。
 
 Procedureは、順序付けた手順を規定する。ActivityとTaskはProcessの作業を記述するものであり、記載順だけを理由として手順上の段階として解釈してはならない。
 
@@ -79,11 +79,11 @@ Procedureは、順序付けた手順を規定する。ActivityとTaskはProcess�
 
 ## 2. 意図、成功および作業内容
 
-Instanceが始まる前から、言葉は、作業に識別できる輪郭を与える。Nameは作業を指し示し、Purposeは存在理由を説明し、Outcomeは成功によって成立する状態を示し、ActivityとTaskは、どの作業がそのProcessに属するかを表す。
+Process Instanceを開始する前でも、Name、Purpose、Outcome、ActivityおよびTaskによって、対象となる作業の輪郭を識別できる。Nameは作業を指し示し、Purposeは存在理由を説明し、Outcomeは成功によって成立する状態を示し、ActivityとTaskは、どの作業がそのProcessに属するかを表す。
 
 ### 2.1 作業とその理由の命名
 
-Nameは作業を指し示し、Purposeはその理由を与える。両者の機能を分ければ、説明できない目的を名称だけに背負わせずに済む。
+Nameは作業を識別し、Purposeはその作業を行う理由を示す。両者の役割を分けることで、NameだけにPurposeの説明まで担わせることを避けられる。
 
 **Name**はProcessを識別し、Process Model内の他のProcessと区別する。Nameは簡潔な名詞句である必要があり、Processの中心的な関心を表す必要がある。Nameは、Purposeの要約であってはならない。英語では、Nameに“process”という語を結び付けるのが望ましいが、これは意味上の要求ではなく言語上の規約である。
 
@@ -93,25 +93,25 @@ Nameは作業を指し示し、Purposeはその理由を与える。両者の機
 
 ### 2.2 成功と生み出すものの区別
 
-成功と生産はしばしば連れ立つが、答える問いは異なる。
+Processの成功とOutputの生成は関連するが、それぞれが答える問いは異なる。
 
 **Outcome**は、Processの実行によって達成される、測定可能で具体的な結果状態である。Outcomeは観察可能かつ評価可能である必要がある。OutcomeはOutputではなく、文書、記録または情報項目を作成したことだけをOutcomeとして記述してはならない。
 
 各Outcomeは、一つの肯定的で観察可能な状態を、宣言文として記述する必要がある。英語のOutcomeでは現在時制の動詞を用いる必要がある。独立した複数の結果を一つのOutcomeに結合してはならない。
 
-一般ProcessのOutcomeは、そのProcessを適用できる全範囲で意味を保つ必要がある。Outcomeの集合は、Purposeに対して十分である必要がある。各OutcomeはPurposeに関係する必要がある。各Outcomeは、単独で読んでも意味を保つのが望ましい。
+一般ProcessのOutcomeは、そのProcessを適用できる全範囲で意味を保つ必要がある。Outcomeの集合は、Purposeを達成するために十分である必要がある。各OutcomeはPurposeに関係する必要がある。各Outcomeは、単独で読んでも意味を保つのが望ましい。
 
 Outcomeは簡潔にするのが望ましい。ただし、簡潔さよりも一つの明確な意味を優先する。Outcomeの数は固定せず、Purposeの達成に必要な結果に応じて定める。便益をOutcomeと区別するのが望ましく、Purposeに関連付けた参考的な注記で説明できる。
 
 **Output**は、Processによって生み出される製品、結果またはサービスである。OutputとOutcomeは関連し得るが、相互に置き換えることはできない。Outputは生み出されるものであり、Outcomeは達成を評価する結果状態である。あるProcessのOutputは、別のProcessのInputになり得る。
 
-判別用の問いとして、その記述が作業から出ていく項目を示すのか、成功判断に用いる状態を示すのかを確認できる。前者はOutputを、後者はOutcomeを示す。この問いは定義の適用を助けるが、定義を置き換えない。
+判別するには、その記述が、作業の結果として外部に引き渡される項目を示すのか、成功の判定に用いる状態を示すのかを確認する。前者はOutputを、後者はOutcomeを示す。この問いは定義の適用を助けるが、定義を置き換えない。
 
 ### 2.3 作業の編成および記述
 
 個々の行為をまとめながら全体への寄与を失わないとき、作業は理解可能になる。
 
-**Activity**は、Process内のまとまりあるTaskの集合である。Activityは、関連する行為を、そのProcessへの寄与を理解し、伝達できるように整理する。
+**Activity**は、Process内のまとまりあるTaskの集合である。Activityは、関連する行為をまとめ、そのProcessへの寄与を理解し、説明できる形に整理したものである。
 
 十分な凝集性と詳細をもつActivityは、固有のPurposeとOutcomeをもつSub-processとして扱うことができる。ActivityとSub-processの集合は、すべてのProcess Outcomeを網羅し、Process Purposeを満たす必要がある。ActivityとOutcomeを一対一に対応させる必要はない。
 
@@ -123,7 +123,7 @@ Outcomeは簡潔にするのが望ましい。ただし、簡潔さよりも一�
 
 ## 3. Process境界の設定
 
-有用な境界は、恣意的な線でも壁でもない。互いに属する作業をまとめ、他のProcessとの授受を明示された状態に保つ。
+有用なProcess境界は、単なる恣意的な区切りや壁ではない。Process境界は、相互に関連する作業を一つにまとめ、他のProcessとの受け渡しを明示する。
 
 ### 3.1 粒度および凝集性
 
@@ -184,7 +184,7 @@ Outcomeの達成を実証できる場合、Outputの指定は任意である。O
 
 Process群の結果は、文書、Artifactまたはモデルに記録されることが多い。Outputに名称を付けるだけでは、文書の作成を要求したことにはならない。
 
-代表的なInputとOutputは、一つの実行方法の例を示す。唯一の方法を規定しない。Processは、代表的な流れだけでなくProcess Description全体から理解するのが望ましい。
+代表的なInputとOutputは、一つの実行方法の例を示すにすぎず、それを唯一の方法として規定するものではない。Processは、代表的な流れだけでなくProcess Description全体から理解するのが望ましい。
 
 ### 4.3 適用の両端にある条件
 
@@ -216,7 +216,7 @@ FrameworkレベルのControlは、宣言した範囲内のProcessを方向付け
 
 ## 5. 実施方法を固定しない再利用
 
-再利用可能なDescriptionは、意味を一定に保ちながら、その周囲に異なる実施の形を許容する。
+再利用可能なProcess Descriptionは、意味を一定に保ちながら、その周囲に異なる実施の形を許容する。
 
 ### 5.1 Framework、ModelおよびReference Model
 
@@ -291,7 +291,7 @@ IterationまたはRecursionがOutputを変更すると、影響を受けるProce
 
 ## 7. 一般Processから一つの適用へ
 
-一般Processは二つの異なる仕方で具体化する。適用する形をTailoringし、一回の適用をInstantiationする。両者は同時に行われ得るが、同じ変更を指すものではない。
+一般Processは、二つの方法で具体化される。一つは適用形態をTailoringする方法、もう一つは一回の適用をInstantiationする方法である。両者は同時に行われ得るが、同じ変更を指すものではない。
 
 ### 7.1 Adaptationおよび厳密さ
 
@@ -390,7 +390,7 @@ Conformanceの主張に必要な範囲を超えてOutcomeを達成し、Activity
 
 CapabilityとConformanceは、異なる評価軸である。指定されたActivityとTaskを実行する場合には、Outcomeだけを達成する場合よりも高いCapability水準が必要になり得る。CapabilityだけではConformanceを確立せず、ConformanceだけではCapabilityを決定しない。
 
-Process Outcomeは、Assessmentと改善で使用するProcess Reference Modelになり得る。Process PurposeとOutcomeは実施目標を示すため、単純な適合性評価以外の方法でも有効性を評価できる。
+ProcessのOutcomeの集合は、Assessmentと改善に用いるProcess Reference Modelとして使用できる。Process PurposeとOutcomeは実施目標を示すため、単純な適合性評価以外の方法でも有効性を評価できる。
 
 ## 9. Processを有用に保つ
 

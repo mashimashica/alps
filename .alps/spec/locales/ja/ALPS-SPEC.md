@@ -112,7 +112,7 @@ Entry Criteriaの成立を判定し、Skill Instanceの実行を開始するこ�
 採用され、管理下に置かれたSkill、Skill ModelおよびSkill Viewの総体。
 
 **3.11 Skill Discovery Description（Skill発見記述）**
-Agentが完全なSkill Descriptionを読み込む前にSkillを発見し、その適用可能性を判定するために用いる、ALPS固有の発見層に置く簡潔な参考情報。Skillが行うこと、そのSkillを使用する状況、および適用可能性の判定に必要な情報を示す。
+Agentが完全なSkill Descriptionを読み込む前にSkillを発見し、その適用可能性を判定するために用いる、ALPS固有の発見層に置く簡潔な参考情報。そのSkillが記述する作業、そのSkillを適用する状況、および適用可能性の判定に必要な情報を示す。
 
 **3.12 Skill Package**
 一つのSkill Description、およびその理解・実行・Output作成を支援する任意の付随資源を、一体として管理する単位。
@@ -158,7 +158,7 @@ Skill Descriptionは、実行主体の構造またはTaskの割当てを規定�
 
 ### 5.4 Skillの境界および粒度
 
-Skillの境界は、Activityの中間Outputによってではなく、主要なOutputおよびOutcomeに基づいて定めることを通常の実務とする（PF 3.1）。Skillにおいては、Outcome、ActivityおよびTaskを強く関連付けるとともに、他のSkillへの依存を可能な限り減らす。
+Skillの境界は、通常、Activityの中間Outputではなく、主要なOutputおよびOutcomeに基づいて定める（PF 3.1）。Skillにおいては、Outcome、ActivityおよびTaskを強く関連付けるとともに、他のSkillへの依存を可能な限り減らす。
 
 多数のTaskを含む重要なActivityは、独立したPurposeとOutcomeを持つ別のSkillとして記述してよい（PF 3.1）。
 
@@ -170,7 +170,7 @@ PF 1.3は、異なるニーズをもつ読者に応じて、Process Description�
 
 記述適合を主張するSkill Descriptionは、両方の層を提供し、それぞれの機能を判別可能にする必要がある。正本となるSkill Descriptionを一意に識別でき、必須の参照先を解決できる限り、両方の層を一体として表現しても、分けて表現してもよい。
 
-a) **発見層**は、NameおよびSkill Discovery Descriptionを提示する必要がある。Skill Discovery Descriptionは、Skillが行うこと、そのSkillを使用する状況、および適用可能性の判定に必要な情報を示す必要がある。
+a) **発見層**は、NameおよびSkill Discovery Descriptionを提示する必要がある。Skill Discovery Descriptionは、そのSkillが記述する作業、そのSkillを適用する状況、および適用可能性の判定に必要な情報を示す必要がある。
 
 b) **実行層**は、Skillの実行およびAssessmentに用いる完全なSkill Descriptionを提示し、または参照可能にする必要がある。実行層には、Name、PurposeおよびOutcomeに加え、6.1に従って採用した任意要素および参考情報を含める。
 
@@ -244,7 +244,7 @@ Skill Outcomeは、Skillの実行によって達成される、測定可能か�
 
 Outcomeは、肯定的かつ観察可能な結果が成立している状態を宣言する文として記述する必要がある。一つのOutcomeには一つの結果だけを記述し、独立した複数の結果を接続詞によって結合することは、避ける必要がある。一般SkillのOutcomeは、適用可能なすべての範囲で意味を保つように記述する必要がある。
 
-Outcomeの集合を達成すればSkill Purposeを達成でき、かつ各Outcomeがその達成に関係するようにする必要がある。各Outcomeは、単独で読まれても意味が通るのが望ましい。簡潔さよりも、意味の単一性と明瞭性を優先する。Outcomeの数は、Purposeの達成に必要な結果によって定まる。Skillの便益はOutcomeと区別し、有用であれば、Purposeに付随する非規範的な注記として別に説明できる。
+Outcomeの集合は、Skill Purposeを達成するために十分である必要がある。また、各Outcomeは、そのPurposeの達成に関係する必要がある。各Outcomeは、単独で読まれても意味が通るのが望ましい。簡潔さよりも、意味の単一性と明瞭性を優先する。Outcomeの数は、Purposeの達成に必要な結果によって定まる。Skillの便益はOutcomeと区別し、有用であれば、Purposeに付随する非規範的な注記として別に説明できる。
 
 #### 6.3.4 Activity
 
@@ -254,7 +254,7 @@ Activity、および必要に応じて独立したSkillとして分離された�
 
 #### 6.3.5 Task
 
-Taskは、一つ以上のOutcomeの達成を支援する個別の行為を表すことを主たる機能とし、その行為の対象と動作を判別できるように記述する必要がある。主たる機能が個別の行為ではない記述は、Taskとして扱わず、その機能に対応する要素に置く必要がある。一つひとつのTaskには規範属性を付与し、その行為が要求事項、推奨事項、許容される行為、または通常実施される行為のいずれであるかを、4.1の規範語によって明確にする必要がある。Activityに属するTaskだけで、そのActivityの境界内にあるすべての行為を列挙する必要はない。6.2 c)およびd)の規則は、ActivityとTaskの双方に適用する。
+Taskは、一つ以上のOutcomeの達成を支援する個別の行為を表すことを主たる機能とする必要がある。Taskは、その行為の対象と実行内容を判別できるように記述する必要がある。主たる機能が個別の行為ではない記述は、Taskとして扱わず、その機能に対応する要素に置く必要がある。一つひとつのTaskには規範属性を付与し、その行為が要求事項、推奨事項、許容される行為、または通常実施される行為のいずれであるかを、4.1の規範語によって明確にする必要がある。Activityに属するTaskだけで、そのActivityの境界内にあるすべての行為を列挙する必要はない。6.2 c)およびd)の規則は、ActivityとTaskの双方に適用する。
 
 #### 6.3.6 InputおよびOutput
 
@@ -276,7 +276,7 @@ Entry Criteriaの要約を発見層に置く場合、実行層から利用でき
 
 概要、説明、Common Approach、実務上のヒント、注記および例は、Skillの理解または適用を支援する参考情報として用いる。参考情報は、主要なSkill要素の意味または規範上の強さを変更してはならない（PF 1.4）。
 
-ALPS固有の発見層に置く参考情報として、Skill Discovery Descriptionは、Skillが行うこと、そのSkillを使用する状況、および適用可能性の判定に必要な情報を簡潔に示す必要がある。Skill Discovery Descriptionは、実行層から利用できる正本のName、Purpose、Outcome、適用範囲、Entry CriteriaおよびConstraintと整合する必要があり、これらの要素を置き換え、またはその規範上の意味を変更してはならない。
+ALPS固有の発見層に置く参考情報として、Skill Discovery Descriptionは、そのSkillが記述する作業、そのSkillを適用する状況、および適用可能性の判定に必要な情報を簡潔に示す必要がある。Skill Discovery Descriptionは、実行層から利用できる正本のName、Purpose、Outcome、適用範囲、Entry CriteriaおよびConstraintと整合する必要があり、これらの要素を置き換え、またはその規範上の意味を変更してはならない。
 
 本規格への記述適合を主張するSkillのSkill Discovery Descriptionは、その記述言語による短いALPS準拠表示で終わる必要がある。英語では`ALPS-conformant.`、日本語では`ALPS準拠。`を正確に用いる必要がある。この表示は、対象を当該Skill Description、基準を12.1 a)の記述適合とする標準化された簡略主張であり、Reference Model適合または実行適合を主張するものではない。
 
@@ -385,7 +385,7 @@ d) 詳細に扱うことが有用な重要なActivityは、別のSkillとして�
 
 e) Name、PurposeおよびOutcomeを、6.3.1〜6.3.3に従って記述する必要がある。
 
-f) 各Taskは、一つ以上のOutcomeの達成を支援する個別の行為を表すことを主たる機能とし、その行為の対象と動作を判別できるように記述する必要がある（6.3.5）。
+f) 各Taskは、一つ以上のOutcomeの達成を支援する個別の行為を表すことを主たる機能とする必要がある。各Taskは、その行為の対象と実行内容を判別できるように記述する必要がある（6.3.5）。
 
 g) 各記述を、その主たる機能に対応するSkill要素として分類する必要がある（6.2 a)、6.3）。
 
@@ -409,7 +409,7 @@ n) Skill Packageを構成する場合、付随資源の必要性、役割およ�
 
 a) 合意された基準を用いて、Skill Descriptionをレビューする必要がある（箇条10）。
 
-b) 各Taskが、一つ以上のOutcomeの達成を支援する個別の行為を表すことを主たる機能とし、その行為の対象と動作を判別できることを確認する必要がある（6.3.5、8.2）。
+b) 各Taskが、一つ以上のOutcomeの達成を支援する個別の行為を表すことを主たる機能としていることを確認する必要がある。また、各Taskについて、その行為の対象と実行内容を判別できることを確認する必要がある（6.3.5、8.2）。
 
 c) 各記述の要素分類が、その主たる機能と整合していることを確認する必要がある。これには、ControlおよびConstraintが宣言する条件と、Taskが表す個別の行為との区別を含む（6.2 a)、6.3.5、6.3.7、9.2）。
 
@@ -503,7 +503,7 @@ d) Skill DescriptionのActivityおよびTaskを、付与された規範属性に
 
 e) Constraintが明示されていない限り、特定の実行順序を仮定しなくてよい（6.2 c)）。
 
-f) 実行中に生じた問題は、解決されるまでIterationを続けるのが望ましい（8.1）。
+f) 実行中に問題が生じた場合は、その問題が解決されるまでIterationを続けるのが望ましい（8.1）。
 
 g) 不可逆的または高影響の行為に先立って、Decision Gateを適用するのが望ましい（10.2）。
 
@@ -533,7 +533,7 @@ e) あらかじめ定義されていなかった授受は、Tailoringによっ�
 
 f) IterationまたはRecursionによってOutputが変更された場合、影響を受けるInputを識別し、それらの整合性および適用される基準を再評価するのが望ましい（PF 6.2）。
 
-g) Integrationによって、同じ階層のうちでの完全性と、異なる階層のあいだでの一貫性とを確保する必要がある（8.1）。
+g) Integrationによって、同一階層内の完全性と階層間の一貫性を確保する必要がある（8.1）。
 
 h) 構成全体としてのOutcome達成状況を判定するのが望ましい。
 
@@ -665,7 +665,7 @@ b) **Iteration** — 同じ階層で、同じSkillまたはSkillの集合を反�
 
 c) **Recursion** — 適用対象の連続する構造階層に、同じSkillまたはSkillの集合を反復して適用すること。ある構造階層で適用されたSkillのOutputは、次の構造階層で適用されるSkillのInputになり得る。
 
-d) **Integration** — 同じ階層のうちでの完全性と、異なる階層のあいだでの一貫性とを確保すること。
+d) **Integration** — 同一階層内の完全性と階層間の一貫性を確保すること。
 
 これらの関係は実行順序を規定しない。実際の流れはTailoringによって定め、Outputの変更が他のSkillのInputに及ぼす影響を考慮する（PF 6.2）。
 
@@ -916,7 +916,7 @@ d) 整備された内容と元の記録との対応が追跡可能である。
 - 長大な記録では、議題単位のIterationによって段階的に精緻化できる。
 ```
 
-注記1: `description`は、Skillが行うことと、そのSkillを使用する状況とを記述し、Skillの選択前に利用できるようにする（3.11）。
+注記1: `description`は、そのSkillが記述する作業と、そのSkillを適用する状況とを示し、Skillの選択前に利用できるようにする（3.11）。
 
 注記2: 「整備済み議事録」はOutputであって、Outcomeではない（6.3.3）。Constraintは引渡し可能となる条件を宣言し、対応する引渡し行為はTaskに記述している（6.3.7、9.2）。EnablerはInputではなく（9.3）、本Skillは実行主体を規定しない（5.3）。
 
