@@ -31,16 +31,16 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.24.x'
-          cache: false
+          cache: true
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Resolve and normalize modules
+      - name: Download modules
+        run: go mod download
+      - name: Verify module files are normalized
         run: |
           go mod tidy
-          echo '--- go.sum ---'
-          cat go.sum
-          echo '--- end go.sum ---'
+          git diff --exit-code -- go.mod go.sum
       - name: Test Go packages
         run: go test ./...
       - name: Test Go packages with race detector
@@ -52,15 +52,10 @@ jobs:
       - name: Check shell syntax
         run: |
           bash -n scripts/local-runtime-smoke.sh
-          if [[ -f scripts/local-runtime-acceptance.sh ]]; then
-            bash -n scripts/local-runtime-acceptance.sh
-          fi
+          bash -n scripts/local-runtime-acceptance.sh
       - name: Run smoke test
         run: bash scripts/local-runtime-smoke.sh
-      - name: Run acceptance test when present
-        run: |
-          if [[ -f scripts/local-runtime-acceptance.sh ]]; then
-            bash scripts/local-runtime-acceptance.sh
-          fi
+      - name: Run acceptance test
+        run: bash scripts/local-runtime-acceptance.sh
       - name: Check whitespace
         run: git diff --check
