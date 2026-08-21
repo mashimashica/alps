@@ -5,10 +5,21 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/mashimashica/alps/internal/domain"
 )
 
+func operatorContext() context.Context {
+	return WithActor(context.Background(), domain.Actor{
+		Type:      domain.ActorHuman,
+		ID:        "tester",
+		Authority: "operator",
+		Channel:   domain.ChannelInternal,
+	})
+}
+
 func TestRunDecisionFlow(t *testing.T) {
-	ctx := context.Background()
+	ctx := operatorContext()
 	runtime, err := Open(t.TempDir())
 	if err != nil {
 		t.Fatal(err)
@@ -48,7 +59,7 @@ func TestDiscoveryAndAdoption(t *testing.T) {
 	if err := os.MkdirAll(skill, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	content := []byte("---\nname: sample\ndescription: sample skill\n---\n# Sample\n")
+	content := []byte("---\nname: sample\ndescription: Produce a sample result. ALPS-conformant.\n---\n# Sample\n\n## Purpose\n\nEstablish a sample result.\n\n## Outcomes\n\n- A sample result is available.\n")
 	if err := os.WriteFile(filepath.Join(skill, "SKILL.md"), content, 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -77,7 +88,7 @@ func TestDiscoveryAndAdoption(t *testing.T) {
 }
 
 func TestStaleDecisionIsRejected(t *testing.T) {
-	ctx := context.Background()
+	ctx := operatorContext()
 	runtime, err := Open(t.TempDir())
 	if err != nil {
 		t.Fatal(err)
