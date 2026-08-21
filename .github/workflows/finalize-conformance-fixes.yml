@@ -6,6 +6,7 @@ on:
       - feat/local-runtime-v0-alpha
     paths:
       - .github/materialize/final-conformance-fixes.py
+      - .github/materialize/externalize-svelte-bootstrap.py
       - .github/workflows/finalize-conformance-fixes.yml
 
 permissions:
@@ -29,6 +30,7 @@ jobs:
       - name: Apply source corrections
         run: |
           python .github/materialize/final-conformance-fixes.py
+          python .github/materialize/externalize-svelte-bootstrap.py
           gofmt -w cmd/alps internal
           go get modernc.org/sqlite@v1.56.0
           go mod tidy
@@ -50,6 +52,7 @@ jobs:
           mkdir -p internal/web/static/assets
           cp -a web/build/. internal/web/static/
           cp assets/icon.svg internal/web/static/assets/icon.svg
+          python .github/materialize/externalize-svelte-bootstrap.py
           python - <<'PY'
           from pathlib import Path
           for path in Path('internal/web/static').rglob('*'):
@@ -78,7 +81,6 @@ jobs:
       - name: Check generated state
         run: |
           git diff --check
-          test ! -e web/node_modules/.package-lock.json || true
       - name: Commit and push
         env:
           GIT_AUTHOR_NAME: Mashimashica
@@ -88,7 +90,7 @@ jobs:
         run: |
           git config user.name "$GIT_AUTHOR_NAME"
           git config user.email "$GIT_AUTHOR_EMAIL"
-          git rm .github/materialize/final-conformance-fixes.py .github/workflows/finalize-conformance-fixes.yml
+          git rm .github/materialize/final-conformance-fixes.py .github/materialize/externalize-svelte-bootstrap.py .github/workflows/finalize-conformance-fixes.yml
           git add -u
           git commit --signoff -m 'feat: finalize Local Runtime v0 contracts and tooling'
           git push origin HEAD:feat/local-runtime-v0-conformance
