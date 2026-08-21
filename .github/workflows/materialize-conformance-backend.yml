@@ -57,6 +57,7 @@ jobs:
           git config user.name "$GIT_AUTHOR_NAME"
           git config user.email "$GIT_AUTHOR_EMAIL"
           git rm .github/workflows/materialize-conformance-backend.yml .github/materialize/conformance-backend-fixes.py .github/materialize/conformance-backend-fixes-2.py
-          git add go.mod go.sum cmd/alps internal
+          git add go.mod go.sum internal
+          git add -f cmd/alps
           git commit --signoff -m 'feat: implement Local Runtime v0 conformance backend'
           git push origin HEAD:feat/local-runtime-v0-conformance
