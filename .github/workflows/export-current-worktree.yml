@@ -1,0 +1,29 @@
+name: Export current Local Runtime worktree
+
+on:
+  pull_request:
+    branches:
+      - feat/local-runtime-v0-alpha
+    paths:
+      - .github/workflows/export-current-worktree.yml
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/local-runtime-v0-conformance
+      - uses: actions/upload-artifact@v4
+        with:
+          name: local-runtime-v0-conformance-current
+          path: |
+            .
+            !.git
+            !web/test-results
+            !web/playwright-report
+          include-hidden-files: true
+          retention-days: 1
