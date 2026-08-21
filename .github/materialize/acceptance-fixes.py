@@ -36,7 +36,7 @@ mcp = Path("internal/mcp/mcp.go")
 value = mcp.read_text()
 value = value.replace('''import (\n\t"bytes"''', '''import (\n\t"bytes"\n\t"errors"''')
 old = '''\ttransport := &mcpsdk.IOTransport{Reader: io.NopCloser(input), Writer: nopWriteCloser{Writer: output}}\n\treturn server.Run(ctx, transport)\n}'''
-new = '''\ttransport := &mcpsdk.IOTransport{Reader: io.NopCloser(input), Writer: nopWriteCloser{Writer: output}}\n\terr := server.Run(ctx, transport)\n\tif errors.Is(err, io.EOF) {\n\t\treturn nil\n\t}\n\treturn err\n}'''
+new = '''\ttransport := &mcpsdk.IOTransport{Reader: io.NopCloser(input), Writer: nopWriteCloser{Writer: output}}\n\terr := server.Run(ctx, transport)\n\tif errors.Is(err, io.EOF) || (err != nil && strings.HasSuffix(err.Error(), "server is closing: EOF")) {\n\t\treturn nil\n\t}\n\treturn err\n}'''
 if old not in value:
     raise SystemExit("missing MCP server.Run pattern")
 mcp.write_text(value.replace(old, new))
