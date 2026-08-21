@@ -41,6 +41,19 @@ jobs:
           python .github/materialize/conformance-ui-fixes.py
           mkdir -p web/static/assets
           cp assets/icon.svg web/static/assets/icon.svg
+      - name: Export transient UI source
+        uses: actions/upload-artifact@v4
+        with:
+          name: local-runtime-conformance-ui-source
+          path: |
+            web
+            schemas
+            migrations
+            integrations
+            tests/fixtures
+            .alps/process-model.yaml
+          include-hidden-files: true
+          retention-days: 1
       - name: Install frontend dependencies
         working-directory: web
         run: npm install --no-audit --no-fund
