@@ -12,6 +12,13 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 
+# Frontend dependencies and generated files
+web/node_modules/
+web/.svelte-kit/
+web/build/
+web/test-results/
+web/playwright-report/
+
 # Local logs and temporary files
 .codex-log/
 *.tmp
@@ -21,4 +28,5 @@ __pycache__/
 
 # ALPS Local Runtime
 .alps-runtime/
+.alps-workspace-*/
 alps
