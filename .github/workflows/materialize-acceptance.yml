@@ -1,0 +1,45 @@
+name: Materialize Local Runtime acceptance suite
+
+on:
+  pull_request:
+    branches:
+      - feat/local-runtime-v0-alpha
+    paths:
+      - .github/materialize/acceptance-payload.py
+      - .github/workflows/materialize-acceptance.yml
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/local-runtime-v0-conformance
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.x'
+          cache: false
+      - name: Materialize acceptance suite
+        run: |
+          python .github/materialize/acceptance-payload.py
+          chmod +x scripts/local-runtime-acceptance.sh
+          bash -n scripts/local-runtime-acceptance.sh
+      - name: Run acceptance suite
+        run: bash scripts/local-runtime-acceptance.sh
+      - name: Commit and push
+        env:
+          GIT_AUTHOR_NAME: Mashimashica
+          GIT_AUTHOR_EMAIL: 43808210+mashimashica@users.noreply.github.com
+          GIT_COMMITTER_NAME: Mashimashica
+          GIT_COMMITTER_EMAIL: 43808210+mashimashica@users.noreply.github.com
+        run: |
+          git config user.name "$GIT_AUTHOR_NAME"
+          git config user.email "$GIT_AUTHOR_EMAIL"
+          git rm .github/materialize/acceptance-payload.py .github/workflows/materialize-acceptance.yml
+          git add scripts/local-runtime-acceptance.sh
+          git commit --signoff -m 'test: add Local Runtime v0 conformance acceptance suite'
+          git push origin HEAD:feat/local-runtime-v0-conformance
