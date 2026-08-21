@@ -58,6 +58,17 @@ jobs:
           mkdir -p internal/web/static/assets
           cp -a web/build/. internal/web/static/
           cp assets/icon.svg internal/web/static/assets/icon.svg
+          python - <<'PY'
+          from pathlib import Path
+          for path in Path('internal/web/static').rglob('*'):
+              if path.is_file() and path.suffix in {'.html', '.css', '.js', '.json', '.svg'}:
+                  text = path.read_text()
+                  trailing_newline = text.endswith('\n')
+                  normalized = '\n'.join(line.rstrip() for line in text.splitlines())
+                  if trailing_newline:
+                      normalized += '\n'
+                  path.write_text(normalized)
+          PY
           cat > internal/web/web.go <<'EOF'
           package web
 
