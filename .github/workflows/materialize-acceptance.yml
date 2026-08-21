@@ -27,6 +27,20 @@ jobs:
       - name: Materialize acceptance suite
         run: |
           python .github/materialize/acceptance-payload.py
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/local-runtime-acceptance.sh')
+          value = path.read_text()
+          value = value.replace(
+              'responses={row.get("id"): row for row in rows if "id" in row}\nassert responses[1]["result"]["protocolVersion"]\ntools=responses[2]["result"]["tools"]',
+              'responses={str(row.get("id")): row for row in rows if "id" in row}\nassert responses["1"]["result"]["protocolVersion"]\ntools=responses["2"]["result"]["tools"]',
+          )
+          value = value.replace(
+              'assert responses[3]["result"].get("content") or responses[3]["result"].get("structuredContent") is not None',
+              'assert responses["3"]["result"].get("content") or responses["3"]["result"].get("structuredContent") is not None',
+          )
+          path.write_text(value)
+          PY
           python .github/materialize/acceptance-fixes.py
           gofmt -w internal/runtime/models.go internal/mcp/mcp.go
           chmod +x scripts/local-runtime-acceptance.sh
