@@ -1,13 +1,6 @@
 name: Materialize Local Runtime conformance backend
 
 on:
-  push:
-    branches:
-      - feat/local-runtime-v0-conformance
-    paths:
-      - .github/materialize/conformance-backend-fixes.py
-      - .github/materialize/conformance-backend-fixes-2.py
-      - .github/workflows/materialize-conformance-backend.yml
   pull_request:
     branches:
       - feat/local-runtime-v0-alpha
@@ -55,7 +48,6 @@ jobs:
           go vet ./...
           git diff --check
       - name: Commit and push
-        if: github.event_name == 'push'
         env:
           GIT_AUTHOR_NAME: Mashimashica
           GIT_AUTHOR_EMAIL: 43808210+mashimashica@users.noreply.github.com
