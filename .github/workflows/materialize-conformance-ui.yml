@@ -39,6 +39,8 @@ jobs:
           base64 --decode /tmp/conformance-ui.b64 > /tmp/conformance-ui.tar.xz
           tar -xJf /tmp/conformance-ui.tar.xz -C .
           python .github/materialize/conformance-ui-fixes.py
+          mkdir -p web/static/assets
+          cp assets/icon.svg web/static/assets/icon.svg
       - name: Install frontend dependencies
         working-directory: web
         run: npm install --no-audit --no-fund
