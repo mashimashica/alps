@@ -72,3 +72,11 @@ palette.write_text(value)
 test = Path("web/tests/navigation.spec.ts")
 value = test.read_text().replace("process.platform === 'darwin' ? 'Meta+K' : 'Control+K'", "'Control+K'")
 test.write_text(value)
+
+server = Path("internal/httpapi/server.go")
+value = server.read_text()
+old = "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
+new = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
+if old not in value:
+    raise SystemExit('missing CSP correction pattern')
+server.write_text(value.replace(old, new))
