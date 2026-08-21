@@ -91,19 +91,19 @@ type assessmentInput struct {
 	AssessmentType   string     `json:"assessmentType"`
 	CriteriaRevision string     `json:"criteriaRevision,omitempty"`
 	Result           string     `json:"result"`
-	OutcomeStatus    string     `json:"outcomeStatus,omitempty"`
+	Rationale        string     `json:"rationale,omitempty"`
 	Evidence         []evidence `json:"evidence,omitempty"`
 }
 
 type handoffInput struct {
-	ProviderRunID    string     `json:"providerRunId"`
-	ProviderArtifact string     `json:"providerArtifact"`
-	RecipientRunID   string     `json:"recipientRunId,omitempty"`
-	RecipientInput   string     `json:"recipientInput"`
-	InterfaceID      string     `json:"interfaceId,omitempty"`
-	CriteriaRevision string     `json:"criteriaRevision,omitempty"`
-	Status           string     `json:"status,omitempty"`
-	Evidence         []evidence `json:"evidence,omitempty"`
+	ProviderRunID      string     `json:"providerRunId"`
+	ProviderArtifactID string     `json:"providerArtifactId"`
+	RecipientRunID     string     `json:"recipientRunId,omitempty"`
+	RecipientProcessID string     `json:"recipientProcessId,omitempty"`
+	RecipientInput     string     `json:"recipientInput"`
+	CriteriaRevision   string     `json:"criteriaRevision,omitempty"`
+	Status             string     `json:"status,omitempty"`
+	Evidence           []evidence `json:"evidence,omitempty"`
 }
 
 type invocationInput struct {

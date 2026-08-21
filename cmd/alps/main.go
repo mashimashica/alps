@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"flag"
@@ -12,6 +13,7 @@ import (
 	"path/filepath"
 	goruntime "runtime"
 	"strings"
+	"time"
 
 	"github.com/mashimashica/alps/internal/httpapi"
 	"github.com/mashimashica/alps/internal/mcp"
@@ -28,17 +30,17 @@ func main() {
 	case "serve":
 		err = serve(os.Args[2:])
 	case "scan":
-		err = postCommand(os.Args[2:], "/api/discovery/scan", map[string]any{})
+		err = postCommand(os.Args[2:], "/v1/discovery/scan", map[string]any{})
 	case "mcp":
 		err = runMCP(os.Args[2:])
 	case "hook":
 		err = runHook(os.Args[2:])
 	case "backup":
-		err = postCommand(os.Args[2:], "/api/admin/backup", map[string]any{})
+		err = postCommand(os.Args[2:], "/v1/admin/backup", map[string]any{})
 	case "export":
 		err = exportRun(os.Args[2:])
 	case "version", "--version", "-v":
-		fmt.Println("alps local-runtime-v0 experimental")
+		fmt.Println("alps local-runtime-v0 review")
 	default:
 		usage()
 		os.Exit(2)
@@ -134,9 +136,19 @@ func runHook(args []string) error {
 	if err != nil {
 		return err
 	}
-	payload := map[string]any{"host": *host, "event": *event, "raw": json.RawMessage(raw)}
+	metadata := json.RawMessage(raw)
+	if len(bytes.TrimSpace(raw)) == 0 {
+		metadata = json.RawMessage(`{}`)
+	}
+	payload := map[string]any{"envelope": map[string]any{
+		"schemaVersion": "alps.dev/host-observation/v1",
+		"host":          *host,
+		"event":         *event,
+		"occurredAt":    time.Now().UTC().Format(time.RFC3339Nano),
+		"metadata":      metadata,
+	}}
 	token, _ := os.ReadFile(filepath.Join(*workspace, "runtime", "access.token"))
-	return postJSON(endpoint+"/api/host-observations", payload, strings.TrimSpace(string(token)))
+	return postJSON(endpoint+"/v1/host-observations", payload, strings.TrimSpace(string(token)), map[string]string{"X-ALPS-Actor-Type": "system", "X-ALPS-Channel": "hook"})
 }
 
 func postCommand(args []string, path string, payload any) error {
@@ -168,7 +180,7 @@ func exportRun(args []string) error {
 	if err != nil {
 		return err
 	}
-	req, _ := http.NewRequest(http.MethodGet, endpoint+"/api/runs/"+*runID+"/export", nil)
+	req, _ := http.NewRequest(http.MethodGet, endpoint+"/v1/runs/"+*runID+"/export", nil)
 	token, _ := os.ReadFile(filepath.Join(*workspace, "runtime", "access.token"))
 	req.Header.Set("Authorization", "Bearer "+strings.TrimSpace(string(token)))
 	resp, err := http.DefaultClient.Do(req)
@@ -193,10 +205,19 @@ func exportRun(args []string) error {
 	return err
 }
 
-func postJSON(url string, payload any, token string) error {
+func postJSON(url string, payload any, token string, extraHeaders ...map[string]string) error {
 	body, _ := json.Marshal(payload)
-	req, _ := http.NewRequest(http.MethodPost, url, strings.NewReader(string(body)))
+	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Idempotency-Key", fmt.Sprintf("cli:%d:%d", os.Getpid(), time.Now().UnixNano()))
+	req.Header.Set("X-ALPS-Actor-Type", "system")
+	req.Header.Set("X-ALPS-Actor-ID", "local-cli")
+	req.Header.Set("X-ALPS-Channel", "internal")
+	if len(extraHeaders) > 0 {
+		for name, value := range extraHeaders[0] {
+			req.Header.Set(name, value)
+		}
+	}
 	if token != "" {
 		req.Header.Set("Authorization", "Bearer "+token)
 	}

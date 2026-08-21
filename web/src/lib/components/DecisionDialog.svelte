@@ -46,7 +46,7 @@
         </dl>
         {#if gate.criteria?.length}<section class="decision-list"><h3>Criteria</h3><ul>{#each gate.criteria as item}<li>{item}</li>{/each}</ul></section>{/if}
         {#if gate.unknown?.length}<section class="decision-list warning"><h3>Unknown</h3><ul>{#each gate.unknown as item}<li>{item}</li>{/each}</ul></section>{/if}
-        {#if gate.evidence?.length}<section class="decision-list"><h3>Evidence</h3><ul>{#each gate.evidence as item}<li>{item.note || item.artifactId || item.uri || item.digest}</li>{/each}</ul></section>{/if}
+        {#if gate.evidence?.length}<section class="decision-list"><h3>Evidence</h3><ul>{#each gate.evidence as item}<li>{item.description || item.id || item.uri || item.digest}</li>{/each}</ul></section>{/if}
         <label class="field"><span>Rationale</span><textarea bind:value={rationale} rows="3" placeholder="Record the basis for the Decision"></textarea></label>
         {#if mutation.isError}<p class="form-error">{mutation.error.message}</p>{/if}
         <footer class="decision-actions">

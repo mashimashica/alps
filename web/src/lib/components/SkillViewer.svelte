@@ -30,8 +30,13 @@
     mutationFn: () => api<Run>('/runs', json('POST', { title: detail.data?.name, process: detail.data?.name, assetId })),
     onSuccess: async () => { open = false; await client.invalidateQueries({ queryKey: ['runs'] }); await goto('/runs'); }
   }));
-  $: action = detail.data?.alpsState === 'adopted' ? 'Start Run' : detail.data?.alpsState === 'changed' ? 'Compare Changes' : detail.data?.validation === 'valid' ? 'Adopt Skill' : 'Review Validation';
-  function primary() { if (detail.data?.alpsState === 'adopted') start.mutate(); else if (detail.data?.validation === 'valid') adopt.mutate(); }
+  $: assetLabel = detail.data?.kind === 'plugin' ? 'Plugin' : detail.data?.kind === 'process-model' ? 'Model' : 'Skill';
+  $: action = detail.data?.alpsState === 'adopted'
+    ? detail.data?.kind === 'skill' ? 'Start Run' : 'Adopted'
+    : detail.data?.alpsState === 'changed' ? 'Adopt New Revision'
+    : detail.data?.validation === 'valid' ? `Adopt ${assetLabel}` : 'Review Validation';
+  $: actionDisabled = adopt.isPending || start.isPending || (detail.data?.alpsState === 'adopted' && detail.data?.kind !== 'skill') || detail.data?.validation !== 'valid';
+  function primary() { if (detail.data?.alpsState === 'adopted' && detail.data?.kind === 'skill') start.mutate(); else if (detail.data?.validation === 'valid') adopt.mutate(); }
   function close() { open = false; selectedPath = ''; }
 </script>
 <Dialog.Root bind:open onOpenChange={(value) => !value && close()}>
@@ -55,7 +60,7 @@
             {:else}<pre class="raw-preview">{file.data?.content ?? detail.data.content ?? ''}</pre>{/if}
           </article>
         </div>
-        <footer class="viewer-footer"><Button variant="primary" disabled={adopt.isPending || start.isPending} on:click={primary}>{action}</Button></footer>
+        <footer class="viewer-footer"><Button variant="primary" disabled={actionDisabled} on:click={primary}>{action}</Button></footer>
       {/if}
     </Dialog.Content>
   </Dialog.Portal>

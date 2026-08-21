@@ -382,6 +382,11 @@ func (r *Runtime) Report(ctx context.Context, id string, input ReportRunInput) (
 		if _, err := tx.ExecContext(ctx, `INSERT INTO run_reports(id,run_id,actor,message,progress,claims_json,evidence_json,created_at) VALUES(?,?,?,?,?,?,?,?)`, report.ID, id, report.Actor, report.Message, report.Progress, marshal(report.Claims), marshal(report.Evidence), report.CreatedAt); err != nil {
 			return err
 		}
+		for _, outcome := range claimedOutcomeNames(input.Claims) {
+			if _, err := tx.ExecContext(ctx, `UPDATE run_outcomes SET status='agent_reported',evidence_json=?,updated_at=? WHERE run_id=? AND status IN ('unassessed','agent_reported') AND (id=? OR name=?)`, marshal(input.Evidence), timestamp, id, outcome, outcome); err != nil {
+				return err
+			}
+		}
 		event, err = appendEventTx(ctx, tx, actor, "run", id, "run.reported", id, "", "v1", map[string]any{"report": report, "version": newVersion})
 		return err
 	})
@@ -390,6 +395,46 @@ func (r *Runtime) Report(ctx context.Context, id string, input ReportRunInput) (
 	}
 	r.publish(event)
 	return r.Run(ctx, id)
+}
+
+func claimedOutcomeNames(claims map[string]any) []string {
+	seen := map[string]struct{}{}
+	var result []string
+	add := func(value string) {
+		value = strings.TrimSpace(value)
+		if value == "" {
+			return
+		}
+		if _, exists := seen[value]; exists {
+			return
+		}
+		seen[value] = struct{}{}
+		result = append(result, value)
+	}
+	if value, ok := claims["outcome"].(string); ok {
+		add(value)
+	}
+	switch values := claims["outcomes"].(type) {
+	case []string:
+		for _, value := range values {
+			add(value)
+		}
+	case []any:
+		for _, current := range values {
+			switch value := current.(type) {
+			case string:
+				add(value)
+			case map[string]any:
+				if id, ok := value["id"].(string); ok {
+					add(id)
+				}
+				if name, ok := value["name"].(string); ok {
+					add(name)
+				}
+			}
+		}
+	}
+	return result
 }
 
 func (r *Runtime) RequestCompletion(ctx context.Context, id string, expected int64) (Run, error) {

@@ -7,6 +7,13 @@ export function relativeTime(value?: string): string {
   return `${Math.floor(seconds / 86400)}d`;
 }
 export function number(value: unknown): string {
-  return typeof value === 'number' ? new Intl.NumberFormat().format(value) : value == null ? '—' : String(value);
+  if (typeof value === 'number') return new Intl.NumberFormat().format(value);
+  if (value == null) return '—';
+  if (Array.isArray(value)) return `${value.length} item${value.length === 1 ? '' : 's'}`;
+  if (typeof value === 'object') {
+    const count = Object.keys(value as Record<string, unknown>).length;
+    return `${count} group${count === 1 ? '' : 's'}`;
+  }
+  return String(value);
 }
 export function humanState(value: string): string { return value.replaceAll('_', ' '); }

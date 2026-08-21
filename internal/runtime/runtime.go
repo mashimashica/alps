@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -94,6 +95,10 @@ func Open(workspace string) (*Runtime, error) {
 	databasePath := filepath.Join(workspace, "db", "alps.sqlite3")
 	database, err := sql.Open("sqlite", databasePath)
 	if err != nil {
+		return nil, err
+	}
+	if err := requireSQLiteVersion(database, 3, 51, 3); err != nil {
+		_ = database.Close()
 		return nil, err
 	}
 	database.SetMaxOpenConns(8)
@@ -261,6 +266,34 @@ func (r *Runtime) Idempotent(ctx context.Context, key, command, requestDigest st
 func RequestDigest(method, path string, body []byte) string {
 	digest := sha256.Sum256(append([]byte(method+"\x00"+path+"\x00"), body...))
 	return "sha256:" + hex.EncodeToString(digest[:])
+}
+
+func requireSQLiteVersion(database *sql.DB, minimum ...int) error {
+	var raw string
+	if err := database.QueryRow(`SELECT sqlite_version()`).Scan(&raw); err != nil {
+		return fmt.Errorf("read SQLite version: %w", err)
+	}
+	parts := strings.Split(raw, ".")
+	current := make([]int, len(minimum))
+	for index := range current {
+		if index >= len(parts) {
+			break
+		}
+		value, err := strconv.Atoi(parts[index])
+		if err != nil {
+			return fmt.Errorf("invalid SQLite version %q: %w", raw, err)
+		}
+		current[index] = value
+	}
+	for index := range minimum {
+		if current[index] > minimum[index] {
+			return nil
+		}
+		if current[index] < minimum[index] {
+			return fmt.Errorf("SQLite %d.%d.%d or later is required; found %s", minimum[0], minimum[1], minimum[2], raw)
+		}
+	}
+	return nil
 }
 
 func ensureToken(path string) (string, error) {

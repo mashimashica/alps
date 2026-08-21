@@ -61,7 +61,7 @@ export type Run = {
   createdAt: string;
   updatedAt: string;
 };
-export type Evidence = { artifactId?: string; eventId?: string; uri?: string; digest?: string; note?: string };
+export type Evidence = { kind: string; id: string; uri?: string; digest?: string; description?: string };
 export type Gate = {
   id: string;
   runId: string;

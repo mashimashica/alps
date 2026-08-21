@@ -1,1 +1,0 @@
-import{St as e,l as t,r as n,xt as r}from"../chunks/BpflPqBH.js";import{t as i}from"../chunks/ze5M53Mr.js";import"../chunks/xihTtKlq.js";import"../chunks/Bfm9aDlM.js";import"../chunks/C1AjVeKC.js";function a(a,o){e(o,!1),n(()=>i(`/atlas`,{replaceState:!0})),t(),r()}export{a as component};
