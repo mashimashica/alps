@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://alps.dev/schemas/hooks/canonical-envelope-v1.schema.json",
+  "title": "ALPS Canonical Hook Event Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "observationId", "host", "event", "occurredAt"],
+  "properties": {
+    "schemaVersion": { "const": "alps-hook/1" },
+    "observationId": { "type": "string" },
+    "host": { "type": "string" },
+    "hostVersion": { "type": "string" },
+    "event": { "type": "string" },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "actorType": { "enum": ["agent", "human", "system"] },
+    "runId": { "type": "string" },
+    "toolName": { "type": "string" },
+    "outcome": { "type": "string" },
+    "metadata": { "type": "object" }
+  }
+}

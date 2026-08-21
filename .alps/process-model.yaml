@@ -1,0 +1,92 @@
+apiVersion: alps.dev/process-model/v1alpha1
+kind: SkillModel
+metadata:
+  id: alps-reference-model
+  name: ALPS Reference Model
+  version: 0.2.0
+  description: Define, manage, and apply ALPS-conformant Agent Skills.
+spec:
+  processes:
+    - id: define
+      ref: ../skills/define-alps/SKILL.md
+    - id: manage
+      ref: ../skills/manage-alps/SKILL.md
+    - id: apply
+      ref: ../skills/apply-alps/SKILL.md
+  interfaces:
+    - id: verified-skill
+      name: Verified Skill Package
+      kind: artifact
+      mediaTypes: [text/markdown, application/yaml]
+    - id: managed-skill
+      name: Managed Skill Revision
+      kind: artifact
+    - id: execution-evidence
+      name: Execution Evidence
+      kind: information
+    - id: change-request
+      name: Change Request
+      kind: information
+  bindings:
+    - id: define.output.verified
+      process: define
+      role: output
+      item: Verified Skill Package
+      interface: verified-skill
+    - id: manage.input.verified
+      process: manage
+      role: input
+      item: Verified Skill Package
+      interface: verified-skill
+    - id: manage.output.managed
+      process: manage
+      role: output
+      item: Managed Skill Revision
+      interface: managed-skill
+    - id: apply.input.managed
+      process: apply
+      role: input
+      item: Managed Skill Revision
+      interface: managed-skill
+    - id: apply.output.evidence
+      process: apply
+      role: output
+      item: Execution Evidence
+      interface: execution-evidence
+    - id: manage.input.evidence
+      process: manage
+      role: input
+      item: Execution Evidence
+      interface: execution-evidence
+    - id: manage.output.change
+      process: manage
+      role: output
+      item: Change Request
+      interface: change-request
+    - id: define.input.change
+      process: define
+      role: input
+      item: Change Request
+      interface: change-request
+  handoffs:
+    - id: verified-for-management
+      from: define.output.verified
+      to: manage.input.verified
+    - id: managed-for-application
+      from: manage.output.managed
+      to: apply.input.managed
+    - id: evidence-for-management
+      from: apply.output.evidence
+      to: manage.input.evidence
+    - id: change-for-definition
+      from: manage.output.change
+      to: define.input.change
+  relationships:
+    - type: iteration
+      processes: [define, manage, apply]
+  entryPoints:
+    - process: define
+    - process: apply
+  labels:
+    domain: agent-skills
+    useCases: [skill-definition, skill-application, skill-management]

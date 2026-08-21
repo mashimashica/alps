@@ -1,0 +1,35 @@
+{
+  "name": "alps-local-runtime-web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@tanstack/svelte-query": "latest",
+    "@tanstack/svelte-virtual": "latest",
+    "bits-ui": "latest",
+    "d3-selection": "latest",
+    "d3-zoom": "latest"
+  },
+  "devDependencies": {
+    "@playwright/test": "latest",
+    "@sveltejs/adapter-static": "latest",
+    "@sveltejs/kit": "latest",
+    "@sveltejs/vite-plugin-svelte": "latest",
+    "@tailwindcss/vite": "latest",
+    "@types/d3-selection": "latest",
+    "@types/d3-zoom": "latest",
+    "svelte": "latest",
+    "svelte-check": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest",
+    "vite": "latest",
+    "vitest": "latest"
+  }
+}

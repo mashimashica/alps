@@ -1,0 +1,23 @@
+{
+  "id": "cursor-v0",
+  "host": "cursor",
+  "adapterVersion": "v0",
+  "capabilities": [
+    {
+      "name": "mcp.stdio",
+      "support": "supported"
+    },
+    {
+      "name": "hooks",
+      "support": "partial"
+    },
+    {
+      "name": "inventory",
+      "support": "adapter"
+    },
+    {
+      "name": "usage.native",
+      "support": "unknown"
+    }
+  ]
+}

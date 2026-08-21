@@ -1,0 +1,113 @@
+export type Asset = {
+  id: string;
+  kind: 'skill' | 'plugin' | 'process-model' | string;
+  name: string;
+  description: string;
+  scope: string;
+  provider: string;
+  sourcePath: string;
+  digest: string;
+  validation: string;
+  sourceState?: string;
+  hostState?: string;
+  alpsState: string;
+  adoptedRevisionId?: string;
+  updatedAt: string;
+};
+
+export type AssetDetail = Asset & {
+  files: string[];
+  content: string;
+  contentPath: string;
+  manifest?: Record<string, unknown>;
+  validationIssues?: Array<{ path: string; code: string; message: string; severity: string }>;
+};
+
+export type GraphNode = { id: string; name: string; kind: string; revisionId?: string; metadata?: Record<string, unknown> };
+export type GraphEdge = { id: string; from: string; to: string; kind: string; bindingId?: string; handoffId?: string; optional?: boolean };
+export type GraphLive = { runId: string; processId: string; state: string; attention: boolean };
+export type GraphFlow = { id: string; handoffId?: string; artifactId?: string; interfaceId?: string; from?: string; to?: string; status: string };
+export type Graph = {
+  modelId?: string;
+  modelName?: string;
+  modelRevisionId?: string;
+  descriptorDigest?: string;
+  mode: 'structure' | 'live' | 'flow';
+  processes: GraphNode[];
+  interfaces: GraphNode[];
+  edges: GraphEdge[];
+  live?: GraphLive[];
+  flow?: GraphFlow[];
+  relationships?: Array<Record<string, unknown>>;
+  entryPoints?: string[];
+};
+
+export type Actor = { type?: string; id?: string; authority?: string; channel?: string };
+export type Run = {
+  id: string;
+  title: string;
+  process: string;
+  assetId?: string;
+  state: string;
+  version: number;
+  progress?: number;
+  statusText: string;
+  processRevisionId?: string;
+  skillPackageRevisionId?: string;
+  pluginRevisionIds?: string[];
+  processModelRevisionId?: string;
+  context?: Record<string, unknown>;
+  actor?: Actor;
+  createdAt: string;
+  updatedAt: string;
+};
+export type Evidence = { artifactId?: string; eventId?: string; uri?: string; digest?: string; note?: string };
+export type Gate = {
+  id: string;
+  runId: string;
+  title: string;
+  effect: string;
+  externalEffect?: string;
+  reversible: boolean;
+  authority: string;
+  status: string;
+  targetRevisionId?: string;
+  expectedRunVersion: number;
+  criteria?: string[];
+  controls?: string[];
+  constraints?: string[];
+  evidence?: Evidence[];
+  unknown?: string[];
+  createdAt: string;
+};
+export type OutcomeStatus = { id: string; name: string; status: string; evidence?: Evidence[]; assessmentId?: string; updatedAt?: string };
+export type DomainEvent = { globalSequence: number; streamSequence: number; eventId: string; eventType: string; occurredAt: string; actor?: Actor; payload?: unknown };
+export type RunDetail = {
+  run: Run;
+  outcomes: OutcomeStatus[];
+  reports: Array<{ id: string; actor: string; message: string; progress?: number; claims?: Record<string, unknown>; evidence?: Evidence[]; createdAt: string }>;
+  gate?: Gate;
+  decisions: Array<Record<string, unknown>>;
+  artifacts: Array<{ id: string; name: string; digest: string; mediaType: string; size: number; role: string; processElement?: string; createdAt: string }>;
+  assessments: Array<Record<string, unknown>>;
+  handoffs: Array<Record<string, unknown>>;
+  modelInvocations: Array<Record<string, unknown>>;
+  usageObservations: Array<Record<string, unknown>>;
+  costObservations: Array<Record<string, unknown>>;
+  events: DomainEvent[];
+};
+export type AnalysisSummary = { active: number; waiting: number; completed: number; assets: number; gates: number; tokens: number | null };
+export type AnalysisLens = {
+  lens: string;
+  definition: string;
+  period: Record<string, string>;
+  population: string;
+  revisionFilters: string[];
+  dataSource: string[];
+  coverage: string;
+  aggregation: string;
+  mappingRevision: string;
+  metrics: Array<{ id: string; label: string; value: unknown; unit?: string; definition: string; coverage: string }>;
+  series: Array<{ id: string; label: string; unit?: string; points: Array<{ at: string; value: number }> }>;
+  findings: Array<{ id: string; severity: string; title: string; detail: string; subjectType?: string; subjectId?: string }>;
+};

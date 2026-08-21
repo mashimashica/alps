@@ -1,0 +1,30 @@
+apiVersion: alps.dev/process-model/v1alpha1
+kind: SkillModel
+metadata:
+  id: fixture
+  name: Fixture Model
+spec:
+  processes:
+    - id: producer
+      ref: producer/SKILL.md
+    - id: consumer
+      ref: consumer/SKILL.md
+  interfaces:
+    - id: result
+      name: Result
+      kind: artifact
+  bindings:
+    - id: producer.output
+      process: producer
+      role: output
+      item: Result
+      interface: result
+    - id: consumer.input
+      process: consumer
+      role: input
+      item: Result
+      interface: result
+  handoffs:
+    - id: result-handoff
+      from: producer.output
+      to: consumer.input

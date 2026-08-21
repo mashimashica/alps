@@ -1,0 +1,1 @@
+function e(e){if(!e)return``;let t=Math.max(0,Math.floor((Date.now()-Date.parse(e))/1e3));return t<60?`now`:t<3600?`${Math.floor(t/60)}m`:t<86400?`${Math.floor(t/3600)}h`:`${Math.floor(t/86400)}d`}function t(e){return typeof e==`number`?new Intl.NumberFormat().format(e):e==null?`—`:String(e)}function n(e){return e.replaceAll(`_`,` `)}export{t as n,e as r,n as t};

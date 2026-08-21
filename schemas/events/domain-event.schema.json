@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://alps.dev/schemas/events/domain-event-v1.schema.json",
+  "title": "ALPS Domain Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["eventId", "globalSequence", "streamType", "streamId", "streamSequence", "eventType", "occurredAt", "actor", "payloadVersion", "payload"],
+  "properties": {
+    "eventId": { "type": "string" },
+    "globalSequence": { "type": "integer", "minimum": 1 },
+    "streamType": { "type": "string" },
+    "streamId": { "type": "string" },
+    "streamSequence": { "type": "integer", "minimum": 1 },
+    "eventType": { "type": "string" },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "actor": { "$ref": "#/$defs/actor" },
+    "authority": { "type": "string" },
+    "correlationId": { "type": "string" },
+    "causationId": { "type": "string" },
+    "payloadVersion": { "type": "string" },
+    "payload": {}
+  },
+  "$defs": { "actor": { "type": "object", "required": ["type", "channel"], "properties": { "type": { "enum": ["agent", "human", "system"] }, "id": { "type": "string" }, "authority": { "type": "string" }, "channel": { "enum": ["mcp", "web", "internal", "hook", "cli"] } }, "additionalProperties": false } }
+}

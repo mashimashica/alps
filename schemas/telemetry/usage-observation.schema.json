@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://alps.dev/schemas/telemetry/usage-observation-v1.schema.json",
+  "title": "ALPS Usage Observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["runId", "source", "scope", "status"],
+  "properties": {
+    "runId": { "type": "string" },
+    "invocationId": { "type": "string" },
+    "source": { "type": "object", "required": ["type"], "properties": { "type": { "type": "string" }, "host": { "type": "string" }, "adapterVersion": { "type": "string" }, "mappingRevision": { "type": "string" } }, "additionalProperties": true },
+    "scope": { "enum": ["invocation", "run", "session", "account"] },
+    "status": { "enum": ["reported", "derived", "estimated", "unavailable"] },
+    "accountingBasis": { "enum": ["consumed", "billable", "credit", "unspecified"] },
+    "tokens": { "type": "object", "properties": { "inputTotal": { "type": ["integer", "null"] }, "outputTotal": { "type": ["integer", "null"] }, "cacheReadInput": { "type": ["integer", "null"] }, "cacheCreationInput": { "type": ["integer", "null"] }, "reasoningOutput": { "type": ["integer", "null"] } }, "additionalProperties": false },
+    "inclusion": { "type": "object", "properties": { "cacheReadInInputTotal": { "type": ["boolean", "null"] }, "cacheCreationInInputTotal": { "type": ["boolean", "null"] }, "reasoningInOutputTotal": { "type": ["boolean", "null"] } }, "additionalProperties": false },
+    "observedAt": { "type": "string", "format": "date-time" }
+  }
+}

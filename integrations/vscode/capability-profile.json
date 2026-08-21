@@ -1,0 +1,23 @@
+{
+  "id": "vscode-v0",
+  "host": "vscode",
+  "adapterVersion": "v0",
+  "capabilities": [
+    {
+      "name": "mcp.stdio",
+      "support": "supported"
+    },
+    {
+      "name": "hooks",
+      "support": "extension"
+    },
+    {
+      "name": "inventory",
+      "support": "adapter"
+    },
+    {
+      "name": "usage.native",
+      "support": "unknown"
+    }
+  ]
+}

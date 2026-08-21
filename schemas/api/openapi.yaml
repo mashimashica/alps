@@ -1,0 +1,130 @@
+openapi: 3.1.0
+info:
+  title: ALPS Local Runtime API
+  version: 0.0.0-experimental
+servers:
+  - url: http://127.0.0.1:8787/v1
+paths:
+  /health:
+    get:
+      operationId: health
+      responses:
+        '200': { description: Runtime is healthy }
+  /catalog:
+    get:
+      operationId: listCatalog
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      responses:
+        '200': { description: Discovered assets }
+  /discovery/scan:
+    post:
+      operationId: scanDiscoveryRoots
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      responses: { '200': { description: Scan result } }
+  /assets/{assetId}:
+    get:
+      operationId: getAsset
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/AssetId' }]
+      responses: { '200': { description: Asset detail } }
+  /assets/{assetId}/validate:
+    post:
+      operationId: validateAsset
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/AssetId' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      responses: { '200': { description: Validation result } }
+  /assets/{assetId}/adopt:
+    post:
+      operationId: adoptAsset
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/AssetId' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      responses: { '200': { description: Immutable revision } }
+  /process-models/{revisionId}/graph:
+    get:
+      operationId: getProcessModelGraph
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      parameters:
+        - { name: revisionId, in: path, required: true, schema: { type: string } }
+        - { name: mode, in: query, schema: { enum: [structure, live, flow] } }
+      responses: { '200': { description: Interface-centric graph } }
+  /runs:
+    get:
+      operationId: listRuns
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      responses: { '200': { description: Runs } }
+    post:
+      operationId: startRun
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [title, process], properties: { title: { type: string }, process: { type: string }, assetId: { type: string }, outcomes: { type: array, items: { type: string } } } } } } }
+      responses: { '200': { description: Created Run } }
+  /runs/{runId}:
+    get:
+      operationId: getRun
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/RunId' }]
+      responses: { '200': { description: Run detail } }
+  /runs/{runId}/reports:
+    post:
+      operationId: reportRunProgress
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/RunId' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      responses: { '200': { description: Updated Run } }
+  /runs/{runId}/completion-requests:
+    post:
+      operationId: requestRunCompletion
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/RunId' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      responses: { '200': { description: Completion evaluation } }
+  /runs/{runId}/artifacts:
+    post:
+      operationId: commitArtifact
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/RunId' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      responses: { '200': { description: Artifact metadata } }
+  /runs/{runId}/gates:
+    post:
+      operationId: openDecisionGate
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/RunId' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      responses: { '200': { description: Decision Gate } }
+  /gates/{gateId}/decisions:
+    post:
+      operationId: recordDecision
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      parameters:
+        - { name: gateId, in: path, required: true, schema: { type: string } }
+        - { $ref: '#/components/parameters/IdempotencyKey' }
+      responses: { '200': { description: Decision result }, '409': { description: Stale Run version } }
+  /assessments:
+    post:
+      operationId: recordAssessment
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      responses: { '200': { description: Assessment } }
+  /handoffs:
+    post:
+      operationId: createHandoff
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      responses: { '200': { description: Handoff } }
+  /analysis/{lens}:
+    get:
+      operationId: analyze
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      parameters: [{ name: lens, in: path, required: true, schema: { enum: [flow, quality, oversight, usage] } }]
+      responses: { '200': { description: Analytical projection } }
+  /events/stream:
+    get:
+      operationId: streamEvents
+      security: [{ bearerAuth: [] }, { cookieAuth: [] }]
+      responses: { '200': { description: Server-sent Domain Events } }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer }
+    cookieAuth: { type: apiKey, in: cookie, name: alps_session }
+  parameters:
+    IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string } }
+    AssetId: { name: assetId, in: path, required: true, schema: { type: string } }
+    RunId: { name: runId, in: path, required: true, schema: { type: string } }

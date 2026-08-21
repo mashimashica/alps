@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "alps-hook/1",
+  "observationId": "fixture-observation",
+  "host": "github-copilot-cli",
+  "hostVersion": "fixture",
+  "event": "tool.completed",
+  "occurredAt": "2026-01-01T00:00:00Z",
+  "actorType": "agent",
+  "runId": "run_fixture",
+  "toolName": "example",
+  "outcome": "success",
+  "metadata": {
+    "prompt": "[redacted by adapter]",
+    "durationMs": 42
+  }
+}

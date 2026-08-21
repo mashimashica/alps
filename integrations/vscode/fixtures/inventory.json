@@ -1,0 +1,16 @@
+{
+  "host": "vscode",
+  "version": "fixture",
+  "workspaceRoots": [
+    "/workspace"
+  ],
+  "repositoryRoot": "/workspace",
+  "realm": "local",
+  "skillRoots": [
+    "/workspace/skills"
+  ],
+  "pluginRoots": [
+    "/workspace"
+  ],
+  "reportedAt": "2026-01-01T00:00:00Z"
+}

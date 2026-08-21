@@ -1,0 +1,23 @@
+{
+  "id": "claude-code-v0",
+  "host": "claude-code",
+  "adapterVersion": "v0",
+  "capabilities": [
+    {
+      "name": "mcp.stdio",
+      "support": "supported"
+    },
+    {
+      "name": "hooks",
+      "support": "supported"
+    },
+    {
+      "name": "inventory",
+      "support": "adapter"
+    },
+    {
+      "name": "usage.native",
+      "support": "partial"
+    }
+  ]
+}

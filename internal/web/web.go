@@ -2,7 +2,7 @@ package web
 
 import "embed"
 
-// Files contains the production-independent experimental web client.
+// Files contains the built ALPS Local Runtime web application.
 //
-//go:embed static/*
+//go:embed all:static
 var Files embed.FS
