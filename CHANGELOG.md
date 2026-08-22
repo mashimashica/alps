@@ -4,6 +4,34 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-22
+
+Release notes: [ALPS 0.4.0](docs/releases/0.4.0.md).
+
+### Added
+
+- Added the `alps-markdown-agent-plugins/1.0` binding for `.alps/MODEL.md`, named Models, and Process Views.
+- Added English and Japanese Model/View templates, a structural checker, and a compatibility/source resolver.
+- Added the authoritative ALPS Reference Model at `.alps/MODEL.md`.
+- Added a namespaced Agent Plugins manifest extension for the default Model entry point.
+
+### Changed
+
+- Extended `define-alps`, `apply-alps`, and `manage-alps` to cover Model/View definition, resolution, application, compatibility, governance, release, and retirement.
+- Updated English and Japanese documentation and package metadata to version 0.4.0.
+
+### Compatibility
+
+- Retained the `define-alps`, `apply-alps`, and `manage-alps` identifiers and root `skills/` paths.
+- Model/View assets using this binding declare `>=0.4.0 <0.5.0`.
+- Packages without Models or Views remain valid.
+- Clients may ignore the namespaced manifest extension when unsupported.
+
+### Status
+
+- This release remains in initial development.
+- The release candidate does not create a Git tag or publish a release.
+
 ## [0.3.0] - 2026-08-22
 
 Release notes: [ALPS 0.3.0](docs/releases/0.3.0.md).

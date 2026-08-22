@@ -20,6 +20,9 @@ This repository uses the ALPS Reference Model.
 - Use `apply-alps` for existing Skills, `define-alps` for an unmet need or Skill redefinition, and `manage-alps` for adoption, Tailoring, assessment, change, or retirement.
 - When combining Skills, make every Output/Input handoff explicit.
 
+- When `.alps/MODEL.md` is present, use it as the default Process Model or Process Reference Model entry point. Resolve named Models and Process Views through the ALPS Markdown Repository and Agent Plugins Binding before applying them.
+- Treat `MODEL.md` and `VIEW.md` as managed assets, not independently invokable Skills. Use `apply-alps` for application, `define-alps` for semantic definition or redefinition, and `manage-alps` for adoption, compatibility, Tailoring, release, assessment, change, or retirement.
+
 ## Repository Workflow
 
 - Keep the repository root on `main` by default. Perform development work in `.worktrees/<branch-name>` on a `<type>/<topic>` branch unless the user explicitly directs otherwise.

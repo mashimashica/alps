@@ -1,6 +1,6 @@
 ---
 name: apply-alps
-description: 適用状況のニーズ、条件およびリスクに合うAgent Skillを選択し、Entry/Exit Criteria、Control、ConstraintおよびTailoringの決定を確認する。Skillを単独で、または組み合わせて実行する。さらに、Skill間におけるOutputとInputの授受、および構成全体の完全性および一貫性を管理する。既存Skillを使う作業、複数Skillの編成、適用根拠またはOutcome達成の証拠を求められたときに使用する。新規Skillの定義だけ、またはSkill資産の採用・変更・廃止だけを行う場合は使用しない。ALPS準拠。
+description: 適用状況のニーズ、条件およびリスクに合うAgent Skillを選択し、Entry/Exit Criteria、Control、ConstraintおよびTailoringの決定を確認する。Skillを単独で、または組み合わせて実行する。さらに、Skill間におけるOutputとInputの授受、および構成全体の完全性および一貫性を管理する。既存Skillを使う作業、複数Skillの編成、適用根拠またはOutcome達成の証拠を求められたときに使用する。新規Skillの定義だけ、またはSkill資産の採用・変更・廃止だけを行う場合は使用しない。既定または名前付きのProcess Model、または互換性のあるProcess Viewを解決して適用する場合にも使用する。ALPS準拠。
 ---
 
 > 本書は日本語ローカライズである。基準となる英語版は[SKILL.md](../../../SKILL.md)であり、内容が矛盾する場合は英語版を優先する。
@@ -39,6 +39,12 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 6. 適用の決定に伴う不確実性とリスクが許容可能であるかを判断する必要がある。
 7. 決定の根拠を記録するのが望ましい。
 
+
+8. 別の管理されたModelが明示的に選択されない限り、`.alps/MODEL.md`が存在する場合は既定Model Entry Pointとして用いるのが望ましい。
+9. 適用前に、ModelまたはViewのBindingおよびALPS Compatibility Rangeを評価する必要がある。
+10. Local Skill Sourceは基準となるSkill Descriptionへ解決する必要がある。External Plugin SourceはPluginおよびSkill Identityを維持する必要がある。
+11. 必須Sourceが未解決または非互換である場合、管理された判断が宣言Scope内でその状態を明示的に受容しない限り、適用を開始してはならない。
+
 ### Skill実行
 
 このActivityは、選択したSkillを用いてProcess Instanceを実行し、そのSkillが宣言するProcess Outcomeを達成する。主にc)、d)およびe)に寄与する。
@@ -69,6 +75,12 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 7. Integrationによって、同一階層内の完全性と階層間の一貫性を確保する必要がある。
 8. 構成全体としてのOutcome達成状況を判定するのが望ましい。
 9. 同一の情報項目が複数のSkillによって変更される場合、その情報項目の整合性、状態および変更の取扱いを、品質リスクに応じて定める必要がある。
+
+
+10. Process Viewは宣言されたSource Modelから適用し、含まれる各要素の`selected`、`adapted`または`new`のTreatmentを維持する必要がある。
+11. `adapted`および`new`のView要素は、管理されたTailoringまたは正式採用によってSource Skillへ取り込まれない限り、Source Skillの要求として扱ってはならない。
+12. ModelおよびViewの関係表をOutput/Input Mappingの初期値として用い、実際の適用文脈に合わせて具体化するのが望ましい。
+13. 解決結果、受容された未解決Sourceおよび互換性判断を適用記録へ含めるのが望ましい。
 
 ## Inputs
 
@@ -101,6 +113,8 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 - 適用されるシステム指示、利用者指示、安全・プライバシー方針、法令、規格および合意を適用する必要がある。
 - 選択した各SkillのSkill Description、Frameworkレベルの宣言および管理Processが承認したTailoringの決定を適用する必要がある。
 - 実行環境の権限、確認および外部作用に関する規則に従う必要がある。
+
+- `MODEL.md`または`VIEW.md`を対象に含める場合、宣言されたEnvironment Binding、配置、Metadata、互換性および解決規則を適用する必要がある。
 
 ## Constraints
 
@@ -147,6 +161,8 @@ Outputの変更が他のSkillのInputに影響する場合、影響を受けるS
 
 - 品質リスクによってProcess Instance記録が正当化される場合は、[process-instance-record.md](process-instance-record.md)の軽量なMarkdown Bindingを利用できる。これは、適用の基礎および意図するOutcomeと、後に得られた結果、判定および証拠とを、同じ人間可読かつ機械判読可能な記録に保持する。
 - 明示的に指定した基準記述から記録を作る場合は`python3 ../../../scripts/process_instance_record.py --locale ja new ...`を、Bindingを確認する場合は`python3 ../../../scripts/process_instance_record.py --locale ja check --at instantiation|completion <record.md>`を実行できる。このスクリプトは、Skillの意味、Tailoring、Outcome達成またはConformanceを推定しない。
+
+- Model／Viewを扱う場合、Repository共通の[Markdown Repository and Agent Plugins Binding](../../../../../.alps/bindings/locales/ja/markdown-agent-plugins.md)、[MODEL Template](../../../../../.alps/templates/locales/ja/MODEL.md)、[VIEW Template](../../../../../.alps/templates/locales/ja/VIEW.md)、`scripts/check_model_view.py`および`scripts/resolve_model_view.py`を、役割と制限を保持して利用してよい。
 
 ## Common Approach
 

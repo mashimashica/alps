@@ -1,6 +1,6 @@
 ---
 name: apply-alps
-description: Select Agent Skills suited to an application situation's needs, conditions, and risks; assess Entry/Exit Criteria and applicable Control, Constraint, and Tailoring decisions; execute the Skills singly or in combination; and manage Output/Input handoffs and the completeness and consistency of the composition as a whole. Use when work applies existing Skills, composes multiple Skills, or requires evidence of the application rationale or Outcome achievement. Do not use when the work only defines a new Skill or only adopts, changes, or retires Skill assets. ALPS-conformant.
+description: Select Agent Skills suited to an application situation's needs, conditions, and risks; assess Entry/Exit Criteria and applicable Control, Constraint, and Tailoring decisions; execute the Skills singly or in combination; and manage Output/Input handoffs and the completeness and consistency of the composition as a whole. Use when work applies existing Skills, composes multiple Skills, or requires evidence of the application rationale or Outcome achievement. Do not use when the work only defines a new Skill or only adopts, changes, or retires Skill assets. Use also when resolving and applying a default or named Process Model or a compatible Process View. ALPS-conformant.
 ---
 
 # Agent Lifecycle Process Skill Application
@@ -37,6 +37,12 @@ This Activity determines the Skills to use for the application situation and the
 6. Whether the uncertainty and risks associated with the application decision are acceptable must be determined.
 7. The rationale for the decision should be recorded.
 
+
+8. `.alps/MODEL.md` should be used as the default Model entry point when present unless another managed Model is explicitly selected.
+9. The Model or View binding and ALPS compatibility range must be evaluated before application.
+10. Local Skill sources must resolve to authoritative Skill Descriptions, and external plugin sources must preserve plugin and Skill identity.
+11. An unresolved or incompatible required source must prevent application unless a managed decision explicitly accepts the unresolved condition within the declared scope.
+
 ### Skill Execution
 
 This Activity uses the selected Skills to execute Process Instances and achieve the Process Outcomes declared by those Skills. It contributes primarily to c), d), and e).
@@ -67,6 +73,12 @@ This Activity combines multiple Skills and manages their interfaces, handoffs, a
 7. Integration must establish completeness within the same level and consistency across different levels.
 8. Outcome achievement for the composition as a whole should be assessed.
 9. When the same information item is changed by multiple Skills, how its integrity, state, and changes are handled must be defined in proportion to the quality risk.
+
+
+10. A Process View must be applied from its declared source Models, and every included element must retain its selected, adapted, or new treatment.
+11. Adapted and new View elements must not be treated as source-Skill requirements unless managed Tailoring or formal adoption has incorporated them.
+12. Model and View relationship tables should be used to seed Output/Input mappings and then refined for the actual application context.
+13. Resolution results, accepted unresolved sources, and compatibility decisions should be included in the application record.
 
 ## Inputs
 
@@ -99,6 +111,8 @@ These Entry Criteria are the conditions for starting this application Process. T
 - Applicable system instructions, user instructions, safety and privacy policies, laws, standards, and agreements must be applied.
 - The Skill Description and Framework-level declarations for each selected Skill, together with Tailoring decisions approved through the management Process, must be applied.
 - Rules concerning permissions, confirmation, and external effects in the execution environment must be followed.
+
+- When `MODEL.md` or `VIEW.md` is in scope, the declared Environment Binding, location, metadata, compatibility, and resolution rules must be applied.
 
 ## Constraints
 
@@ -146,6 +160,8 @@ This section is informative and does not require a particular method of executio
 - This root `SKILL.md` is the authoritative English Skill Description. For Japanese-language work, use the [Japanese localization](references/locales/ja/SKILL.md) and its adjacent localized resources. Respond in the user's language; if the localization conflicts with this file, this English description governs.
 - When the quality risk justifies a Process Instance record, the lightweight Markdown binding in [process-instance-record.md](references/process-instance-record.md) can be used. It keeps the application basis and intended Outcomes together with the later results, assessments, and evidence in the same human- and machine-readable record.
 - `python3 scripts/process_instance_record.py new ...` can create a record from explicitly supplied source statements, and `python3 scripts/process_instance_record.py check --at instantiation|completion <record.md>` can check the binding. The script does not infer Skill meaning, Tailoring, Outcome achievement, or Conformance.
+
+- For Model or View work, use the repository-shared [Markdown Repository and Agent Plugins Binding](../../.alps/bindings/markdown-agent-plugins.md), [MODEL template](../../.alps/templates/MODEL.md), [VIEW template](../../.alps/templates/VIEW.md), `scripts/check_model_view.py`, and `scripts/resolve_model_view.py` with their stated roles and limitations.
 
 ## Common Approach
 

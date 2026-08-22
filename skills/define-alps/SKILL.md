@@ -1,6 +1,6 @@
 ---
 name: define-alps
-description: Identify Skill needs; design and verify assessable Skill Descriptions that conform to ALPS and the Process Framework. Use when conceiving a new Skill, redefining an existing Skill, designing its Purpose, Outcomes, Activities, or Tasks, reviewing description conformance, trialing it in representative contexts, establishing traceability, or producing evidence for an adoption decision. Use the management process when the work concerns only adoption, change control, or retirement. ALPS-conformant.
+description: Identify Skill needs; design and verify assessable Skill Descriptions that conform to ALPS and the Process Framework. Use when conceiving a new Skill, redefining an existing Skill, designing its Purpose, Outcomes, Activities, or Tasks, reviewing description conformance, trialing it in representative contexts, establishing traceability, or producing evidence for an adoption decision. Use the management process when the work concerns only adoption, change control, or retirement. Use also when defining or verifying a Process Model or Process View under a declared binding. ALPS-conformant.
 ---
 
 # Agent Lifecycle Process Skill Definition
@@ -54,6 +54,14 @@ This Activity determines the structure and content of a Skill Description that s
 13. When representative Inputs and Outputs are shown, the principal relationships with other Skills or Processes should be identified as needed.
 14. When a Skill Package is composed, the need, role, and conditions of use for its accompanying resources must be identified.
 
+
+15. When a Process Model is in scope, its included Skills, source identities, representative Output/Input relationships, selection principles, compatibility, and management conditions must be identified without duplicating authoritative Skill Descriptions.
+16. When a Process View is in scope, its Name, Purpose, Outcomes, stakeholders, concerns, source Models, and application guidance must be identified.
+17. Every View Activity or Task must be identified as selected, adapted, or new; selected or adapted elements must retain an explicit source.
+18. The declared Environment Binding and ALPS compatibility range must be identified.
+19. Local Skill sources and source Models should be made mechanically resolvable.
+20. The need must be classified as an independent Skill, a Model relationship, a cross-cutting View, or another asset type before the representation is selected.
+
 ### Skill Verification
 
 This Activity confirms the descriptive conformance of the Skill Description and the achievability of its intended Outcomes. It primarily contributes to Outcomes c), d), e), and f).
@@ -72,6 +80,12 @@ This Activity confirms the descriptive conformance of the Skill Description and 
 12. Completion of defect treatment should be confirmed before the Decision Gate for the adoption decision.
 13. When the Skill Description identifies an exchange with another Skill or Process, it should be evaluated whether the Output can be used as the intended recipient's Input.
 14. When the Skill Package is included in the verification scope, the existence of the authoritative Skill Description, resolvability of mandatory references, roles and conditions of use of accompanying resources, and consistency between the Skill Description and those resources must be evaluated.
+
+
+15. A Model or View should be trialed with representative selection, resolution, handoff, and change scenarios.
+16. The declared binding, compatibility range, canonical location, and source identities must be checked.
+17. Mechanical preflight results, semantic defects, unresolved external sources, and limitations must be recorded for the adoption Decision Gate.
+18. For a View, the source and treatment of every included Activity or Task must be checked.
 
 ## Inputs
 
@@ -114,6 +128,8 @@ The selected Skill need and selection rationale, verified Skill Description, rec
 - Reference information must not alter the meaning or normative force of the primary elements.
 - Applicable laws, regulatory requirements, policies, voluntary standards, and agreements must be applied within their declared scope.
 - Rules for Skill creation, verification, and saving that are effective in the execution environment must be followed.
+
+- When `MODEL.md` or `VIEW.md` is in scope, the declared Environment Binding, location, metadata, compatibility, and resolution rules must be applied.
 
 ## Constraints
 
@@ -165,6 +181,8 @@ This section is reference information and does not require a specific manner of 
 - When designing the composition of a Skill Package and the roles of accompanying resources, [skill-package-format.md](references/skill-package-format.md) can be used as an informative example. Adopt only the resources that are needed.
 - When producing a formal need record, Skill Description, traceability table, verification record, or adoption-decision record, [record-templates.md](references/record-templates.md) can be tailored to the subject of application.
 - For the representative Markdown Environment Binding used by this Package, `python3 scripts/check_skill_description.py <SKILL.md>` can pre-check YAML frontmatter, canonical headings, and related structural signals. Those representations are binding-specific rather than ALPS requirements; the script does not by itself demonstrate Conformance or achievement of Outcomes.
+
+- For Model or View work, use the repository-shared [Markdown Repository and Agent Plugins Binding](../../.alps/bindings/markdown-agent-plugins.md), [MODEL template](../../.alps/templates/MODEL.md), [VIEW template](../../.alps/templates/VIEW.md), `scripts/check_model_view.py`, and `scripts/resolve_model_view.py` with their stated roles and limitations.
 
 ## Common Approach
 

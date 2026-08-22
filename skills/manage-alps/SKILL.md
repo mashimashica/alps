@@ -1,6 +1,6 @@
 ---
 name: manage-alps
-description: Govern the adoption, discoverability, change, retirement, tailoring, assessment, and improvement of Agent Skills, Skill Packages, Process Models, or Process Views. Use when managing Skill asset registration, updates, deactivation, tailoring decisions, performance assessment, improvement prioritization, change impacts, communication, or reverification. Use the definition Process instead when only defining a new Skill Description, and the application Process when only executing a selected Skill. ALPS-conformant.
+description: Govern the adoption, discoverability, change, retirement, tailoring, assessment, and improvement of Agent Skills, Skill Packages, Process Models, or Process Views. Use when managing Skill asset registration, updates, deactivation, tailoring decisions, performance assessment, improvement prioritization, change impacts, communication, or reverification. Use the definition Process instead when only defining a new Skill Description, and the application Process when only executing a selected Skill. Use also for Model/View adoption, compatibility, versioning, release, deprecation, or retirement. ALPS-conformant.
 ---
 
 # Agent Lifecycle Process Skill Management
@@ -39,6 +39,14 @@ This Activity manages adoption, discoverability, change communication, configura
 8. Skills established as standards should be used consistently across multiple subjects of application.
 9. When a component of a Skill Package changes, affected Skill Descriptions and accompanying resources should be identified and necessary reverification performed.
 
+
+10. Model and View identifiers, versions, status, authoritative language, binding, compatibility range, and source identities must be managed.
+11. Adoption must consider mechanical preflight, semantic verification, representative trials, unresolved sources, and affected users.
+12. Changes to included Skills, source versions, relationships, Views, Framework-level declarations, or compatibility must be impact-assessed.
+13. A release candidate must distinguish preparation from Git tagging, registry publication, and public release.
+14. Deprecation or retirement must identify affected Models, Views, packages, stored invocations, and migration or retention conditions.
+15. Compatibility decisions and accepted unresolved external sources must be explicit and traceable.
+
 ### Skill Tailoring
 
 This Activity adapts Skills and Process Models to the needs, conditions, and risks of a particular context of application. It primarily contributes to Outcomes a) and d).
@@ -70,6 +78,10 @@ This Activity assesses Skill performance and effectiveness and connects the resu
 8. Mechanisms should be established both to collect lessons learned and connect them to action and to analyze candidate changes for improvement.
 9. A changed Skill should undergo confirmation through Skill Verification in the ALPS definition process.
 10. Inconsistency and rework arising from exchanges among Skills may be used to identify improvement opportunities.
+
+
+11. A changed Model or View should be reverified through the definition Process before release or renewed adoption.
+12. Resolution failures, compatibility conflicts, ambiguous sources, and repeated View adaptations should be assessed as improvement inputs.
 
 ## Inputs
 
@@ -105,6 +117,8 @@ Managed Skill assets, tailored Skills, Tailoring decisions and rationale, assess
 - Applicable laws, regulations, policies, contracts, information-management requirements, safety requirements, and the user-specified scope of change must be applied.
 - The scope, exceptions, and whether Tailoring is permitted must be stated for Framework-level Controls and Enablers.
 - Controls and Constraints for Skill management, change, retention, reference, recovery, and deletion that are effective in the execution environment must be followed. These requirements arise from the execution environment rather than from ALPS itself; where applicable, they remain part of the declared execution scope and assessment.
+
+- When `MODEL.md` or `VIEW.md` is in scope, the declared Environment Binding, location, metadata, compatibility, and resolution rules must be applied.
 
 ## Constraints
 
@@ -152,6 +166,8 @@ This section is informative and does not require a specific method of execution.
 
 - This root `SKILL.md` is the authoritative English Skill Description. For Japanese-language work, use the [Japanese localization](references/locales/ja/SKILL.md) and its adjacent localized resources. Respond in the user's language; if the localization conflicts with this file, this English description governs.
 - [management-records.md](references/management-records.md) provides optional, human-readable blocks for asset management, Tailoring, assessment and improvement, Decision Gates, changes, retirement, and handoffs. The needed blocks can be included in a general Process Instance Record or kept as referenced management Outputs.
+
+- For Model or View work, use the repository-shared [Markdown Repository and Agent Plugins Binding](../../.alps/bindings/markdown-agent-plugins.md), [MODEL template](../../.alps/templates/MODEL.md), [VIEW template](../../.alps/templates/VIEW.md), `scripts/check_model_view.py`, and `scripts/resolve_model_view.py` with their stated roles and limitations.
 
 ## Common Approach
 
