@@ -25,7 +25,7 @@ In ALPS:
 
 A useful description lets a reader understand why the work exists, what success means, what work belongs to it, what enters and leaves it, and what conditions apply. It does not require one particular performer or implementation method.
 
-ALPS also provides a three-Skill Reference Model for defining, applying, and managing Agent Skills.
+ALPS also provides a three-Process Reference Model for defining, applying, and managing Agent Skills.
 
 ## Using ALPS
 
