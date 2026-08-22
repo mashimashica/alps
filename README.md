@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <strong>Version 0.2.0</strong><br>
+  <strong>Version 0.3.0</strong><br>
   Initial development
 </p>
 
@@ -163,7 +163,7 @@ ALPS applies this Framework to Skill description, life cycle management, Tailori
 
 ## Versioning
 
-ALPS is versioned as a single repository-wide release unit. The current version is **0.2.0**, and it remains in initial development. The exact contents of a release are identified by its Git tag and commit. See [CHANGELOG.md](CHANGELOG.md) for release history and [Versioning](docs/versioning.md) for compatibility and release rules.
+ALPS is versioned as a single repository-wide release unit. The current version is **0.3.0**, and it remains in initial development. The exact contents of a release are identified by its Git tag and commit. See [CHANGELOG.md](CHANGELOG.md) for release history and [Versioning](docs/versioning.md) for compatibility and release rules.
 
 ## License and Reuse
 

@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <strong>Version 0.2.0</strong><br>
+  <strong>Version 0.3.0</strong><br>
   初期開発版
 </p>
 
@@ -163,7 +163,7 @@ ALPSは、このFrameworkをSkillの記述、ライフサイクル管理、Tailo
 
 ## バージョン管理
 
-ALPSは、リポジトリ全体を一つのリリース単位としてバージョン管理します。現在のVersionは**0.2.0**であり、初期開発段階にあります。Releaseの正確な内容は、Git TagとCommitによって特定します。[CHANGELOG.md](../../CHANGELOG.md)および[バージョン管理方針](versioning.md)を参照してください。
+ALPSは、リポジトリ全体を一つのリリース単位としてバージョン管理します。現在のVersionは**0.3.0**であり、初期開発段階にあります。Releaseの正確な内容は、Git TagとCommitによって特定します。[CHANGELOG.md](../../CHANGELOG.md)および[バージョン管理方針](versioning.md)を参照してください。
 
 ## ライセンスと再利用
 

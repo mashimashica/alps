@@ -4,6 +4,32 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-22
+
+Release notes: [ALPS 0.3.0](docs/releases/0.3.0.md).
+
+### Added
+
+- Added client-specific plugin manifests for Claude Code, Codex, and Cursor alongside the root Agent Plugins manifest.
+- Added per-Skill OpenAI interface metadata and bundled ALPS icon assets for clients that consume them.
+
+### Changed
+
+- Restructured the English and Japanese READMEs around adoption, reference Skill selection, ALPS concepts, and repository contents.
+- Simplified the English and Japanese installation guidance for `npx plugins add mashimashica/alps`.
+- Clarified Japanese Process Description prose and aligned Japanese terminology and adaptation-related wording with the authoritative English sources.
+
+### Compatibility
+
+- Retained the `define-alps`, `apply-alps`, and `manage-alps` identifiers and root `skills/` paths introduced in 0.2.0.
+- Consumers already using the 0.2.0 Skill identifiers and package paths do not need to rename them.
+- The release adds machine-consumed client manifests and interface metadata and is therefore a pre-1.0 MINOR release.
+
+### Status
+
+- This release remains in initial development.
+- Compatibility is governed by the pre-1.0 rules in [Versioning](docs/versioning.md).
+
 ## [0.2.0] - 2026-08-19
 
 Release notes: [ALPS 0.2.0](docs/releases/0.2.0.md).

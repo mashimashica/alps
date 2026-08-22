@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "alps",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Agent Lifecycle Process Skills: a process-based framework and reference model for defining, applying, and managing reusable Agent Skills.",
   "author": {
     "name": "mashimashica",
