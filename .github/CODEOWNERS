@@ -1,5 +1,0 @@
-# Require mashimashica's approval for every pull request.
-* @mashimashica
-
-# Protect the ownership policy itself.
-/.github/ @mashimashica
