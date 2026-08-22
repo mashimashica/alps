@@ -1,6 +1,6 @@
 # Process Instance Record
 
-This informative binding supports a readable record that can be created when a Process or Skill is instantiated and completed in the same file after execution. Use it only when the quality risk, applicable Controls, review, handoff, or a Conformance claim justifies the detail.
+This informative binding supports a readable record for a Process Instance. The record can be created before invocation and completed in the same file after execution. Use it only when the quality risk, applicable Controls, review, handoff, or a Conformance claim justifies the detail.
 
 This is an optional Environment Binding. Its file format, fields, and checker rules are binding-specific, not ALPS requirements. Headings are for readers and may be renamed or reordered. The visible ``- `key`: value`` fields and the `kind` value make a generated record machine-readable.
 
@@ -33,7 +33,7 @@ The following is a representative layout, not a required heading set or order.
 ## Application basis
 - `kind`: application
 - `record_format`: process-instance-record/1
-- `source`: <managed Skill or Process source and version>
+- `source`: <managed Skill Description or Process Description and version>
 - `context`: <application situation and need>
 - `scope`: <application scope, including relevant exclusions or an explicit statement that none apply>
 
@@ -58,7 +58,7 @@ The following is a representative layout, not a required heading set or order.
 - `limitations`:
 ```
 
-Use additional blocks with core `kind` values such as `activity`, `purpose`, `input`, `output`, `entry_criterion`, `exit_criterion`, `control`, `constraint`, `enabler`, `exchange`, or `decision` when they are material. Prefix a local extension kind with `x_`, for example `x_review_note`; this makes a misspelled core kind distinguishable from an intentional extension. The checker ignores prose sections that have no `kind` field and does not impose a complete ALPS model on every Instance.
+Use additional blocks with core `kind` values such as `activity`, `purpose`, `input`, `output`, `entry_criterion`, `exit_criterion`, `control`, `constraint`, `enabler`, `exchange`, or `decision` when they are material. Prefix a local extension kind with `x_`, for example `x_review_note`; this makes a misspelled core kind distinguishable from an intentional extension. The checker ignores prose sections that have no `kind` field and does not impose a complete Process Description on every Process Instance.
 
 ## Conditional blocks
 
@@ -67,9 +67,9 @@ Use a handoff block for a material Output/Input correspondence. At completion, r
 ```markdown
 ## Handoff
 - `kind`: handoff
-- `provider`: <providing Skill or Instance>
+- `provider`: <providing Process or Process Instance>
 - `output`: <Output>
-- `receiver`: <receiving Skill or Instance>
+- `receiver`: <receiving Process or Process Instance>
 - `input`: <Input>
 - `correspondence`: <meaning, scope, and quality conditions>
 - `status`:
