@@ -12,6 +12,9 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 
+# Generated distributions
+dist/
+
 # Local logs and temporary files
 .codex-log/
 *.tmp
