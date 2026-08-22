@@ -18,7 +18,7 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 - a) 適用状況のニーズおよび条件が識別されている。
 - b) 適用するSkillおよび適用形態が、根拠とともに決定されている。
 - c) 適用されるControl、ConstraintおよびTailoringの決定が識別されている。
-- d) Skill Instanceの適用結果が、宣言された適用範囲、適用されるControl、ConstraintおよびTailoringの決定に適合している。
+- d) Process Instanceの適用結果が、宣言された適用範囲、適用されるControl、ConstraintおよびTailoringの決定に適合している。
 - e) 適用対象となるSkillの宣言されたOutcomeが達成されている。
 - f) 必要なSkill間の授受が確立されている。
 - g) Skill構成の完全性および一貫性が確立されている。
@@ -41,7 +41,7 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 
 ### Skill実行
 
-このActivityは、選択されたSkillのInstanceを実行し、宣言されたOutcomeを達成する。主にc)、d)およびe)に寄与する。
+このActivityは、選択したSkillを用いてProcess Instanceを実行し、そのSkillが宣言するProcess Outcomeを達成する。主にc)、d)およびe)に寄与する。
 
 1. Entry Criteriaの成立を判定してからSkillを発動する必要がある。成立しない場合は、発動を見合わせるか、不足している条件を満たすことを先行させる必要がある。
 2. 必要なInputおよびEnablerの利用可能性を確認するのが望ましい。
@@ -62,7 +62,7 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 
 1. 目標とするOutcomeの集合を識別する必要がある。
 2. 構成に用いる各Skillの出典を識別するのが望ましい。
-3. 反復利用される構成は、Skill Viewとして文書化してよい。
+3. 反復利用される構成は、Process Viewとして文書化してよい。
 4. 提供側のOutputと受領側のInputとの対応を明示する必要がある。
 5. あらかじめ定義されていなかった授受は、Tailoringによって追加してよい。
 6. IterationまたはRecursionによってOutputが変更された場合、影響を受けるInputを識別し、それらの整合性および適用される基準を再評価するのが望ましい。
@@ -130,7 +130,7 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 |---|---|---|---|
 | 管理Process | 管理されたSkill情報、Tailoring決定、適用条件 | 適用Process | 受領Activity: Skill選択およびSkill実行。資産、版、状態、範囲および条件。 |
 | Skill A | 宣言されたOutput | Skill B | 受領側Input: Skill Bの宣言されたInput。名称、意味、範囲、品質条件および状態。 |
-| 本適用Process | 実行記録、意思決定、教訓、測定結果 | 管理Process | 受領Activity: Skill評価・改善。Skill Instance、証拠、制限および変更候補。 |
+| 本適用Process | 実行記録、意思決定、教訓、測定結果 | 管理Process | 受領Activity: Skill評価・改善。Process Instance、証拠、制限および変更候補。 |
 | 本適用Process | 未充足ニーズ | 定義Process | 受領Activity: Skillニーズ識別。文脈、期待、候補不在の根拠およびリスク。 |
 
 Outputの変更が他のSkillのInputに影響する場合、影響を受けるSkillとInputを識別し、必要な再評価を行うのが望ましい。
