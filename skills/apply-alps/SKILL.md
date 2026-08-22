@@ -16,7 +16,7 @@ When this Skill succeeds, the following conditions are established.
 - a) The needs and conditions of the application situation have been identified.
 - b) The Skills to apply and the form of application have been determined with a rationale.
 - c) The applicable Control, Constraint, and Tailoring decisions have been identified.
-- d) The application results of the Skill Instances conform to the declared application scope and to the applicable Control, Constraint, and Tailoring decisions.
+- d) The application results of the Process Instances conform to the declared application scope and to the applicable Control, Constraint, and Tailoring decisions.
 - e) The declared Outcomes of the Skills being applied have been achieved.
 - f) The required handoffs among Skills have been established.
 - g) The completeness and consistency of the Skill composition have been established.
@@ -39,7 +39,7 @@ This Activity determines the Skills to use for the application situation and the
 
 ### Skill Execution
 
-This Activity executes Instances of the selected Skills and achieves their declared Outcomes. It contributes primarily to c), d), and e).
+This Activity uses the selected Skills to execute Process Instances and achieve the Process Outcomes declared by those Skills. It contributes primarily to c), d), and e).
 
 1. Whether the Entry Criteria are satisfied must be assessed before a Skill is invoked. If they are not satisfied, invocation must be deferred or the unmet conditions must be resolved first.
 2. The availability of the required Inputs and Enablers should be confirmed.
@@ -60,7 +60,7 @@ This Activity combines multiple Skills and manages their interfaces, handoffs, a
 
 1. The target set of Outcomes must be identified.
 2. The provenance of each Skill used in the composition should be identified.
-3. A repeatedly used composition may be documented as a Skill View.
+3. A repeatedly used composition may be documented as a Process View.
 4. The mapping from each provider Output to each receiver Input must be made explicit.
 5. Previously undefined handoffs may be added through Tailoring.
 6. When Iteration or Recursion changes an Output, the affected Inputs should be identified and their integrity and the applicable criteria should be reevaluated.
@@ -128,7 +128,7 @@ Typical Enablers include managed Skill assets, Agent capabilities, required tool
 |---|---|---|---|
 | Management Process | Managed Skill information, Tailoring decisions, application conditions | Application Process | Recipient Activities: Skill Selection and Skill Execution. Asset, version, status, scope, and conditions. |
 | Skill A | Declared Output | Skill B | Recipient Input: declared Input of Skill B. Name, meaning, scope, quality conditions, and state. |
-| This application Process | Execution records, decisions, lessons learned, measurement results | Management Process | Recipient Activity: Skill Assessment and Improvement. Skill Instances, evidence, limitations, and proposed changes. |
+| This application Process | Execution records, decisions, lessons learned, measurement results | Management Process | Recipient Activity: Skill Assessment and Improvement. Process Instances, evidence, limitations, and proposed changes. |
 | This application Process | Unmet need | Definition Process | Recipient Activity: Skill Need Identification. Context, expectations, rationale for the absence of a candidate, and risks. |
 
 When a change to an Output affects another Skill's Input, the affected Skill and Input should be identified and the necessary reevaluation should be performed.

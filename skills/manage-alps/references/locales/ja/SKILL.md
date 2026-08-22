@@ -1,6 +1,6 @@
 ---
 name: manage-alps
-description: Agent Skill、Skill Package、Skill ModelまたはSkill Viewについて、採用、発見可能性、変更、廃止、Tailoring、評価および改善を統制する。Skill資産の登録・更新・無効化、Tailoringの判断、実績の評価、改善候補の優先順位付け、変更の影響、周知または再検証を管理するときに使用する。新しいSkill Descriptionの定義だけ、または選択済みSkillの実行だけが目的の場合は、それぞれ定義Processまたは適用Processを使用する。ALPS準拠。
+description: Agent Skill、Skill Package、Process ModelまたはProcess Viewについて、採用、発見可能性、変更、廃止、Tailoring、評価および改善を統制する。Skill資産の登録・更新・無効化、Tailoringの判断、実績の評価、改善候補の優先順位付け、変更の影響、周知または再検証を管理するときに使用する。新しいSkill Descriptionの定義だけ、または選択済みSkillの実行だけが目的の場合は、それぞれ定義Processまたは適用Processを使用する。ALPS準拠。
 ---
 
 > 本書は日本語ローカライズである。基準となる英語版は[SKILL.md](../../../SKILL.md)であり、内容が矛盾する場合は英語版を優先する。
@@ -37,13 +37,13 @@ description: Agent Skill、Skill Package、Skill ModelまたはSkill Viewにつ�
 4. 管理指針またはSkillに変更があったなら、その内容を関係する利用者に周知するのが望ましい。
 5. ニーズがなくなったSkillまたは有害となったSkillを識別し、廃止する必要がある。
 6. 廃止したSkillの記述を、参照のために保存してよい。
-7. Skill Model内の重複および未充足領域を、継続的に識別するのが望ましい。
+7. Process Model内の重複および未充足領域を、継続的に識別するのが望ましい。
 8. 標準として定めたSkillを複数の適用対象で一貫して用いるのが望ましい。
 9. Skill Packageの構成要素を変更した場合、影響を受けるSkill Descriptionおよび付随資源を識別し、必要な再検証を行うのが望ましい。
 
 ### Skill Tailoring
 
-このActivityは、SkillおよびSkill Modelを、特定の適用状況のニーズ、条件およびリスクに適合させる。主にa)およびd)のOutcomeに寄与する。
+このActivityは、SkillおよびProcess Modelを、特定の適用状況のニーズ、条件およびリスクに適合させる。主にa)およびd)のOutcomeに寄与する。
 
 1. 適用に関係するリスク、要求事項、複雑性、利用可能な能力および資源、ならびに関連規格を識別する必要がある。
 2. 適用条件、利用可能な専門知識および経験、ステークホルダーの期待または要求事項、ならびにリスク許容度を考慮し、候補となるSkillまたはライフサイクルモデルを評価する必要がある。

@@ -1,6 +1,6 @@
 ---
 name: manage-alps
-description: Govern the adoption, discoverability, change, retirement, tailoring, assessment, and improvement of Agent Skills, Skill Packages, Skill Models, or Skill Views. Use when managing Skill asset registration, updates, deactivation, tailoring decisions, performance assessment, improvement prioritization, change impacts, communication, or reverification. Use the definition Process instead when only defining a new Skill Description, and the application Process when only executing a selected Skill. ALPS-conformant.
+description: Govern the adoption, discoverability, change, retirement, tailoring, assessment, and improvement of Agent Skills, Skill Packages, Process Models, or Process Views. Use when managing Skill asset registration, updates, deactivation, tailoring decisions, performance assessment, improvement prioritization, change impacts, communication, or reverification. Use the definition Process instead when only defining a new Skill Description, and the application Process when only executing a selected Skill. ALPS-conformant.
 ---
 
 # Agent Lifecycle Process Skill Management
@@ -35,13 +35,13 @@ This Activity manages adoption, discoverability, change communication, configura
 4. When management guidance or a Skill changes, the change should be communicated to affected users.
 5. A Skill for which the need no longer exists or that has become harmful must be identified and retired.
 6. The description of a retired Skill may be retained for reference.
-7. Duplication and gaps within the Skill Model should be continually identified.
+7. Duplication and gaps within the Process Model should be continually identified.
 8. Skills established as standards should be used consistently across multiple subjects of application.
 9. When a component of a Skill Package changes, affected Skill Descriptions and accompanying resources should be identified and necessary reverification performed.
 
 ### Skill Tailoring
 
-This Activity adapts Skills and Skill Models to the needs, conditions, and risks of a particular context of application. It primarily contributes to Outcomes a) and d).
+This Activity adapts Skills and Process Models to the needs, conditions, and risks of a particular context of application. It primarily contributes to Outcomes a) and d).
 
 1. Application-related risks, requirements, complexity, available capabilities and resources, and relevant standards must be identified.
 2. Candidate Skills or life cycle models must be evaluated by considering conditions of application, available expertise and experience, stakeholder expectations or requirements, and risk tolerance.

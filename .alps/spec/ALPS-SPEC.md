@@ -22,7 +22,7 @@ This specification treats a Skill as a Process Description and applies the PF de
 - 8. Skill Execution Structures and Relationships
 - 9. Controls, Constraints, and Enablers
 - 10. Entry/Exit Criteria, Decision Gates, and Reviews
-- 11. Tailoring and Skill Instantiation
+- 11. Tailoring and Process Instantiation
 - 12. Conformance, Capability, and Assessment
 - Appendix A (informative) Examples of a Skill Description and Skill Package
 - Appendix B (informative) Correspondence with the Process Framework
@@ -41,11 +41,11 @@ a) Requirements, recommendations, and writing rules for describing an Agent Skil
 
 b) A reference model defining the three Processes that constitute the Skill life cycle and their constituent Activities and Tasks (the ALPS Reference Model; Clause 7).
 
-c) Rules for execution structures, interfaces, exchanges, and Skill Views used to apply multiple Skills in combination (Clause 8).
+c) Rules for execution structures, interfaces, exchanges, and Process Views used to apply multiple Skills in combination (Clause 8).
 
 d) The declaration and handling of Controls, Constraints, and Enablers applicable to Skills (Clause 9), and the application of Entry/Exit Criteria, Decision Gates, reviews, and audits (Clause 10).
 
-e) Rules for Skill Tailoring and Instantiation (Clause 11), criteria for claims of Conformance to this specification and to Skills, and treatment of Capability (Clause 12).
+e) Rules for Tailoring and Process Instantiation (Clause 11), criteria for claims of Conformance to this specification and to Skills, and treatment of Capability (Clause 12).
 
 f) The logical composition and integrity of a Skill Package comprising a Skill Description and accompanying resources that support understanding or executing the Skill or creating its Outputs (5.7).
 
@@ -91,30 +91,19 @@ ALPS-specific functional presentation layers through which a Skill Description i
 
 These layers do not add Process Description elements and do not require a particular physical separation, file format, or storage structure.
 
-**3.5 Skill Model**
-A Process Model defining a set of Skills selected or defined for a particular application domain and the relationships among them.
-
-**3.6 ALPS Reference Model**
+**3.5 ALPS Reference Model**
 The Process Reference Model in Clause 7 of this specification, which defines the ALPS definition process, ALPS application process, and ALPS management process through their respective Purposes and Outcomes. Each Process comprises three Activities. The model can be used as a frame of reference for assessment and improvement of the Skill life cycle.
 
-**3.7 Skill View**
-A Process View that organizes Activities and Tasks spanning multiple Skills around a particular concern or Purpose (see 8.3).
+**3.6 Invocation**
+Determining that Entry Criteria are satisfied and beginning execution of a Process Instance through a selected Skill.
 
-NOTE: A Skill View does not define a Skill as an independent Process; it presents a perspective that cuts across existing Skills.
+**3.7 Skill Asset**
+A Skill or Skill Package that has been adopted and placed under management.
 
-**3.8 Skill Instance**
-One application of a Skill in a particular context of application (Process Instance).
-
-**3.9 Invocation**
-Determining that Entry Criteria are satisfied and beginning execution of a Skill Instance.
-
-**3.10 Skill Asset**
-The totality of adopted and managed Skills, Skill Models, and Skill Views.
-
-**3.11 Skill Discovery Description**
+**3.8 Skill Discovery Description**
 Concise reference information placed in the ALPS-specific discovery layer that an Agent uses to discover a Skill and determine its applicability before loading the complete Skill Description. It states what the Skill does, when the Skill is used, and the information needed to determine applicability.
 
-**3.12 Skill Package**
+**3.9 Skill Package**
 A unit managed as a whole that contains one Skill Description and any accompanying resources that support understanding or executing the Skill or creating its Outputs.
 
 ## 4. Normative Language and Conventions
@@ -144,7 +133,7 @@ The main text of this specification (Clauses 1 through 12) is normative. Notes, 
 
 The content of a Skill must be written as a Process Description conforming to the PF.
 
-6.2 applies to a **general Skill** that describes a general Process. An **instance-specific Skill** that describes a particular Instance states that fact and its context of application and can specify the required capabilities, resources, Inputs, Outputs, Constraints, Controls, and time (PF 1.1).
+A Skill Description can describe a general Process or, when explicitly scoped to a particular context, a Process Instance. A description of a Process Instance can specify the required capabilities, resources, Inputs, Outputs, Constraints, Controls, and time (PF 1.1).
 
 ### 5.2 Dual Nature of a Skill: Process Description and Enabler
 
@@ -162,7 +151,7 @@ Skill boundaries are typically established from primary Outputs and Outcomes rat
 
 A significant Activity containing many Tasks may be described as a separate Skill with its own Purpose and Outcomes (PF 3.1).
 
-When the definition, maintenance, assessment, or change handling of an information item spanning multiple Skills has an independent Purpose and Outcomes and mutually cohesive Activities, and can be bounded as one Process, it may be described as a separate Skill. By contrast, when no independent Process boundary is established and relationships among existing Skills are presented as a cross-cutting concern, it can be described as a Skill View (8.3).
+When the definition, maintenance, assessment, or change handling of an information item spanning multiple Skills has an independent Purpose and Outcomes and mutually cohesive Activities, and can be bounded as one Process, it may be described as a separate Skill. By contrast, when no independent Process boundary is established and relationships among existing Skills are presented as a cross-cutting concern, it can be described as a Process View (8.3).
 
 ### 5.5 Functional Layers and Progressive Disclosure
 
@@ -178,9 +167,11 @@ c) Matters that cut across multiple Skills should be treated separately from an 
 
 NOTE: These functional layers support progressive disclosure without requiring two files, two sections, or another particular physical structure.
 
-### 5.6 Skill Models and Life Cycle Models
+### 5.6 Process Models and Life Cycle Models
 
-A Skill Model is a Framework of interrelated Skills and can provide a basis for composing Process Models, including life cycle models (PF 5.1). A subset can be selected from a Skill Model and applied according to Purpose. Selection of Skills and the timing of their execution need continual review in response to changes affecting the subject or context of application (PF 5.2).
+Process Models and life cycle models are interpreted with the meanings established by the PF. When Processes in a Process Model are made available as Skills, the Model may identify the Skill Package that supplies each authoritative Process Description and the relationships among the Processes.
+
+A subset of Processes can be selected from a Process Model according to Purpose. The Skills that describe the selected Processes can then be applied singly or in combination. Selection and timing need continual review when the subject or context of application changes (PF 5.1 and 5.2).
 
 ### 5.7 Skill Packages and Accompanying Resources
 
@@ -199,9 +190,6 @@ ALPS specializes the general constructs of the PF for Agent Skills. The normativ
 | PF construct | ALPS specialization |
 |---|---|
 | Process Description | Skill Description (3.3) |
-| Process Instance | Skill Instance (3.8) |
-| Process Model | Skill Model (3.5) |
-| Process View | Skill View (3.7) |
 | Resources that perform or support a Process | Agents, models, tools, and execution environments, treated as Enablers (5.2, 9.3) |
 
 ALPS may make a PF rule concrete for the Agent context and may strengthen it where needed. ALPS must not change the meaning of a PF concept, weaken a PF requirement, or replace a PF concept with a different one (see Clause 2).
@@ -232,7 +220,7 @@ NOTE: Rule d) also protects against an Agent misreading the listed order of Acti
 
 #### 6.3.1 Name
 
-A Skill Name must use a concise noun phrase as the Skill heading. The Name states the Skill's central concern and differentiates it from other Skills in the Skill Model. The Name must not be written as a summary of the Purpose (PF 2.1).
+A Skill Name must use a concise noun phrase as the Skill heading. The Name states the Process's central concern and differentiates it from other Processes represented in the applicable Process Model. The Name must not be written as a summary of the Purpose (PF 2.1).
 
 #### 6.3.2 Purpose
 
@@ -266,7 +254,7 @@ Representative Inputs and Outputs do not prescribe the only manner of execution.
 
 #### 6.3.7 Control, Constraint, Enabler, Entry Criteria, and Exit Criteria
 
-Controls and Constraints declare conditions that direct or limit Skill execution. Enablers make Skill execution possible or assist it. Entry Criteria state conditions under which a Skill can be invoked; Exit Criteria state conditions under which a Skill Instance can be completed. These elements are used according to the Purpose of the description and the required level of detail. Details are given in Clauses 9 and 10.
+Controls and Constraints declare conditions that direct or limit Skill execution. Enablers make Skill execution possible or assist it. Entry Criteria state conditions under which a Skill can be invoked; Exit Criteria state conditions under which a Process Instance can be completed. These elements are used according to the Purpose of the description and the required level of detail. Details are given in Clauses 9 and 10.
 
 The primary function of a Control or Constraint statement must be to declare a condition that directs or limits execution. A statement whose primary function is an individual action must be classified as a Task.
 
@@ -453,7 +441,7 @@ b) The Skills to apply and the form of application are determined with rationale
 
 c) Applicable Controls, Constraints, and Tailoring decisions are identified.
 
-d) The results of applying a Skill Instance conform to the declared scope, applicable Controls and Constraints, and Tailoring decisions.
+d) The results of applying a Process Instance conform to the declared scope, applicable Controls and Constraints, and Tailoring decisions.
 
 e) The declared Outcomes of the Skills subject to application are achieved.
 
@@ -491,7 +479,7 @@ g) The rationale for the decision should be recorded.
 
 #### 7.4.2 Skill Execution
 
-This Activity executes an Instance of a selected Skill and achieves its declared Outcomes.
+This Activity uses a selected Skill to execute a Process Instance and achieve the Process Outcomes declared by the Skill.
 
 a) A Skill must be invoked only after determining that its Entry Criteria are satisfied. If they are not satisfied, invocation must be deferred or resolution of the deficiency must precede it.
 
@@ -525,7 +513,7 @@ a) The target set of Outcomes must be identified.
 
 b) The source of each Skill used in the composition should be identified (8.3).
 
-c) A repeatedly used composition may be documented as a Skill View (8.3).
+c) A repeatedly used composition may be documented as a Process View (8.3).
 
 d) The mapping between each provider Output and recipient Input must be made explicit (8.2).
 
@@ -591,7 +579,7 @@ e) A Skill for which the need no longer exists or that has become harmful must b
 
 f) The description of a retired Skill may be retained for reference.
 
-g) Duplication and gaps within the Skill Model should be continually identified.
+g) Duplication and gaps within the Process Model should be continually identified.
 
 h) Skills established as standards should be used consistently across multiple subjects of application (PF 9.2).
 
@@ -599,7 +587,7 @@ i) When a component of a Skill Package changes, affected Skill Descriptions and 
 
 #### 7.5.2 Skill Tailoring
 
-This Activity adapts Skills and Skill Models to the needs, conditions, and risks of a particular context of application.
+This Activity adapts Skills and Process Models to the needs, conditions, and risks of a particular context of application.
 
 a) Application-related risks, requirements, complexity, available capabilities and resources, and relevant standards must be identified (PF 7.3).
 
@@ -685,25 +673,25 @@ Traceability should cover Outcomes, Activities, Tasks, and information items. Th
 
 NOTE: Explicit exchange mappings keep the meaning, scope, state, and quality conditions of an information item from being lost as it passes between Skills.
 
-### 8.3 Skill View
+### 8.3 Process View
 
-A Skill View organizes Activities and Tasks spanning multiple Skills around a particular concern or Purpose (PF 5.3).
+A Process View organizes Activities and Tasks spanning multiple Skills around a particular concern or Purpose (PF 5.3).
 
 When an independent Process boundary is established, the subject can be described as a separate Skill in accordance with 5.4.
 
-a) Every Skill View must state its Name, Purpose, and Outcomes.
+a) Every Process View must state its Name, Purpose, and Outcomes.
 
-b) To achieve the Outcomes, a Skill View may include Activities and Tasks selected from an existing Skill Model, adapted Activities and Tasks, or Activities and Tasks specific to the Skill View.
+b) To achieve the Outcomes, a Process View may include Activities and Tasks selected from an existing Process Model, adapted Activities and Tasks, or Activities and Tasks specific to the Process View.
 
-c) A Skill View must include explanations and guidance for applying those Activities and Tasks.
+c) A Process View must include explanations and guidance for applying those Activities and Tasks.
 
-d) A Skill View must explicitly identify the source of each Activity and Task and whether it is selected, adapted, or new. Elements selected from an existing Skill Model must retain their source.
+d) A Process View must explicitly identify the source of each Activity and Task and whether it is selected, adapted, or new. Elements selected from an existing Process Model must retain their source.
 
-e) Adapted elements and elements specific to the Skill View are not treated as changes to the original Skill Model. Unless Tailoring or formal adoption into the Skill Model occurs, these elements do not count toward Conformance to the original Skill.
+e) Adapted elements and elements specific to the Process View are not treated as changes to the original Process Model. Unless Tailoring or formal adoption into the Process Model occurs, these elements do not count toward Conformance to the original Skill.
 
-f) Operation of a particular Skill Model may adopt a restricted Skill View that uses only Activities and Tasks from existing Skills. Under this approach, Activities and Tasks specific to the Skill View must not be included.
+f) Operation of a particular Process Model may adopt a restricted Process View that uses only Activities and Tasks from existing Skills. Under this approach, Activities and Tasks specific to the Process View must not be included.
 
-g) A Skill View may show connections among Skills and the sources of the Skills used in its composition.
+g) A Process View may show connections among Skills and the sources of the Skills used in its composition.
 
 ## 9. Controls, Constraints, and Enablers
 
@@ -737,7 +725,7 @@ NOTE: Treating Agents, models, tools, and execution environments as Enablers kee
 
 a) Entry Criteria state conditions under which a Skill can be invoked. A summary should be placed in the discovery layer as reference information for determining applicability (5.5).
 
-b) Exit Criteria state conditions under which a Skill Instance can be completed. Exit Criteria should be related to determining achievement of the Outcomes.
+b) Exit Criteria state conditions under which a Process Instance can be completed. Exit Criteria should be related to determining achievement of the Outcomes.
 
 ### 10.2 Decision Gate
 
@@ -761,7 +749,7 @@ When an Output is transferred to another Skill or a stakeholder, it should be ev
 
 Reviews and audits should be tailored to the needs and risks of the subject of application, and their Entry Criteria, Exit Criteria, and responses to problems should be established (PF 8.2).
 
-## 11. Tailoring and Skill Instantiation
+## 11. Tailoring and Process Instantiation
 
 ### 11.1 Discipline of Tailoring
 
@@ -773,9 +761,9 @@ NOTE: Requiring Tailoring to pass through the ALPS management process prevents u
 
 Common-level Tailoring adapts an external standard, including this specification, to needs shared across an intended application domain. Individual-level Tailoring adapts the resulting common Skill to the needs of a particular subject of application (PF 7.2).
 
-### 11.3 Skill Instantiation
+### 11.3 Process Instantiation
 
-When justified by quality risk, a Skill Instance can be detailed and Instance-specific success criteria, Activities, and Tasks can be identified (PF 7.4).
+When justified by quality risk, a Process Instance can be described in greater detail, and instance-specific success criteria, Activities, and Tasks can be identified (PF 7.4).
 
 ## 12. Conformance, Capability, and Assessment
 
@@ -783,11 +771,11 @@ When justified by quality risk, a Skill Instance can be detailed and Instance-sp
 
 Conformance relating to this specification can be claimed for the following subjects. Every claim must identify the subject and the selected criteria.
 
-a) **Description Conformance** — A Skill Description, or Skill View, satisfies the applicable requirements of Clauses 4 through 6, and also 8.3 for a Skill View. When a Skill Package is included in the subject of conformance, the Package satisfies the applicable requirements of 5.7.
+a) **Description Conformance** — A Skill Description satisfies the applicable requirements of Clauses 4 through 6. When a Skill Package is included in the subject of conformance, the Package also satisfies the applicable requirements of 5.7.
 
-b) **Reference Model Conformance** — For definition, application, or management of a Skill Model, Conformance under 12.2 or 12.3 is established for the declared Process among the three Processes in Clause 7.
+b) **Reference Model Conformance** — For definition, application, or management of Skills, Conformance under 12.2 or 12.3 is established for the declared Process among the three Processes in Clause 7.
 
-c) **Execution Conformance** — Execution of a Skill, as a Skill Instance, establishes Conformance under 12.2 or 12.3 to the declared Skill.
+c) **Execution Conformance** — Execution of a Process Instance through a Skill establishes Conformance under 12.2 or 12.3 to the Process described by that Skill.
 
 ### 12.2 Full Conformance
 
@@ -1010,16 +998,16 @@ Non-determinism, emergent behavior, supervisor cognitive load, automation bias, 
 
 Traceability is the property that the relationships among Inputs, judgments, Tasks, Outputs, evidence, and changes can be followed.
 
-Accountability is the relationship that determines who holds decision authority, supervisory responsibility, or the obligation to answer for a particular Skill Instance.
+Accountability is the relationship that determines who holds decision authority, supervisory responsibility, or the obligation to answer for a particular Process Instance.
 
-Traceability supports Accountability but does not by itself assign responsibility. A general Process Description fixes neither a performer nor an organizational structure; a particular Process Instance or Skill Instance can define the responsibilities, authority, approvers, and escalation paths that it needs. Logs and audit evidence support after-the-fact verification and help clarify responsibility relationships.
+Traceability supports Accountability but does not by itself assign responsibility. A general Process Description fixes neither a performer nor an organizational structure; a particular Process Instance can define the responsibilities, authority, approvers, and escalation paths that it needs. Logs and audit evidence support after-the-fact verification and help clarify responsibility relationships.
 
 ### D.4 Human Capability as Enabler and Constraint
 
 - Human expertise, judgment, and the capacity to intervene can be Enablers.
 - Cognitive load, response time, and supervisor availability can be Constraints.
 - When the needed oversight capability cannot be secured, Entry Criteria may fail to hold.
-- Conformance of a Skill Instance does not demonstrate the general Capability of a supervisor or an oversight regime, and a high Capability assessment does not demonstrate the Conformance of an individual execution (12.4).
+- Conformance of a Process Instance does not demonstrate the general Capability of a supervisor or an oversight regime, and a high Capability assessment does not demonstrate the Conformance of an individual execution (12.4).
 
 ALPS defines no human capability levels, maturity model, or certification scheme.
 
