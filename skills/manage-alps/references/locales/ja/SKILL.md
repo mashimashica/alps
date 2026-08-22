@@ -41,6 +41,14 @@ description: Agent Skill、Skill Package、Process ModelまたはProcess Viewに
 8. 標準として定めたSkillを複数の適用対象で一貫して用いるのが望ましい。
 9. Skill Packageの構成要素を変更した場合、影響を受けるSkill Descriptionおよび付随資源を識別し、必要な再検証を行うのが望ましい。
 
+
+10. ModelおよびViewのIdentifier、Version、Status、基準言語、Binding、Compatibility RangeおよびSource Identityを管理する必要がある。
+11. 採用判断では、機械的事前検査、意味的検証、代表的試行、未解決Sourceおよび影響を受ける利用者を考慮する必要がある。
+12. 含まれるSkill、Source Version、関係、View、Framework-level宣言または互換性の変更についてImpactを評価する必要がある。
+13. Release Candidateの準備と、Git Tag作成、Registry公開および公開Releaseを区別する必要がある。
+14. 非推奨化または廃止では、影響を受けるModel、View、Package、保存済みInvocationならびにMigrationまたは保持条件を識別する必要がある。
+15. 互換性判断および受容された未解決External Sourceを明示し、追跡可能にする必要がある。
+
 ### Skill Tailoring
 
 このActivityは、SkillおよびProcess Modelを、特定の適用状況のニーズ、条件およびリスクに適合させる。主にa)およびd)のOutcomeに寄与する。
@@ -72,6 +80,10 @@ description: Agent Skill、Skill Package、Process ModelまたはProcess Viewに
 8. 教訓を収集して対応に結び付ける仕組みと、改善に向けた変更候補を分析する仕組みとを設けるのが望ましい。
 9. 変更されたSkillは、定義ProcessのSkill検証による確認を経るのが望ましい。
 10. Skill間の授受に起因する不整合および再作業を、改善機会の識別に用いてよい。
+
+
+11. 変更されたModelまたはViewは、Releaseまたは再採用前にDefinition Processによる再検証を受けるのが望ましい。
+12. 解決失敗、互換性Conflict、曖昧なSourceおよび反復的なView Adaptationを改善Inputとして評価するのが望ましい。
 
 ## Inputs
 
@@ -107,6 +119,8 @@ description: Agent Skill、Skill Package、Process ModelまたはProcess Viewに
 - 適用される法令、規制要求、方針、契約、情報管理要求、安全要求、および利用者が指定した変更範囲に従う必要がある。
 - FrameworkレベルのControlおよびEnablerには、適用範囲、例外およびTailoringの可否を明示する必要がある。
 - 実行環境において有効なSkill管理、変更、保持、参照、復旧および削除に関するControlおよびConstraintに従う必要がある。これらの要求はALPS自体ではなく実行環境に由来し、適用される場合は宣言した実行範囲および評価の一部となる。
+
+- `MODEL.md`または`VIEW.md`を対象に含める場合、宣言されたEnvironment Binding、配置、Metadata、互換性および解決規則を適用する必要がある。
 
 ## Constraints
 
@@ -153,6 +167,8 @@ description: Agent Skill、Skill Package、Process ModelまたはProcess Viewに
 この節は参考情報であり、特定の実行方法を要求しない。
 
 - [management-records.md](management-records.md)は、資産管理、Tailoring、評価・改善、Decision Gate、変更、廃止および授受のための、人間可読な任意ブロックを提供する。必要なブロックを汎用Process Instance Recordに含めるか、参照される管理Outputとして別に保持できる。
+
+- Model／Viewを扱う場合、Repository共通の[Markdown Repository and Agent Plugins Binding](../../../../../.alps/bindings/locales/ja/markdown-agent-plugins.md)、[MODEL Template](../../../../../.alps/templates/locales/ja/MODEL.md)、[VIEW Template](../../../../../.alps/templates/locales/ja/VIEW.md)、`scripts/check_model_view.py`および`scripts/resolve_model_view.py`を、役割と制限を保持して利用してよい。
 
 ## Common Approach
 

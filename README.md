@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <strong>Version 0.3.0</strong><br>
+  <strong>Version 0.4.0</strong><br>
   Initial development
 </p>
 
@@ -46,6 +46,19 @@ The installer discovers the package, detects supported agent clients, and asks f
 | `define-alps` | A Skill need is unmet, or a Skill must be designed, redefined, or verified. |
 | `apply-alps` | Existing Skills must be selected, executed, composed, or handed off. |
 | `manage-alps` | Skills must be adopted, tailored, assessed, changed, improved, or retired. |
+
+### Use a Process Model or Process View
+
+When a package contains `.alps/MODEL.md`, treat it as the default managed Process Model entry point. Named Models are stored under `.alps/models/<model-id>/MODEL.md`, and cross-cutting Process Views are stored under `.alps/views/<view-id>/VIEW.md`.
+
+Before applying a Model or View, run mechanical preflight with the installed ALPS version:
+
+```console
+python3 scripts/check_model_view.py --root .
+python3 scripts/resolve_model_view.py --root . --alps-version 0.4.0
+```
+
+Use `apply-alps` to resolve and apply an existing Model or View, `define-alps` to define or semantically revise one, and `manage-alps` to adopt, version, tailor, assess, release, deprecate, or retire it. The binding and resolver do not turn Models or Views into independently invokable Skills.
 
 ### Invoke a reference Skill explicitly
 
@@ -156,6 +169,9 @@ ALPS applies this Framework to Skill description, life cycle management, Tailori
 | Resource | English | Japanese |
 | --- | --- | --- |
 | Process Framework | [process-framework.md](.alps/spec/process-framework.md) | [process-framework.md](.alps/spec/locales/ja/process-framework.md) |
+| Markdown Repository and Agent Plugins Binding | [markdown-agent-plugins.md](.alps/bindings/markdown-agent-plugins.md) | [markdown-agent-plugins.md](.alps/bindings/locales/ja/markdown-agent-plugins.md) |
+| ALPS Reference Model | [MODEL.md](.alps/MODEL.md) | [MODEL.md](.alps/references/locales/ja/MODEL.md) |
+| Model and View templates | [MODEL.md](.alps/templates/MODEL.md) / [VIEW.md](.alps/templates/VIEW.md) | [MODEL.md](.alps/templates/locales/ja/MODEL.md) / [VIEW.md](.alps/templates/locales/ja/VIEW.md) |
 | ALPS Specification | [ALPS-SPEC.md](.alps/spec/ALPS-SPEC.md) | [ALPS-SPEC.md](.alps/spec/locales/ja/ALPS-SPEC.md) |
 | `define-alps` — Definition Process | [SKILL.md](skills/define-alps/SKILL.md) | [SKILL.md](skills/define-alps/references/locales/ja/SKILL.md) |
 | `apply-alps` — Application Process | [SKILL.md](skills/apply-alps/SKILL.md) | [SKILL.md](skills/apply-alps/references/locales/ja/SKILL.md) |
@@ -163,7 +179,7 @@ ALPS applies this Framework to Skill description, life cycle management, Tailori
 
 ## Versioning
 
-ALPS is versioned as a single repository-wide release unit. The current version is **0.3.0**, and it remains in initial development. The exact contents of a release are identified by its Git tag and commit. See [CHANGELOG.md](CHANGELOG.md) for release history and [Versioning](docs/versioning.md) for compatibility and release rules.
+ALPS is versioned as a single repository-wide release unit. The current version is **0.4.0**, and it remains in initial development. The exact contents of a release are identified by its Git tag and commit. See [CHANGELOG.md](CHANGELOG.md) for release history and [Versioning](docs/versioning.md) for compatibility and release rules.
 
 ## License and Reuse
 

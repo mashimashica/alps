@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <strong>Version 0.3.0</strong><br>
+  <strong>Version 0.4.0</strong><br>
   初期開発版
 </p>
 
@@ -46,6 +46,19 @@ npx plugins add mashimashica/alps
 | `define-alps` | Skillニーズが満たされていない場合、またはSkillを設計、再定義もしくは検証する場合。 |
 | `apply-alps` | 既存Skillを選択、実行、編成または授受する場合。 |
 | `manage-alps` | Skillを採用、Tailoring、評価、変更、改善または廃止する場合。 |
+
+### Process ModelまたはProcess Viewを使用する
+
+Packageに`.alps/MODEL.md`がある場合、それを管理された既定Process Model Entry Pointとして扱う。名前付きModelは`.alps/models/<model-id>/MODEL.md`、横断的なProcess Viewは`.alps/views/<view-id>/VIEW.md`に配置する。
+
+ModelまたはViewの適用前に、導入済みALPS Versionを指定して機械的事前検査を行う。
+
+```console
+python3 scripts/check_model_view.py --root .
+python3 scripts/resolve_model_view.py --root . --alps-version 0.4.0
+```
+
+既存ModelまたはViewの解決・適用には`apply-alps`、定義または意味的変更には`define-alps`、採用、Version管理、Tailoring、Assessment、Release、非推奨化または廃止には`manage-alps`を用いる。BindingとResolverはModelまたはViewを独立して発動可能なSkillにしない。
 
 ### 参照Skillを明示的に呼び出す
 
@@ -156,6 +169,9 @@ ALPSは、このFrameworkをSkillの記述、ライフサイクル管理、Tailo
 | 内容 | 英語 | 日本語 |
 | --- | --- | --- |
 | Process Framework | [process-framework.md](../../.alps/spec/process-framework.md) | [process-framework.md](../../.alps/spec/locales/ja/process-framework.md) |
+| Markdown Repository and Agent Plugins Binding | [markdown-agent-plugins.md](../../.alps/bindings/markdown-agent-plugins.md) | [markdown-agent-plugins.md](../../.alps/bindings/locales/ja/markdown-agent-plugins.md) |
+| ALPS Reference Model | [MODEL.md](../../.alps/MODEL.md) | [MODEL.md](../../.alps/references/locales/ja/MODEL.md) |
+| Model／View Template | [MODEL.md](../../.alps/templates/MODEL.md) / [VIEW.md](../../.alps/templates/VIEW.md) | [MODEL.md](../../.alps/templates/locales/ja/MODEL.md) / [VIEW.md](../../.alps/templates/locales/ja/VIEW.md) |
 | ALPS Specification | [ALPS-SPEC.md](../../.alps/spec/ALPS-SPEC.md) | [ALPS-SPEC.md](../../.alps/spec/locales/ja/ALPS-SPEC.md) |
 | `define-alps` — 定義Process | [SKILL.md](../../skills/define-alps/SKILL.md) | [SKILL.md](../../skills/define-alps/references/locales/ja/SKILL.md) |
 | `apply-alps` — 適用Process | [SKILL.md](../../skills/apply-alps/SKILL.md) | [SKILL.md](../../skills/apply-alps/references/locales/ja/SKILL.md) |
@@ -163,7 +179,7 @@ ALPSは、このFrameworkをSkillの記述、ライフサイクル管理、Tailo
 
 ## バージョン管理
 
-ALPSは、リポジトリ全体を一つのリリース単位としてバージョン管理します。現在のVersionは**0.3.0**であり、初期開発段階にあります。Releaseの正確な内容は、Git TagとCommitによって特定します。[CHANGELOG.md](../../CHANGELOG.md)および[バージョン管理方針](versioning.md)を参照してください。
+ALPSは、リポジトリ全体を一つのリリース単位としてバージョン管理します。現在のVersionは**0.4.0**であり、初期開発段階にあります。Releaseの正確な内容は、Git TagとCommitによって特定します。[CHANGELOG.md](../../CHANGELOG.md)および[バージョン管理方針](versioning.md)を参照してください。
 
 ## ライセンスと再利用
 

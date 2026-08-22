@@ -1,0 +1,37 @@
+name: Validate ALPS process assets
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Process Models, Process Views, and terminology
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile scripts/check_model_view.py scripts/resolve_model_view.py scripts/check_process_terminology.py
+          python3 scripts/check_model_view.py --root .
+          python3 scripts/resolve_model_view.py --root . --alps-version "$(cat VERSION)"
+          python3 scripts/check_process_terminology.py --root .
+          python3 - <<'PYJSON'
+          import json
+          from pathlib import Path
+          for path in [
+              Path('plugin.json'),
+              Path('.claude-plugin/plugin.json'),
+              Path('.codex-plugin/plugin.json'),
+              Path('.cursor-plugin/plugin.json'),
+          ]:
+              json.loads(path.read_text(encoding='utf-8'))
+              print(f'{path}: JSON OK')
+          PYJSON
+          git diff --check

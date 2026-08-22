@@ -20,6 +20,9 @@ ALPSは、Skillの定義・適用・管理を一つのライフサイクルと�
 - 既存Skillを適用する作業には`apply-alps`、未充足ニーズまたはSkillの再定義には`define-alps`、採用、Tailoring、評価、変更または廃止には`manage-alps`を用います。
 - 複数Skillを組み合わせる場合は、すべてのOutput/Inputの授受を明示します。
 
+- `.alps/MODEL.md`が存在する場合、それを既定Process ModelまたはProcess Reference Model Entry Pointとして用いる。名前付きModelおよびProcess Viewは、適用前にALPS Markdown Repository and Agent Plugins Bindingによって解決する。
+- `MODEL.md`および`VIEW.md`は管理対象資産として扱い、独立して発動可能なSkillとして扱わない。適用には`apply-alps`、意味的定義または再定義には`define-alps`、採用、互換性、Tailoring、Release、Assessment、変更または廃止には`manage-alps`を用いる。
+
 ## リポジトリの作業フロー
 
 - 原則として、リポジトリのルートでは`main`ブランチを維持します。ユーザーの明示的な指示がない限り、開発作業は`.worktrees/<branch-name>`の`<type>/<topic>`ブランチで行います。

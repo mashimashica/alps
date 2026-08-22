@@ -56,6 +56,14 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 13. 代表的なInputおよびOutputを示す場合、他のSkillまたはProcessとの主要な対応関係を、必要に応じて識別するのが望ましい。
 14. Skill Packageを構成する場合、付随資源の必要性、役割および利用条件を識別する必要がある。
 
+
+15. Process Modelを対象に含める場合、基準となるSkill Descriptionを複製せず、含まれるSkill、Source Identity、代表的Output/Input関係、選択原則、互換性および管理条件を識別する必要がある。
+16. Process Viewを対象に含める場合、Name、Purpose、Outcome、Stakeholder、Concern、Source Modelおよび適用指針を識別する必要がある。
+17. View内のActivityまたはTaskを`selected`、`adapted`または`new`として識別する必要がある。`selected`または`adapted`要素は明示的なSourceを保持する必要がある。
+18. 宣言されたEnvironment BindingおよびALPS Compatibility Rangeを識別する必要がある。
+19. Local Skill SourceおよびSource Modelを機械的に解決可能にするのが望ましい。
+20. 表現を選ぶ前に、ニーズを独立Skill、Model上の関係、横断的Viewまたは別種の資産として分類する必要がある。
+
 ### Skill検証
 
 このActivityは、Skill Descriptionの記述適合性と、意図したOutcomeの達成可能性を確認する。主にOutcomes c)、d)、e)およびf)に寄与する。
@@ -74,6 +82,12 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 12. 欠陥処置が完了したことを、採用の判断（Decision Gate）に先立って確認するのが望ましい。
 13. Skill Descriptionが他のSkillまたはProcessとの授受を示す場合、Outputが想定される受領側のInputとして利用可能であるかを評価するのが望ましい。
 14. Skill Packageを検証対象に含める場合、基準となるSkill Descriptionの存在、必須の参照先を対象環境から特定して取得できること、付随資源の役割および利用条件、ならびにSkill Descriptionと付随資源との整合性を評価する必要がある。
+
+
+15. 代表的な選択、解決、Handoffおよび変更Scenarioを用いてModelまたはViewを試行するのが望ましい。
+16. 宣言されたBinding、Compatibility Range、標準配置およびSource Identityを確認する必要がある。
+17. 機械的事前検査結果、意味的欠陥、未解決External Sourceおよび制限を採用Decision Gate向けに記録する必要がある。
+18. Viewについては、含まれる各ActivityまたはTaskのSourceおよびTreatmentを確認する必要がある。
 
 ## Inputs
 
@@ -116,6 +130,8 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 - 参考情報によって主要要素の意味または規範上の強さを変更してはならない。
 - 適用法令、規制要求、方針、任意規格および合意を、宣言された適用範囲で適用する必要がある。
 - 実行環境で有効なSkill作成、検証および保存の規則に従う必要がある。
+
+- `MODEL.md`または`VIEW.md`を対象に含める場合、宣言されたEnvironment Binding、配置、Metadata、互換性および解決規則を適用する必要がある。
 
 ## Constraints
 
@@ -166,6 +182,8 @@ Outputが他のSkillのInputになる場合、名称、意味および適用範�
 - Skill Packageの構成と付随資源の役割を設計する場合は、[skill-package-format.md](skill-package-format.md)を参考例として利用できる。必要な資源だけを採用する。
 - 正式なニーズ記録、Skill Description、トレーサビリティ表、検証記録または採用判断記録を作る場合は、[record-templates.md](record-templates.md)を適用対象に合わせてTailoringして利用できる。
 - 本Packageの代表的なMarkdown Environment Bindingについては、`python3 ../../../scripts/check_skill_description.py --locale ja <SKILL.md>`でYAML frontmatter、基準見出しおよび関連する構造上の徴候を事前確認できる。これらの表現はBinding固有であり、ALPSの要求ではない。スクリプトはConformanceまたはOutcome達成を単独では証明しない。
+
+- Model／Viewを扱う場合、Repository共通の[Markdown Repository and Agent Plugins Binding](../../../../../.alps/bindings/locales/ja/markdown-agent-plugins.md)、[MODEL Template](../../../../../.alps/templates/locales/ja/MODEL.md)、[VIEW Template](../../../../../.alps/templates/locales/ja/VIEW.md)、`scripts/check_model_view.py`および`scripts/resolve_model_view.py`を、役割と制限を保持して利用してよい。
 
 ## Common Approach
 
