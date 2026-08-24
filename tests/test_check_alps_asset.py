@@ -1980,6 +1980,38 @@ This is explanatory text.
             ["skill:#one", "skill:#two"],
         )
 
+    def test_reference_scan_masks_fences_nested_in_list_containers(self) -> None:
+        tildes = chr(126) * 3
+        value = (
+            "- outer item\n"
+            "    " + tildes + "\n"
+            "    skill:#missing\n"
+            "    " + (chr(126) * 4) + "\n"
+            "- visible skill:#one\n"
+            "  - nested item\n"
+            "      " + tildes + "\n"
+            "      skill:#missing-nested\n"
+            "      " + (chr(126) * 5) + "\n"
+            "> - quoted item\n"
+            ">     " + tildes + "\n"
+            ">     skill:#missing-quoted\n"
+            ">     " + (chr(126) * 4) + "\n"
+            "> - visible skill:#two\n"
+        )
+        self.assertEqual(
+            CHECKER.references(value),
+            ["skill:#one", "skill:#two"],
+        )
+
+        ordinary_code = (
+            "    " + tildes + "\n"
+            "    skill:#ordinary-code\n"
+            "    " + tildes + "\n"
+            "\nParagraph skill:#three\n"
+        )
+        self.assertIn("skill:#ordinary-code", CHECKER.without_fenced_code(ordinary_code))
+        self.assertEqual(CHECKER.references(ordinary_code), ["skill:#three"])
+
     def test_reference_scan_masks_only_markdown_link_destination_spans(self) -> None:
         inline = "[one](skill:#missing) [two](skill:#missing)\nskill:#missing"
         self.assertEqual(
@@ -2148,6 +2180,95 @@ metadata:
         self.assertTrue(
             any("cyclic YAML alias" in error for error in cyclic_errors),
             cyclic_errors,
+        )
+
+    def test_frontmatter_resolves_sequence_mapping_merges_with_precedence(self) -> None:
+        text = """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+defaults: &defaults {alps: {kind: process-view}}
+overrides: &overrides {alps: {kind: process-model}}
+metadata:
+  <<: [*defaults, *overrides]
+---
+"""
+        values, errors = CHECKER.frontmatter(text)
+        self.assertEqual(errors, [], errors)
+        self.assertEqual(values.get("alps.kind"), "process-view")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "skills" / "fixture" / "SKILL.md"
+            write(path, text + "\n# Fixture\n")
+            self.assertEqual(CHECKER.representation_kind(path), "process-view")
+            asset_errors, _ = CHECKER.check_asset(path, {"": root}, None)
+            self.assertTrue(
+                any("Process View requires" in error for error in asset_errors),
+                asset_errors,
+            )
+
+        explicit = text.replace(
+            "  <<: [*defaults, *overrides]",
+            "  <<: [*defaults, *overrides]\n  alps:\n    kind: process-reference-model",
+        )
+        explicit_values, explicit_errors = CHECKER.frontmatter(explicit)
+        self.assertEqual(explicit_errors, [], explicit_errors)
+        self.assertEqual(explicit_values.get("alps.kind"), "process-reference-model")
+
+        multiline = text.replace(
+            "  <<: [*defaults, *overrides]",
+            "  <<: [\n    *defaults, # first mapping\n    *overrides\n  ]",
+        )
+        multiline_values, multiline_errors = CHECKER.frontmatter(multiline)
+        self.assertEqual(multiline_errors, [], multiline_errors)
+        self.assertEqual(multiline_values.get("alps.kind"), "process-view")
+
+        invalid = text.replace(
+            "  <<: [*defaults, *overrides]",
+            "  <<: [*defaults, scalar-member]",
+        )
+        _, invalid_errors = CHECKER.frontmatter(invalid)
+        self.assertTrue(
+            any("YAML merge key must resolve to a mapping" in error for error in invalid_errors),
+            invalid_errors,
+        )
+
+        unresolved = text.replace(
+            "  <<: [*defaults, *overrides]",
+            "  <<: [*defaults, *missing]",
+        )
+        _, unresolved_errors = CHECKER.frontmatter(unresolved)
+        self.assertTrue(
+            any("unresolved YAML alias *missing" in error for error in unresolved_errors),
+            unresolved_errors,
+        )
+
+        cyclic = """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+defaults: &defaults {<<: [*defaults]}
+metadata:
+  <<: *defaults
+---
+"""
+        _, cyclic_errors = CHECKER.frontmatter(cyclic)
+        self.assertTrue(
+            any("cyclic YAML alias" in error for error in cyclic_errors),
+            cyclic_errors,
+        )
+
+        block_sequence = """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+defaults: &defaults {alps: {kind: process-view}}
+metadata:
+  <<:
+    - *defaults
+---
+"""
+        _, block_errors = CHECKER.frontmatter(block_sequence)
+        self.assertTrue(
+            any("unsupported YAML block sequence" in error for error in block_errors),
+            block_errors,
         )
 
     def test_frontmatter_accumulates_multiline_flow_metadata_before_kind_dispatch(self) -> None:

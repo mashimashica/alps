@@ -167,12 +167,18 @@ class YAMLMappingNode:
 
 
 @dataclass(frozen=True)
+class YAMLSequenceNode:
+    items: tuple["YAMLNode", ...]
+    line: int
+
+
+@dataclass(frozen=True)
 class YAMLNullNode:
     line: int
 
 
-YAMLNode = YAMLScalarNode | YAMLAliasNode | YAMLMappingNode | YAMLNullNode
-YAMLResolved = str | dict[str, "YAMLResolved"] | None
+YAMLNode = YAMLScalarNode | YAMLAliasNode | YAMLMappingNode | YAMLSequenceNode | YAMLNullNode
+YAMLResolved = str | dict[str, "YAMLResolved"] | list["YAMLResolved"] | None
 YAML_MAX_DEPTH = 32
 YAML_MAX_NODES = 512
 
@@ -420,10 +426,10 @@ def yaml_register_anchors(
 
 def yaml_flow_close(value: str) -> int | None:
     value = yaml_without_flow_comments(value)
-    if not value.startswith("{"):
+    if not value or value[0] not in "[{":
         return None
-    depth = 0
-    cursor = 0
+    stack: list[str] = [value[0]]
+    cursor = 1
     while cursor < len(value):
         if value[cursor] in ("'", '"'):
             end = yaml_quoted_end(value, cursor)
@@ -433,13 +439,13 @@ def yaml_flow_close(value: str) -> int | None:
             continue
         character = value[cursor]
         if character in "[{":
-            depth += 1
+            stack.append(character)
         elif character in "]}":
-            depth -= 1
-            if depth == 0 and character == "}":
-                return cursor
-            if depth < 0:
+            if not stack or (stack[-1], character) not in (("[", "]"), ("{", "}")):
                 return None
+            stack.pop()
+            if not stack:
+                return cursor
         cursor += 1
     return None
 
@@ -476,9 +482,9 @@ def yaml_flow_parts(value: str) -> list[str] | None:
 
 
 def yaml_collect_flow(lines: list[str], index: int, value: str) -> tuple[str, int]:
-    """Collect a possibly multiline flow mapping before parsing its entries."""
+    """Collect a possibly multiline flow collection before parsing its entries."""
     properties, remainder = yaml_node_properties(value.strip())
-    if not remainder.startswith("{"):
+    if not remainder.startswith(("{", "[")):
         return value, index + 1
     parts = [remainder]
     cursor = index + 1
@@ -596,9 +602,7 @@ def yaml_inline_node(
     elif remainder.startswith("{"):
         node = yaml_flow_mapping(remainder, line, depth + 1, state)
     elif remainder.startswith("["):
-        # Sequences are outside the inspected frontmatter subset. Keep their
-        # source text so an alias to one is rejected as a non-mapping value.
-        node = YAMLScalarNode(remainder, line)
+        node = yaml_flow_sequence(remainder, line, depth + 1, state)
     elif not remainder:
         node = YAMLNullNode(line)
     else:
@@ -606,6 +610,28 @@ def yaml_inline_node(
     if state.count_node(line):
         yaml_register_anchors(properties, node, line, state)
     return node
+
+
+def yaml_flow_sequence(
+    value: str,
+    line: int,
+    depth: int,
+    state: YAMLParseState,
+) -> YAMLSequenceNode:
+    items: list[YAMLNode] = []
+    parts = yaml_flow_parts(value)
+    if parts is None:
+        message = (
+            "unclosed YAML flow sequence"
+            if yaml_flow_close(value) is None
+            else "invalid YAML flow sequence"
+        )
+        state.add_error(line, message)
+        return YAMLSequenceNode(tuple(items), line)
+    for part in parts:
+        if part.strip():
+            items.append(yaml_inline_node(part, line, depth, state))
+    return YAMLSequenceNode(tuple(items), line)
 
 
 def yaml_flow_mapping(
@@ -685,7 +711,9 @@ def yaml_mapping(
             break
         mapping = yaml_mapping_line(raw, cursor + 2, state)
         if mapping is None:
-            if raw.lstrip().startswith(("'", '"', "?", "[", "{")):
+            if raw.lstrip().startswith("-"):
+                state.add_error(cursor + 2, "unsupported YAML block sequence")
+            elif raw.lstrip().startswith(("'", '"', "?", "[", "{")):
                 state.add_error(cursor + 2, "invalid YAML mapping key")
             cursor += 1
             continue
@@ -707,7 +735,20 @@ def yaml_mapping(
             else:
                 child_indent = indent
             if child < len(lines) and child_indent > indent:
-                node, cursor = yaml_mapping(lines, child, child_indent, depth + 1, state)
+                if lines[child].lstrip().startswith("-"):
+                    state.add_error(child + 2, "unsupported YAML block sequence")
+                    cursor = child
+                    while cursor < len(lines):
+                        child_line = lines[cursor]
+                        if child_line.strip():
+                            child_line_indent = len(child_line) - len(child_line.lstrip(" "))
+                            if child_line_indent <= indent:
+                                break
+                        cursor += 1
+                    node = YAMLNullNode(line)
+                    state.count_node(line)
+                else:
+                    node, cursor = yaml_mapping(lines, child, child_indent, depth + 1, state)
             else:
                 node = YAMLNullNode(line)
                 state.count_node(line)
@@ -740,6 +781,11 @@ def resolve_yaml_node(
         return node.value
     if isinstance(node, YAMLNullNode):
         return None
+    if isinstance(node, YAMLSequenceNode):
+        return [
+            resolve_yaml_node(child, anchors, stack, depth + 1, errors)
+            for child in node.items
+        ]
     if isinstance(node, YAMLAliasNode):
         if node.name not in anchors:
             item = (node.line, f"unresolved YAML alias *{node.name}")
@@ -761,16 +807,31 @@ def resolve_yaml_node(
         merged_value = resolve_yaml_node(
             child, anchors, stack, depth + 1, errors
         )
-        if not isinstance(merged_value, dict):
+        merged_mappings: list[dict[str, YAMLResolved]]
+        if isinstance(merged_value, list):
+            merged_mappings = [
+                member for member in merged_value if isinstance(member, dict)
+            ]
+            if len(merged_mappings) != len(merged_value):
+                item = (
+                    getattr(child, "line", getattr(node, "line", 0)),
+                    "YAML merge key must resolve to a mapping",
+                )
+                if item not in errors:
+                    errors.append(item)
+        elif isinstance(merged_value, dict):
+            merged_mappings = [merged_value]
+        else:
+            merged_mappings = []
             item = (
                 getattr(child, "line", getattr(node, "line", 0)),
                 "YAML merge key must resolve to a mapping",
             )
             if item not in errors:
                 errors.append(item)
-            continue
-        for merged_key, merged_child in merged_value.items():
-            merged.setdefault(merged_key, merged_child)
+        for merged_mapping in merged_mappings:
+            for merged_key, merged_child in merged_mapping.items():
+                merged.setdefault(merged_key, merged_child)
     result = dict(merged)
     for key, child in node.items.items():
         if key == "<<":
@@ -943,7 +1004,7 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
             if mapping_line:
                 _, _, raw_value = mapping_line
                 _, remainder = yaml_node_properties(raw_value.strip())
-                if remainder.startswith("{"):
+                if remainder.startswith(("{", "[")):
                     _, last = yaml_collect_flow(lines, index, raw_value)
                     flow_continuations.update(range(index + 1, last))
         metadata_alias = (
@@ -984,7 +1045,7 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
             if mapping_line and mapping_line[1] == "metadata"
             else ""
         )
-        if mapping_line and mapping_line[1] == "metadata" and flow_value.startswith("{"):
+        if mapping_line and mapping_line[1] == "metadata" and flow_value.startswith(("{", "[")):
             resolved_metadata = resolved_yaml.get("metadata")
             flow_error = any(
                 line == number and message.startswith("invalid YAML flow mapping")
@@ -1364,38 +1425,106 @@ def representation_kind(path: Path) -> str:
     return meta.get("alps.kind", "process")
 
 
-def markdown_container_content(line: str) -> str:
-    """Return line content after Markdown blockquote container prefixes."""
+def markdown_container_parts(line: str) -> tuple[str, int]:
+    """Return content after blockquote prefixes and the quote-container depth."""
 
     content = line.rstrip("\r\n")
     newline = line[len(content) :]
     cursor = 0
+    quote_depth = 0
     while True:
         marker = re.match(r" {0,3}>[ \t]?", content[cursor:])
         if marker is None:
             break
+        quote_depth += 1
         cursor += marker.end()
-    return content[cursor:] + newline
+    return content[cursor:] + newline, quote_depth
+
+
+def markdown_container_content(line: str) -> str:
+    """Return line content after Markdown blockquote container prefixes."""
+
+    return markdown_container_parts(line)[0]
+
+
+def markdown_list_item_match(value: str) -> re.Match[str] | None:
+    """Match a list marker after expanding tabs to Markdown-like columns."""
+
+    return re.match(r"^(?P<indent> *)(?:[-+*]|\d+[.)])[ \t]+", value.expandtabs(4))
+
+
+def markdown_fence_match(
+    value: str,
+    list_containers: list[tuple[int, int]],
+) -> re.Match[str] | None:
+    """Match a fence indented at most three spaces in its active container."""
+
+    expanded = value.expandtabs(4)
+    match = re.match(r"^(?P<indent> *)(?P<marker>`{3,}|~{3,})(?P<tail>.*)$", expanded)
+    if match is None:
+        return None
+    indent = len(match.group("indent"))
+    bases = [content_indent for _, content_indent in list_containers if content_indent <= indent]
+    base_indent = max(bases, default=0)
+    if indent < base_indent or indent - base_indent > 3:
+        return None
+    return match
 
 
 def without_fenced_code(text: str) -> str:
     """Replace fenced code with newlines so examples are not operative syntax."""
 
     visible: list[str] = []
-    fence: tuple[str, int] | None = None
+    fence: tuple[str, int, int] | None = None
+    list_containers: list[tuple[int, int]] = []
+    previous_quote_depth: int | None = None
     for line in text.splitlines(keepends=True):
-        content = markdown_container_content(line)
-        marker = re.match(r"^ {0,3}(`{3,}|~{3,})", content)
-        if marker:
-            token = marker.group(1)
-            if fence is None:
-                fence = (token[0], len(token))
-            elif (
-                token[0] == fence[0]
-                and len(token) >= fence[1]
-                and not content[marker.end() :].strip()
+        content, quote_depth = markdown_container_parts(line)
+        if previous_quote_depth is not None and quote_depth != previous_quote_depth:
+            list_containers = []
+        previous_quote_depth = quote_depth
+        content_without_newline = content.rstrip("\r\n")
+        if fence is not None:
+            marker = markdown_fence_match(content_without_newline, list_containers)
+            if (
+                marker is not None
+                and marker.group("marker")[0] == fence[0]
+                and len(marker.group("marker")) >= fence[1]
+                and quote_depth == fence[2]
+                and not marker.group("tail").strip()
             ):
                 fence = None
+            visible.append("\n" if line.endswith("\n") else "")
+            continue
+
+        list_item = markdown_list_item_match(content_without_newline)
+        if list_item is not None:
+            marker_indent = len(list_item.group("indent"))
+            if not list_containers and marker_indent > 3:
+                list_item = None
+            elif list_containers and marker_indent > 3:
+                if marker_indent < list_containers[-1][1]:
+                    list_item = None
+        if list_item is not None:
+            marker_indent = len(list_item.group("indent"))
+            content_indent = list_item.end()
+            while list_containers and marker_indent < list_containers[-1][0]:
+                list_containers.pop()
+            if list_containers and marker_indent == list_containers[-1][0]:
+                list_containers[-1] = (marker_indent, content_indent)
+            else:
+                list_containers.append((marker_indent, content_indent))
+        elif content_without_newline.strip():
+            indent = len(content_without_newline.expandtabs(4)) - len(
+                content_without_newline.expandtabs(4).lstrip(" ")
+            )
+            while list_containers and indent <= list_containers[-1][0]:
+                list_containers.pop()
+
+        marker = markdown_fence_match(content_without_newline, list_containers)
+        if marker is not None:
+            token = marker.group("marker")
+            fence = (token[0], len(token), quote_depth)
             visible.append("\n" if line.endswith("\n") else "")
             continue
         visible.append(line if fence is None else ("\n" if line.endswith("\n") else ""))
