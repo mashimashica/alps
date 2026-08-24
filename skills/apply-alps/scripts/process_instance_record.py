@@ -57,13 +57,13 @@ LOCALES = {
     },
     "ja": {
         "application_basis": "適用の基礎",
-        "purpose": "Purpose",
-        "outcome": "意図するOutcome",
-        "task": "Task",
+        "purpose": "目的",
+        "outcome": "意図する成果",
+        "task": "タスク",
         "criterion": "成功基準",
         "created": "作成しました",
         "error": "エラー",
-        "valid": "{at}時点で{format} Bindingに適合: {path}",
+        "valid": "{path}: {at}時点の{format}形式として有効",
     },
 }
 
