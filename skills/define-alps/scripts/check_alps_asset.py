@@ -1126,9 +1126,21 @@ def normalize_atx_heading_text(value: str) -> str:
 
 
 def heading1(text: str) -> str | None:
-    text = without_html_comments(without_fenced_code(text))
-    match = re.search(r"(?m)^# ([^\n]+?)\s*$", text)
-    return normalize_atx_heading_text(match.group(1)) if match else None
+    text = without_html_comments(without_indented_code(without_fenced_code(text)))
+    atx_match = re.search(r"(?m)^# ([^\n]+?)\s*$", text)
+    setext_match = re.search(
+        r"(?m)^ {0,3}(?P<name>(?!(?:[-+*]|\d+[.)])(?:[ \t]+|$)|>|#(?:[ \t]|$))"
+        r"\S[^\n]*?)\n {0,3}=+[ \t]*$",
+        text,
+    )
+    candidates: list[tuple[int, str]] = []
+    if atx_match:
+        candidates.append(
+            (atx_match.start(), normalize_atx_heading_text(atx_match.group(1)))
+        )
+    if setext_match:
+        candidates.append((setext_match.start(), setext_match.group("name").strip()))
+    return min(candidates, key=lambda item: item[0])[1] if candidates else None
 
 
 def section(
@@ -1522,10 +1534,17 @@ def without_fenced_code(text: str) -> str:
                 list_containers.pop()
 
         marker = markdown_fence_match(content_without_newline, list_containers)
-        if marker is not None:
+        valid_opener = marker is not None and not (
+            marker.group("marker")[0] == "`" and "`" in marker.group("tail")
+        )
+        if valid_opener:
+            assert marker is not None
             token = marker.group("marker")
             fence = (token[0], len(token), quote_depth)
             visible.append("\n" if line.endswith("\n") else "")
+            continue
+        if marker is not None and marker.group("marker")[0] == "`":
+            visible.append(line.replace("`", " "))
             continue
         visible.append(line if fence is None else ("\n" if line.endswith("\n") else ""))
     return "".join(visible)

@@ -2012,6 +2012,17 @@ This is explanatory text.
         self.assertIn("skill:#ordinary-code", CHECKER.without_fenced_code(ordinary_code))
         self.assertEqual(CHECKER.references(ordinary_code), ["skill:#three"])
 
+    def test_reference_scan_rejects_backtick_fence_openers_with_backticks_in_info(self) -> None:
+        invalid = "```bad`info\nskill:#missing\n"
+        self.assertIn("skill:#missing", CHECKER.without_fenced_code(invalid))
+        self.assertEqual(CHECKER.references(invalid), ["skill:#missing"])
+
+        valid_backtick = "```good-info\nskill:#hidden-backtick\n```\nskill:#after-backtick\n"
+        self.assertEqual(CHECKER.references(valid_backtick), ["skill:#after-backtick"])
+
+        valid_tilde = "~~~bad`info\nskill:#hidden-tilde\n~~~\nskill:#after-tilde\n"
+        self.assertEqual(CHECKER.references(valid_tilde), ["skill:#after-tilde"])
+
     def test_reference_scan_masks_only_markdown_link_destination_spans(self) -> None:
         inline = "[one](skill:#missing) [two](skill:#missing)\nskill:#missing"
         self.assertEqual(
@@ -3777,6 +3788,51 @@ description: フィクスチャプロセス。ALPS準拠。
             japanese_structure.tasks,
             (("担当者は作業する必要がある。", "担当者は記録することが望ましい。"),),
         )
+
+    def test_heading1_recognizes_setext_h1_and_masks_nonoperative_forms(self) -> None:
+        valid = (
+            """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+---
+
+"""
+            "  Setext Name  \n"
+            "   ============  \n"
+            """
+
+## Purpose
+
+The fixture has a purpose.
+
+## Outcomes
+
+- The fixture is complete.
+"""
+        )
+        self.assertEqual(CHECKER.heading1(valid), "Setext Name")
+        self.assertEqual(CHECKER.heading1("名前\n====\n"), "名前")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "skills" / "fixture" / "SKILL.md"
+            write(path, valid)
+            errors, _ = CHECKER.check_asset(path, {"": root}, None)
+            self.assertFalse(
+                any("representation requires Name" in error for error in errors),
+                errors,
+            )
+
+        invalid_forms = (
+            "Fake H2\n-------\n",
+            "    Fake indented\n    ================\n",
+            "```markdown\nFake fenced\n============\n```\n",
+            "<!--\nFake commented\n================\n-->\n",
+            "- Fake list item\n================\n",
+            "ordinary = text\nnext line\n",
+        )
+        for value in invalid_forms:
+            with self.subTest(value=value):
+                self.assertIsNone(CHECKER.heading1(value))
 
     def test_closing_markers_apply_to_model_reference_and_view_extractors(self) -> None:
         processes = "### One ###\n\n### Two ###\n\n### C# value# ###"
