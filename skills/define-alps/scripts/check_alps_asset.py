@@ -700,6 +700,43 @@ def yaml_block_sequence(
     return YAMLSequenceNode(tuple(items), index + 2), cursor
 
 
+def yaml_skip_block_sequence(
+    lines: list[str],
+    index: int,
+    indent: int,
+    parent_indent: int,
+    depth: int,
+    state: YAMLParseState,
+) -> tuple[YAMLSequenceNode, int]:
+    """Consume an unrelated bounded block sequence without inspecting values.
+
+    Sequence-valued frontmatter such as ``allowed-tools`` and ``metadata.tags``
+    is outside the metadata bindings this checker dispatches on.  Consume that
+    subtree as an opaque sequence so its contents cannot become metadata keys,
+    while retaining the parser's depth and node bounds.  Merge values continue
+    through ``yaml_block_sequence`` so they are fully resolved and validated.
+    """
+    if depth > YAML_MAX_DEPTH:
+        state.add_error(index + 2, "YAML frontmatter nesting limit exceeded")
+        return YAMLSequenceNode(tuple(), index + 1), index + 1
+    if not state.count_node(index + 2):
+        return YAMLSequenceNode(tuple(), index + 1), index + 1
+    cursor = index
+    while cursor < len(lines):
+        raw = lines[cursor]
+        if not raw.strip() or raw.lstrip().startswith("#"):
+            cursor += 1
+            continue
+        current_indent = len(raw) - len(raw.lstrip(" "))
+        if current_indent <= parent_indent:
+            break
+        if current_indent == indent and not raw.lstrip().startswith("-"):
+            break
+        state.count_node(cursor + 2)
+        cursor += 1
+    return YAMLSequenceNode(tuple(), index + 2), cursor
+
+
 def yaml_flow_mapping(
     value: str,
     line: int,
@@ -807,17 +844,14 @@ def yaml_mapping(
                             lines, child, child_indent, depth + 1, state
                         )
                     else:
-                        state.add_error(child + 2, "unsupported YAML block sequence")
-                        cursor = child
-                        while cursor < len(lines):
-                            child_line = lines[cursor]
-                            if child_line.strip():
-                                child_line_indent = len(child_line) - len(child_line.lstrip(" "))
-                                if child_line_indent <= indent:
-                                    break
-                            cursor += 1
-                        node = YAMLNullNode(line)
-                        state.count_node(line)
+                        node, cursor = yaml_skip_block_sequence(
+                            lines,
+                            child,
+                            child_indent,
+                            indent,
+                            depth + 1,
+                            state,
+                        )
                 else:
                     node, cursor = yaml_mapping(lines, child, child_indent, depth + 1, state)
             else:
@@ -1214,24 +1248,86 @@ def heading1(text: str) -> str | None:
     return min(candidates, key=lambda item: item[0])[1] if candidates else None
 
 
+def valid_setext_heading_text(value: str) -> bool:
+    """Return whether a line can be the text of a Setext heading."""
+    if len(value) - len(value.lstrip(" ")) > 3:
+        return False
+    stripped = value.strip()
+    if not stripped:
+        return False
+    if re.match(r"^(?:[-+*]|\d+[.)])(?:[ \t]+|$)", stripped):
+        return False
+    if stripped.startswith(">") or re.match(r"^#{1,6}(?:[ \t]|$)", stripped):
+        return False
+    if re.fullmatch(r"(?:[-*_][ \t]*){3,}", stripped):
+        return False
+    return True
+
+
+def semantic_heading_candidates(
+    text: str,
+) -> list[tuple[int, int, int, str]]:
+    """Return visible ATX and Setext headings as ``(start, end, level, text)``."""
+    lines = text.splitlines(keepends=True)
+    starts: list[int] = []
+    offset = 0
+    for line in lines:
+        starts.append(offset)
+        offset += len(line)
+    candidates: list[tuple[int, int, int, str]] = []
+    for index, line in enumerate(lines):
+        content = line.rstrip("\r\n")
+        atx = re.fullmatch(r" {0,3}(#{1,6})[ \t]+(.+?)[ \t]*", content)
+        if atx:
+            heading_text = normalize_atx_heading_text(atx.group(2))
+            if heading_text:
+                candidates.append(
+                    (starts[index], starts[index] + len(line), len(atx.group(1)), heading_text)
+                )
+        if index + 1 >= len(lines) or not valid_setext_heading_text(content):
+            continue
+        underline = lines[index + 1].rstrip("\r\n")
+        setext = re.fullmatch(r" {0,3}(=+|-+)[ \t]*", underline)
+        if setext:
+            candidates.append(
+                (
+                    starts[index],
+                    starts[index + 1] + len(lines[index + 1]),
+                    1 if setext.group(1)[0] == "=" else 2,
+                    content.strip(),
+                )
+            )
+    candidates.sort(key=lambda candidate: (candidate[0], candidate[1]))
+    return candidates
+
+
 def section(
     text: str,
     heading: str,
     level: int = 2,
     stop_at_any_heading: bool = False,
 ) -> str | None:
-    text = without_html_comments(without_fenced_code(text))
-    marker = "#" * level + " " + heading
-    boundary = (
-        r"^ {0,3}#{1,6}[ \t]"
-        if stop_at_any_heading
-        else rf"^ {{0,3}}#{{1,{level}}}[ \t]"
+    text = without_html_comments(
+        without_indented_code(without_fenced_code(text))
     )
-    pattern = re.compile(
-        rf"(?ms)^ {{0,3}}{re.escape(marker)}(?:[ \t]+#+)?[ \t]*\n(.*?)(?={boundary}|\Z)"
+    candidates = semantic_heading_candidates(text)
+    target = next(
+        (
+            candidate
+            for candidate in candidates
+            if candidate[2] == level and candidate[3] == heading
+        ),
+        None,
     )
-    match = pattern.search(text)
-    return match.group(1).strip() if match else None
+    if target is None:
+        return None
+    target_start, target_end, _, _ = target
+    for candidate in candidates:
+        if candidate[0] <= target_start:
+            continue
+        if stop_at_any_heading or candidate[2] <= level:
+            return text[target_end : candidate[0]].strip()
+    return text[target_end:].strip()
 
 
 def normalized_lines(value: str) -> list[str]:
@@ -1374,37 +1470,67 @@ def table(text: str) -> tuple[list[str], list[list[str]]]:
 
 
 def relationship_table_endpoint_indices(header: list[str]) -> tuple[int, int] | None:
-    """Return provider/recipient columns for a supported relationship table."""
-    if len(header) >= 3:
-        return 0, 2
-    if len(header) != 2:
-        return None
+    """Return endpoint columns identified by normalized localized headers."""
     normalized = [
         re.sub(r"\s+", " ", without_inline_code(cell)).strip().casefold()
         for cell in header
     ]
-    provider = normalized[0] in {
+    provider_headers = {
         "provider",
         "provider process",
+        "provider processes",
+        "source",
+        "source process",
+        "source processes",
+        "提供側",
         "提供側プロセス",
         "提供プロセス",
+        "出典プロセス",
+        "送信元プロセス",
+        "ソースプロセス",
     }
-    recipient = normalized[1] in {
+    recipient_headers = {
         "recipient",
         "recipient process",
+        "recipient processes",
+        "target",
+        "target process",
+        "target processes",
+        "受領側",
         "受領側プロセス",
         "受領プロセス",
+        "対象プロセス",
+        "宛先プロセス",
+        "受信先プロセス",
+        "ターゲットプロセス",
     }
-    return (0, 1) if provider and recipient else None
+    provider_indices = [
+        index for index, value in enumerate(normalized) if value in provider_headers
+    ]
+    recipient_indices = [
+        index for index, value in enumerate(normalized) if value in recipient_headers
+    ]
+    if len(provider_indices) != 1 or len(recipient_indices) != 1:
+        return None
+    if provider_indices[0] == recipient_indices[0]:
+        return None
+    return provider_indices[0], recipient_indices[0]
 
 
 def relationship_table_errors(path: Path, value: str) -> list[str]:
-    """Reject a two-column table unless its columns identify both endpoints."""
+    """Reject relationship tables without exactly one header for each endpoint."""
     errors: list[str] = []
     for header, rows in markdown_tables(value):
-        if rows and len(header) == 2 and relationship_table_endpoint_indices(header) is None:
+        if relationship_table_endpoint_indices(header) is not None:
+            continue
+        if len(header) == 2:
             errors.append(
                 f"{path}: two-column relationship table must identify Provider and Recipient Processes"
+            )
+        else:
+            errors.append(
+                f"{path}: relationship table must identify exactly one "
+                "Provider/Source and Recipient/Target Process column"
             )
     return errors
 

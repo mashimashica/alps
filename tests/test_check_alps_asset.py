@@ -2336,15 +2336,39 @@ metadata:
             cyclic_block_errors,
         )
 
-        unrelated_sequence = block_sequence.replace(
-            "metadata:\n  <<:",
-            "metadata:\n  values:",
+        unrelated_sequences = """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+allowed-tools:
+  - python
+
+  # An unrelated bounded sequence is valid frontmatter.
+  - web.run
+metadata:
+  tags:
+    - one
+
+    - two
+  alps:
+    kind: process-view
+---
+"""
+        unrelated_values, unrelated_sequence_errors = CHECKER.frontmatter(
+            unrelated_sequences
         )
-        _, unrelated_sequence_errors = CHECKER.frontmatter(unrelated_sequence)
-        self.assertTrue(
-            any("unsupported YAML block sequence" in error for error in unrelated_sequence_errors),
-            unrelated_sequence_errors,
-        )
+        self.assertEqual(unrelated_sequence_errors, [], unrelated_sequence_errors)
+        self.assertEqual(unrelated_values.get("alps.kind"), "process-view")
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "skills" / "fixture" / "SKILL.md"
+            write(path, unrelated_sequences + "\n# Fixture View\n")
+            self.assertEqual(CHECKER.representation_kind(path), "process-view")
+            asset_errors, _ = CHECKER.check_asset(path, {"": root}, None)
+            self.assertTrue(
+                any("Process View requires" in error for error in asset_errors),
+                asset_errors,
+            )
 
     def test_non_process_representations_resolve_operative_references(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -2813,6 +2837,58 @@ Missing | Also Missing"""
         self.assertTrue(
             any("two-column relationship table must identify Provider" in error for error in errors),
             errors,
+        )
+
+    def test_relationship_tables_derive_endpoint_columns_from_localized_headers(self) -> None:
+        current_order = """| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+| One | information | Two | relates the Processes. |"""
+        reordered = """| Provider Process | Recipient Process | Relationship |
+| --- | --- | --- |
+| One | Two | relates the Processes. |"""
+        relationship_first = """| Relationship | Recipient Process | Provider Process |
+| --- | --- | --- |
+| relates the Processes. | Two | One |"""
+        self.assertEqual(check_model(current_order), [])
+        self.assertEqual(check_model(reordered), [])
+        self.assertEqual(check_model(relationship_first), [])
+
+        japanese = """関係 | 受領側プロセス | 提供側プロセス
+--- | --- | ---
+関係 | 二 | 一"""
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese_path = write_process_model_pair(
+                Path(directory), japanese, relationship_first
+            )
+            errors, _ = CHECKER.check_pair(
+                english, japanese_path, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
+            )
+            self.assertEqual(errors, [], errors)
+
+    def test_relationship_tables_reject_missing_or_ambiguous_endpoint_headers(self) -> None:
+        missing = check_model(
+            """| Process | Relationship | Notes |
+| --- | --- | --- |
+| One | relates | Two |"""
+        )
+        self.assertTrue(
+            any(
+                "relationship table must identify exactly one Provider/Source" in error
+                for error in missing
+            ),
+            missing,
+        )
+        ambiguous = check_model(
+            """| Provider Process | Source Process | Recipient Process |
+| --- | --- | --- |
+| One | One | Two |"""
+        )
+        self.assertTrue(
+            any(
+                "relationship table must identify exactly one Provider/Source" in error
+                for error in ambiguous
+            ),
+            ambiguous,
         )
 
     def test_process_model_validates_all_relationship_tables(self) -> None:
@@ -3955,6 +4031,93 @@ The fixture has a purpose.
         for value in invalid_forms:
             with self.subTest(value=value):
                 self.assertIsNone(CHECKER.heading1(value))
+
+    def test_section_recognizes_setext_h2_and_respects_heading_boundaries(self) -> None:
+        text = """Purpose
+-------
+
+The fixture has a purpose.
+
+Details
+-------
+
+This is a later H2 section.
+
+Deep detail
+----------
+
+This is another H2 boundary.
+
+Root
+====
+
+This is a level-one boundary.
+"""
+        self.assertEqual(
+            CHECKER.section(text, "Purpose"),
+            "The fixture has a purpose.",
+        )
+        self.assertEqual(
+            CHECKER.section(
+                "Purpose\n-------\n\nBody.\n\n### Deep\n\nStill body.\n",
+                "Purpose",
+            ),
+            "Body.\n\n### Deep\n\nStill body.",
+        )
+        self.assertEqual(
+            CHECKER.section(
+                "Purpose\n-------\n\nBody.\n\n### Deep\n\nNot body.\n",
+                "Purpose",
+                stop_at_any_heading=True,
+            ),
+            "Body.",
+        )
+
+        invalid_forms = (
+            "    Purpose\n-------\n\nFake.\n",
+            "- Purpose\n-------\n\nFake.\n",
+            "```markdown\nPurpose\n-------\n\nFake.\n```\n",
+            "<!--\nPurpose\n-------\n\nFake.\n-->\n",
+            "Purpose\n=====\n\nThis is H1, not an H2 section.\n",
+        )
+        for value in invalid_forms:
+            with self.subTest(value=value):
+                self.assertIsNone(CHECKER.section(value, "Purpose"))
+
+    def test_setext_h2_required_sections_work_for_process_models_and_views(self) -> None:
+        def setext_h2(value: str) -> str:
+            return value + "\n" + "-" * max(3, len(value))
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            model = process_model(root, "- One -> Two")
+            model_text = model.read_text(encoding="utf-8")
+            for heading in ("Purpose", "Processes", "Relationships"):
+                model_text = model_text.replace(
+                    f"## {heading}\n", setext_h2(heading) + "\n"
+                )
+            write(model, model_text)
+            model_errors, _ = CHECKER.check_asset(model, {"": root}, None)
+            self.assertEqual(model_errors, [], model_errors)
+
+            view = process_view(
+                root,
+                "- One\n- Two",
+                "- One Activity\n- Two Task",
+            )
+            view_text = view.read_text(encoding="utf-8")
+            for heading in (
+                "Purpose",
+                "Outcomes",
+                "Source Processes",
+                "Included Activities and Tasks",
+            ):
+                view_text = view_text.replace(
+                    f"## {heading}\n", setext_h2(heading) + "\n"
+                )
+            write(view, view_text)
+            view_errors, _ = CHECKER.check_asset(view, {"": root}, None)
+            self.assertEqual(view_errors, [], view_errors)
 
     def test_indented_atx_headings_are_semantic_but_four_spaces_are_code(self) -> None:
         for indent in (1, 2, 3):
