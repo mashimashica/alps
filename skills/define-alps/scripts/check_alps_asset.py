@@ -115,6 +115,31 @@ class SourceSemanticEntry:
 
 
 @dataclass(frozen=True)
+class RelationshipSemanticEntry:
+    kind: str
+    number: int
+    line: int
+    value: str
+    endpoint_cells: tuple[str, str] | None
+    is_table: bool
+
+
+@dataclass(frozen=True)
+class ProcessSemanticEntry:
+    value: str
+    displayed_value: str | None
+    line: int
+    kind: str
+
+
+@dataclass(frozen=True)
+class OutcomeSemanticEntry:
+    value: str
+    line: int
+    is_table: bool
+
+
+@dataclass(frozen=True)
 class YAMLScalarNode:
     value: str
     line: int
@@ -1218,37 +1243,100 @@ def relationship_table_errors(path: Path, value: str) -> list[str]:
     return errors
 
 
-def outcome_items(value: str | None) -> list[str]:
-    """Return semantic Outcome units without prescribing Markdown markers."""
+def outcome_table_row_value(row: list[str]) -> str:
+    cells = [re.sub(r"\s+", " ", cell).strip() for cell in row]
+    if len(cells) > 1 and re.fullmatch(r"(?:[a-z]|\d+)[.)]?", cells[0], re.I):
+        cells = cells[1:]
+    return " | ".join(cell for cell in cells if cell)
+
+
+def outcome_semantic_entries(value: str | None) -> list[OutcomeSemanticEntry]:
+    """Extract Outcome rows and marked items once, preserving document order."""
 
     if not value or not value.strip():
         return []
-    marked = [
-        re.sub(r"\s+", " ", item.group("item")).strip()
-        for item in re.finditer(
+    visible = without_html_comments(
+        without_indented_code(without_fenced_code(value))
+    )
+    table_blocks = markdown_table_blocks(visible)
+    events: list[tuple[int, int, str]] = []
+    for _, (header, rows, _, _, start_line) in enumerate(table_blocks):
+        for row_offset, row in enumerate(rows, start=2):
+            item = outcome_table_row_value(row)
+            if item:
+                events.append((start_line + row_offset, 0, item))
+
+    table_free = mask_markdown_table_spans(visible)
+    list_matches = list(
+        re.finditer(
             r"(?ms)^(?P<indent>[ \t]{0,3})(?:[-*+]|\d+[.)]|[a-z][.)])\s+"
             r"(?P<item>.*?)(?=^(?P=indent)(?:[-*+]|\d+[.)]|[a-z][.)])\s+|"
             r"^[ \t]*$\n(?=\S)|\Z)",
-            value,
+            table_free,
             re.I,
         )
+    )
+    for match in list_matches:
+        item = re.sub(r"\s+", " ", match.group("item")).strip()
+        item = re.sub(r"^[a-z][.)]\s+", "", item, flags=re.I)
+        if item:
+            events.append((table_free[: match.start()].count("\n"), 1, item))
+
+    if events or table_blocks or list_matches:
+        events.sort(key=lambda event: (event[0], event[1]))
+        return [
+            OutcomeSemanticEntry(value=item, line=line, is_table=kind == 0)
+            for line, kind, item in events
+        ]
+    return [
+        OutcomeSemanticEntry(value=item, line=index, is_table=False)
+        for index, item in enumerate(prose_paragraphs(visible))
     ]
-    if marked:
-        values: list[str] = []
-        for item in marked:
-            item = re.sub(r"^[a-z][.)]\s+", "", item, flags=re.I)
-            values.append(item)
-        return values
-    _, rows = table(value)
-    if rows:
-        values = []
-        for row in rows:
-            cells = [re.sub(r"\s+", " ", cell).strip() for cell in row]
-            if len(cells) > 1 and re.fullmatch(r"(?:[a-z]|\d+)[.)]?", cells[0], re.I):
-                cells = cells[1:]
-            values.append(" | ".join(cell for cell in cells if cell))
-        return [item for item in values if item]
-    return prose_paragraphs(value)
+
+
+def outcome_items(value: str | None) -> list[str]:
+    """Return semantic Outcome units without prescribing Markdown markers."""
+
+    return [entry.value for entry in outcome_semantic_entries(value)]
+
+
+def outcome_reference_sequence(
+    value: str | None,
+    current_package_id: str | None,
+) -> tuple[str, ...]:
+    """Return canonical references from Outcome entries in document order."""
+    return tuple(
+        normalized_reference_key(reference, current_package_id)
+        for entry in outcome_semantic_entries(value)
+        for reference in references(entry.value)
+    )
+
+
+def outcome_pair_errors(
+    english: Path,
+    japanese: Path,
+    english_value: str | None,
+    japanese_value: str | None,
+    current_package_id: str | None,
+) -> list[str]:
+    english_entries = outcome_semantic_entries(english_value)
+    japanese_entries = outcome_semantic_entries(japanese_value)
+    errors: list[str] = []
+    if len(english_entries) != len(japanese_entries):
+        errors.append(
+            f"{english} / {japanese}: Outcome count differs "
+            f"({len(english_entries)} != {len(japanese_entries)})"
+        )
+        return errors
+    if tuple(entry.is_table for entry in english_entries) != tuple(
+        entry.is_table for entry in japanese_entries
+    ):
+        errors.append(f"{english} / {japanese}: Outcome kind/order differs")
+    english_references = outcome_reference_sequence(english_value, current_package_id)
+    japanese_references = outcome_reference_sequence(japanese_value, current_package_id)
+    if (english_references or japanese_references) and english_references != japanese_references:
+        errors.append(f"{english} / {japanese}: Outcome reference identity or order differs")
+    return errors
 
 
 def representation_kind(path: Path) -> str:
@@ -1834,15 +1922,11 @@ def check_process_model(
     errors = required_sections(path, text, "Process Model", locale, ("purpose", "processes", "relationships"))
     processes = section(text, HEADINGS[locale]["processes"]) or ""
     relationships = section(text, HEADINGS[locale]["relationships"]) or ""
-    relationship_tables = markdown_tables(relationships)
-    relationship_rows = [
-        row for _, rows in relationship_tables for row in rows
-    ]
+    relationship_entries = relationship_semantic_entries(relationships)
     process_entries = process_model_entries(processes)
-    relationship_items = re.findall(r"(?m)^\s{0,3}(?:[-*+]|\d+[.)])\s+\S", relationships)
     if not process_entries and not references(processes):
         errors.append(f"{path}: Process Model requires identifiable Process entries")
-    if not relationship_rows and not relationship_items:
+    if not relationship_entries:
         errors.append(f"{path}: Process Model requires identifiable relationship entries")
     errors.extend(relationship_table_errors(path, relationships))
     errors.extend(relationship_list_endpoint_errors(path, relationships))
@@ -1889,99 +1973,205 @@ def check_process_model(
     return errors
 
 
-def process_model_entries(value: str, *, include_headings: bool = True) -> list[str]:
-    table_rows = [row for _, rows in markdown_tables(value) for row in rows]
-    if table_rows:
-        return [row[0] for row in table_rows if row and row[0]]
-    entries = [
-        match.group(1).strip()
-        for match in re.finditer(
-            r"(?m)^\s{0,3}(?:[-*+]|\d+[.)])\s+(\S.*)$", value
-        )
-    ]
-    if entries:
-        return entries
-    if not include_headings:
-        return []
-    visible = without_html_comments(without_indented_code(without_fenced_code(value)))
-    headings = list(
-        re.finditer(r"(?m)^ {0,3}(#{3,6})\s+([^\n]+?)\s*$", visible)
+def process_semantic_entries(
+    value: str,
+    *,
+    include_headings: bool = True,
+) -> list[ProcessSemanticEntry]:
+    """Extract Process rows, lists, and supported headings in document order."""
+    visible = without_html_comments(
+        without_indented_code(without_fenced_code(value))
     )
-    entry_level = min((len(match.group(1)) for match in headings), default=None)
+    table_blocks = markdown_table_blocks(visible)
+    events: list[tuple[int, int, str, str | None]] = []
+    for _, (header, rows, _, _, start_line) in enumerate(table_blocks):
+        for row_offset, row in enumerate(rows, start=2):
+            if row and row[0].strip():
+                events.append(
+                    (
+                        start_line + row_offset,
+                        0,
+                        " ".join(row),
+                        row[0].strip(),
+                    )
+                )
+
+    table_free = mask_markdown_table_spans(visible)
+    for line_number, line in enumerate(table_free.splitlines()):
+        match = re.match(r"^\s{0,3}(?:[-*+]|\d+[.)])\s+(\S.*)$", line)
+        if match:
+            events.append((line_number, 1, match.group(1).strip(), None))
+
+    if include_headings:
+        headings = list(
+            re.finditer(r"(?m)^ {0,3}(#{3,6})\s+([^\n]+?)\s*$", table_free)
+        )
+        entry_level = min(
+            (len(match.group(1)) for match in headings),
+            default=None,
+        )
+        for match in headings:
+            if len(match.group(1)) == entry_level:
+                events.append(
+                    (
+                        table_free[: match.start()].count("\n"),
+                        2,
+                        match.group(2).strip(),
+                        None,
+                    )
+                )
+
+    events.sort(key=lambda event: (event[0], event[1]))
     return [
-        match.group(2).strip()
-        for match in headings
-        if len(match.group(1)) == entry_level
+        ProcessSemanticEntry(
+            value=item,
+            displayed_value=displayed_value,
+            line=line,
+            kind=("table" if kind == 0 else "list" if kind == 1 else "heading"),
+        )
+        for line, kind, item, displayed_value in events
     ]
+
+
+def process_model_entries(value: str, *, include_headings: bool = True) -> list[str]:
+    return [
+        entry.displayed_value
+        if entry.kind == "table" and entry.displayed_value is not None
+        else entry.value
+        for entry in process_semantic_entries(value, include_headings=include_headings)
+    ]
+
+
+def process_reference_sequence(
+    value: str,
+    current_package_id: str | None,
+) -> tuple[str, ...]:
+    """Return canonical Process references from semantic entries in order."""
+    return tuple(
+        normalized_reference_key(reference, current_package_id)
+        for entry in process_semantic_entries(value)
+        for reference in references(entry.value)
+    )
+
+
+def relationship_list_endpoint_pair(item: str) -> tuple[str, str] | None:
+    cells = table_row_cells(item)
+    if len(cells) >= 3:
+        return cells[0], cells[2]
+    arrow = re.search(r"\s+(?:->|=>|→|⟶|⟹)\s+", item)
+    if not arrow:
+        return None
+    provider = item[: arrow.start()].strip()
+    recipient = item[arrow.end() :].strip()
+    if not references(recipient):
+        recipient = process_display_name(recipient)
+    if not provider or not recipient:
+        return None
+    return provider, recipient
+
+
+def relationship_semantic_entries(value: str) -> list[RelationshipSemanticEntry]:
+    """Extract table rows and outside relationship list items in document order."""
+    visible = without_html_comments(
+        without_indented_code(without_fenced_code(value))
+    )
+    table_blocks = markdown_table_blocks(visible)
+    events: list[tuple[int, int, str, str, tuple[str, str] | None]] = []
+    for _, (header, rows, _, _, start_line) in enumerate(table_blocks):
+        endpoint_indices = relationship_table_endpoint_indices(header)
+        for row_offset, row in enumerate(rows, start=2):
+            endpoint_cells = None
+            if endpoint_indices is not None:
+                provider_index, recipient_index = endpoint_indices
+                if len(row) > max(provider_index, recipient_index):
+                    endpoint_cells = (row[provider_index], row[recipient_index])
+            events.append(
+                (
+                    start_line + row_offset,
+                    0,
+                    "row",
+                    " ".join(row),
+                    endpoint_cells,
+                )
+            )
+
+    table_free = mask_markdown_table_spans(visible)
+    for line_number, line in enumerate(table_free.splitlines()):
+        match = re.match(r"^\s{0,3}(?:[-*+]|\d+[.)])\s+(\S.*)$", line)
+        if match:
+            item = match.group(1).strip()
+            events.append(
+                (
+                    line_number,
+                    1,
+                    "item",
+                    item,
+                    relationship_list_endpoint_pair(item),
+                )
+            )
+
+    events.sort(key=lambda event: (event[0], event[1]))
+    row_number = 0
+    item_number = 0
+    entries: list[RelationshipSemanticEntry] = []
+    for line, _, kind, item, endpoint_cells in events:
+        if kind == "row":
+            row_number += 1
+            number = row_number
+            is_table = True
+        else:
+            item_number += 1
+            number = item_number
+            is_table = False
+        entries.append(
+            RelationshipSemanticEntry(
+                kind=kind,
+                number=number,
+                line=line,
+                value=item,
+                endpoint_cells=endpoint_cells,
+                is_table=is_table,
+            )
+        )
+    return entries
+
+
+def relationship_reference_sequence(
+    value: str,
+    current_package_id: str | None,
+) -> tuple[str, ...]:
+    """Return canonical references from relationship entries in document order."""
+    return tuple(
+        normalized_reference_key(reference, current_package_id)
+        for entry in relationship_semantic_entries(value)
+        for reference in references(entry.value)
+    )
 
 
 def relationship_endpoint_cells(value: str) -> list[tuple[str, int, str, str]]:
     """Return provider and recipient cells from recognized relationship structures."""
-
-    table_endpoints: list[tuple[str, int, str, str]] = []
-    for header, rows in markdown_tables(value):
-        endpoint_indices = relationship_table_endpoint_indices(header)
-        if not rows or endpoint_indices is None:
+    endpoints: list[tuple[str, int, str, str]] = []
+    for entry in relationship_semantic_entries(value):
+        if entry.endpoint_cells is None:
             continue
-        provider_index, recipient_index = endpoint_indices
-        table_endpoints.extend(
+        provider, recipient = entry.endpoint_cells
+        endpoints.extend(
             (
-                ("row", row_number, role, row[index])
-                for row_number, row in enumerate(rows, start=1)
-                for role, index in (("provider", provider_index), ("recipient", recipient_index))
-                if len(row) > index
+                (entry.kind, entry.number, "provider", provider),
+                (entry.kind, entry.number, "recipient", recipient),
             )
         )
-    if table_endpoints:
-        return table_endpoints
-
-    endpoints: list[tuple[str, int, str, str]] = []
-    for item_number, item in enumerate(
-        process_model_entries(value, include_headings=False), start=1
-    ):
-        cells = table_row_cells(item)
-        if len(cells) >= 3:
-            endpoints.extend(
-                (
-                    ("item", item_number, "provider", cells[0]),
-                    ("item", item_number, "recipient", cells[2]),
-                )
-            )
-            continue
-        arrow = re.search(r"\s+(?:->|=>|→|⟶|⟹)\s+", item)
-        if not arrow:
-            continue
-        provider = item[: arrow.start()].strip()
-        recipient = item[arrow.end() :].strip()
-        if not references(recipient):
-            recipient = process_display_name(recipient)
-        if provider and recipient:
-            endpoints.extend(
-                (
-                    ("item", item_number, "provider", provider),
-                    ("item", item_number, "recipient", recipient),
-                )
-            )
     return endpoints
 
 
 def relationship_list_endpoint_errors(path: Path, value: str) -> list[str]:
     """Reject list relationship items that do not identify both endpoints."""
-    if any(rows for _, rows in markdown_tables(value)):
-        return []
-    items = process_model_entries(value, include_headings=False)
-    if not items:
-        return []
-    endpoint_items = {
-        (entry_kind, entry_number)
-        for entry_kind, entry_number, _, _ in relationship_endpoint_cells(value)
-    }
     errors: list[str] = []
-    for item_number, item in enumerate(items, start=1):
-        if ("item", item_number) in endpoint_items:
+    for entry in relationship_semantic_entries(value):
+        if entry.kind != "item" or entry.endpoint_cells is not None:
             continue
         errors.append(
-            f"{path}: relationship item {item_number} must identify "
+            f"{path}: relationship item {entry.number} must identify "
             "provider and recipient Processes"
         )
     return errors
@@ -2094,13 +2284,8 @@ def check_reference_model(
     if not blocks:
         return errors + [f"{path}: no Process entries found"]
     relationship_tables = markdown_tables(relationships)
-    relationship_rows = [
-        row for _, rows in relationship_tables for row in rows
-    ]
-    relationship_items = re.findall(
-        r"(?m)^\s{0,3}(?:[-*+]|\d+[.)])\s+\S", relationships
-    )
-    if not relationship_rows and not relationship_items:
+    relationship_entries = relationship_semantic_entries(relationships)
+    if not relationship_entries:
         errors.append(
             f"{path}: Process Reference Model requires identifiable relationship entries"
         )
@@ -2345,18 +2530,19 @@ def process_model_identities(
     value: str,
     current_package_id: str | None,
 ) -> dict[str, str | None]:
-    table_rows = [row for _, rows in markdown_tables(value) for row in rows]
-    if table_rows:
-        entries = (
-            (row[0], references(" ".join(row)))
-            for row in table_rows
-            if row and row[0]
+    entries = (
+        (
+            entry.displayed_value
+            if entry.kind == "table" and entry.displayed_value is not None
+            else entry.value,
+            references(entry.value),
         )
-    else:
-        entries = (
-            (entry, references(entry))
-            for entry in process_model_entries(value)
+        for entry in process_semantic_entries(value)
+        if (
+            entry.kind != "table"
+            or entry.displayed_value is not None
         )
+    )
     return declared_process_identities(
         entries,
         current_package_id,
@@ -3228,12 +3414,8 @@ def check_pair(
         ja_relationship_text = section(ja_text, HEADINGS["ja"]["relationships"]) or ""
         en_processes = process_model_entries(en_process_text)
         ja_processes = process_model_entries(ja_process_text)
-        en_relationships = process_model_entries(
-            en_relationship_text, include_headings=False
-        )
-        ja_relationships = process_model_entries(
-            ja_relationship_text, include_headings=False
-        )
+        en_relationships = relationship_semantic_entries(en_relationship_text)
+        ja_relationships = relationship_semantic_entries(ja_relationship_text)
         if len(en_processes) != len(ja_processes):
             errors.append(
                 f"{english} / {japanese}: Process count differs ({len(en_processes)} != {len(ja_processes)})"
@@ -3247,10 +3429,10 @@ def check_pair(
         ja_refs = normalized_references(ja_process_text, current_package_id)
         if en_refs != ja_refs:
             errors.append(f"{english} / {japanese}: Process reference identity or order differs")
-        en_relationship_refs = normalized_references(
+        en_relationship_refs = relationship_reference_sequence(
             en_relationship_text, current_package_id
         )
-        ja_relationship_refs = normalized_references(
+        ja_relationship_refs = relationship_reference_sequence(
             ja_relationship_text, current_package_id
         )
         if en_relationship_refs != ja_relationship_refs:
@@ -3283,14 +3465,10 @@ def check_pair(
     if en_kind == "process-reference-model":
         en_processes = process_blocks(section(en_text, HEADINGS["en"]["processes"]) or "")
         ja_processes = process_blocks(section(ja_text, HEADINGS["ja"]["processes"]) or "")
-        en_relationships = process_model_entries(
-            section(en_text, HEADINGS["en"]["relationships"]) or "",
-            include_headings=False,
-        )
-        ja_relationships = process_model_entries(
-            section(ja_text, HEADINGS["ja"]["relationships"]) or "",
-            include_headings=False,
-        )
+        en_relationship_text = section(en_text, HEADINGS["en"]["relationships"]) or ""
+        ja_relationship_text = section(ja_text, HEADINGS["ja"]["relationships"]) or ""
+        en_relationships = relationship_semantic_entries(en_relationship_text)
+        ja_relationships = relationship_semantic_entries(ja_relationship_text)
         if len(en_processes) != len(ja_processes):
             errors.append(
                 f"{english} / {japanese}: Process count differs ({len(en_processes)} != {len(ja_processes)})"
@@ -3308,18 +3486,16 @@ def check_pair(
         )
         if en_refs != ja_refs:
             errors.append(f"{english} / {japanese}: Process reference identity or order differs")
-        en_relationship_refs = normalized_references(
-            section(en_text, HEADINGS["en"]["relationships"]) or "", current_package_id
+        en_relationship_refs = relationship_reference_sequence(
+            en_relationship_text, current_package_id
         )
-        ja_relationship_refs = normalized_references(
-            section(ja_text, HEADINGS["ja"]["relationships"]) or "", current_package_id
+        ja_relationship_refs = relationship_reference_sequence(
+            ja_relationship_text, current_package_id
         )
         if en_relationship_refs != ja_relationship_refs:
             errors.append(
                 f"{english} / {japanese}: Relationship reference identity or order differs"
             )
-        en_relationship_text = section(en_text, HEADINGS["en"]["relationships"]) or ""
-        ja_relationship_text = section(ja_text, HEADINGS["ja"]["relationships"]) or ""
         en_process_identities = process_reference_model_identities(
             section(en_text, HEADINGS["en"]["processes"]) or "",
             current_package_id,
@@ -3344,8 +3520,8 @@ def check_pair(
             warnings.append(unverified_relationship_warning(english, japanese))
         return errors, warnings
     if en_kind == "process-view":
-        en_outcomes = outcome_items(section(en_text, HEADINGS["en"]["outcomes"]))
-        ja_outcomes = outcome_items(section(ja_text, HEADINGS["ja"]["outcomes"]))
+        en_outcome_text = section(en_text, HEADINGS["en"]["outcomes"])
+        ja_outcome_text = section(ja_text, HEADINGS["ja"]["outcomes"])
         en_source_text = section(en_text, HEADINGS["en"]["sources"]) or ""
         ja_source_text = section(ja_text, HEADINGS["ja"]["sources"]) or ""
         en_included_text = section(en_text, HEADINGS["en"]["included"]) or ""
@@ -3360,10 +3536,15 @@ def check_pair(
         ja_included = [
             row for _, rows in ja_included_tables for row in rows
         ]
-        if len(en_outcomes) != len(ja_outcomes):
-            errors.append(
-                f"{english} / {japanese}: Outcome count differs ({len(en_outcomes)} != {len(ja_outcomes)})"
+        errors.extend(
+            outcome_pair_errors(
+                english,
+                japanese,
+                en_outcome_text,
+                ja_outcome_text,
+                current_package_id,
             )
+        )
         if len(en_sources) != len(ja_sources):
             errors.append(
                 f"{english} / {japanese}: Source Process count differs "
@@ -3515,10 +3696,15 @@ def check_pair(
 
     en = parse_process_structure(en_text, "en")
     ja = parse_process_structure(ja_text, "ja")
-    if len(en.outcomes) != len(ja.outcomes):
-        errors.append(
-            f"{english} / {japanese}: Outcome count differs ({len(en.outcomes)} != {len(ja.outcomes)})"
+    errors.extend(
+        outcome_pair_errors(
+            english,
+            japanese,
+            section(en_text, HEADINGS["en"]["outcomes"]),
+            section(ja_text, HEADINGS["ja"]["outcomes"]),
+            current_package_id,
         )
+    )
     if len(en.activities) != len(ja.activities):
         errors.append(
             f"{english} / {japanese}: Activity count differs ({len(en.activities)} != {len(ja.activities)})"

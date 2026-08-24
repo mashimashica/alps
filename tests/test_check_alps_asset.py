@@ -892,6 +892,107 @@ Three | information | Four | relates the Processes."""
                 )
                 self.assertTrue(any(expected in error for error in errors), errors)
 
+    def test_outcome_items_merge_mixed_forms_in_order_and_mask_code(self) -> None:
+        table = """| Outcome | Reference |
+| --- | --- |
+| First | `skill:#one` |
+| Second | `skill:#two` |"""
+        mixed = (
+            table
+            + "\n\n- Third (`skill:#three`)\n\n"
+            + "<!-- - Hidden -->\n\n"
+            + "```markdown\n"
+            + table
+            + "\n- Missing (`skill:#does-not-exist`)\n```")
+        self.assertEqual(
+            CHECKER.outcome_items(mixed),
+            [
+                "First | `skill:#one`",
+                "Second | `skill:#two`",
+                "Third (`skill:#three`)",
+            ],
+        )
+        self.assertEqual(
+            CHECKER.outcome_items(table),
+            ["First | `skill:#one`", "Second | `skill:#two`"],
+        )
+        self.assertEqual(CHECKER.outcome_items("- First\n- Second"), ["First", "Second"])
+        self.assertEqual(
+            CHECKER.outcome_items("First outcome.\n\nSecond outcome."),
+            ["First outcome.", "Second outcome."],
+        )
+        self.assertEqual(
+            CHECKER.outcome_items(table + "\n\nCategory label prose."),
+            ["First | `skill:#one`", "Second | `skill:#two`"],
+        )
+
+    def test_process_view_pair_compares_mixed_outcome_entries(self) -> None:
+        english_outcomes = """| Outcome | Reference |
+| --- | --- |
+| First | `skill:#one` |
+
+- Second (`skill:#two`)"""
+        japanese_outcomes = """| 成果 | 参照 |
+| --- | --- |
+| 一つ目 | `skill:#one` |
+
+- 二つ目 (`skill:#two`)"""
+
+        def install_outcomes(
+            english: Path, japanese: Path, en_value: str, ja_value: str
+        ) -> None:
+            for path, heading, next_heading, value in (
+                (english, "## Outcomes\n\n", "\n\n## Source Processes", en_value),
+                (japanese, "## 成果\n\n", "\n\n## 出典プロセス", ja_value),
+            ):
+                text = path.read_text(encoding="utf-8")
+                prefix, remainder = text.split(heading, 1)
+                _, suffix = remainder.split(next_heading, 1)
+                write(path, prefix + heading + value + next_heading + suffix)
+
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_process_view_pair(
+                Path(directory), "- Activity: Work", "- 活動: 作業"
+            )
+            install_outcomes(english, japanese, english_outcomes, japanese_outcomes)
+            errors, _ = CHECKER.check_pair(
+                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
+            )
+            self.assertEqual(errors, [], errors)
+
+            install_outcomes(
+                english,
+                japanese,
+                english_outcomes,
+                "- 二つ目\n\n" + japanese_outcomes.split("\n\n", 1)[0],
+            )
+            errors, _ = CHECKER.check_pair(
+                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
+            )
+            self.assertTrue(any("Outcome kind/order differs" in error for error in errors), errors)
+
+            install_outcomes(english, japanese, english_outcomes, japanese_outcomes.split("\n\n", 1)[0])
+            errors, _ = CHECKER.check_pair(
+                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
+            )
+            self.assertTrue(any("Outcome count differs" in error for error in errors), errors)
+
+            install_outcomes(
+                english,
+                japanese,
+                english_outcomes,
+                japanese_outcomes.replace(
+                    "- 二つ目 (`skill:#two`)", "- 一つ目 (`skill:#one`)"
+                ),
+            )
+            errors, _ = CHECKER.check_pair(
+                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
+            )
+            self.assertTrue(
+                any("Outcome reference identity or order differs" in error for error in errors),
+                errors,
+            )
+
     def test_process_view_pair_counts_keyword_free_tasks_under_activity_headings(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             english, japanese = write_process_view_pair(
@@ -1570,6 +1671,135 @@ This deeper heading is not a Process entry.
 """
         self.assertEqual(CHECKER.process_model_entries(processes), ["One", "Two"])
         self.assertEqual(check_model("- One -> Two", processes), [])
+
+    def test_process_model_merges_mixed_process_entries_and_masks_code(self) -> None:
+        processes = """| Process | Skill |
+| --- | --- |
+| One | `skill:#one` |
+
+- Two
+
+### Three
+
+#### Notes
+
+This is explanatory text.
+
+```markdown
+| Process | Skill |
+| --- | --- |
+| Missing | `skill:#does-not-exist` |
+- Missing
+```
+"""
+        self.assertEqual(
+            CHECKER.process_model_entries(processes),
+            ["One", "Two", "Three"],
+        )
+        self.assertEqual(
+            CHECKER.process_model_identities(processes, "fixture"),
+            {
+                "One": "ref:fixture#one",
+                "Two": "name:Two",
+                "Three": "name:Three",
+            },
+        )
+        self.assertEqual(check_model("- One -> Two", processes), [])
+
+        missing = processes.replace(
+            "- Two\n\n### Three", "- Missing (`skill:#does-not-exist`)\n\n### Three"
+        )
+        errors = check_model("- One -> Two", missing)
+        self.assertTrue(
+            any("unresolved Skill reference skill:#does-not-exist" in error for error in errors),
+            errors,
+        )
+
+    def test_process_model_pair_compares_mixed_process_entries(self) -> None:
+        english_processes = """| Process | Description |
+| --- | --- |
+| One | first Process |
+
+- Two
+"""
+        japanese_processes = """| プロセス | 説明 |
+| --- | --- |
+| 一 | 最初のプロセス |
+
+- 二
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_process_model_pair(
+                Path(directory), "- 一 -> 二", "- One -> Two"
+            )
+            write(
+                english,
+                english.read_text(encoding="utf-8").replace(
+                    "- One\n- Two", english_processes.strip()
+                ),
+            )
+            write(
+                japanese,
+                japanese.read_text(encoding="utf-8").replace(
+                    "- 一\n- 二", japanese_processes.strip()
+                ),
+            )
+            errors, _ = CHECKER.check_pair(
+                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
+            )
+            self.assertEqual(errors, [], errors)
+
+            write(
+                japanese,
+                japanese.read_text(encoding="utf-8").replace("\n\n- 二", ""),
+            )
+            errors, _ = CHECKER.check_pair(
+                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
+            )
+            self.assertTrue(
+                any("Process count differs" in error for error in errors),
+                errors,
+            )
+
+        canonical_en = """| Process | Skill |
+| --- | --- |
+| One | `skill:#one` |
+
+- Two (`skill:#two`)
+"""
+        canonical_ja = """| プロセス | スキル |
+| --- | --- |
+| 一 | `skill:#one` |
+
+- 二 (`skill:#two`)
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_process_model_pair(
+                Path(directory), "- 一 -> 二", "- One -> Two"
+            )
+            write(
+                english,
+                english.read_text(encoding="utf-8").replace(
+                    "- One\n- Two", canonical_en.strip()
+                ),
+            )
+            write(
+                japanese,
+                japanese.read_text(encoding="utf-8").replace(
+                    "- 一\n- 二",
+                    canonical_ja.replace(
+                        "- 二 (`skill:#two`)",
+                        "- 一 (`skill:#one`) -> 二 (`skill:#two`)",
+                    ).strip(),
+                ),
+            )
+            errors, _ = CHECKER.check_pair(
+                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
+            )
+            self.assertTrue(
+                any("Process reference identity or order differs" in error for error in errors),
+                errors,
+            )
 
 
     def test_process_model_accepts_list_process_descriptions(self) -> None:
@@ -2350,6 +2580,217 @@ Missing | Also Missing"""
             any("recipient Process 'Missing' is not declared" in error for error in errors),
             errors,
         )
+
+    def test_process_models_validate_mixed_table_and_list_relationships(self) -> None:
+        table = """| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+| One | information | Two | relates the Processes. |"""
+        mixed = table + "\n\n- Missing -> Also Missing"
+        for checker in (check_model, check_reference_model_fixture):
+            with self.subTest(checker=checker.__name__):
+                errors = checker(mixed)
+                self.assertTrue(
+                    any(
+                        "provider Process 'Missing' is not declared" in error
+                        for error in errors
+                    ),
+                    errors,
+                )
+                self.assertTrue(
+                    any(
+                        "recipient Process 'Also Missing' is not declared" in error
+                        for error in errors
+                    ),
+                    errors,
+                )
+
+    def test_process_models_reject_endpointless_mixed_relationship_list_item(self) -> None:
+        table = """| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+| One | information | Two | relates the Processes. |"""
+        mixed = table + "\n\n- Nothing structured here"
+        for checker in (check_model, check_reference_model_fixture):
+            with self.subTest(checker=checker.__name__):
+                errors = checker(mixed)
+                self.assertTrue(
+                    any(
+                        "relationship item 1 must identify provider and recipient Processes"
+                        in error
+                        for error in errors
+                    ),
+                    errors,
+                )
+
+    def test_process_models_accept_mixed_relationships_and_ignore_fenced_code(self) -> None:
+        table = """| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+| One | information | Two | relates the Processes. |"""
+        mixed = (
+            table
+            + "\n\n- Two -> One\n\n"
+            + "```markdown\n"
+            + table
+            + "\n- Missing -> Also Missing\n```")
+        for checker in (check_model, check_reference_model_fixture):
+            with self.subTest(checker=checker.__name__):
+                self.assertEqual(checker(mixed), [])
+
+    def test_relationship_semantic_entries_preserve_mixed_document_order(self) -> None:
+        first = """| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+| One | information | Two | relates the Processes. |"""
+        second = """| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+| Two | information | One | relates the Processes. |"""
+        value = (
+            first
+            + "\n\n- One -> Two\n\n"
+            + second
+            + "\n\n```markdown\n"
+            + first
+            + "\n- Missing -> Also Missing\n```")
+        entries = CHECKER.relationship_semantic_entries(value)
+        self.assertEqual(
+            [(entry.kind, entry.number) for entry in entries],
+            [("row", 1), ("item", 1), ("row", 2)],
+        )
+        self.assertEqual(
+            [
+                (entry_kind, entry_number, role, cell)
+                for entry_kind, entry_number, role, cell in CHECKER.relationship_endpoint_cells(value)
+            ],
+            [
+                ("row", 1, "provider", "One"),
+                ("row", 1, "recipient", "Two"),
+                ("item", 1, "provider", "One"),
+                ("item", 1, "recipient", "Two"),
+                ("row", 2, "provider", "Two"),
+                ("row", 2, "recipient", "One"),
+            ],
+        )
+
+    def test_process_model_pair_compares_mixed_relationship_entries(self) -> None:
+        table_en = """| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+| One | information | Two | relates the Processes. |"""
+        table_ja = """提供側プロセス | 情報 | 受領側プロセス | 関係
+--- | --- | --- | ---
+一 | 情報 | 二 | プロセス間の関係。"""
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_process_model_pair(
+                Path(directory), table_ja + "\n\n- 一 -> 二", table_en + "\n\n- One -> Two"
+            )
+            errors, _ = CHECKER.check_pair(
+                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
+            )
+            self.assertEqual(errors, [], errors)
+
+            write(
+                japanese,
+                japanese.read_text(encoding="utf-8").replace(
+                    "\n\n- 一 -> 二", ""
+                ),
+            )
+            errors, _ = CHECKER.check_pair(
+                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
+            )
+            self.assertTrue(
+                any("Relationship count differs" in error for error in errors),
+                errors,
+            )
+
+    def test_process_model_pair_detects_mixed_relationship_endpoint_order(self) -> None:
+        table_en = """| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+| One (`skill:#one`) | information | Two (`skill:#two`) | relates the Processes. |"""
+        table_ja = """| 提供側プロセス | 情報 | 受領側プロセス | 関係 |
+| --- | --- | --- | --- |
+| 一 (`skill:#one`) | 情報 | 二 (`skill:#two`) | プロセス間の関係。 |"""
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_table_process_model_pair(
+                Path(directory),
+                table_ja + "\n\n- 二 (`skill:#two`) -> 一 (`skill:#one`)",
+                table_en + "\n\n- One (`skill:#one`) -> Two (`skill:#two`)",
+            )
+            errors, _ = CHECKER.check_pair(
+                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
+            )
+            self.assertTrue(
+                any(
+                    "relationship provider/recipient endpoint identity or order differs"
+                    in error
+                    for error in errors
+                ),
+                errors,
+            )
+
+    def test_process_reference_model_pair_detects_mixed_relationship_endpoint_order(self) -> None:
+        table_en = """| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+| Define ALPS (`skill:#define-alps`) | information | Apply ALPS (`skill:#apply-alps`) | relates the Processes. |"""
+        table_ja = """| 提供側プロセス | 情報 | 受領側プロセス | 関係 |
+| --- | --- | --- | --- |
+| ALPS定義 (`skill:#define-alps`) | 情報 | ALPS適用 (`skill:#apply-alps`) | プロセス間の関係。 |"""
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_reference_model_pair(
+                Path(directory),
+                table_ja + "\n\n- `skill:#apply-alps` -> `skill:#define-alps`",
+            )
+            write(
+                english,
+                english.read_text(encoding="utf-8").replace(
+                    "| Define ALPS | information | Apply ALPS | relates the Processes. |",
+                    "| Define ALPS (`skill:#define-alps`) | information | Apply ALPS (`skill:#apply-alps`) | relates the Processes. |\n\n- `skill:#define-alps` -> `skill:#apply-alps`",
+                ),
+            )
+            errors, _ = CHECKER.check_pair(
+                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
+            )
+            self.assertTrue(
+                any(
+                    "relationship provider/recipient endpoint identity or order differs"
+                    in error
+                    for error in errors
+                ),
+                errors,
+            )
+
+    def test_process_reference_model_pair_compares_mixed_relationship_entries(self) -> None:
+        table_en = """| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+| Define ALPS | information | Apply ALPS | relates the Processes. |"""
+        table_ja = """| 提供側プロセス | 情報 | 受領側プロセス | 関係 |
+| --- | --- | --- | --- |
+| ALPS定義 | 情報 | ALPS適用 | プロセス間の関係。 |"""
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_reference_model_pair(
+                Path(directory), table_ja + "\n\n- ALPS定義 -> ALPS適用"
+            )
+            write(
+                english,
+                english.read_text(encoding="utf-8").replace(
+                    "| Define ALPS | information | Apply ALPS | relates the Processes. |",
+                    "| Define ALPS | information | Apply ALPS | relates the Processes. |\n\n- Define ALPS -> Apply ALPS",
+                ),
+            )
+            errors, _ = CHECKER.check_pair(
+                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
+            )
+            self.assertEqual(errors, [], errors)
+
+            write(
+                japanese,
+                japanese.read_text(encoding="utf-8").replace(
+                    "\n\n- ALPS定義 -> ALPS適用", ""
+                ),
+            )
+            errors, _ = CHECKER.check_pair(
+                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
+            )
+            self.assertTrue(
+                any("Relationship count differs" in error for error in errors),
+                errors,
+            )
 
     def test_process_model_pair_reports_reversed_two_column_relationship_as_unverified(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
