@@ -210,26 +210,55 @@ def strip_yaml_node_properties(value: str) -> str:
     return value
 
 
+def yaml_quoted_end(value: str, start: int) -> int | None:
+    """Return the end after a quoted scalar, honoring YAML quote escapes."""
+    quote = value[start]
+    cursor = start + 1
+    while cursor < len(value):
+        if quote == '"' and value[cursor] == "\\":
+            cursor += 2
+            continue
+        if (
+            quote == "'"
+            and value[cursor] == "'"
+            and cursor + 1 < len(value)
+            and value[cursor + 1] == "'"
+        ):
+            cursor += 2
+            continue
+        if value[cursor] == quote:
+            return cursor + 1
+        cursor += 1
+    return None
+
+
+def yaml_without_flow_comments(value: str, stop_at_comment: bool = False) -> str:
+    """Remove flow comments while preserving quoted content and line state."""
+    visible: list[str] = []
+    cursor = 0
+    while cursor < len(value):
+        if value[cursor] in ("'", '"'):
+            end = yaml_quoted_end(value, cursor)
+            visible.append(value[cursor:] if end is None else value[cursor:end])
+            cursor = len(value) if end is None else end
+            continue
+        if value[cursor] == "#" and (cursor == 0 or value[cursor - 1].isspace()):
+            if stop_at_comment:
+                break
+            while cursor < len(value) and value[cursor] not in "\r\n":
+                cursor += 1
+            while cursor < len(value) and value[cursor] in "\r\n":
+                cursor += 1
+            visible.append(" ")
+            continue
+        visible.append(value[cursor])
+        cursor += 1
+    return "".join(visible)
+
+
 def yaml_without_comment(value: str) -> str:
     """Remove an unquoted YAML comment without changing quoted content."""
-    quote: str | None = None
-    escaped = False
-    for index, character in enumerate(value):
-        if quote:
-            if quote == '"' and escaped:
-                escaped = False
-            elif quote == '"' and character == "\\":
-                escaped = True
-            elif character == quote and not (
-                quote == "'" and index + 1 < len(value) and value[index + 1] == "'"
-            ):
-                quote = None
-            continue
-        if character in ("'", '"'):
-            quote = character
-        elif character == "#" and (index == 0 or value[index - 1].isspace()):
-            return value[:index].rstrip()
-    return value.strip()
+    return yaml_without_flow_comments(value, stop_at_comment=True).strip()
 
 
 def yaml_alias_name(value: str) -> str | None:
@@ -275,92 +304,95 @@ def yaml_register_anchors(
 
 
 def yaml_flow_close(value: str) -> int | None:
+    value = yaml_without_flow_comments(value)
     if not value.startswith("{"):
         return None
     depth = 0
-    quote: str | None = None
-    escaped = False
-    for index, character in enumerate(value):
-        if quote:
-            if quote == '"' and escaped:
-                escaped = False
-            elif quote == '"' and character == "\\":
-                escaped = True
-            elif character == quote and not (
-                quote == "'" and index + 1 < len(value) and value[index + 1] == "'"
-            ):
-                quote = None
+    cursor = 0
+    while cursor < len(value):
+        if value[cursor] in ("'", '"'):
+            end = yaml_quoted_end(value, cursor)
+            if end is None:
+                return None
+            cursor = end
             continue
-        if character in ("'", '"'):
-            quote = character
-        elif character in "[{":
+        character = value[cursor]
+        if character in "[{":
             depth += 1
         elif character in "]}":
             depth -= 1
             if depth == 0 and character == "}":
-                return index
+                return cursor
             if depth < 0:
                 return None
+        cursor += 1
     return None
 
 
 def yaml_flow_parts(value: str) -> list[str] | None:
+    value = yaml_without_flow_comments(value)
     close = yaml_flow_close(value)
-    if close is None or yaml_without_comment(value[close + 1 :]).strip():
+    if close is None or value[close + 1 :].strip():
         return None
     body = value[1:close]
     parts: list[str] = []
     start = 0
     depth = 0
-    quote: str | None = None
-    escaped = False
-    for index, character in enumerate(body):
-        if quote:
-            if quote == '"' and escaped:
-                escaped = False
-            elif quote == '"' and character == "\\":
-                escaped = True
-            elif character == quote and not (
-                quote == "'" and index + 1 < len(body) and body[index + 1] == "'"
-            ):
-                quote = None
+    cursor = 0
+    while cursor < len(body):
+        if body[cursor] in ("'", '"'):
+            end = yaml_quoted_end(body, cursor)
+            if end is None:
+                return None
+            cursor = end
             continue
-        if character in ("'", '"'):
-            quote = character
-        elif character in "[{":
+        index = cursor
+        character = body[cursor]
+        if character in "[{":
             depth += 1
         elif character in "]}":
             depth -= 1
         elif character == "," and depth == 0:
             parts.append(body[start:index])
             start = index + 1
+        cursor += 1
     parts.append(body[start:])
     return parts
 
 
+def yaml_collect_flow(lines: list[str], index: int, value: str) -> tuple[str, int]:
+    """Collect a possibly multiline flow mapping before parsing its entries."""
+    properties, remainder = yaml_node_properties(value.strip())
+    if not remainder.startswith("{"):
+        return value, index + 1
+    parts = [remainder]
+    cursor = index + 1
+    while yaml_flow_close("\n".join(parts)) is None and cursor < len(lines):
+        parts.append(lines[cursor].strip())
+        cursor += 1
+    return yaml_without_flow_comments("\n".join((*properties, *parts))), cursor
+
+
 def yaml_flow_separator(value: str) -> int:
+    value = yaml_without_flow_comments(value)
     depth = 0
-    quote: str | None = None
-    escaped = False
-    for index, character in enumerate(value):
-        if quote:
-            if quote == '"' and escaped:
-                escaped = False
-            elif quote == '"' and character == "\\":
-                escaped = True
-            elif character == quote and not (
-                quote == "'" and index + 1 < len(value) and value[index + 1] == "'"
-            ):
-                quote = None
+    cursor = 0
+    while cursor < len(value):
+        if value[cursor] in ("'", '"'):
+            end = yaml_quoted_end(value, cursor)
+            if end is None:
+                return -1
+            cursor = end
             continue
-        if character in ("'", '"'):
-            quote = character
-        elif character in "[{":
+        index = cursor
+        character = value[cursor]
+        if character in "[{":
             depth += 1
         elif character in "]}":
             depth -= 1
         elif character == ":" and depth == 0:
             return index
+        cursor += 1
     return -1
 
 
@@ -411,7 +443,12 @@ def yaml_flow_mapping(
     items: dict[str, YAMLNode] = {}
     parts = yaml_flow_parts(value)
     if parts is None:
-        state.add_error(line, "invalid YAML flow mapping")
+        message = (
+            "unclosed YAML flow mapping"
+            if yaml_flow_close(value) is None
+            else "invalid YAML flow mapping"
+        )
+        state.add_error(line, message)
         return YAMLMappingNode(items, line)
     for part in parts:
         if not part.strip():
@@ -502,8 +539,9 @@ def yaml_mapping(
                 cursor += 1
             yaml_register_anchors(properties, node, line, state)
         else:
-            node = yaml_inline_node(raw_value.strip(), line, depth, state)
-            cursor += 1
+            flow_value, next_cursor = yaml_collect_flow(lines, cursor, raw_value)
+            node = yaml_inline_node(flow_value, line, depth, state)
+            cursor = next_cursor
         items[key] = node
     return YAMLMappingNode(items, index + 2), cursor
 
@@ -639,10 +677,11 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
         quoted_continuations.update(range(index + 1, last + 1))
 
     values: dict[str, str] = {}
+    flow_continuations: set[int] = set()
     in_metadata = False
     metadata_child_indent: int | None = None
     for index, original in enumerate(lines):
-        if index in quoted_continuations:
+        if index in quoted_continuations or index in flow_continuations:
             continue
         number = index + 2
         raw = quoted_values.get(index, block_values.get(index, original))
@@ -651,6 +690,13 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
         if re.match(r"^ *\t", raw):
             errors.append(f"frontmatter line {number} uses a tab for indentation")
             continue
+        if index not in block_values:
+            flow_start = re.match(r"^\s*[A-Za-z0-9_.-]+:\s*(.*?)\s*$", raw)
+            if flow_start:
+                _, remainder = yaml_node_properties(flow_start.group(1).strip())
+                if remainder.startswith("{"):
+                    _, last = yaml_collect_flow(lines, index, flow_start.group(1))
+                    flow_continuations.update(range(index + 1, last))
         metadata_alias_match = re.match(r"^metadata:\s*(.*?)\s*$", raw)
         metadata_alias = (
             yaml_alias_name(metadata_alias_match.group(1))
@@ -2356,7 +2402,7 @@ def japanese_prose_lines(text: str) -> Iterable[tuple[int, str]]:
 def raw_english_words(line: str, allowed_terms: set[str]) -> list[str]:
     for term in sorted(allowed_terms, key=len, reverse=True):
         line = line.replace(term, "")
-    line = re.sub(r"`[^`]*`", "", line)
+    line = without_inline_code(line)
     line = re.sub(r"https?://\S+", "", line)
     line = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", line)
     line = re.sub(r"<[^>]+>", "", line)

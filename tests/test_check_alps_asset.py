@@ -879,6 +879,91 @@ Three | information | Four | relates the Processes."""
                         errors,
                     )
 
+    def test_frontmatter_accumulates_multiline_flow_metadata_before_kind_dispatch(self) -> None:
+        forms = (
+            "metadata: {\n"
+            "  alps: {kind: process-view}\n"
+            "}\n",
+            "kind: &kind process-view\n"
+            "metadata: !!map &metadata {\n"
+            "  # metadata comment\n"
+            "  alps: !!map {kind: !!str *kind} # item comment\n"
+            "} # representation comment\n",
+            "metadata: {\n"
+            "  note: 'it''s } # text',\n"
+            "  alps: {kind: process-view}\n"
+            "} # representation comment\n",
+        )
+        for form in forms:
+            with self.subTest(form=form):
+                text = (
+                    "---\n"
+                    "name: fixture\n"
+                    "description: Fixture process. ALPS-conformant.\n"
+                    + form
+                    + "---\n"
+                )
+                values, frontmatter_errors = CHECKER.frontmatter(text)
+                self.assertEqual(frontmatter_errors, [], frontmatter_errors)
+                self.assertEqual(values["alps.kind"], "process-view")
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    path = root / "skills" / "fixture" / "SKILL.md"
+                    write(
+                        path,
+                        text
+                        + "\n# Fixture\n\n## Purpose\n\nPurpose.\n\n"
+                        "## Outcomes\n\n- Outcome.\n",
+                    )
+                    self.assertEqual(CHECKER.representation_kind(path), "process-view")
+                    errors, _ = CHECKER.check_asset(path, {"": root}, None)
+                    self.assertTrue(
+                        any("Process View requires Source Processes" in error for error in errors),
+                        errors,
+                    )
+                    self.assertFalse(
+                        any("Process representation requires" in error for error in errors),
+                        errors,
+                    )
+
+    def test_frontmatter_flow_quote_scanner_preserves_multiline_hash_and_brace(self) -> None:
+        text = (
+            "---\n"
+            "name: fixture\n"
+            "description: Fixture process. ALPS-conformant.\n"
+            "metadata: {\n"
+            "  note: \"line one\n"
+            "    # } remains quoted\",\n"
+            "  alps: {kind: process-view}\n"
+            "} # representation comment\n"
+            "---\n"
+        )
+        values, errors = CHECKER.frontmatter(text)
+        self.assertEqual(errors, [], errors)
+        self.assertEqual(values["metadata.note"], "line one\n# } remains quoted")
+        self.assertEqual(values["alps.kind"], "process-view")
+
+    def test_frontmatter_reports_invalid_and_unclosed_flow_mappings(self) -> None:
+        invalid = (
+            "---\n"
+            "name: fixture\n"
+            "description: Fixture process. ALPS-conformant.\n"
+            "metadata: {alps process-view}\n"
+            "---\n"
+        )
+        _, errors = CHECKER.frontmatter(invalid)
+        self.assertTrue(any("invalid metadata flow mapping" in error for error in errors), errors)
+        unclosed = (
+            "---\n"
+            "name: fixture\n"
+            "description: Fixture process. ALPS-conformant.\n"
+            "metadata: {\n"
+            "  alps: {kind: process-view}\n"
+            "---\n"
+        )
+        _, errors = CHECKER.frontmatter(unclosed)
+        self.assertTrue(any("unclosed YAML flow mapping" in error for error in errors), errors)
+
     def test_frontmatter_aliases_report_unresolved_cyclic_and_wrong_nodes(self) -> None:
         cases = (
             (
@@ -1089,6 +1174,21 @@ Three | information | Four | relates the Processes."""
             any("unresolved Skill reference skill:#missing" in error for error in errors),
             errors,
         )
+
+    def test_japanese_naturalness_masks_exact_arbitrary_inline_code_runs(self) -> None:
+        lines = (
+            "これは ``HiddenWord ``` inner`` と VisibleWord。",
+            "これは ```HiddenTriple``` と VisibleTriple。",
+        )
+        for line in lines:
+            errors = CHECKER.japanese_naturalness_errors(Path("fixture"), line, set())
+            self.assertTrue(any("Visible" in error for error in errors), (line, errors))
+            self.assertFalse(any("Hidden" in error for error in errors), (line, errors))
+        unclosed = CHECKER.japanese_naturalness_errors(
+            Path("fixture"), "これは ``UnclosedWord と VisibleUnclosed。", set()
+        )
+        self.assertTrue(any("UnclosedWord" in error for error in unclosed), unclosed)
+        self.assertTrue(any("VisibleUnclosed" in error for error in unclosed), unclosed)
 
     def test_process_model_validates_two_column_provider_recipient_tables(self) -> None:
         outer = """| Provider | Recipient |
