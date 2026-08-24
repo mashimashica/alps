@@ -159,6 +159,82 @@ def check_reference_model_fixture(relationships: str) -> list[str]:
         return errors
 
 
+def process_reference_model_with_heading_level(
+    root: Path,
+    entry_level: int,
+    child_level: int | None = None,
+    malformed: bool = False,
+    boundary_fixture: bool = False,
+    custom_heading_level: int | None = None,
+) -> Path:
+    path = root / "skills" / "fixture-reference-model" / "SKILL.md"
+    entry = "#" * entry_level
+    child = "#" * (child_level or entry_level + 1)
+    purpose_heading = "#" * (entry_level if malformed else child_level or entry_level + 1)
+    custom = (
+        f"{'#' * custom_heading_level} Notes\n\nEvidence for One.\n\n"
+        + chr(96) + "skill:#one" + chr(96) + "\n\n"
+        if custom_heading_level is not None
+        else ""
+    )
+    first_reference = (
+        ""
+        if custom_heading_level is not None
+        else chr(96) + "skill:#one" + chr(96) + "\n\n"
+    )
+    tail = "\n### Fake from a later section\n\nIgnored.\n" if boundary_fixture else ""
+    write(
+        path,
+        f"""---
+name: fixture-reference-model
+description: A fixture Process Reference Model.
+metadata:
+  alps.kind: process-reference-model
+---
+
+# Fixture Reference Model
+
+## Purpose
+
+The fixture defines two reference Processes.
+
+## Processes
+
+{entry} One
+
+{purpose_heading} Purpose
+
+One purpose.
+
+{custom}
+{child} Outcomes
+
+- One is achieved.
+
+{first_reference}
+
+{entry} Two
+
+{child} Purpose
+
+Two purpose.
+
+{child} Outcomes
+
+- Two is achieved.
+
+`skill:#two`
+
+## Relationships
+
+| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+| One | information | Two | relates the Processes. |
+{tail}""",
+    )
+    return path
+
+
 def process_view(root: Path, sources: str, included: str) -> Path:
     path = root / "skills" / "fixture-view" / "SKILL.md"
     write(
@@ -563,6 +639,61 @@ Three | information | Four | relates the Processes."""
 | --- | --- | --- | --- |
 | One (`skill:#one`) | information | skill:#two | relates the Processes. |"""
         self.assertEqual(check_reference_model_fixture(valid), [])
+
+    def test_process_reference_model_accepts_entry_heading_levels_three_to_five(self) -> None:
+        for entry_level in (3, 4, 5):
+            with self.subTest(entry_level=entry_level), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                reference_process_skill(root, "one", "One")
+                reference_process_skill(root, "two", "Two")
+                path = process_reference_model_with_heading_level(root, entry_level)
+                errors, _ = CHECKER.check_asset(path, {"": root}, None)
+                self.assertEqual(errors, [], (entry_level, errors))
+
+    def test_process_reference_model_keeps_deeper_custom_headings_in_entry_body(self) -> None:
+        for entry_level in (3, 4):
+            with self.subTest(entry_level=entry_level), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                reference_process_skill(root, "one", "One")
+                reference_process_skill(root, "two", "Two")
+                path = process_reference_model_with_heading_level(
+                    root,
+                    entry_level,
+                    custom_heading_level=5,
+                )
+                errors, _ = CHECKER.check_asset(path, {"": root}, None)
+                self.assertEqual(errors, [], (entry_level, errors))
+
+    def test_process_reference_model_rejects_malformed_child_level_and_ignores_fake_headings(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            reference_process_skill(root, "one", "One")
+            reference_process_skill(root, "two", "Two")
+            malformed = process_reference_model_with_heading_level(root, 4, malformed=True)
+            errors, _ = CHECKER.check_asset(malformed, {"": root}, None)
+            self.assertTrue(
+                any("One: non-empty Purpose and Outcomes are required" in error for error in errors),
+                errors,
+            )
+
+            valid = process_reference_model_with_heading_level(
+                root,
+                5,
+                boundary_fixture=True,
+            )
+            fence = chr(96) * 3
+            content = valid.read_text(encoding="utf-8").replace(
+                chr(96) + "skill:#one" + chr(96) + "\n\n",
+                (
+                    chr(96) + "skill:#one" + chr(96) + "\n\n"
+                    "The prose mentions ### Fake but is not a heading.\n\n"
+                    "<!--\n### Comment fake\n-->\n\n"
+                    + fence + "markdown\n### Code fake\n" + fence + "\n\n"
+                ),
+            )
+            write(valid, content)
+            errors, _ = CHECKER.check_asset(valid, {"": root}, None)
+            self.assertEqual(errors, [], errors)
 
     def test_process_view_checks_source_list_display_name(self) -> None:
         invalid_sources = "- Missing (`skill:#one`)\n- Two (`skill:#two`)"
@@ -1346,6 +1477,71 @@ The fixture has a purpose.
             values, errors = CHECKER.frontmatter(text)
             self.assertEqual(errors, [], (metadata, errors))
             self.assertEqual(values["alps.kind"], "process", (metadata, values))
+
+    def test_frontmatter_folds_plain_description_continuations_and_checks_suffix(self) -> None:
+        cases = (
+            (
+                "description: Fixture process.\n"
+                "  ALPS-conformant.\n",
+                "Fixture process. ALPS-conformant.",
+            ),
+            (
+                "description: Fixture process.\n"
+                "  # description comment\n"
+                "  ALPS-conformant.\n",
+                "Fixture process. ALPS-conformant.",
+            ),
+            (
+                "description: Fixture process.\n"
+                "\n"
+                "  ALPS-conformant.\n",
+                "Fixture process.\nALPS-conformant.",
+            ),
+            (
+                "description: Fixture process. # first comment\n"
+                "  ALPS-conformant. # continuation comment\n",
+                "Fixture process. ALPS-conformant.",
+            ),
+        )
+        for description, expected in cases:
+            with self.subTest(description=description):
+                text = (
+                    "---\n"
+                    "name: fixture\n"
+                    + description
+                    + "metadata:\n"
+                    "  alps.kind: process\n"
+                    "---\n"
+                )
+                values, errors = CHECKER.frontmatter(text)
+                self.assertEqual(errors, [], (description, errors))
+                self.assertEqual(values["description"], expected, values)
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    path = root / "skills" / "fixture" / "SKILL.md"
+                    write(
+                        path,
+                        text
+                        + "\n# Fixture\n\n## Purpose\n\nPurpose.\n\n"
+                        "## Outcomes\n\n- Outcome.\n",
+                    )
+                    self.assertEqual(CHECKER.check_frontmatter(path, text), [], errors)
+
+    def test_frontmatter_does_not_fold_name_or_kind_and_keeps_tab_diagnostic(self) -> None:
+        text = (
+            "---\n"
+            "name: fixture\n"
+            "  not a name continuation\n"
+            "description: Fixture process. ALPS-conformant.\n"
+            "metadata:\n"
+            "  alps.kind: process\n"
+            "\tALPS-conformant.\n"
+            "---\n"
+        )
+        values, errors = CHECKER.frontmatter(text)
+        self.assertEqual(values["name"], "fixture")
+        self.assertEqual(values["alps.kind"], "process")
+        self.assertTrue(any("uses a tab for indentation" in error for error in errors), errors)
 
     def test_frontmatter_preserves_quoted_scalar_error_checks_with_properties(self) -> None:
         unbalanced = (

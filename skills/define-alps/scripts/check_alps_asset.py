@@ -676,15 +676,72 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
         )
         quoted_continuations.update(range(index + 1, last + 1))
 
+    plain_values: dict[int, str] = {}
+    plain_scalar_values: dict[int, str] = {}
+    plain_continuations: set[int] = set()
+    for index, raw in enumerate(lines):
+        mapping = re.match(
+            r"^(?P<prefix>\s*(?P<key>[A-Za-z0-9_.-]+):\s*)(?P<value>.*?)\s*$",
+            raw,
+        )
+        if (
+            not mapping
+            or mapping.group("key") != "description"
+            or raw.startswith(" ")
+        ):
+            continue
+        raw_value = mapping.group("value").strip()
+        _, scalar = yaml_node_properties(raw_value)
+        scalar = yaml_without_comment(scalar)
+        if (
+            not scalar
+            or scalar.startswith(("'", '"', "{", "[", "|", ">"))
+            or yaml_alias_name(scalar) is not None
+        ):
+            continue
+        base_indent = len(raw) - len(raw.lstrip(" "))
+        parts = [scalar]
+        consumed: list[int] = []
+        pending_blank = False
+        for continuation_index in range(index + 1, len(lines)):
+            continuation = lines[continuation_index]
+            if not continuation.strip():
+                pending_blank = True
+                continue
+            if continuation.lstrip().startswith("#"):
+                continue
+            continuation_indent = len(continuation) - len(continuation.lstrip(" "))
+            if continuation_indent <= base_indent:
+                break
+            if re.match(r"^\s*[A-Za-z0-9_.-]+:\s*", continuation):
+                break
+            continuation_value = yaml_without_comment(continuation.strip())
+            if not continuation_value:
+                continue
+            parts.append(("\n" if pending_blank else " ") + continuation_value)
+            pending_blank = False
+            consumed.append(continuation_index)
+        if consumed:
+            plain_values[index] = mapping.group("prefix") + scalar
+            plain_scalar_values[index] = "".join(parts)
+            plain_continuations.update(consumed)
+
     values: dict[str, str] = {}
     flow_continuations: set[int] = set()
     in_metadata = False
     metadata_child_indent: int | None = None
     for index, original in enumerate(lines):
-        if index in quoted_continuations or index in flow_continuations:
+        if (
+            index in quoted_continuations
+            or index in plain_continuations
+            or index in flow_continuations
+        ):
             continue
         number = index + 2
-        raw = quoted_values.get(index, block_values.get(index, original))
+        raw = quoted_values.get(
+            index,
+            block_values.get(index, plain_values.get(index, original)),
+        )
         if not raw.strip() or raw.lstrip().startswith("#"):
             continue
         if re.match(r"^ *\t", raw):
@@ -775,6 +832,9 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
         if in_metadata:
             key = f"metadata.{key}"
         value = value.strip()
+        if index in plain_scalar_values:
+            values[key] = plain_scalar_values[index]
+            continue
         alias = yaml_alias_name(value)
         if alias is not None and isinstance(resolved_yaml_anchors.get(alias), str):
             value = resolved_yaml_anchors[alias]
@@ -808,10 +868,16 @@ def heading1(text: str) -> str | None:
     return match.group(1).strip() if match else None
 
 
-def section(text: str, heading: str, level: int = 2) -> str | None:
+def section(
+    text: str,
+    heading: str,
+    level: int = 2,
+    stop_at_any_heading: bool = False,
+) -> str | None:
     text = without_html_comments(without_fenced_code(text))
     marker = "#" * level + " " + heading
-    pattern = re.compile(rf"(?ms)^{re.escape(marker)}\s*$\n(.*?)(?=^#{{1,{level}}}\s|\Z)")
+    boundary = r"^#{1,6}\s" if stop_at_any_heading else rf"^#{{1,{level}}}\s"
+    pattern = re.compile(rf"(?ms)^{re.escape(marker)}\s*$\n(.*?)(?={boundary}|\Z)")
     match = pattern.search(text)
     return match.group(1).strip() if match else None
 
@@ -1704,9 +1770,38 @@ def named_relationship_endpoint_errors(
     return errors
 
 
+def process_block_details(value: str) -> list[tuple[str, str, int]]:
+    visible = without_html_comments(without_fenced_code(value))
+    child_headings = {
+        HEADINGS[locale][key]
+        for locale in HEADINGS
+        for key in ("purpose", "outcomes")
+    }
+    candidates = [
+        match
+        for match in re.finditer(r"(?m)^(#{3,5}) ([^\n]+?)\s*$", visible)
+        if match.group(2).strip() not in child_headings
+    ]
+    entry_level = min((len(match.group(1)) for match in candidates), default=None)
+    headings = [
+        match for match in candidates if len(match.group(1)) == entry_level
+    ]
+    return [
+        (
+            match.group(2).strip(),
+            visible[
+                match.end() : headings[index + 1].start()
+                if index + 1 < len(headings)
+                else None
+            ],
+            len(match.group(1)),
+        )
+        for index, match in enumerate(headings)
+    ]
+
+
 def process_blocks(value: str) -> list[tuple[str, str]]:
-    matches = list(re.finditer(r"(?ms)^### ([^\n]+?)\s*$\n(.*?)(?=^### |\Z)", value))
-    return [(match.group(1).strip(), match.group(2)) for match in matches]
+    return [(name, body) for name, body, _ in process_block_details(value)]
 
 
 def check_reference_model(
@@ -1721,7 +1816,7 @@ def check_reference_model(
     )
     processes = section(text, HEADINGS[locale]["processes"]) or ""
     relationships = section(text, HEADINGS[locale]["relationships"]) or ""
-    blocks = process_blocks(processes)
+    blocks = process_block_details(processes)
     if not blocks:
         return errors + [f"{path}: no Process entries found"]
     relationship_header, relationship_rows = table(relationships)
@@ -1736,10 +1831,21 @@ def check_reference_model(
     errors.extend(relationship_list_endpoint_errors(path, relationships))
 
     declared_references = set(normalized_references(processes, current_package_id))
-    declared_names = {model_name for model_name, _ in blocks}
-    for model_name, body in blocks:
-        purpose = section(body, HEADINGS[locale]["purpose"], 4)
-        outcomes = section(body, HEADINGS[locale]["outcomes"], 4)
+    declared_names = {model_name for model_name, _, _ in blocks}
+    for model_name, body, level in blocks:
+        child_level = level + 1
+        purpose = section(
+            body,
+            HEADINGS[locale]["purpose"],
+            child_level,
+            stop_at_any_heading=True,
+        )
+        outcomes = section(
+            body,
+            HEADINGS[locale]["outcomes"],
+            child_level,
+            stop_at_any_heading=True,
+        )
         if purpose is None or not purpose.strip() or not outcome_items(outcomes):
             errors.append(f"{path}: {model_name}: non-empty Purpose and Outcomes are required")
             continue
