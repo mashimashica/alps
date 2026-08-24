@@ -139,6 +139,7 @@ class ProcessSemanticEntry:
     displayed_value: str | None
     line: int
     kind: str
+    reference_value: str | None = None
 
 
 @dataclass(frozen=True)
@@ -578,7 +579,7 @@ def yaml_mapping_line(
         key = yaml_scalar_value(content[: end + 1], line, state)
         return None if not key else (indentation, key, separator.group(1))
     match = re.fullmatch(
-        r"([A-Za-z0-9_.-]+|<<):(?:[ \t]*(.*))?", content, re.S
+        r"([A-Za-z0-9_.-]+|<<)[ \t]*:(?:[ \t]*(.*))?", content, re.S
     )
     if not match:
         return None
@@ -1070,7 +1071,7 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
             continuation_indent = len(continuation) - len(continuation.lstrip(" "))
             if continuation_indent <= base_indent:
                 break
-            if re.match(r"^\s*[A-Za-z0-9_.-]+:\s*", continuation):
+            if re.match(r"^\s*[A-Za-z0-9_.-]+[ \t]*:[ \t]*", continuation):
                 break
             continuation_value = yaml_without_comment(continuation.strip())
             if not continuation_value:
@@ -2383,11 +2384,15 @@ def check_process_model(
         errors.append(f"{path}: Process Model requires identifiable Process entries")
     if not relationship_entries:
         errors.append(f"{path}: Process Model requires identifiable relationship entries")
+    errors.extend(
+        f"{path}: {message}"
+        for message in process_table_header_errors(processes)
+    )
     errors.extend(relationship_table_errors(path, relationships))
     errors.extend(relationship_list_endpoint_errors(path, relationships))
 
-    process_references = references(processes)
-    declared_references = set(normalized_references(processes, current_package_id))
+    process_references = process_reference_values(processes)
+    declared_references = set(process_reference_sequence(processes, current_package_id))
     declared_names = {
         process_display_name(entry) for entry in process_model_entries(processes)
     } - {""}
@@ -2432,30 +2437,41 @@ def process_semantic_entries(
     value: str,
     *,
     include_headings: bool = True,
+    include_lists: bool = True,
 ) -> list[ProcessSemanticEntry]:
     """Extract Process rows, lists, and supported headings in document order."""
     visible = without_html_comments(
         without_indented_code(without_fenced_code(value))
     )
     table_blocks = markdown_table_blocks(visible)
-    events: list[tuple[int, int, str, str | None]] = []
+    events: list[tuple[int, int, str, str | None, str | None]] = []
     for _, (header, rows, _, _, start_line) in enumerate(table_blocks):
+        name_index, reference_index, _ = process_table_header_indices(header)
+        if name_index is None:
+            continue
         for row_offset, row in enumerate(rows, start=2):
-            if row and row[0].strip():
+            if name_index < len(row) and row[name_index].strip():
+                reference_value = (
+                    row[reference_index]
+                    if reference_index is not None and reference_index < len(row)
+                    else None
+                )
                 events.append(
                     (
                         start_line + row_offset,
                         0,
                         " ".join(row),
-                        row[0].strip(),
+                        row[name_index].strip(),
+                        reference_value,
                     )
                 )
 
     table_free = mask_markdown_table_spans(visible)
-    for line_number, line in enumerate(table_free.splitlines()):
-        match = re.match(r"^\s{0,3}(?:[-*+]|\d+[.)])\s+(\S.*)$", line)
-        if match:
-            events.append((line_number, 1, match.group(1).strip(), None))
+    if include_lists:
+        for line_number, line in enumerate(table_free.splitlines()):
+            match = re.match(r"^\s{0,3}(?:[-*+]|\d+[.)])\s+(\S.*)$", line)
+            if match:
+                events.append((line_number, 1, match.group(1).strip(), None, None))
 
     if include_headings:
         headings = list(
@@ -2473,6 +2489,7 @@ def process_semantic_entries(
                         2,
                         normalize_atx_heading_text(match.group(2)),
                         None,
+                        None,
                     )
                 )
 
@@ -2483,8 +2500,9 @@ def process_semantic_entries(
             displayed_value=displayed_value,
             line=line,
             kind=("table" if kind == 0 else "list" if kind == 1 else "heading"),
+            reference_value=reference_value,
         )
-        for line, kind, item, displayed_value in events
+        for line, kind, item, displayed_value, reference_value in events
     ]
 
 
@@ -2497,6 +2515,22 @@ def process_model_entries(value: str, *, include_headings: bool = True) -> list[
     ]
 
 
+def process_entry_references(
+    entry: ProcessSemanticEntry,
+) -> list[str]:
+    if entry.kind == "table" and entry.reference_value is not None:
+        return references(entry.reference_value)
+    return references(entry.value)
+
+
+def process_reference_values(value: str) -> tuple[str, ...]:
+    return tuple(
+        reference
+        for entry in process_semantic_entries(value)
+        for reference in process_entry_references(entry)
+    )
+
+
 def process_reference_sequence(
     value: str,
     current_package_id: str | None,
@@ -2504,8 +2538,7 @@ def process_reference_sequence(
     """Return canonical Process references from semantic entries in order."""
     return tuple(
         normalized_reference_key(reference, current_package_id)
-        for entry in process_semantic_entries(value)
-        for reference in references(entry.value)
+        for reference in process_reference_values(value)
     )
 
 
@@ -2740,6 +2773,86 @@ def process_blocks(value: str) -> list[tuple[str, str]]:
     return [(name, body) for name, body, _ in process_block_details(value)]
 
 
+PROCESS_NAME_HEADER_ALIASES = frozenset(
+    {
+        "process",
+        "processes",
+        "process name",
+        "process names",
+        "プロセス",
+        "プロセス名",
+        "プロセス名称",
+    }
+)
+PROCESS_REFERENCE_HEADER_ALIASES = frozenset(
+    {
+        "skill",
+        "skills",
+        "skill ref",
+        "skill refs",
+        "skill reference",
+        "skill references",
+        "canonical skill",
+        "canonical skill reference",
+        "reference",
+        "references",
+        "スキル",
+        "スキル参照",
+        "スキルリファレンス",
+        "参照",
+        "参照スキル",
+    }
+)
+
+
+def normalized_process_table_header(value: str) -> str:
+    return re.sub(r"\s+", " ", without_inline_code(value)).strip().casefold()
+
+
+def process_table_header_indices(
+    header: list[str],
+) -> tuple[int | None, int | None, list[str]]:
+    normalized = [normalized_process_table_header(cell) for cell in header]
+    name_indices = [
+        index for index, value in enumerate(normalized)
+        if value in PROCESS_NAME_HEADER_ALIASES
+    ]
+    reference_indices = [
+        index for index, value in enumerate(normalized)
+        if value in PROCESS_REFERENCE_HEADER_ALIASES
+    ]
+    errors: list[str] = []
+    if len(name_indices) != 1:
+        errors.append(
+            "Process table requires a Process name column"
+            if not name_indices
+            else "Process table has ambiguous Process name columns"
+        )
+    if len(reference_indices) > 1:
+        errors.append("Process table has ambiguous Skill reference columns")
+    return (
+        name_indices[0] if len(name_indices) == 1 else None,
+        reference_indices[0] if len(reference_indices) == 1 else None,
+        errors,
+    )
+
+
+def process_table_header_errors(value: str) -> list[str]:
+    errors: list[str] = []
+    for header, rows in markdown_tables(value):
+        if not rows:
+            continue
+        name_index, reference_index, header_errors = process_table_header_indices(header)
+        errors.extend(header_errors)
+        if name_index is not None and reference_index is None and any(
+            references(" ".join(row)) for row in rows
+        ):
+            errors.append(
+                "Process table requires a Skill reference column for canonical references"
+            )
+    return errors
+
+
 def check_reference_model(
     path: Path,
     text: str,
@@ -2753,7 +2866,16 @@ def check_reference_model(
     processes = section(text, HEADINGS[locale]["processes"]) or ""
     relationships = section(text, HEADINGS[locale]["relationships"]) or ""
     blocks = process_block_details(processes)
-    if not blocks:
+    table_process_entries = process_semantic_entries(
+        processes,
+        include_headings=False,
+        include_lists=False,
+    )
+    errors.extend(
+        f"{path}: {message}"
+        for message in process_table_header_errors(processes)
+    )
+    if not blocks and not table_process_entries:
         return errors + [f"{path}: no Process entries found"]
     relationship_tables = markdown_tables(relationships)
     relationship_entries = relationship_semantic_entries(relationships)
@@ -2764,8 +2886,13 @@ def check_reference_model(
     errors.extend(relationship_table_errors(path, relationships))
     errors.extend(relationship_list_endpoint_errors(path, relationships))
 
-    declared_references = set(normalized_references(processes, current_package_id))
+    declared_references = set(process_reference_sequence(processes, current_package_id))
     declared_names = {model_name for model_name, _, _ in blocks}
+    declared_names.update(
+        entry.displayed_value
+        for entry in table_process_entries
+        if entry.displayed_value
+    )
     for model_name, body, level in blocks:
         child_level = level + 1
         purpose = section(
@@ -3027,7 +3154,7 @@ def process_model_identities(
             entry.displayed_value
             if entry.kind == "table" and entry.displayed_value is not None
             else entry.value,
-            references(entry.value),
+            process_entry_references(entry),
         )
         for entry in process_semantic_entries(value)
         if (
@@ -3046,13 +3173,67 @@ def process_reference_model_identities(
     value: str,
     current_package_id: str | None,
 ) -> dict[str, str | None]:
+    table_entries = process_semantic_entries(
+        value,
+        include_headings=False,
+        include_lists=False,
+    )
     return declared_process_identities(
-        (
+        [
             (displayed_name, references(body))
             for displayed_name, body in process_blocks(value)
-        ),
+        ]
+        + [
+            (entry.displayed_value or entry.value, process_entry_references(entry))
+            for entry in table_entries
+            if entry.displayed_value
+        ],
         current_package_id,
         source_identity,
+    )
+
+
+def process_reference_model_entries(value: str) -> list[tuple[str, str]]:
+    """Return reference-model declarations without double-counting mixed forms."""
+    table_entries = process_semantic_entries(
+        value,
+        include_headings=False,
+        include_lists=False,
+    )
+    blocks = process_blocks(value)
+    if not table_entries:
+        return blocks
+    names = {
+        entry.displayed_value
+        for entry in table_entries
+        if entry.displayed_value
+    }
+    return [
+        (entry.displayed_value, "")
+        for entry in table_entries
+        if entry.displayed_value
+    ] + [
+        (name, body)
+        for name, body in blocks
+        if name not in names
+    ]
+
+
+def process_reference_model_reference_sequence(
+    value: str,
+    current_package_id: str | None,
+) -> tuple[str, ...]:
+    table_entries = process_semantic_entries(
+        value,
+        include_headings=False,
+        include_lists=False,
+    )
+    if not table_entries:
+        return normalized_references(value, current_package_id)
+    return tuple(
+        normalized_reference_key(reference, current_package_id)
+        for entry in table_entries
+        for reference in process_entry_references(entry)
     )
 
 
@@ -3934,6 +4115,11 @@ def check_pair(
         ja_process_text = section(ja_text, HEADINGS["ja"]["processes"]) or ""
         en_relationship_text = section(en_text, HEADINGS["en"]["relationships"]) or ""
         ja_relationship_text = section(ja_text, HEADINGS["ja"]["relationships"]) or ""
+        for label, process_text in (("English", en_process_text), ("Japanese", ja_process_text)):
+            errors.extend(
+                f"{english} / {japanese}: {label} {message}"
+                for message in process_table_header_errors(process_text)
+            )
         en_processes = process_model_entries(en_process_text)
         ja_processes = process_model_entries(ja_process_text)
         en_relationships = relationship_semantic_entries(en_relationship_text)
@@ -3947,8 +4133,8 @@ def check_pair(
                 f"{english} / {japanese}: Relationship count differs "
                 f"({len(en_relationships)} != {len(ja_relationships)})"
             )
-        en_refs = normalized_references(en_process_text, current_package_id)
-        ja_refs = normalized_references(ja_process_text, current_package_id)
+        en_refs = process_reference_sequence(en_process_text, current_package_id)
+        ja_refs = process_reference_sequence(ja_process_text, current_package_id)
         if en_refs != ja_refs:
             errors.append(f"{english} / {japanese}: Process reference identity or order differs")
         en_relationship_refs = relationship_reference_sequence(
@@ -3985,8 +4171,15 @@ def check_pair(
             warnings.append(unverified_relationship_warning(english, japanese))
         return errors, warnings
     if en_kind == "process-reference-model":
-        en_processes = process_blocks(section(en_text, HEADINGS["en"]["processes"]) or "")
-        ja_processes = process_blocks(section(ja_text, HEADINGS["ja"]["processes"]) or "")
+        en_process_text = section(en_text, HEADINGS["en"]["processes"]) or ""
+        ja_process_text = section(ja_text, HEADINGS["ja"]["processes"]) or ""
+        for label, process_text in (("English", en_process_text), ("Japanese", ja_process_text)):
+            errors.extend(
+                f"{english} / {japanese}: {label} {message}"
+                for message in process_table_header_errors(process_text)
+            )
+        en_processes = process_reference_model_entries(en_process_text)
+        ja_processes = process_reference_model_entries(ja_process_text)
         en_relationship_text = section(en_text, HEADINGS["en"]["relationships"]) or ""
         ja_relationship_text = section(ja_text, HEADINGS["ja"]["relationships"]) or ""
         en_relationships = relationship_semantic_entries(en_relationship_text)
@@ -4000,11 +4193,11 @@ def check_pair(
                 f"{english} / {japanese}: Relationship count differs "
                 f"({len(en_relationships)} != {len(ja_relationships)})"
             )
-        en_refs = normalized_references(
-            section(en_text, HEADINGS["en"]["processes"]) or "", current_package_id
+        en_refs = process_reference_model_reference_sequence(
+            en_process_text, current_package_id
         )
-        ja_refs = normalized_references(
-            section(ja_text, HEADINGS["ja"]["processes"]) or "", current_package_id
+        ja_refs = process_reference_model_reference_sequence(
+            ja_process_text, current_package_id
         )
         if en_refs != ja_refs:
             errors.append(f"{english} / {japanese}: Process reference identity or order differs")
@@ -4019,11 +4212,11 @@ def check_pair(
                 f"{english} / {japanese}: Relationship reference identity or order differs"
             )
         en_process_identities = process_reference_model_identities(
-            section(en_text, HEADINGS["en"]["processes"]) or "",
+            en_process_text,
             current_package_id,
         )
         ja_process_identities = process_reference_model_identities(
-            section(ja_text, HEADINGS["ja"]["processes"]) or "",
+            ja_process_text,
             current_package_id,
         )
         endpoint_mismatch, endpoint_unverified = relationship_endpoint_pair_status(

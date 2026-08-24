@@ -1786,6 +1786,95 @@ This is explanatory text.
             errors,
         )
 
+    def test_process_model_process_table_derives_name_and_skill_columns(self) -> None:
+        processes = """| Skill | Process |
+| --- | --- |
+| skill:#one | One |
+| skill:#two | Two |
+"""
+        self.assertEqual(
+            CHECKER.process_model_entries(processes),
+            ["One", "Two"],
+        )
+        self.assertEqual(
+            CHECKER.process_model_identities(processes, "fixture"),
+            {
+                "One": "ref:fixture#one",
+                "Two": "ref:fixture#two",
+            },
+        )
+        self.assertEqual(check_model("- One -> Two", processes), [])
+        self.assertEqual(
+            check_model("- skill:#one -> skill:#two", processes),
+            [],
+        )
+        self.assertEqual(
+            CHECKER.process_reference_model_identities(processes, "fixture"),
+            {
+                "One": "ref:fixture#one",
+                "Two": "ref:fixture#two",
+            },
+        )
+
+        japanese_processes = """| スキル | プロセス |
+| --- | --- |
+| `skill:#one` | 一 |
+| `skill:#two` | 二 |
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_process_model_pair(
+                Path(directory), "- 一 -> 二", "- One -> Two"
+            )
+            write(
+                english,
+                english.read_text(encoding="utf-8").replace(
+                    "- One\n- Two", processes.strip()
+                ),
+            )
+            write(
+                japanese,
+                japanese.read_text(encoding="utf-8").replace(
+                    "- 一\n- 二", japanese_processes.strip()
+                ),
+            )
+            errors, _ = CHECKER.check_pair(
+                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
+            )
+            self.assertEqual(errors, [], errors)
+
+    def test_process_model_process_table_rejects_missing_or_ambiguous_headers(self) -> None:
+        missing_name = """| Skill | Description |
+| --- | --- |
+| skill:#one | One |
+"""
+        errors = check_model("- One -> Two", missing_name)
+        self.assertTrue(
+            any("Process table requires a Process name column" in error for error in errors),
+            errors,
+        )
+        ambiguous_skill = """| Process | Skill | Reference |
+| --- | --- | --- |
+| One | skill:#one | skill:#one |
+"""
+        errors = check_model("- One -> Two", ambiguous_skill)
+        self.assertTrue(
+            any("Process table has ambiguous Skill reference columns" in error for error in errors),
+            errors,
+        )
+        missing_reference = """| Process | Description |
+| --- | --- |
+| One | skill:#one |
+"""
+        errors = check_model("- One -> Two", missing_reference)
+        self.assertTrue(
+            any(
+                "Process table requires a Skill reference column for canonical references"
+                in error
+                for error in errors
+            ),
+            errors,
+        )
+
     def test_process_model_pair_compares_mixed_process_entries(self) -> None:
         english_processes = """| Process | Description |
 | --- | --- |
@@ -2910,6 +2999,57 @@ metadata:
                 )
                 self.assertTrue(any("English" in error for error in errors), errors)
                 self.assertEqual(errors, list(dict.fromkeys(errors)), errors)
+
+    def test_frontmatter_accepts_separation_before_plain_yaml_colons(self) -> None:
+        plain = """---
+name : fixture
+description : Fixture process. ALPS-conformant.
+metadata :
+  alps :
+    kind : process-view
+---
+"""
+        quoted = """---
+"name" : "fixture"
+"description" : "Fixture process. ALPS-conformant."
+"metadata" :
+  "alps" :
+    "kind" : "process-view"
+---
+"""
+        plain_values, plain_errors = CHECKER.frontmatter(plain)
+        quoted_values, quoted_errors = CHECKER.frontmatter(quoted)
+        self.assertEqual(plain_errors, [], plain_errors)
+        self.assertEqual(quoted_errors, [], quoted_errors)
+        self.assertEqual(plain_values.get("name"), "fixture")
+        self.assertEqual(plain_values.get("description"), "Fixture process. ALPS-conformant.")
+        self.assertEqual(plain_values.get("alps.kind"), "process-view")
+        self.assertEqual(plain_values, quoted_values)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "skills" / "fixture" / "SKILL.md"
+            write(path, plain + "\n# Fixture View\n")
+            self.assertEqual(CHECKER.representation_kind(path), "process-view")
+            asset_errors, _ = CHECKER.check_asset(path, {"": root}, None)
+            self.assertTrue(
+                any("Process View requires" in error for error in asset_errors),
+                asset_errors,
+            )
+
+    def test_frontmatter_rejects_malformed_plain_yaml_keys_with_separator(self) -> None:
+        malformed = """---
+name : fixture
+description : Fixture process. ALPS-conformant.
+: value
+? [complex] : value
+---
+"""
+        _, errors = CHECKER.frontmatter(malformed)
+        self.assertTrue(errors, errors)
+        self.assertTrue(
+            any("not a key/value" in error or "invalid YAML mapping key" in error for error in errors),
+            errors,
+        )
 
     def test_process_model_validates_two_column_provider_recipient_tables(self) -> None:
         outer = """| Provider | Recipient |
