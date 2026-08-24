@@ -1057,10 +1057,17 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
     return values, errors
 
 
+def normalize_atx_heading_text(value: str) -> str:
+    """Remove only a space-separated ATX closing sequence from heading text."""
+
+    value = value.strip()
+    return re.sub(r"[ \t]+#+[ \t]*$", "", value).rstrip()
+
+
 def heading1(text: str) -> str | None:
     text = without_html_comments(without_fenced_code(text))
     match = re.search(r"(?m)^# ([^\n]+?)\s*$", text)
-    return match.group(1).strip() if match else None
+    return normalize_atx_heading_text(match.group(1)) if match else None
 
 
 def section(
@@ -1072,7 +1079,9 @@ def section(
     text = without_html_comments(without_fenced_code(text))
     marker = "#" * level + " " + heading
     boundary = r"^#{1,6}\s" if stop_at_any_heading else rf"^#{{1,{level}}}\s"
-    pattern = re.compile(rf"(?ms)^{re.escape(marker)}\s*$\n(.*?)(?={boundary}|\Z)")
+    pattern = re.compile(
+        rf"(?ms)^{re.escape(marker)}(?:[ \t]+#+)?[ \t]*\n(.*?)(?={boundary}|\Z)"
+    )
     match = pattern.search(text)
     return match.group(1).strip() if match else None
 
@@ -1818,6 +1827,28 @@ def process_core(path: Path) -> tuple[str, str, list[str]]:
     return name, purpose_value, outcome_values
 
 
+def process_reference_errors(
+    path: Path,
+    text: str,
+    roots: dict[str, Path],
+    locale: str,
+    current_package_id: str | None,
+) -> list[str]:
+    """Resolve every operative canonical reference in a Process representation."""
+
+    errors: list[str] = []
+    seen: set[str] = set()
+    for reference in references(text):
+        try:
+            resolve_skill(reference, roots, locale, current_package_id)
+        except ValueError as exc:
+            message = f"{path}: Process reference {reference}: {exc}"
+            if message not in seen:
+                seen.add(message)
+                errors.append(message)
+    return errors
+
+
 def classify_normative(task: str, locale: str) -> str | None:
     task = without_inline_code(without_html_comments(task))
     matches: list[tuple[int, int, str]] = []
@@ -1832,7 +1863,8 @@ def classify_normative(task: str, locale: str) -> str | None:
 
 
 def is_task_section_heading(value: str, locale: str) -> bool:
-    normalized = re.sub(r"\s+", " ", value.strip()).rstrip(":：").strip()
+    normalized = normalize_atx_heading_text(value)
+    normalized = re.sub(r"\s+", " ", normalized).rstrip(":：").strip()
     return normalized.casefold() in TASK_SECTION_HEADINGS[locale]
 
 
@@ -1854,7 +1886,7 @@ def parse_process_structure(text: str, locale: str) -> ProcessStructure:
     activities: list[str] = []
     tasks: list[tuple[str, ...]] = []
     for index, match in enumerate(matches):
-        activities.append(match.group(2).strip())
+        activities.append(normalize_atx_heading_text(match.group(2)))
         start = match.end()
         end = matches[index + 1].start() if index + 1 < len(matches) else len(activity_text)
         block = activity_text[start:end]
@@ -1917,8 +1949,20 @@ def check_frontmatter(path: Path, text: str) -> list[str]:
     return errors
 
 
-def semantic_process_findings(path: Path, text: str, locale: str) -> tuple[list[str], list[str]]:
-    errors: list[str] = []
+def semantic_process_findings(
+    path: Path,
+    text: str,
+    locale: str,
+    roots: dict[str, Path],
+    current_package_id: str | None,
+) -> tuple[list[str], list[str]]:
+    errors = process_reference_errors(
+        path,
+        text,
+        roots,
+        locale,
+        current_package_id,
+    )
     warnings: list[str] = []
     try:
         process_core(path)
@@ -2046,7 +2090,7 @@ def process_semantic_entries(
                     (
                         table_free[: match.start()].count("\n"),
                         2,
-                        match.group(2).strip(),
+                        normalize_atx_heading_text(match.group(2)),
                         None,
                     )
                 )
@@ -2274,7 +2318,7 @@ def process_block_details(value: str) -> list[tuple[str, str, int]]:
     candidates = [
         match
         for match in re.finditer(r"(?m)^(#{3,5}) ([^\n]+?)\s*$", visible)
-        if match.group(2).strip() not in child_headings
+        if normalize_atx_heading_text(match.group(2)) not in child_headings
     ]
     entry_level = min((len(match.group(1)) for match in candidates), default=None)
     headings = [
@@ -2282,7 +2326,7 @@ def process_block_details(value: str) -> list[tuple[str, str, int]]:
     ]
     return [
         (
-            match.group(2).strip(),
+            normalize_atx_heading_text(match.group(2)),
             visible[
                 match.end() : headings[index + 1].start()
                 if index + 1 < len(headings)
@@ -2427,10 +2471,15 @@ def source_semantic_entries(value: str) -> list[SourceSemanticEntry]:
         for line_number, line in enumerate(lines)
         if line.strip()
     ]
+
+    def structured_value(line: str) -> str:
+        value = re.sub(r"^(?:[-*+]\s+|\d+[.)]\s+|#{3,}\s+)", "", line)
+        return normalize_atx_heading_text(value) if re.match(r"^#{3,}\s+", line) else value
+
     structured = [
         (
             line_number,
-            re.sub(r"^(?:[-*+]\s+|\d+[.)]\s+|#{3,}\s+)", "", line),
+            structured_value(line),
         )
         for line_number, line in normalized
         if re.match(r"^(?:[-*+]\s+|\d+[.)]\s+|#{3,}\s+)", line)
@@ -2935,7 +2984,7 @@ def included_semantic_events(
         heading = re.match(r"^ {0,3}(#{3,6})\s+(.+?)\s*$", line)
         if heading is None:
             continue
-        candidate = heading.group(2)
+        candidate = normalize_atx_heading_text(heading.group(2))
         kind_match = pattern.search(without_inline_code(candidate))
         kind = None
         if kind_match is not None:
@@ -2955,7 +3004,7 @@ def included_semantic_events(
         heading = re.match(r"^ {0,3}(#{3,6})\s+(.+?)\s*$", line)
         if heading is not None:
             level = len(heading.group(1))
-            candidate = heading.group(2)
+            candidate = normalize_atx_heading_text(heading.group(2))
             kind_match = pattern.search(without_inline_code(candidate))
             heading_kind = None
             if kind_match is not None:
@@ -3288,7 +3337,13 @@ def check_asset(
     if kind not in SUPPORTED_KINDS:
         return errors, warnings
     if kind == "process":
-        more_errors, more_warnings = semantic_process_findings(path, text, locale)
+        more_errors, more_warnings = semantic_process_findings(
+            path,
+            text,
+            locale,
+            roots,
+            package_identity,
+        )
         return errors + more_errors, warnings + more_warnings
     if kind == "process-model":
         return errors + check_process_model(path, text, locale, roots, package_identity), warnings

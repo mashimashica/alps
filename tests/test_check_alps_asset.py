@@ -3463,6 +3463,251 @@ description: フィクスチャのプロセス。
                 errors,
             )
 
+    def test_process_resolves_operative_references_and_ignores_masked_forms(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "package"
+            other_root = Path(directory) / "other-package"
+            process_skill(root, "one", "One")
+            process_skill(other_root, "two", "Two")
+            path = root / "skills" / "fixture" / "SKILL.md"
+            write(
+                path,
+                """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+---
+
+# Fixture
+
+## Purpose
+
+The Process uses `skill:#one` and skill:other#two.
+
+[ignored](https://example.com/skill:#missing)
+
+<!-- skill:#missing -->
+
+```markdown
+skill:#missing
+```
+
+    skill:#missing
+
+`not a canonical reference: skill:#missing`
+
+## Outcomes
+
+- The Process is complete.
+
+## Activities & Tasks
+
+### Work
+
+1. The agent must work.
+""",
+            )
+            errors, _ = CHECKER.check_asset(
+                path, {"": root, "other": other_root}, None
+            )
+            self.assertEqual(errors, [], errors)
+
+    def test_process_resolves_localized_references_and_rejects_unsafe_targets(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "package"
+            process_skill(root, "one", "One")
+            localized_target = root / "skills" / "one" / "references" / "locales" / "ja" / "SKILL.md"
+            write(localized_target, "# ワン\n")
+            outside = Path(directory) / "outside" / "escape"
+            write(outside / "SKILL.md", "# Escaped\n")
+            escape_link = root / "skills" / "escape"
+            try:
+                escape_link.symlink_to(outside, target_is_directory=True)
+            except OSError as exc:
+                self.skipTest(f"symlinks unavailable: {exc}")
+
+            path = root / "skills" / "fixture" / "references" / "locales" / "ja" / "SKILL.md"
+            write(
+                path,
+                """---
+name: fixture
+description: フィクスチャプロセス。ALPS準拠。
+---
+
+# フィクスチャ
+
+## 目的
+
+`skill:#one`
+
+## 成果
+
+- プロセスが完了している。
+
+## 活動とタスク
+
+### 作業
+
+- 担当者は作業する必要がある。
+""",
+            )
+            errors, _ = CHECKER.check_asset(path, {"": root}, None)
+            self.assertEqual(errors, [], errors)
+
+            unsafe = path.read_text(encoding="utf-8").replace(
+                "`skill:#one`",
+                "`skill:#missing` skill:unknown#one skill:#escape `skill:#missing`",
+            )
+            write(path, unsafe)
+            errors, _ = CHECKER.check_asset(path, {"": root}, None)
+            process_reference_errors = [
+                error for error in errors if "Process reference" in error
+            ]
+            self.assertEqual(len(process_reference_errors), 3, errors)
+            self.assertTrue(
+                any("unresolved Skill reference skill:#missing" in error for error in errors),
+                errors,
+            )
+            self.assertTrue(
+                any("unresolved package identity 'unknown'" in error for error in errors),
+                errors,
+            )
+            self.assertTrue(
+                any("escapes package root" in error for error in errors),
+                errors,
+            )
+            self.assertFalse(any("invalid canonical Skill reference" in error for error in errors), errors)
+
+    def test_semantic_heading_extractors_normalize_atx_closing_markers(self) -> None:
+        english = """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+---
+
+# Fixture #
+
+## Purpose ##
+
+The Process has C# and value# literals.
+
+## Outcomes ##
+
+- The Process is complete.
+
+## Activities & Tasks ##
+
+### Work ###
+
+1. The agent must work.
+
+#### Tasks ####
+
+2. The agent should record.
+
+```markdown
+### Code fake ###
+```
+
+<!--
+### Comment fake ###
+-->
+"""
+        self.assertEqual(CHECKER.heading1(english), "Fixture")
+        self.assertEqual(
+            CHECKER.section(english, "Purpose"),
+            "The Process has C# and value# literals.",
+        )
+        structure = CHECKER.parse_process_structure(english, "en")
+        self.assertEqual(structure.activities, ("Work",))
+        self.assertEqual(
+            structure.tasks,
+            (("The agent must work.", "The agent should record."),),
+        )
+        self.assertEqual(CHECKER.heading1("# Name #\n"), "Name")
+        self.assertEqual(CHECKER.heading1("# C# value#\n"), "C# value#")
+
+        japanese = """---
+name: fixture
+description: フィクスチャプロセス。ALPS準拠。
+---
+
+# フィクスチャ #
+
+## 目的 ##
+
+プロセスには目的がある。
+
+## 成果 ##
+
+- プロセスが完了している。
+
+## 活動とタスク ##
+
+### 作業 ###
+
+1. 担当者は作業する必要がある。
+
+#### タスク ####
+
+2. 担当者は記録することが望ましい。
+"""
+        japanese_structure = CHECKER.parse_process_structure(japanese, "ja")
+        self.assertEqual(japanese_structure.activities, ("作業",))
+        self.assertEqual(
+            japanese_structure.tasks,
+            (("担当者は作業する必要がある。", "担当者は記録することが望ましい。"),),
+        )
+
+    def test_closing_markers_apply_to_model_reference_and_view_extractors(self) -> None:
+        processes = "### One ###\n\n### Two ###\n\n### C# value# ###"
+        self.assertEqual(
+            CHECKER.process_model_entries(processes),
+            ["One", "Two", "C# value#"],
+        )
+        reference_processes = """### One ###
+
+#### Purpose ####
+
+One purpose.
+
+#### Outcomes ####
+
+- One is achieved.
+
+`skill:#one`
+
+### Two ###
+
+#### Purpose ####
+
+Two purpose.
+
+#### Outcomes ####
+
+- Two is achieved.
+
+`skill:#two`
+"""
+        self.assertEqual(
+            [name for name, _, _ in CHECKER.process_block_details(reference_processes)],
+            ["One", "Two"],
+        )
+        self.assertEqual(
+            CHECKER.source_entries("### One ###\n### Two ###"),
+            ["One", "Two"],
+        )
+        included = """### Activity: Work ###
+
+#### Task: Review ####
+
+```markdown
+### Activity: Fake ###
+```
+"""
+        self.assertEqual(
+            CHECKER.included_semantic_items(included, "en"),
+            [("activity", "Activity: Work"), ("task", "Task: Review")],
+        )
+
     def test_process_view_rejects_unstructured_included_content_and_keeps_supported_forms(self) -> None:
         for included in (
             "Nothing structured here.",
