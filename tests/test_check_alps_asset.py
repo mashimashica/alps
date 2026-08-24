@@ -1,4495 +1,1934 @@
 from __future__ import annotations
 
+from contextlib import contextmanager, redirect_stderr, redirect_stdout
+from dataclasses import asdict
+import io
 import importlib.util
+import json
+import os
 import sys
 import tempfile
+import textwrap
 import unittest
 from pathlib import Path
 
 
-CHECKER_PATH = Path(__file__).parents[1] / "skills/define-alps/scripts/check_alps_asset.py"
+ROOT = Path(__file__).parents[1]
+CHECKER_PATH = ROOT / "skills/define-alps/scripts/check_alps_asset.py"
 SPEC = importlib.util.spec_from_file_location("check_alps_asset", CHECKER_PATH)
 assert SPEC is not None and SPEC.loader is not None
 CHECKER = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = CHECKER
 SPEC.loader.exec_module(CHECKER)
+from alps_check import Severity  # noqa: E402
 
 
-def write(path: Path, content: str) -> None:
+def _clean(value: str) -> str:
+    return textwrap.dedent(value).strip("\n") + "\n"
+
+
+def _frontmatter(
+    name: str,
+    kind: str,
+    locale: str,
+    *,
+    metadata: bool = True,
+    description: str | None = None,
+) -> str:
+    suffix = "ALPS-conformant." if locale == "en" else "ALPS準拠。"
+    description = description or (
+        f"Canonical {kind} fixture. {suffix}" if kind == "process"
+        else f"Canonical {kind} fixture."
+    )
+    lines = ["---", f"name: {name}", f"description: {description}"]
+    if metadata:
+        lines.extend(["metadata:", f"  alps.kind: {kind}"])
+    return "\n".join(lines + ["---", ""])
+
+
+def _heading(locale: str, key: str) -> str:
+    names = {
+        "en": {
+            "purpose": "Purpose", "outcomes": "Outcomes", "activities": "Activities & Tasks",
+            "inputs": "Inputs", "processes": "Processes", "relationships": "Relationships",
+            "source": "Source Processes", "included": "Included Activities and Tasks",
+            "application": "Application",
+        },
+        "ja": {
+            "purpose": "目的", "outcomes": "成果", "activities": "活動とタスク",
+            "inputs": "入力", "processes": "プロセス", "relationships": "関係",
+            "source": "出典プロセス", "included": "含まれる活動およびタスク", "application": "適用",
+        },
+    }
+    return names[locale][key]
+
+
+def _process_body(
+    locale: str = "en",
+    *,
+    outcome_lines: tuple[str, ...] | None = None,
+    task_lines: tuple[str, ...] | None = None,
+    activity: str | None = None,
+    title: str | None = None,
+    extra: str = "",
+) -> str:
+    if locale == "ja":
+        purpose = "このフィクスチャの目的を定義する。"
+        outcome_lines = outcome_lines or ("成果が準備される。",)
+        task_lines = task_lines or ("エージェントは入力を確認する必要がある。",)
+        activity = activity or "確認"
+        title = title or "フィクスチャプロセス"
+    else:
+        purpose = "Defines the purpose of this fixture."
+        outcome_lines = outcome_lines or ("The result is ready.",)
+        task_lines = task_lines or ("The agent must inspect the input.",)
+        activity = activity or "Inspect"
+        title = title or "Fixture Process"
+    outcome_block = "\n".join(f"- {line}" for line in outcome_lines)
+    task_block = "\n".join(f"{index}. {text}" for index, text in enumerate(task_lines, 1))
+    return _clean(
+        f"""# {title}
+
+## {_heading(locale, 'purpose')}
+
+{purpose}
+
+## {_heading(locale, 'outcomes')}
+
+Introductory prose is opaque.
+{outcome_block}
+
+## {_heading(locale, 'activities')}
+
+### {activity}
+
+Activity introduction is opaque.
+
+{task_block}
+{extra}
+"""
+    )
+
+
+def _model_body(locale: str = "en") -> str:
+    if locale == "ja":
+        return _clean(
+            """
+            # フィクスチャモデル
+
+            ## 目的
+
+            関連プロセスを整理する。
+
+            ## プロセス
+
+            | プロセス | スキル |
+            | --- | --- |
+            | アルファ | `skill:#alpha` |
+            | ベータ | |
+
+            ## 関係
+
+            | 提供側プロセス | 情報 | 受領側プロセス | 関係 |
+            | --- | --- | --- | --- |
+            | アルファ | 情報 | ベータ | 支援 |
+            """
+        )
+    return _clean(
+        """
+        # Fixture Model
+
+        ## Purpose
+
+        Organizes related Processes.
+
+        ## Processes
+
+        | Process | Skill |
+        | --- | --- |
+        | Alpha | `skill:#alpha` |
+        | Beta | |
+
+        ## Relationships
+
+        | Provider Process | Information | Recipient Process | Relationship |
+        | --- | --- | --- | --- |
+        | Alpha | Information | Beta | Supports |
+        """
+    )
+
+
+def _reference_model_body(locale: str = "en") -> str:
+    if locale == "ja":
+        return _clean(
+            """
+            # フィクスチャ参照モデル
+
+            ## 目的
+
+            プロセスの意味中心を整理する。
+
+            ## プロセス
+
+            ### アルファ
+
+            スキル: `skill:#alpha`
+
+            #### 目的
+
+            アルファを定義する。
+
+            #### 成果
+
+            - アルファの成果が整う。
+
+            ### ベータ
+
+            #### 目的
+
+            ベータを定義する。
+
+            #### 成果
+
+            - ベータの成果が整う。
+
+            ## 関係
+
+            | 提供側プロセス | 情報 | 受領側プロセス | 関係 |
+            | --- | --- | --- | --- |
+            | アルファ | 情報 | ベータ | 支援 |
+            """
+        )
+    return _clean(
+        """
+        # Fixture Reference Model
+
+        ## Purpose
+
+        Organizes Process semantic centers.
+
+        ## Processes
+
+        ### Alpha
+
+        Skill: `skill:#alpha`
+
+        #### Purpose
+
+        Define Alpha.
+
+        #### Outcomes
+
+        - Alpha is ready.
+
+        ### Beta
+
+        #### Purpose
+
+        Define Beta.
+
+        #### Outcomes
+
+        - Beta is ready.
+
+        ## Relationships
+
+        | Provider Process | Information | Recipient Process | Relationship |
+        | --- | --- | --- | --- |
+        | Alpha | Information | Beta | Supports |
+        """
+    )
+
+
+def _view_body(locale: str = "en") -> str:
+    if locale == "ja":
+        return _clean(
+            """
+            # フィクスチャビュー
+
+            ## 目的
+
+            共通の観点でプロセスを表示する。
+
+            ## 成果
+
+            - ビューの成果が整う。
+
+            ## 出典プロセス
+
+            | 出典プロセス | 参照 |
+            | --- | --- |
+            | アルファ | `skill:#alpha` |
+            | ベータ | `skill:#beta` |
+
+            ## 含まれる活動およびタスク
+
+            | 出典プロセス | 出典要素 |
+            | --- | --- |
+            | アルファ (`skill:#alpha`) | 活動: 確認 |
+            | ベータ (`skill:#beta`) | タスク: 記録 |
+
+            ## 適用
+
+            このビューを適用する。
+            """
+        )
+    return _clean(
+        """
+        # Fixture View
+
+        ## Purpose
+
+        Presents Processes through one concern.
+
+        ## Outcomes
+
+        - The view outcome is ready.
+
+        ## Source Processes
+
+        | Source Process | Reference |
+        | --- | --- |
+        | Alpha | `skill:#alpha` |
+        | Beta | `skill:#beta` |
+
+        ## Included Activities and Tasks
+
+        | Source Process | Source element |
+        | --- | --- |
+        | Alpha (`skill:#alpha`) | Activity: Inspect |
+        | Beta (`skill:#beta`) | Task: Record |
+
+        ## Application
+
+        Apply this view.
+        """
+    )
+
+
+def _asset(name: str, kind: str, locale: str, body: str, *, metadata: bool = True) -> str:
+    return _frontmatter(name, kind, locale, metadata=metadata) + body
+
+
+def _write(root: Path, relative: str, content: str) -> Path:
+    path = root / relative
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
-
-
-def process_skill(root: Path, name: str, title: str) -> None:
-    write(
-        root / "skills" / name / "SKILL.md",
-        f"---\nname: {name}\ndescription: {title} process.\n---\n\n# {title}\n",
-    )
-
-
-def process_model(
-    root: Path,
-    relationships: str,
-    processes: str = "- One\n- Two",
-) -> Path:
-    path = root / "skills" / "fixture-model" / "SKILL.md"
-    write(
-        path,
-        """---
-name: fixture-model
-description: A fixture Process Model.
-metadata:
-  alps.kind: process-model
----
-
-# Fixture Model
-
-## Purpose
-
-The fixture organizes two Processes.
-
-## Processes
-
-"""
-        + processes
-        + """
-
-## Relationships
-
-"""
-        + relationships
-        + "\n",
-    )
     return path
 
 
-def check_model(
-    relationships: str,
-    processes: str = "- One\n- Two",
-) -> list[str]:
+@contextmanager
+def _temp_root():
     with tempfile.TemporaryDirectory() as directory:
-        root = Path(directory)
-        process_skill(root, "one", "One")
-        process_skill(root, "two", "Two")
-        path = process_model(root, relationships, processes)
-        errors, _ = CHECKER.check_asset(path, {"": root}, None)
-        return errors
+        yield Path(directory)
 
 
-def reference_process_skill(root: Path, name: str, title: str) -> None:
-    write(
-        root / "skills" / name / "SKILL.md",
-        f"""---
-name: {name}
-description: {title} process.
----
+def _parse(root: Path, content: str, *, locale: str = "en", name: str = "fixture"):
+    return CHECKER.parse_asset(_write(root, f"{name}.md", content), locale)
 
-# {title}
 
-## Purpose
+def _codes(result) -> tuple[str, ...]:
+    return tuple(item.code for item in result.diagnostics)
 
-{title} purpose.
 
-## Outcomes
+def _classes(result) -> tuple[str, ...]:
+    return tuple(item.class_name for item in result.diagnostics)
 
-- {title} is achieved.
-""",
-    )
 
+class CheckerProfileMilestoneATests(unittest.TestCase):
+    def assert_no_errors(self, result) -> None:
+        errors = [item.render() for item in result.diagnostics if item.severity.value == "error"]
+        self.assertEqual(errors, [], "\n".join(errors))
 
-def process_reference_model(root: Path, relationships: str) -> Path:
-    path = root / "skills" / "fixture-reference-model" / "SKILL.md"
-    write(
-        path,
-        """---
-name: fixture-reference-model
-description: A fixture Process Reference Model.
-metadata:
-  alps.kind: process-reference-model
----
-
-# Fixture Reference Model
-
-## Purpose
-
-The fixture defines two reference Processes.
-
-## Processes
-
-### One
-
-#### Purpose
-
-One purpose.
-
-#### Outcomes
-
-- One is achieved.
-
-`skill:#one`
-
-### Two
-
-#### Purpose
-
-Two purpose.
-
-#### Outcomes
-
-- Two is achieved.
-
-`skill:#two`
-
-## Relationships
-
-"""
-        + relationships
-        + "\n",
-    )
-    return path
-
-
-def check_reference_model_fixture(relationships: str) -> list[str]:
-    with tempfile.TemporaryDirectory() as directory:
-        root = Path(directory)
-        reference_process_skill(root, "one", "One")
-        reference_process_skill(root, "two", "Two")
-        path = process_reference_model(root, relationships)
-        errors, _ = CHECKER.check_asset(path, {"": root}, None)
-        return errors
-
-
-def process_reference_model_with_heading_level(
-    root: Path,
-    entry_level: int,
-    child_level: int | None = None,
-    malformed: bool = False,
-    boundary_fixture: bool = False,
-    custom_heading_level: int | None = None,
-) -> Path:
-    path = root / "skills" / "fixture-reference-model" / "SKILL.md"
-    entry = "#" * entry_level
-    child = "#" * (child_level or entry_level + 1)
-    purpose_heading = "#" * (entry_level if malformed else child_level or entry_level + 1)
-    custom = (
-        f"{'#' * custom_heading_level} Notes\n\nEvidence for One.\n\n"
-        + chr(96) + "skill:#one" + chr(96) + "\n\n"
-        if custom_heading_level is not None
-        else ""
-    )
-    first_reference = (
-        ""
-        if custom_heading_level is not None
-        else chr(96) + "skill:#one" + chr(96) + "\n\n"
-    )
-    tail = "\n### Fake from a later section\n\nIgnored.\n" if boundary_fixture else ""
-    write(
-        path,
-        f"""---
-name: fixture-reference-model
-description: A fixture Process Reference Model.
-metadata:
-  alps.kind: process-reference-model
----
-
-# Fixture Reference Model
-
-## Purpose
-
-The fixture defines two reference Processes.
-
-## Processes
-
-{entry} One
-
-{purpose_heading} Purpose
-
-One purpose.
-
-{custom}
-{child} Outcomes
-
-- One is achieved.
-
-{first_reference}
-
-{entry} Two
-
-{child} Purpose
-
-Two purpose.
-
-{child} Outcomes
-
-- Two is achieved.
-
-`skill:#two`
-
-## Relationships
-
-| Provider Process | Information | Recipient Process | Relationship |
-| --- | --- | --- | --- |
-| One | information | Two | relates the Processes. |
-{tail}""",
-    )
-    return path
-
-
-def process_view(root: Path, sources: str, included: str) -> Path:
-    path = root / "skills" / "fixture-view" / "SKILL.md"
-    write(
-        path,
-        """---
-name: fixture-view
-description: A fixture Process View.
-metadata:
-  alps.kind: process-view
----
-
-# Fixture View
-
-## Purpose
-
-The fixture organizes source Processes.
-
-## Outcomes
-
-- The source Processes are represented.
-
-## Source Processes
-
-"""
-        + sources
-        + """
-
-## Included Activities and Tasks
-
-"""
-        + included
-        + """
-
-## Application
-
-The fixture provides application guidance.
-""",
-    )
-    return path
-
-
-def check_view_fixture(sources: str, included: str) -> list[str]:
-    with tempfile.TemporaryDirectory() as directory:
-        root = Path(directory)
-        process_skill(root, "one", "One")
-        process_skill(root, "two", "Two")
-        path = process_view(root, sources, included)
-        errors, _ = CHECKER.check_asset(path, {"": root}, None)
-        return errors
-
-
-def write_process_view_pair(
-    root: Path,
-    english_included: str,
-    japanese_included: str,
-) -> tuple[Path, Path]:
-    english = root / "view" / "SKILL.md"
-    japanese = english.parent / "references" / "locales" / "ja" / "SKILL.md"
-    write(
-        english,
-        """---
-name: fixture-view
-description: Fixture Process View.
-metadata:
-  alps.kind: process-view
----
-
-# Fixture View
-
-## Purpose
-
-The fixture organizes source Processes.
-
-## Outcomes
-
-- The source Processes are represented.
-
-## Source Processes
-
-- One
-- Two
-
-## Included Activities and Tasks
-
-"""
-        + english_included
-        + """
-
-## Application
-
-The fixture provides application guidance.
-""",
-    )
-    write(
-        japanese,
-        """---
-name: fixture-view
-description: フィクスチャのプロセスビュー。
-metadata:
-  alps.kind: process-view
----
-
-# フィクスチャビュー
-
-## 目的
-
-出典プロセスを整理する。
-
-## 成果
-
-- 出典プロセスを表現する。
-
-## 出典プロセス
-
-- 一
-- 二
-
-## 含まれる活動およびタスク
-
-"""
-        + japanese_included
-        + """
-
-## 適用
-
-フィクスチャを適用できる。
-""",
-    )
-    return english, japanese
-
-
-def check_anchored_view_fixture(complete: bool) -> tuple[str, list[str]]:
-    with tempfile.TemporaryDirectory() as directory:
-        root = Path(directory)
-        process_skill(root, "one", "One")
-        process_skill(root, "two", "Two")
-        if complete:
-            path = process_view(
-                root,
-                "- One (`skill:#one`)\n- Two (`skill:#two`)",
-                """| Source Process | Source element |
-| --- | --- |
-| One (`skill:#one`) | Activity |
-| Two (`skill:#two`) | Task |""",
-            )
-            write(
-                path,
-                path.read_text(encoding="utf-8").replace(
-                    "metadata:\n",
-                    "metadata: &representation\n",
-                ),
-            )
-        else:
-            path = root / "skills" / "fixture-view" / "SKILL.md"
-            write(
-                path,
-                """---
-name: fixture-view
-description: A fixture Process View.
-metadata: &representation
-  alps.kind: process-view
----
-
-# Fixture View
-
-## Purpose
-
-The fixture organizes source Processes.
-
-## Outcomes
-
-- The source Processes are represented.
-""",
-            )
-        errors, _ = CHECKER.check_asset(path, {"": root}, None)
-        return CHECKER.representation_kind(path), errors
-
-
-def write_process_model_pair(
-    root: Path,
-    japanese_relationships: str,
-    english_relationships: str = "- One -> Two",
-) -> tuple[Path, Path]:
-    english = root / "model" / "SKILL.md"
-    japanese = english.parent / "references" / "locales" / "ja" / "SKILL.md"
-    write(
-        english,
-        """---
-name: fixture-process-model
-description: Fixture Process Model.
-metadata:
-  alps.kind: process-model
----
-
-# Fixture Process Model
-
-## Purpose
-
-The fixture organizes two Processes.
-
-## Processes
-
-- One
-- Two
-
-## Relationships
-
-"""
-        + english_relationships
-        + """
-
-## Application
-
-The fixture is applicable.
-""",
-    )
-    write(
-        japanese,
-        """---
-name: fixture-process-model
-description: フィクスチャのプロセスモデル。
-metadata:
-  alps.kind: process-model
----
-
-# フィクスチャプロセスモデル
-
-## 目的
-
-二つのプロセスを整理する。
-
-## プロセス
-
-- 一
-- 二
-
-## 関係
-
-"""
-        + japanese_relationships
-        + """
-
-## 適用
-
-フィクスチャを適用できる。
-""",
-    )
-    return english, japanese
-
-
-def write_table_process_model_pair(
-    root: Path,
-    japanese_relationships: str,
-    english_relationships: str = "- One -> Two",
-) -> tuple[Path, Path]:
-    english, japanese = write_process_model_pair(
-        root, japanese_relationships, english_relationships
-    )
-    write(
-        english,
-        english.read_text(encoding="utf-8").replace(
-            "## Processes\n\n- One\n- Two",
-            "## Processes\n\n"
-            "| Process | Skill |\n"
-            "| --- | --- |\n"
-            "| One | `skill:#one` |\n"
-            "| Two | `skill:#two` |",
-        ),
-    )
-    write(
-        japanese,
-        japanese.read_text(encoding="utf-8").replace(
-            "## プロセス\n\n- 一\n- 二",
-            "## プロセス\n\n"
-            "| プロセス | スキル |\n"
-            "| --- | --- |\n"
-            "| 一 | `skill:#one` |\n"
-            "| 二 | `skill:#two` |",
-        ),
-    )
-    return english, japanese
-
-
-def write_reference_model_pair(
-    root: Path,
-    japanese_relationships: str,
-) -> tuple[Path, Path]:
-    english = root / "fixture" / "SKILL.md"
-    japanese = english.parent / "references" / "locales" / "ja" / "SKILL.md"
-    skill_ref = chr(96) + "skill:#" + "{}" + chr(96)
-    write(
-        english,
-        """---
-name: fixture-reference-model
-description: Fixture Process Reference Model.
-metadata:
-  alps.kind: process-reference-model
----
-
-# Fixture Reference Model
-
-## Purpose
-
-The fixture defines two Processes.
-
-## Processes
-
-### Define ALPS
-
-Skill: """
-        + skill_ref.format("define-alps")
-        + """
-
-#### Purpose
-
-Define purpose.
-
-#### Outcomes
-
-- Define is achieved.
-
-### Apply ALPS
-
-Skill: """
-        + skill_ref.format("apply-alps")
-        + """
-
-#### Purpose
-
-Apply purpose.
-
-#### Outcomes
-
-- Apply is achieved.
-
-## Relationships
-
-| Provider Process | Information | Recipient Process | Relationship |
-| --- | --- | --- | --- |
-| Define ALPS | information | Apply ALPS | relates the Processes. |
-
-## Application
-
-The fixture is applicable.
-""",
-    )
-    write(
-        japanese,
-        """---
-name: fixture-reference-model
-description: フィクスチャのプロセス参照モデル。
-metadata:
-  alps.kind: process-reference-model
----
-
-# フィクスチャ参照モデル
-
-## 目的
-
-二つのプロセスを定める。
-
-## プロセス
-
-### ALPS定義
-
-スキル: """
-        + skill_ref.format("define-alps")
-        + """
-
-#### 目的
-
-定義目的。
-
-#### 成果
-
-- 定義が達成されている。
-
-### ALPS適用
-
-スキル: """
-        + skill_ref.format("apply-alps")
-        + """
-
-#### 目的
-
-適用目的。
-
-#### 成果
-
-- 適用が達成されている。
-
-## 関係
-
-"""
-        + japanese_relationships
-        + """
-
-## 適用
-
-フィクスチャを適用できる。
-""",
-    )
-    return english, japanese
-
-
-class CheckerRegressionTests(unittest.TestCase):
-    def test_table_tokenizer_honors_escape_parity_and_exact_code_run(self) -> None:
-        self.assertEqual(
-            CHECKER.table_row_cells(r"| left | A \| B | right |"),
-            ["left", r"A \| B", "right"],
+    def test_profile_version_and_diagnostic_rendered_contract(self) -> None:
+        self.assertEqual(CHECKER.PROFILE_VERSION, "alps-repository-checker/v1")
+        diagnostic = CHECKER.Diagnostic(
+            "unsupported-profile-syntax", "tab-heading", Severity.ERROR,
+            "fixture.md", 12, "headings require one ASCII space",
         )
         self.assertEqual(
-            CHECKER.table_row_cells(r"| left | A \\| B | right |"),
-            ["left", "A " + chr(92) + chr(92), "B", "right"],
+            diagnostic.render(),
+            "fixture.md:12: error unsupported-profile-syntax/tab-heading: headings require one ASCII space",
         )
-        self.assertEqual(
-            CHECKER.table_row_cells(r"| left | ``A | B`` | right |"),
-            ["left", "``A | B``", "right"],
+        warning = CHECKER.Diagnostic(
+            "quality-review", "outcome-recorded-language", Severity.WARNING,
+            "fixture.md", None, "review wording",
         )
-        self.assertEqual(
-            CHECKER.table_row_cells(r"| left | ```A | B`` | right |"),
-            ["left", "```A | B`` | right |"],
+        self.assertEqual(warning.render(), "fixture.md: warning quality-review/outcome-recorded-language: review wording")
+
+    def test_canonical_english_japanese_and_kind_fixtures_produce_ir(self) -> None:
+        cases = (
+            ("process", "en", False, _process_body("en"), ("purpose", "outcomes", "activities")),
+            ("process", "ja", False, _process_body("ja"), ("purpose", "outcomes", "activities")),
+            ("process-model", "en", True, _model_body("en"), ("purpose", "processes", "relationships")),
+            ("process-model", "ja", True, _model_body("ja"), ("purpose", "processes", "relationships")),
+            ("process-reference-model", "en", True, _reference_model_body("en"), ("purpose", "processes", "relationships")),
+            ("process-reference-model", "ja", True, _reference_model_body("ja"), ("purpose", "processes", "relationships")),
+            ("process-view", "en", True, _view_body("en"), ("purpose", "outcomes", "source", "included", "application")),
+            ("process-view", "ja", True, _view_body("ja"), ("purpose", "outcomes", "source", "included", "application")),
         )
+        with _temp_root() as root:
+            for kind, locale, metadata, body, section_keys in cases:
+                with self.subTest(kind=kind, locale=locale):
+                    name = f"fixture-{kind}-{locale}"
+                    result = _parse(root, _asset(name, kind, locale, body, metadata=metadata), locale=locale, name=name)
+                    self.assert_no_errors(result)
+                    self.assertIsNotNone(result.ir)
+                    self.assertEqual(result.frontmatter.name, name)
+                    self.assertEqual(result.frontmatter.kind, kind)
+                    self.assertEqual(result.ir.locale, locale)
+                    self.assertEqual(result.ir.kind, kind)
+                    self.assertEqual(tuple(section.key for section in result.ir.sections), section_keys)
+                    self.assertEqual(result.ir.purpose is not None, True)
+                    if kind == "process":
+                        self.assertEqual(len(result.ir.outcomes), 1)
+                        self.assertEqual(len(result.ir.activities), 1)
+                        self.assertEqual(len(result.ir.activities[0].tasks), 1)
+                    elif kind == "process-model":
+                        self.assertEqual(tuple(item.name for item in result.ir.processes), ("Alpha", "Beta") if locale == "en" else ("アルファ", "ベータ"))
+                        self.assertEqual(len(result.ir.relationships), 1)
+                    elif kind == "process-reference-model":
+                        self.assertEqual(len(result.ir.processes), 2)
+                        self.assertEqual(tuple(len(item.outcomes) for item in result.ir.processes), (1, 1))
+                    else:
+                        self.assertEqual(len(result.ir.source_processes), 2)
+                        self.assertEqual(len(result.ir.included_activities_tasks), 2)
+                        self.assertEqual(len(result.ir.application), 1)
 
-    def test_process_model_accepts_escaped_and_inline_code_pipes(self) -> None:
-        escaped = r"""| Provider | Information | Recipient | Relationship |
-| --- | --- | --- | --- |
-| One | A \| B | Two | relates the Processes. |"""
-        inline = """| Provider | Information | Recipient | Relationship |
-| --- | --- | --- | --- |
-| One | `A | B` | Two | relates the Processes. |"""
-        self.assertEqual(check_model(escaped), [])
-        self.assertEqual(check_model(inline), [])
-
-    def test_table_accepts_outer_and_unpiped_gfm_rows(self) -> None:
-        outer = """| Provider | Information | Recipient | Relationship |
-| :--- | :---: | ---: | --- |
-| One | information | Two | relates the Processes. |"""
-        unpiped = """Provider | Information | Recipient | Relationship
-:--- | :---: | ---: | ---
-One | information | Two | relates the Processes."""
-        leading_only = """| Provider | Information | Recipient | Relationship
-| :--- | :---: | ---: | ---
-| One | information | Two | relates the Processes. |"""
-        trailing_only = """Provider | Information | Recipient | Relationship |
-:--- | :---: | ---: | ---: |
-One | information | Two | relates the Processes. |"""
-        self.assertEqual(CHECKER.table(outer), CHECKER.table(unpiped))
-        self.assertEqual(CHECKER.table(outer), CHECKER.table(leading_only))
-        self.assertEqual(CHECKER.table(outer), CHECKER.table(trailing_only))
-        self.assertEqual(check_model(outer), [])
-        self.assertEqual(check_model(unpiped), [])
-        self.assertEqual(check_model(leading_only), [])
-        self.assertEqual(check_model(trailing_only), [])
-
-    def test_table_ignores_unrelated_pipe_prose_around_contiguous_block(self) -> None:
-        text = """Unrelated | prose
-Provider | Information | Recipient | Relationship
---- | --- | --- | ---
-One | information | Two | relates the Processes.
-Unrelated prose"""
-        header, rows = CHECKER.table(text)
-        self.assertEqual(
-            header,
-            ["Provider", "Information", "Recipient", "Relationship"],
+    def test_typed_ir_snapshot_keeps_spans_identities_and_roles(self) -> None:
+        body = _process_body(
+            "en",
+            outcome_lines=("The outcome `skill:#alpha` is ready.",),
+            task_lines=("The agent must inspect the input.",),
         )
-        self.assertEqual(
-            rows,
-            [["One", "information", "Two", "relates the Processes."]],
+        with _temp_root() as root:
+            result = _parse(root, _asset("snapshot-process", "process", "en", body, metadata=False), locale="en", name="snapshot-process")
+            self.assert_no_errors(result)
+            ir = result.ir
+            snapshot = asdict(ir)
+            json.dumps(snapshot, ensure_ascii=False)
+            self.assertEqual(snapshot["locale"], "en")
+            self.assertEqual(snapshot["kind"], "process")
+            self.assertEqual([item["key"] for item in snapshot["sections"]], ["purpose", "outcomes", "activities"])
+            self.assertEqual(snapshot["outcomes"][0]["identity"], "`skill:#alpha`")
+            self.assertEqual(snapshot["activities"][0]["tasks"][0]["normative_class"], "must")
+            self.assertEqual(ir.frontmatter.name_span.line, 2)
+            self.assertEqual(ir.frontmatter.name_span.column, len("name: "))
+            self.assertEqual(ir.sections[0].span.line, 7)
+            self.assertEqual(ir.outcomes[0].references[0].span.line, ir.outcomes[0].line)
+            self.assertEqual(ir.outcomes[0].references[0].token, "`skill:#alpha`")
+
+            model = _parse(root, _asset("snapshot-model", "process-model", "en", _model_body()), name="snapshot-model")
+            self.assert_no_errors(model)
+            self.assertEqual(tuple(item.name for item in model.ir.processes), ("Alpha", "Beta"))
+            self.assertEqual(model.ir.processes[0].reference.skill_name, "alpha")
+            self.assertEqual(model.ir.relationships[0].provider_process, "Alpha")
+
+            view = _parse(root, _asset("snapshot-view", "process-view", "en", _view_body()), name="snapshot-view")
+            self.assert_no_errors(view)
+            self.assertEqual(view.ir.source_processes[0].reference.token, "`skill:#alpha`")
+            self.assertEqual(view.ir.included_activities_tasks[0].kind, "activity")
+
+    def test_document_reference_aggregation_is_unique_without_collapsing_record_order(self) -> None:
+        process = _process_body(
+            outcome_lines=("The outcome `skill:#alpha` and `skill:#alpha` is ready.",),
+            task_lines=("The agent must inspect `skill:#alpha` and `skill:#alpha`.",),
         )
-
-    def test_table_stops_before_blank_and_second_table(self) -> None:
-        text = """Provider | Information | Recipient | Relationship
---- | --- | --- | ---
-One | information | Two | relates the Processes.
-
-Second Provider | Information | Second Recipient | Relationship
---- | --- | --- | ---
-Three | information | Four | relates the Processes."""
-        header, rows = CHECKER.table(text)
-        self.assertEqual(
-            header,
-            ["Provider", "Information", "Recipient", "Relationship"],
-        )
-        self.assertEqual(
-            rows,
-            [["One", "information", "Two", "relates the Processes."]],
-        )
-
-    def test_markdown_tables_pad_short_rows_without_absorbing_prose_or_extra_cells(self) -> None:
-        text = """| Provider | Information | Recipient | Relationship |
-| --- | --- | --- | --- |
-| One | information |
-| Two | information | One | relates the Processes. |
-| Three | information |
-Four | information
-
-Unrelated prose
-
-Second Provider | Information | Second Recipient | Relationship
---- | --- | --- | ---
-Four | information | Three | relates the Processes.
-| Five | information | Four |
-| Six | information | Five | relates the Processes. | extra |
-"""
-        tables = CHECKER.markdown_tables(text)
-        self.assertEqual(len(tables), 2)
-        self.assertEqual(
-            tables[0][1],
-            [
-                ["One", "information", "", ""],
-                ["Two", "information", "One", "relates the Processes."],
-                ["Three", "information", "", ""],
-                ["Four", "information", "", ""],
-            ],
-        )
-        self.assertEqual(
-            tables[1][1],
-            [
-                ["Four", "information", "Three", "relates the Processes."],
-                ["Five", "information", "Four", ""],
-            ],
-        )
-        errors = check_model(
-            """| Provider | Information | Recipient | Relationship |
-| --- | --- | --- | --- |
-| One | information | Two | relates the Processes. |
-One | information
-"""
-        )
-        self.assertTrue(
-            any("recipient Process" in error for error in errors),
-            errors,
-        )
-
-    def test_process_model_pair_sees_short_relationship_row_omission(self) -> None:
-        english = """| Provider Process | Information | Recipient Process | Relationship |
-| --- | --- | --- | --- |
-| One | information | Two | relates the Processes. |
-One | information
-"""
-        japanese = """提供側プロセス | 情報 | 受領側プロセス | 関係
---- | --- | --- | ---
-一 | 情報 | 二 | プロセス間の関係。
-"""
-        with tempfile.TemporaryDirectory() as directory:
-            english_path, japanese_path = write_process_model_pair(
-                Path(directory), japanese, english
-            )
-            errors, _ = CHECKER.check_pair(
-                english_path,
-                japanese_path,
-                set(CHECKER.DEFAULT_JA_TERMS),
-                "fixture",
-            )
-            self.assertTrue(
-                any("Relationship count differs" in error for error in errors),
-                errors,
-            )
-
-    def test_process_model_checks_canonical_endpoint_display_name(self) -> None:
-        invalid = """| Provider | Information | Recipient | Relationship |
-| --- | --- | --- | --- |
-| Missing (`skill:#one`) | information | Two | relates the Processes. |"""
-        errors = check_model(invalid)
-        self.assertTrue(any("differs from referenced Process 'One'" in error for error in errors), errors)
-        valid = """| Provider | Information | Recipient | Relationship |
-| --- | --- | --- | --- |
-| One (`skill:#one`) | information | skill:#two | relates the Processes. |"""
-        self.assertEqual(check_model(valid), [])
-
-    def test_process_model_rejects_multiple_canonical_endpoint_references(self) -> None:
-        relationships = """| Provider | Information | Recipient | Relationship |
-| --- | --- | --- | --- |
-| One (`skill:#one` `skill:#two`) | information | Two | relates the Processes. |"""
-        errors = check_model(relationships)
-        self.assertTrue(any("at most one canonical Skill reference" in error for error in errors), errors)
-
-    def test_process_reference_model_checks_canonical_endpoint_display_name(self) -> None:
-        invalid = """| Provider | Information | Recipient | Relationship |
-| --- | --- | --- | --- |
-| Missing (`skill:#one`) | information | Two | relates the Processes. |"""
-        errors = check_reference_model_fixture(invalid)
-        self.assertTrue(any("differs from referenced Process 'One'" in error for error in errors), errors)
-        valid = """| Provider | Information | Recipient | Relationship |
-| --- | --- | --- | --- |
-| One (`skill:#one`) | information | skill:#two | relates the Processes. |"""
-        self.assertEqual(check_reference_model_fixture(valid), [])
-
-    def test_process_reference_model_accepts_entry_heading_levels_three_to_five(self) -> None:
-        for entry_level in (3, 4, 5):
-            with self.subTest(entry_level=entry_level), tempfile.TemporaryDirectory() as directory:
-                root = Path(directory)
-                reference_process_skill(root, "one", "One")
-                reference_process_skill(root, "two", "Two")
-                path = process_reference_model_with_heading_level(root, entry_level)
-                errors, _ = CHECKER.check_asset(path, {"": root}, None)
-                self.assertEqual(errors, [], (entry_level, errors))
-
-    def test_process_reference_model_keeps_deeper_custom_headings_in_entry_body(self) -> None:
-        for entry_level in (3, 4):
-            with self.subTest(entry_level=entry_level), tempfile.TemporaryDirectory() as directory:
-                root = Path(directory)
-                reference_process_skill(root, "one", "One")
-                reference_process_skill(root, "two", "Two")
-                path = process_reference_model_with_heading_level(
-                    root,
-                    entry_level,
-                    custom_heading_level=5,
-                )
-                errors, _ = CHECKER.check_asset(path, {"": root}, None)
-                self.assertEqual(errors, [], (entry_level, errors))
-
-    def test_process_reference_model_rejects_malformed_child_level_and_ignores_fake_headings(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            reference_process_skill(root, "one", "One")
-            reference_process_skill(root, "two", "Two")
-            malformed = process_reference_model_with_heading_level(root, 4, malformed=True)
-            errors, _ = CHECKER.check_asset(malformed, {"": root}, None)
-            self.assertTrue(
-                any("One: non-empty Purpose and Outcomes are required" in error for error in errors),
-                errors,
-            )
-
-            valid = process_reference_model_with_heading_level(
-                root,
-                5,
-                boundary_fixture=True,
-            )
-            fence = chr(96) * 3
-            content = valid.read_text(encoding="utf-8").replace(
-                chr(96) + "skill:#one" + chr(96) + "\n\n",
-                (
-                    chr(96) + "skill:#one" + chr(96) + "\n\n"
-                    "The prose mentions ### Fake but is not a heading.\n\n"
-                    "<!--\n### Comment fake\n-->\n\n"
-                    + fence + "markdown\n### Code fake\n" + fence + "\n\n"
-                ),
-            )
-            write(valid, content)
-            errors, _ = CHECKER.check_asset(valid, {"": root}, None)
-            self.assertEqual(errors, [], errors)
-
-    def test_process_view_checks_source_list_display_name(self) -> None:
-        invalid_sources = "- Missing (`skill:#one`)\n- Two (`skill:#two`)"
-        included = """| Source Process | Source element |
-| --- | --- |
-| Missing (`skill:#one`) | Activity |
-| Two (`skill:#two`) | Task |"""
-        errors = check_view_fixture(invalid_sources, included)
-        self.assertTrue(any("source entry 1" in error and "differs from referenced Process 'One'" in error for error in errors), errors)
-        valid_sources = "- One\n- skill:#one\n- skill:#two"
-        valid_included = """| Source Process | Source element |
-| --- | --- |
-| One (`skill:#one`) | Activity |
-| skill:#two | Task |"""
-        self.assertEqual(check_view_fixture(valid_sources, valid_included), [])
-
-    def test_process_view_pair_compares_structured_non_table_included_elements(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            english, japanese = write_process_view_pair(
-                Path(directory),
-                "- Activity: Work\n- Task: Review",
-                "- 活動: 作業\n- タスク: 確認",
+        with _temp_root() as root:
+            parsed = _parse(root, _asset("reference-aggregation", "process", "en", process), name="reference-aggregation")
+            self.assert_no_errors(parsed)
+            self.assertEqual(
+                tuple(reference.token for reference in parsed.ir.outcomes[0].references),
+                ("`skill:#alpha`", "`skill:#alpha`"),
             )
             self.assertEqual(
-                CHECKER.check_asset(english, {"": root}, "fixture")[0],
-                [],
+                tuple(reference.token for reference in parsed.ir.activities[0].tasks[0].references),
+                ("`skill:#alpha`", "`skill:#alpha`"),
             )
+            self.assertEqual(tuple(reference.token for reference in parsed.ir.references), ("`skill:#alpha`",))
+
+            view_body = _view_body().replace("Apply this view.", "Apply `skill:#alpha` and `skill:#alpha`.")
+            view = _parse(root, _asset("reference-application", "process-view", "en", view_body), name="reference-application")
+            self.assert_no_errors(view)
             self.assertEqual(
-                CHECKER.check_asset(japanese, {"": root}, "fixture")[0],
-                [],
+                tuple(reference.token for reference in view.ir.application[0].references),
+                ("`skill:#alpha`", "`skill:#alpha`"),
             )
-            errors, warnings = CHECKER.check_pair(
-                english,
-                japanese,
-                set(CHECKER.DEFAULT_JA_TERMS),
-                "fixture",
+            aggregate_tokens = tuple(reference.token for reference in view.ir.references)
+            self.assertEqual(len(aggregate_tokens), len(set(aggregate_tokens)))
+
+    def test_shipped_assets_parse_and_cli_default_requires_japanese(self) -> None:
+        shipped = sorted(ROOT.glob("skills/*/SKILL.md")) + sorted(ROOT.glob("skills/*/references/locales/ja/SKILL.md"))
+        self.assertEqual(len(shipped), 8)
+        for path in shipped:
+            with self.subTest(path=path.relative_to(ROOT).as_posix()):
+                result = CHECKER.parse_asset(path)
+                self.assert_no_errors(result)
+                self.assertIsNotNone(result.ir)
+
+        original = os.getcwd()
+        try:
+            os.chdir(ROOT)
+            for args in ((), ("--require-japanese",)):
+                with self.subTest(cli_args=args):
+                    stdout, stderr = io.StringIO(), io.StringIO()
+                    with redirect_stdout(stdout), redirect_stderr(stderr):
+                        status = CHECKER.main(list(args))
+                    self.assertEqual(status, 0, stderr.getvalue())
+                    self.assertIn("PROFILE_VERSION=alps-repository-checker/v1", stdout.getvalue())
+                    self.assertIn("not an ALPS Conformance claim", stdout.getvalue())
+        finally:
+            os.chdir(original)
+
+    def test_frontmatter_exact_order_fields_defaults_suffix_and_rejections(self) -> None:
+        base = _frontmatter("fixture", "process", "en", metadata=False)
+        metadata = _frontmatter("fixture", "process-view", "en")
+        cases = (
+            ("unknown", base.replace("\ndescription:", "\nextra: value\ndescription:", 1), "unknown-key", "unsupported-profile-syntax"),
+            ("duplicate", base.replace("description:", "name: other\ndescription:"), "duplicate-key", "unsupported-profile-syntax"),
+            ("missing-required", base.replace("description: Canonical process fixture. ALPS-conformant.\n", ""), "missing-field", "profile-structure"),
+            ("wrong-order", base.replace("name: fixture\ndescription:", "description: Canonical process fixture. ALPS-conformant.\nname: fixture\n#"), "field-order", "profile-structure"),
+            ("alias", metadata.replace("alps.kind: process-view", "alps.kind: *view"), "unsupported-scalar", "unsupported-profile-syntax"),
+            ("anchor", metadata.replace("alps.kind: process-view", "alps.kind: &view process-view"), "unsupported-scalar", "unsupported-profile-syntax"),
+            ("merge", metadata.replace("metadata:\n", "<<: *base\nmetadata:\n"), "unknown-key", "unsupported-profile-syntax"),
+            ("tag", metadata.replace("alps.kind: process-view", "alps.kind: !str process-view"), "unsupported-scalar", "unsupported-profile-syntax"),
+            ("flow", metadata.replace("alps.kind: process-view", "alps.kind: {kind: process-view}"), "unsupported-scalar", "unsupported-profile-syntax"),
+            ("block", base.replace("description: Canonical process fixture. ALPS-conformant.", "description: |"), "unsupported-scalar", "unsupported-profile-syntax"),
+            ("sequence", metadata.replace("alps.kind: process-view", "alps.kind: - process-view"), "unsupported-scalar", "unsupported-profile-syntax"),
+            ("quoted", base.replace("name: fixture", 'name: "fixture"'), "unsupported-scalar", "unsupported-profile-syntax"),
+            ("tab", base.replace("description:", "\tdescription:"), "tab-indentation", "unsupported-profile-syntax"),
+            ("continuation", base.replace("description: Canonical process fixture. ALPS-conformant.\n", "description: Canonical process fixture. ALPS-conformant.\n continuation\n"), "continuation-line", "unsupported-profile-syntax"),
+            ("wrong-indent", metadata.replace("  alps.kind:", "   alps.kind:"), "unknown-metadata-child", "unsupported-profile-syntax"),
+            ("empty-metadata", metadata.replace("  alps.kind: process-view\n", ""), "empty-metadata", "unsupported-profile-syntax"),
+        )
+        with _temp_root() as root:
+            for label, frontmatter, code, class_name in cases:
+                with self.subTest(case=label):
+                    result = _parse(root, frontmatter + _process_body(), name=f"frontmatter-{label}")
+                    self.assertIn(code, _codes(result))
+                    self.assertIn(class_name, _classes(result))
+
+            default = _parse(root, base + _process_body(), name="frontmatter-default")
+            self.assert_no_errors(default)
+            self.assertEqual(default.frontmatter.kind, "process")
+
+            japanese = _frontmatter("fixture", "process", "ja", metadata=False).replace("ALPS準拠。", "ALPS-conformant.")
+            japanese_path = _write(root, "references/locales/ja/suffix.md", japanese + _process_body("ja"))
+            checked = CHECKER.check_document(japanese_path, {"": root})
+            self.assertIn("description-suffix", _codes(checked))
+            self.assertTrue(any(item.class_name == "profile-structure" for item in checked.diagnostics))
+
+    def test_h1_h2_exact_grammar_order_duplicates_required_and_html_boundary(self) -> None:
+        canonical = _asset("heading", "process", "en", _process_body(), metadata=False)
+        replacements = (
+            ("setext-h1", "# Fixture Process\n", "Fixture Process\n===\n", "setext-heading"),
+            ("closing-h1", "# Fixture Process\n", "# Fixture Process ##\n", "closing-heading"),
+            ("indented-h1", "# Fixture Process\n", " # Fixture Process\n", "indented-container"),
+            ("h1-tab", "# Fixture Process\n", "#\tFixture Process\n", "literal-tab-h1"),
+            ("h7", "# Fixture Process\n", "####### Too Deep\n# Fixture Process\n", "heading-level"),
+            ("unknown-h2", "## Purpose\n", "## Unknown\n\n## Purpose\n", "unrecognized-h2"),
+            ("duplicate", "\n## Activities & Tasks\n", "\n## Activities & Tasks\n\n## Activities & Tasks\n", "duplicate-section"),
+            ("out-of-order", "## Purpose\n\n", "## Outcomes\n\n## Purpose\n\n", "section-order"),
+            ("missing-required", "## Outcomes\n", "", "missing-section"),
+        )
+        with _temp_root() as root:
+            for label, old, new, code in replacements:
+                with self.subTest(case=label):
+                    content = canonical.replace(old, new, 1)
+                    result = _parse(root, content, name=f"heading-{label}")
+                    self.assertIn(code, _codes(result))
+
+            html = canonical.replace(
+                "## Activities & Tasks\n",
+                "## Inputs\n\n<pre>\n# Fake H1\n## Outcomes\n- Fake outcome\n</pre>\n\n## Activities & Tasks\n",
             )
-            self.assertEqual(errors, [], errors)
-            self.assertEqual(warnings, [], warnings)
+            result = _parse(root, html, name="heading-html")
+            self.assertIn("raw-html", _codes(result))
+            self.assertEqual(result.ir.title, "Fixture Process")
+            self.assertEqual(len(result.ir.outcomes), 1)
+            self.assertEqual(len(result.ir.activities), 1)
 
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_process_view_pair(
-                Path(directory),
-                "### Activity: Work\n#### Task: Review",
-                "### 活動: 作業\n#### タスク: 確認",
+    def test_opaque_containers_are_hidden_and_boundaries_are_diagnostic(self) -> None:
+        opaque = _process_body() + _clean(
+            """
+                ## Inputs
+
+                Ordinary prose remains opaque.
+
+                ```markdown
+                # Fake H1
+                ### Fake Activity
+                1. Fake task must not enter the IR.
+                `skill:#hidden-fence`
+                ```
+
+                > ## Fake Blockquote
+                > - Fake outcome
+                > `skill:#hidden-quote`
+
+                <!--
+                ## Fake Comment
+                - Fake outcome
+                `skill:#hidden-comment`
+                -->
+            """
+        )
+        negative = (
+            ("unclosed-fence", opaque.replace("```\n\n> ## Fake", "```\n\n> ## Fake", 1).rsplit("```", 1)[0], "unclosed-fence"),
+            ("nested-fence", opaque.replace("```markdown", "- ```markdown", 1), "nested-container"),
+            ("indented-fence", opaque.replace("```markdown", "   ```markdown", 1), "indented-container"),
+            ("nested-blockquote", opaque.replace("> ## Fake Blockquote", "> > Fake Blockquote", 1), "nested-blockquote"),
+            ("indented-block", opaque.replace("> ## Fake Blockquote", "    ## Fake Blockquote", 1), "indented-container"),
+            ("unclosed-comment", opaque.replace("<!--\n", "<!--\n", 1).rsplit("-->\n", 1)[0], "unclosed-comment"),
+        )
+        with _temp_root() as root:
+            result = _parse(root, _asset("opaque", "process", "en", opaque, metadata=False), name="opaque")
+            self.assert_no_errors(result)
+            self.assertEqual(len(result.ir.outcomes), 1)
+            self.assertEqual(len(result.ir.activities), 1)
+            self.assertEqual(len(result.ir.activities[0].tasks), 1)
+            self.assertEqual(result.ir.references, ())
+            for label, body, code in negative:
+                with self.subTest(case=label):
+                    parsed = _parse(root, _asset(label, "process", "en", body, metadata=False), name=label)
+                    self.assertIn(code, _codes(parsed))
+
+    def test_process_outcome_activity_task_structure_and_normative_classes(self) -> None:
+        markers = (
+            ("en-must-not", "The agent must not skip this step.", "must-not"),
+            ("en-must", "The agent must inspect this step.", "must"),
+            ("en-should-not", "The agent should not skip this step.", "should-not"),
+            ("en-should", "The agent should inspect this step.", "should"),
+            ("en-may", "The agent may inspect this step.", "may"),
+            ("en-typically", "The agent typically inspects this step.", "typically"),
+            ("ja-must-not", "この手順を省略してはならない。", "must-not"),
+            ("ja-must", "この手順を実施する必要がある。", "must"),
+            ("ja-should-not", "この手順は避けるのが望ましい。", "should-not"),
+            ("ja-should", "この手順を行うのが望ましい。", "should"),
+            ("ja-may", "この手順を変更してもよい。", "may"),
+            ("ja-typically", "通常この手順を使う。", "typically"),
+            ("precedence-must-not", "The agent must not skip this step.", "must-not"),
+            ("precedence-should", "The agent must not skip; it should proceed.", "should"),
+            ("precedence-should-not", "The agent should not skip this step.", "should-not"),
+            ("precedence-must", "The agent should not skip; it must proceed.", "must"),
+        )
+        with _temp_root() as root:
+            for label, task, expected in markers:
+                locale = "ja" if label.startswith("ja-") else "en"
+                with self.subTest(case=label):
+                    parsed = _parse(
+                        root,
+                        _asset(label, "process", locale, _process_body(locale, task_lines=(task,)), metadata=False),
+                        locale=locale,
+                        name=label,
+                    )
+                    self.assert_no_errors(parsed)
+                    self.assertEqual(parsed.ir.activities[0].tasks[0].normative_class, expected)
+
+            continued = _process_body(
+                outcome_lines=("The outcome starts.",),
+                task_lines=("The agent must act.",),
+            ).replace("- The outcome starts.", "- The outcome starts.\n   and continues.")
+            continued = continued.replace("1. The agent must act.", "1. The agent must act.\n   with evidence.")
+            parsed = _parse(root, _asset("continuations", "process", "en", continued, metadata=False), name="continuations")
+            self.assert_no_errors(parsed)
+            self.assertEqual(parsed.ir.outcomes[0].text, "The outcome starts. and continues.")
+            self.assertEqual(parsed.ir.activities[0].tasks[0].text, "The agent must act. with evidence.")
+
+            syntax_cases = (
+                ("outcome-table", "- The result is ready.\n", "| Result |\n| --- |\n| ready |\n", "outcome-list-syntax"),
+                ("outcome-prose", "- The result is ready.\n", "The result is ready.\n", "outcome-list-missing"),
+                ("outcome-second-list", "- The result is ready.\n", "- The result is ready.\n\n- Another result.\n", "outcome-second-list"),
+                ("outcome-nested-list", "- The result is ready.\n", "- The result is ready.\n   - Nested result.\n", "indented-container"),
+                ("task-second-list", "1. The agent must act.\n", "1. The agent must act.\n\n2. The agent must record.\n", "task-second-list"),
+                ("task-nested-list", "1. The agent must act.\n", "1. The agent must act.\n   - Nested task.\n", "indented-container"),
+                ("h4-child", "### Inspect\n", "### Inspect\n\n#### Tasks\n\n", "activity-heading"),
             )
-            errors, warnings = CHECKER.check_pair(
-                english,
-                japanese,
-                set(CHECKER.DEFAULT_JA_TERMS),
-                "fixture",
+            for label, old, new, code in syntax_cases:
+                with self.subTest(case=label):
+                    source = _process_body(task_lines=("The agent must act.",)) if label.startswith("task-") else _process_body()
+                    body = source.replace(old, new, 1)
+                    parsed = _parse(root, _asset(label, "process", "en", body, metadata=False), name=label)
+                    self.assertIn(code, _codes(parsed))
+
+            quality = _parse(
+                root,
+                _asset("quality", "process", "en", _process_body(outcome_lines=("The result is recorded.",)), metadata=False),
+                name="quality",
             )
-            self.assertEqual(errors, [], errors)
-            self.assertEqual(warnings, [], warnings)
+            self.assertIn("outcome-recorded-language", _codes(quality))
+            self.assertIn("quality-review", _classes(quality))
+            self.assertFalse(any(item.severity is Severity.ERROR for item in quality.diagnostics))
 
-        for english_included, japanese_included, expected in (
-            (
-                "- Activity: Work\n- Task: Review",
-                "- 活動: 作業",
-                "included Activity/Task count differs",
-            ),
-            (
-                "- Activity: Work\n    - Task: Review",
-                "- 活動: 作業",
-                "included Activity/Task count differs",
-            ),
-            (
-                "- Activity: Work\n- Task: Review",
-                "- タスク: 確認\n- 活動: 作業",
-                "included Activity/Task kind/order differs",
-            ),
-        ):
-            with self.subTest(expected=expected), tempfile.TemporaryDirectory() as directory:
-                english, japanese = write_process_view_pair(
-                    Path(directory), english_included, japanese_included
-                )
-                errors, _ = CHECKER.check_pair(
-                    english,
-                    japanese,
-                    set(CHECKER.DEFAULT_JA_TERMS),
-                    "fixture",
-                )
-                self.assertTrue(any(expected in error for error in errors), errors)
+            control_body = _process_body(extra="\n## Inputs\n\nApplicable Controls are listed here.\n")
+            control = _parse(root, _asset("control", "process", "en", control_body, metadata=False), name="control")
+            self.assertIn("input-classified-control", _codes(control))
+            self.assertIn("semantic", _classes(control))
 
-    def test_outcome_items_merge_mixed_forms_in_order_and_mask_code(self) -> None:
-        table = """| Outcome | Reference |
-| --- | --- |
-| First | `skill:#one` |
-| Second | `skill:#two` |"""
-        mixed = (
-            table
-            + "\n\n- Third (`skill:#three`)\n\n"
-            + "<!-- - Hidden -->\n\n"
-            + "```markdown\n"
-            + table
-            + "\n- Missing (`skill:#does-not-exist`)\n```")
-        self.assertEqual(
-            CHECKER.outcome_items(mixed),
-            [
-                "First | `skill:#one`",
-                "Second | `skill:#two`",
-                "Third (`skill:#three`)",
-            ],
+
+    def test_required_prose_rejects_headings_for_all_kinds_and_view_application(self) -> None:
+        purpose_cases = (
+            ("process", _process_body(), "Defines the purpose of this fixture."),
+            ("process-model", _model_body(), "Organizes related Processes."),
+            ("process-reference-model", _reference_model_body(), "Organizes Process semantic centers."),
+            ("process-view", _view_body(), "Presents Processes through one concern."),
         )
-        self.assertEqual(
-            CHECKER.outcome_items(table),
-            ["First | `skill:#one`", "Second | `skill:#two`"],
-        )
-        self.assertEqual(CHECKER.outcome_items("- First\n- Second"), ["First", "Second"])
-        self.assertEqual(
-            CHECKER.outcome_items("First outcome.\n\nSecond outcome."),
-            ["First outcome.", "Second outcome."],
-        )
-        self.assertEqual(
-            CHECKER.outcome_items(table + "\n\nCategory label prose."),
-            ["First | `skill:#one`", "Second | `skill:#two`"],
-        )
+        with _temp_root() as root:
+            for kind, body, purpose in purpose_cases:
+                for variant, replacement in (
+                    ("heading-only", "### Hidden Purpose\n"),
+                    ("heading-plus-prose", "### Hidden Purpose\n\n" + purpose),
+                ):
+                    with self.subTest(kind=kind, purpose_variant=variant):
+                        parsed = _parse(
+                            root,
+                            _asset(f"required-purpose-{kind}-{variant}", kind, "en", body.replace(purpose, replacement, 1)),
+                            name=f"required-purpose-{kind}-{variant}",
+                        )
+                        self.assertIn("required-prose-heading", _codes(parsed))
+                        if variant == "heading-only":
+                            self.assertIn("purpose-empty", _codes(parsed))
+                        else:
+                            self.assertEqual(parsed.ir.purpose, purpose)
 
-    def test_process_view_pair_compares_mixed_outcome_entries(self) -> None:
-        english_outcomes = """| Outcome | Reference |
-| --- | --- |
-| First | `skill:#one` |
+            entry_body = _reference_model_body().replace(
+                "Define Alpha.", "##### Hidden Entry Purpose\n\nDefine Alpha.", 1
+            )
+            entry = _parse(
+                root,
+                _asset("required-entry-purpose", "process-reference-model", "en", entry_body),
+                name="required-entry-purpose",
+            )
+            self.assertIn("required-prose-heading", _codes(entry))
 
-- Second (`skill:#two`)"""
-        japanese_outcomes = """| 成果 | 参照 |
-| --- | --- |
-| 一つ目 | `skill:#one` |
-
-- 二つ目 (`skill:#two`)"""
-
-        def install_outcomes(
-            english: Path, japanese: Path, en_value: str, ja_value: str
-        ) -> None:
-            for path, heading, next_heading, value in (
-                (english, "## Outcomes\n\n", "\n\n## Source Processes", en_value),
-                (japanese, "## 成果\n\n", "\n\n## 出典プロセス", ja_value),
+            for variant, replacement in (
+                ("heading-only", "### Hidden Application\n"),
+                ("heading-plus-prose", "### Hidden Application\n\nApply this view."),
             ):
-                text = path.read_text(encoding="utf-8")
-                prefix, remainder = text.split(heading, 1)
-                _, suffix = remainder.split(next_heading, 1)
-                write(path, prefix + heading + value + next_heading + suffix)
+                with self.subTest(application_variant=variant):
+                    body = _view_body().replace("Apply this view.", replacement, 1)
+                    parsed = _parse(
+                        root,
+                        _asset(f"required-application-{variant}", "process-view", "en", body),
+                        name=f"required-application-{variant}",
+                    )
+                    self.assertIn("required-prose-heading", _codes(parsed))
+                    if variant == "heading-only":
+                        self.assertIn("application-empty", _codes(parsed))
+                    else:
+                        self.assertEqual(parsed.ir.application[0].text, "Apply this view.")
 
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_process_view_pair(
-                Path(directory), "- Activity: Work", "- 活動: 作業"
-            )
-            install_outcomes(english, japanese, english_outcomes, japanese_outcomes)
-            errors, _ = CHECKER.check_pair(
-                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
-            )
-            self.assertEqual(errors, [], errors)
+    def test_decimal_task_marker_is_bounded_without_internal_failure(self) -> None:
+        huge_marker = "9" * 5000
+        body = _process_body().replace(
+            "1. The agent must inspect the input.",
+            f"{huge_marker}. The agent must inspect the input.",
+            1,
+        )
+        with _temp_root() as root:
+            path = _write(root, "huge-task-marker.md", _asset("huge-task-marker", "process", "en", body))
+            checked = CHECKER.check_document(path, {"": root})
+            self.assertEqual(checked.exit_status, 1)
+            self.assertIn("task-list-start", _codes(checked))
+            self.assertNotIn("internal", _classes(checked))
 
-            install_outcomes(
-                english,
-                japanese,
-                english_outcomes,
-                "- 二つ目\n\n" + japanese_outcomes.split("\n\n", 1)[0],
-            )
-            errors, _ = CHECKER.check_pair(
-                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
-            )
-            self.assertTrue(any("Outcome kind/order differs" in error for error in errors), errors)
 
-            install_outcomes(english, japanese, english_outcomes, japanese_outcomes.split("\n\n", 1)[0])
-            errors, _ = CHECKER.check_pair(
-                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
-            )
-            self.assertTrue(any("Outcome count differs" in error for error in errors), errors)
+class CheckerProfileMilestoneBTests(unittest.TestCase):
+    @staticmethod
+    def _roots(root: Path, qualified: bool = False) -> dict[str, Path]:
+        return {"mashimashica/alps": root} if qualified else {"": root}
 
-            install_outcomes(
-                english,
-                japanese,
-                english_outcomes,
-                japanese_outcomes.replace(
-                    "- 二つ目 (`skill:#two`)", "- 一つ目 (`skill:#one`)"
-                ),
-            )
-            errors, _ = CHECKER.check_pair(
-                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
-            )
-            self.assertTrue(
-                any("Outcome reference identity or order differs" in error for error in errors),
-                errors,
-            )
+    @staticmethod
+    def _qualified(body: str) -> str:
+        return body.replace("skill:#", "skill:mashimashica/alps#")
 
-    def test_process_view_pair_counts_keyword_free_tasks_under_activity_headings(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_process_view_pair(
-                Path(directory),
-                "### Activity: Work\n- Review inputs",
-                "### 活動: 作業\n- 入力を確認",
-            )
-            errors, warnings = CHECKER.check_pair(
-                english,
-                japanese,
-                set(CHECKER.DEFAULT_JA_TERMS),
-                "fixture",
-            )
-            self.assertEqual(errors, [], errors)
-            self.assertEqual(warnings, [], warnings)
-
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_process_view_pair(
-                Path(directory),
-                "### Work\n- Review inputs\n- Confirm output",
-                "### 作業\n- 出力を確認",
-            )
-            errors, _ = CHECKER.check_pair(
-                english,
-                japanese,
-                set(CHECKER.DEFAULT_JA_TERMS),
-                "fixture",
-            )
-            self.assertTrue(
-                any("included Activity/Task count differs" in error for error in errors),
-                errors,
-            )
-
-    def test_process_view_accepts_valid_non_table_canonical_inclusions(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            process_skill(root, "one", "One")
-            process_skill(root, "two", "Two")
-            path = process_view(
+    @staticmethod
+    def _write_targets(
+        root: Path,
+        *,
+        japanese: bool = True,
+        titles: dict[str, str] | None = None,
+        japanese_titles: dict[str, str] | None = None,
+    ) -> None:
+        titles = titles or {"alpha": "Alpha", "beta": "Beta"}
+        japanese_titles = japanese_titles or {key: value for key, value in titles.items()}
+        for skill, title in titles.items():
+            _write(
                 root,
-                "- One (`skill:fixture#one`)\n- Two (`skill:#two`)",
-                "- Task One (`skill:#one`)\n- Task Two (`skill:fixture#two`)",
+                f"skills/{skill}/SKILL.md",
+                _asset(skill, "process", "en", _process_body("en", title=title), metadata=False),
             )
-            errors, _ = CHECKER.check_asset(
-                path,
-                {"": root, "fixture": root},
-                "fixture",
+            if japanese:
+                _write(
+                    root,
+                    f"skills/{skill}/references/locales/ja/SKILL.md",
+                    _asset(skill, "process", "ja", _process_body("ja", title=japanese_titles[skill]), metadata=False),
+                )
+
+    @staticmethod
+    def _check(root: Path, relative: str, content: str, *, qualified: bool = False, package_id: str | None = None):
+        path = _write(root, relative, content)
+        return CHECKER.check_document(path, CheckerProfileMilestoneBTests._roots(root, qualified), package_id)
+
+    @staticmethod
+    def _reference_body(locale: str = "en", *, reversed_relationship: bool = False) -> str:
+        if locale == "ja":
+            alpha_name, beta_name = "アルファ", "ベータ"
+            purpose, outcome = "このフィクスチャの目的を定義する。", "成果が準備される。"
+            skill, purpose_heading, outcomes_heading, relationships = "スキル", "目的", "成果", "関係"
+            headers = "| 提供側プロセス | 情報 | 受領側プロセス | 関係 |\n| --- | --- | --- | --- |"
+        else:
+            alpha_name, beta_name = "Alpha", "Beta"
+            purpose, outcome = "Defines the purpose of this fixture.", "The result is ready."
+            skill, purpose_heading, outcomes_heading, relationships = "Skill", "Purpose", "Outcomes", "Relationships"
+            headers = "| Provider Process | Information | Recipient Process | Relationship |\n| --- | --- | --- | --- |"
+        headers = headers.replace("\n", "\n            ")
+        provider, recipient = (beta_name, alpha_name) if reversed_relationship else (alpha_name, beta_name)
+        return _clean(
+            f"""
+            # Fixture Reference Model
+
+            ## {_heading(locale, 'purpose')}
+
+            Organizes Process semantic centers.
+
+            ## {_heading(locale, 'processes')}
+
+            ### {alpha_name}
+
+            {skill}: `skill:#alpha`
+
+            #### {purpose_heading}
+
+            {purpose}
+
+            #### {outcomes_heading}
+
+            - {outcome}
+
+            ### {beta_name}
+
+            {skill}: `skill:#beta`
+
+            #### {purpose_heading}
+
+            {purpose}
+
+            #### {outcomes_heading}
+
+            - {outcome}
+
+            ## {relationships}
+
+            {headers}
+            | {provider} | Information | {recipient} | Supports |
+            """
+        )
+
+    def assert_no_errors(self, result) -> None:
+        errors = [item.render() for item in result.diagnostics if item.severity is Severity.ERROR]
+        self.assertEqual(errors, [], "\n".join(errors))
+
+    def test_exact_machine_tables_reject_profile_boundary_forms(self) -> None:
+        specs = (
+            ("processes", _model_body(), "| Process | Skill |", "| --- | --- |", "| Beta | |", "## Relationships\n", "Process"),
+            ("relationships", _model_body(), "| Provider Process | Information | Recipient Process | Relationship |", "| --- | --- | --- | --- |", "| Alpha | Information | Beta | Supports |", "## Relationships\n", "Provider Process"),
+            ("source", _view_body(), "| Source Process | Reference |", "| --- | --- |", "| Alpha | `skill:#alpha` |", "## Included Activities and Tasks\n", "Source Process"),
+            ("included", _view_body(), "| Source Process | Source element |", "| --- | --- |", "| Alpha (`skill:#alpha`) | Activity: Inspect |", "## Application\n", "Source Process"),
+        )
+        boundaries = (
+            ("no-padding", lambda header, separator, row: (header, separator, row.replace("| ", "|", 1)), "table-width"),
+            ("multi-padding", lambda header, separator, row: (header, separator, row.replace("| ", "|  ", 1)), "table-width"),
+            ("unpiped", lambda header, separator, row: (header[1:], separator, row), "table-width"),
+            ("wrong-header", lambda header, separator, row: (header.replace(header.split(" | ")[0].lstrip("| "), "Name", 1), separator, row), "table-header"),
+            ("reordered-header", lambda header, separator, row: ("| " + " | ".join(reversed(header.strip("| ").split(" | "))) + " |", separator, row), "table-header"),
+            ("localized-header", lambda header, separator, row: ("| プロセス | スキル |" if "Skill" in header else "| プロセス | 情報 | 受領側プロセス | 関係 |" if "Provider" in header else "| 出典プロセス | 参照 |" if "Reference" in header else "| 出典プロセス | 出典要素 |", separator, row), "table-header"),
+            ("alignment-separator", lambda header, separator, row: (header, separator.replace("---", ":---", 1), row), "table-separator"),
+            ("short-row", lambda header, separator, row: (header, separator, "|".join(row.split("|")[:-2]) + "|"), "table-width"),
+            ("extra-row", lambda header, separator, row: (header, separator, row.rsplit(" |", 1)[0] + " | Extra |"), "table-width"),
+            ("cell-pipe", lambda header, separator, row: (header, separator, row.rsplit(" |", 1)[0] + " | pipe |"), "table-width"),
+        )
+        with _temp_root() as root:
+            for schema, source, header, separator, row, next_heading, _ in specs:
+                for boundary, mutate, expected in boundaries:
+                    with self.subTest(schema=schema, boundary=boundary):
+                        changed_header, changed_separator, changed_row = mutate(header, separator, row)
+                        body = source.replace(header, changed_header, 1).replace(separator, changed_separator, 1).replace(row, changed_row, 1)
+                        result = _parse(root, _asset(f"table-{schema}-{boundary}", "process-model" if schema in ("processes", "relationships") else "process-view", "en", body), name=f"table-{schema}-{boundary}")
+                        self.assertIn(expected, _codes(result))
+
+                with self.subTest(schema=schema, boundary="second-table"):
+                    second = f"\n{header}\n{separator}\n{row}\n"
+                    body = source.replace(next_heading, second + next_heading, 1)
+                    result = _parse(root, _asset(f"table-{schema}-second", "process-model" if schema in ("processes", "relationships") else "process-view", "en", body), name=f"table-{schema}-second")
+                    self.assertIn("table-second", _codes(result))
+                with self.subTest(schema=schema, boundary="mixed-list"):
+                    body = source.replace(row, row + "\n- mixed content", 1)
+                    result = _parse(root, _asset(f"table-{schema}-mixed", "process-model" if schema in ("processes", "relationships") else "process-view", "en", body), name=f"table-{schema}-mixed")
+                    self.assertIn("table-mixed-content", _codes(result))
+
+            rejected = (
+                ("process-list", _model_body().replace("| Process | Skill |\n| --- | --- |\n| Alpha | `skill:#alpha` |\n| Beta | |", "- Alpha\n- Beta"), "table-missing"),
+                ("process-h3", _model_body().replace("| Process | Skill |\n| --- | --- |\n| Alpha | `skill:#alpha` |\n| Beta | |", "### Alpha\n\nPurpose"), "table-heading"),
+                ("relationship-arrow", _model_body().replace("| Provider Process | Information | Recipient Process | Relationship |\n| --- | --- | --- | --- |\n| Alpha | Information | Beta | Supports |", "- Alpha -> Beta"), "table-missing"),
             )
-            self.assertEqual(errors, [], errors)
+            for label, body, expected in rejected:
+                with self.subTest(case=label):
+                    result = _parse(root, _asset(label, "process-model", "en", body), name=label)
+                    self.assertIn(expected, _codes(result))
 
-    def test_process_view_rejects_non_table_inclusion_missing_canonical_reference(self) -> None:
-        errors = check_view_fixture(
-            "- One\n- Two",
-            "- Task Missing (`skill:#does-not-exist`)",
-        )
-        self.assertTrue(
-            any("unresolved Skill reference skill:#does-not-exist" in error for error in errors),
-            errors,
-        )
+    def test_process_model_semantics_references_endpoints_and_locale_identity(self) -> None:
+        with _temp_root() as root:
+            self._write_targets(root)
+            valid = self._check(root, "model.md", _asset("model", "process-model", "en", _model_body()))
+            self.assert_no_errors(valid)
 
-    def test_process_view_rejects_non_table_inclusion_undeclared_source(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            process_skill(root, "one", "One")
-            process_skill(root, "two", "Two")
-            process_skill(root, "three", "Three")
-            path = process_view(
+            qualified = self._check(
                 root,
-                "- One\n- Two",
-                "- Activity: Work (`skill:#three`)",
+                "qualified-model.md",
+                _asset("model", "process-model", "en", self._qualified(_model_body())),
+                qualified=True,
+                package_id="mashimashica/alps",
             )
-            errors, _ = CHECKER.check_asset(path, {"": root}, None)
-        self.assertTrue(
-            any("undeclared Source Process" in error for error in errors),
-            errors,
-        )
+            self.assert_no_errors(qualified)
 
-    def test_process_view_validates_all_source_process_tables(self) -> None:
-        valid_sources = """| Source Process | Reference |
-| --- | --- |
-| One | skill:#one |
-
-### Other Sources
-
-| Source Process | Reference |
-| --- | --- |
-| Two | skill:#two |"""
-        included = """| Source Process | Source element |
-| --- | --- |
-| One | Activity |
-| Two | Task |"""
-        self.assertEqual(check_view_fixture(valid_sources, included), [])
-
-    def test_process_view_rejects_wrong_source_in_later_source_table(self) -> None:
-        sources = """| Source Process | Reference |
-| --- | --- |
-| One | skill:#one |
-| Two | skill:#two |
-
-### Other Sources
-
-| Source Process | Reference |
-| --- | --- |
-| Totally Wrong | skill:#one |"""
-        included = """| Source Process | Source element |
-| --- | --- |
-| One | Activity |
-| Two | Task |"""
-        errors = check_view_fixture(sources, included)
-        self.assertTrue(
-            any("differs from referenced Process 'One'" in error for error in errors),
-            errors,
-        )
-
-    def test_process_view_combines_source_tables_and_outside_entries(self) -> None:
-        valid_sources = """| Source Process | Reference |
-| --- | --- |
-| One | `skill:#one` |
-
-- Two (`skill:#two`)
-
-```markdown
-| Source Process | Reference |
-| --- | --- |
-| Missing | `skill:#does-not-exist` |
-- Missing (`skill:#does-not-exist`)
-```"""
-        self.assertEqual(
-            CHECKER.source_entries(valid_sources),
-            ["One", "Two (`skill:#two`)",],
-        )
-        included = """| Source Process | Source element |
-| --- | --- |
-| One | Activity |"""
-        self.assertEqual(check_view_fixture(valid_sources, included), [])
-
-        wrong_sources = valid_sources.split("\n\n```", 1)[0].replace(
-            "- Two (`skill:#two`)",
-            "- Totally Wrong (`skill:#one`)",
-        )
-        wrong_errors = check_view_fixture(wrong_sources, included)
-        self.assertTrue(
-            any("differs from referenced Process 'One'" in error for error in wrong_errors),
-            wrong_errors,
-        )
-
-        missing_sources = valid_sources.split("\n\n```", 1)[0].replace(
-            "- Two (`skill:#two`)",
-            "- Missing (`skill:#does-not-exist`)",
-        )
-        missing_errors = check_view_fixture(missing_sources, included)
-        self.assertTrue(
-            any("unresolved Skill reference skill:#does-not-exist" in error for error in missing_errors),
-            missing_errors,
-        )
-
-    def test_process_view_pair_combines_mixed_source_table_and_outside_order(self) -> None:
-        table_en = """| Source Process | Reference |
-| --- | --- |
-| One | `skill:#one` |"""
-        table_ja = """| 出典プロセス | 参照 |
-| --- | --- |
-| 一 | `skill:#one` |"""
-
-        def check_pair_case(english_sources: str, japanese_sources: str) -> list[str]:
-            with tempfile.TemporaryDirectory() as directory:
-                english, japanese = write_process_view_pair(
-                    Path(directory), "- Activity: Work", "- 活動: 作業"
-                )
-                write(
-                    english,
-                    english.read_text(encoding="utf-8").replace(
-                        "- One\n- Two", english_sources
-                    ),
-                )
-                write(
-                    japanese,
-                    japanese.read_text(encoding="utf-8").replace(
-                        "- 一\n- 二", japanese_sources
-                    ),
-                )
-                errors, _ = CHECKER.check_pair(
-                    english,
-                    japanese,
-                    set(CHECKER.DEFAULT_JA_TERMS),
-                    "fixture",
-                )
-                return errors
-
-        mixed_en = table_en + "\n\n- Two (`skill:#two`)"
-        mixed_ja = table_ja + "\n\n- 二 (`skill:#two`)"
-        cases = (
-            ("valid mixed source form", mixed_en, mixed_ja, None),
-            ("outside omission", mixed_en, table_ja, "Source Process count differs"),
-            (
-                "outside order",
-                mixed_en,
-                "- 二 (`skill:#two`)\n\n" + table_ja,
-                "Source Process reference identity or order differs",
-            ),
-            (
-                "outside identity",
-                mixed_en,
-                table_ja + "\n\n- 一 (`skill:#one`)",
-                "Source Process reference identity or order differs",
-            ),
-        )
-        for name, english_sources, japanese_sources, expected in cases:
-            with self.subTest(name=name):
-                errors = check_pair_case(english_sources, japanese_sources)
-                if expected is None:
-                    self.assertEqual(errors, [], errors)
-                else:
-                    self.assertTrue(any(expected in error for error in errors), errors)
-
-    def test_process_view_pair_compares_all_source_process_tables(self) -> None:
-        def source_table(
-            header: str, rows: str, reference_header: str = "Reference"
-        ) -> str:
-            return f"""| {header} | {reference_header} |
-| --- | --- |
-{rows}"""
-
-        first_en = source_table("Source Process", "| One | `skill:#one` |")
-        second_en = source_table("Source Process", "| Two | `skill:#two` |")
-        first_ja = source_table("出典プロセス", "| 一 | `skill:#one` |", "参照")
-        second_ja = source_table("出典プロセス", "| 二 | `skill:#two` |", "参照")
-
-        def check_pair_case(english_sources: str, japanese_sources: str) -> list[str]:
-            with tempfile.TemporaryDirectory() as directory:
-                english, japanese = write_process_view_pair(
-                    Path(directory), "- Activity: Work", "- 活動: 作業"
-                )
-                write(
-                    english,
-                    english.read_text(encoding="utf-8").replace(
-                        "- One\n- Two", english_sources
-                    ),
-                )
-                write(
-                    japanese,
-                    japanese.read_text(encoding="utf-8").replace(
-                        "- 一\n- 二", japanese_sources
-                    ),
-                )
-                errors, _ = CHECKER.check_pair(
-                    english,
-                    japanese,
-                    set(CHECKER.DEFAULT_JA_TERMS),
-                    "fixture",
-                )
-                return errors
-
-        cases = (
-            (
-                "multiple valid tables",
-                first_en + "\n\n" + second_en,
-                first_ja + "\n\n" + second_ja,
-                None,
-            ),
-            (
-                "later-table omission",
-                first_en + "\n\n" + second_en,
-                first_ja,
-                "Source Process count differs",
-            ),
-            (
-                "later-table order",
-                first_en + "\n\n" + second_en,
-                second_ja + "\n\n" + first_ja,
-                "Source Process reference identity or order differs",
-            ),
-            (
-                "later-table identity",
-                first_en + "\n\n" + second_en,
-                first_ja
-                + "\n\n"
-                + source_table("出典プロセス", "| 一 | `skill:#one` |", "参照"),
-                "Source Process reference identity or order differs",
-            ),
-        )
-        for name, english_sources, japanese_sources, expected in cases:
-            with self.subTest(name=name):
-                errors = check_pair_case(english_sources, japanese_sources)
-                if expected is None:
-                    self.assertEqual(errors, [], errors)
-                else:
-                    self.assertTrue(any(expected in error for error in errors), errors)
-
-    def test_process_view_validates_non_table_items_after_provenance_table(self) -> None:
-        valid = """| Source Process | Source element |
-| --- | --- |
-| One | Activity |
-
-### Activity: Work
-- Task Two (`skill:#two`)"""
-        self.assertEqual(check_view_fixture("- One\n- Two", valid), [])
-
-        missing = valid.replace(
-            "Task Two (`skill:#two`)",
-            "Task Missing (`skill:#does-not-exist`)",
-        )
-        errors = check_view_fixture("- One\n- Two", missing)
-        self.assertTrue(
-            any("unresolved Skill reference skill:#does-not-exist" in error for error in errors),
-            errors,
-        )
-
-    def test_process_view_pair_compares_mixed_provenance_and_non_table_items(self) -> None:
-        table_en = """| Source Process | Source element |
-| --- | --- |
-| One (`skill:#one`) | Activity |"""
-        table_ja = """| 出典プロセス | 出典要素 |
-| --- | --- |
-| 一 (`skill:#one`) | 活動 |"""
-        outside_en = "### Activity: Work\n- Task Two (`skill:#two`)"
-        outside_ja = "### 活動: 作業\n- タスク 二 (`skill:#two`)"
-
-        def check_pair_case(english_included: str, japanese_included: str) -> list[str]:
-            with tempfile.TemporaryDirectory() as directory:
-                english, japanese = write_process_view_pair(
-                    Path(directory), english_included, japanese_included
-                )
-                english_text = english.read_text(encoding="utf-8").replace(
-                    "- One\n- Two",
-                    "- One (`skill:#one`)\n- Two (`skill:#two`)",
-                )
-                japanese_text = japanese.read_text(encoding="utf-8").replace(
-                    "- 一\n- 二",
-                    "- 一 (`skill:#one`)\n- 二 (`skill:#two`)",
-                )
-                write(english, english_text)
-                write(japanese, japanese_text)
-                errors, _ = CHECKER.check_pair(
-                    english,
-                    japanese,
-                    set(CHECKER.DEFAULT_JA_TERMS),
-                    "fixture",
-                )
-                return errors
-
-        cases = (
-            (
-                "valid mixed forms",
-                table_en + "\n\n" + outside_en,
-                table_ja + "\n\n" + outside_ja,
-                None,
-            ),
-            (
-                "outside omission",
-                table_en + "\n\n" + outside_en,
-                table_ja,
-                "included Activity/Task count differs",
-            ),
-            (
-                "outside order",
-                table_en + "\n\n" + outside_en,
-                outside_ja + "\n\n" + table_ja,
-                "included source identity or order differs",
-            ),
-            (
-                "outside identity",
-                table_en + "\n\n" + outside_en,
-                table_ja + "\n\n" + outside_ja.replace("skill:#two", "skill:#one"),
-                "included source identity or order differs",
-            ),
-        )
-        for name, english_included, japanese_included, expected in cases:
-            with self.subTest(name=name):
-                errors = check_pair_case(english_included, japanese_included)
-                if expected is None:
-                    self.assertEqual(errors, [], errors)
-                else:
-                    self.assertTrue(any(expected in error for error in errors), errors)
-
-    def test_process_view_validates_every_provenance_table_and_ignores_fenced_tables(self) -> None:
-        included = """| Source Process | Source element |
-| --- | --- |
-| One | Activity |
-
-### Categorized Tasks
-
-```markdown
-| Source Process | Source element |
-| --- | --- |
-| Missing | Task |
-```
-
-| Source Process | Source element |
-| --- | --- |
-| Two | Task |"""
-        self.assertEqual(check_view_fixture("- One\n- Two", included), [])
-
-    def test_process_view_rejects_undeclared_source_in_later_provenance_table(self) -> None:
-        included = """| Source Process | Source element |
-| --- | --- |
-| One | Activity |
-
-### Categorized Tasks
-
-| Source Process | Source element |
-| --- | --- |
-| Missing | Task |"""
-        errors = check_view_fixture("- One\n- Two", included)
-        self.assertTrue(any("undeclared Source Process" in error for error in errors), errors)
-
-    def test_process_view_pair_compares_every_provenance_table(self) -> None:
-        first_en = """| Source Process | Source element |
-| --- | --- |
-| One (`skill:#one`) | Activity |"""
-        first_ja = """| 出典プロセス | 出典要素 |
-| --- | --- |
-| 一 (`skill:#one`) | 活動 |"""
-        second_en_one = """| Source Process | Source element |
-| --- | --- |
-| Two (`skill:#two`) | Task |"""
-        second_ja_one = """| 出典プロセス | 出典要素 |
-| --- | --- |
-| 二 (`skill:#two`) | タスク |"""
-
-        def check_pair_case(english_included: str, japanese_included: str) -> list[str]:
-            with tempfile.TemporaryDirectory() as directory:
-                english, japanese = write_process_view_pair(
-                    Path(directory), english_included, japanese_included
-                )
-                english_text = english.read_text(encoding="utf-8").replace(
-                    "- One\n- Two",
-                    "- One (`skill:#one`)\n- Two (`skill:#two`)",
-                )
-                japanese_text = japanese.read_text(encoding="utf-8").replace(
-                    "- 一\n- 二",
-                    "- 一 (`skill:#one`)\n- 二 (`skill:#two`)",
-                )
-                write(english, english_text)
-                write(japanese, japanese_text)
-                errors, _ = CHECKER.check_pair(
-                    english,
-                    japanese,
-                    set(CHECKER.DEFAULT_JA_TERMS),
-                    "fixture",
-                )
-                return errors
-
-        cases = (
-            (
-                "second-table omission",
-                first_en + "\n\n" + second_en_one,
-                first_ja,
-                "included provenance table count differs",
-            ),
-            (
-                "second-table count",
-                first_en + "\n\n" + second_en_one + "\n| One (`skill:#one`) | Task |",
-                first_ja + "\n\n" + second_ja_one,
-                "included source-element count differs",
-            ),
-            (
-                "second-table order",
-                first_en
-                + "\n\n"
-                + """| Source Process | Source element |
-| --- | --- |
-| One (`skill:#one`) | Task |
-| Two (`skill:#two`) | Task |""",
-                first_ja
-                + "\n\n"
-                + """| 出典プロセス | 出典要素 |
-| --- | --- |
-| 二 (`skill:#two`) | タスク |
-| 一 (`skill:#one`) | タスク |""",
-                "included source provenance or order differs",
-            ),
-            (
-                "second-table identity",
-                first_en + "\n\n" + second_en_one,
-                first_ja
-                + "\n\n"
-                + """| 出典プロセス | 出典要素 |
-| --- | --- |
-| 一 (`skill:#one`) | タスク |""",
-                "included source provenance or order differs",
-            ),
-        )
-        for name, english_included, japanese_included, expected in cases:
-            with self.subTest(name=name):
-                errors = check_pair_case(english_included, japanese_included)
-                self.assertTrue(any(expected in error for error in errors), errors)
-
-    def test_process_view_pair_compares_stable_included_source_identity(self) -> None:
-        reference_one = chr(96) + "skill:#one" + chr(96)
-        reference_two = chr(96) + "skill:#two" + chr(96)
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_process_view_pair(
-                Path(directory),
-                "- Activity: Work (" + reference_one + ")\n"
-                "- Task: Review (" + reference_two + ")",
-                "- 活動: 作業 (" + reference_two + ")\n"
-                "- タスク: 確認 (" + reference_one + ")",
+            cases = (
+                ("duplicate-name", _model_body().replace("| Beta | |", "| Alpha | |"), "process-duplicate"),
+                ("duplicate-reference", _model_body().replace("| Beta | |", "| Beta | `skill:#alpha` |"), "process-duplicate"),
+                ("undeclared-endpoint", _model_body().replace("| Alpha | Information | Beta | Supports |", "| Gamma | Information | Beta | Supports |"), "relationship-endpoint"),
+                ("reference-endpoint", _model_body().replace("| Alpha | Information | Beta | Supports |", "| `skill:#alpha` | Information | Beta | Supports |"), "relationship-endpoint-reference"),
             )
-            errors, _ = CHECKER.check_pair(
-                english,
-                japanese,
-                set(CHECKER.DEFAULT_JA_TERMS),
-                "fixture",
+            for label, body, expected in cases:
+                with self.subTest(case=label):
+                    result = self._check(root, f"model-{label}.md", _asset(label, "process-model", "en", body))
+                    self.assertIn(expected, _codes(result))
+
+        with _temp_root() as root:
+            self._write_targets(root, titles={"alpha": "Not Alpha", "beta": "Beta"})
+            mismatch = self._check(root, "display-mismatch.md", _asset("model", "process-model", "en", _model_body()))
+            self.assertIn("reference-display", _codes(mismatch))
+
+        with _temp_root() as root:
+            _write(root, "skills/alpha/SKILL.md", _asset("alpha", "process-model", "en", _model_body()))
+            self._write_targets(root, titles={"beta": "Beta"})
+            target_kind = self._check(root, "target-kind.md", _asset("model", "process-model", "en", _model_body()))
+            self.assertIn("reference-target-kind", _codes(target_kind))
+
+        en_body = _model_body().replace("| Beta | |", "| Beta | `skill:#beta` |")
+        ja_body = _model_body("ja").replace("| ベータ | |", "| ベータ | `skill:#beta` |")
+        with _temp_root() as root:
+            english = _write(root, "model-en.md", _asset("model", "process-model", "en", en_body))
+            japanese = _write(root, "model-ja.md", _asset("model", "process-model", "ja", ja_body))
+            errors, warnings = CHECKER.check_pair(english, japanese)
+            self.assertEqual(errors, [])
+            self.assertEqual(warnings, [])
+
+            reversed_body = ja_body.replace("| アルファ | 情報 | ベータ |", "| ベータ | 情報 | アルファ |")
+            reversed_path = _write(root, "model-reversed-ja.md", _asset("model", "process-model", "ja", reversed_body))
+            errors, _ = CHECKER.check_pair(english, reversed_path)
+            self.assertTrue(any("model-relationship-provider-mismatch" in item for item in errors))
+
+            empty_en = en_body.replace("| Alpha | `skill:#alpha` |", "| Alpha | |", 1).replace("| Beta | `skill:#beta` |", "| Beta | |", 1)
+            empty_ja = ja_body.replace("| アルファ | `skill:#alpha` |", "| アルファ | |", 1).replace("| ベータ | `skill:#beta` |", "| ベータ | |", 1)
+            empty_path = _write(root, "model-empty-ja.md", _asset("model", "process-model", "ja", empty_ja))
+            warning_errors, warning_only = CHECKER.check_pair(
+                _write(root, "model-empty-en.md", _asset("model", "process-model", "en", empty_en)), empty_path
             )
-            self.assertTrue(
-                any("included source identity or order differs" in error for error in errors),
-                errors,
+            self.assertEqual(warning_errors, [])
+            self.assertTrue(any("warning unverified-locale-identity" in item for item in warning_only))
+
+    def test_reference_model_structure_skill_position_target_equality_and_pairs(self) -> None:
+        with _temp_root() as root:
+            self._write_targets(root, japanese=False)
+            valid = self._check(root, "reference.md", _asset("reference", "process-reference-model", "en", self._reference_body()))
+            self.assert_no_errors(valid)
+
+            structural = (
+                ("wrong-h4-order", self._reference_body().replace("#### Purpose\n\nDefines the purpose of this fixture.\n\n#### Outcomes\n\n- The result is ready.", "#### Outcomes\n\n- The result is ready.\n\n#### Purpose\n\nDefines the purpose of this fixture.", 1), "reference-entry-purpose"),
+                ("no-pre-h4-prose", self._reference_body().replace("Skill: `skill:#alpha`\n", "Skill: `skill:#alpha`\nPreamble is not permitted.\n", 1), "reference-entry-preamble"),
+                ("skill-after-h4", self._reference_body().replace("Skill: `skill:#alpha`\n", "", 1).replace("#### Purpose\n\n", "#### Purpose\n\nSkill: `skill:#alpha`\n\n", 1), "skill-position"),
+                ("wrong-entry-level", self._reference_body().replace("### Alpha", "#### Alpha", 1).replace("### Beta", "#### Beta", 1), "process-empty"),
+            )
+            for label, body, expected in structural:
+                with self.subTest(case=label):
+                    result = _parse(root, _asset(label, "process-reference-model", "en", body), name=label)
+                    self.assertIn(expected, _codes(result))
+
+            japanese = _parse(root, _asset("reference-ja", "process-reference-model", "ja", self._reference_body("ja")), locale="ja", name="reference-ja")
+            self.assert_no_errors(japanese)
+            wrong_locale_skill = self._reference_body("ja").replace("スキル:", "Skill:", 1)
+            wrong_locale = _parse(root, _asset("reference-ja-skill", "process-reference-model", "ja", wrong_locale_skill), locale="ja", name="reference-ja-skill")
+            self.assertIn("skill-locale", _codes(wrong_locale))
+
+            purpose_bad = self._reference_body().replace("Defines the purpose of this fixture.", "A different purpose.", 1)
+            result = self._check(root, "reference-purpose-bad.md", _asset("reference", "process-reference-model", "en", purpose_bad))
+            self.assertIn("reference-purpose", _codes(result))
+            outcome_bad = self._reference_body().replace("- The result is ready.", "- A different outcome is ready.", 1)
+            result = self._check(root, "reference-outcome-bad.md", _asset("reference", "process-reference-model", "en", outcome_bad))
+            self.assertIn("reference-outcomes", _codes(result))
+
+        with _temp_root() as root:
+            english = _write(root, "reference-en.md", _asset("reference", "process-reference-model", "en", self._reference_body()))
+            japanese = _write(root, "reference-ja-reversed.md", _asset("reference", "process-reference-model", "ja", self._reference_body("ja", reversed_relationship=True)))
+            errors, warnings = CHECKER.check_pair(english, japanese)
+            self.assertTrue(any("reference-relationship-provider-mismatch" in item for item in errors))
+            self.assertTrue(all("error locale-mismatch/" in item for item in errors))
+            self.assertEqual(warnings, [])
+
+            shipped_en = ROOT / "skills/alps-reference-model/SKILL.md"
+            shipped_ja = ROOT / "skills/alps-reference-model/references/locales/ja/SKILL.md"
+            errors, warnings = CHECKER.check_pair(shipped_en, shipped_ja)
+            self.assertEqual(errors, [])
+            self.assertEqual(warnings, [])
+
+
+class CheckerProfileMilestoneCTests(unittest.TestCase):
+    def assert_no_errors(self, result) -> None:
+        errors = [item.render() for item in result.diagnostics if item.severity is Severity.ERROR]
+        self.assertEqual(errors, [], "\n".join(errors))
+
+    def test_process_view_sources_inclusions_and_locale_matrices(self) -> None:
+        helper = CheckerProfileMilestoneBTests
+        with _temp_root() as root:
+            helper._write_targets(root)
+            valid = helper._check(root, "view.md", _asset("view", "process-view", "en", _view_body()))
+            self.assert_no_errors(valid)
+
+            cases = (
+                ("one-source", _view_body().replace("| Beta | `skill:#beta` |\n", "").replace("| Beta (`skill:#beta`) | Task: Record |\n", ""), "source-count"),
+                ("duplicate-source", _view_body().replace("| Beta | `skill:#beta` |", "| Alpha | `skill:#alpha` |"), "source-duplicate"),
+                ("empty-source-reference", _view_body().replace("| Beta | `skill:#beta` |", "| Beta | |"), "malformed-reference"),
+                ("multiple-source-references", _view_body().replace("| Beta | `skill:#beta` |", "| Beta | `skill:#beta` `skill:#alpha` |"), "malformed-reference"),
+                ("display-target-mismatch", _view_body().replace("| Alpha | `skill:#alpha` |", "| Wrong | `skill:#alpha` |").replace("Alpha (`skill:#alpha`)", "Wrong (`skill:#alpha`)"), "source-display"),
+                ("undeclared-inclusion", _view_body().replace("Alpha (`skill:#alpha`)", "Gamma (`skill:#gamma`)"), "included-source"),
+                ("mismatched-inclusion", _view_body().replace("Alpha (`skill:#alpha`)", "Beta (`skill:#alpha`)"), "included-source"),
+                ("duplicate-inclusion", _view_body().replace("| Beta (`skill:#beta`) | Task: Record |", "| Beta (`skill:#beta`) | Task: Record |\n| Beta (`skill:#beta`) | Task: Record |"), "included-duplicate"),
+                ("bad-inclusion-prefix", _view_body().replace("Activity: Inspect", "Item: Inspect"), "included-prefix"),
+                ("missing-inclusion", _view_body().replace("| Alpha (`skill:#alpha`) | Activity: Inspect |\n", "").replace("| Beta (`skill:#beta`) | Task: Record |\n", ""), "included-empty"),
+            )
+            for label, body, expected in cases:
+                with self.subTest(case=label):
+                    result = helper._check(root, f"view-{label}.md", _asset(label, "process-view", "en", body))
+                    self.assertIn(expected, _codes(result))
+
+            reused = _view_body().replace(
+                "| Beta (`skill:#beta`) | Task: Record |",
+                "| Alpha (`skill:#alpha`) | Task: Record |\n| Beta (`skill:#beta`) | Task: Record |",
+            )
+            reused_result = helper._check(root, "view-reused-source.md", _asset("view", "process-view", "en", reused))
+            self.assert_no_errors(reused_result)
+
+            japanese = _write(root, "view-ja.md", _asset("view", "process-view", "ja", _view_body("ja")))
+            english = _write(root, "view-en.md", _asset("view", "process-view", "en", _view_body()))
+            errors, warnings = CHECKER.check_pair(english, japanese)
+            self.assertEqual(errors, [])
+            self.assertTrue(all("warning unverified-locale-identity" in item for item in warnings), warnings)
+
+            locale_cases = (
+                ("source-order", _view_body("ja").replace("| アルファ | `skill:#alpha` |\n| ベータ | `skill:#beta` |", "| ベータ | `skill:#beta` |\n| アルファ | `skill:#alpha` |"), "view-source-reference-mismatch"),
+                ("included-kind", _view_body("ja").replace("タスク: 記録", "活動: 記録"), "view-included-kind-mismatch"),
+                ("included-source-reference", _view_body("ja"), "view-included-source-reference-mismatch"),
+            )
+            for label, body, expected in locale_cases:
+                with self.subTest(locale_case=label):
+                    if label == "included-source-reference":
+                        _write(root, "skills/gamma/SKILL.md", _asset("gamma", "process", "en", _process_body(title="Beta"), metadata=False))
+                        body = body.replace("| ベータ | `skill:#beta` |", "| ベータ | `skill:#gamma` |")
+                        body = body.replace("ベータ (`skill:#beta`)", "ベータ (`skill:#gamma`)")
+                    changed = _write(root, f"view-{label}-ja.md", _asset("view", "process-view", "ja", body))
+                    pair_errors, _ = CHECKER.check_pair(english, changed)
+                    self.assertTrue(any(expected in item for item in pair_errors), pair_errors)
+
+    def test_resolved_identity_duplicates_and_locale_context(self) -> None:
+        helper = CheckerProfileMilestoneBTests
+        package = "mashimashica/alps"
+
+        with _temp_root() as root:
+            helper._write_targets(root)
+
+            duplicate_model_body = _model_body().replace(
+                "| Beta | |",
+                f"| Beta | `skill:{package}#alpha` |",
+            )
+            duplicate_model = helper._check(
+                root,
+                "resolved-duplicate-model.md",
+                _asset("resolved-duplicate-model", "process-model", "en", duplicate_model_body),
+                qualified=True,
+                package_id=package,
+            )
+            self.assertIn("process-duplicate", _codes(duplicate_model))
+
+            duplicate_reference_body = helper._reference_body().replace(
+                "Skill: `skill:#beta`",
+                f"Skill: `skill:{package}#alpha`",
+            )
+            duplicate_reference = helper._check(
+                root,
+                "resolved-duplicate-reference.md",
+                _asset("resolved-duplicate-reference", "process-reference-model", "en", duplicate_reference_body),
+                qualified=True,
+                package_id=package,
+            )
+            self.assertIn("process-duplicate", _codes(duplicate_reference))
+
+            mixed_inclusion_body = _view_body().replace(
+                "Alpha (`skill:#alpha`)",
+                f"Alpha (`skill:{package}#alpha`)",
+            )
+            mixed_inclusion = helper._check(
+                root,
+                "resolved-inclusion.md",
+                _asset("resolved-inclusion", "process-view", "en", mixed_inclusion_body),
+                qualified=True,
+                package_id=package,
+            )
+            self.assert_no_errors(mixed_inclusion)
+            self.assertEqual(mixed_inclusion.ir.source_processes[0].reference.token, "`skill:#alpha`")
+            self.assertEqual(
+                mixed_inclusion.ir.included_activities_tasks[0].source_reference.token,
+                f"`skill:{package}#alpha`",
             )
 
-    def test_process_view_non_table_extractor_ignores_code_and_comments(self) -> None:
-        fence = chr(96) * 3
-        included = (
-            fence
-            + "markdown\n### Activity: Hidden\n"
-            + fence
-            + "\n<!--\n- Task: Hidden\n-->\n"
-            "- Activity: Work\n"
-            "    - Task: Hidden continuation code\n"
-        )
-        self.assertEqual(
-            CHECKER.included_semantic_elements(included, "en", "fixture"),
-            [("activity", None), ("task", None)],
-        )
-        self.assertEqual(
-            CHECKER.included_semantic_elements(
-                "- 活動: 作業\n    - タスク: 確認\n", "ja", "fixture"
-            ),
-            [("activity", None), ("task", None)],
-        )
-        self.assertEqual(
-            CHECKER.included_semantic_elements(
-                "Paragraph\n\n    - Activity: Hidden\n    - Task: Hidden\n",
+            duplicate_view_body = _view_body().replace(
+                "| Beta | `skill:#beta` |",
+                f"| Beta | `skill:{package}#alpha` |",
+            ).replace(
+                "| Beta (`skill:#beta`) |",
+                f"| Beta (`skill:{package}#alpha`) |",
+            )
+            duplicate_view = helper._check(
+                root,
+                "resolved-duplicate-view.md",
+                _asset("resolved-duplicate-view", "process-view", "en", duplicate_view_body),
+                qualified=True,
+                package_id=package,
+            )
+            self.assertIn("source-duplicate", _codes(duplicate_view))
+            self.assertIn("source-count", _codes(duplicate_view))
+
+        with _temp_root() as root:
+            _write(
+                root,
+                "skills/beta/SKILL.md",
+                _asset("beta", "process", "en", _process_body(title="Beta"), metadata=False),
+            )
+            unresolved = helper._check(root, "unresolved-inclusion.md", _asset("unresolved-inclusion", "process-view", "en", _view_body()))
+            self.assertIn("target-not-found", _codes(unresolved))
+
+        with _temp_root() as root:
+            process_en = _asset(
+                "identity-process",
+                "process",
                 "en",
-                "fixture",
-            ),
-            [],
-        )
-        self.assertEqual(
-            CHECKER.included_semantic_elements(
-                "    Activity: Hidden\n        Task: Hidden\n",
-                "en",
-                "fixture",
-            ),
-            [],
-        )
-        self.assertEqual(
-            check_view_fixture("- One\n- Two", included),
-            [],
-        )
-        self.assertEqual(
-            check_view_fixture(
-                "- One\n- Two",
-                "### Activity: Work\n#### Task: Review",
-            ),
-            [],
-        )
-
-    def test_process_view_heading_extractor_uses_shallowest_activity_level(self) -> None:
-        included = """### Work
-- Activity: Work step
-#### Notes
-- Task: explanatory Task text is not a semantic item
-#### Activity: Nested example
-- Task: nested explanatory item is not a semantic item
-### Review
-- Task: Review step
-"""
-        self.assertEqual(
-            CHECKER.included_semantic_elements(included, "en", "fixture"),
-            [
-                ("activity", None),
-                ("task", None),
-                ("activity", None),
-                ("task", None),
-            ],
-        )
-        self.assertEqual(
-            CHECKER.included_semantic_elements(
-                "#### Work\n- 活動: 作業\n##### Notes\n- タスク: 説明\n#### Review\n- タスク: 確認\n",
+                _process_body(outcome_lines=("The result `skill:#alpha` is ready.",)),
+            )
+            process_ja = _asset(
+                "identity-process",
+                "process",
                 "ja",
-                "fixture",
-            ),
-            [
-                ("activity", None),
-                ("task", None),
-                ("activity", None),
-                ("task", None),
-            ],
+                _process_body("ja", outcome_lines=(f"成果 `skill:{package}#alpha` が整う。",)),
+            )
+            process_errors, process_warnings = CHECKER.check_pair(
+                _write(root, "identity-process-en.md", process_en),
+                _write(root, "identity-process-ja.md", process_ja),
+                package_identity=package,
+            )
+            self.assertEqual(process_errors, [])
+            self.assertEqual(process_warnings, [])
+
+            model_en_body = _model_body().replace("| Beta | |", "| Beta | `skill:#beta` |")
+            model_ja_body = _model_body("ja").replace("| ベータ | |", "| ベータ | `skill:#beta` |")
+            model_ja_body = model_ja_body.replace("skill:#", f"skill:{package}#")
+            model_errors, model_warnings = CHECKER.check_pair(
+                _write(root, "identity-model-en.md", _asset("identity-model", "process-model", "en", model_en_body)),
+                _write(root, "identity-model-ja.md", _asset("identity-model", "process-model", "ja", model_ja_body)),
+                package_identity=package,
+            )
+            self.assertEqual(model_errors, [])
+            self.assertEqual(model_warnings, [])
+
+            view_en_body = _view_body().replace(
+                "- The view outcome is ready.",
+                "- The view outcome `skill:#alpha` is ready.",
+            )
+            view_ja_body = _view_body("ja").replace(
+                "- ビューの成果が整う。",
+                f"- ビューの成果 `skill:{package}#alpha` が整う。",
+            ).replace("skill:#", f"skill:{package}#")
+            view_errors, view_warnings = CHECKER.check_pair(
+                _write(root, "identity-view-en.md", _asset("identity-view", "process-view", "en", view_en_body)),
+                _write(root, "identity-view-ja.md", _asset("identity-view", "process-view", "ja", view_ja_body)),
+                package_identity=package,
+            )
+            self.assertEqual(view_errors, [])
+            self.assertEqual(view_warnings, [])
+
+            reference_en_body = helper._reference_body().replace(
+                "- The result is ready.",
+                "- The result `skill:#alpha` is ready.",
+            )
+            reference_ja_body = helper._reference_body("ja").replace(
+                "- 成果が準備される。",
+                f"- 成果 `skill:{package}#alpha` が整う。",
+            ).replace("skill:#", f"skill:{package}#")
+            reference_errors, reference_warnings = CHECKER.check_pair(
+                _write(root, "identity-reference-en.md", _asset("identity-reference", "process-reference-model", "en", reference_en_body)),
+                _write(root, "identity-reference-ja.md", _asset("identity-reference", "process-reference-model", "ja", reference_ja_body)),
+                package_identity=package,
+            )
+            self.assertEqual(reference_errors, [])
+            self.assertEqual(reference_warnings, [])
+
+            different_package_ja = _process_body(
+                "ja",
+                outcome_lines=("成果 `skill:other/pkg#alpha` が整う。",),
+            )
+            different_errors, _ = CHECKER.check_pair(
+                _write(root, "different-package-en.md", process_en),
+                _write(root, "different-package-ja.md", _asset("identity-process", "process", "ja", different_package_ja)),
+                package_identity=package,
+            )
+            self.assertTrue(any("process-outcome-reference-mismatch" in item for item in different_errors))
+
+    def test_cli_passes_configured_package_identity_to_locale_comparison(self) -> None:
+        helper = CheckerProfileMilestoneBTests
+        package = "mashimashica/alps"
+        with _temp_root() as root:
+            helper._write_targets(root, japanese=False)
+            model_en_body = _model_body().replace("| Beta | |", "| Beta | `skill:#beta` |")
+            model_ja_body = _model_body("ja").replace("| ベータ | |", "| ベータ | `skill:#beta` |")
+            model_ja_body = model_ja_body.replace("skill:#", f"skill:{package}#")
+            model_en = _write(
+                root,
+                "skills/model/SKILL.md",
+                _asset("cli-model", "process-model", "en", model_en_body),
+            )
+            model_ja = _write(
+                root,
+                "skills/model/references/locales/ja/SKILL.md",
+                _asset("cli-model", "process-model", "ja", model_ja_body),
+            )
+            previous = Path.cwd()
+            output, errors = io.StringIO(), io.StringIO()
+            try:
+                with redirect_stdout(output), redirect_stderr(errors):
+                    status = CHECKER.main([
+                        "--package-root",
+                        f"{package}={root}",
+                        str(model_en),
+                    ])
+            finally:
+                os.chdir(previous)
+            self.assertTrue(model_ja.is_file())
+            self.assertEqual(status, 0, errors.getvalue())
+            self.assertIn("PROFILE_VERSION=alps-repository-checker/v1", output.getvalue())
+
+    def test_canonical_reference_resolution_and_package_containment(self) -> None:
+        helper = CheckerProfileMilestoneBTests
+        with _temp_root() as root:
+            helper._write_targets(root)
+            local = helper._check(root, "local-model.md", _asset("model", "process-model", "en", _model_body()))
+            self.assert_no_errors(local)
+            qualified = helper._check(
+                root, "qualified-model.md", _asset("model", "process-model", "en", helper._qualified(_model_body())),
+                qualified=True, package_id="mashimashica/alps",
+            )
+            self.assert_no_errors(qualified)
+
+            malformed = (
+                ("empty-skill", "skill:#"),
+                ("empty-package-segment", "skill:mashimashica//alps#alpha"),
+                ("dot-segment", "skill:mashimashica/./alps#alpha"),
+                ("dot-dot-segment", "skill:mashimashica/../alps#alpha"),
+                ("backslash", r"skill:mashimashica\alps#alpha"),
+                ("uppercase-segment", "skill:Mashimashica/alps#alpha"),
+            )
+            for label, token in malformed:
+                with self.subTest(reference=label):
+                    body = _model_body().replace("`skill:#alpha`", f"`{token}`")
+                    result = helper._check(root, f"reference-{label}.md", _asset(label, "process-model", "en", body))
+                    self.assertIn("malformed-reference", _codes(result))
+
+        with _temp_root() as root:
+            _write(root, "skills/beta/SKILL.md", _asset("beta", "process", "en", _process_body(title="Beta"), metadata=False))
+            missing = helper._check(root, "missing-target.md", _asset("model", "process-model", "en", _model_body()))
+            self.assertIn("target-not-found", _codes(missing))
+
+        with _temp_root() as root:
+            _write(root, "skills/beta/SKILL.md", _asset("beta", "process", "en", _process_body(title="Beta"), metadata=False))
+            target_directory = root / "skills" / "alpha" / "SKILL.md"
+            target_directory.mkdir(parents=True)
+            nonregular = helper._check(root, "nonregular-target.md", _asset("model", "process-model", "en", _model_body()))
+            self.assertIn("target-not-regular-file", _codes(nonregular))
+
+        with _temp_root() as root:
+            outside = root.parent / "outside-package"
+            _write(outside, "model.md", _asset("model", "process-model", "en", _model_body()))
+            outside_result = CHECKER.check_document(outside / "model.md", {"": root})
+            self.assertIn("containing-package-not-found", _codes(outside_result))
+
+        with _temp_root() as root:
+            if not hasattr(os, "symlink"):
+                self.skipTest("symlink support is unavailable")
+            inside = root / "linked-alpha"
+            _write(inside, "SKILL.md", _asset("alpha", "process", "en", _process_body(title="Alpha"), metadata=False))
+            link = root / "skills" / "alpha"
+            link.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                link.symlink_to(inside, target_is_directory=True)
+            except OSError as error:
+                self.skipTest(f"symlinks unsupported: {error}")
+            _write(root, "skills/beta/SKILL.md", _asset("beta", "process", "en", _process_body(title="Beta"), metadata=False))
+            accepted = helper._check(root, "in-root-symlink.md", _asset("model", "process-model", "en", _model_body()))
+            self.assert_no_errors(accepted)
+
+        with _temp_root() as root:
+            if not hasattr(os, "symlink"):
+                self.skipTest("symlink support is unavailable")
+            outside = root.parent / "outside-target"
+            _write(outside, "SKILL.md", _asset("alpha", "process", "en", _process_body(title="Alpha"), metadata=False))
+            link = root / "skills" / "alpha"
+            link.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                link.symlink_to(outside, target_is_directory=True)
+            except OSError as error:
+                self.skipTest(f"symlinks unsupported: {error}")
+            _write(root, "skills/beta/SKILL.md", _asset("beta", "process", "en", _process_body(title="Beta"), metadata=False))
+            escaped = helper._check(root, "symlink-target.md", _asset("model", "process-model", "en", _model_body()))
+            self.assertIn("target-escapes-package-root", _codes(escaped))
+
+        with _temp_root() as root:
+            helper._write_targets(root, japanese=True, japanese_titles={"alpha": "アルファ", "beta": "ベータ"})
+            japanese_path = _write(root, "skills/model/references/locales/ja/SKILL.md", _asset("model", "process-model", "ja", _model_body("ja")))
+            localized = CHECKER.check_document(japanese_path, {"": root})
+            self.assert_no_errors(localized)
+
+        with _temp_root() as root:
+            helper._write_targets(root, japanese=False)
+            fallback_body = _model_body("ja").replace("アルファ", "Alpha").replace("ベータ", "Beta")
+            japanese_path = _write(root, "skills/model/references/locales/ja/SKILL.md", _asset("model", "process-model", "ja", fallback_body))
+            fallback = CHECKER.check_document(japanese_path, {"": root})
+            self.assert_no_errors(fallback)
+
+    def test_ir_only_validator_locale_guard_parse_once_and_serialized_contract(self) -> None:
+        import inspect
+        from unittest import mock
+        import alps_check.checker as checker_module
+        import alps_check.locale_compare as locale_compare
+        import alps_check.validators as validators
+
+        for function in (CHECKER.validate_ir, validators.validate_ir, locale_compare.compare_locale_ir):
+            with self.subTest(function=function.__module__ + "." + function.__name__):
+                names = set(inspect.signature(function).parameters)
+                self.assertFalse(names & {"source", "source_text", "raw_text", "markdown", "text"}, names)
+
+        for module in (validators, locale_compare):
+            with self.subTest(module=module.__name__):
+                source = inspect.getsource(module)
+                self.assertNotIn("read_text", source)
+                self.assertNotIn("read_bytes", source)
+                self.assertNotIn("open(", source)
+                self.assertNotIn("parse_markdown", source)
+                self.assertNotIn("re.", source)
+                self.assertNotIn("re.compile", source)
+
+        with _temp_root() as root:
+            path = _write(root, "process.md", _asset("process", "process", "en", _process_body()))
+            with mock.patch.object(checker_module, "parse_asset", wraps=checker_module.parse_asset) as parse_mock:
+                result = CHECKER.check_document(path, {"": root})
+            self.assert_no_errors(result)
+            self.assertEqual(parse_mock.call_count, 1)
+            serialized = json.dumps(
+                {"profile_version": CHECKER.PROFILE_VERSION, "result": asdict(result)},
+                ensure_ascii=False,
+                sort_keys=True,
+            )
+            self.assertIn(CHECKER.PROFILE_VERSION, serialized)
+            self.assertIn('"ir":', serialized)
+            self.assertIn('"kind": "process"', serialized)
+
+    def test_cli_shares_parse_cache_across_top_level_and_referenced_assets(self) -> None:
+        from unittest import mock
+        import alps_check.checker as checker_module
+
+        with _temp_root() as root:
+            process = _write(
+                root,
+                "skills/process/SKILL.md",
+                _asset("process", "process", "en", _process_body(title="Process"), metadata=False),
+            )
+            model_body = _clean(
+                """
+                # Process Model
+
+                ## Purpose
+
+                Organizes the Process.
+
+                ## Processes
+
+                | Process | Skill |
+                | --- | --- |
+                | Process | `skill:#process` |
+
+                ## Relationships
+
+                | Provider Process | Information | Recipient Process | Relationship |
+                | --- | --- | --- | --- |
+                | Process | Information | Process | Supports |
+                """
+            )
+            model = _write(
+                root,
+                "skills/model/SKILL.md",
+                _asset("model", "process-model", "en", model_body),
+            )
+            previous = Path.cwd()
+            output, errors = io.StringIO(), io.StringIO()
+            os.chdir(root)
+            try:
+                with mock.patch.object(
+                    checker_module, "parse_asset", wraps=checker_module.parse_asset
+                ) as parse_mock:
+                    with redirect_stdout(output), redirect_stderr(errors):
+                        status = CHECKER.main(
+                            [
+                                "--root",
+                                str(root),
+                                "--no-locale-pairs",
+                                str(process),
+                                str(model),
+                            ]
+                        )
+            finally:
+                os.chdir(previous)
+
+            self.assertEqual(status, 0, errors.getvalue())
+            observed = []
+            for call in parse_mock.call_args_list:
+                path = call.args[0]
+                requested_locale = call.args[1] if len(call.args) > 1 else None
+                effective_locale = requested_locale or checker_module.locale_for(path)
+                observed.append(
+                    (
+                        os.path.normcase(os.path.abspath(os.fspath(path))),
+                        effective_locale,
+                    )
+                )
+            expected = {
+                (
+                    os.path.normcase(os.path.abspath(os.fspath(process))),
+                    "en",
+                ),
+                (
+                    os.path.normcase(os.path.abspath(os.fspath(model))),
+                    "en",
+                ),
+            }
+            self.assertEqual(set(observed), expected)
+            self.assertEqual(len(observed), len(set(observed)))
+            self.assertEqual(parse_mock.call_count, len(expected))
+
+    def test_locale_pair_frontmatter_process_model_reference_and_view_contracts(self) -> None:
+        helper = CheckerProfileMilestoneBTests
+        en_outcomes = ("Outcome one `skill:#alpha`.", "Outcome two `skill:#beta`.")
+        en_tasks = ("The agent must inspect `skill:#alpha`.", "The agent should review `skill:#beta`.")
+        ja_outcomes = ("成果一 `skill:#alpha`。", "成果二 `skill:#beta`。")
+        ja_tasks = ("エージェントは `skill:#alpha` を確認する必要がある。", "エージェントは `skill:#beta` を確認するのが望ましい。")
+
+        def pair(en_body: str, ja_body: str, *, en_kind: str = "process", ja_kind: str = "process", ja_name: str = "fixture"):
+            with _temp_root() as root:
+                english = _write(root, "en.md", _asset("fixture", en_kind, "en", en_body))
+                japanese = _write(root, "ja.md", _asset(ja_name, ja_kind, "ja", ja_body))
+                return CHECKER.check_pair(english, japanese)
+
+        errors, warnings = pair(
+            _process_body("en", outcome_lines=en_outcomes, task_lines=en_tasks),
+            _process_body("ja", outcome_lines=ja_outcomes, task_lines=ja_tasks),
         )
+        self.assertEqual(errors, [])
+        self.assertEqual(warnings, [])
 
-    def test_process_view_heading_extractor_ignores_shallower_task_heading(self) -> None:
-        included = """### Task: explanatory section
-#### Activity: Work
-##### Task: Review
-"""
-        self.assertEqual(
-            CHECKER.included_semantic_elements(included, "en", "fixture"),
-            [("activity", None), ("task", None)],
+        process_cases = (
+            ("frontmatter-name", _process_body("ja", outcome_lines=ja_outcomes, task_lines=ja_tasks), "fixture-jp", "frontmatter-name-mismatch"),
+            ("outcome-count", _process_body("ja", outcome_lines=ja_outcomes[:1], task_lines=ja_tasks), "fixture", "process-outcome-count-mismatch"),
+            ("outcome-reference-sequence", _process_body("ja", outcome_lines=("成果一 `skill:#beta`。", "成果二 `skill:#alpha`。"), task_lines=ja_tasks), "fixture", "process-outcome-reference-mismatch"),
+            ("task-count", _process_body("ja", outcome_lines=ja_outcomes, task_lines=ja_tasks[:1]), "fixture", "process-task-count-mismatch"),
+            ("normative-class", _process_body("ja", outcome_lines=ja_outcomes, task_lines=(ja_tasks[0], "エージェントは `skill:#beta` を確認する必要がある。")), "fixture", "process-task-normative-class-mismatch"),
+            ("activity-count", _process_body("ja", outcome_lines=ja_outcomes, task_lines=ja_tasks, extra="\n### 追加\n\n1. エージェントは追加を確認する必要がある。\n"), "fixture", "process-activity-count-mismatch"),
         )
+        for label, body, name, expected in process_cases:
+            with self.subTest(process_case=label):
+                errors, _ = pair(_process_body("en", outcome_lines=en_outcomes, task_lines=en_tasks), body, ja_name=name)
+                self.assertTrue(any(expected in item for item in errors), errors)
+                self.assertTrue(all("error locale-mismatch/" in item for item in errors), errors)
 
-    def test_process_view_heading_extractor_preserves_task_kind_at_activity_level(self) -> None:
-        included = """### Activity: Work
-### Task: explanatory task
-"""
-        self.assertEqual(
-            CHECKER.included_semantic_elements(included, "en", "fixture"),
-            [("activity", None), ("task", None)],
+        model_en = _model_body().replace("| Beta | |", "| Beta | `skill:#beta` |")
+        model_ja = _model_body("ja").replace("| ベータ | |", "| ベータ | `skill:#beta` |")
+        errors, warnings = pair(model_en, model_ja, en_kind="process-model", ja_kind="process-model")
+        self.assertEqual(errors, [])
+        self.assertEqual(warnings, [])
+        model_cases = (
+            ("process-count", model_ja.replace("| ベータ | `skill:#beta` |\n", "").replace("| アルファ | 情報 | ベータ | 支援 |", "| アルファ | 情報 | アルファ | 支援 |"), "model-process-count-mismatch"),
+            ("process-identity", model_ja.replace("| アルファ | `skill:#alpha` |\n| ベータ | `skill:#beta` |", "| ベータ | `skill:#beta` |\n| アルファ | `skill:#alpha` |"), "model-process-identity-mismatch"),
+            ("relationship-provider", model_ja.replace("| アルファ | 情報 | ベータ |", "| ベータ | 情報 | アルファ |"), "model-relationship-provider-mismatch"),
         )
+        for label, body, expected in model_cases:
+            with self.subTest(model_case=label):
+                errors, _ = pair(model_en, body, en_kind="process-model", ja_kind="process-model")
+                self.assertTrue(any(expected in item for item in errors), errors)
 
-    def test_process_view_checks_source_table_display_name_and_canonical_only(self) -> None:
-        invalid_sources = """| Source Process | Reference |
-| --- | --- |
-| Missing | skill:#one |
-| Two | skill:#two |"""
-        included = """| Source Process | Source element |
-| --- | --- |
-| Missing (`skill:#one`) | Activity |
-| Two (`skill:#two`) | Task |"""
-        errors = check_view_fixture(invalid_sources, included)
-        self.assertTrue(any("source row 1" in error and "differs from referenced Process 'One'" in error for error in errors), errors)
-        valid_sources = """| Source Process | Reference |
-| --- | --- |
-| One | skill:#one |
-| skill:#two | canonical-only |"""
-        valid_included = """| Source Process | Source element |
-| --- | --- |
-| One | Activity |
-| skill:#two | Task |"""
-        self.assertEqual(check_view_fixture(valid_sources, valid_included), [])
+        reference_en = helper._reference_body()
+        reference_ja = helper._reference_body("ja")
+        errors, _ = pair(reference_en, reference_ja, en_kind="process-reference-model", ja_kind="process-reference-model")
+        self.assertEqual(errors, [])
+        reversed_reference = helper._reference_body("ja", reversed_relationship=True)
+        errors, _ = pair(reference_en, reversed_reference, en_kind="process-reference-model", ja_kind="process-reference-model")
+        self.assertTrue(any("reference-relationship-provider-mismatch" in item for item in errors), errors)
 
-    def test_process_view_rejects_multiple_source_references(self) -> None:
-        sources = """| Source Process | Reference |
-| --- | --- |
-| One | skill:#one skill:#two |
-| Two | skill:#two |"""
-        included = """| Source Process | Source element |
-| --- | --- |
-| One | Activity |
-| Two | Task |"""
-        errors = check_view_fixture(sources, included)
-        self.assertTrue(any("source row 1" in error and "at most one canonical Skill reference" in error for error in errors), errors)
+        view_en = _view_body().replace("The view outcome is ready.", "The view outcome `skill:#alpha` is ready.")
+        view_ja = _view_body("ja").replace("ビューの成果が整う。", "ビューの成果 `skill:#alpha` が整う。")
+        errors, _ = pair(view_en, view_ja, en_kind="process-view", ja_kind="process-view")
+        self.assertEqual(errors, [])
+        changed_view_ja = view_ja.replace("`skill:#alpha`", "`skill:#beta`", 1)
+        errors, _ = pair(view_en, changed_view_ja, en_kind="process-view", ja_kind="process-view")
+        self.assertTrue(any("view-outcome-identity-mismatch" in item for item in errors), errors)
 
-    def test_process_model_rejects_undeclared_named_table_endpoint(self) -> None:
-        relationships = """| Provider | Information | Recipient | Relationship |
-| --- | --- | --- | --- |
-| One | information | Missing | relates the Processes. |"""
-        errors = check_model(relationships)
-        self.assertTrue(
-            any(
-                "relationship row 1 recipient Process 'Missing' is not declared"
-                in error
-                for error in errors
-            ),
-            errors,
+        empty_model_en = model_en.replace("| Alpha | `skill:#alpha` |", "| Alpha | |").replace("| Beta | `skill:#beta` |", "| Beta | |")
+        empty_model_ja = model_ja.replace("| アルファ | `skill:#alpha` |", "| アルファ | |").replace("| ベータ | `skill:#beta` |", "| ベータ | |")
+        errors, warnings = pair(empty_model_en, empty_model_ja, en_kind="process-model", ja_kind="process-model")
+        self.assertEqual(errors, [])
+        self.assertTrue(warnings)
+        self.assertTrue(all("warning unverified-locale-identity/" in item for item in warnings), warnings)
+
+    def test_cli_exit_statuses_version_warning_success_and_no_conformance_claim(self) -> None:
+        from unittest import mock
+        import alps_check.cli as cli_module
+
+        def run(root: Path, argv: list[str]):
+            previous = Path.cwd()
+            output, errors = io.StringIO(), io.StringIO()
+            os.chdir(root)
+            try:
+                with redirect_stdout(output), redirect_stderr(errors):
+                    status = CHECKER.main(argv)
+            finally:
+                os.chdir(previous)
+            return status, output.getvalue(), errors.getvalue()
+
+        with _temp_root() as root:
+            helper = CheckerProfileMilestoneBTests
+            helper._write_targets(root, japanese=True)
+            model = _model_body().replace("| Alpha | `skill:#alpha` |", "| Alpha | |")
+            model = model.replace("| Beta | |", "| Beta | |")
+            _write(root, "skills/model/SKILL.md", _asset("model", "process-model", "en", model))
+            model_ja = _model_body("ja").replace("| アルファ | `skill:#alpha` |", "| アルファ | |")
+            _write(root, "skills/model/references/locales/ja/SKILL.md", _asset("model", "process-model", "ja", model_ja))
+            status, output, errors = run(root, [])
+            self.assertEqual(status, 0)
+            self.assertIn(f"PROFILE_VERSION={CHECKER.PROFILE_VERSION}", output)
+            self.assertIn("not an ALPS Conformance claim", output)
+            self.assertIn("warning unverified-locale-identity", errors)
+
+        with _temp_root() as root:
+            unsupported = _write(root, "unsupported.md", _asset("unsupported", "process", "en", _process_body().replace("## Purpose", "## Unknown", 1)))
+            semantic = _write(root, "semantic.md", _asset("semantic", "process-model", "en", _model_body().replace("| Alpha | Information | Beta | Supports |", "| Gamma | Information | Beta | Supports |")))
+            pair_dir = root / "skills" / "pair"
+            english = _write(pair_dir, "SKILL.md", _asset("pair", "process", "en", _process_body(outcome_lines=("One.", "Two."))))
+            japanese = _write(pair_dir, "references/locales/ja/SKILL.md", _asset("pair", "process", "ja", _process_body("ja", outcome_lines=("一つ。",))))
+            for label, path, expected in (
+                ("unsupported", unsupported, "unsupported-profile-syntax"),
+                ("semantic", semantic, "relationship-endpoint"),
+                ("locale", english, "process-outcome-count-mismatch"),
+            ):
+                with self.subTest(document_status=label):
+                    status, _, errors = run(root, [str(path)])
+                    self.assertEqual(status, 1)
+                    self.assertIn(expected, errors)
+
+            valid = _write(root, "valid.md", _asset("valid", "process", "en", _process_body()))
+            invalid_utf8 = root / "invalid-utf8.md"
+            invalid_utf8.write_bytes(b"\xff")
+            for label, argv, expected in (
+                ("invalid-utf8", [str(invalid_utf8)], "host-input/invalid-utf8"),
+                ("missing", [str(root / "does-not-exist.md")], "host-input/read-failed"),
+                ("config", ["--package-root", "invalid-spec", str(valid)], "host-input/invalid-package-root-spec"),
+            ):
+                with self.subTest(input_status=label):
+                    status, _, errors = run(root, argv)
+                    self.assertEqual(status, 2)
+                    self.assertIn(expected, errors)
+
+            with mock.patch.object(cli_module, "_run", side_effect=RuntimeError("boom")):
+                status, _, errors = run(root, [])
+            self.assertEqual(status, 2)
+            self.assertIn("internal/cli-failed", errors)
+
+        with _temp_root() as root:
+            previous = Path.cwd()
+            output, errors = io.StringIO(), io.StringIO()
+            os.chdir(root)
+            try:
+                with self.assertRaises(SystemExit) as raised, redirect_stdout(output), redirect_stderr(errors):
+                    CHECKER.main(["--version"])
+            finally:
+                os.chdir(previous)
+            self.assertEqual(raised.exception.code, 0)
+            self.assertIn(CHECKER.PROFILE_VERSION, output.getvalue())
+            self.assertEqual(errors.getvalue(), "")
+
+        with _temp_root() as root:
+            _write(root, "skills/lonely/SKILL.md", _asset("lonely", "process", "en", _process_body()))
+            status, _, errors = run(root, ["--require-japanese"])
+            self.assertEqual(status, 1)
+            self.assertIn("locale-mismatch/missing-japanese-counterpart", errors)
+
+    def test_cli_resolves_relative_asset_paths_against_configured_root_from_other_cwd(self) -> None:
+        with _temp_root() as root:
+            asset = _write(
+                root,
+                "skills/relative/SKILL.md",
+                _asset("relative", "process", "en", _process_body()),
+            )
+            outside = root / "outside"
+            outside.mkdir()
+            previous = Path.cwd()
+            output, errors = io.StringIO(), io.StringIO()
+            os.chdir(outside)
+            try:
+                with redirect_stdout(output), redirect_stderr(errors):
+                    status = CHECKER.main(
+                        ["--root", str(root), "--no-locale-pairs", "skills/relative/SKILL.md"]
+                    )
+            finally:
+                os.chdir(previous)
+            self.assertEqual(status, 0, errors.getvalue())
+            self.assertIn(f"PROFILE_VERSION={CHECKER.PROFILE_VERSION}", output.getvalue())
+            self.assertNotIn(str(outside / "skills"), errors.getvalue())
+            self.assertTrue(asset.is_file())
+
+    def test_cli_rejects_removed_legacy_ja_allow_term_option(self) -> None:
+        with _temp_root() as root:
+            previous = Path.cwd()
+            errors = io.StringIO()
+            os.chdir(root)
+            try:
+                with self.assertRaises(SystemExit) as raised, redirect_stderr(errors):
+                    CHECKER.main(["--ja-allow-term", "用語"])
+            finally:
+                os.chdir(previous)
+            self.assertEqual(raised.exception.code, 2)
+            self.assertIn("unrecognized arguments: --ja-allow-term", errors.getvalue())
+
+    def test_input_diagnostics_compose_and_invalid_utf8_keeps_host_status(self) -> None:
+        with _temp_root() as root:
+            valid = _asset("input-boundary", "process", "en", _process_body()).encode()
+            standalone = (
+                ("bom", b"\xef\xbb\xbf" + valid, "utf8-bom"),
+                ("nul", valid.replace(b"Fixture Process", b"Fixture\x00Process", 1), "nul-byte"),
+                ("bare-cr", valid.replace(b"\n", b"\r", 1), "bare-cr"),
+            )
+            for label, data, code in standalone:
+                with self.subTest(standalone=label):
+                    path = root / f"standalone-{label}.md"
+                    path.write_bytes(data)
+                    parsed = CHECKER.parse_asset(path)
+                    self.assertIn(code, _codes(parsed))
+
+            combined = b"\xef\xbb\xbf" + (b"x\x00\r\xff\n" * 20_001)
+            path = root / "combined-input-boundaries.md"
+            path.write_bytes(combined)
+            parsed = CHECKER.parse_asset(path)
+            self.assertIn("utf8-bom", _codes(parsed))
+            self.assertIn("nul-byte", _codes(parsed))
+            self.assertIn("bare-cr", _codes(parsed))
+            self.assertIn("line-limit", _codes(parsed))
+            self.assertIn("invalid-utf8", _codes(parsed))
+            self.assertIn("host-input", _classes(parsed))
+
+            previous = Path.cwd()
+            errors = io.StringIO()
+            os.chdir(root)
+            try:
+                with redirect_stderr(errors):
+                    status = CHECKER.main([str(path)])
+            finally:
+                os.chdir(previous)
+            self.assertEqual(status, 2)
+            self.assertIn("host-input/invalid-utf8", errors.getvalue())
+
+    def test_exact_and_plus_one_resource_limits_records_and_container_state_bound(self) -> None:
+        from unittest import mock
+        from alps_check import markdown_profile
+        from alps_check.model import (
+            MAX_ACTIVE_CONTAINER_STATES,
+            MAX_FRONTMATTER_BYTES,
+            MAX_INPUT_BYTES,
+            MAX_INPUT_LINES,
+            MAX_LINE_BYTES,
+            MAX_RECORDS_PER_SECTION,
         )
+        self.assertEqual(MAX_ACTIVE_CONTAINER_STATES, 1)
 
-    def test_process_model_accepts_heading_form_process_entries(self) -> None:
-        processes = """### One
+        def parse_bytes(root: Path, label: str, data: bytes):
+            path = root / f"{label}.md"
+            path.write_bytes(data)
+            return CHECKER.parse_asset(path)
 
-#### Notes
+        with _temp_root() as root:
+            base = _asset("bytes-limit", "process", "en", _process_body(extra="\n## Inputs\n\n")).encode()
+            remaining = MAX_INPUT_BYTES - len(base)
+            filler = bytearray()
+            while remaining >= MAX_LINE_BYTES + 1:
+                filler.extend(b"x" * MAX_LINE_BYTES + b"\n")
+                remaining -= MAX_LINE_BYTES + 1
+            if remaining == 1:
+                filler.extend(b"\n")
+            elif remaining > 1:
+                filler.extend(b"x" * (remaining - 1) + b"\n")
+            exact = base + bytes(filler)
+            over = exact + b"x"
+            self.assertEqual(len(exact), MAX_INPUT_BYTES)
+            self.assertLess(exact.count(b"\n"), MAX_INPUT_LINES)
+            exact_result = parse_bytes(root, "bytes-exact", exact)
+            self.assert_no_errors(exact_result)
+            self.assertIn("input-too-large", _codes(parse_bytes(root, "bytes-plus-one", over)))
 
-This explanatory heading is not a Process entry.
+        with _temp_root() as root:
+            base_lines = _asset("lines-limit", "process", "en", _process_body(extra="\n## Inputs\n\n")).splitlines()
+            exact = "\n".join(base_lines + ["x"] * (MAX_INPUT_LINES - len(base_lines))).encode()
+            over = exact + b"\nx"
+            self.assert_no_errors(parse_bytes(root, "lines-exact", exact))
+            self.assertIn("line-limit", _codes(parse_bytes(root, "lines-plus-one", over)))
 
-```markdown
-### Fake from code
-```
+        with _temp_root() as root:
+            base = _asset("line-bytes", "process", "en", _process_body(extra="\n## Inputs\n\n")).encode()
+            exact = base + b"x" * MAX_LINE_BYTES
+            over = base + b"x" * (MAX_LINE_BYTES + 1)
+            self.assert_no_errors(parse_bytes(root, "line-bytes-exact", exact))
+            self.assertIn("line-too-long", _codes(parse_bytes(root, "line-bytes-plus-one", over)))
 
-    ### Fake from indented code
+        with _temp_root() as root:
+            front = _frontmatter("frontmatter-limit", "process", "en").encode()
+            close = b"---\n"
+            prefix = front[:front.rfind(close)]
 
-### Two
+            # The exact v1 five-line mapping is deliberately surrounded by
+            # rejected filler: field grammar is stricter than this independent
+            # upper-byte guard, so validity is not the assertion for this case.
+            def frontmatter_asset(limit: int) -> bytes:
+                available = limit - len(prefix) - len(close)
+                unit = b"x:" + b"a" * 997 + b"\n"
+                filler = bytearray()
+                while available > len(unit) + 2:
+                    filler.extend(unit)
+                    available -= len(unit)
+                final_length = available
+                filler += b"x:" + b"a" * (final_length - 3) + b"\n"
+                return prefix + filler + close + _process_body(extra="\n## Inputs\n\n").encode()
 
-#### Details
+            exact = frontmatter_asset(MAX_FRONTMATTER_BYTES)
+            over = frontmatter_asset(MAX_FRONTMATTER_BYTES + 1)
+            self.assertEqual(exact.find(close, len(prefix)) + len(close), MAX_FRONTMATTER_BYTES)
+            exact_result = parse_bytes(root, "frontmatter-exact", exact)
+            self.assertNotIn("frontmatter-too-large", _codes(exact_result))
+            self.assertTrue(exact_result.diagnostics)
+            self.assertIn("frontmatter-too-large", _codes(parse_bytes(root, "frontmatter-plus-one", over)))
 
-This deeper heading is not a Process entry.
-"""
-        self.assertEqual(CHECKER.process_model_entries(processes), ["One", "Two"])
-        self.assertEqual(check_model("- One -> Two", processes), [])
+        def process_with_records(count: int, *, tasks: bool = False) -> str:
+            if tasks:
+                return _asset("records", "process", "en", _process_body(task_lines=tuple(f"The agent must complete step {i}." for i in range(count))))
+            return _asset("records", "process", "en", _process_body(outcome_lines=tuple(f"Outcome item {i} exists." for i in range(count))))
 
-    def test_process_model_merges_mixed_process_entries_and_masks_code(self) -> None:
-        processes = """| Process | Skill |
-| --- | --- |
-| One | `skill:#one` |
+        def model_with_records(process_count: int, relationship_count: int) -> str:
+            processes = "\n".join(f"| Process {i} | |" for i in range(process_count))
+            relationships = "\n".join("| Process 0 | Information | Process 1 | Supports |" for _ in range(relationship_count))
+            return _asset(
+                "records-model", "process-model", "en", _clean(
+                    f"""# Records Model
 
-- Two
+## Purpose
 
-### Three
+Bounded records.
 
-#### Notes
+## Processes
 
-This is explanatory text.
-
-```markdown
 | Process | Skill |
 | --- | --- |
-| Missing | `skill:#does-not-exist` |
-- Missing
-```
+{processes}
+
+## Relationships
+
+| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+{relationships}
 """
-        self.assertEqual(
-            CHECKER.process_model_entries(processes),
-            ["One", "Two", "Three"],
-        )
-        self.assertEqual(
-            CHECKER.process_model_identities(processes, "fixture"),
+                ),
+            )
+
+        def view_with_records(source_count: int, included_count: int) -> str:
+            sources = "\n".join(
+                f"| Source {index} | `skill:#source-{index}` |"
+                for index in range(source_count)
+            )
+            included = "\n".join(
+                f"| Source 0 (`skill:#source-0`) | Activity: Inspect {index} |"
+                for index in range(included_count)
+            )
+            return _asset("records-view", "process-view", "en", _clean(
+                f"""# Records View
+
+## Purpose
+
+Bounded view records.
+
+## Outcomes
+
+- The view is ready.
+
+## Source Processes
+
+| Source Process | Reference |
+| --- | --- |
+{sources}
+
+## Included Activities and Tasks
+
+| Source Process | Source element |
+| --- | --- |
+{included}
+
+## Application
+
+Apply this view.
+"""
+            ))
+
+        def reference_model_with_records(count: int) -> str:
+            entries = "\n".join(
+                f"""### Process {index}
+
+#### Purpose
+
+Defines process {index}.
+
+#### Outcomes
+
+- Process {index} is ready.
+"""
+                for index in range(count)
+            )
+            return _asset("records-reference", "process-reference-model", "en", _clean(
+                f"""# Records Reference Model
+
+## Purpose
+
+Bounded reference entries.
+
+## Processes
+
+{entries}
+
+## Relationships
+
+| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+| Process 0 | Information | Process 1 | Supports |
+"""
+            ))
+
+        def aggregate_references(count: int) -> str:
+            references = "\n".join(f"`skill:#reference-{index}`" for index in range(count))
+            return _asset(
+                "records-references",
+                "process",
+                "en",
+                _process_body(extra=f"\n## Inputs\n\n{references}\n"),
+            )
+
+        with _temp_root() as root:
+            record_cases = (
+                ("outcomes", lambda n: process_with_records(n), "record-limit"),
+                ("tasks", lambda n: process_with_records(n, tasks=True), "record-limit"),
+                ("process-table", lambda n: model_with_records(n, 1), "record-limit"),
+                ("relationship-table", lambda n: model_with_records(2, n), "record-limit"),
+                ("view-source-table", lambda n: view_with_records(n, 1), "record-limit"),
+                ("view-included-table", lambda n: view_with_records(2, n), "record-limit"),
+                ("reference-model-processes", reference_model_with_records, "record-limit"),
+                ("aggregate-references", aggregate_references, "reference-limit"),
+            )
+            for label, factory, expected in record_cases:
+                with self.subTest(record_section=label, limit="exact"):
+                    exact = CHECKER.parse_asset(_write(root, f"records-{label}-exact.md", factory(MAX_RECORDS_PER_SECTION)))
+                    self.assert_no_errors(exact)
+                with self.subTest(record_section=label, limit="plus-one"):
+                    over = CHECKER.parse_asset(_write(root, f"records-{label}-plus-one.md", factory(MAX_RECORDS_PER_SECTION + 1)))
+                    self.assertIn(expected, _codes(over))
+
+        with _temp_root() as root:
+            nested = _parse(root, _asset("nested-state", "process", "en", _process_body(extra="\n## Inputs\n\n- ```\n# hidden\n```\n")), name="nested-state")
+            self.assertIn("nested-container", _codes(nested))
+            with mock.patch.object(markdown_profile, "MAX_ACTIVE_CONTAINER_STATES", MAX_ACTIVE_CONTAINER_STATES):
+                _, bounded = markdown_profile._scan("nested-state.md", ["- ```", "# hidden", "```"], 0)
+            self.assertIn("nested-container", tuple(item.code for item in bounded))
+            _, closed = markdown_profile._scan("closed-state.md", ["```", "hidden", "```"], 0)
+            self.assertNotIn("state-limit", tuple(item.code for item in closed))
+            with mock.patch.object(markdown_profile, "MAX_ACTIVE_CONTAINER_STATES", 0):
+                _, limited = markdown_profile._scan("state-limit.md", ["```"], 0)
+            self.assertIn("state-limit", tuple(item.code for item in limited))
+
+    def test_diagnostic_class_whitelist_and_profile_version_serialization_contract(self) -> None:
+        from alps_check import locale_compare
+
+        allowed = frozenset(
             {
-                "One": "ref:fixture#one",
-                "Two": "name:Two",
-                "Three": "name:Three",
-            },
-        )
-        self.assertEqual(check_model("- One -> Two", processes), [])
-
-        missing = processes.replace(
-            "- Two\n\n### Three", "- Missing (`skill:#does-not-exist`)\n\n### Three"
-        )
-        errors = check_model("- One -> Two", missing)
-        self.assertTrue(
-            any("unresolved Skill reference skill:#does-not-exist" in error for error in errors),
-            errors,
-        )
-
-    def test_process_model_process_table_derives_name_and_skill_columns(self) -> None:
-        processes = """| Skill | Process |
-| --- | --- |
-| skill:#one | One |
-| skill:#two | Two |
-"""
-        self.assertEqual(
-            CHECKER.process_model_entries(processes),
-            ["One", "Two"],
-        )
-        self.assertEqual(
-            CHECKER.process_model_identities(processes, "fixture"),
-            {
-                "One": "ref:fixture#one",
-                "Two": "ref:fixture#two",
-            },
-        )
-        self.assertEqual(check_model("- One -> Two", processes), [])
-        self.assertEqual(
-            check_model("- skill:#one -> skill:#two", processes),
-            [],
-        )
-        self.assertEqual(
-            CHECKER.process_reference_model_identities(processes, "fixture"),
-            {
-                "One": "ref:fixture#one",
-                "Two": "ref:fixture#two",
-            },
-        )
-
-        japanese_processes = """| スキル | プロセス |
-| --- | --- |
-| `skill:#one` | 一 |
-| `skill:#two` | 二 |
-"""
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_process_model_pair(
-                Path(directory), "- 一 -> 二", "- One -> Two"
-            )
-            write(
-                english,
-                english.read_text(encoding="utf-8").replace(
-                    "- One\n- Two", processes.strip()
-                ),
-            )
-            write(
-                japanese,
-                japanese.read_text(encoding="utf-8").replace(
-                    "- 一\n- 二", japanese_processes.strip()
-                ),
-            )
-            errors, _ = CHECKER.check_pair(
-                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
-            )
-            self.assertEqual(errors, [], errors)
-
-    def test_process_model_process_table_rejects_missing_or_ambiguous_headers(self) -> None:
-        missing_name = """| Skill | Description |
-| --- | --- |
-| skill:#one | One |
-"""
-        errors = check_model("- One -> Two", missing_name)
-        self.assertTrue(
-            any("Process table requires a Process name column" in error for error in errors),
-            errors,
-        )
-        ambiguous_skill = """| Process | Skill | Reference |
-| --- | --- | --- |
-| One | skill:#one | skill:#one |
-"""
-        errors = check_model("- One -> Two", ambiguous_skill)
-        self.assertTrue(
-            any("Process table has ambiguous Skill reference columns" in error for error in errors),
-            errors,
-        )
-        missing_reference = """| Process | Description |
-| --- | --- |
-| One | skill:#one |
-"""
-        errors = check_model("- One -> Two", missing_reference)
-        self.assertTrue(
-            any(
-                "Process table requires a Skill reference column for canonical references"
-                in error
-                for error in errors
-            ),
-            errors,
-        )
-
-    def test_process_model_pair_compares_mixed_process_entries(self) -> None:
-        english_processes = """| Process | Description |
-| --- | --- |
-| One | first Process |
-
-- Two
-"""
-        japanese_processes = """| プロセス | 説明 |
-| --- | --- |
-| 一 | 最初のプロセス |
-
-- 二
-"""
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_process_model_pair(
-                Path(directory), "- 一 -> 二", "- One -> Two"
-            )
-            write(
-                english,
-                english.read_text(encoding="utf-8").replace(
-                    "- One\n- Two", english_processes.strip()
-                ),
-            )
-            write(
-                japanese,
-                japanese.read_text(encoding="utf-8").replace(
-                    "- 一\n- 二", japanese_processes.strip()
-                ),
-            )
-            errors, _ = CHECKER.check_pair(
-                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
-            )
-            self.assertEqual(errors, [], errors)
-
-            write(
-                japanese,
-                japanese.read_text(encoding="utf-8").replace("\n\n- 二", ""),
-            )
-            errors, _ = CHECKER.check_pair(
-                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
-            )
-            self.assertTrue(
-                any("Process count differs" in error for error in errors),
-                errors,
-            )
-
-        canonical_en = """| Process | Skill |
-| --- | --- |
-| One | `skill:#one` |
-
-- Two (`skill:#two`)
-"""
-        canonical_ja = """| プロセス | スキル |
-| --- | --- |
-| 一 | `skill:#one` |
-
-- 二 (`skill:#two`)
-"""
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_process_model_pair(
-                Path(directory), "- 一 -> 二", "- One -> Two"
-            )
-            write(
-                english,
-                english.read_text(encoding="utf-8").replace(
-                    "- One\n- Two", canonical_en.strip()
-                ),
-            )
-            write(
-                japanese,
-                japanese.read_text(encoding="utf-8").replace(
-                    "- 一\n- 二",
-                    canonical_ja.replace(
-                        "- 二 (`skill:#two`)",
-                        "- 一 (`skill:#one`) -> 二 (`skill:#two`)",
-                    ).strip(),
-                ),
-            )
-            errors, _ = CHECKER.check_pair(
-                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
-            )
-            self.assertTrue(
-                any("Process reference identity or order differs" in error for error in errors),
-                errors,
-            )
-
-
-    def test_process_model_accepts_list_process_descriptions(self) -> None:
-        processes = "- One: the first Process\n- Two: the second Process"
-        self.assertEqual(check_model("- One -> Two", processes), [])
-
-    def test_process_model_preserves_meaningful_parenthetical_names(self) -> None:
-        processes = (
-            "- One (intake): the first Process\n"
-            "- Two (review): the second Process"
-        )
-        self.assertEqual(
-            check_model("- One (intake) -> Two (review): carries information", processes),
-            [],
-        )
-        self.assertEqual(
-            check_model(
-                "- One (intake) -> Two (review) - carries information",
-                processes,
-            ),
-            [],
-        )
-        full_width_processes = (
-            "- One （intake）: the first Process\n"
-            "- Two （review）: the second Process"
-        )
-        self.assertEqual(
-            check_model(
-                "- One （intake） -> Two （review）: carries information",
-                full_width_processes,
-            ),
-            [],
-        )
-        self.assertEqual(CHECKER.process_display_name("skill:#one"), "")
-        self.assertEqual(
-            CHECKER.process_display_name("One (intake): the first Process"),
-            "One (intake)",
-        )
-        self.assertEqual(
-            CHECKER.process_display_name("One （intake）: the first Process"),
-            "One （intake）",
-        )
-        self.assertEqual(
-            CHECKER.process_display_name("One (v2: beta): the first Process"),
-            "One (v2: beta)",
-        )
-        self.assertEqual(
-            CHECKER.process_display_name("One (intake) - the first Process"),
-            "One (intake)",
-        )
-
-    def test_process_model_accepts_declared_named_table_endpoints(self) -> None:
-        relationships = """| Provider | Information | Recipient | Relationship |
-| --- | --- | --- | --- |
-| One | information | Two | relates the Processes. |"""
-        self.assertEqual(check_model(relationships), [])
-
-    def test_process_model_rejects_undeclared_named_list_endpoint(self) -> None:
-        errors = check_model("- One -> Missing")
-        self.assertTrue(
-            any(
-                "relationship item 1 recipient Process 'Missing' is not declared"
-                in error
-                for error in errors
-            ),
-            errors,
-        )
-
-    def test_process_model_accepts_declared_named_list_endpoints(self) -> None:
-        self.assertEqual(check_model("- One -> Two"), [])
-
-    def test_process_model_rejects_endpointless_relationship_list_item(self) -> None:
-        errors = check_model("- Nothing structured here")
-        self.assertTrue(
-            any(
-                "relationship item 1 must identify provider and recipient Processes"
-                in error
-                for error in errors
-            ),
-            errors,
-        )
-
-    def test_process_reference_model_rejects_endpointless_relationship_list_item(self) -> None:
-        errors = check_reference_model_fixture("- Nothing structured here")
-        self.assertTrue(
-            any(
-                "relationship item 1 must identify provider and recipient Processes"
-                in error
-                for error in errors
-            ),
-            errors,
-        )
-
-    def test_process_models_reject_single_canonical_relationship_list_items(self) -> None:
-        for checker in (check_model, check_reference_model_fixture):
-            with self.subTest(checker=checker.__name__):
-                errors = checker("- skill:#one")
-                self.assertTrue(
-                    any(
-                        "relationship item 1 must identify provider and recipient Processes"
-                        in error
-                        for error in errors
-                    ),
-                    errors,
-                )
-
-    def test_process_models_accept_canonical_provider_and_recipient_relationships(self) -> None:
-        self.assertEqual(check_model("- skill:#one -> skill:#two"), [])
-        self.assertEqual(check_reference_model_fixture("- skill:#one -> skill:#two"), [])
-
-    def test_process_model_trims_named_recipient_description(self) -> None:
-        self.assertEqual(check_model("- One -> Two: carries information"), [])
-
-    def test_process_model_accepts_canonical_provider_in_arrow_list(self) -> None:
-        self.assertEqual(check_model("- skill:#one -> Two"), [])
-
-    def test_process_model_accepts_canonical_recipient_in_arrow_list(self) -> None:
-        self.assertEqual(check_model("- One -> skill:#two"), [])
-
-    def test_process_models_separate_reference_only_endpoint_descriptions(self) -> None:
-        valid_relationships = (
-            "- One -> skill:#two: carries information",
-            "- skill:#one: provides information -> Two",
-            "- skill:#one: provides information -> skill:#two: carries information",
-            "- Two (`skill:#two`): carries information -> One (`skill:#one`)",
-        )
-        for relationship in valid_relationships:
-            with self.subTest(relationship=relationship):
-                self.assertEqual(check_model(relationship), [])
-                self.assertEqual(check_reference_model_fixture(relationship), [])
-
-        mismatch = check_model(
-            "- One -> Wrong (`skill:#two`): carries information"
-        )
-        self.assertTrue(
-            any("differs from referenced Process 'Two'" in error for error in mismatch),
-            mismatch,
-        )
-
-    def test_process_model_pair_compares_reference_only_endpoint_descriptions(self) -> None:
-        english = "- One -> skill:#two: carries information"
-        japanese = "- 一 -> skill:#two: 情報を運ぶ。"
-        with tempfile.TemporaryDirectory() as directory:
-            english_path, japanese_path = write_process_model_pair(
-                Path(directory), japanese, english
-            )
-            errors, _ = CHECKER.check_pair(
-                english_path,
-                japanese_path,
-                set(CHECKER.DEFAULT_JA_TERMS) | {"skill", "two"},
-                "fixture",
-            )
-            self.assertEqual(errors, [], errors)
-
-    def test_inline_code_cannot_hide_following_canonical_reference(self) -> None:
-        inline_comment = chr(96) + chr(60) + "!--" + chr(96)
-        self.assertEqual(
-            CHECKER.references(inline_comment + " skill:#missing"),
-            ["skill:#missing"],
-        )
-        errors = check_model("- " + inline_comment + " skill:#missing")
-        self.assertTrue(
-            any("unresolved Skill reference skill:#missing" in error for error in errors),
-            errors,
-        )
-
-    def test_inline_code_keeps_valid_canonical_reference_operative(self) -> None:
-        self.assertEqual(CHECKER.references(chr(96) + "skill:#one" + chr(96)), ["skill:#one"])
-        inline_comment = chr(96) + chr(60) + "!--" + chr(96)
-        self.assertEqual(
-            CHECKER.references(inline_comment + " skill:#one"),
-            ["skill:#one"],
-        )
-
-    def test_reference_scan_ignores_top_level_and_list_indented_code(self) -> None:
-        value = """Relationships:
-
-    skill:#missing
-
-- One -> Two skill:#one
-  Continuation keeps skill:#two operative.
-
-      skill:#missing
-"""
-        self.assertEqual(
-            CHECKER.references(value),
-            ["skill:#one", "skill:#two"],
-        )
-
-    def test_reference_scan_ignores_blockquoted_fences_and_indented_code(self) -> None:
-        backticks = chr(96) * 3
-        tildes = chr(126) * 3
-        quoted_code = (
-            "> " + backticks + "text\n"
-            "> skill:#missing\n"
-            "> " + backticks + "\n"
-            "> > " + tildes + "text\n"
-            "> > skill:#missing\n"
-            "> > " + tildes + "\n"
-            ">     skill:#missing\n"
-            "> >     skill:#missing\n"
-        )
-        self.assertEqual(CHECKER.references(quoted_code), [])
-        self.assertEqual(
-            CHECKER.references("> See skill:#one here.\n"),
-            ["skill:#one"],
-        )
-        self.assertEqual(
-            CHECKER.references(
-                "> - One -> Two skill:#one\n"
-                ">   Continuation keeps skill:#two operative.\n"
-            ),
-            ["skill:#one", "skill:#two"],
-        )
-
-    def test_reference_scan_masks_fences_nested_in_list_containers(self) -> None:
-        tildes = chr(126) * 3
-        value = (
-            "- outer item\n"
-            "    " + tildes + "\n"
-            "    skill:#missing\n"
-            "    " + (chr(126) * 4) + "\n"
-            "- visible skill:#one\n"
-            "  - nested item\n"
-            "      " + tildes + "\n"
-            "      skill:#missing-nested\n"
-            "      " + (chr(126) * 5) + "\n"
-            "> - quoted item\n"
-            ">     " + tildes + "\n"
-            ">     skill:#missing-quoted\n"
-            ">     " + (chr(126) * 4) + "\n"
-            "> - visible skill:#two\n"
-        )
-        self.assertEqual(
-            CHECKER.references(value),
-            ["skill:#one", "skill:#two"],
-        )
-
-        ordinary_code = (
-            "    " + tildes + "\n"
-            "    skill:#ordinary-code\n"
-            "    " + tildes + "\n"
-            "\nParagraph skill:#three\n"
-        )
-        self.assertIn("skill:#ordinary-code", CHECKER.without_fenced_code(ordinary_code))
-        self.assertEqual(CHECKER.references(ordinary_code), ["skill:#three"])
-
-    def test_reference_scan_rejects_backtick_fence_openers_with_backticks_in_info(self) -> None:
-        invalid = "```bad`info\nskill:#missing\n"
-        self.assertIn("skill:#missing", CHECKER.without_fenced_code(invalid))
-        self.assertEqual(CHECKER.references(invalid), ["skill:#missing"])
-
-        valid_backtick = "```good-info\nskill:#hidden-backtick\n```\nskill:#after-backtick\n"
-        self.assertEqual(CHECKER.references(valid_backtick), ["skill:#after-backtick"])
-
-        valid_tilde = "~~~bad`info\nskill:#hidden-tilde\n~~~\nskill:#after-tilde\n"
-        self.assertEqual(CHECKER.references(valid_tilde), ["skill:#after-tilde"])
-
-    def test_reference_scan_masks_only_markdown_link_destination_spans(self) -> None:
-        inline = "[one](skill:#missing) [two](skill:#missing)\nskill:#missing"
-        self.assertEqual(
-            CHECKER.markdown_link_targets(inline),
-            ["skill:#missing", "skill:#missing"],
-        )
-        self.assertEqual(CHECKER.references(inline), ["skill:#missing"])
-
-        definitions = "[one]: skill:#missing\n[two]: skill:#missing\n\nskill:#missing"
-        self.assertEqual(
-            CHECKER.markdown_link_targets(definitions),
-            ["skill:#missing", "skill:#missing"],
-        )
-        self.assertEqual(CHECKER.references(definitions), ["skill:#missing"])
-
-    def test_anchored_metadata_kind_is_preserved_for_valid_view(self) -> None:
-        kind, errors = check_anchored_view_fixture(True)
-        self.assertEqual(kind, "process-view")
-        self.assertEqual(errors, [])
-
-    def test_anchored_process_view_requires_view_sections(self) -> None:
-        kind, errors = check_anchored_view_fixture(False)
-        self.assertEqual(kind, "process-view")
-        self.assertTrue(
-            any("Process View requires Source Processes" in error for error in errors),
-            errors,
-        )
-        self.assertFalse(
-            any("Process representation requires" in error for error in errors),
-            errors,
-        )
-
-    def test_frontmatter_aliases_select_view_kind_and_validate_view_sections(self) -> None:
-        forms = (
-            "view-kind: &view-kind {alps.kind: process-view}\n"
-            "metadata: *view-kind\n",
-            "view-kind: &view-kind {alps.kind: process-view}\n"
-            "metadata: !!map *view-kind\n",
-            "representations:\n"
-            "  view-kind: &view-kind\n"
-            "    alps.kind: process-view\n"
-            "metadata: *view-kind\n",
-        )
-        for form in forms:
-            with self.subTest(form=form):
-                with tempfile.TemporaryDirectory() as directory:
-                    root = Path(directory)
-                    path = root / "skills" / "fixture" / "SKILL.md"
-                    write(
-                        path,
-                        "---\n"
-                        "name: fixture\n"
-                        "description: Fixture process. ALPS-conformant.\n"
-                        + form
-                        + "---\n\n"
-                        "# Fixture\n\n"
-                        "## Purpose\n\n"
-                        "The fixture has a purpose.\n\n"
-                        "## Outcomes\n\n"
-                        "- The fixture is complete.\n",
-                    )
-                    values, frontmatter_errors = CHECKER.frontmatter(
-                        path.read_text(encoding="utf-8")
-                    )
-                    self.assertEqual(frontmatter_errors, [], frontmatter_errors)
-                    self.assertEqual(values["alps.kind"], "process-view")
-                    self.assertEqual(CHECKER.representation_kind(path), "process-view")
-                    errors, _ = CHECKER.check_asset(path, {"": root}, None)
-                    self.assertTrue(
-                        any("Process View requires Source Processes" in error for error in errors),
-                        errors,
-                    )
-                    self.assertFalse(
-                        any("Process representation requires" in error for error in errors),
-                        errors,
-                    )
-
-    def test_frontmatter_merges_nested_metadata_aliases_before_kind_dispatch(self) -> None:
-        forms = (
-            "view: &view {kind: process-view}\n"
-            "metadata:\n"
-            "  alps: *view\n",
-            "view: !!map &view {kind: !!str process-view}\n"
-            "metadata:\n"
-            "  alps: !!map *view\n",
-            "kind: &kind process-view\n"
-            "metadata: {alps: {kind: *kind}}\n",
-        )
-        for form in forms:
-            with self.subTest(form=form):
-                text = (
-                    "---\n"
-                    "name: fixture\n"
-                    "description: Fixture process. ALPS-conformant.\n"
-                    + form
-                    + "---\n"
-                )
-                values, frontmatter_errors = CHECKER.frontmatter(text)
-                self.assertEqual(frontmatter_errors, [], frontmatter_errors)
-                self.assertEqual(values["alps.kind"], "process-view")
-                with tempfile.TemporaryDirectory() as directory:
-                    root = Path(directory)
-                    path = root / "skills" / "fixture" / "SKILL.md"
-                    write(
-                        path,
-                        text
-                        + "\n# Fixture\n\n## Purpose\n\nPurpose.\n\n"
-                        "## Outcomes\n\n- Outcome.\n",
-                    )
-                    self.assertEqual(CHECKER.representation_kind(path), "process-view")
-                    errors, _ = CHECKER.check_asset(path, {"": root}, None)
-                    self.assertTrue(
-                        any("Process View requires Source Processes" in error for error in errors),
-                        errors,
-                    )
-                    self.assertFalse(
-                        any("Process representation requires" in error for error in errors),
-                        errors,
-                    )
-
-    def test_frontmatter_resolves_mapping_merge_before_kind_dispatch(self) -> None:
-        text = """---
-name: fixture
-description: Fixture process. ALPS-conformant.
-defaults: &defaults {alps: {kind: process-view}}
-metadata:
-  <<: *defaults
----
-"""
-        values, errors = CHECKER.frontmatter(text)
-        self.assertEqual(errors, [], errors)
-        self.assertEqual(values.get("alps.kind"), "process-view")
-
-        override = text.replace(
-            "metadata:\n  <<: *defaults",
-            "metadata:\n  <<: *defaults\n  alps:\n    kind: process-model",
-        )
-        override_values, override_errors = CHECKER.frontmatter(override)
-        self.assertEqual(override_errors, [], override_errors)
-        self.assertEqual(override_values.get("alps.kind"), "process-model")
-
-    def test_frontmatter_rejects_invalid_and_cyclic_mapping_merges(self) -> None:
-        invalid = """---
-name: fixture
-description: Fixture process. ALPS-conformant.
-kind: &kind process-view
-metadata:
-  <<: *kind
----
-"""
-        _, invalid_errors = CHECKER.frontmatter(invalid)
-        self.assertTrue(
-            any("YAML merge key" in error for error in invalid_errors),
-            invalid_errors,
-        )
-
-        cyclic = """---
-name: fixture
-description: Fixture process. ALPS-conformant.
-defaults: &defaults {<<: *defaults}
-metadata:
-  <<: *defaults
----
-"""
-        _, cyclic_errors = CHECKER.frontmatter(cyclic)
-        self.assertTrue(
-            any("cyclic YAML alias" in error for error in cyclic_errors),
-            cyclic_errors,
-        )
-
-    def test_frontmatter_resolves_sequence_mapping_merges_with_precedence(self) -> None:
-        text = """---
-name: fixture
-description: Fixture process. ALPS-conformant.
-defaults: &defaults {alps: {kind: process-view}}
-overrides: &overrides {alps: {kind: process-model}}
-metadata:
-  <<: [*defaults, *overrides]
----
-"""
-        values, errors = CHECKER.frontmatter(text)
-        self.assertEqual(errors, [], errors)
-        self.assertEqual(values.get("alps.kind"), "process-view")
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            path = root / "skills" / "fixture" / "SKILL.md"
-            write(path, text + "\n# Fixture\n")
-            self.assertEqual(CHECKER.representation_kind(path), "process-view")
-            asset_errors, _ = CHECKER.check_asset(path, {"": root}, None)
-            self.assertTrue(
-                any("Process View requires" in error for error in asset_errors),
-                asset_errors,
-            )
-
-        explicit = text.replace(
-            "  <<: [*defaults, *overrides]",
-            "  <<: [*defaults, *overrides]\n  alps:\n    kind: process-reference-model",
-        )
-        explicit_values, explicit_errors = CHECKER.frontmatter(explicit)
-        self.assertEqual(explicit_errors, [], explicit_errors)
-        self.assertEqual(explicit_values.get("alps.kind"), "process-reference-model")
-
-        multiline = text.replace(
-            "  <<: [*defaults, *overrides]",
-            "  <<: [\n    *defaults, # first mapping\n    *overrides\n  ]",
-        )
-        multiline_values, multiline_errors = CHECKER.frontmatter(multiline)
-        self.assertEqual(multiline_errors, [], multiline_errors)
-        self.assertEqual(multiline_values.get("alps.kind"), "process-view")
-
-        invalid = text.replace(
-            "  <<: [*defaults, *overrides]",
-            "  <<: [*defaults, scalar-member]",
-        )
-        _, invalid_errors = CHECKER.frontmatter(invalid)
-        self.assertTrue(
-            any("YAML merge key must resolve to a mapping" in error for error in invalid_errors),
-            invalid_errors,
-        )
-
-        unresolved = text.replace(
-            "  <<: [*defaults, *overrides]",
-            "  <<: [*defaults, *missing]",
-        )
-        _, unresolved_errors = CHECKER.frontmatter(unresolved)
-        self.assertTrue(
-            any("unresolved YAML alias *missing" in error for error in unresolved_errors),
-            unresolved_errors,
-        )
-
-        cyclic = """---
-name: fixture
-description: Fixture process. ALPS-conformant.
-defaults: &defaults {<<: [*defaults]}
-metadata:
-  <<: *defaults
----
-"""
-        _, cyclic_errors = CHECKER.frontmatter(cyclic)
-        self.assertTrue(
-            any("cyclic YAML alias" in error for error in cyclic_errors),
-            cyclic_errors,
-        )
-
-        block_sequence = """---
-name: fixture
-description: Fixture process. ALPS-conformant.
-defaults: &defaults {alps: {kind: process-view}}
-overrides: &overrides {alps: {kind: process-model}}
-metadata:
-  <<:
-
-    # Earlier mappings have precedence over later mappings.
-    - *defaults
-
-    - *overrides
----
-"""
-        block_values, block_errors = CHECKER.frontmatter(block_sequence)
-        self.assertEqual(block_errors, [], block_errors)
-        self.assertEqual(block_values.get("alps.kind"), "process-view")
-
-        explicit_block = block_sequence.replace(
-            "    - *overrides\n---",
-            "    - *overrides\n  alps:\n    kind: process-reference-model\n---",
-        )
-        explicit_values, explicit_errors = CHECKER.frontmatter(explicit_block)
-        self.assertEqual(explicit_errors, [], explicit_errors)
-        self.assertEqual(explicit_values.get("alps.kind"), "process-reference-model")
-
-        invalid_block = block_sequence.replace(
-            "    - *overrides",
-            "    - scalar-member",
-        )
-        _, invalid_block_errors = CHECKER.frontmatter(invalid_block)
-        self.assertTrue(
-            any("YAML merge key must resolve to a mapping" in error for error in invalid_block_errors),
-            invalid_block_errors,
-        )
-
-        unresolved_block = block_sequence.replace(
-            "    - *overrides",
-            "    - *missing",
-        )
-        _, unresolved_block_errors = CHECKER.frontmatter(unresolved_block)
-        self.assertTrue(
-            any("unresolved YAML alias *missing" in error for error in unresolved_block_errors),
-            unresolved_block_errors,
-        )
-
-        malformed_block = block_sequence.replace(
-            "    - *overrides",
-            "   - *overrides",
-        )
-        _, malformed_block_errors = CHECKER.frontmatter(malformed_block)
-        self.assertTrue(malformed_block_errors, malformed_block_errors)
-
-        cyclic_block = """---
-name: fixture
-description: Fixture process. ALPS-conformant.
-defaults: &defaults
-  <<:
-    - *defaults
-metadata:
-  <<: *defaults
----
-"""
-        _, cyclic_block_errors = CHECKER.frontmatter(cyclic_block)
-        self.assertTrue(
-            any("cyclic YAML alias" in error for error in cyclic_block_errors),
-            cyclic_block_errors,
-        )
-
-        unrelated_sequences = """---
-name: fixture
-description: Fixture process. ALPS-conformant.
-allowed-tools:
-  - python
-
-  # An unrelated bounded sequence is valid frontmatter.
-  - web.run
-metadata:
-  tags:
-    - one
-
-    - two
-  alps:
-    kind: process-view
----
-"""
-        unrelated_values, unrelated_sequence_errors = CHECKER.frontmatter(
-            unrelated_sequences
-        )
-        self.assertEqual(unrelated_sequence_errors, [], unrelated_sequence_errors)
-        self.assertEqual(unrelated_values.get("alps.kind"), "process-view")
-
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            path = root / "skills" / "fixture" / "SKILL.md"
-            write(path, unrelated_sequences + "\n# Fixture View\n")
-            self.assertEqual(CHECKER.representation_kind(path), "process-view")
-            asset_errors, _ = CHECKER.check_asset(path, {"": root}, None)
-            self.assertTrue(
-                any("Process View requires" in error for error in asset_errors),
-                asset_errors,
-            )
-
-    def test_non_process_representations_resolve_operative_references(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            reference_process_skill(root, "one", "One")
-            reference_process_skill(root, "two", "Two")
-
-            model = process_model(root, "- One -> Two")
-            model_text = model.read_text(encoding="utf-8").replace(
-                "The fixture organizes two Processes.",
-                "The model uses skill:#does-not-exist.",
-            )
-            write(model, model_text)
-
-            reference_model = process_reference_model(root, "- skill:#one -> skill:#two")
-            reference_model_text = reference_model.read_text(encoding="utf-8").replace(
-                "The fixture defines two reference Processes.",
-                "The reference model uses skill:#does-not-exist.",
-            )
-            write(reference_model, reference_model_text)
-
-            view = process_view(
-                root,
-                "- One\n- Two",
-                """| Source Process | Source element |
-| --- | --- |
-| One | Activity |
-| Two | Task |""",
-            )
-            view_text = view.read_text(encoding="utf-8").replace(
-                "The fixture provides application guidance.",
-                "The application uses skill:#does-not-exist.",
-            )
-            write(view, view_text)
-
-            for path in (model, reference_model, view):
-                with self.subTest(kind=CHECKER.representation_kind(path)):
-                    errors, _ = CHECKER.check_asset(path, {"": root}, None)
-                    self.assertTrue(
-                        any("unresolved Skill reference skill:#does-not-exist" in error for error in errors),
-                        (path, errors),
-                    )
-
-            other_root = Path(directory) / "other-package"
-            reference_process_skill(other_root, "two", "Two")
-            for path in (model, reference_model, view):
-                valid_text = path.read_text(encoding="utf-8").replace(
-                    "skill:#does-not-exist",
-                    "skill:#one skill:other#two",
-                )
-                write(path, valid_text)
-                with self.subTest(valid_kind=CHECKER.representation_kind(path)):
-                    errors, _ = CHECKER.check_asset(
-                        path,
-                        {"": root, "other": other_root},
-                        None,
-                    )
-                    self.assertEqual(errors, [], (path, errors))
-
-    def test_frontmatter_accumulates_multiline_flow_metadata_before_kind_dispatch(self) -> None:
-        forms = (
-            "metadata: {\n"
-            "  alps: {kind: process-view}\n"
-            "}\n",
-            "kind: &kind process-view\n"
-            "metadata: !!map &metadata {\n"
-            "  # metadata comment\n"
-            "  alps: !!map {kind: !!str *kind} # item comment\n"
-            "} # representation comment\n",
-            "metadata: {\n"
-            "  note: 'it''s } # text',\n"
-            "  alps: {kind: process-view}\n"
-            "} # representation comment\n",
-        )
-        for form in forms:
-            with self.subTest(form=form):
-                text = (
-                    "---\n"
-                    "name: fixture\n"
-                    "description: Fixture process. ALPS-conformant.\n"
-                    + form
-                    + "---\n"
-                )
-                values, frontmatter_errors = CHECKER.frontmatter(text)
-                self.assertEqual(frontmatter_errors, [], frontmatter_errors)
-                self.assertEqual(values["alps.kind"], "process-view")
-                with tempfile.TemporaryDirectory() as directory:
-                    root = Path(directory)
-                    path = root / "skills" / "fixture" / "SKILL.md"
-                    write(
-                        path,
-                        text
-                        + "\n# Fixture\n\n## Purpose\n\nPurpose.\n\n"
-                        "## Outcomes\n\n- Outcome.\n",
-                    )
-                    self.assertEqual(CHECKER.representation_kind(path), "process-view")
-                    errors, _ = CHECKER.check_asset(path, {"": root}, None)
-                    self.assertTrue(
-                        any("Process View requires Source Processes" in error for error in errors),
-                        errors,
-                    )
-                    self.assertFalse(
-                        any("Process representation requires" in error for error in errors),
-                        errors,
-                    )
-
-    def test_frontmatter_flow_quote_scanner_preserves_multiline_hash_and_brace(self) -> None:
-        text = (
-            "---\n"
-            "name: fixture\n"
-            "description: Fixture process. ALPS-conformant.\n"
-            "metadata: {\n"
-            "  note: \"line one\n"
-            "\n"
-            "    # } remains quoted\",\n"
-            "  alps: {kind: process-view}\n"
-            "} # representation comment\n"
-            "---\n"
-        )
-        values, errors = CHECKER.frontmatter(text)
-        self.assertEqual(errors, [], errors)
-        self.assertEqual(values["metadata.note"], "line one\n# } remains quoted")
-        self.assertEqual(values["alps.kind"], "process-view")
-
-    def test_frontmatter_flow_double_quoted_line_breaks_fold_and_preserve_blanks(self) -> None:
-        text = (
-            "---\n"
-            "name: fixture\n"
-            "description: Fixture process. ALPS-conformant.\n"
-            "metadata: {\n"
-            '  "alps.kind": process-view,\n'
-            '  note: "line one\n'
-            '    line two",\n'
-            '  "display\n'
-            '    name": "value",\n'
-            '  blank: "first\n'
-            "\n"
-            '    third"\n'
-            "}\n"
-            "---\n"
-        )
-        values, errors = CHECKER.frontmatter(text)
-        self.assertEqual(errors, [], errors)
-        self.assertEqual(values["alps.kind"], "process-view")
-        self.assertEqual(values["metadata.note"], "line one line two")
-        self.assertEqual(values["metadata.display name"], "value")
-        self.assertEqual(values["metadata.blank"], "first\nthird")
-        decoded, _, error = CHECKER.yaml_decode_quoted_scalar('"one\r\ntwo"')
-        self.assertIsNone(error)
-        self.assertEqual(decoded, "one two")
-
-    def test_frontmatter_reports_invalid_and_unclosed_flow_mappings(self) -> None:
-        invalid = (
-            "---\n"
-            "name: fixture\n"
-            "description: Fixture process. ALPS-conformant.\n"
-            "metadata: {alps process-view}\n"
-            "---\n"
-        )
-        _, errors = CHECKER.frontmatter(invalid)
-        self.assertTrue(any("invalid metadata flow mapping" in error for error in errors), errors)
-        unclosed = (
-            "---\n"
-            "name: fixture\n"
-            "description: Fixture process. ALPS-conformant.\n"
-            "metadata: {\n"
-            "  alps: {kind: process-view}\n"
-            "---\n"
-        )
-        _, errors = CHECKER.frontmatter(unclosed)
-        self.assertTrue(any("unclosed YAML flow mapping" in error for error in errors), errors)
-
-    def test_frontmatter_aliases_report_unresolved_cyclic_and_wrong_nodes(self) -> None:
-        cases = (
-            (
-                "metadata: *missing\n",
-                "unresolved YAML alias *missing",
-            ),
-            (
-                "kind: &kind process\nmetadata: *kind\n",
-                "must resolve to a mapping for metadata",
-            ),
-            (
-                "first: &first *second\n"
-                "second: &second *first\n"
-                "metadata: *first\n",
-                "cyclic YAML alias",
-            ),
-        )
-        for form, expected in cases:
-            with self.subTest(form=form):
-                text = (
-                    "---\n"
-                    "name: fixture\n"
-                    "description: Fixture process. ALPS-conformant.\n"
-                    + form
-                    + "---\n"
-                )
-                values, errors = CHECKER.frontmatter(text)
-                self.assertNotIn("alps.kind", values)
-                self.assertTrue(any(expected in error for error in errors), errors)
-                with tempfile.TemporaryDirectory() as directory:
-                    root = Path(directory)
-                    path = root / "skills" / "fixture" / "SKILL.md"
-                    write(
-                        path,
-                        text
-                        + "\n# Fixture\n\n## Purpose\n\nPurpose.\n\n"
-                        "## Outcomes\n\n- Outcome.\n",
-                    )
-                    self.assertEqual(CHECKER.representation_kind(path), "")
-                    asset_errors, _ = CHECKER.check_asset(path, {"": root}, None)
-                    self.assertFalse(
-                        any("Process representation requires" in error for error in asset_errors),
-                        asset_errors,
-                    )
-
-    def test_frontmatter_scalar_aliases_resolve_and_mapping_aliases_remain_non_scalar(self) -> None:
-        text = "---\n"
-        text += "name: &skill-name fixture\n"
-        text += "description: Fixture process. ALPS-conformant.\n"
-        text += "metadata: &representation {alps.kind: process}\n"
-        text += "alias: *skill-name\n"
-        text += "mapping-alias: *representation\n"
-        text += "---\n"
-        values, errors = CHECKER.frontmatter(text)
-        self.assertEqual(errors, [], errors)
-        self.assertEqual(values["alias"], "fixture")
-        self.assertEqual(values["mapping-alias"], "*representation")
-
-
-    def test_process_model_pair_accepts_translated_named_endpoints(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_process_model_pair(
-                Path(directory),
-                "- 一 -> 二",
-            )
-            errors, warnings = CHECKER.check_pair(
-                english,
-                japanese,
-                set(CHECKER.DEFAULT_JA_TERMS),
-                "fixture",
-            )
-            self.assertEqual(errors, [], errors)
-            self.assertTrue(any("unverified" in warning for warning in warnings), warnings)
-
-    def test_process_model_pair_preserves_canonical_endpoint_comparison(self) -> None:
-        english_relationships = "- One (`skill:#one`) -> Two (`skill:#two`)"
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_process_model_pair(
-                Path(directory),
-                "- 一 (`skill:#one`) -> 二 (`skill:#two`)",
-                english_relationships,
-            )
-            errors, warnings = CHECKER.check_pair(
-                english,
-                japanese,
-                set(CHECKER.DEFAULT_JA_TERMS),
-                "fixture",
-            )
-            self.assertEqual(errors, [], errors)
-            self.assertEqual(warnings, [], warnings)
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_process_model_pair(
-                Path(directory),
-                "- 二 (`skill:#two`) -> 一 (`skill:#one`)",
-                english_relationships,
-            )
-            errors, warnings = CHECKER.check_pair(
-                english,
-                japanese,
-                set(CHECKER.DEFAULT_JA_TERMS),
-                "fixture",
-            )
-            self.assertTrue(
-                any(
-                    "relationship provider/recipient endpoint identity or order differs"
-                    in error
-                    for error in errors
-                ),
-                errors,
-            )
-            self.assertEqual(warnings, [], warnings)
-
-    def test_process_model_pair_accepts_outer_and_unpiped_relationship_tables(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_process_model_pair(
-                Path(directory),
-                "提供側プロセス | 情報 | 受領側プロセス | 関係\n--- | --- | --- | ---\n一 | 情報 | 二 | プロセス間の関係。",
-                "| Provider Process | Information | Recipient Process | Relationship |\n| --- | --- | --- | --- |\n| One | information | Two | relates the Processes. |",
-            )
-            errors, warnings = CHECKER.check_pair(
-                english,
-                japanese,
-                set(CHECKER.DEFAULT_JA_TERMS),
-                "fixture",
-            )
-            self.assertEqual(errors, [], errors)
-            self.assertTrue(any("unverified" in warning for warning in warnings), warnings)
-
-    def test_process_model_pair_reports_reversed_unpiped_relationship_as_unverified(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_process_model_pair(
-                Path(directory),
-                "提供側プロセス | 情報 | 受領側プロセス | 関係\n--- | --- | --- | ---\n二 | 情報 | 一 | プロセス間の関係。",
-                "| Provider Process | Information | Recipient Process | Relationship |\n| --- | --- | --- | --- |\n| One | information | Two | relates the Processes. |",
-            )
-            errors, warnings = CHECKER.check_pair(
-                english,
-                japanese,
-                set(CHECKER.DEFAULT_JA_TERMS),
-                "fixture",
-            )
-            self.assertEqual(errors, [], errors)
-            self.assertTrue(any("unverified" in warning for warning in warnings), warnings)
-
-    def test_process_model_pair_correlates_table_process_names_with_skill_references(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_table_process_model_pair(
-                Path(directory),
-                "- 二 -> 一",
-            )
-            errors, warnings = CHECKER.check_pair(
-                english,
-                japanese,
-                set(CHECKER.DEFAULT_JA_TERMS),
-                "fixture",
-            )
-            self.assertTrue(
-                any(
-                    "relationship provider/recipient endpoint identity or order differs"
-                    in error
-                    for error in errors
-                ),
-                errors,
-            )
-            self.assertEqual(warnings, [], warnings)
-
-    def test_process_model_pair_reports_reversed_translated_endpoints_as_unverified(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_process_model_pair(
-                Path(directory),
-                "- 二 -> 一",
-            )
-            errors, warnings = CHECKER.check_pair(
-                english,
-                japanese,
-                set(CHECKER.DEFAULT_JA_TERMS),
-                "fixture",
-            )
-            self.assertEqual(errors, [], errors)
-            self.assertTrue(any("unverified" in warning for warning in warnings), warnings)
-
-    def test_reference_model_pair_accepts_translated_named_endpoints(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_reference_model_pair(
-                Path(directory),
-                """| 提供側プロセス | 情報 | 受領側プロセス | 関係 |
-| --- | --- | --- | --- |
-| ALPS定義 | 情報 | ALPS適用 | プロセス間の関係。 |""",
-            )
-            errors, _ = CHECKER.check_pair(english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture")
-            self.assertEqual(errors, [], errors)
-
-    def test_reference_model_pair_rejects_reversed_named_endpoints(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_reference_model_pair(
-                Path(directory),
-                """| 提供側プロセス | 情報 | 受領側プロセス | 関係 |
-| --- | --- | --- | --- |
-| ALPS適用 | 情報 | ALPS定義 | プロセス間の関係。 |""",
-            )
-            errors, _ = CHECKER.check_pair(english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture")
-            self.assertTrue(
-                any(
-                    "relationship provider/recipient endpoint identity or order differs"
-                    in error
-                    for error in errors
-                ),
-                errors,
-            )
-
-    def test_shipped_reference_model_pair_passes_named_endpoint_comparison(self) -> None:
-        root = Path(__file__).parents[1]
-        english = root / "skills" / "alps-reference-model" / "SKILL.md"
-        japanese = (
-            english.parent / "references" / "locales" / "ja" / "SKILL.md"
-        )
-        errors, _ = CHECKER.check_pair(english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "mashimashica/alps")
-        self.assertEqual(errors, [], errors)
-
-    def test_inline_code_exact_runs_keep_following_reference_operative(self) -> None:
-        delimiter = chr(96) * 2
-        triple_run = chr(96) * 3
-        value = delimiter + "literal " + triple_run + " content" + delimiter
-        self.assertEqual(
-            CHECKER.references(value + " skill:#missing"),
-            ["skill:#missing"],
-        )
-        errors = check_model("- " + value + " skill:#missing")
-        self.assertTrue(
-            any("unresolved Skill reference skill:#missing" in error for error in errors),
-            errors,
-        )
-
-    def test_japanese_naturalness_masks_exact_arbitrary_inline_code_runs(self) -> None:
-        lines = (
-            "これは ``HiddenWord ``` inner`` と VisibleWord。",
-            "これは ```HiddenTriple``` と VisibleTriple。",
-        )
-        for line in lines:
-            errors = CHECKER.japanese_naturalness_errors(Path("fixture"), line, set())
-            self.assertTrue(any("Visible" in error for error in errors), (line, errors))
-            self.assertFalse(any("Hidden" in error for error in errors), (line, errors))
-        unclosed = CHECKER.japanese_naturalness_errors(
-            Path("fixture"), "これは ``UnclosedWord と VisibleUnclosed。", set()
-        )
-        self.assertTrue(any("UnclosedWord" in error for error in unclosed), unclosed)
-        self.assertTrue(any("VisibleUnclosed" in error for error in unclosed), unclosed)
-
-    def test_japanese_naturalness_checks_decoded_description_forms(self) -> None:
-        forms = (
-            '"description": "English prose ALPS準拠。"\n',
-            'description: "English prose ALPS準拠。"\n',
-            'description: "English\n  prose ALPS準拠。"\n',
-            "description: >-\n  English prose ALPS準拠。\n",
-        )
-        for description in forms:
-            with self.subTest(description=description):
-                text = "---\nname: fixture\n" + description + "---\n"
-                errors = CHECKER.japanese_naturalness_errors(
-                    Path("fixture"), text, set()
-                )
-                self.assertTrue(any("English" in error for error in errors), errors)
-                self.assertEqual(errors, list(dict.fromkeys(errors)), errors)
-
-    def test_frontmatter_accepts_separation_before_plain_yaml_colons(self) -> None:
-        plain = """---
-name : fixture
-description : Fixture process. ALPS-conformant.
-metadata :
-  alps :
-    kind : process-view
----
-"""
-        quoted = """---
-"name" : "fixture"
-"description" : "Fixture process. ALPS-conformant."
-"metadata" :
-  "alps" :
-    "kind" : "process-view"
----
-"""
-        plain_values, plain_errors = CHECKER.frontmatter(plain)
-        quoted_values, quoted_errors = CHECKER.frontmatter(quoted)
-        self.assertEqual(plain_errors, [], plain_errors)
-        self.assertEqual(quoted_errors, [], quoted_errors)
-        self.assertEqual(plain_values.get("name"), "fixture")
-        self.assertEqual(plain_values.get("description"), "Fixture process. ALPS-conformant.")
-        self.assertEqual(plain_values.get("alps.kind"), "process-view")
-        self.assertEqual(plain_values, quoted_values)
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            path = root / "skills" / "fixture" / "SKILL.md"
-            write(path, plain + "\n# Fixture View\n")
-            self.assertEqual(CHECKER.representation_kind(path), "process-view")
-            asset_errors, _ = CHECKER.check_asset(path, {"": root}, None)
-            self.assertTrue(
-                any("Process View requires" in error for error in asset_errors),
-                asset_errors,
-            )
-
-    def test_frontmatter_rejects_malformed_plain_yaml_keys_with_separator(self) -> None:
-        malformed = """---
-name : fixture
-description : Fixture process. ALPS-conformant.
-: value
-? [complex] : value
----
-"""
-        _, errors = CHECKER.frontmatter(malformed)
-        self.assertTrue(errors, errors)
-        self.assertTrue(
-            any("not a key/value" in error or "invalid YAML mapping key" in error for error in errors),
-            errors,
-        )
-
-    def test_process_model_validates_two_column_provider_recipient_tables(self) -> None:
-        outer = """| Provider | Recipient |
-| --- | --- |
-| One | Two |"""
-        unpiped = """Provider Process | Recipient Process
---- | ---
-One | Two"""
-        self.assertEqual(check_model(outer), [])
-        self.assertEqual(check_model(unpiped), [])
-        errors = check_model(
-            """Provider | Recipient
---- | ---
-Missing | Also Missing"""
-        )
-        self.assertTrue(
-            any("provider Process 'Missing' is not declared" in error for error in errors),
-            errors,
-        )
-        self.assertTrue(
-            any("recipient Process 'Also Missing' is not declared" in error for error in errors),
-            errors,
-        )
-
-    def test_process_model_rejects_unidentified_two_column_relationship_table(self) -> None:
-        errors = check_model(
-            """| Left | Right |
-| --- | --- |
-| One | Two |"""
-        )
-        self.assertTrue(
-            any("two-column relationship table must identify Provider" in error for error in errors),
-            errors,
-        )
-
-    def test_relationship_tables_derive_endpoint_columns_from_localized_headers(self) -> None:
-        current_order = """| Provider Process | Information | Recipient Process | Relationship |
-| --- | --- | --- | --- |
-| One | information | Two | relates the Processes. |"""
-        reordered = """| Provider Process | Recipient Process | Relationship |
-| --- | --- | --- |
-| One | Two | relates the Processes. |"""
-        relationship_first = """| Relationship | Recipient Process | Provider Process |
-| --- | --- | --- |
-| relates the Processes. | Two | One |"""
-        self.assertEqual(check_model(current_order), [])
-        self.assertEqual(check_model(reordered), [])
-        self.assertEqual(check_model(relationship_first), [])
-
-        japanese = """関係 | 受領側プロセス | 提供側プロセス
---- | --- | ---
-関係 | 二 | 一"""
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese_path = write_process_model_pair(
-                Path(directory), japanese, relationship_first
-            )
-            errors, _ = CHECKER.check_pair(
-                english, japanese_path, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
-            )
-            self.assertEqual(errors, [], errors)
-
-    def test_relationship_tables_reject_missing_or_ambiguous_endpoint_headers(self) -> None:
-        missing = check_model(
-            """| Process | Relationship | Notes |
-| --- | --- | --- |
-| One | relates | Two |"""
-        )
-        self.assertTrue(
-            any(
-                "relationship table must identify exactly one Provider/Source" in error
-                for error in missing
-            ),
-            missing,
-        )
-        ambiguous = check_model(
-            """| Provider Process | Source Process | Recipient Process |
-| --- | --- | --- |
-| One | One | Two |"""
-        )
-        self.assertTrue(
-            any(
-                "relationship table must identify exactly one Provider/Source" in error
-                for error in ambiguous
-            ),
-            ambiguous,
-        )
-
-    def test_process_model_validates_all_relationship_tables(self) -> None:
-        first = """| Provider Process | Information | Recipient Process | Relationship |
-| --- | --- | --- | --- |
-| One | information | Two | relates the Processes. |"""
-        second_valid = """| Provider Process | Information | Recipient Process | Relationship |
-| --- | --- | --- | --- |
-| Two | information | One | relates the Processes. |"""
-        second_invalid = """| Provider Process | Information | Recipient Process | Relationship |
-| --- | --- | --- | --- |
-| Two | information | Missing | relates the Processes. |"""
-        self.assertEqual(
-            check_model(first + "\n\nA second category.\n\n" + second_valid),
-            [],
-        )
-        errors = check_model(first + "\n\nA second category.\n\n" + second_invalid)
-        self.assertTrue(
-            any("recipient Process 'Missing' is not declared" in error for error in errors),
-            errors,
-        )
-
-    def test_process_models_validate_mixed_table_and_list_relationships(self) -> None:
-        table = """| Provider Process | Information | Recipient Process | Relationship |
-| --- | --- | --- | --- |
-| One | information | Two | relates the Processes. |"""
-        mixed = table + "\n\n- Missing -> Also Missing"
-        for checker in (check_model, check_reference_model_fixture):
-            with self.subTest(checker=checker.__name__):
-                errors = checker(mixed)
-                self.assertTrue(
-                    any(
-                        "provider Process 'Missing' is not declared" in error
-                        for error in errors
-                    ),
-                    errors,
-                )
-                self.assertTrue(
-                    any(
-                        "recipient Process 'Also Missing' is not declared" in error
-                        for error in errors
-                    ),
-                    errors,
-                )
-
-    def test_process_models_reject_endpointless_mixed_relationship_list_item(self) -> None:
-        table = """| Provider Process | Information | Recipient Process | Relationship |
-| --- | --- | --- | --- |
-| One | information | Two | relates the Processes. |"""
-        mixed = table + "\n\n- Nothing structured here"
-        for checker in (check_model, check_reference_model_fixture):
-            with self.subTest(checker=checker.__name__):
-                errors = checker(mixed)
-                self.assertTrue(
-                    any(
-                        "relationship item 1 must identify provider and recipient Processes"
-                        in error
-                        for error in errors
-                    ),
-                    errors,
-                )
-
-    def test_process_models_accept_mixed_relationships_and_ignore_fenced_code(self) -> None:
-        table = """| Provider Process | Information | Recipient Process | Relationship |
-| --- | --- | --- | --- |
-| One | information | Two | relates the Processes. |"""
-        mixed = (
-            table
-            + "\n\n- Two -> One\n\n"
-            + "```markdown\n"
-            + table
-            + "\n- Missing -> Also Missing\n```")
-        for checker in (check_model, check_reference_model_fixture):
-            with self.subTest(checker=checker.__name__):
-                self.assertEqual(checker(mixed), [])
-
-    def test_relationship_semantic_entries_preserve_mixed_document_order(self) -> None:
-        first = """| Provider Process | Information | Recipient Process | Relationship |
-| --- | --- | --- | --- |
-| One | information | Two | relates the Processes. |"""
-        second = """| Provider Process | Information | Recipient Process | Relationship |
-| --- | --- | --- | --- |
-| Two | information | One | relates the Processes. |"""
-        value = (
-            first
-            + "\n\n- One -> Two\n\n"
-            + second
-            + "\n\n```markdown\n"
-            + first
-            + "\n- Missing -> Also Missing\n```")
-        entries = CHECKER.relationship_semantic_entries(value)
-        self.assertEqual(
-            [(entry.kind, entry.number) for entry in entries],
-            [("row", 1), ("item", 1), ("row", 2)],
-        )
-        self.assertEqual(
-            [
-                (entry_kind, entry_number, role, cell)
-                for entry_kind, entry_number, role, cell in CHECKER.relationship_endpoint_cells(value)
-            ],
-            [
-                ("row", 1, "provider", "One"),
-                ("row", 1, "recipient", "Two"),
-                ("item", 1, "provider", "One"),
-                ("item", 1, "recipient", "Two"),
-                ("row", 2, "provider", "Two"),
-                ("row", 2, "recipient", "One"),
-            ],
-        )
-
-    def test_process_model_pair_compares_mixed_relationship_entries(self) -> None:
-        table_en = """| Provider Process | Information | Recipient Process | Relationship |
-| --- | --- | --- | --- |
-| One | information | Two | relates the Processes. |"""
-        table_ja = """提供側プロセス | 情報 | 受領側プロセス | 関係
---- | --- | --- | ---
-一 | 情報 | 二 | プロセス間の関係。"""
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_process_model_pair(
-                Path(directory), table_ja + "\n\n- 一 -> 二", table_en + "\n\n- One -> Two"
-            )
-            errors, _ = CHECKER.check_pair(
-                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
-            )
-            self.assertEqual(errors, [], errors)
-
-            write(
-                japanese,
-                japanese.read_text(encoding="utf-8").replace(
-                    "\n\n- 一 -> 二", ""
-                ),
-            )
-            errors, _ = CHECKER.check_pair(
-                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
-            )
-            self.assertTrue(
-                any("Relationship count differs" in error for error in errors),
-                errors,
-            )
-
-    def test_process_model_pair_detects_mixed_relationship_endpoint_order(self) -> None:
-        table_en = """| Provider Process | Information | Recipient Process | Relationship |
-| --- | --- | --- | --- |
-| One (`skill:#one`) | information | Two (`skill:#two`) | relates the Processes. |"""
-        table_ja = """| 提供側プロセス | 情報 | 受領側プロセス | 関係 |
-| --- | --- | --- | --- |
-| 一 (`skill:#one`) | 情報 | 二 (`skill:#two`) | プロセス間の関係。 |"""
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_table_process_model_pair(
-                Path(directory),
-                table_ja + "\n\n- 二 (`skill:#two`) -> 一 (`skill:#one`)",
-                table_en + "\n\n- One (`skill:#one`) -> Two (`skill:#two`)",
-            )
-            errors, _ = CHECKER.check_pair(
-                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
-            )
-            self.assertTrue(
-                any(
-                    "relationship provider/recipient endpoint identity or order differs"
-                    in error
-                    for error in errors
-                ),
-                errors,
-            )
-
-    def test_process_reference_model_pair_detects_mixed_relationship_endpoint_order(self) -> None:
-        table_en = """| Provider Process | Information | Recipient Process | Relationship |
-| --- | --- | --- | --- |
-| Define ALPS (`skill:#define-alps`) | information | Apply ALPS (`skill:#apply-alps`) | relates the Processes. |"""
-        table_ja = """| 提供側プロセス | 情報 | 受領側プロセス | 関係 |
-| --- | --- | --- | --- |
-| ALPS定義 (`skill:#define-alps`) | 情報 | ALPS適用 (`skill:#apply-alps`) | プロセス間の関係。 |"""
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_reference_model_pair(
-                Path(directory),
-                table_ja + "\n\n- `skill:#apply-alps` -> `skill:#define-alps`",
-            )
-            write(
-                english,
-                english.read_text(encoding="utf-8").replace(
-                    "| Define ALPS | information | Apply ALPS | relates the Processes. |",
-                    "| Define ALPS (`skill:#define-alps`) | information | Apply ALPS (`skill:#apply-alps`) | relates the Processes. |\n\n- `skill:#define-alps` -> `skill:#apply-alps`",
-                ),
-            )
-            errors, _ = CHECKER.check_pair(
-                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
-            )
-            self.assertTrue(
-                any(
-                    "relationship provider/recipient endpoint identity or order differs"
-                    in error
-                    for error in errors
-                ),
-                errors,
-            )
-
-    def test_process_reference_model_pair_compares_mixed_relationship_entries(self) -> None:
-        table_en = """| Provider Process | Information | Recipient Process | Relationship |
-| --- | --- | --- | --- |
-| Define ALPS | information | Apply ALPS | relates the Processes. |"""
-        table_ja = """| 提供側プロセス | 情報 | 受領側プロセス | 関係 |
-| --- | --- | --- | --- |
-| ALPS定義 | 情報 | ALPS適用 | プロセス間の関係。 |"""
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_reference_model_pair(
-                Path(directory), table_ja + "\n\n- ALPS定義 -> ALPS適用"
-            )
-            write(
-                english,
-                english.read_text(encoding="utf-8").replace(
-                    "| Define ALPS | information | Apply ALPS | relates the Processes. |",
-                    "| Define ALPS | information | Apply ALPS | relates the Processes. |\n\n- Define ALPS -> Apply ALPS",
-                ),
-            )
-            errors, _ = CHECKER.check_pair(
-                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
-            )
-            self.assertEqual(errors, [], errors)
-
-            write(
-                japanese,
-                japanese.read_text(encoding="utf-8").replace(
-                    "\n\n- ALPS定義 -> ALPS適用", ""
-                ),
-            )
-            errors, _ = CHECKER.check_pair(
-                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
-            )
-            self.assertTrue(
-                any("Relationship count differs" in error for error in errors),
-                errors,
-            )
-
-    def test_process_model_pair_reports_reversed_two_column_relationship_as_unverified(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_process_model_pair(
-                Path(directory),
-                "提供側プロセス | 受領側プロセス\n--- | ---\n二 | 一",
-                "Provider | Recipient\n--- | ---\nOne | Two",
-            )
-            errors, warnings = CHECKER.check_pair(
-                english,
-                japanese,
-                set(CHECKER.DEFAULT_JA_TERMS),
-                "fixture",
-            )
-            self.assertEqual(errors, [], errors)
-            self.assertTrue(any("unverified" in warning for warning in warnings), warnings)
-
-    def test_frontmatter_parses_scalar_anchors_tags_and_preserves_yaml_forms(self) -> None:
-        text = """---
-name: &skill-name fixture
-description: !!str Fixture process. ALPS-conformant. # discovery comment
-metadata: &representation # mapping comment
-  alps.kind: !!str &kind process
-alias: *representation
-quoted: 'keep # this text'
----
-"""
-        values, errors = CHECKER.frontmatter(text)
-        self.assertEqual(errors, [])
-        self.assertEqual(values["name"], "fixture")
-        self.assertEqual(values["description"], "Fixture process. ALPS-conformant.")
-        self.assertEqual(values["alps.kind"], "process")
-        self.assertEqual(values["alias"], "*representation")
-        self.assertEqual(values["quoted"], "keep # this text")
-        block_values, block_errors = CHECKER.frontmatter(
-            """---
-name: fixture
-description: &description |
-  Fixture process. ALPS-conformant.
----
-"""
-        )
-        self.assertEqual(block_errors, [])
-        self.assertEqual(block_values["description"], "Fixture process. ALPS-conformant.")
-
-    def test_frontmatter_parses_quoted_block_keys_and_dispatches_nested_view_kind(self) -> None:
-        text = r'''---
-"name": fixture
-"description": Fixture process. ALPS-conformant.
-metadata:
-  "alps.kind": process-view
-  'note''key': !!str value
-  "quote\"key": &kind process-view
-  "alias": *kind
-  "display: key": scalar
----
-'''
-        values, errors = CHECKER.frontmatter(text)
-        self.assertEqual(errors, [], errors)
-        self.assertEqual(values["name"], "fixture")
-        self.assertEqual(values["description"], "Fixture process. ALPS-conformant.")
-        self.assertEqual(values["alps.kind"], "process-view")
-        self.assertEqual(values["metadata.note'key"], "value")
-        self.assertEqual(values['metadata.quote"key'], "process-view")
-        self.assertEqual(values["metadata.alias"], "process-view")
-        self.assertEqual(values["metadata.display: key"], "scalar")
-
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            path = root / "skills" / "fixture" / "SKILL.md"
-            write(
-                path,
-                text
-                + "# Fixture\n\n## Purpose\n\nPurpose.\n\n"
-                "## Outcomes\n\n- Outcome.\n",
-            )
-            asset_errors, _ = CHECKER.check_asset(path, {"": root}, None)
-            self.assertTrue(
-                any("Process View requires Source Processes" in error for error in asset_errors),
-                asset_errors,
-            )
-            self.assertFalse(
-                any("Process representation requires" in error for error in asset_errors),
-                asset_errors,
-            )
-
-        flow_values, flow_errors = CHECKER.frontmatter(
-            """---
-name: fixture
-description: Fixture process. ALPS-conformant.
-metadata: {"alps.kind": process-view}
----
-"""
-        )
-        self.assertEqual(flow_errors, [], flow_errors)
-        self.assertEqual(flow_values["alps.kind"], "process-view")
-
-        complex_values, complex_errors = CHECKER.frontmatter(
-            """---
-name: fixture
-description: Fixture process. ALPS-conformant.
-metadata:
-  [alps.kind]: process-view
----
-"""
-        )
-        self.assertTrue(
-            any("invalid YAML mapping key" in error for error in complex_errors),
-            complex_errors,
-        )
-        self.assertNotEqual(complex_values.get("alps.kind"), "process-view")
-
-    def test_frontmatter_scalar_anchor_fixture_passes_asset_checks(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            path = root / "skills" / "fixture" / "SKILL.md"
-            write(
-                path,
-                """---
-name: &skill-name fixture
-description: !!str Fixture process. ALPS-conformant.
-metadata:
-  alps.kind: &kind process
----
-
-# Fixture
-
-## Purpose
-
-The fixture has a purpose.
-
-## Outcomes
-
-- The fixture is complete.
-""",
-            )
-            errors, _ = CHECKER.check_asset(path, {"": root}, None)
-            self.assertEqual(errors, [], errors)
-
-    def test_frontmatter_multiline_quoted_scalars_accept_anchor_and_tag_properties(self) -> None:
-        for quote in ('"', "'"):
-            for properties in ("&d", "!!str"):
-                text = (
-                    "---\n"
-                    "name: fixture\n"
-                    f"description: {properties} {quote}Fixture process.\n"
-                    f"  ALPS-conformant.{quote}\n"
-                    "---\n"
-                )
-                values, errors = CHECKER.frontmatter(text)
-                self.assertEqual(errors, [], (quote, properties, errors))
-                self.assertEqual(
-                    values["description"],
-                    "Fixture process. ALPS-conformant.",
-                    (quote, properties, values),
-                )
-
-    def test_frontmatter_single_line_quoted_scalars_accept_anchor_and_tag_properties(self) -> None:
-        for quote in ('"', "'"):
-            for properties in ("&d", "!!str"):
-                text = (
-                    "---\n"
-                    "name: fixture\n"
-                    f"description: {properties} {quote}Fixture process. "
-                    f"ALPS-conformant.{quote}\n"
-                    "---\n"
-                )
-                values, errors = CHECKER.frontmatter(text)
-                self.assertEqual(errors, [], (quote, properties, errors))
-                self.assertEqual(
-                    values["description"],
-                    "Fixture process. ALPS-conformant.",
-                    (quote, properties, values),
-                )
-
-    def test_frontmatter_decodes_full_yaml_double_quoted_escape_set(self) -> None:
-        text = (
-            "---\n"
-            'value: "\\0\\a\\b\\t\\n\\v\\f\\r\\e\\ \\"\\/\\\\\\N\\_\\L\\P\\x70\\u0072\\U0000006f"\n'
-            "---\n"
-        )
-        values, errors = CHECKER.frontmatter(text)
-        expected = (
-            "\0\a\b\t\n\v\f\r\x1b "
-            + '"'
-            + "/"
-            + "\\"
-            + "\x85\xa0\u2028\u2029pro"
-        )
-        self.assertEqual(errors, [], errors)
-        self.assertEqual(values["value"], expected)
-
-    def test_frontmatter_double_quoted_escapes_decode_name_description_and_kind(self) -> None:
-        text = r'''---
-name: "\x70"
-description: "Fixture process. ALPS-conformant."
-metadata:
-  "alps.\x6bind": "process-view"
----
-'''
-        values, errors = CHECKER.frontmatter(text)
-        self.assertEqual(errors, [], errors)
-        self.assertEqual(values["name"], "p")
-        self.assertEqual(values["description"], "Fixture process. ALPS-conformant.")
-        self.assertEqual(values["alps.kind"], "process-view")
-
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            path = root / "skills" / "fixture" / "SKILL.md"
-            write(
-                path,
-                text
-                + "# Fixture\n\n## Purpose\n\nPurpose.\n\n"
-                "## Outcomes\n\n- Outcome.\n",
-            )
-            asset_errors, _ = CHECKER.check_asset(path, {"": root}, None)
-            self.assertTrue(
-                any("Process View requires Source Processes" in error for error in asset_errors),
-                asset_errors,
-            )
-            self.assertFalse(
-                any("Process representation requires" in error for error in asset_errors),
-                asset_errors,
-            )
-
-    def test_frontmatter_double_quoted_escaped_line_break_is_folded(self) -> None:
-        text = r'''---
-name: fixture
-description: "Fixture process.\
-  ALPS-conformant."
-metadata:
-  alps.kind: process
----
-'''
-        values, errors = CHECKER.frontmatter(text)
-        self.assertEqual(errors, [], errors)
-        self.assertEqual(values["description"], "Fixture process.ALPS-conformant.")
-
-    def test_frontmatter_rejects_invalid_yaml_double_quoted_escapes(self) -> None:
-        for escape in (r"\q", r"\x1", r"\uD800", r"\U00110000"):
-            with self.subTest(escape=escape):
-                text = (
-                    "---\n"
-                    "name: fixture\n"
-                    "description: Fixture process. ALPS-conformant.\n"
-                    'metadata:\n  alps.kind: "' + escape + '"\n'
-                    "---\n"
-                )
-                values, errors = CHECKER.frontmatter(text)
-                self.assertTrue(
-                    any(
-                        "invalid YAML double-quoted" in error
-                        for error in errors
-                    ),
-                    (escape, errors),
-                )
-                self.assertNotEqual(values.get("alps.kind"), escape)
-
-    def test_frontmatter_parses_anchored_tagged_flow_metadata_with_comments(self) -> None:
-        for metadata in (
-            "metadata: &m {alps.kind: &k process} # representation comment",
-            "metadata: !!map &m {alps.kind: !!str process} # representation comment",
-        ):
-            text = (
-                "---\n"
-                "name: fixture\n"
-                "description: Fixture process. ALPS-conformant.\n"
-                f"{metadata}\n"
-                "---\n"
-            )
-            values, errors = CHECKER.frontmatter(text)
-            self.assertEqual(errors, [], (metadata, errors))
-            self.assertEqual(values["alps.kind"], "process", (metadata, values))
-
-    def test_frontmatter_folds_plain_description_continuations_and_checks_suffix(self) -> None:
-        cases = (
-            (
-                "description: Fixture process.\n"
-                "  ALPS-conformant.\n",
-                "Fixture process. ALPS-conformant.",
-            ),
-            (
-                "description: Fixture process.\n"
-                "  # description comment\n"
-                "  ALPS-conformant.\n",
-                "Fixture process. ALPS-conformant.",
-            ),
-            (
-                "description: Fixture process.\n"
-                "\n"
-                "  ALPS-conformant.\n",
-                "Fixture process.\nALPS-conformant.",
-            ),
-            (
-                "description: Fixture process. # first comment\n"
-                "  ALPS-conformant. # continuation comment\n",
-                "Fixture process. ALPS-conformant.",
-            ),
-        )
-        for description, expected in cases:
-            with self.subTest(description=description):
-                text = (
-                    "---\n"
-                    "name: fixture\n"
-                    + description
-                    + "metadata:\n"
-                    "  alps.kind: process\n"
-                    "---\n"
-                )
-                values, errors = CHECKER.frontmatter(text)
-                self.assertEqual(errors, [], (description, errors))
-                self.assertEqual(values["description"], expected, values)
-                with tempfile.TemporaryDirectory() as directory:
-                    root = Path(directory)
-                    path = root / "skills" / "fixture" / "SKILL.md"
-                    write(
-                        path,
-                        text
-                        + "\n# Fixture\n\n## Purpose\n\nPurpose.\n\n"
-                        "## Outcomes\n\n- Outcome.\n",
-                    )
-                    self.assertEqual(CHECKER.check_frontmatter(path, text), [], errors)
-
-    def test_frontmatter_does_not_fold_name_or_kind_and_keeps_tab_diagnostic(self) -> None:
-        text = (
-            "---\n"
-            "name: fixture\n"
-            "  not a name continuation\n"
-            "description: Fixture process. ALPS-conformant.\n"
-            "metadata:\n"
-            "  alps.kind: process\n"
-            "\tALPS-conformant.\n"
-            "---\n"
-        )
-        values, errors = CHECKER.frontmatter(text)
-        self.assertEqual(values["name"], "fixture")
-        self.assertEqual(values["alps.kind"], "process")
-        self.assertTrue(any("uses a tab for indentation" in error for error in errors), errors)
-
-    def test_frontmatter_preserves_quoted_scalar_error_checks_with_properties(self) -> None:
-        unbalanced = (
-            "---\n"
-            "name: fixture\n"
-            "description: &d \"Fixture process.\n"
-            "  ALPS-conformant.\n"
-            "---\n"
-        )
-        _, errors = CHECKER.frontmatter(unbalanced)
-        self.assertTrue(
-            any("unbalanced quoted scalar" in error for error in errors),
-            errors,
-        )
-        trailing = (
-            "---\n"
-            "name: fixture\n"
-            "description: !!str \"Fixture process. ALPS-conformant.\" trailing\n"
-            "---\n"
-        )
-        _, errors = CHECKER.frontmatter(trailing)
-        self.assertTrue(
-            any("content after a quoted scalar" in error for error in errors),
-            errors,
-        )
-
-    def test_process_activities_accept_alternate_heading_levels_and_exclude_later_sections(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            path = root / "skills" / "fixture" / "SKILL.md"
-            write(
-                path,
-                """---
-name: fixture
-description: Fixture process. ALPS-conformant.
----
-
-# Fixture
-
-## Purpose
-
-The fixture has a purpose.
-
-## Outcomes
-
-- The fixture is complete.
-
-## Activities & Tasks
-
-### Plan
-
-1. The agent must plan.
-
-#### Work
-
-1. The agent should work.
-
-## Inputs
-
-### Unrelated later heading
-
-1. Perform an action.
-""",
-            )
-            errors, _ = CHECKER.check_asset(path, {"": root}, None)
-            self.assertEqual(errors, [], errors)
-
-    def test_process_activities_keep_deeper_explanatory_headings_in_activity_body(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            path = root / "skills" / "fixture" / "SKILL.md"
-            write(
-                path,
-                """---
-name: fixture
-description: Fixture process. ALPS-conformant.
----
-
-# Fixture
-
-## Purpose
-
-The fixture has a purpose.
-
-## Outcomes
-
-- The fixture is complete.
-
-## Activities & Tasks
-
-### Work
-
-1. The agent must work.
-
-#### Notes
-
-- Informational note.
-
-### Review
-
-1. The agent should review.
-""",
-            )
-            structure = CHECKER.parse_process_structure(
-                path.read_text(encoding="utf-8"), "en"
-            )
-            self.assertEqual(structure.activities, ("Work", "Review"))
-            self.assertEqual(tuple(map(len, structure.tasks)), (1, 1))
-            errors, _ = CHECKER.check_asset(path, {"": root}, None)
-            self.assertEqual(errors, [], errors)
-
-    def test_process_tasks_under_alternate_heading_require_normative_force(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            path = root / "skills" / "fixture" / "SKILL.md"
-            write(
-                path,
-                """---
-name: fixture
-description: Fixture process. ALPS-conformant.
----
-
-# Fixture
-
-## Purpose
-
-The fixture has a purpose.
-
-## Outcomes
-
-- The fixture is complete.
-
-## Activities & Tasks
-
-#### Work
-
-1. Perform an action.
-""",
-            )
-            errors, _ = CHECKER.check_asset(path, {"": root}, None)
-            self.assertTrue(
-                any(
-                    "Activity 1 Task 1 has no recognizable normative attribute"
-                    in error
-                    for error in errors
-                ),
-                errors,
-            )
-
-    def test_process_tasks_under_recognized_child_sections_preserve_order_and_boundaries(self) -> None:
-        text = """---
-name: fixture
-description: Fixture process. ALPS-conformant.
----
-
-# Fixture
-
-## Purpose
-
-The fixture has a purpose.
-
-## Outcomes
-
-- The fixture is complete.
-
-## Activities & Tasks
-
-### Work
-
-1. The agent must prepare.
-   The preparation continues here.
-
-#### Tasks
-
-2. The agent should record.
-   The record action continues here.
-
-##### Notes
-
-- This explanatory item is not a Task.
-
-##### Tasks
-
-3. The agent may verify.
-
-#### Notes
-
-- This second explanatory item is not a Task.
-
-#### Task
-
-4. The agent must finish.
-
-### Review
-
-- The agent may review.
-"""
-        structure = CHECKER.parse_process_structure(text, "en")
-        self.assertEqual(structure.activities, ("Work", "Review"))
-        self.assertEqual(
-            structure.tasks,
-            (
-                (
-                    "The agent must prepare. The preparation continues here.",
-                    "The agent should record. The record action continues here.",
-                    "The agent may verify.",
-                    "The agent must finish.",
-                ),
-                ("The agent may review.",),
-            ),
-        )
-
-    def test_process_tasks_under_child_heading_require_normative_force(self) -> None:
-        def document(activities: str) -> str:
-            return """---
-name: fixture
-description: Fixture process. ALPS-conformant.
----
-
-# Fixture
-
-## Purpose
-
-The fixture has a purpose.
-
-## Outcomes
-
-- The fixture is complete.
-
-## Activities & Tasks
-
-""" + activities + "\n"
-
-        for activities, expected_error in (
-            ("### Work\n#### Tasks\n1. Perform the action.", True),
-            ("### Work\n#### Tasks\n1. The agent must perform the action.", False),
-        ):
-            with self.subTest(expected_error=expected_error), tempfile.TemporaryDirectory() as directory:
-                root = Path(directory)
-                path = root / "skills" / "fixture" / "SKILL.md"
-                write(path, document(activities))
-                errors, _ = CHECKER.check_asset(path, {"": root}, None)
-                has_normative_error = any(
-                    "Activity 1 Task 1 has no recognizable normative attribute" in error
-                    for error in errors
-                )
-                self.assertEqual(has_normative_error, expected_error, errors)
-
-    def test_process_pair_counts_child_tasks_and_compares_normative_force(self) -> None:
-        english_activities = """### Work
-1. The agent must prepare.
-#### Tasks
-2. The agent should record.
-#### Notes
-- Explanatory note.
-### Review
-- The agent may review.
-"""
-        japanese_activities = """### 作業
-1. 担当者は準備する必要がある。
-#### タスク
-2. 担当者は記録することが望ましい。
-#### 注記
-- 説明用の注記。
-### 確認
-- 担当者は確認してもよい。
-"""
-
-        def write_pair(root: Path, ja_activities: str) -> tuple[Path, Path]:
-            english = root / "process" / "SKILL.md"
-            japanese = english.parent / "references" / "locales" / "ja" / "SKILL.md"
-            write(
-                english,
-                """---
-name: fixture-process
-description: Fixture process.
----
-
-# Fixture Process
-
-## Purpose
-
-The fixture has a purpose.
-
-## Outcomes
-
-- The fixture is complete.
-
-## Activities & Tasks
-
-""" + english_activities,
-            )
-            write(
-                japanese,
-                """---
-name: fixture-process
-description: フィクスチャのプロセス。
----
-
-# フィクスチャプロセス
-
-## 目的
-
-フィクスチャには目的がある。
-
-## 成果
-
-- フィクスチャが完成している。
-
-## 活動とタスク
-
-""" + ja_activities,
-            )
-            return english, japanese
-
-        with tempfile.TemporaryDirectory() as directory:
-            english, japanese = write_pair(Path(directory), japanese_activities)
-            errors, _ = CHECKER.check_pair(
-                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
-            )
-            self.assertEqual(errors, [], errors)
-
-            japanese_text = japanese.read_text(encoding="utf-8").replace(
-                "#### タスク\n2. 担当者は記録することが望ましい。\n", ""
-            )
-            write(japanese, japanese_text)
-            errors, _ = CHECKER.check_pair(
-                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
-            )
-            self.assertTrue(
-                any("Task counts by Activity differ" in error for error in errors),
-                errors,
-            )
-
-    def test_process_resolves_operative_references_and_ignores_masked_forms(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory) / "package"
-            other_root = Path(directory) / "other-package"
-            process_skill(root, "one", "One")
-            process_skill(other_root, "two", "Two")
-            path = root / "skills" / "fixture" / "SKILL.md"
-            write(
-                path,
-                """---
-name: fixture
-description: Fixture process. ALPS-conformant.
----
-
-# Fixture
-
-## Purpose
-
-The Process uses `skill:#one` and skill:other#two.
-
-[ignored](https://example.com/skill:#missing)
-
-<!-- skill:#missing -->
-
-```markdown
-skill:#missing
-```
-
-    skill:#missing
-
-`not a canonical reference: skill:#missing`
-
-## Outcomes
-
-- The Process is complete.
-
-## Activities & Tasks
-
-### Work
-
-1. The agent must work.
-""",
-            )
-            errors, _ = CHECKER.check_asset(
-                path, {"": root, "other": other_root}, None
-            )
-            self.assertEqual(errors, [], errors)
-
-    def test_process_resolves_localized_references_and_rejects_unsafe_targets(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory) / "package"
-            process_skill(root, "one", "One")
-            localized_target = root / "skills" / "one" / "references" / "locales" / "ja" / "SKILL.md"
-            write(localized_target, "# ワン\n")
-            outside = Path(directory) / "outside" / "escape"
-            write(outside / "SKILL.md", "# Escaped\n")
-            escape_link = root / "skills" / "escape"
-            try:
-                escape_link.symlink_to(outside, target_is_directory=True)
-            except OSError as exc:
-                self.skipTest(f"symlinks unavailable: {exc}")
-
-            path = root / "skills" / "fixture" / "references" / "locales" / "ja" / "SKILL.md"
-            write(
-                path,
-                """---
-name: fixture
-description: フィクスチャプロセス。ALPS準拠。
----
-
-# フィクスチャ
-
-## 目的
-
-`skill:#one`
-
-## 成果
-
-- プロセスが完了している。
-
-## 活動とタスク
-
-### 作業
-
-- 担当者は作業する必要がある。
-""",
-            )
-            errors, _ = CHECKER.check_asset(path, {"": root}, None)
-            self.assertEqual(errors, [], errors)
-
-            unsafe = path.read_text(encoding="utf-8").replace(
-                "`skill:#one`",
-                "`skill:#missing` skill:unknown#one skill:#escape `skill:#missing`",
-            )
-            write(path, unsafe)
-            errors, _ = CHECKER.check_asset(path, {"": root}, None)
-            process_reference_errors = [
-                error for error in errors if "Process reference" in error
-            ]
-            self.assertEqual(len(process_reference_errors), 3, errors)
-            self.assertTrue(
-                any("unresolved Skill reference skill:#missing" in error for error in errors),
-                errors,
-            )
-            self.assertTrue(
-                any("unresolved package identity 'unknown'" in error for error in errors),
-                errors,
-            )
-            self.assertTrue(
-                any("escapes package root" in error for error in errors),
-                errors,
-            )
-            self.assertFalse(any("invalid canonical Skill reference" in error for error in errors), errors)
-
-    def test_semantic_heading_extractors_normalize_atx_closing_markers(self) -> None:
-        english = """---
-name: fixture
-description: Fixture process. ALPS-conformant.
----
-
-# Fixture #
-
-## Purpose ##
-
-The Process has C# and value# literals.
-
-## Outcomes ##
-
-- The Process is complete.
-
-## Activities & Tasks ##
-
-### Work ###
-
-1. The agent must work.
-
-#### Tasks ####
-
-2. The agent should record.
-
-```markdown
-### Code fake ###
-```
-
-<!--
-### Comment fake ###
--->
-"""
-        self.assertEqual(CHECKER.heading1(english), "Fixture")
-        self.assertEqual(
-            CHECKER.section(english, "Purpose"),
-            "The Process has C# and value# literals.",
-        )
-        structure = CHECKER.parse_process_structure(english, "en")
-        self.assertEqual(structure.activities, ("Work",))
-        self.assertEqual(
-            structure.tasks,
-            (("The agent must work.", "The agent should record."),),
-        )
-        self.assertEqual(CHECKER.heading1("# Name #\n"), "Name")
-        self.assertEqual(CHECKER.heading1("# C# value#\n"), "C# value#")
-
-        japanese = """---
-name: fixture
-description: フィクスチャプロセス。ALPS準拠。
----
-
-# フィクスチャ #
-
-## 目的 ##
-
-プロセスには目的がある。
-
-## 成果 ##
-
-- プロセスが完了している。
-
-## 活動とタスク ##
-
-### 作業 ###
-
-1. 担当者は作業する必要がある。
-
-#### タスク ####
-
-2. 担当者は記録することが望ましい。
-"""
-        japanese_structure = CHECKER.parse_process_structure(japanese, "ja")
-        self.assertEqual(japanese_structure.activities, ("作業",))
-        self.assertEqual(
-            japanese_structure.tasks,
-            (("担当者は作業する必要がある。", "担当者は記録することが望ましい。"),),
-        )
-
-    def test_heading1_recognizes_setext_h1_and_masks_nonoperative_forms(self) -> None:
-        valid = (
-            """---
-name: fixture
-description: Fixture process. ALPS-conformant.
----
-
-"""
-            "  Setext Name  \n"
-            "   ============  \n"
-            """
-
-## Purpose
-
-The fixture has a purpose.
-
-## Outcomes
-
-- The fixture is complete.
-"""
-        )
-        self.assertEqual(CHECKER.heading1(valid), "Setext Name")
-        self.assertEqual(CHECKER.heading1("名前\n====\n"), "名前")
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            path = root / "skills" / "fixture" / "SKILL.md"
-            write(path, valid)
-            errors, _ = CHECKER.check_asset(path, {"": root}, None)
-            self.assertFalse(
-                any("representation requires Name" in error for error in errors),
-                errors,
-            )
-
-        invalid_forms = (
-            "Fake H2\n-------\n",
-            "    Fake indented\n    ================\n",
-            "```markdown\nFake fenced\n============\n```\n",
-            "<!--\nFake commented\n================\n-->\n",
-            "- Fake list item\n================\n",
-            "ordinary = text\nnext line\n",
-        )
-        for value in invalid_forms:
-            with self.subTest(value=value):
-                self.assertIsNone(CHECKER.heading1(value))
-
-    def test_section_recognizes_setext_h2_and_respects_heading_boundaries(self) -> None:
-        text = """Purpose
--------
-
-The fixture has a purpose.
-
-Details
--------
-
-This is a later H2 section.
-
-Deep detail
-----------
-
-This is another H2 boundary.
-
-Root
-====
-
-This is a level-one boundary.
-"""
-        self.assertEqual(
-            CHECKER.section(text, "Purpose"),
-            "The fixture has a purpose.",
-        )
-        self.assertEqual(
-            CHECKER.section(
-                "Purpose\n-------\n\nBody.\n\n### Deep\n\nStill body.\n",
-                "Purpose",
-            ),
-            "Body.\n\n### Deep\n\nStill body.",
-        )
-        self.assertEqual(
-            CHECKER.section(
-                "Purpose\n-------\n\nBody.\n\n### Deep\n\nNot body.\n",
-                "Purpose",
-                stop_at_any_heading=True,
-            ),
-            "Body.",
-        )
-
-        invalid_forms = (
-            "    Purpose\n-------\n\nFake.\n",
-            "- Purpose\n-------\n\nFake.\n",
-            "```markdown\nPurpose\n-------\n\nFake.\n```\n",
-            "<!--\nPurpose\n-------\n\nFake.\n-->\n",
-            "Purpose\n=====\n\nThis is H1, not an H2 section.\n",
-        )
-        for value in invalid_forms:
-            with self.subTest(value=value):
-                self.assertIsNone(CHECKER.section(value, "Purpose"))
-
-    def test_setext_h2_required_sections_work_for_process_models_and_views(self) -> None:
-        def setext_h2(value: str) -> str:
-            return value + "\n" + "-" * max(3, len(value))
-
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            model = process_model(root, "- One -> Two")
-            model_text = model.read_text(encoding="utf-8")
-            for heading in ("Purpose", "Processes", "Relationships"):
-                model_text = model_text.replace(
-                    f"## {heading}\n", setext_h2(heading) + "\n"
-                )
-            write(model, model_text)
-            model_errors, _ = CHECKER.check_asset(model, {"": root}, None)
-            self.assertEqual(model_errors, [], model_errors)
-
-            view = process_view(
-                root,
-                "- One\n- Two",
-                "- One Activity\n- Two Task",
-            )
-            view_text = view.read_text(encoding="utf-8")
-            for heading in (
-                "Purpose",
-                "Outcomes",
-                "Source Processes",
-                "Included Activities and Tasks",
-            ):
-                view_text = view_text.replace(
-                    f"## {heading}\n", setext_h2(heading) + "\n"
-                )
-            write(view, view_text)
-            view_errors, _ = CHECKER.check_asset(view, {"": root}, None)
-            self.assertEqual(view_errors, [], view_errors)
-
-    def test_indented_atx_headings_are_semantic_but_four_spaces_are_code(self) -> None:
-        for indent in (1, 2, 3):
-            with self.subTest(indent=indent):
-                prefix = " " * indent
-                text = f"""---
-name: fixture
-description: Fixture process. ALPS-conformant.
----
-
-{prefix}# Fixture
-
-{prefix}## Purpose
-
-The fixture has a purpose.
-
-{prefix}## Outcomes
-
-- The fixture is complete.
-
-{prefix}## Activities & Tasks
-
-{prefix}### Work
-
-1. The agent must work.
-"""
-                self.assertEqual(CHECKER.heading1(text), "Fixture")
-                self.assertEqual(
-                    CHECKER.section(text, "Purpose"),
-                    "The fixture has a purpose.",
-                )
-                self.assertEqual(
-                    CHECKER.parse_process_structure(text, "en").activities,
-                    ("Work",),
-                )
-
-        self.assertEqual(
-            CHECKER.process_model_entries("  ### One\n   ### Two"),
-            ["One", "Two"],
-        )
-        self.assertEqual(
-            [name for name, _, _ in CHECKER.process_block_details(
-                "  ### One\n  #### Purpose\n\nOne purpose.\n\n"
-                "  #### Outcomes\n\n- One is achieved.\n\n"
-                "  ### Two\n"
-            )],
-            ["One", "Two"],
-        )
-
-        self.assertIsNone(CHECKER.heading1("    # Fake\n"))
-        self.assertIsNone(CHECKER.section("    ## Purpose\n\nFake\n", "Purpose"))
-        masked = (
-            "```markdown\n"
-            "   ## Purpose\n\nFake\n"
-            "```\n\n"
-            "<!--\n   ## Purpose\n\nFake\n-->\n"
-        )
-        self.assertIsNone(CHECKER.section(masked, "Purpose"))
-
-    def test_closing_markers_apply_to_model_reference_and_view_extractors(self) -> None:
-        processes = "### One ###\n\n### Two ###\n\n### C# value# ###"
-        self.assertEqual(
-            CHECKER.process_model_entries(processes),
-            ["One", "Two", "C# value#"],
-        )
-        reference_processes = """### One ###
-
-#### Purpose ####
-
-One purpose.
-
-#### Outcomes ####
-
-- One is achieved.
-
-`skill:#one`
-
-### Two ###
-
-#### Purpose ####
-
-Two purpose.
-
-#### Outcomes ####
-
-- Two is achieved.
-
-`skill:#two`
-"""
-        self.assertEqual(
-            [name for name, _, _ in CHECKER.process_block_details(reference_processes)],
-            ["One", "Two"],
-        )
-        self.assertEqual(
-            CHECKER.source_entries("### One ###\n### Two ###"),
-            ["One", "Two"],
-        )
-        included = """### Activity: Work ###
-
-#### Task: Review ####
-
-```markdown
-### Activity: Fake ###
-```
-"""
-        self.assertEqual(
-            CHECKER.included_semantic_items(included, "en"),
-            [("activity", "Activity: Work"), ("task", "Task: Review")],
-        )
-
-    def test_process_view_rejects_unstructured_included_content_and_keeps_supported_forms(self) -> None:
-        for included in (
-            "Nothing structured here.",
-            "No Activity has been selected.",
-            "The Activity is Work and the Task is Review.",
-        ):
-            with self.subTest(included=included):
-                errors = check_view_fixture("- One\n- Two", included)
-                self.assertTrue(
-                    any("must identify at least one Activity or Task" in error for error in errors),
-                    errors,
-                )
-        self.assertEqual(
-            check_view_fixture("- One\n- Two", "- Activity: Work\n- Task: Review"),
-            [],
-        )
+                "host-input",
+                "unsupported-profile-syntax",
+                "profile-structure",
+                "semantic",
+                "locale-mismatch",
+                "unverified-locale-identity",
+                "quality-review",
+                "internal",
+            }
+        )
+        with _temp_root() as root:
+            malformed = _parse(root, _asset("malformed", "process", "en", _process_body()).replace("name: malformed", "unknown: value"), name="malformed")
+            quality = _parse(root, _asset("quality", "process", "en", _process_body(outcome_lines=("The outcome is recorded.",))), name="quality")
+            semantic = CHECKER.check_document(
+                _write(root, "semantic.md", _asset("semantic", "process-model", "en", _model_body().replace("| Alpha | Information | Beta | Supports |", "| Gamma | Information | Beta | Supports |"))),
+                {"": root},
+            )
+            invalid = root / "invalid.md"
+            invalid.write_bytes(b"\xff")
+            host = CHECKER.parse_asset(invalid)
+            internal = CHECKER.check_document(root / "missing.md", object())
+            english = CHECKER.parse_asset(_write(root, "pair-en.md", _asset("pair", "process", "en", _process_body(outcome_lines=("One `skill:#alpha`.",)))))
+            japanese = CHECKER.parse_asset(_write(root, "pair-ja.md", _asset("pair", "process", "ja", _process_body("ja", outcome_lines=("一つ `skill:#beta`。",)))))
+            locale_diagnostics = locale_compare.compare_locale_ir(english.ir, japanese.ir)
+
+            observed = set()
+            for result in (malformed, quality, semantic, host, internal):
+                observed.update(_classes(result))
+            observed.update(item.class_name for item in locale_diagnostics)
+            self.assertTrue(observed <= allowed, sorted(observed - allowed))
+            self.assertIn("quality-review", observed)
+            self.assertIn("host-input", observed)
+            self.assertIn("internal", observed)
+            self.assertIn("locale-mismatch", observed)
+
+            valid = CHECKER.check_document(_write(root, "serialized.md", _asset("serialized", "process", "en", _process_body())), {"": root})
+            contract = {
+                "profile_version": CHECKER.PROFILE_VERSION,
+                "diagnostics": [asdict(item) for item in valid.diagnostics],
+                "ir": asdict(valid.ir) if valid.ir is not None else None,
+            }
+            encoded = json.dumps(contract, ensure_ascii=False, sort_keys=True)
+            decoded = json.loads(encoded)
+            self.assertEqual(decoded["profile_version"], "alps-repository-checker/v1")
+            self.assertEqual(decoded["ir"]["kind"], "process")
+            self.assertIn("sections", decoded["ir"])
 
 
 if __name__ == "__main__":
