@@ -929,6 +929,58 @@ Three | information | Four | relates the Processes."""
             [],
         )
 
+    def test_process_view_heading_extractor_uses_shallowest_activity_level(self) -> None:
+        included = """### Work
+- Activity: Work step
+#### Notes
+- Task: explanatory Task text is not a semantic item
+#### Activity: Nested example
+- Task: nested explanatory item is not a semantic item
+### Review
+- Task: Review step
+"""
+        self.assertEqual(
+            CHECKER.included_semantic_elements(included, "en", "fixture"),
+            [
+                ("activity", None),
+                ("task", None),
+                ("activity", None),
+                ("task", None),
+            ],
+        )
+        self.assertEqual(
+            CHECKER.included_semantic_elements(
+                "#### Work\n- 活動: 作業\n##### Notes\n- タスク: 説明\n#### Review\n- タスク: 確認\n",
+                "ja",
+                "fixture",
+            ),
+            [
+                ("activity", None),
+                ("task", None),
+                ("activity", None),
+                ("task", None),
+            ],
+        )
+
+    def test_process_view_heading_extractor_ignores_shallower_task_heading(self) -> None:
+        included = """### Task: explanatory section
+#### Activity: Work
+##### Task: Review
+"""
+        self.assertEqual(
+            CHECKER.included_semantic_elements(included, "en", "fixture"),
+            [("activity", None), ("task", None)],
+        )
+
+    def test_process_view_heading_extractor_preserves_task_kind_at_activity_level(self) -> None:
+        included = """### Activity: Work
+### Task: explanatory task
+"""
+        self.assertEqual(
+            CHECKER.included_semantic_elements(included, "en", "fixture"),
+            [("activity", None), ("task", None)],
+        )
+
     def test_process_view_checks_source_table_display_name_and_canonical_only(self) -> None:
         invalid_sources = """| Source Process | Reference |
 | --- | --- |
@@ -1126,6 +1178,32 @@ Three | information | Four | relates the Processes."""
 """
         self.assertEqual(
             CHECKER.references(value),
+            ["skill:#one", "skill:#two"],
+        )
+
+    def test_reference_scan_ignores_blockquoted_fences_and_indented_code(self) -> None:
+        backticks = chr(96) * 3
+        tildes = chr(126) * 3
+        quoted_code = (
+            "> " + backticks + "text\n"
+            "> skill:#missing\n"
+            "> " + backticks + "\n"
+            "> > " + tildes + "text\n"
+            "> > skill:#missing\n"
+            "> > " + tildes + "\n"
+            ">     skill:#missing\n"
+            "> >     skill:#missing\n"
+        )
+        self.assertEqual(CHECKER.references(quoted_code), [])
+        self.assertEqual(
+            CHECKER.references("> See skill:#one here.\n"),
+            ["skill:#one"],
+        )
+        self.assertEqual(
+            CHECKER.references(
+                "> - One -> Two skill:#one\n"
+                ">   Continuation keeps skill:#two operative.\n"
+            ),
             ["skill:#one", "skill:#two"],
         )
 
@@ -2026,6 +2104,50 @@ The fixture has a purpose.
             errors, _ = CHECKER.check_asset(path, {"": root}, None)
             self.assertEqual(errors, [], errors)
 
+    def test_process_activities_keep_deeper_explanatory_headings_in_activity_body(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "skills" / "fixture" / "SKILL.md"
+            write(
+                path,
+                """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+---
+
+# Fixture
+
+## Purpose
+
+The fixture has a purpose.
+
+## Outcomes
+
+- The fixture is complete.
+
+## Activities & Tasks
+
+### Work
+
+1. The agent must work.
+
+#### Notes
+
+- Informational note.
+
+### Review
+
+1. The agent should review.
+""",
+            )
+            structure = CHECKER.parse_process_structure(
+                path.read_text(encoding="utf-8"), "en"
+            )
+            self.assertEqual(structure.activities, ("Work", "Review"))
+            self.assertEqual(tuple(map(len, structure.tasks)), (1, 1))
+            errors, _ = CHECKER.check_asset(path, {"": root}, None)
+            self.assertEqual(errors, [], errors)
+
     def test_process_tasks_under_alternate_heading_require_normative_force(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -2065,20 +2187,19 @@ The fixture has a purpose.
             )
 
     def test_process_view_rejects_unstructured_included_content_and_keeps_supported_forms(self) -> None:
-        errors = check_view_fixture("- One\n- Two", "Nothing structured here.")
-        self.assertTrue(
-            any("must identify at least one Activity or Task" in error for error in errors),
-            errors,
-        )
+        for included in (
+            "Nothing structured here.",
+            "No Activity has been selected.",
+            "The Activity is Work and the Task is Review.",
+        ):
+            with self.subTest(included=included):
+                errors = check_view_fixture("- One\n- Two", included)
+                self.assertTrue(
+                    any("must identify at least one Activity or Task" in error for error in errors),
+                    errors,
+                )
         self.assertEqual(
             check_view_fixture("- One\n- Two", "- Activity: Work\n- Task: Review"),
-            [],
-        )
-        self.assertEqual(
-            check_view_fixture(
-                "- One\n- Two",
-                "The Activity is Work and the Task is Review.",
-            ),
             [],
         )
 

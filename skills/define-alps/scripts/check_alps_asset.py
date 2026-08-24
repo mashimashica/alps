@@ -1169,13 +1169,28 @@ def representation_kind(path: Path) -> str:
     return meta.get("alps.kind", "process")
 
 
+def markdown_container_content(line: str) -> str:
+    """Return line content after Markdown blockquote container prefixes."""
+
+    content = line.rstrip("\r\n")
+    newline = line[len(content) :]
+    cursor = 0
+    while True:
+        marker = re.match(r" {0,3}>[ \t]?", content[cursor:])
+        if marker is None:
+            break
+        cursor += marker.end()
+    return content[cursor:] + newline
+
+
 def without_fenced_code(text: str) -> str:
     """Replace fenced code with newlines so examples are not operative syntax."""
 
     visible: list[str] = []
     fence: tuple[str, int] | None = None
     for line in text.splitlines(keepends=True):
-        marker = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
+        content = markdown_container_content(line)
+        marker = re.match(r"^ {0,3}(`{3,}|~{3,})", content)
         if marker:
             token = marker.group(1)
             if fence is None:
@@ -1183,7 +1198,7 @@ def without_fenced_code(text: str) -> str:
             elif (
                 token[0] == fence[0]
                 and len(token) >= fence[1]
-                and not line[marker.end() :].strip()
+                and not content[marker.end() :].strip()
             ):
                 fence = None
             visible.append("\n" if line.endswith("\n") else "")
@@ -1268,9 +1283,11 @@ def without_indented_code(text: str) -> str:
     previous_paragraph = False
     list_content_indent: int | None = None
     for line in text.splitlines(keepends=True):
-        content = line.rstrip("\r\n")
+        content_line = markdown_container_content(line)
+        content = content_line.rstrip("\r\n")
+        newline = line[len(line.rstrip("\r\n")) :]
         if not content.strip():
-            visible.append("\n" if line.endswith("\n") else "")
+            visible.append(newline)
             previous_paragraph = False
             continue
         expanded = content.expandtabs(4)
@@ -1288,7 +1305,7 @@ def without_indented_code(text: str) -> str:
             list_content_indent = None
         code_indent = (list_content_indent + 4) if list_content_indent is not None else 4
         if indent >= code_indent and (in_code or not previous_paragraph):
-            visible.append("\n" if line.endswith("\n") else "")
+            visible.append(newline)
             in_code = True
             previous_paragraph = False
             continue
@@ -1631,21 +1648,38 @@ def classify_normative(task: str, locale: str) -> str | None:
 def parse_process_structure(text: str, locale: str) -> ProcessStructure:
     outcomes = tuple(outcome_items(section(text, HEADINGS[locale]["outcomes"])))
     activity_text = section(text, HEADINGS[locale]["activities"]) or ""
-    matches = list(re.finditer(r"(?m)^#{3,6} ([^\n]+?)\s*$", activity_text))
+    heading_matches = list(re.finditer(r"(?m)^(#{3,6}) ([^\n]+?)\s*$", activity_text))
+    activity_level = min(
+        (len(match.group(1)) for match in heading_matches),
+        default=None,
+    )
+    matches = [
+        match
+        for match in heading_matches
+        if len(match.group(1)) == activity_level
+    ]
     activities: list[str] = []
     tasks: list[tuple[str, ...]] = []
     for index, match in enumerate(matches):
-        activities.append(match.group(1).strip())
+        activities.append(match.group(2).strip())
         start = match.end()
         end = matches[index + 1].start() if index + 1 < len(matches) else len(activity_text)
         block = activity_text[start:end]
+        task_block = block
+        if activity_level is not None and activity_level < 6:
+            child_heading = re.search(
+                rf"(?m)^#{{{activity_level + 1},6}} [^\n]+?\s*$",
+                block,
+            )
+            if child_heading is not None:
+                task_block = block[: child_heading.start()]
         task_values = tuple(
             re.sub(r"\s+", " ", item.group("item")).strip()
             for item in re.finditer(
                 r"(?ms)^(?P<indent>[ \t]{0,3})(?:\d+[.)]|[-*+])\s+"
                 r"(?P<item>.*?)(?=^(?P=indent)(?:\d+[.)]|[-*+])\s+|"
                 r"^[ \t]*$\n(?=\S)|\Z)",
-                block,
+                task_block,
             )
         )
         tasks.append(task_values)
@@ -2502,18 +2536,72 @@ def included_semantic_elements(
     """Extract structured Activity/Task elements without comparing names."""
     visible = included_visible_text(value)
     pattern = included_kind_pattern(locale)
-    events: list[tuple[int, str, str | None]] = []
-    for line_number, line in enumerate(visible.splitlines()):
-        heading = re.match(r"^ {0,3}#{3,6}\s+(.+?)\s*$", line)
-        item = re.match(r"^ {0,3}(?:[-*+]|\d+[.)])\s+(.+?)\s*$", line)
-        candidate_match = heading or item
-        if candidate_match is None:
+    lines = visible.splitlines()
+    headings: list[tuple[int, int, str | None]] = []
+    for line_number, line in enumerate(lines):
+        heading = re.match(r"^ {0,3}(#{3,6})\s+(.+?)\s*$", line)
+        if heading is None:
             continue
-        candidate = candidate_match.group(1)
+        candidate = heading.group(2)
         kind_match = pattern.search(without_inline_code(candidate))
-        if kind_match is None:
-            continue
-        kind = "activity" if kind_match.group(0).casefold() in {"activity", "活動"} else "task"
+        kind = None
+        if kind_match is not None:
+            kind = "activity" if kind_match.group(0).casefold() in {"activity", "活動"} else "task"
+        headings.append((line_number, len(heading.group(1)), kind))
+    # An unqualified heading at the shallowest heading level is the structural
+    # Activity boundary.  Explicit Task headings must not move that boundary,
+    # and a heading's own kind remains authoritative when it is emitted.
+    activity_level = min(
+        (level for _, level, kind in headings if kind != "task"),
+        default=None,
+    )
+    heading_structure = activity_level is not None
+    events: list[tuple[int, str, str | None]] = []
+    heading_stack: list[tuple[int, str | None]] = []
+    for line_number, line in enumerate(lines):
+        heading = re.match(r"^ {0,3}(#{3,6})\s+(.+?)\s*$", line)
+        if heading is not None:
+            level = len(heading.group(1))
+            candidate = heading.group(2)
+            kind_match = pattern.search(without_inline_code(candidate))
+            heading_kind = None
+            if kind_match is not None:
+                heading_kind = (
+                    "activity"
+                    if kind_match.group(0).casefold() in {"activity", "活動"}
+                    else "task"
+                )
+            while heading_stack and heading_stack[-1][0] >= level:
+                heading_stack.pop()
+            heading_stack.append((level, heading_kind))
+            if not heading_structure:
+                if heading_kind is None:
+                    continue
+                kind = heading_kind
+            elif level == activity_level:
+                kind = heading_kind or "activity"
+            elif level == activity_level + 1 and heading_kind == "task":
+                kind = "task"
+            else:
+                continue
+        else:
+            item = re.match(r"^ {0,3}(?:[-*+]|\d+[.)])\s+(.+?)\s*$", line)
+            if item is None:
+                continue
+            if heading_structure and heading_stack:
+                context_level, context_kind = heading_stack[-1]
+                if context_level != activity_level:
+                    continue
+            candidate = item.group(1)
+            kind_match = pattern.search(without_inline_code(candidate))
+            if kind_match is None:
+                continue
+            if heading_structure and heading_stack:
+                # A list directly under an Activity heading is its task list;
+                # deeper heading bodies are intentionally non-semantic.
+                kind = "task"
+            else:
+                kind = "activity" if kind_match.group(0).casefold() in {"activity", "活動"} else "task"
         refs = references(candidate)
         identity = (
             normalized_reference_key(refs[0], current_package_id)
@@ -2620,8 +2708,7 @@ def check_view(
                 errors.append(f"{path}: provenance row {row_number} names an undeclared Source Process: {row[0]}")
     elif included.strip():
         structured = included_semantic_elements(included, locale, current_package_id)
-        visible = included_visible_text(included)
-        if structured or included_kind_pattern(locale).search(without_inline_code(visible)):
+        if structured:
             warnings.append(
                 f"{path}: source-element provenance could not be established mechanically"
             )
