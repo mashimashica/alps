@@ -132,6 +132,47 @@ def quoted_scalar_end(value: str) -> int | None:
     return -1
 
 
+def backtick_run_length(value: str, start: int) -> int:
+    """Return the length of the backtick run beginning at ``start``."""
+    length = 1
+    while start + length < len(value) and value[start + length] == "`":
+        length += 1
+    return length
+
+
+def inline_code_end(text: str, start: int, delimiter_length: int) -> int | None:
+    """Find a closing inline-code run whose length exactly matches the opener."""
+    cursor = start + delimiter_length
+    while cursor < len(text):
+        if text[cursor] != "`":
+            cursor += 1
+            continue
+        run = backtick_run_length(text, cursor)
+        if run == delimiter_length:
+            return cursor
+        cursor += run
+    return None
+
+
+def strip_yaml_node_properties(value: str) -> str:
+    """Remove YAML anchors and tags that precede a scalar value."""
+    value = value.lstrip()
+    while value:
+        if value.startswith("&"):
+            match = re.match(r"&[^\s#]+", value)
+        elif value.startswith("!<"):
+            close = value.find(">", 2)
+            match = None if close < 0 else re.match(r"!<[^>]*>", value)
+        elif value.startswith("!"):
+            match = re.match(r"![^\s#]+", value)
+        else:
+            break
+        if match is None:
+            break
+        value = value[match.end() :].lstrip()
+    return value
+
+
 def flow_mapping_items(value: str) -> dict[str, str] | None:
     """Return scalar entries from a YAML flow mapping used by metadata."""
     value = value.strip()
@@ -219,7 +260,7 @@ def flow_mapping_items(value: str) -> dict[str, str] | None:
         if separator < 0:
             return None
         key = part[:separator].strip()
-        item_value = part[separator + 1 :].strip()
+        item_value = strip_yaml_node_properties(part[separator + 1 :].strip())
         if key.startswith(("'", '"')) and quoted_scalar_end(key) == len(key) - 1:
             key = key[1:-1].replace("''", "'")
         if item_value.startswith(("'", '"')):
@@ -244,7 +285,9 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
     block_values: dict[int, str] = {}
     for index, raw in enumerate(lines):
         block = re.match(
-            r"^(?P<prefix>\s*[A-Za-z0-9_.-]+:\s*)(?P<style>[>|])(?:[+-]?[1-9]?|[1-9][+-]?)\s*$",
+            r"^(?P<prefix>\s*[A-Za-z0-9_.-]+:\s*)"
+            r"(?:(?:&[^\s#]+|!(?:<[^>]*>|[^\s#]+))\s*)*"
+            r"(?P<style>[>|])(?:[+-]?[1-9]?|[1-9][+-]?)\s*$",
             raw,
         )
         if not block:
@@ -265,10 +308,18 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
     quoted_values: dict[int, str] = {}
     quoted_continuations: set[int] = set()
     for index, raw in enumerate(lines):
-        scalar = re.match(r"^(?P<prefix>\s*[A-Za-z0-9_.-]+:\s*)(?P<value>['\"].*)$", raw)
-        if not scalar or quoted_scalar_end(scalar.group("value")) != -1:
+        mapping = re.match(
+            r"^(?P<prefix>\s*[A-Za-z0-9_.-]+:\s*)(?P<value>.*?)\s*$",
+            raw,
+        )
+        if not mapping:
             continue
-        pieces = [scalar.group("value")]
+        raw_value = mapping.group("value").strip()
+        scalar_value = strip_yaml_node_properties(raw_value)
+        if not scalar_value.startswith(("'", '"')) or quoted_scalar_end(scalar_value) != -1:
+            continue
+        property_prefix = raw_value[: len(raw_value) - len(scalar_value)]
+        pieces = [scalar_value]
         last = index
         for continuation_index in range(index + 1, len(lines)):
             pieces.append(lines[continuation_index].strip())
@@ -276,7 +327,9 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
             combined = " ".join(pieces)
             if quoted_scalar_end(combined) not in {None, -1}:
                 break
-        quoted_values[index] = scalar.group("prefix") + " ".join(pieces)
+        quoted_values[index] = (
+            mapping.group("prefix") + property_prefix + " ".join(pieces)
+        )
         quoted_continuations.update(range(index + 1, last + 1))
 
     values: dict[str, str] = {}
@@ -298,9 +351,14 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
             in_metadata = True
             metadata_child_indent = None
             continue
-        flow_metadata = re.match(r"^metadata:\s*(\{.*)$", raw)
-        if flow_metadata:
-            items = flow_mapping_items(flow_metadata.group(1))
+        flow_metadata = re.match(r"^metadata:\s*(.*)$", raw)
+        flow_value = (
+            strip_yaml_node_properties(flow_metadata.group(1))
+            if flow_metadata
+            else ""
+        )
+        if flow_metadata and flow_value.startswith("{"):
+            items = flow_mapping_items(flow_value)
             if items is None:
                 errors.append(f"frontmatter line {number} has an invalid metadata flow mapping")
             elif "alps.kind" in items:
@@ -336,18 +394,20 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
         if in_metadata:
             key = f"metadata.{key}"
         value = value.strip()
-        if index not in block_values and value.startswith(("'", '"')):
-            cursor = quoted_scalar_end(value)
-            if cursor in {None, -1}:
-                errors.append(f"frontmatter line {number} has an unbalanced quoted scalar")
-                continue
-            remainder = value[cursor + 1 :].strip()
-            if remainder and not remainder.startswith("#"):
-                errors.append(f"frontmatter line {number} has content after a quoted scalar")
-                continue
-            value = value[1:cursor]
-        elif index not in block_values:
-            value = re.split(r"\s+#", value, maxsplit=1)[0].rstrip()
+        if index not in block_values:
+            value = strip_yaml_node_properties(value)
+            if value.startswith(("'", '"')):
+                cursor = quoted_scalar_end(value)
+                if cursor in {None, -1}:
+                    errors.append(f"frontmatter line {number} has an unbalanced quoted scalar")
+                    continue
+                remainder = value[cursor + 1 :].strip()
+                if remainder and not remainder.startswith("#"):
+                    errors.append(f"frontmatter line {number} has content after a quoted scalar")
+                    continue
+                value = value[1:cursor]
+            else:
+                value = re.split(r"\s+#", value, maxsplit=1)[0].rstrip()
         values[key] = value
     if "metadata.alps.kind" in values:
         values["alps.kind"] = values["metadata.alps.kind"]
@@ -394,9 +454,7 @@ def table_row_cells(line: str) -> list[str]:
     separators: list[int] = []
     while index < len(line):
         if line[index] == "`":
-            run = 1
-            while index + run < len(line) and line[index + run] == "`":
-                run += 1
+            run = backtick_run_length(line, index)
             if code_run is None:
                 code_run = run
             elif run == code_run:
@@ -448,6 +506,41 @@ def table(text: str) -> tuple[list[str], list[list[str]]]:
             rows.append(row)
         return header, rows
     return [], []
+
+
+def relationship_table_endpoint_indices(header: list[str]) -> tuple[int, int] | None:
+    """Return provider/recipient columns for a supported relationship table."""
+    if len(header) >= 3:
+        return 0, 2
+    if len(header) != 2:
+        return None
+    normalized = [
+        re.sub(r"\s+", " ", without_inline_code(cell)).strip().casefold()
+        for cell in header
+    ]
+    provider = normalized[0] in {
+        "provider",
+        "provider process",
+        "提供側プロセス",
+        "提供プロセス",
+    }
+    recipient = normalized[1] in {
+        "recipient",
+        "recipient process",
+        "受領側プロセス",
+        "受領プロセス",
+    }
+    return (0, 1) if provider and recipient else None
+
+
+def relationship_table_errors(path: Path, value: str) -> list[str]:
+    """Reject a two-column table unless its columns identify both endpoints."""
+    header, rows = table(value)
+    if rows and len(header) == 2 and relationship_table_endpoint_indices(header) is None:
+        return [
+            f"{path}: two-column relationship table must identify Provider and Recipient Processes"
+        ]
+    return []
 
 
 def outcome_items(value: str | None) -> list[str]:
@@ -516,9 +609,9 @@ def without_html_comments(text: str) -> str:
     index = 0
     while index < len(text):
         if text[index] == "`":
-            run = len(text[index:]) - len(text[index:].lstrip("`"))
-            end = text.find("`" * run, index + run)
-            if end < 0:
+            run = backtick_run_length(text, index)
+            end = inline_code_end(text, index, run)
+            if end is None:
                 visible.append(text[index:])
                 break
             visible.append(text[index : end + run])
@@ -543,9 +636,9 @@ def without_inline_code(text: str) -> str:
             result.append(text[index])
             index += 1
             continue
-        run = len(text[index:]) - len(text[index:].lstrip("`"))
-        end = text.find("`" * run, index + run)
-        if end < 0:
+        run = backtick_run_length(text, index)
+        end = inline_code_end(text, index, run)
+        if end is None:
             result.append(text[index:])
             break
         result.append(" " * (end + run - index))
@@ -563,9 +656,9 @@ def mask_inline_code_for_reference_scan(text: str) -> str:
             result.append(text[index])
             index += 1
             continue
-        run = len(text[index:]) - len(text[index:].lstrip("`"))
-        end = text.find("`" * run, index + run)
-        if end < 0:
+        run = backtick_run_length(text, index)
+        end = inline_code_end(text, index, run)
+        if end is None:
             token = text[index:]
             result.append("".join("\n" if char == "\n" else " " for char in token))
             break
@@ -672,9 +765,9 @@ def markdown_link_targets(text: str) -> list[str]:
     index = 0
     while index < len(value):
         if value[index] == "`":
-            run = len(value[index:]) - len(value[index:].lstrip("`"))
-            end = value.find("`" * run, index + run)
-            index = len(value) if end < 0 else end + run
+            run = backtick_run_length(value, index)
+            end = inline_code_end(value, index, run)
+            index = len(value) if end is None else end + run
             continue
         label_start = index + 1 if value.startswith("![", index) else index
         if label_start >= len(value) or value[label_start] != "[":
@@ -930,7 +1023,7 @@ def classify_normative(task: str, locale: str) -> str | None:
 def parse_process_structure(text: str, locale: str) -> ProcessStructure:
     outcomes = tuple(outcome_items(section(text, HEADINGS[locale]["outcomes"])))
     activity_text = section(text, HEADINGS[locale]["activities"]) or ""
-    matches = list(re.finditer(r"(?m)^### ([^\n]+?)\s*$", activity_text))
+    matches = list(re.finditer(r"(?m)^#{3,6} ([^\n]+?)\s*$", activity_text))
     activities: list[str] = []
     tasks: list[tuple[str, ...]] = []
     for index, match in enumerate(matches):
@@ -1018,6 +1111,7 @@ def check_process_model(
         errors.append(f"{path}: Process Model requires identifiable Process entries")
     if not relationship_rows and not relationship_items:
         errors.append(f"{path}: Process Model requires identifiable relationship entries")
+    errors.extend(relationship_table_errors(path, relationships))
     errors.extend(relationship_list_endpoint_errors(path, relationships))
 
     process_references = references(processes)
@@ -1078,11 +1172,13 @@ def relationship_endpoint_cells(value: str) -> list[tuple[str, int, str, str]]:
     """Return provider and recipient cells from recognized relationship structures."""
 
     header, rows = table(value)
-    if rows and len(header) >= 3:
+    endpoint_indices = relationship_table_endpoint_indices(header)
+    if rows and endpoint_indices is not None:
+        provider_index, recipient_index = endpoint_indices
         return [
             ("row", row_number, role, row[index])
             for row_number, row in enumerate(rows, start=1)
-            for role, index in (("provider", 0), ("recipient", 2))
+            for role, index in (("provider", provider_index), ("recipient", recipient_index))
             if len(row) > index
         ]
 
@@ -1226,6 +1322,7 @@ def check_reference_model(
         errors.append(
             f"{path}: Process Reference Model requires identifiable relationship entries"
         )
+    errors.extend(relationship_table_errors(path, relationships))
     errors.extend(relationship_list_endpoint_errors(path, relationships))
 
     declared_references = set(normalized_references(processes, current_package_id))
@@ -1776,8 +1873,15 @@ def check_view(
                     continue
             if row_source not in declared_keys:
                 errors.append(f"{path}: provenance row {row_number} names an undeclared Source Process: {row[0]}")
-    elif re.search(r"(?im)\b(?:Activity|Task)\b|活動|タスク", included):
-        warnings.append(f"{path}: source-element provenance could not be established mechanically")
+    elif included.strip():
+        if re.search(r"(?im)\b(?:Activity|Task)\b|活動|タスク", included):
+            warnings.append(
+                f"{path}: source-element provenance could not be established mechanically"
+            )
+        else:
+            errors.append(
+                f"{path}: Process View Included Activities and Tasks must identify at least one Activity or Task"
+            )
     return errors, warnings
 
 

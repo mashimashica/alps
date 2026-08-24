@@ -872,6 +872,305 @@ Three | information | Four | relates the Processes."""
         errors, _ = CHECKER.check_pair(english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "mashimashica/alps")
         self.assertEqual(errors, [], errors)
 
+    def test_inline_code_exact_runs_keep_following_reference_operative(self) -> None:
+        delimiter = chr(96) * 2
+        triple_run = chr(96) * 3
+        value = delimiter + "literal " + triple_run + " content" + delimiter
+        self.assertEqual(
+            CHECKER.references(value + " skill:#missing"),
+            ["skill:#missing"],
+        )
+        errors = check_model("- " + value + " skill:#missing")
+        self.assertTrue(
+            any("unresolved Skill reference skill:#missing" in error for error in errors),
+            errors,
+        )
+
+    def test_process_model_validates_two_column_provider_recipient_tables(self) -> None:
+        outer = """| Provider | Recipient |
+| --- | --- |
+| One | Two |"""
+        unpiped = """Provider Process | Recipient Process
+--- | ---
+One | Two"""
+        self.assertEqual(check_model(outer), [])
+        self.assertEqual(check_model(unpiped), [])
+        errors = check_model(
+            """Provider | Recipient
+--- | ---
+Missing | Also Missing"""
+        )
+        self.assertTrue(
+            any("provider Process 'Missing' is not declared" in error for error in errors),
+            errors,
+        )
+        self.assertTrue(
+            any("recipient Process 'Also Missing' is not declared" in error for error in errors),
+            errors,
+        )
+
+    def test_process_model_rejects_unidentified_two_column_relationship_table(self) -> None:
+        errors = check_model(
+            """| Left | Right |
+| --- | --- |
+| One | Two |"""
+        )
+        self.assertTrue(
+            any("two-column relationship table must identify Provider" in error for error in errors),
+            errors,
+        )
+
+    def test_process_model_pair_detects_reversed_two_column_relationship_table(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_process_model_pair(
+                Path(directory),
+                "提供側プロセス | 受領側プロセス\n--- | ---\n二 | 一",
+                "Provider | Recipient\n--- | ---\nOne | Two",
+            )
+            errors, _ = CHECKER.check_pair(
+                english,
+                japanese,
+                set(CHECKER.DEFAULT_JA_TERMS),
+                "fixture",
+            )
+            self.assertTrue(
+                any(
+                    "relationship provider/recipient endpoint identity or order differs"
+                    in error
+                    for error in errors
+                ),
+                errors,
+            )
+
+    def test_frontmatter_parses_scalar_anchors_tags_and_preserves_yaml_forms(self) -> None:
+        text = """---
+name: &skill-name fixture
+description: !!str Fixture process. ALPS-conformant. # discovery comment
+metadata: &representation # mapping comment
+  alps.kind: !!str &kind process
+alias: *representation
+quoted: 'keep # this text'
+---
+"""
+        values, errors = CHECKER.frontmatter(text)
+        self.assertEqual(errors, [])
+        self.assertEqual(values["name"], "fixture")
+        self.assertEqual(values["description"], "Fixture process. ALPS-conformant.")
+        self.assertEqual(values["alps.kind"], "process")
+        self.assertEqual(values["alias"], "*representation")
+        self.assertEqual(values["quoted"], "keep # this text")
+        block_values, block_errors = CHECKER.frontmatter(
+            """---
+name: fixture
+description: &description |
+  Fixture process. ALPS-conformant.
+---
+"""
+        )
+        self.assertEqual(block_errors, [])
+        self.assertEqual(block_values["description"], "Fixture process. ALPS-conformant.")
+
+    def test_frontmatter_scalar_anchor_fixture_passes_asset_checks(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "skills" / "fixture" / "SKILL.md"
+            write(
+                path,
+                """---
+name: &skill-name fixture
+description: !!str Fixture process. ALPS-conformant.
+metadata:
+  alps.kind: &kind process
+---
+
+# Fixture
+
+## Purpose
+
+The fixture has a purpose.
+
+## Outcomes
+
+- The fixture is complete.
+""",
+            )
+            errors, _ = CHECKER.check_asset(path, {"": root}, None)
+            self.assertEqual(errors, [], errors)
+
+    def test_frontmatter_multiline_quoted_scalars_accept_anchor_and_tag_properties(self) -> None:
+        for quote in ('"', "'"):
+            for properties in ("&d", "!!str"):
+                text = (
+                    "---\n"
+                    "name: fixture\n"
+                    f"description: {properties} {quote}Fixture process.\n"
+                    f"  ALPS-conformant.{quote}\n"
+                    "---\n"
+                )
+                values, errors = CHECKER.frontmatter(text)
+                self.assertEqual(errors, [], (quote, properties, errors))
+                self.assertEqual(
+                    values["description"],
+                    "Fixture process. ALPS-conformant.",
+                    (quote, properties, values),
+                )
+
+    def test_frontmatter_single_line_quoted_scalars_accept_anchor_and_tag_properties(self) -> None:
+        for quote in ('"', "'"):
+            for properties in ("&d", "!!str"):
+                text = (
+                    "---\n"
+                    "name: fixture\n"
+                    f"description: {properties} {quote}Fixture process. "
+                    f"ALPS-conformant.{quote}\n"
+                    "---\n"
+                )
+                values, errors = CHECKER.frontmatter(text)
+                self.assertEqual(errors, [], (quote, properties, errors))
+                self.assertEqual(
+                    values["description"],
+                    "Fixture process. ALPS-conformant.",
+                    (quote, properties, values),
+                )
+
+    def test_frontmatter_parses_anchored_tagged_flow_metadata_with_comments(self) -> None:
+        for metadata in (
+            "metadata: &m {alps.kind: &k process} # representation comment",
+            "metadata: !!map &m {alps.kind: !!str process} # representation comment",
+        ):
+            text = (
+                "---\n"
+                "name: fixture\n"
+                "description: Fixture process. ALPS-conformant.\n"
+                f"{metadata}\n"
+                "---\n"
+            )
+            values, errors = CHECKER.frontmatter(text)
+            self.assertEqual(errors, [], (metadata, errors))
+            self.assertEqual(values["alps.kind"], "process", (metadata, values))
+
+    def test_frontmatter_preserves_quoted_scalar_error_checks_with_properties(self) -> None:
+        unbalanced = (
+            "---\n"
+            "name: fixture\n"
+            "description: &d \"Fixture process.\n"
+            "  ALPS-conformant.\n"
+            "---\n"
+        )
+        _, errors = CHECKER.frontmatter(unbalanced)
+        self.assertTrue(
+            any("unbalanced quoted scalar" in error for error in errors),
+            errors,
+        )
+        trailing = (
+            "---\n"
+            "name: fixture\n"
+            "description: !!str \"Fixture process. ALPS-conformant.\" trailing\n"
+            "---\n"
+        )
+        _, errors = CHECKER.frontmatter(trailing)
+        self.assertTrue(
+            any("content after a quoted scalar" in error for error in errors),
+            errors,
+        )
+
+    def test_process_activities_accept_alternate_heading_levels_and_exclude_later_sections(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "skills" / "fixture" / "SKILL.md"
+            write(
+                path,
+                """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+---
+
+# Fixture
+
+## Purpose
+
+The fixture has a purpose.
+
+## Outcomes
+
+- The fixture is complete.
+
+## Activities & Tasks
+
+### Plan
+
+1. The agent must plan.
+
+#### Work
+
+1. The agent should work.
+
+## Inputs
+
+### Unrelated later heading
+
+1. Perform an action.
+""",
+            )
+            errors, _ = CHECKER.check_asset(path, {"": root}, None)
+            self.assertEqual(errors, [], errors)
+
+    def test_process_tasks_under_alternate_heading_require_normative_force(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "skills" / "fixture" / "SKILL.md"
+            write(
+                path,
+                """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+---
+
+# Fixture
+
+## Purpose
+
+The fixture has a purpose.
+
+## Outcomes
+
+- The fixture is complete.
+
+## Activities & Tasks
+
+#### Work
+
+1. Perform an action.
+""",
+            )
+            errors, _ = CHECKER.check_asset(path, {"": root}, None)
+            self.assertTrue(
+                any(
+                    "Activity 1 Task 1 has no recognizable normative attribute"
+                    in error
+                    for error in errors
+                ),
+                errors,
+            )
+
+    def test_process_view_rejects_unstructured_included_content_and_keeps_supported_forms(self) -> None:
+        errors = check_view_fixture("- One\n- Two", "Nothing structured here.")
+        self.assertTrue(
+            any("must identify at least one Activity or Task" in error for error in errors),
+            errors,
+        )
+        self.assertEqual(
+            check_view_fixture("- One\n- Two", "- Activity: Work\n- Task: Review"),
+            [],
+        )
+        self.assertEqual(
+            check_view_fixture(
+                "- One\n- Two",
+                "The Activity is Work and the Task is Review.",
+            ),
+            [],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
