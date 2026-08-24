@@ -1,6 +1,6 @@
 ---
 name: alps-reference-model
-description: Provides the ALPS Reference Model for selecting, composing, and assessing the ALPS definition, application, and management Processes.
+description: Provides the ALPS Reference Model for selecting, composing, assessing, and improving the ALPS definition, application, and management Processes.
 metadata:
   alps.kind: process-reference-model
 ---
@@ -15,81 +15,82 @@ The ALPS Reference Model defines the Processes required to define, apply, and ma
 
 ### Define ALPS
 
-Skill: `skill:mashimashica/alps#define-alps`
+Skill: `skill:#define-alps`
 
 #### Purpose
 
-This Process establishes an assessable and usable Skill Description that satisfies identified stakeholder needs.
+This Process establishes an assessable and usable ALPS representation that satisfies an identified need while preserving the semantics of the represented Process Framework construct.
 
 #### Outcomes
 
-- a) The need to be addressed as a Skill and the intended contexts of use are identified.
-- b) The Process Purpose, Outcomes, and boundary are aligned with the selected need.
-- c) The Skill Description satisfies the applicable ALPS description requirements.
-- d) Elements within the Skill Description and exchanges with external parties are traceable.
-- e) The achievability of the Outcomes in representative contexts of use is confirmed.
-- f) A decision on Skill adoption can be made from evidence that includes defects and limitations.
+- a) The need for the ALPS representation and the intended contexts of use are identified.
+- b) The represented Process Framework construct, Purpose, boundary, and required level of detail are aligned with the selected need.
+- c) The authoritative representation satisfies the applicable Process Framework and ALPS requirements for its representation kind.
+- d) References, relationships, provenance, and exchanges required by the representation are traceable and resolvable.
+- e) A Process Description has demonstrated Outcome achievability in representative contexts, or a non-Process representation has demonstrated semantic consistency and applicability to its intended concern.
+- f) A decision on adoption can be made from verification evidence that includes defects, assumptions, and limitations.
 
 ### Apply ALPS
 
-Skill: `skill:mashimashica/alps#apply-alps`
+Skill: `skill:#apply-alps`
 
 #### Purpose
 
-This Process achieves the intended Outcomes through the single or combined application of Processes represented by Skills suited to the application situation.
+This Process selects and activates applicable ALPS representations, resolves the Processes needed for the application situation, and achieves the intended Outcomes through the single or combined application of Process Skills.
 
 #### Outcomes
 
-- a) The needs and conditions of the application situation have been identified.
-- b) The Processes to apply, the Skills providing their authoritative descriptions, and the form of application have been determined with a rationale.
-- c) The applicable Control, Constraint, and Tailoring decisions have been identified.
-- d) The application results of the Process Instances conform to the declared application scope and to the applicable Control, Constraint, and Tailoring decisions.
-- e) The declared Outcomes of the Processes being applied have been achieved.
-- f) The required handoffs among Processes have been established.
-- g) The completeness and consistency of the Process composition have been established.
+- a) The needs, conditions, and risks of the application situation are identified.
+- b) Applicable Process Models, Process Reference Models, Process Views, and Process representations are selected or activated as needed, and candidate Processes are resolved from them.
+- c) The Process Skills to invoke and the form of application are determined with a rationale.
+- d) Applicable Controls, Constraints, Tailoring decisions, and Decision Gates are identified before affected actions occur.
+- e) Process Instances are executed within the declared application scope and applicable Controls, Constraints, and Tailoring decisions.
+- f) The declared Outcomes of the applied Processes are achieved with observable evidence.
+- g) Required handoffs and the completeness and consistency of the Process composition are established.
 
 ### Manage ALPS
 
-Skill: `skill:mashimashica/alps#manage-alps`
+Skill: `skill:#manage-alps`
 
 #### Purpose
 
-This Process governs adopted ALPS assets and their application so that suitable Agent Skills, Skill Packages, Process Models, and Process Views remain available, controlled, and fit for their intended use.
+This Process governs ALPS representations and their application and maintains the continual availability of suitable, coherent, and trustworthy ALPS assets.
 
 #### Outcomes
 
-- a) Policies and guidance for adoption, deployment, Tailoring, assessment, change, and retirement are established.
-- b) Adopted Agent Skills, Skill Packages, Process Models, and Process Views are discoverable in a managed state.
-- c) Identity, status, version, references, change, and retirement of managed subjects are controlled.
-- d) Tailoring decisions and rationale are traceable to applicable Controls and Constraints.
-- e) Process application performance is assessed against declared criteria.
-- f) The fitness of managed Process Models and Process Views is assessed against declared criteria.
-- g) Improvement opportunities are prioritized from evidence, lessons learned, and assessment results.
-- h) Decided improvements are implemented.
-- i) Subjects affected by implemented improvements are reverified as needed.
+- a) Policies and guidance for managing, deploying, Tailoring, and adopting ALPS representations are established.
+- b) Adopted ALPS representations are discoverable with their identity, kind, status, version, and applicable conditions under management.
+- c) Changes and retirement are controlled with their impacts, reference integrity, and affected users or representations identified.
+- d) Tailoring, formal adoption, and other management decisions are traceable to applicable Controls, Constraints, scope, evidence, and rationale.
+- e) Process execution is assessed using criteria appropriate to its declared subject, including Conformance, performance, and effectiveness where relevant.
+- f) Managed ALPS representations are assessed using criteria appropriate to their kind, including semantic consistency, description Conformance, relationship coherence, and applicability where relevant.
+- g) Improvement opportunities are prioritized from execution evidence, lessons learned, representation assessments, and change impacts.
+- h) Decided improvements are implemented through controlled change.
+- i) Representations affected by implemented improvements are reverified.
+- j) Resulting management states are updated.
 
 ## Relationships
 
 | Provider Process | Information | Recipient Process | Relationship |
 | --- | --- | --- | --- |
-| Define ALPS | Verified Skill Description and verification evidence | Manage ALPS | Supports adoption, registration, change, and reverification decisions. |
-| Manage ALPS | Information about managed Agent Skills, Skill Packages, Process Models, and Process Views; Tailoring decisions; and conditions of application | Apply ALPS | Establishes the managed assets and conditions available for application. |
-| Apply ALPS | Execution and decision records, lessons learned, and measurable results | Manage ALPS | Supports assessment, improvement, change, and retirement decisions. |
-| Manage ALPS | Change requests, redefinition requests, and reverification requests | Define ALPS | Initiates definition, redefinition, or reverification when an authoritative description or representation must change. |
+| Define ALPS | Verified authoritative ALPS representation and verification evidence | Manage ALPS | Supports adoption, registration, controlled change, and reverification. |
+| Manage ALPS | Managed representations, status, Tailoring decisions, and application conditions | Apply ALPS | Establishes the authoritative assets and conditions available for application. |
+| Apply ALPS | Selection rationale, execution evidence, Outcome evidence, handoffs, and lessons | Manage ALPS | Supports assessment, improvement, change, and retirement decisions. |
+| Manage ALPS | Redefinition, reverification, or formal-adoption request | Define ALPS | Initiates controlled definition or redefinition of an authoritative representation. |
 
-The relationships do not prescribe an execution sequence. The three Processes can be applied iteratively, concurrently, or recursively when the application situation requires it.
+The relationships do not prescribe an execution sequence. The three Processes may be applied iteratively, concurrently, or recursively according to the application situation.
 
 ## Application
 
-Activate this Agent Skill to load the ALPS Reference Model. Use `apply-alps` to select and compose the referenced Processes for the application situation. Loading this Reference Model does not itself invoke a Process.
+Activate this Agent Skill to load the ALPS Reference Model. Use Apply ALPS to select or activate relevant Models and Views, resolve the required Processes, and invoke only Agent Skills that represent Processes. Loading this Reference Model does not itself invoke a Process.
 
 ## Verification
 
-A representation of this Process Reference Model is valid only when each referenced Process Skill resolves and its Name, Purpose, and Outcomes retain the same semantic center represented here. Purpose and Outcomes are required to match their authoritative Process Descriptions.
+This Process Reference Model is valid only when each referenced Process Skill resolves, represents a Process, and has the same Process Name, Purpose, and Outcomes represented here. Purpose and Outcomes must match their authoritative Process Descriptions. A mismatch is an error and neither representation silently overrides the other.
 
 ## Conformance
 
-This Process Reference Model can be assessed as a Process Reference Model representation. Process Outcome Conformance and Process Task Conformance remain claims about the referenced Processes and their Process Instances, not about activation of this Agent Skill.
+This Process Reference Model can be assessed as a Process Reference Model representation. Process Outcome Conformance and Process Task Conformance remain claims about the referenced Processes and their Process Instances. Activation of this Agent Skill is not Process Invocation or Execution Conformance.
 
 ## Bundled Resources
 

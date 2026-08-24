@@ -26,13 +26,7 @@ SUPPORTED_KINDS = {
 }
 NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 SKILL_REF = re.compile(r"skill:(?P<package>[^#\s]*)#(?P<skill>[a-z0-9][a-z0-9-]*)")
-SKILL_TOKEN = re.compile(r'''skill:[^\s`<>()\[\]{}"',;!?]*''')
-MARKDOWN_INLINE_LINK = re.compile(
-    r"!?\[[^\]\n]*\]\((?P<target><[^>\n]+>|[^)\n]+)\)"
-)
-MARKDOWN_REFERENCE_LINK = re.compile(
-    r"(?m)^\s{0,3}\[[^\]\n]+\]:\s*(?P<target><[^>\n]+>|\S+)"
-)
+SKILL_TOKEN = re.compile(r'''skill:[^\s`<>()\[\]{}"',;!?。、，；：！？）」』】〉》]*''')
 RECORD_CENTRIC = {
     "en": re.compile(r"\b(?:is|are|was|were)\s+(?:only\s+)?(?:recorded|documented)\b", re.I),
     "ja": re.compile(r"(?:が|は)(?:記録|文書化)されている"),
@@ -120,6 +114,125 @@ def locale_for(path: Path) -> str:
     return "en"
 
 
+def quoted_scalar_end(value: str) -> int | None:
+    if not value.startswith(("'", '"')):
+        return None
+    quote = value[0]
+    cursor = 1
+    while cursor < len(value):
+        if quote == '"' and value[cursor] == "\\":
+            cursor += 2
+            continue
+        if value[cursor] == quote:
+            if quote == "'" and cursor + 1 < len(value) and value[cursor + 1] == quote:
+                cursor += 2
+                continue
+            return cursor
+        cursor += 1
+    return -1
+
+
+def flow_mapping_items(value: str) -> dict[str, str] | None:
+    """Return scalar entries from a YAML flow mapping used by metadata."""
+    value = value.strip()
+    if not value.startswith("{"):
+        return None
+    depth = 0
+    quote: str | None = None
+    escaped = False
+    close = -1
+    for index, char in enumerate(value):
+        if quote:
+            if quote == '"' and escaped:
+                escaped = False
+            elif quote == '"' and char == "\\":
+                escaped = True
+            elif char == quote:
+                if quote == "'" and index + 1 < len(value) and value[index + 1] == "'":
+                    continue
+                quote = None
+            continue
+        if char in ("'", '"'):
+            quote = char
+        elif char in "[{":
+            depth += 1
+        elif char in "]}":
+            depth -= 1
+            if depth == 0:
+                close = index
+                break
+    if close < 0 or value[close + 1 :].strip() not in {"", "#"} and not value[close + 1 :].lstrip().startswith("#"):
+        return None
+
+    body = value[1:close]
+    parts: list[str] = []
+    start = 0
+    depth = 0
+    quote = None
+    escaped = False
+    for index, char in enumerate(body):
+        if quote:
+            if quote == '"' and escaped:
+                escaped = False
+            elif quote == '"' and char == "\\":
+                escaped = True
+            elif char == quote:
+                quote = None
+            continue
+        if char in ("'", '"'):
+            quote = char
+        elif char in "[{":
+            depth += 1
+        elif char in "]}":
+            depth -= 1
+        elif char == "," and depth == 0:
+            parts.append(body[start:index])
+            start = index + 1
+    parts.append(body[start:])
+
+    result: dict[str, str] = {}
+    for part in parts:
+        if not part.strip():
+            continue
+        depth = 0
+        quote = None
+        escaped = False
+        separator = -1
+        for index, char in enumerate(part):
+            if quote:
+                if quote == '"' and escaped:
+                    escaped = False
+                elif quote == '"' and char == "\\":
+                    escaped = True
+                elif char == quote:
+                    quote = None
+                continue
+            if char in ("'", '"'):
+                quote = char
+            elif char in "[{":
+                depth += 1
+            elif char in "]}":
+                depth -= 1
+            elif char == ":" and depth == 0:
+                separator = index
+                break
+        if separator < 0:
+            return None
+        key = part[:separator].strip()
+        item_value = part[separator + 1 :].strip()
+        if key.startswith(("'", '"')) and quoted_scalar_end(key) == len(key) - 1:
+            key = key[1:-1].replace("''", "'")
+        if item_value.startswith(("'", '"')):
+            end = quoted_scalar_end(item_value)
+            if end != len(item_value) - 1:
+                continue
+            item_value = item_value[1:end].replace("''", "'")
+        elif item_value.startswith(("{", "[")):
+            continue
+        result[key] = item_value
+    return result
+
+
 def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
     if not text.startswith("---\n"):
         return {}, ["YAML frontmatter must start on the first line"]
@@ -127,20 +240,85 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
     if end < 0:
         return {}, ["YAML frontmatter is not closed"]
 
+    lines = text[4:end].splitlines()
+    block_values: dict[int, str] = {}
+    for index, raw in enumerate(lines):
+        block = re.match(
+            r"^(?P<prefix>\s*[A-Za-z0-9_.-]+:\s*)(?P<style>[>|])(?:[+-]?[1-9]?|[1-9][+-]?)\s*$",
+            raw,
+        )
+        if not block:
+            continue
+        base_indent = len(raw) - len(raw.lstrip(" "))
+        content: list[str] = []
+        for continuation in lines[index + 1 :]:
+            if not continuation.strip():
+                content.append("")
+                continue
+            indent = len(continuation) - len(continuation.lstrip(" "))
+            if indent <= base_indent:
+                break
+            content.append(continuation.strip())
+        value = " ".join(part for part in content if part)
+        block_values[index] = block.group("prefix") + value
+
+    quoted_values: dict[int, str] = {}
+    quoted_continuations: set[int] = set()
+    for index, raw in enumerate(lines):
+        scalar = re.match(r"^(?P<prefix>\s*[A-Za-z0-9_.-]+:\s*)(?P<value>['\"].*)$", raw)
+        if not scalar or quoted_scalar_end(scalar.group("value")) != -1:
+            continue
+        pieces = [scalar.group("value")]
+        last = index
+        for continuation_index in range(index + 1, len(lines)):
+            pieces.append(lines[continuation_index].strip())
+            last = continuation_index
+            combined = " ".join(pieces)
+            if quoted_scalar_end(combined) not in {None, -1}:
+                break
+        quoted_values[index] = scalar.group("prefix") + " ".join(pieces)
+        quoted_continuations.update(range(index + 1, last + 1))
+
     values: dict[str, str] = {}
     errors: list[str] = []
     in_metadata = False
-    for number, raw in enumerate(text[4:end].splitlines(), start=2):
+    metadata_child_indent: int | None = None
+    for index, original in enumerate(lines):
+        if index in quoted_continuations:
+            continue
+        number = index + 2
+        raw = quoted_values.get(index, block_values.get(index, original))
         if not raw.strip() or raw.lstrip().startswith("#"):
             continue
-        if raw == "metadata:":
+        if re.match(r"^ *\t", raw):
+            errors.append(f"frontmatter line {number} uses a tab for indentation")
+            continue
+        if re.fullmatch(r"metadata:\s*(?:#.*)?", raw):
             in_metadata = True
+            metadata_child_indent = None
+            continue
+        flow_metadata = re.match(r"^metadata:\s*(\{.*)$", raw)
+        if flow_metadata:
+            items = flow_mapping_items(flow_metadata.group(1))
+            if items is None:
+                errors.append(f"frontmatter line {number} has an invalid metadata flow mapping")
+            elif "alps.kind" in items:
+                values["metadata.alps.kind"] = items["alps.kind"]
+            in_metadata = False
+            metadata_child_indent = None
             continue
         if raw and not raw.startswith((" ", "\t")):
             in_metadata = False
+            metadata_child_indent = None
         scalar = re.match(r"^([A-Za-z0-9_.-]+):\s*(.*?)\s*$", raw)
-        nested = re.match(r"^\s+([A-Za-z0-9_.-]+):\s*(.*?)\s*$", raw)
-        match = nested if in_metadata else scalar
+        nested = re.match(r"^ +([A-Za-z0-9_.-]+):\s*(.*?)\s*$", raw)
+        if in_metadata and nested:
+            indent = len(raw) - len(raw.lstrip(" "))
+            if metadata_child_indent is None:
+                metadata_child_indent = indent
+            match = nested if indent == metadata_child_indent else None
+        else:
+            match = scalar
         if not match:
             # Block scalars and unrelated nested binding metadata are outside
             # the fields inspected here.
@@ -149,20 +327,40 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
             errors.append(f"frontmatter line {number} is not a key/value")
             continue
         key, value = match.groups()
+        if not in_metadata and key in {"alps.kind", "metadata.alps.kind"}:
+            errors.append(
+                f"frontmatter line {number} must declare alps.kind under metadata"
+            )
+            continue
         if in_metadata:
             key = f"metadata.{key}"
-        values[key] = value.strip().strip('"').strip("'")
+        value = value.strip()
+        if index not in block_values and value.startswith(("'", '"')):
+            cursor = quoted_scalar_end(value)
+            if cursor in {None, -1}:
+                errors.append(f"frontmatter line {number} has an unbalanced quoted scalar")
+                continue
+            remainder = value[cursor + 1 :].strip()
+            if remainder and not remainder.startswith("#"):
+                errors.append(f"frontmatter line {number} has content after a quoted scalar")
+                continue
+            value = value[1:cursor]
+        elif index not in block_values:
+            value = re.split(r"\s+#", value, maxsplit=1)[0].rstrip()
+        values[key] = value
     if "metadata.alps.kind" in values:
         values["alps.kind"] = values["metadata.alps.kind"]
     return values, errors
 
 
 def heading1(text: str) -> str | None:
+    text = without_html_comments(without_fenced_code(text))
     match = re.search(r"(?m)^# ([^\n]+?)\s*$", text)
     return match.group(1).strip() if match else None
 
 
 def section(text: str, heading: str, level: int = 2) -> str | None:
+    text = without_html_comments(without_fenced_code(text))
     marker = "#" * level + " " + heading
     pattern = re.compile(rf"(?ms)^{re.escape(marker)}\s*$\n(.*?)(?=^#{{1,{level}}}\s|\Z)")
     match = pattern.search(text)
@@ -193,14 +391,21 @@ def outcome_items(value: str | None) -> list[str]:
 
     if not value or not value.strip():
         return []
-    lines = normalized_lines(value)
-    marked = [line for line in lines if re.match(r"^(?:[-*+]\s+|\d+[.)]\s+|[a-z][.)]\s+)", line, re.I)]
+    marked = [
+        re.sub(r"\s+", " ", item.group("item")).strip()
+        for item in re.finditer(
+            r"(?ms)^(?P<indent>[ \t]{0,3})(?:[-*+]|\d+[.)]|[a-z][.)])\s+"
+            r"(?P<item>.*?)(?=^(?P=indent)(?:[-*+]|\d+[.)]|[a-z][.)])\s+|"
+            r"^[ \t]*$\n(?=\S)|\Z)",
+            value,
+            re.I,
+        )
+    ]
     if marked:
         values: list[str] = []
-        for line in marked:
-            line = re.sub(r"^(?:[-*+]\s+|\d+[.)]\s+)", "", line)
-            line = re.sub(r"^[a-z][.)]\s+", "", line, flags=re.I)
-            values.append(re.sub(r"\s+", " ", line).strip())
+        for item in marked:
+            item = re.sub(r"^[a-z][.)]\s+", "", item, flags=re.I)
+            values.append(item)
         return values
     _, rows = table(value)
     if rows:
@@ -219,8 +424,127 @@ def representation_kind(path: Path) -> str:
     return meta.get("alps.kind", "process")
 
 
+def without_fenced_code(text: str) -> str:
+    """Replace fenced code with newlines so examples are not operative syntax."""
+
+    visible: list[str] = []
+    fence: tuple[str, int] | None = None
+    for line in text.splitlines(keepends=True):
+        marker = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
+        if marker:
+            token = marker.group(1)
+            if fence is None:
+                fence = (token[0], len(token))
+            elif (
+                token[0] == fence[0]
+                and len(token) >= fence[1]
+                and not line[marker.end() :].strip()
+            ):
+                fence = None
+            visible.append("\n" if line.endswith("\n") else "")
+            continue
+        visible.append(line if fence is None else ("\n" if line.endswith("\n") else ""))
+    return "".join(visible)
+
+
+def without_html_comments(text: str) -> str:
+    return re.sub(
+        r"(?s)<!--.*?(?:-->|\Z)",
+        lambda match: "\n" * match.group(0).count("\n"),
+        text,
+    )
+
+
+def without_inline_code(text: str) -> str:
+    result: list[str] = []
+    index = 0
+    while index < len(text):
+        if text[index] != "`":
+            result.append(text[index])
+            index += 1
+            continue
+        run = len(text[index:]) - len(text[index:].lstrip("`"))
+        end = text.find("`" * run, index + run)
+        if end < 0:
+            result.append(text[index:])
+            break
+        result.append(" " * (end + run - index))
+        index = end + run
+    return "".join(result)
+
+
+def without_indented_code(text: str) -> str:
+    """Mask Markdown indented code while retaining ordinary list continuations."""
+
+    visible: list[str] = []
+    in_code = False
+    previous_paragraph = False
+    list_content_indent: int | None = None
+    for line in text.splitlines(keepends=True):
+        content = line.rstrip("\r\n")
+        if not content.strip():
+            visible.append("\n" if line.endswith("\n") else "")
+            previous_paragraph = False
+            continue
+        expanded = content.expandtabs(4)
+        indent = len(expanded) - len(expanded.lstrip(" "))
+        list_item = re.match(r"^( {0,3})(?:[-*+]|\d+[.)])\s+", expanded)
+        if list_item:
+            marker = re.match(r"^ {0,3}(?:[-*+]|\d+[.)])\s+", expanded)
+            assert marker is not None
+            list_content_indent = marker.end()
+            in_code = False
+            visible.append(line)
+            previous_paragraph = True
+            continue
+        if list_content_indent is not None and indent < list_content_indent:
+            list_content_indent = None
+        code_indent = (list_content_indent + 4) if list_content_indent is not None else 4
+        if indent >= code_indent and (in_code or not previous_paragraph):
+            visible.append("\n" if line.endswith("\n") else "")
+            in_code = True
+            previous_paragraph = False
+            continue
+        in_code = False
+        visible.append(line)
+        stripped = expanded.lstrip()
+        previous_paragraph = not re.match(
+            r"(?:#{1,6}\s|>|```|~~~|(?:[-*_]\s*){3,}$)", stripped
+        )
+    return "".join(visible)
+
+
+def reference_scan_text(text: str) -> str:
+    """Keep prose and exact inline canonical references, excluding code examples."""
+
+    value = without_html_comments(without_fenced_code(text))
+    for target in markdown_link_targets(value):
+        value = value.replace(target, " " * len(target))
+    value = re.sub(r"\b(?:https?|ftp)://[^\s<]+", "", value)
+    result: list[str] = []
+    index = 0
+    while index < len(value):
+        if value[index] != "`":
+            result.append(value[index])
+            index += 1
+            continue
+        run = len(value[index:]) - len(value[index:].lstrip("`"))
+        end = value.find("`" * run, index + run)
+        if end < 0:
+            result.append(value[index:])
+            break
+        content = value[index + run : end].strip()
+        if SKILL_REF.fullmatch(content):
+            result.append(content)
+        index = end + run
+    return "".join(result)
+
+
 def reference_tokens(text: str) -> list[str]:
-    return [match.group(0).rstrip(".:") for match in SKILL_TOKEN.finditer(text)]
+    return [
+        match.group(0).rstrip(".:")
+        for match in SKILL_TOKEN.finditer(reference_scan_text(text))
+    ]
 
 
 def references(text: str) -> list[str]:
@@ -248,8 +572,114 @@ def reference_syntax_errors(path: Path, text: str) -> list[str]:
 def markdown_link_targets(text: str) -> list[str]:
     """Return inline and reference-definition Markdown link destinations."""
 
-    targets = [match.group("target") for match in MARKDOWN_INLINE_LINK.finditer(text)]
-    targets.extend(match.group("target") for match in MARKDOWN_REFERENCE_LINK.finditer(text))
+    value = without_html_comments(
+        without_inline_code(without_indented_code(without_fenced_code(text)))
+    )
+
+    targets: list[str] = []
+    index = 0
+    while index < len(value):
+        if value[index] == "`":
+            run = len(value[index:]) - len(value[index:].lstrip("`"))
+            end = value.find("`" * run, index + run)
+            index = len(value) if end < 0 else end + run
+            continue
+        label_start = index + 1 if value.startswith("![", index) else index
+        if label_start >= len(value) or value[label_start] != "[":
+            index += 1
+            continue
+        depth = 1
+        cursor = label_start + 1
+        while cursor < len(value) and depth:
+            if value[cursor] == "\\":
+                cursor += 2
+                continue
+            if value[cursor] == "[":
+                depth += 1
+            elif value[cursor] == "]":
+                depth -= 1
+            cursor += 1
+        if depth or cursor >= len(value) or value[cursor] != "(":
+            index = max(index + 1, cursor)
+            continue
+        cursor += 1
+        while cursor < len(value) and value[cursor] in " \t\n":
+            cursor += 1
+        if cursor < len(value) and value[cursor] == "<":
+            start = cursor
+            cursor += 1
+            while cursor < len(value):
+                if value[cursor] == "\\":
+                    cursor += 2
+                    continue
+                if value[cursor] == ">":
+                    targets.append(value[start : cursor + 1])
+                    cursor += 1
+                    break
+                cursor += 1
+        else:
+            start = cursor
+            parentheses = 0
+            while cursor < len(value):
+                character = value[cursor]
+                if character == "\\":
+                    cursor += 2
+                    continue
+                if character == "(":
+                    parentheses += 1
+                elif character == ")":
+                    if parentheses == 0:
+                        targets.append(value[start:cursor])
+                        cursor += 1
+                        break
+                    parentheses -= 1
+                elif character in " \t\n" and parentheses == 0:
+                    targets.append(value[start:cursor])
+                    break
+                cursor += 1
+        index = max(index + 1, cursor)
+
+    lines = value.splitlines()
+    for line_index, line in enumerate(lines):
+        label = re.match(r"^ {0,3}\[", line)
+        if not label:
+            continue
+        cursor = label.end()
+        while cursor < len(line):
+            if line[cursor] == "\\":
+                cursor += 2
+                continue
+            if line[cursor] == "]":
+                break
+            cursor += 1
+        if cursor >= len(line) or not line.startswith("]:", cursor):
+            continue
+        cursor += 2
+        while cursor < len(line) and line[cursor] in " \t":
+            cursor += 1
+        if cursor >= len(line):
+            if line_index + 1 >= len(lines) or not re.match(r"^[ \t]+\S", lines[line_index + 1]):
+                continue
+            line = lines[line_index + 1]
+            cursor = len(line) - len(line.lstrip(" \t"))
+        if line[cursor] == "<":
+            end = cursor + 1
+            while end < len(line):
+                if line[end] == "\\":
+                    end += 2
+                    continue
+                if line[end] == ">":
+                    targets.append(line[cursor : end + 1])
+                    break
+                end += 1
+        else:
+            end = cursor
+            while end < len(line) and not line[end].isspace():
+                if line[end] == "\\" and end + 1 < len(line):
+                    end += 2
+                else:
+                    end += 1
+            targets.append(line[cursor:end])
     return targets
 
 
@@ -265,6 +695,28 @@ def containing_package_root(path: Path, roots: dict[str, Path]) -> Path | None:
     return max(candidates, key=lambda root: len(root.parts)) if candidates else None
 
 
+def containing_package_identity(
+    path: Path, roots: dict[str, Path], configured_identity: str | None
+) -> str | None:
+    """Return the identity of the most specific package containing path."""
+
+    package_root = containing_package_root(path, roots)
+    if package_root is None:
+        return configured_identity
+    if (
+        configured_identity
+        and configured_identity in roots
+        and roots[configured_identity].resolve() == package_root
+    ):
+        return configured_identity
+    aliases = sorted(
+        identity
+        for identity, root in roots.items()
+        if identity and root.resolve() == package_root
+    )
+    return aliases[0] if len(aliases) == 1 else configured_identity
+
+
 def local_link_errors(path: Path, text: str, package_root: Path) -> list[str]:
     """Report local Markdown links that escape the package or do not resolve."""
 
@@ -276,9 +728,18 @@ def local_link_errors(path: Path, text: str, package_root: Path) -> list[str]:
             target = target[1:-1].strip()
         else:
             target = target.split(maxsplit=1)[0]
-        if not target or target.startswith(("#", "/", "//")):
+        if not target or target.startswith(("#", "//")):
+            continue
+        if target.startswith("/"):
+            errors.append(f"{path}: root-relative Markdown reference is not allowed: {target}")
+            continue
+        if re.match(r"^[A-Za-z]:[\\/]", target):
+            errors.append(f"{path}: absolute Markdown reference is not allowed: {target}")
             continue
         parsed = urlsplit(target)
+        if parsed.scheme == "file":
+            errors.append(f"{path}: file-scheme Markdown reference is not allowed: {target}")
+            continue
         if parsed.scheme:
             continue
         local_target = unquote(parsed.path)
@@ -307,15 +768,22 @@ def package_roots(values: list[str], current_root: Path, package_id: str | None)
     return roots
 
 
-def resolve_skill(reference: str, roots: dict[str, Path], locale: str = "en") -> ResolvedSkill:
+def resolve_skill(
+    reference: str,
+    roots: dict[str, Path],
+    locale: str = "en",
+    current_package_id: str | None = None,
+) -> ResolvedSkill:
     match = SKILL_REF.fullmatch(reference)
     if not match:
         raise ValueError(f"invalid canonical Skill reference: {reference}")
-    package = match.group("package")
+    package = match.group("package") or current_package_id or ""
     if package not in roots:
         raise ValueError(f"unresolved package identity {package!r} in {reference}")
-    root = roots[package]
-    path = root / "skills" / match.group("skill") / "SKILL.md"
+    root = roots[package].resolve()
+    path = (root / "skills" / match.group("skill") / "SKILL.md").resolve()
+    if not path.is_relative_to(root):
+        raise ValueError(f"Skill reference escapes package root: {reference}")
     if not path.is_file():
         raise ValueError(f"unresolved Skill reference {reference}: {path} not found")
     if locale == "ja":
@@ -355,6 +823,7 @@ def process_core(path: Path) -> tuple[str, str, list[str]]:
 
 
 def classify_normative(task: str, locale: str) -> str | None:
+    task = without_inline_code(without_html_comments(task))
     matches: list[tuple[int, int, str]] = []
     for priority, (name, pattern) in enumerate(NORMATIVE_PATTERNS[locale]):
         matches.extend((match.start(), -priority, name) for match in pattern.finditer(task))
@@ -378,8 +847,13 @@ def parse_process_structure(text: str, locale: str) -> ProcessStructure:
         end = matches[index + 1].start() if index + 1 < len(matches) else len(activity_text)
         block = activity_text[start:end]
         task_values = tuple(
-            item.group(1).strip()
-            for item in re.finditer(r"(?m)^\s*(?:\d+[.)]|[-*+])\s+(.+?)\s*$", block)
+            re.sub(r"\s+", " ", item.group("item")).strip()
+            for item in re.finditer(
+                r"(?ms)^(?P<indent>[ \t]{0,3})(?:\d+[.)]|[-*+])\s+"
+                r"(?P<item>.*?)(?=^(?P=indent)(?:\d+[.)]|[-*+])\s+|"
+                r"^[ \t]*$\n(?=\S)|\Z)",
+                block,
+            )
         )
         tasks.append(task_values)
     return ProcessStructure(outcomes, tuple(activities), tuple(tasks))
@@ -434,17 +908,66 @@ def semantic_process_findings(path: Path, text: str, locale: str) -> tuple[list[
     return errors, warnings
 
 
-def check_process_model(path: Path, text: str, locale: str, roots: dict[str, Path]) -> list[str]:
+def check_process_model(
+    path: Path,
+    text: str,
+    locale: str,
+    roots: dict[str, Path],
+    current_package_id: str | None,
+) -> list[str]:
     errors = required_sections(path, text, "Process Model", locale, ("purpose", "processes", "relationships"))
-    for reference in references(section(text, HEADINGS[locale]["processes"]) or ""):
+    processes = section(text, HEADINGS[locale]["processes"]) or ""
+    relationships = section(text, HEADINGS[locale]["relationships"]) or ""
+    _, process_rows = table(processes)
+    _, relationship_rows = table(relationships)
+    process_items = re.findall(r"(?m)^\s{0,3}(?:[-*+]|\d+[.)])\s+\S", processes)
+    relationship_items = re.findall(r"(?m)^\s{0,3}(?:[-*+]|\d+[.)])\s+\S", relationships)
+    if not process_rows and not process_items and not references(processes):
+        errors.append(f"{path}: Process Model requires identifiable Process entries")
+    if not relationship_rows and not relationship_items:
+        errors.append(f"{path}: Process Model requires identifiable relationship entries")
+
+    process_references = references(processes)
+    declared_references = set(normalized_references(processes, current_package_id))
+    declared_names = {
+        source_identity(entry) for entry in process_model_entries(processes)
+    } - {""}
+    for reference in process_references:
         try:
-            target = resolve_skill(reference, roots, locale)
+            target = resolve_skill(reference, roots, locale, current_package_id)
         except ValueError as exc:
             errors.append(f"{path}: {exc}")
             continue
         if representation_kind(target.path) != "process":
             errors.append(f"{path}: {reference} does not resolve to a Process representation")
+    for reference in references(relationships):
+        try:
+            target = resolve_skill(reference, roots, locale, current_package_id)
+        except ValueError as exc:
+            errors.append(f"{path}: {exc}")
+            continue
+        if representation_kind(target.path) != "process":
+            errors.append(f"{path}: {reference} does not resolve to a Process representation")
+            continue
+        target_name = heading1(target.path.read_text(encoding="utf-8"))
+        if (
+            normalized_references(reference, current_package_id)[0] not in declared_references
+            and source_identity(target_name or "") not in declared_names
+        ):
+            errors.append(f"{path}: relationship endpoint {reference} is not declared in Processes")
     return errors
+
+
+def process_model_entries(value: str) -> list[str]:
+    _, rows = table(value)
+    if rows:
+        return [row[0] for row in rows if row and row[0]]
+    return [
+        match.group(1).strip()
+        for match in re.finditer(
+            r"(?m)^\s{0,3}(?:[-*+]|\d+[.)])\s+(\S.*)$", value
+        )
+    ]
 
 
 def process_blocks(value: str) -> list[tuple[str, str]]:
@@ -452,15 +975,32 @@ def process_blocks(value: str) -> list[tuple[str, str]]:
     return [(match.group(1).strip(), match.group(2)) for match in matches]
 
 
-def check_reference_model(path: Path, text: str, locale: str, roots: dict[str, Path]) -> list[str]:
+def check_reference_model(
+    path: Path,
+    text: str,
+    locale: str,
+    roots: dict[str, Path],
+    current_package_id: str | None,
+) -> list[str]:
     errors = required_sections(
         path, text, "Process Reference Model", locale, ("purpose", "processes", "relationships")
     )
     processes = section(text, HEADINGS[locale]["processes"]) or ""
+    relationships = section(text, HEADINGS[locale]["relationships"]) or ""
     blocks = process_blocks(processes)
     if not blocks:
         return errors + [f"{path}: no Process entries found"]
+    relationship_header, relationship_rows = table(relationships)
+    relationship_items = re.findall(
+        r"(?m)^\s{0,3}(?:[-*+]|\d+[.)])\s+\S", relationships
+    )
+    if not relationship_rows and not relationship_items:
+        errors.append(
+            f"{path}: Process Reference Model requires identifiable relationship entries"
+        )
 
+    declared_references = set(normalized_references(processes, current_package_id))
+    declared_names = {model_name for model_name, _ in blocks}
     for model_name, body in blocks:
         purpose = section(body, HEADINGS[locale]["purpose"], 4)
         outcomes = section(body, HEADINGS[locale]["outcomes"], 4)
@@ -474,7 +1014,7 @@ def check_reference_model(path: Path, text: str, locale: str, roots: dict[str, P
         if not refs:
             continue
         try:
-            target = resolve_skill(refs[0], roots, locale)
+            target = resolve_skill(refs[0], roots, locale, current_package_id)
         except ValueError as exc:
             errors.append(f"{path}: {model_name}: {exc}")
             continue
@@ -494,6 +1034,36 @@ def check_reference_model(path: Path, text: str, locale: str, roots: dict[str, P
             errors.append(f"{path}: {model_name}: Purpose differs from {target.path}")
         if model_outcomes != source_outcomes:
             errors.append(f"{path}: {model_name}: Outcomes differ from {target.path}")
+
+    for reference in references(relationships):
+        try:
+            target = resolve_skill(reference, roots, locale, current_package_id)
+        except ValueError as exc:
+            errors.append(f"{path}: {exc}")
+            continue
+        if representation_kind(target.path) != "process":
+            errors.append(f"{path}: {reference} does not resolve to a Process representation")
+            continue
+        target_name = heading1(target.path.read_text(encoding="utf-8"))
+        reference_key = normalized_references(reference, current_package_id)[0]
+        if reference_key not in declared_references and target_name not in declared_names:
+            errors.append(f"{path}: relationship endpoint {reference} is not declared in Processes")
+    if relationship_rows and len(relationship_header) >= 3:
+        for row_number, row in enumerate(relationship_rows, start=1):
+            if len(row) < 3:
+                errors.append(
+                    f"{path}: relationship row {row_number} must identify provider and recipient Processes"
+                )
+                continue
+            for role, cell in (("provider", row[0]), ("recipient", row[2])):
+                if references(cell):
+                    continue
+                endpoint = source_identity(cell)
+                if endpoint not in declared_names:
+                    errors.append(
+                        f"{path}: relationship row {row_number} {role} Process "
+                        f"{cell!r} is not declared in Processes"
+                    )
     return errors
 
 
@@ -511,11 +1081,92 @@ def source_entries(value: str) -> list[str]:
 
 def source_identity(value: str) -> str:
     value = re.sub(r"`?skill:[^\s`]+`?", "", value)
-    value = re.sub(r"[（(][^()（）]*[）)]", "", value)
+    value = re.sub(r"[（(]\s*[）)]", "", value)
     return re.sub(r"\s+", " ", value).strip(" |-:")
 
 
-def source_process_keys(value: str) -> set[str]:
+def normalized_reference_key(
+    reference: str,
+    current_package_id: str | None,
+    roots: dict[str, Path] | None = None,
+) -> str:
+    package, skill = normalized_references(reference, current_package_id)[0]
+    if not package and roots is not None and "" in roots:
+        current_root = roots[""].resolve()
+        aliases = sorted(
+            identity
+            for identity, root in roots.items()
+            if identity and root.resolve() == current_root
+        )
+        if len(aliases) == 1:
+            package = aliases[0]
+    return f"ref:{package}#{skill}"
+
+
+def source_canonical_names(
+    value: str,
+    current_package_id: str | None,
+    roots: dict[str, Path] | None,
+    locale: str,
+) -> dict[str, str]:
+    canonical_names: dict[str, str] = {}
+
+    def bind(name: str, key: str) -> None:
+        existing = canonical_names.get(name)
+        canonical_names[name] = key if existing is None or existing == key else ""
+
+    for entry in source_entries(value):
+        refs = references(entry)
+        if not refs:
+            continue
+        key = normalized_reference_key(refs[0], current_package_id, roots)
+        displayed_name = source_identity(entry)
+        if displayed_name:
+            bind(displayed_name, key)
+    _, rows = table(value)
+    for row in rows:
+        refs = references(" ".join(row))
+        if refs and row and source_identity(row[0]):
+            bind(
+                source_identity(row[0]),
+                normalized_reference_key(refs[0], current_package_id, roots),
+            )
+    if roots is not None:
+        for reference in references(value):
+            try:
+                target = resolve_skill(reference, roots, locale, current_package_id)
+            except ValueError:
+                continue
+            target_name = heading1(target.path.read_text(encoding="utf-8"))
+            if target_name:
+                bind(
+                    source_identity(target_name),
+                    normalized_reference_key(reference, current_package_id, roots),
+                )
+    return canonical_names
+
+
+def source_identity_key(
+    value: str,
+    current_package_id: str | None,
+    roots: dict[str, Path] | None,
+    canonical_names: dict[str, str],
+) -> str:
+    refs = references(value)
+    if refs:
+        return normalized_reference_key(refs[0], current_package_id, roots)
+    identity = source_identity(value)
+    if not identity:
+        return ""
+    return canonical_names.get(identity, f"name:{identity}")
+
+
+def source_process_keys(
+    value: str,
+    current_package_id: str | None,
+    roots: dict[str, Path] | None = None,
+    locale: str = "en",
+) -> set[str]:
     """Return one identity key per declared Source Process.
 
     A displayed Process name and the canonical reference in the same table row
@@ -523,22 +1174,25 @@ def source_process_keys(value: str) -> set[str]:
     """
 
     _, rows = table(value)
+    canonical_names = source_canonical_names(value, current_package_id, roots, locale)
+
     keys: set[str] = set()
     if rows:
         for row in rows:
             row_text = " ".join(row)
             refs = references(row_text)
             if refs:
-                keys.add(f"ref:{refs[0]}")
+                keys.add(normalized_reference_key(refs[0], current_package_id, roots))
             elif row and source_identity(row[0]):
-                keys.add(f"name:{source_identity(row[0])}")
+                identity = source_identity(row[0])
+                keys.add(canonical_names.get(identity, f"name:{identity}"))
         return keys
     ordered: list[str] = []
     pending_name_index: int | None = None
     for entry in source_entries(value):
         refs = references(entry)
         if refs:
-            key = f"ref:{refs[0]}"
+            key = normalized_reference_key(refs[0], current_package_id, roots)
             # Plain Markdown can place a displayed Process name on one line
             # and its canonical reference on the next.  Replace that pending
             # displayed-name key instead of counting the same source twice.
@@ -549,12 +1203,19 @@ def source_process_keys(value: str) -> set[str]:
                 ordered.append(key)
                 pending_name_index = None
         elif source_identity(entry):
-            ordered.append(f"name:{source_identity(entry)}")
+            identity = source_identity(entry)
+            ordered.append(canonical_names.get(identity, f"name:{identity}"))
             pending_name_index = len(ordered) - 1
     return set(ordered)
 
 
-def check_view(path: Path, text: str, locale: str, roots: dict[str, Path]) -> tuple[list[str], list[str]]:
+def check_view(
+    path: Path,
+    text: str,
+    locale: str,
+    roots: dict[str, Path],
+    current_package_id: str | None,
+) -> tuple[list[str], list[str]]:
     errors = required_sections(
         path,
         text,
@@ -568,11 +1229,11 @@ def check_view(path: Path, text: str, locale: str, roots: dict[str, Path]) -> tu
 
     source_text = section(text, HEADINGS[locale]["sources"]) or ""
     source_values = source_entries(source_text)
-    if len(source_process_keys(source_text)) < 2:
+    if len(source_process_keys(source_text, current_package_id, roots, locale)) < 2:
         errors.append(f"{path}: Process View requires at least two distinct Source Processes")
     for reference in references(source_text):
         try:
-            target = resolve_skill(reference, roots, locale)
+            target = resolve_skill(reference, roots, locale, current_package_id)
         except ValueError as exc:
             errors.append(f"{path}: {exc}")
             continue
@@ -589,25 +1250,60 @@ def check_view(path: Path, text: str, locale: str, roots: dict[str, Path]) -> tu
     if rows:
         if len(header) < 2 or tuple(header[:2]) != expected:
             errors.append(f"{path}: Process View provenance table must begin with {expected[0]} and {expected[1]}")
-        known = {source_identity(value) for value in source_values}
+        canonical_names = source_canonical_names(
+            source_text, current_package_id, roots, locale
+        )
+        declared_keys = source_process_keys(
+            source_text, current_package_id, roots, locale
+        )
         for row_number, row in enumerate(rows, start=1):
             if len(row) < 2 or not row[0] or not row[1]:
                 errors.append(f"{path}: provenance row {row_number} must identify Source Process and source element")
                 continue
-            row_source = source_identity(row[0])
-            if known and row_source not in known:
+            row_refs = references(row[0])
+            if len(row_refs) > 1:
+                errors.append(
+                    f"{path}: provenance row {row_number} must identify exactly one Source Process"
+                )
+                continue
+            row_source = source_identity_key(
+                row[0], current_package_id, roots, canonical_names
+            )
+            if not row_source:
+                errors.append(
+                    f"{path}: provenance row {row_number} has no usable Source Process identity"
+                )
+                continue
+            if row_refs:
+                try:
+                    target = resolve_skill(row_refs[0], roots, locale, current_package_id)
+                except ValueError as exc:
+                    errors.append(f"{path}: provenance row {row_number}: {exc}")
+                    continue
+                if representation_kind(target.path) != "process":
+                    errors.append(
+                        f"{path}: provenance row {row_number} source reference "
+                        f"{row_refs[0]} does not resolve to a Process representation"
+                    )
+                    continue
+            if row_source not in declared_keys:
                 errors.append(f"{path}: provenance row {row_number} names an undeclared Source Process: {row[0]}")
     elif re.search(r"(?im)\b(?:Activity|Task)\b|活動|タスク", included):
         warnings.append(f"{path}: source-element provenance could not be established mechanically")
     return errors, warnings
 
 
-def check_asset(path: Path, roots: dict[str, Path]) -> tuple[list[str], list[str]]:
+def check_asset(
+    path: Path,
+    roots: dict[str, Path],
+    current_package_id: str | None,
+) -> tuple[list[str], list[str]]:
     text = path.read_text(encoding="utf-8")
     locale = locale_for(path)
     errors = check_frontmatter(path, text)
     errors.extend(reference_syntax_errors(path, text))
     package_root = containing_package_root(path, roots)
+    package_identity = containing_package_identity(path, roots, current_package_id)
     if package_root is None:
         errors.append(f"{path}: representation is outside the declared package roots")
     else:
@@ -623,17 +1319,17 @@ def check_asset(path: Path, roots: dict[str, Path]) -> tuple[list[str], list[str
         more_errors, more_warnings = semantic_process_findings(path, text, locale)
         return errors + more_errors, warnings + more_warnings
     if kind == "process-model":
-        return errors + check_process_model(path, text, locale, roots), warnings
+        return errors + check_process_model(path, text, locale, roots, package_identity), warnings
     if kind == "process-reference-model":
-        return errors + check_reference_model(path, text, locale, roots), warnings
-    more_errors, more_warnings = check_view(path, text, locale, roots)
+        return errors + check_reference_model(path, text, locale, roots, package_identity), warnings
+    more_errors, more_warnings = check_view(path, text, locale, roots, package_identity)
     return errors + more_errors, warnings + more_warnings
 
 
 def japanese_prose_lines(text: str) -> Iterable[tuple[int, str]]:
+    text = without_html_comments(without_fenced_code(text))
     in_frontmatter = False
     description_indent: int | None = None
-    in_fence = False
     for number, original in enumerate(text.splitlines(), start=1):
         stripped = original.strip()
         if number == 1 and stripped == "---":
@@ -660,10 +1356,7 @@ def japanese_prose_lines(text: str) -> Iterable[tuple[int, str]]:
                 else:
                     yield number, value
             continue
-        if stripped.startswith("```"):
-            in_fence = not in_fence
-            continue
-        if in_fence or not stripped or stripped.startswith("<!--"):
+        if not stripped or stripped.startswith("<!--"):
             continue
         yield number, original
 
@@ -736,10 +1429,18 @@ def check_pair(
 
     errors.extend(japanese_naturalness_errors(japanese, ja_text, allowed_terms))
     if en_kind == "process-model":
-        en_processes = table(section(en_text, HEADINGS["en"]["processes"]) or "")[1]
-        ja_processes = table(section(ja_text, HEADINGS["ja"]["processes"]) or "")[1]
-        en_relationships = table(section(en_text, HEADINGS["en"]["relationships"]) or "")[1]
-        ja_relationships = table(section(ja_text, HEADINGS["ja"]["relationships"]) or "")[1]
+        en_processes = process_model_entries(
+            section(en_text, HEADINGS["en"]["processes"]) or ""
+        )
+        ja_processes = process_model_entries(
+            section(ja_text, HEADINGS["ja"]["processes"]) or ""
+        )
+        en_relationships = process_model_entries(
+            section(en_text, HEADINGS["en"]["relationships"]) or ""
+        )
+        ja_relationships = process_model_entries(
+            section(ja_text, HEADINGS["ja"]["relationships"]) or ""
+        )
         if len(en_processes) != len(ja_processes):
             errors.append(
                 f"{english} / {japanese}: Process count differs ({len(en_processes)} != {len(ja_processes)})"
@@ -757,12 +1458,26 @@ def check_pair(
         )
         if en_refs != ja_refs:
             errors.append(f"{english} / {japanese}: Process reference identity or order differs")
+        en_relationship_refs = normalized_references(
+            section(en_text, HEADINGS["en"]["relationships"]) or "", current_package_id
+        )
+        ja_relationship_refs = normalized_references(
+            section(ja_text, HEADINGS["ja"]["relationships"]) or "", current_package_id
+        )
+        if en_relationship_refs != ja_relationship_refs:
+            errors.append(
+                f"{english} / {japanese}: Relationship reference identity or order differs"
+            )
         return errors, warnings
     if en_kind == "process-reference-model":
         en_processes = process_blocks(section(en_text, HEADINGS["en"]["processes"]) or "")
         ja_processes = process_blocks(section(ja_text, HEADINGS["ja"]["processes"]) or "")
-        en_relationships = table(section(en_text, HEADINGS["en"]["relationships"]) or "")[1]
-        ja_relationships = table(section(ja_text, HEADINGS["ja"]["relationships"]) or "")[1]
+        en_relationships = process_model_entries(
+            section(en_text, HEADINGS["en"]["relationships"]) or ""
+        )
+        ja_relationships = process_model_entries(
+            section(ja_text, HEADINGS["ja"]["relationships"]) or ""
+        )
         if len(en_processes) != len(ja_processes):
             errors.append(
                 f"{english} / {japanese}: Process count differs ({len(en_processes)} != {len(ja_processes)})"
@@ -780,6 +1495,16 @@ def check_pair(
         )
         if en_refs != ja_refs:
             errors.append(f"{english} / {japanese}: Process reference identity or order differs")
+        en_relationship_refs = normalized_references(
+            section(en_text, HEADINGS["en"]["relationships"]) or "", current_package_id
+        )
+        ja_relationship_refs = normalized_references(
+            section(ja_text, HEADINGS["ja"]["relationships"]) or "", current_package_id
+        )
+        if en_relationship_refs != ja_relationship_refs:
+            errors.append(
+                f"{english} / {japanese}: Relationship reference identity or order differs"
+            )
         return errors, warnings
     if en_kind == "process-view":
         en_outcomes = outcome_items(section(en_text, HEADINGS["en"]["outcomes"]))
@@ -810,6 +1535,35 @@ def check_pair(
         )
         if en_refs != ja_refs:
             errors.append(f"{english} / {japanese}: Source Process reference identity or order differs")
+        en_source_text = section(en_text, HEADINGS["en"]["sources"]) or ""
+        ja_source_text = section(ja_text, HEADINGS["ja"]["sources"]) or ""
+        en_names = source_canonical_names(
+            en_source_text, current_package_id, None, "en"
+        )
+        ja_names = source_canonical_names(
+            ja_source_text, current_package_id, None, "ja"
+        )
+
+        def provenance_identity(
+            rows: list[list[str]], canonical_names: dict[str, str]
+        ) -> tuple[str, ...]:
+            result: list[str] = []
+            for row in rows:
+                if len(row) < 2:
+                    continue
+                result.append(
+                    source_identity_key(
+                        row[0], current_package_id, None, canonical_names
+                    )
+                )
+            return tuple(result)
+
+        if provenance_identity(en_included, en_names) != provenance_identity(
+            ja_included, ja_names
+        ):
+            errors.append(
+                f"{english} / {japanese}: included source provenance or order differs"
+            )
         return errors, warnings
     if en_kind != "process":
         return errors, warnings
@@ -834,7 +1588,7 @@ def check_pair(
         for task_index in range(min(len(en.tasks[activity_index]), len(ja.tasks[activity_index]))):
             en_force = classify_normative(en.tasks[activity_index][task_index], "en")
             ja_force = classify_normative(ja.tasks[activity_index][task_index], "ja")
-            if en_force and ja_force and en_force != ja_force:
+            if en_force != ja_force:
                 errors.append(
                     f"{english} / {japanese}: normative force differs at Activity {activity_index + 1} "
                     f"Task {task_index + 1} ({en_force} != {ja_force})"
@@ -884,7 +1638,7 @@ def main() -> int:
             errors.append(f"{path}: file not found")
             continue
         if path not in checked_assets:
-            asset_errors, asset_warnings = check_asset(path, roots)
+            asset_errors, asset_warnings = check_asset(path, roots, args.package_id)
             errors.extend(asset_errors)
             warnings.extend(asset_warnings)
             checked_assets.add(path)
@@ -909,12 +1663,13 @@ def main() -> int:
         for localized_path in pair:
             if localized_path in checked_assets:
                 continue
-            asset_errors, asset_warnings = check_asset(localized_path, roots)
+            asset_errors, asset_warnings = check_asset(localized_path, roots, args.package_id)
             errors.extend(asset_errors)
             warnings.extend(asset_warnings)
             checked_assets.add(localized_path)
         checked_pairs.add(pair)
-        pair_errors, pair_warnings = check_pair(*pair, allowed_terms, args.package_id)
+        pair_identity = containing_package_identity(english, roots, args.package_id)
+        pair_errors, pair_warnings = check_pair(*pair, allowed_terms, pair_identity)
         errors.extend(pair_errors)
         warnings.extend(pair_warnings)
 

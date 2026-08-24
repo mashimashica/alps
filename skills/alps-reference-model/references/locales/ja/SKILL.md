@@ -1,99 +1,100 @@
 ---
 name: alps-reference-model
-description: ALPSのDefinition、ApplicationおよびManagement Processを選択・構成・AssessmentするためのALPS Reference Modelを提供する。
+description: ALPSを定義、適用および管理するプロセスの選択、構成、アセスメントおよび改善に用いるALPS参照モデルを提供する。
 metadata:
   alps.kind: process-reference-model
 ---
 
-> 本書は日本語Localizationである。基準となる英語版は[SKILL.md](../../../SKILL.md)であり、矛盾する場合は英語版を優先する。
+> 本書は日本語版である。正本となる英語版は[SKILL.md](../../../SKILL.md)であり、矛盾する場合は英語版を優先する。
 
-# ALPS Reference Model
+# ALPS参照モデル
 
-## Purpose
+## 目的
 
-ALPS Reference Modelは、Agent Lifecycle Process Skillsを定義、適用および管理するために必要なProcessを定義し、それらの関係を明示的な構造に配置する。
+ALPS参照モデルは、エージェントライフサイクルプロセススキルの定義、適用および管理に必要なプロセスを定め、それらの関係を明示的な構造として示す。
 
-## Processes
+## プロセス
 
 ### Define ALPS
 
-Skill: `skill:mashimashica/alps#define-alps`
+スキル: `skill:#define-alps`
 
-#### Purpose
+#### 目的
 
-本Processは、識別されたステークホルダーのニーズを満たす、評価可能で利用可能なSkill Descriptionを確立する。
+本プロセスは、識別されたニーズを満たし、表現対象となるプロセスフレームワークの概念の意味を保持する、評価可能で利用可能なALPS表現を確立する。
 
-#### Outcomes
+#### 成果
 
-- a) Skill化の対象となるニーズおよび想定利用文脈が識別されている。
-- b) ProcessのPurpose、Outcomeおよび境界が、選定されたニーズと整合している。
-- c) Skill Descriptionが、ALPSの適用される記述要求を満たしている。
-- d) Skill Description内の要素および外部との授受が追跡可能である。
-- e) 代表的な適用文脈におけるOutcomeの達成可能性が確認されている。
-- f) Skillの採用可否を、欠陥および制限を含む証拠に基づいて判断できる状態にある。
+- a) ALPS表現のニーズおよび想定利用文脈が識別されている。
+- b) 表現対象となるプロセスフレームワークの概念、目的、境界および必要な詳細度が、選定されたニーズと整合している。
+- c) 正本となる表現が、その表現種別に適用されるプロセスフレームワークおよびALPSの要求を満たしている。
+- d) 表現に必要な参照、関係、来歴および受け渡しが追跡可能で解決可能である。
+- e) プロセス記述では代表的文脈で成果達成可能性が示され、プロセス以外の表現では意図する関心事に対する意味的一貫性および適用可能性が示されている。
+- f) 欠陥、前提および制限を含む検証証拠から、採用判断を行える状態にある。
 
 ### Apply ALPS
 
-Skill: `skill:mashimashica/alps#apply-alps`
+スキル: `skill:#apply-alps`
 
-#### Purpose
+#### 目的
 
-本Processは、適用状況に適合するSkillが表現するProcessを単独で、または組み合わせて適用することにより、意図されたOutcomeを達成する。
+本プロセスは、適用可能なALPS表現を選択して読み込み、適用状況に必要なプロセスを解決し、プロセススキルを単独または組み合わせて適用することにより、意図した成果を達成する。
 
-#### Outcomes
+#### 成果
 
-- a) 適用状況のニーズおよび条件が識別されている。
-- b) 適用するProcess、その正本記述を提供するSkillおよび適用形態が、根拠とともに決定されている。
-- c) 適用されるControl、ConstraintおよびTailoringの決定が識別されている。
-- d) Process Instanceの適用結果が、宣言された適用範囲、適用されるControl、ConstraintおよびTailoringの決定に適合している。
-- e) 適用対象となるProcessの宣言されたOutcomeが達成されている。
-- f) 必要なProcess間の授受が確立されている。
-- g) Process構成の完全性および一貫性が確立されている。
+- a) 適用状況のニーズ、条件およびリスクが識別されている。
+- b) 必要に応じてプロセスモデル、プロセス参照モデル、プロセスビューおよびプロセス表現が選択または読み込まれ、それらから候補プロセスが解決されている。
+- c) 呼び出すプロセススキルおよび適用形態が、根拠とともに決定されている。
+- d) 適用される統制事項、制約、テーラリング判断および意思決定ゲートが、影響する行為の前に識別されている。
+- e) プロセスインスタンスが、宣言した適用範囲と適用される統制事項、制約およびテーラリング判断のもとで実行されている。
+- f) 適用したプロセスの宣言成果が、観測可能な証拠によって達成されている。
+- g) 必要な受け渡しならびにプロセスの組み合わせの完全性および一貫性が確立されている。
 
 ### Manage ALPS
 
-Skill: `skill:mashimashica/alps#manage-alps`
+スキル: `skill:#manage-alps`
 
-#### Purpose
+#### 目的
 
-本Processは、採用済みのALPS資産とその適用を統制し、適切なAgent Skill、Skill Package、Process ModelおよびProcess Viewを、統制され、意図する用途に適合した状態で継続的に利用可能にする。
+本プロセスは、ALPS表現とその適用を統制し、適切で一貫し信頼できるALPS資産を継続的に利用可能な状態に維持する。
 
-#### Outcomes
+#### 成果
 
-- a) 採用、展開、Tailoring、Assessment、変更および廃止に関する方針と指針が確立されている。
-- b) 採用されたAgent Skill、Skill Package、Process ModelおよびProcess Viewが、管理された状態で発見可能である。
-- c) 管理対象の識別情報、状態、版、参照、変更および廃止が統制されている。
-- d) Tailoringの判断および根拠と、適用されるControlおよびConstraintとの対応を追跡できる。
-- e) Process適用の実績が、宣言した基準に照らして評価されている。
-- f) 管理されたProcess ModelおよびProcess Viewの適合性が、宣言した基準に照らして評価されている。
-- g) 改善機会が、証拠、教訓およびAssessment結果に基づいて優先順位付けされている。
-- h) 決定された改善が実装されている。
-- i) 実装された改善の影響を受ける対象が、必要に応じて再検証されている。
+- a) ALPS表現の管理、展開、テーラリングおよび採用に関する方針と指針が確立されている。
+- b) 採用されたALPS表現が、識別情報、表現種別、状態、版および適用条件とともに管理下で発見可能である。
+- c) 変更と廃止が、その影響、参照の完全性および影響を受ける利用者または表現を識別した状態で統制されている。
+- d) テーラリング、正式採用およびその他の管理判断が、適用される統制事項、制約、適用範囲、証拠および根拠まで追跡可能である。
+- e) プロセス実行が、宣言した対象に適した基準を用いて、該当する場合は適合、性能および有効性についてアセスメントされている。
+- f) 管理対象のALPS表現が、その種別に適した基準を用いて、該当する場合は意味的一貫性、記述適合、関係の一貫性および適用可能性についてアセスメントされている。
+- g) 改善機会が、実行証拠、教訓、表現アセスメントおよび変更影響から優先順位付けされている。
+- h) 決定した改善が、統制された変更によって実施されている。
+- i) 実施した改善の影響を受ける表現が再検証されている。
+- j) その結果となる管理状態が更新されている。
 
-## Relationships
+## 関係
 
-| Provider Process | Information | Recipient Process | Relationship |
+| 提供側プロセス | 情報 | 受領側プロセス | 関係 |
 | --- | --- | --- | --- |
-| Define ALPS | Verified Skill DescriptionおよびVerification Evidence | Manage ALPS | Adoption、Registration、ChangeおよびReverification Decisionを支援する。 |
-| Manage ALPS | 管理されたAgent Skill、Skill Package、Process ModelおよびProcess Viewに関する情報、Tailoring判断ならびに適用条件 | Apply ALPS | 適用に利用できる管理済み資産および条件を確立する。 |
-| Apply ALPS | 実行および判断の記録、教訓ならびに測定可能な結果 | Manage ALPS | Assessment、改善、変更および廃止の判断を支援する。 |
-| Manage ALPS | 変更要求、再定義要求および再検証要求 | Define ALPS | 正本の記述または表現を変更する必要がある場合に、定義、再定義または再検証を開始する。 |
+| Define ALPS | 検証済みで正本となるALPS表現および検証証拠 | Manage ALPS | 採用、登録、統制された変更および再検証を支援する。 |
+| Manage ALPS | 管理された表現、状態、テーラリング判断および適用条件 | Apply ALPS | 適用に利用できる正本資産および条件を確立する。 |
+| Apply ALPS | 選択根拠、実行証拠、成果証拠、受け渡しおよび教訓 | Manage ALPS | アセスメント、改善、変更および廃止判断を支援する。 |
+| Manage ALPS | 再定義、再検証または正式採用の要求 | Define ALPS | 正本となる表現の統制された定義または再定義を開始する。 |
 
-関係はExecution Sequenceを規定しない。Application Situationに応じて三つのProcessをIterative、ConcurrentまたはRecursiveに適用できる。
+関係は実行順序を規定しない。適用状況に応じて三つのプロセスを反復的、並行的または再帰的に適用できる。
 
-## Application
+## 適用
 
-本Agent SkillをActivateしてALPS Reference Modelを読み込む。Application Situationに応じて参照Processを選択・構成するには`apply-alps`を用いる。本Reference Modelの読込み自体はProcessをInvocationしない。
+本エージェントスキルを読み込んでALPS参照モデルを利用する。Apply ALPSを用いて関連モデルまたはビューを選択または読み込み、必要なプロセスを解決し、プロセスを表現するエージェントスキルだけを呼び出す。本参照モデルの読込み自体はプロセスの呼び出しではない。
 
-## Verification
+## 検証
 
-本Process Reference Modelの表現は、参照する各Process Skillが解決でき、そのName、PurposeおよびOutcomesがここで表現した同じSemantic Centerを保持する場合に有効である。PurposeおよびOutcomesは基準となるProcess Descriptionと一致する必要がある。
+本プロセス参照モデルは、参照する各プロセススキルを解決でき、そのスキルがプロセスを表現し、ここに示すプロセス名称、目的および成果と同じ内容を持つ場合に限り有効である。目的および成果は、正本となるプロセス記述と一致する必要がある。不一致はエラーであり、どちらか一方が暗黙に他方を上書きすることはない。
 
-## Conformance
+## 適合
 
-本Process Reference ModelはProcess Reference Modelの表現としてAssessmentできる。Process Outcome ConformanceおよびProcess Task Conformanceは参照ProcessおよびそのProcess Instanceに関するClaimであり、本Agent SkillのActivationに関するClaimではない。
+本プロセス参照モデルはプロセス参照モデル表現としてアセスメントできる。プロセス成果適合およびプロセスタスク適合は参照プロセスおよびそのプロセスインスタンスに関する主張である。本エージェントスキルの読込みはプロセスの呼び出しまたは実行適合ではない。
 
-## Bundled Resources
+## 同梱資源
 
-- [Process Framework](../../../../../spec/process-framework.md)
-- [ALPS Specification](../../../../../spec/ALPS-SPEC.md)
+- [プロセスフレームワーク](../../../../../spec/process-framework.md)
+- [ALPS仕様](../../../../../spec/ALPS-SPEC.md)
