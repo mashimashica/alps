@@ -448,11 +448,27 @@ def without_fenced_code(text: str) -> str:
 
 
 def without_html_comments(text: str) -> str:
-    return re.sub(
-        r"(?s)<!--.*?(?:-->|\Z)",
-        lambda match: "\n" * match.group(0).count("\n"),
-        text,
-    )
+    visible: list[str] = []
+    index = 0
+    while index < len(text):
+        if text[index] == "`":
+            run = len(text[index:]) - len(text[index:].lstrip("`"))
+            end = text.find("`" * run, index + run)
+            if end < 0:
+                visible.append(text[index:])
+                break
+            visible.append(text[index : end + run])
+            index = end + run
+            continue
+        if text.startswith("<!--", index):
+            end = text.find("-->", index + 4)
+            stop = len(text) if end < 0 else end + 3
+            visible.append("\n" * text[index:stop].count("\n"))
+            index = stop
+            continue
+        visible.append(text[index])
+        index += 1
+    return "".join(visible)
 
 
 def without_inline_code(text: str) -> str:
@@ -469,6 +485,32 @@ def without_inline_code(text: str) -> str:
             result.append(text[index:])
             break
         result.append(" " * (end + run - index))
+        index = end + run
+    return "".join(result)
+
+
+def mask_inline_code_for_reference_scan(text: str) -> str:
+    """Mask non-reference inline code before HTML comments are removed."""
+
+    result: list[str] = []
+    index = 0
+    while index < len(text):
+        if text[index] != "`":
+            result.append(text[index])
+            index += 1
+            continue
+        run = len(text[index:]) - len(text[index:].lstrip("`"))
+        end = text.find("`" * run, index + run)
+        if end < 0:
+            token = text[index:]
+            result.append("".join("\n" if char == "\n" else " " for char in token))
+            break
+        token = text[index : end + run]
+        content = text[index + run : end].strip()
+        if SKILL_REF.fullmatch(content):
+            result.append(content)
+        else:
+            result.append("".join("\n" if char == "\n" else " " for char in token))
         index = end + run
     return "".join(result)
 
@@ -517,27 +559,13 @@ def without_indented_code(text: str) -> str:
 def reference_scan_text(text: str) -> str:
     """Keep prose and exact inline canonical references, excluding code examples."""
 
-    value = without_html_comments(without_fenced_code(text))
+    value = without_fenced_code(text)
+    value = mask_inline_code_for_reference_scan(value)
+    value = without_html_comments(value)
     for target in markdown_link_targets(value):
         value = value.replace(target, " " * len(target))
     value = re.sub(r"\b(?:https?|ftp)://[^\s<]+", "", value)
-    result: list[str] = []
-    index = 0
-    while index < len(value):
-        if value[index] != "`":
-            result.append(value[index])
-            index += 1
-            continue
-        run = len(value[index:]) - len(value[index:].lstrip("`"))
-        end = value.find("`" * run, index + run)
-        if end < 0:
-            result.append(value[index:])
-            break
-        content = value[index + run : end].strip()
-        if SKILL_REF.fullmatch(content):
-            result.append(content)
-        index = end + run
-    return "".join(result)
+    return value
 
 
 def reference_tokens(text: str) -> list[str]:
@@ -955,6 +983,9 @@ def check_process_model(
             and source_identity(target_name or "") not in declared_names
         ):
             errors.append(f"{path}: relationship endpoint {reference} is not declared in Processes")
+    errors.extend(
+        named_relationship_endpoint_errors(path, relationships, declared_names)
+    )
     return errors
 
 
@@ -968,6 +999,64 @@ def process_model_entries(value: str) -> list[str]:
             r"(?m)^\s{0,3}(?:[-*+]|\d+[.)])\s+(\S.*)$", value
         )
     ]
+
+
+def relationship_endpoint_cells(value: str) -> list[tuple[str, int, str, str]]:
+    """Return provider and recipient cells from recognized relationship structures."""
+
+    header, rows = table(value)
+    if rows and len(header) >= 3:
+        return [
+            ("row", row_number, role, row[index])
+            for row_number, row in enumerate(rows, start=1)
+            for role, index in (("provider", 0), ("recipient", 2))
+            if len(row) > index
+        ]
+
+    endpoints: list[tuple[str, int, str, str]] = []
+    for item_number, item in enumerate(process_model_entries(value), start=1):
+        cells = [cell.strip() for cell in item.split("|")]
+        if len(cells) >= 3:
+            endpoints.extend(
+                (
+                    ("item", item_number, "provider", cells[0]),
+                    ("item", item_number, "recipient", cells[2]),
+                )
+            )
+            continue
+        arrow = re.search(r"\s+(?:->|=>|→|⟶|⟹)\s+", item)
+        if not arrow:
+            continue
+        provider = item[: arrow.start()].strip()
+        recipient = item[arrow.end() :].strip()
+        recipient = re.split(r"\s*(?:[:：]|\s+[–—-]\s+)\s*", recipient, maxsplit=1)[0].strip()
+        if provider and recipient:
+            endpoints.extend(
+                (
+                    ("item", item_number, "provider", provider),
+                    ("item", item_number, "recipient", recipient),
+                )
+            )
+    return endpoints
+
+
+def named_relationship_endpoint_errors(
+    path: Path,
+    relationships: str,
+    declared_names: set[str],
+) -> list[str]:
+    errors: list[str] = []
+    for entry_kind, entry_number, role, cell in relationship_endpoint_cells(relationships):
+        if references(cell):
+            continue
+        endpoint = source_identity(cell)
+        if endpoint in declared_names:
+            continue
+        errors.append(
+            f"{path}: relationship {entry_kind} {entry_number} {role} Process "
+            f"{cell!r} is not declared in Processes"
+        )
+    return errors
 
 
 def process_blocks(value: str) -> list[tuple[str, str]]:
@@ -1054,16 +1143,9 @@ def check_reference_model(
                 errors.append(
                     f"{path}: relationship row {row_number} must identify provider and recipient Processes"
                 )
-                continue
-            for role, cell in (("provider", row[0]), ("recipient", row[2])):
-                if references(cell):
-                    continue
-                endpoint = source_identity(cell)
-                if endpoint not in declared_names:
-                    errors.append(
-                        f"{path}: relationship row {row_number} {role} Process "
-                        f"{cell!r} is not declared in Processes"
-                    )
+    errors.extend(
+        named_relationship_endpoint_errors(path, relationships, declared_names)
+    )
     return errors
 
 
