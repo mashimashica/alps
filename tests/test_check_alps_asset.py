@@ -859,6 +859,83 @@ Three | information | Four | relates the Processes."""
                 )
                 self.assertTrue(any(expected in error for error in errors), errors)
 
+    def test_process_view_pair_counts_keyword_free_tasks_under_activity_headings(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_process_view_pair(
+                Path(directory),
+                "### Activity: Work\n- Review inputs",
+                "### 活動: 作業\n- 入力を確認",
+            )
+            errors, warnings = CHECKER.check_pair(
+                english,
+                japanese,
+                set(CHECKER.DEFAULT_JA_TERMS),
+                "fixture",
+            )
+            self.assertEqual(errors, [], errors)
+            self.assertEqual(warnings, [], warnings)
+
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_process_view_pair(
+                Path(directory),
+                "### Work\n- Review inputs\n- Confirm output",
+                "### 作業\n- 出力を確認",
+            )
+            errors, _ = CHECKER.check_pair(
+                english,
+                japanese,
+                set(CHECKER.DEFAULT_JA_TERMS),
+                "fixture",
+            )
+            self.assertTrue(
+                any("included Activity/Task count differs" in error for error in errors),
+                errors,
+            )
+
+    def test_process_view_accepts_valid_non_table_canonical_inclusions(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            process_skill(root, "one", "One")
+            process_skill(root, "two", "Two")
+            path = process_view(
+                root,
+                "- One (`skill:fixture#one`)\n- Two (`skill:#two`)",
+                "- Task One (`skill:#one`)\n- Task Two (`skill:fixture#two`)",
+            )
+            errors, _ = CHECKER.check_asset(
+                path,
+                {"": root, "fixture": root},
+                "fixture",
+            )
+            self.assertEqual(errors, [], errors)
+
+    def test_process_view_rejects_non_table_inclusion_missing_canonical_reference(self) -> None:
+        errors = check_view_fixture(
+            "- One\n- Two",
+            "- Task Missing (`skill:#does-not-exist`)",
+        )
+        self.assertTrue(
+            any("unresolved Skill reference skill:#does-not-exist" in error for error in errors),
+            errors,
+        )
+
+    def test_process_view_rejects_non_table_inclusion_undeclared_source(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            process_skill(root, "one", "One")
+            process_skill(root, "two", "Two")
+            process_skill(root, "three", "Three")
+            path = process_view(
+                root,
+                "- One\n- Two",
+                "- Activity: Work (`skill:#three`)",
+            )
+            errors, _ = CHECKER.check_asset(path, {"": root}, None)
+        self.assertTrue(
+            any("undeclared Source Process" in error for error in errors),
+            errors,
+        )
+
     def test_process_view_pair_compares_stable_included_source_identity(self) -> None:
         reference_one = chr(96) + "skill:#one" + chr(96)
         reference_two = chr(96) + "skill:#two" + chr(96)
@@ -1027,6 +1104,28 @@ Three | information | Four | relates the Processes."""
             ),
             errors,
         )
+
+    def test_process_model_accepts_heading_form_process_entries(self) -> None:
+        processes = """### One
+
+#### Notes
+
+This explanatory heading is not a Process entry.
+
+```markdown
+### Fake from code
+```
+
+    ### Fake from indented code
+
+### Two
+
+#### Details
+
+This deeper heading is not a Process entry.
+"""
+        self.assertEqual(CHECKER.process_model_entries(processes), ["One", "Two"])
+        self.assertEqual(check_model("- One -> Two", processes), [])
 
 
     def test_process_model_accepts_list_process_descriptions(self) -> None:

@@ -1745,11 +1745,10 @@ def check_process_model(
     errors = required_sections(path, text, "Process Model", locale, ("purpose", "processes", "relationships"))
     processes = section(text, HEADINGS[locale]["processes"]) or ""
     relationships = section(text, HEADINGS[locale]["relationships"]) or ""
-    _, process_rows = table(processes)
     _, relationship_rows = table(relationships)
-    process_items = re.findall(r"(?m)^\s{0,3}(?:[-*+]|\d+[.)])\s+\S", processes)
+    process_entries = process_model_entries(processes)
     relationship_items = re.findall(r"(?m)^\s{0,3}(?:[-*+]|\d+[.)])\s+\S", relationships)
-    if not process_rows and not process_items and not references(processes):
+    if not process_entries and not references(processes):
         errors.append(f"{path}: Process Model requires identifiable Process entries")
     if not relationship_rows and not relationship_items:
         errors.append(f"{path}: Process Model requires identifiable relationship entries")
@@ -1798,15 +1797,29 @@ def check_process_model(
     return errors
 
 
-def process_model_entries(value: str) -> list[str]:
+def process_model_entries(value: str, *, include_headings: bool = True) -> list[str]:
     _, rows = table(value)
     if rows:
         return [row[0] for row in rows if row and row[0]]
-    return [
+    entries = [
         match.group(1).strip()
         for match in re.finditer(
             r"(?m)^\s{0,3}(?:[-*+]|\d+[.)])\s+(\S.*)$", value
         )
+    ]
+    if entries:
+        return entries
+    if not include_headings:
+        return []
+    visible = without_html_comments(without_indented_code(without_fenced_code(value)))
+    headings = list(
+        re.finditer(r"(?m)^ {0,3}(#{3,6})\s+([^\n]+?)\s*$", visible)
+    )
+    entry_level = min((len(match.group(1)) for match in headings), default=None)
+    return [
+        match.group(2).strip()
+        for match in headings
+        if len(match.group(1)) == entry_level
     ]
 
 
@@ -1825,7 +1838,9 @@ def relationship_endpoint_cells(value: str) -> list[tuple[str, int, str, str]]:
         ]
 
     endpoints: list[tuple[str, int, str, str]] = []
-    for item_number, item in enumerate(process_model_entries(value), start=1):
+    for item_number, item in enumerate(
+        process_model_entries(value, include_headings=False), start=1
+    ):
         cells = table_row_cells(item)
         if len(cells) >= 3:
             endpoints.extend(
@@ -1857,7 +1872,7 @@ def relationship_list_endpoint_errors(path: Path, value: str) -> list[str]:
     _, rows = table(value)
     if rows:
         return []
-    items = process_model_entries(value)
+    items = process_model_entries(value, include_headings=False)
     if not items:
         return []
     endpoint_items = {
@@ -2528,12 +2543,11 @@ def included_visible_text(value: str) -> str:
     return "".join(visible)
 
 
-def included_semantic_elements(
+def included_semantic_items(
     value: str,
     locale: str,
-    current_package_id: str | None,
-) -> list[tuple[str, str | None]]:
-    """Extract structured Activity/Task elements without comparing names."""
+) -> list[tuple[str, str]]:
+    """Extract structured Activity/Task items without comparing names."""
     visible = included_visible_text(value)
     pattern = included_kind_pattern(locale)
     lines = visible.splitlines()
@@ -2556,7 +2570,7 @@ def included_semantic_elements(
         default=None,
     )
     heading_structure = activity_level is not None
-    events: list[tuple[int, str, str | None]] = []
+    events: list[tuple[int, str, str]] = []
     heading_stack: list[tuple[int, str | None]] = []
     for line_number, line in enumerate(lines):
         heading = re.match(r"^ {0,3}(#{3,6})\s+(.+?)\s*$", line)
@@ -2588,28 +2602,90 @@ def included_semantic_elements(
             item = re.match(r"^ {0,3}(?:[-*+]|\d+[.)])\s+(.+?)\s*$", line)
             if item is None:
                 continue
+            direct_activity_item = False
             if heading_structure and heading_stack:
-                context_level, context_kind = heading_stack[-1]
-                if context_level != activity_level:
+                context_level, _ = heading_stack[-1]
+                direct_activity_item = context_level == activity_level
+                if not direct_activity_item:
                     continue
             candidate = item.group(1)
             kind_match = pattern.search(without_inline_code(candidate))
-            if kind_match is None:
-                continue
-            if heading_structure and heading_stack:
+            if direct_activity_item:
                 # A list directly under an Activity heading is its task list;
                 # deeper heading bodies are intentionally non-semantic.
                 kind = "task"
             else:
+                if kind_match is None:
+                    continue
                 kind = "activity" if kind_match.group(0).casefold() in {"activity", "活動"} else "task"
+        events.append((line_number, kind, candidate))
+    return [(kind, candidate) for _, kind, candidate in events]
+
+
+def included_semantic_elements(
+    value: str,
+    locale: str,
+    current_package_id: str | None,
+) -> list[tuple[str, str | None]]:
+    """Extract structured Activity/Task elements without comparing names."""
+    events = included_semantic_items(value, locale)
+    result: list[tuple[str, str | None]] = []
+    for kind, candidate in events:
         refs = references(candidate)
         identity = (
             normalized_reference_key(refs[0], current_package_id)
             if len(refs) == 1
             else None
         )
-        events.append((line_number, kind, identity))
-    return [(kind, identity) for _, kind, identity in events]
+        result.append((kind, identity))
+    return result
+
+
+def included_reference_errors(
+    path: Path,
+    items: Iterable[tuple[str, str]],
+    source_text: str,
+    roots: dict[str, Path],
+    locale: str,
+    current_package_id: str | None,
+) -> list[str]:
+    """Validate canonical source identities in non-table Included items."""
+    declared_keys = source_process_keys(source_text, current_package_id, roots, locale)
+    errors: list[str] = []
+    for item_number, (_, candidate) in enumerate(items, start=1):
+        item_references = references(candidate)
+        if len(item_references) > 1:
+            errors.append(
+                f"{path}: included item {item_number} must identify at most one canonical Skill reference"
+            )
+            continue
+        if not item_references:
+            continue
+        reference = item_references[0]
+        try:
+            target = resolve_skill(reference, roots, locale, current_package_id)
+        except ValueError as exc:
+            errors.append(f"{path}: included item {item_number}: {exc}")
+            continue
+        if representation_kind(target.path) != "process":
+            errors.append(
+                f"{path}: included item {item_number} reference {reference} "
+                "does not resolve to a Process representation"
+            )
+            continue
+        target_name = source_identity(
+            heading1(target.path.read_text(encoding="utf-8")) or ""
+        )
+        reference_key = normalized_reference_key(
+            reference, current_package_id, roots
+        )
+        target_name_key = f"name:{target_name}" if target_name else ""
+        if reference_key not in declared_keys and target_name_key not in declared_keys:
+            errors.append(
+                f"{path}: included item {item_number} reference {reference} "
+                "names an undeclared Source Process"
+            )
+    return errors
 
 
 def check_view(
@@ -2707,8 +2783,18 @@ def check_view(
             if row_source not in declared_keys:
                 errors.append(f"{path}: provenance row {row_number} names an undeclared Source Process: {row[0]}")
     elif included.strip():
-        structured = included_semantic_elements(included, locale, current_package_id)
-        if structured:
+        structured_items = included_semantic_items(included, locale)
+        if structured_items:
+            errors.extend(
+                included_reference_errors(
+                    path,
+                    structured_items,
+                    source_text,
+                    roots,
+                    locale,
+                    current_package_id,
+                )
+            )
             warnings.append(
                 f"{path}: source-element provenance could not be established mechanically"
             )
@@ -2863,8 +2949,12 @@ def check_pair(
         ja_relationship_text = section(ja_text, HEADINGS["ja"]["relationships"]) or ""
         en_processes = process_model_entries(en_process_text)
         ja_processes = process_model_entries(ja_process_text)
-        en_relationships = process_model_entries(en_relationship_text)
-        ja_relationships = process_model_entries(ja_relationship_text)
+        en_relationships = process_model_entries(
+            en_relationship_text, include_headings=False
+        )
+        ja_relationships = process_model_entries(
+            ja_relationship_text, include_headings=False
+        )
         if len(en_processes) != len(ja_processes):
             errors.append(
                 f"{english} / {japanese}: Process count differs ({len(en_processes)} != {len(ja_processes)})"
@@ -2915,10 +3005,12 @@ def check_pair(
         en_processes = process_blocks(section(en_text, HEADINGS["en"]["processes"]) or "")
         ja_processes = process_blocks(section(ja_text, HEADINGS["ja"]["processes"]) or "")
         en_relationships = process_model_entries(
-            section(en_text, HEADINGS["en"]["relationships"]) or ""
+            section(en_text, HEADINGS["en"]["relationships"]) or "",
+            include_headings=False,
         )
         ja_relationships = process_model_entries(
-            section(ja_text, HEADINGS["ja"]["relationships"]) or ""
+            section(ja_text, HEADINGS["ja"]["relationships"]) or "",
+            include_headings=False,
         )
         if len(en_processes) != len(ja_processes):
             errors.append(
