@@ -401,8 +401,43 @@ def yaml_scalar_value(value: str) -> str:
     if value.startswith(("'", '"')):
         end = quoted_scalar_end(value)
         if end is not None and end >= 0:
-            return value[1:end].replace("''", "'")
+            scalar = value[1:end]
+            if value[0] == "'":
+                return scalar.replace("''", "'")
+            decoded: list[str] = []
+            cursor = 0
+            while cursor < len(scalar):
+                if (
+                    scalar[cursor] == "\\"
+                    and cursor + 1 < len(scalar)
+                    and scalar[cursor + 1] in {'"', "\\"}
+                ):
+                    decoded.append(scalar[cursor + 1])
+                    cursor += 2
+                else:
+                    decoded.append(scalar[cursor])
+                    cursor += 1
+            return "".join(decoded)
     return value
+
+
+def yaml_mapping_line(value: str) -> tuple[int, str, str] | None:
+    """Parse a block mapping line with a scalar or quoted scalar key."""
+    indentation = len(value) - len(value.lstrip(" "))
+    _, content = yaml_node_properties(value[indentation:])
+    if content.startswith(("'", '"')):
+        end = quoted_scalar_end(content)
+        if end in {None, -1}:
+            return None
+        separator = re.match(r"^[ \t]*:[ \t]*(.*)$", content[end + 1 :])
+        if not separator:
+            return None
+        key = yaml_scalar_value(content[: end + 1])
+        return None if not key else (indentation, key, separator.group(1))
+    match = re.fullmatch(r"([A-Za-z0-9_.-]+):(?:[ \t]*(.*))?", content)
+    if not match:
+        return None
+    return indentation, match.group(1), match.group(2) or ""
 
 
 def yaml_inline_node(
@@ -509,12 +544,13 @@ def yaml_mapping(
             break
         if current_indent > indent:
             break
-        match = re.match(r"^([ ]*)([A-Za-z0-9_.-]+):(?:[ \t]*(.*))?$", raw)
-        if not match:
+        mapping = yaml_mapping_line(raw)
+        if mapping is None:
+            if raw.lstrip().startswith(("'", '"', "?", "[", "{")):
+                state.add_error(cursor + 2, "invalid YAML mapping key")
             cursor += 1
             continue
-        key = match.group(2)
-        raw_value = match.group(3) or ""
+        _, key, raw_value = mapping
         line = cursor + 2
         properties, remainder = yaml_node_properties(raw_value.strip())
         remainder = yaml_without_comment(remainder)
@@ -628,15 +664,14 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
     errors = [f"frontmatter line {line} {message}" for line, message in yaml_errors]
     block_values: dict[int, str] = {}
     for index, raw in enumerate(lines):
-        block = re.match(
-            r"^(?P<prefix>\s*[A-Za-z0-9_.-]+:\s*)"
-            r"(?:(?:&[^\s#]+|!(?:<[^>]*>|[^\s#]+))\s*)*"
-            r"(?P<style>[>|])(?:[+-]?[1-9]?|[1-9][+-]?)\s*$",
-            raw,
-        )
-        if not block:
+        mapping = yaml_mapping_line(raw)
+        if not mapping:
             continue
-        base_indent = len(raw) - len(raw.lstrip(" "))
+        base_indent, key, raw_value = mapping
+        _, style = yaml_node_properties(raw_value.strip())
+        style = yaml_without_comment(style)
+        if not re.fullmatch(r"[>|](?:[+-]?[1-9]?|[1-9][+-]?)?", style):
+            continue
         content: list[str] = []
         for continuation in lines[index + 1 :]:
             if not continuation.strip():
@@ -647,18 +682,16 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
                 break
             content.append(continuation.strip())
         value = " ".join(part for part in content if part)
-        block_values[index] = block.group("prefix") + value
+        block_values[index] = " " * base_indent + key + ": " + value
 
     quoted_values: dict[int, str] = {}
     quoted_continuations: set[int] = set()
     for index, raw in enumerate(lines):
-        mapping = re.match(
-            r"^(?P<prefix>\s*[A-Za-z0-9_.-]+:\s*)(?P<value>.*?)\s*$",
-            raw,
-        )
+        mapping = yaml_mapping_line(raw)
         if not mapping:
             continue
-        raw_value = mapping.group("value").strip()
+        indentation, key, raw_value = mapping
+        raw_value = raw_value.strip()
         scalar_value = strip_yaml_node_properties(raw_value)
         if not scalar_value.startswith(("'", '"')) or quoted_scalar_end(scalar_value) != -1:
             continue
@@ -672,7 +705,7 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
             if quoted_scalar_end(combined) not in {None, -1}:
                 break
         quoted_values[index] = (
-            mapping.group("prefix") + property_prefix + " ".join(pieces)
+            " " * indentation + key + ": " + property_prefix + " ".join(pieces)
         )
         quoted_continuations.update(range(index + 1, last + 1))
 
@@ -680,17 +713,14 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
     plain_scalar_values: dict[int, str] = {}
     plain_continuations: set[int] = set()
     for index, raw in enumerate(lines):
-        mapping = re.match(
-            r"^(?P<prefix>\s*(?P<key>[A-Za-z0-9_.-]+):\s*)(?P<value>.*?)\s*$",
-            raw,
-        )
+        mapping = yaml_mapping_line(raw)
         if (
             not mapping
-            or mapping.group("key") != "description"
-            or raw.startswith(" ")
+            or mapping[0] != 0
+            or mapping[1] != "description"
         ):
             continue
-        raw_value = mapping.group("value").strip()
+        raw_value = mapping[2].strip()
         _, scalar = yaml_node_properties(raw_value)
         scalar = yaml_without_comment(scalar)
         if (
@@ -722,7 +752,7 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
             pending_blank = False
             consumed.append(continuation_index)
         if consumed:
-            plain_values[index] = mapping.group("prefix") + scalar
+            plain_values[index] = mapping[1] + ": " + scalar
             plain_scalar_values[index] = "".join(parts)
             plain_continuations.update(consumed)
 
@@ -747,17 +777,17 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
         if re.match(r"^ *\t", raw):
             errors.append(f"frontmatter line {number} uses a tab for indentation")
             continue
+        mapping_line = yaml_mapping_line(raw)
         if index not in block_values:
-            flow_start = re.match(r"^\s*[A-Za-z0-9_.-]+:\s*(.*?)\s*$", raw)
-            if flow_start:
-                _, remainder = yaml_node_properties(flow_start.group(1).strip())
+            if mapping_line:
+                _, _, raw_value = mapping_line
+                _, remainder = yaml_node_properties(raw_value.strip())
                 if remainder.startswith("{"):
-                    _, last = yaml_collect_flow(lines, index, flow_start.group(1))
+                    _, last = yaml_collect_flow(lines, index, raw_value)
                     flow_continuations.update(range(index + 1, last))
-        metadata_alias_match = re.match(r"^metadata:\s*(.*?)\s*$", raw)
         metadata_alias = (
-            yaml_alias_name(metadata_alias_match.group(1))
-            if metadata_alias_match
+            yaml_alias_name(mapping_line[2])
+            if mapping_line and mapping_line[1] == "metadata"
             else None
         )
         if metadata_alias is not None:
@@ -779,17 +809,21 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
             metadata_child_indent = None
             continue
         # YAML mapping nodes may carry anchors or tags before nested entries.
-        if re.fullmatch(r"metadata:\s*(?:(?:[&!][^\s#]+)\s*)*(?:#.*)?", raw):
+        metadata_value = (
+            yaml_without_comment(strip_yaml_node_properties(mapping_line[2]))
+            if mapping_line and mapping_line[1] == "metadata"
+            else None
+        )
+        if metadata_value == "":
             in_metadata = True
             metadata_child_indent = None
             continue
-        flow_metadata = re.match(r"^metadata:\s*(.*)$", raw)
         flow_value = (
-            strip_yaml_node_properties(flow_metadata.group(1))
-            if flow_metadata
+            strip_yaml_node_properties(mapping_line[2])
+            if mapping_line and mapping_line[1] == "metadata"
             else ""
         )
-        if flow_metadata and flow_value.startswith("{"):
+        if mapping_line and mapping_line[1] == "metadata" and flow_value.startswith("{"):
             resolved_metadata = resolved_yaml.get("metadata")
             flow_error = any(
                 line == number and message.startswith("invalid YAML flow mapping")
@@ -807,15 +841,13 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
         if raw and not raw.startswith((" ", "\t")):
             in_metadata = False
             metadata_child_indent = None
-        scalar = re.match(r"^([A-Za-z0-9_.-]+):\s*(.*?)\s*$", raw)
-        nested = re.match(r"^ +([A-Za-z0-9_.-]+):\s*(.*?)\s*$", raw)
-        if in_metadata and nested:
-            indent = len(raw) - len(raw.lstrip(" "))
+        if in_metadata and mapping_line:
+            indent, key, value = mapping_line
             if metadata_child_indent is None:
                 metadata_child_indent = indent
-            match = nested if indent == metadata_child_indent else None
+            match = mapping_line if indent == metadata_child_indent else None
         else:
-            match = scalar
+            match = mapping_line if mapping_line and mapping_line[0] == 0 else None
         if not match:
             # Block scalars and unrelated nested binding metadata are outside
             # the fields inspected here.
@@ -823,7 +855,7 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
                 continue
             errors.append(f"frontmatter line {number} is not a key/value")
             continue
-        key, value = match.groups()
+        _, key, value = match
         if not in_metadata and key in {"alps.kind", "metadata.alps.kind"}:
             errors.append(
                 f"frontmatter line {number} must declare alps.kind under metadata"
@@ -1701,10 +1733,6 @@ def relationship_list_endpoint_errors(path: Path, value: str) -> list[str]:
     errors: list[str] = []
     for item_number, item in enumerate(items, start=1):
         if ("item", item_number) in endpoint_items:
-            continue
-        # A single canonical reference is a supported reference-form entry;
-        # its target is validated by the reference loop above.
-        if len(references(item)) == 1:
             continue
         errors.append(
             f"{path}: relationship item {item_number} must identify "

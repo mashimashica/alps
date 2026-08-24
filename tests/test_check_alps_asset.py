@@ -849,6 +849,23 @@ Three | information | Four | relates the Processes."""
             errors,
         )
 
+    def test_process_models_reject_single_canonical_relationship_list_items(self) -> None:
+        for checker in (check_model, check_reference_model_fixture):
+            with self.subTest(checker=checker.__name__):
+                errors = checker("- skill:#one")
+                self.assertTrue(
+                    any(
+                        "relationship item 1 must identify provider and recipient Processes"
+                        in error
+                        for error in errors
+                    ),
+                    errors,
+                )
+
+    def test_process_models_accept_canonical_provider_and_recipient_relationships(self) -> None:
+        self.assertEqual(check_model("- skill:#one -> skill:#two"), [])
+        self.assertEqual(check_reference_model_fixture("- skill:#one -> skill:#two"), [])
+
     def test_process_model_trims_named_recipient_description(self) -> None:
         self.assertEqual(check_model("- One -> Two: carries information"), [])
 
@@ -873,7 +890,10 @@ Three | information | Four | relates the Processes."""
     def test_inline_code_keeps_valid_canonical_reference_operative(self) -> None:
         self.assertEqual(CHECKER.references(chr(96) + "skill:#one" + chr(96)), ["skill:#one"])
         inline_comment = chr(96) + chr(60) + "!--" + chr(96)
-        self.assertEqual(check_model("- " + inline_comment + " skill:#one"), [])
+        self.assertEqual(
+            CHECKER.references(inline_comment + " skill:#one"),
+            ["skill:#one"],
+        )
 
     def test_reference_scan_ignores_top_level_and_list_indented_code(self) -> None:
         value = """Relationships:
@@ -1398,6 +1418,73 @@ description: &description |
         )
         self.assertEqual(block_errors, [])
         self.assertEqual(block_values["description"], "Fixture process. ALPS-conformant.")
+
+    def test_frontmatter_parses_quoted_block_keys_and_dispatches_nested_view_kind(self) -> None:
+        text = r'''---
+"name": fixture
+"description": Fixture process. ALPS-conformant.
+metadata:
+  "alps.kind": process-view
+  'note''key': !!str value
+  "quote\"key": &kind process-view
+  "alias": *kind
+  "display: key": scalar
+---
+'''
+        values, errors = CHECKER.frontmatter(text)
+        self.assertEqual(errors, [], errors)
+        self.assertEqual(values["name"], "fixture")
+        self.assertEqual(values["description"], "Fixture process. ALPS-conformant.")
+        self.assertEqual(values["alps.kind"], "process-view")
+        self.assertEqual(values["metadata.note'key"], "value")
+        self.assertEqual(values['metadata.quote"key'], "process-view")
+        self.assertEqual(values["metadata.alias"], "process-view")
+        self.assertEqual(values["metadata.display: key"], "scalar")
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "skills" / "fixture" / "SKILL.md"
+            write(
+                path,
+                text
+                + "# Fixture\n\n## Purpose\n\nPurpose.\n\n"
+                "## Outcomes\n\n- Outcome.\n",
+            )
+            asset_errors, _ = CHECKER.check_asset(path, {"": root}, None)
+            self.assertTrue(
+                any("Process View requires Source Processes" in error for error in asset_errors),
+                asset_errors,
+            )
+            self.assertFalse(
+                any("Process representation requires" in error for error in asset_errors),
+                asset_errors,
+            )
+
+        flow_values, flow_errors = CHECKER.frontmatter(
+            """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+metadata: {"alps.kind": process-view}
+---
+"""
+        )
+        self.assertEqual(flow_errors, [], flow_errors)
+        self.assertEqual(flow_values["alps.kind"], "process-view")
+
+        complex_values, complex_errors = CHECKER.frontmatter(
+            """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+metadata:
+  [alps.kind]: process-view
+---
+"""
+        )
+        self.assertTrue(
+            any("invalid YAML mapping key" in error for error in complex_errors),
+            complex_errors,
+        )
+        self.assertNotEqual(complex_values.get("alps.kind"), "process-view")
 
     def test_frontmatter_scalar_anchor_fixture_passes_asset_checks(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
