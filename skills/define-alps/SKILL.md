@@ -7,14 +7,14 @@ description: Identify Skill needs; design and verify assessable Skill Descriptio
 
 ## Purpose
 
-This Skill establishes an assessable and usable Skill Description that satisfies identified stakeholder needs.
+This Process establishes an assessable and usable Skill Description that satisfies identified stakeholder needs.
 
 ## Outcomes
 
-Success of this Skill establishes the following conditions.
+Success of this Process establishes the following conditions.
 
 - a) The need to be addressed as a Skill and the intended contexts of use are identified.
-- b) The Skill Purpose, Outcomes, and boundary are aligned with the selected need.
+- b) The Process Purpose, Outcomes, and boundary are aligned with the selected need.
 - c) The Skill Description satisfies the applicable ALPS description requirements.
 - d) Elements within the Skill Description and exchanges with external parties are traceable.
 - e) The achievability of the Outcomes in representative contexts of use is confirmed.
@@ -39,10 +39,10 @@ This Activity explores candidates for treatment as Skills and selects the need t
 
 This Activity determines the structure and content of a Skill Description that satisfies the selected need. It primarily contributes to Outcomes b), c), and d).
 
-1. The Skill boundary must be established from the primary Outputs and Outcomes.
-2. Dependencies on other Skills must be reduced as far as practicable.
+1. The Process boundary must be established from the primary Outputs and Outcomes.
+2. Dependencies on other Processes must be reduced as far as practicable.
 3. The Skill Description must provide distinguishable discovery-layer and execution-layer information. Their physical separation is not required.
-4. A significant Activity that benefits from detailed treatment may be separated into another Skill.
+4. A significant Activity that benefits from detailed treatment may be separated into another Process described by another Skill.
 5. Name, Purpose, and Outcomes must be written in accordance with the applicable description rules.
 6. Each Task must have the primary function of expressing an individual action that supports achievement of one or more Outcomes and must be written so that the object and operation of that action are distinguishable.
 7. Each statement must be classified under the Skill element corresponding to its primary function.
@@ -50,8 +50,8 @@ This Activity determines the structure and content of a Skill Description that s
 9. Guidance on how to apply the Skill should be separated as Common Approach and practical tips.
 10. It must be confirmed that the set of Activities covers all Outcomes and satisfies the Purpose.
 11. Relationships between Tasks and Outcomes should be identified.
-12. The Skill Discovery Description must state what the Skill does, when it is used, and the information needed to determine applicability. A Skill Discovery Description claiming ALPS Description Conformance must end with `ALPS-conformant.`
-13. When representative Inputs and Outputs are shown, the principal relationships with other Skills or Processes should be identified as needed.
+12. The Skill Discovery Description must state what the Process does, when the Skill is used, and the information needed to determine applicability. A Skill Discovery Description claiming ALPS Description Conformance must end with `ALPS-conformant.`
+13. When representative Inputs and Outputs are shown, the principal relationships with other Processes should be identified as needed.
 14. When a Skill Package is composed, the need, role, and conditions of use for its accompanying resources must be identified.
 
 ### Skill Verification
@@ -62,7 +62,7 @@ This Activity confirms the descriptive conformance of the Skill Description and 
 2. It must be confirmed that each Task has the primary function of expressing an individual action that supports achievement of one or more Outcomes and that the object and operation of that action are distinguishable.
 3. It must be confirmed that the element classification of each statement is consistent with its primary function.
 4. It must be confirmed that normative attributes are distinguishable.
-5. When a general Skill is verified, it must be confirmed that its normative part does not require a specific method, technique, tool, or execution sequence.
+5. When a general Process Description is verified, it must be confirmed that its normative part does not require a specific method, technique, tool, or execution sequence.
 6. It must be confirmed that the discovery-layer and execution-layer information are consistent.
 7. The review should incorporate a perspective independent of the Skill author.
 8. The achievability of the Outcomes should be evaluated through trials in representative contexts of use.
@@ -70,7 +70,7 @@ This Activity confirms the descriptive conformance of the Skill Description and 
 10. Boundary cases from the intended contexts of use may be included in the evaluation.
 11. Detected defects should be recorded, and actions with due dates and completion conditions should be established.
 12. Completion of defect treatment should be confirmed before the Decision Gate for the adoption decision.
-13. When the Skill Description identifies an exchange with another Skill or Process, it should be evaluated whether the Output can be used as the intended recipient's Input.
+13. When the Skill Description identifies an exchange with another Process, it should be evaluated whether the Output can be used as the intended recipient's Input.
 14. When the Skill Package is included in the verification scope, the existence of the authoritative Skill Description, resolvability of mandatory references, roles and conditions of use of accompanying resources, and consistency between the Skill Description and those resources must be evaluated.
 
 ## Inputs
@@ -102,14 +102,14 @@ The selected Skill need and selection rationale, verified Skill Description, rec
 ## Controls
 
 - Apply the Process Framework and ALPS. If they conflict, the Process Framework must take precedence.
-- The normative words and their meanings are those defined in the Process Framework. This Skill does not redefine them.
-- The applicable clauses of [process-framework.md](../../.alps/spec/process-framework.md) and [ALPS-SPEC.md](../../.alps/spec/ALPS-SPEC.md) must be consulted when interpreting a Process Framework or ALPS requirement, confirming a normative attribute, determining Conformance, or changing this Skill.
-- The Name must be a short noun phrase that distinguishes the Skill from other Skills. The Name must not summarize the Purpose.
+- The normative words and their meanings are those defined in the Process Framework. This Process Description does not redefine them.
+- The applicable clauses of [process-framework.md](../../.alps/spec/process-framework.md) and [ALPS-SPEC.md](../../.alps/spec/ALPS-SPEC.md) must be consulted when interpreting a Process Framework or ALPS requirement, confirming a normative attribute, determining Conformance, or changing this Process Description.
+- The Name must be a short noun phrase that distinguishes the Process from other Processes. The Name must not summarize the Purpose.
 - The Purpose must state the high-level objective or objectives that belong together.
 - The Purpose should be stated concisely in one sentence wherever possible.
 - Each Outcome must state one positive, observable, and assessable result condition, rather than the creation of an Output.
 - The Outcome set must contain all and only the results needed to achieve the Purpose.
-- The set of Activities and any separated Skills must cover all Outcomes. Activities may map to Outcomes on a basis other than one to one.
+- The set of Activities and any separated Processes must cover all Outcomes. Activities may map to Outcomes on a basis other than one to one.
 - Each sentence should address only one meaning.
 - Reference information must not alter the meaning or normative force of the primary elements.
 - Applicable laws, regulatory requirements, policies, voluntary standards, and agreements must be applied within their declared scope.
@@ -117,7 +117,7 @@ The selected Skill need and selection rationale, verified Skill Description, rec
 
 ## Constraints
 
-- A general Skill must not normatively fix a specific performer, Task allocation, method, tool, metric, or execution sequence.
+- A general Process Description must not normatively fix a specific performer, Task allocation, method, tool, metric, or execution sequence.
 - Agents, models, tools, and execution environments must not be treated as Inputs. They must be treated as Enablers.
 - A Decision Gate must not be treated as a component of a Skill Description. It must be treated as a separate decision mechanism that controls adoption, hold, change, re-execution, or termination.
 - Mandatory references must be resolvable. Unnecessary duplication or conflict must not arise between the Skill Description and accompanying resources.
@@ -135,19 +135,19 @@ The selected Skill need and selection rationale, verified Skill Description, rec
 - When Conformance is claimed, the subject, scope, and whether the criteria are Outcomes, Tasks, or both must be stated.
 - Full Conformance to Outcomes must demonstrate achievement of every Outcome listed in the Outcomes section. Activities and Tasks are treated as guidance.
 - Full Conformance to Tasks must demonstrate satisfaction of every requirement stated with must or must not by an Activity or Task. Outcomes are treated as guidance.
-- Tailored Conformance may be claimed for a Skill or Process that does not satisfy the selected Full Conformance criteria. The claim must declare the Skill or Process tailored in accordance with Skill Tailoring in the ALPS management process and its scope of application. It must also demonstrate satisfaction of every Outcome and Activity/Task requirement remaining within that scope.
+- Tailored Conformance may be claimed for a Process described by a Skill that does not satisfy the selected Full Conformance criteria. The claim must declare the Process tailored in accordance with Tailoring in the ALPS management process and its scope of application. It must also demonstrate satisfaction of every Outcome and Activity/Task requirement remaining within that scope.
 - Independent Process Outcome Conformance must not be claimed for an individual Activity alone.
 
 ## Interfaces & Traceability
 
 | Information item provided | Primary recipient | Related information |
 |---|---|---|
-| Verified Skill Description | Skill Asset Management | Adoption subject, version, conditions of application, and verification results. |
+| Verified Skill Description | ALPS Asset Management | Adoption subject, version, conditions of application, and verification results. |
 | Verification results and defect treatment | Adoption Decision Gate | Decision criteria, evidence, unresolved limitations, and the decision. |
 | Task–Outcome mapping | Assessment or reverification | Tasks, Outcomes, evidence, and status. |
 | Redefinition and reverification results | Skill management | Change request, affected scope, and post-change evidence. |
 
-When an Output becomes another Skill's Input, their names, meanings, and scopes should be aligned.
+When an Output becomes another Process's Input, their names, meanings, and scopes should be aligned.
 
 ## Shared Normative References
 

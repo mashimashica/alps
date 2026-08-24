@@ -1,6 +1,6 @@
 # Process Instance Record
 
-This informative binding supports a readable record that can be created when a Process or Skill is instantiated and completed in the same file after execution. Use it only when the quality risk, applicable Controls, review, handoff, or a Conformance claim justifies the detail.
+This informative binding supports a readable record for a Process Instance. The record can be created before invocation and completed in the same file after execution. Use it only when the quality risk, applicable Controls, review, handoff, or a Conformance claim justifies the detail.
 
 This is an optional Environment Binding. Its file format, fields, and checker rules are binding-specific, not ALPS requirements. Headings are for readers and may be renamed or reordered. The visible ``- `key`: value`` fields and the `kind` value make a generated record machine-readable.
 
@@ -33,7 +33,7 @@ The following is a representative layout, not a required heading set or order.
 ## Application basis
 - `kind`: application
 - `record_format`: process-instance-record/1
-- `source`: <managed Skill or Process source and version>
+- `source`: <managed Process Description and version, including its providing Skill when applicable>
 - `context`: <application situation and need>
 - `scope`: <application scope, including relevant exclusions or an explicit statement that none apply>
 
@@ -58,7 +58,7 @@ The following is a representative layout, not a required heading set or order.
 - `limitations`:
 ```
 
-Use additional blocks with core `kind` values such as `activity`, `purpose`, `input`, `output`, `entry_criterion`, `exit_criterion`, `control`, `constraint`, `enabler`, `exchange`, or `decision` when they are material. Prefix a local extension kind with `x_`, for example `x_review_note`; this makes a misspelled core kind distinguishable from an intentional extension. The checker ignores prose sections that have no `kind` field and does not impose a complete ALPS model on every Instance.
+Use additional blocks with core `kind` values such as `activity`, `purpose`, `input`, `output`, `entry_criterion`, `exit_criterion`, `control`, `constraint`, `enabler`, `exchange`, or `decision` when they are material. Prefix a local extension kind with `x_`, for example `x_review_note`; this makes a misspelled core kind distinguishable from an intentional extension. The checker ignores prose sections that have no `kind` field and does not impose a complete Process Description on every Process Instance.
 
 ## Conditional blocks
 
@@ -67,9 +67,9 @@ Use a handoff block for a material Output/Input correspondence. At completion, r
 ```markdown
 ## Handoff
 - `kind`: handoff
-- `provider`: <providing Skill or Instance>
+- `provider`: <providing Process or Process Instance>
 - `output`: <Output>
-- `receiver`: <receiving Skill or Instance>
+- `receiver`: <receiving Process or Process Instance>
 - `input`: <Input>
 - `correspondence`: <meaning, scope, and quality conditions>
 - `status`:
@@ -84,7 +84,7 @@ Use a Tailoring block only when an element is added, changed, or excluded throug
 - `before`: <optional: managed statement before the change>
 - `after`: <optional: approved statement after the change>
 - `basis`: <risks, requirements, complexity, available capabilities and resources, and relevant standards>
-- `candidate_evaluation`: <evaluation of candidate Skills or lifecycle models against application conditions, expertise and experience, stakeholder expectations and requirements, and risk tolerance>
+- `candidate_evaluation`: <evaluation of candidate Processes or lifecycle models against application conditions, expertise and experience, stakeholder expectations and requirements, and risk tolerance>
 - `rationale`: <recommended: decision rationale>
 - `decision`: <management decision and, when applicable, its resolvable reference>
 - `affected_party_input`: <affected parties and the Input obtained, or an explicit statement that none were identified>
@@ -107,11 +107,11 @@ Use a Conformance block only when making a claim.
 - `evidence`: <evidence supporting the claim>
 ```
 
-For Tailored Conformance, use `subject`, `scope`, and `remaining_requirements` in the Conformance block to identify the tailored Skill or Process, the claim scope, and every Outcome and Activity/Task requirement that remains within that scope. Also include either a local `tailoring` block or a `tailoring_decision` reference through which the details can be resolved. A `tailoring_decision` reference does not replace `scope` or `remaining_requirements` in the Conformance block. For an ALPS claim, the evidence must demonstrate satisfaction of those remaining Outcomes and requirements; the checker verifies only that the evidence field is present.
+For Tailored Conformance, use `subject`, `scope`, and `remaining_requirements` in the Conformance block to identify the tailored Process, the claim scope, and every Outcome and Activity/Task requirement that remains within that scope. The providing Skill may also be identified when applicable. Also include either a local `tailoring` block or a `tailoring_decision` reference through which the details can be resolved. A `tailoring_decision` reference does not replace `scope` or `remaining_requirements` in the Conformance block. For an ALPS claim, the evidence must demonstrate satisfaction of those remaining Outcomes and requirements; the checker verifies only that the evidence field is present.
 
 ## Generator and checker
 
-The generator transcribes only the values supplied on the command line. It does not read a Skill to infer its Purpose, Outcomes, Tasks, normative attributes, or Tailoring. It prepares the complete content before atomically placing it at the output path, so a failed replacement does not truncate the existing record.
+The generator transcribes only the values supplied on the command line. It does not read a Process Description to infer its Purpose, Outcomes, Tasks, normative attributes, or Tailoring. It prepares the complete content before atomically placing it at the output path, so a failed replacement does not truncate the existing record.
 
 ```bash
 python3 scripts/process_instance_record.py new \

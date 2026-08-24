@@ -1,164 +1,163 @@
 ---
 name: manage-alps
-description: Govern the adoption, discoverability, change, retirement, tailoring, assessment, and improvement of Agent Skills, Skill Packages, Skill Models, or Skill Views. Use when managing Skill asset registration, updates, deactivation, tailoring decisions, performance assessment, improvement prioritization, change impacts, communication, or reverification. Use the definition Process instead when only defining a new Skill Description, and the application Process when only executing a selected Skill. ALPS-conformant.
+description: Govern the adoption, discoverability, change, retirement, Tailoring, assessment, and improvement of Agent Skills, Skill Packages, Process Models, and Process Views. Use when managing registration, updates, deactivation, Tailoring decisions, assessment, improvement priorities, change impacts, communication, or reverification. Use the definition Process when defining or redefining an authoritative Process Description, and the application Process when applying selected Processes. ALPS-conformant.
 ---
 
 # Agent Lifecycle Process Skill Management
 
 ## Purpose
 
-This Skill governs Skill assets and their application and maintains the continual availability of suitable Skills.
+This Process governs adopted ALPS assets and their application so that suitable Agent Skills, Skill Packages, Process Models, and Process Views remain available, controlled, and fit for their intended use.
 
 ## Outcomes
 
-A successful application of this Skill establishes the following conditions.
+Success of this Process establishes the following conditions.
 
-- a) Policies and guidance for Skill management, deployment, and Tailoring are established.
-- b) Adopted Skills are discoverable in a managed state.
-- c) Changes to and retirement of Skills are controlled, including their impacts on affected users.
+- a) Policies and guidance for adoption, deployment, Tailoring, assessment, change, and retirement are established.
+- b) Adopted Agent Skills, Skill Packages, Process Models, and Process Views are discoverable in a managed state.
+- c) Identity, status, version, references, change, and retirement of managed subjects are controlled.
 - d) Tailoring decisions and rationale are traceable to applicable Controls and Constraints.
-- e) Skill performance and effectiveness are assessed against established criteria.
-- f) Improvement opportunities are prioritized from lessons learned and assessment results.
-- g) Decided improvements are implemented.
+- e) Process application performance is assessed against declared criteria.
+- f) The fitness of managed Process Models and Process Views is assessed against declared criteria.
+- g) Improvement opportunities are prioritized from evidence, lessons learned, and assessment results.
+- h) Decided improvements are implemented.
+- i) Subjects affected by implemented improvements are reverified as needed.
 
 ## Activities & Tasks
 
-The order in which the following headings, Activities, Tasks, and numbers appear does not prescribe a procedure or execution sequence. Entry Criteria are conditions evaluated before invocation, and Exit Criteria are conditions evaluated before declaring completion. Controls and Constraints apply irrespective of where they appear. Each Activity can be applied concurrently, iteratively, or recursively as needed.
+The order of the following Activities and Tasks does not prescribe an execution sequence. Each Activity may be applied concurrently, iteratively, or recursively as needed.
 
-### Skill Asset Management
+### ALPS Asset Management
 
-This Activity manages adoption, discoverability, change communication, configuration, and retirement of Skill assets. It primarily contributes to Outcomes a), b), c), and g).
+This Activity manages adoption, discoverability, reference integrity, change communication, configuration, and retirement of managed ALPS subjects. It primarily contributes to Outcomes a), b), c), h), and i).
 
-1. The means for managing and deploying Skills, together with Tailoring guidance, should be established.
+1. The means for managing and deploying Agent Skills, Skill Packages, Process Models, and Process Views, together with Tailoring guidance, should be established.
 2. Framework-level Controls and Enablers must be declared together with their scope, exceptions, and whether Tailoring is permitted.
-3. Evidence from Skill Verification in the ALPS definition process should be confirmed before a Skill is adopted.
-4. When management guidance or a Skill changes, the change should be communicated to affected users.
-5. A Skill for which the need no longer exists or that has become harmful must be identified and retired.
-6. The description of a retired Skill may be retained for reference.
-7. Duplication and gaps within the Skill Model should be continually identified.
-8. Skills established as standards should be used consistently across multiple subjects of application.
-9. When a component of a Skill Package changes, affected Skill Descriptions and accompanying resources should be identified and necessary reverification performed.
+3. Verification evidence from the ALPS definition Process should be confirmed before an authoritative description or representation is adopted.
+4. The authority, version or state, applicability, references, and management status of each adopted subject should be recorded.
+5. Mandatory references among Process Descriptions, Process Models, Process Views, and accompanying resources must be checked for resolvability.
+6. Changes to management guidance or a managed subject should be communicated to affected users and dependent subjects.
+7. A managed subject for which the need no longer exists or that has become harmful must be identified for retirement.
+8. A subject identified for retirement must be retired through a controlled decision.
+9. A retired description or representation may be retained for reference when its status and conditions of use remain explicit.
+10. Duplication, gaps, and inconsistent relationships within applicable Process Models and Process Views should be continually identified.
+11. When a Skill Package component or referenced subject changes, affected descriptions, representations, and accompanying resources should be identified.
+12. Affected descriptions, representations, and accompanying resources that require reverification must be reverified.
 
-### Skill Tailoring
+### Tailoring
 
-This Activity adapts Skills and Skill Models to the needs, conditions, and risks of a particular context of application. It primarily contributes to Outcomes a) and d).
+This Activity adapts applicable Processes and Process Models to the needs, conditions, and risks of a particular context of application. It primarily contributes to Outcomes a) and d).
 
 1. Application-related risks, requirements, complexity, available capabilities and resources, and relevant standards must be identified.
-2. Candidate Skills or life cycle models must be evaluated by considering conditions of application, available expertise and experience, stakeholder expectations or requirements, and risk tolerance.
+2. Candidate Processes or life cycle models must be evaluated against the conditions of application, available expertise, stakeholder expectations, and risk tolerance.
 3. Tailoring decisions should be based on facts and evidence.
-4. Outcomes, Activities, Tasks, representative Inputs, and representative Outputs may be deleted, modified, or added.
+4. Outcomes, Activities, Tasks, representative Inputs, and representative Outputs may be deleted, modified, or added within the declared Tailoring scope.
 5. Tailoring must comply with applicable Controls and Constraints.
 6. Input must be obtained from affected parties.
-7. The rigor of Skill application should be set on the basis of risk so that Activities can be performed with sufficient rigor at an acceptable level of risk.
-8. The scope of Tailoring should be made clear. Assumptions and criteria should be identified, and the rationale for decisions should be recorded.
-9. Tailoring is typically performed dynamically throughout the period of application according to risk and context.
-10. Tailoring operation should be reviewed throughout application and revised when conditions warrant.
-11. A means of continually assessing the performance of the tailored Skill should be established.
-12. The level of detail used to describe Inputs, Outputs, and their exchanges should be adjusted according to dependencies among Skills, concurrent or iterative application, and quality risk.
+7. The rigor of Process application should be set according to risk.
+8. The Tailoring scope should be recorded.
+9. Tailoring assumptions should be recorded.
+10. Tailoring criteria should be recorded.
+11. The rationale for each Tailoring decision should be recorded.
+12. Tailoring should be reviewed throughout application.
+13. Tailoring should be revised when conditions warrant.
+14. A means of assessing the performance of a tailored Process should be established.
+15. The detail used to describe Inputs, Outputs, and their exchanges should be adjusted according to dependencies, concurrency, iteration, and quality risk.
 
-### Skill Assessment and Improvement
+### Assessment and Improvement
 
-This Activity assesses Skill performance and effectiveness and connects the results to improvement. It primarily contributes to Outcomes e), f), and g).
+This Activity assesses managed subjects and connects the results to controlled improvement. It primarily contributes to Outcomes e), f), g), h), and i).
 
-1. Measures should be established to gain insight into Skill performance and effectiveness.
-2. Lessons learned should be identified and collected throughout the period of Skill execution.
-3. Collection of lessons learned at predefined milestones should also be planned.
-4. Measures should be analyzed to determine Skill effectiveness.
-5. Skill strengths and weaknesses should be assessed, and reviews and audits should be established.
-6. Skill performance may be compared with established criteria, applicable standards, or comparators to identify improvement opportunities. The comparison should analyze performance, effectiveness, conformance, benefits, and costs.
-7. Improvement opportunities should be continually identified, prioritized, and implemented.
-8. Mechanisms should be established both to collect lessons learned and connect them to action and to analyze candidate changes for improvement.
-9. A changed Skill should undergo confirmation through Skill Verification in the ALPS definition process.
-10. Inconsistency and rework arising from exchanges among Skills may be used to identify improvement opportunities.
+1. Assessment criteria should be established according to the subject being assessed.
+2. Process application should be assessed using relevant performance, effectiveness, Outcome, Task, and Conformance evidence.
+3. A Process Model should be assessed for coverage, relationships, consistency, applicability, and resolvability of referenced Process Descriptions.
+4. A Process View should be assessed for fitness to its Concern or Purpose, source integrity, application guidance, and achievement of its declared Outcomes.
+5. Lessons learned should be collected throughout application and at planned review points.
+6. Strengths, weaknesses, gaps, duplication, and inconsistent exchanges should be assessed.
+7. Improvement opportunities should be continually identified.
+8. Improvement opportunities should be prioritized according to available evidence.
+9. Decided improvements should be implemented.
+10. Candidate changes should be analysed for impacts on dependent subjects, references, users, and Conformance claims.
+11. A changed authoritative description or representation should be submitted to the ALPS definition Process for reverification.
 
 ## Inputs
 
-The following are representative Inputs and do not prescribe the only method of execution.
-
-Verified Skill Descriptions, change requests, application context, Tailoring guidance, Input from affected parties, execution and decision records, lessons learned, and measurement results.
+Representative Inputs include verified Skill Descriptions and other verified ALPS representations, change requests, application context, Tailoring guidance, affected-party input, Process Instance and decision records, lessons learned, measurement results, and reference-integrity findings.
 
 ## Outputs
 
-The following are representative Outputs and do not prescribe the only method of execution.
-
-Managed Skill assets, tailored Skills, Tailoring decisions and rationale, assessment results, prioritized improvement opportunities, change requests for Skills, and retirement decisions.
+Representative Outputs include managed Agent Skills, Skill Packages, Process Models, and Process Views; Tailoring decisions and rationale; assessment results; prioritized improvements; change or redefinition requests; reverification requests; and retirement decisions.
 
 ## Entry Criteria
 
-- A management trigger concerning adoption, change, retirement, Tailoring, assessment, or improvement of a Skill asset has been identified.
-- The Skill asset to be managed, scope of application, baseline, or assessment period can be identified.
-- The primary applicable Controls and Constraints can be confirmed, or their absence can be recorded as an open issue.
-- When an irreversible or high-impact management action is anticipated, the need for a Decision Gate and the necessary authority can be determined.
+- A management trigger concerning adoption, change, retirement, Tailoring, assessment, or improvement has been identified.
+- The managed subject, application scope, baseline, or assessment period can be identified.
+- Principal applicable Controls and Constraints can be confirmed, or their absence can be recorded as an open issue.
+- When an irreversible or high-impact action is anticipated, the required authority and Decision Gate can be determined.
 
 ## Exit Criteria
 
-- The scope, criteria, and applied Activities are recorded.
-- Management decisions, their rationale, assumptions, and evidence are traceable.
-- Impacts of changes, retirement, or Tailoring; communication to relevant parties; and the need for reverification are recorded.
-- Achievement of the declared Outcomes and unresolved risks are determined.
-- Handoffs to the subsequent definition Process or application Process are explicit.
+- The managed subject, scope, criteria, and applied Activities are recorded.
+- Management decisions, rationale, assumptions, and evidence are traceable.
+- Reference and change impacts, communication needs, and required reverification are determined.
+- Achievement of applicable Outcomes and unresolved risks are determined.
+- Handoffs to the definition Process or application Process are explicit.
 
 ## Controls
 
-- The Process Framework and ALPS must be applied. If they conflict, the Process Framework must take precedence.
-- The normative words and their meanings are those defined in the Process Framework. This Skill does not redefine them.
+- The Process Framework and ALPS must be applied. If they conflict, the Process Framework takes precedence.
 - Applicable laws, regulations, policies, contracts, information-management requirements, safety requirements, and the user-specified scope of change must be applied.
-- The scope, exceptions, and whether Tailoring is permitted must be stated for Framework-level Controls and Enablers.
-- Controls and Constraints for Skill management, change, retention, reference, recovery, and deletion that are effective in the execution environment must be followed. These requirements arise from the execution environment rather than from ALPS itself; where applicable, they remain part of the declared execution scope and assessment.
+- Framework-level Controls and Enablers must state their scope, exceptions, and whether Tailoring is permitted.
+- Execution-environment requirements for management, change, retention, reference, recovery, and deletion must be followed within their declared scope.
 
 ## Constraints
 
-- The normative part of a general Skill must not require a specific executor, tool, technique, measure, or fixed execution sequence.
-- Agents, models, tools, management systems, and execution environments must not be treated as Inputs. They must be treated as Enablers.
-- A Decision Gate should be applied before irreversible or high-impact adoption, change, retirement, or Tailoring. When an applicable Control or Constraint requires passage through a Decision Gate, the action must not be performed before passage.
-- A determination of Conformance or effectiveness must be based on sufficient evidence.
+- The normative part of a general Process Description must not require a specific executor, tool, technique, measure, or fixed execution sequence.
+- Agents, models, tools, management systems, and execution environments must be treated as Enablers rather than Inputs.
+- A Decision Gate should be applied before irreversible or high-impact adoption, change, retirement, or Tailoring.
+- A determination of Conformance, effectiveness, or fitness must be based on sufficient evidence and must identify its subject.
 
 ## Enablers
 
-- Managed Skill registers, versions, configurations, and change histories
-- Expertise in stakeholders, business domains, and risk domains
-- Agents or tools that support Skill creation, verification, search, version comparison, retention, communication, and assessment
+- Managed registers, versions, configurations, references, and change histories
+- Stakeholder, business-domain, Process, and risk expertise
+- Agents or tools supporting verification, search, reference resolution, version comparison, retention, communication, and assessment
 - Independent review or audit capability
 
 ## Conformance
 
-- A claim of Conformance must identify the target, scope, and whether Outcomes, Tasks, or both are used as the basis.
-- Full Conformance to Outcomes must demonstrate achievement of every Outcome listed in the Outcomes section.
-- Full Conformance to Tasks must demonstrate satisfaction of every requirement stated with must or must not by an Activity or Task.
-- To claim Tailored Conformance when the selected Full Conformance basis is not satisfied, the tailored Process and its scope must be declared, and satisfaction of every Outcome and Activity/Task requirement that remains within that scope must be demonstrated.
-- Independent Process Outcome Conformance must not be claimed for an individual Activity alone.
+- A Conformance claim must identify its subject, scope, basis, and evidence.
+- Process Outcome or Task Conformance applies only to the applicable Process and Process Instance.
+- Assessment of a Process Model or Process View must not be represented as Process Outcome or Task Conformance.
+- Tailored Conformance must declare the tailored Process and scope and demonstrate the selected Conformance basis within that scope.
 - Capability and Conformance must be treated as separate assessment dimensions.
 
 ## Interfaces & Traceability
 
 | Provider | Information item | Recipient |
 |---|---|---|
-| Definition Process | Verified Skill Description and verification results | This management Process |
-| This management Process | Managed Skill information, Tailoring decisions, and application conditions | Application Process |
-| Application Process | Execution and decision records, lessons learned, and measurable results | This management Process |
-| This management Process | Change requests, redefinition requests, and reverification requests | Definition Process |
+| Definition Process | Verified Process Description or other verified ALPS representation | This management Process |
+| This management Process | Managed subject information, references, Tailoring decisions, and application conditions | Application Process |
+| Application Process | Process Instance evidence, decisions, lessons learned, and measurable results | This management Process |
+| This management Process | Change, redefinition, and reverification requests | Definition Process |
 
-When multiple Skills are composed for application, the correspondence between provider Outputs and recipient Inputs must be explicit. The provider and recipient should align the name, meaning, and scope of information items handed off. When the same information item is changed by multiple Skills, its integrity, state, and change handling must be determined according to quality risk.
+Provider Outputs and recipient Inputs must retain identifiable meaning, scope, state, authority, and quality conditions.
 
 ## Shared Normative References
 
 This section is informative and has no normative force.
 
-- When interpretation of the Process Framework or ALPS, conflict resolution, normative attributes, Conformance, or Tailoring requires the governing texts, use the repository-shared [Process Framework](../../.alps/spec/process-framework.md) and [ALPS Specification](../../.alps/spec/ALPS-SPEC.md). These documents are repository-level normative assets and are not owned by this Skill Package.
+- Use the repository-shared [Process Framework](../../.alps/spec/process-framework.md) and [ALPS Specification](../../.alps/spec/ALPS-SPEC.md) when interpretation of governing concepts, Conformance, or Tailoring is required.
 
 ## Bundled Resources
 
-This section is informative and does not require a specific method of execution.
-
-- This root `SKILL.md` is the authoritative English Skill Description. For Japanese-language work, use the [Japanese localization](references/locales/ja/SKILL.md) and its adjacent localized resources. Respond in the user's language; if the localization conflicts with this file, this English description governs.
-- [management-records.md](references/management-records.md) provides optional, human-readable blocks for asset management, Tailoring, assessment and improvement, Decision Gates, changes, retirement, and handoffs. The needed blocks can be included in a general Process Instance Record or kept as referenced management Outputs.
+- This root `SKILL.md` is the authoritative English Process Description. For Japanese-language work, use the [Japanese localization](references/locales/ja/SKILL.md); if the localization conflicts with this file, this English description governs.
+- [management-records.md](references/management-records.md) provides optional records for adoption, Tailoring, assessment, change, retirement, Decision Gates, and handoffs.
 
 ## Common Approach
 
 This section is informative and has no normative force.
 
-- Classifying a management trigger into one or more of Skill Asset Management, Skill Tailoring, and Skill Assessment and Improvement can make it easier to organize the necessary evidence and recipients.
-- Relating the target, baseline, scope, Controls, Constraints, relevant parties, and evidence in a single management record can make change impacts easier to trace.
-- For an irreversible or high-impact management decision, a Decision Gate suited to the application context and risk can be useful.
-- For retirement, new invocations, impacts on dependencies and users, retention of necessary reference records, and recovery conditions can be considered according to the application context.
-- Oversight records received from the application Process — approvals and interventions, undetected failures, insufficient explanations or logs, signs of automation bias, supervisor load, and the adequacy of Decision Gates — can serve as Inputs to Skill Assessment and Improvement.
+- Classify a management trigger by the subject and decision required before selecting records or assessment criteria.
+- Keep the managed subject, baseline, scope, Controls, Constraints, affected parties, references, and evidence together enough to make impacts traceable.
+- Use a Decision Gate suited to the consequence and reversibility of an irreversible or high-impact action.

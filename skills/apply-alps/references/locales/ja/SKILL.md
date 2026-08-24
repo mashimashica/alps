@@ -1,6 +1,6 @@
 ---
 name: apply-alps
-description: 適用状況のニーズ、条件およびリスクに合うAgent Skillを選択し、Entry/Exit Criteria、Control、ConstraintおよびTailoringの決定を確認する。Skillを単独で、または組み合わせて実行する。さらに、Skill間におけるOutputとInputの授受、および構成全体の完全性および一貫性を管理する。既存Skillを使う作業、複数Skillの編成、適用根拠またはOutcome達成の証拠を求められたときに使用する。新規Skillの定義だけ、またはSkill資産の採用・変更・廃止だけを行う場合は使用しない。ALPS準拠。
+description: 適用状況のニーズ、条件およびリスクに合うProcessの正本記述を提供するAgent Skillを選択し、Entry/Exit Criteria、Control、ConstraintおよびTailoringの判断を確認する。Processを単独で、または組み合わせて適用する。さらに、Process間におけるOutputとInputの授受、および構成全体の完全性および一貫性を管理する。既存ProcessをSkillを通じて適用する作業、複数Processの編成、適用根拠またはOutcome達成の証拠を求められたときに使用する。新規Skillの定義だけ、またはSkill資産の採用・変更・廃止だけを行う場合は使用しない。ALPS準拠。
 ---
 
 > 本書は日本語ローカライズである。基準となる英語版は[SKILL.md](../../../SKILL.md)であり、内容が矛盾する場合は英語版を優先する。
@@ -9,41 +9,41 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 
 ## Purpose
 
-本Skillは、適用状況に適合するSkillを単独で、または組み合わせて適用することにより、意図されたOutcomeを達成する。
+本Processは、適用状況に適合するSkillが表現するProcessを単独で、または組み合わせて適用することにより、意図されたOutcomeを達成する。
 
 ## Outcomes
 
-本Skillの成功によって、次の状態が成立している。
+本Processの成功によって、次の状態が成立している。
 
 - a) 適用状況のニーズおよび条件が識別されている。
-- b) 適用するSkillおよび適用形態が、根拠とともに決定されている。
+- b) 適用するProcess、その正本記述を提供するSkillおよび適用形態が、根拠とともに決定されている。
 - c) 適用されるControl、ConstraintおよびTailoringの決定が識別されている。
-- d) Skill Instanceの適用結果が、宣言された適用範囲、適用されるControl、ConstraintおよびTailoringの決定に適合している。
-- e) 適用対象となるSkillの宣言されたOutcomeが達成されている。
-- f) 必要なSkill間の授受が確立されている。
-- g) Skill構成の完全性および一貫性が確立されている。
+- d) Process Instanceの適用結果が、宣言された適用範囲、適用されるControl、ConstraintおよびTailoringの決定に適合している。
+- e) 適用対象となるProcessの宣言されたOutcomeが達成されている。
+- f) 必要なProcess間の授受が確立されている。
+- g) Process構成の完全性および一貫性が確立されている。
 
 ## Activities & Tasks
 
-以下の見出し、Activity、Taskおよび番号の記載順序は、手順または実行順序を規定しない。本SkillのEntry Criteriaは本適用Processの発動前の判定条件、Exit Criteriaは完了宣言前の判定条件であり、ControlsおよびConstraintsは記載位置にかかわらず適用される。選択した各SkillのEntry Criteriaは、そのSkillの発動前に別途判定する。Iteration、Concurrency、RecursionおよびIntegrationを、適用状況に応じて用いる。
+以下の見出し、Activity、Taskおよび番号の記載順序は、手順または実行順序を規定しない。本ProcessのEntry Criteriaは発動前の判定条件、Exit Criteriaは完了宣言前の判定条件であり、ControlsおよびConstraintsは記載位置にかかわらず適用される。選択した各ProcessのEntry Criteriaは、そのProcessを提供Skillを通じて発動する前に別途判定する。Iteration、Concurrency、RecursionおよびIntegrationを、適用状況に応じて用いる。
 
 ### Skill選択
 
-このActivityは、適用状況に対して用いるSkillおよびその適用形態を決定する。主にa)、b)およびc)に寄与する。
+このActivityは、適用するProcess、その正本記述を提供するSkillおよび適用形態を決定する。主にa)、b)およびc)に寄与する。
 
 1. 適用状況のニーズ、条件および適用されるConstraintを識別する必要がある。
-2. 通常、ニーズをSkillのPurposeおよびOutcomeと照合する。
+2. 通常、ニーズを候補Skillが記述するProcessのPurposeおよびOutcomeと照合する。
 3. 通常、Skill Discovery Descriptionを含む発見層の情報に基づいて候補Skillを識別する。
 4. 候補間の重複がある場合、Purposeによって範囲を判別するのが望ましい。
 5. 適合する候補がない場合、そのニーズを定義ProcessのSkillニーズ識別に引き渡してよい。
 6. 適用の決定に伴う不確実性とリスクが許容可能であるかを判断する必要がある。
 7. 決定の根拠を記録するのが望ましい。
 
-### Skill実行
+### Process実行
 
-このActivityは、選択されたSkillのInstanceを実行し、宣言されたOutcomeを達成する。主にc)、d)およびe)に寄与する。
+このActivityは、選択したSkillを用いて記述対象ProcessのInstanceを実行し、そのProcess Descriptionが宣言するOutcomeを達成する。主にc)、d)およびe)に寄与する。
 
-1. Entry Criteriaの成立を判定してからSkillを発動する必要がある。成立しない場合は、発動を見合わせるか、不足している条件を満たすことを先行させる必要がある。
+1. 記述対象ProcessのEntry Criteriaの成立を判定してから、その提供Skillを通じてProcessを発動する必要がある。成立しない場合は、発動を見合わせるか、不足している条件を満たすことを先行させる必要がある。
 2. 必要なInputおよびEnablerの利用可能性を確認するのが望ましい。
 3. 適用されるControl、ConstraintおよびTailoringの決定を識別する必要がある。
 4. Skill DescriptionのActivityおよびTaskを、付与された規範属性に従って実行する必要がある。要求事項として記述されたTaskは、管理されたTailoringによる正当な変更がない限り、省略してはならない。
@@ -54,21 +54,21 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 9. Outcomeの達成状況を、観察可能な証拠に基づいて判定するのが望ましい。
 10. Outputは、授受の定義に従って受領側に引き渡すのが望ましい。品質条件が定められている場合、その充足を確認するのが望ましい。
 11. 実行上の重要な意思決定、その根拠および前提を記録し、必要な変更管理のもとに置くのが望ましい。
-12. 実行から得られた教訓を、管理ProcessのSkill評価・改善に引き渡してよい。
+12. 実行から得られた教訓を、管理ProcessのAssessment・改善に引き渡してよい。
 
-### Skill編成
+### Process編成
 
-このActivityは、複数のSkillを組み合わせ、そのインターフェース、授受および構成全体の完全性および一貫性を管理する。主にe)、f)およびg)に寄与する。
+このActivityは、複数のProcessを組み合わせ、そのインターフェース、授受および構成全体の完全性および一貫性を管理する。主にe)、f)およびg)に寄与する。
 
 1. 目標とするOutcomeの集合を識別する必要がある。
-2. 構成に用いる各Skillの出典を識別するのが望ましい。
-3. 反復利用される構成は、Skill Viewとして文書化してよい。
+2. 構成に用いる各Processの出典と、その正本記述を提供するSkillを識別するのが望ましい。
+3. 反復利用される構成は、Process Viewとして文書化してよい。
 4. 提供側のOutputと受領側のInputとの対応を明示する必要がある。
 5. あらかじめ定義されていなかった授受は、Tailoringによって追加してよい。
 6. IterationまたはRecursionによってOutputが変更された場合、影響を受けるInputを識別し、それらの整合性および適用される基準を再評価するのが望ましい。
 7. Integrationによって、同一階層内の完全性と階層間の一貫性を確保する必要がある。
 8. 構成全体としてのOutcome達成状況を判定するのが望ましい。
-9. 同一の情報項目が複数のSkillによって変更される場合、その情報項目の整合性、状態および変更の取扱いを、品質リスクに応じて定める必要がある。
+9. 同一の情報項目が複数のProcessによって変更される場合、その情報項目の整合性、状態および変更の取扱いを、品質リスクに応じて定める必要がある。
 
 ## Inputs
 
@@ -76,7 +76,7 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 
 ## Outputs
 
-代表的なOutputは、適用Skillおよび適用形態の決定、Skill Descriptionが定めるOutput、Skill構成の定義、構成全体のOutput、実行および意思決定の記録である。これらは唯一の実行方法を規定するものではない。
+代表的なOutputは、適用Processとその記述を提供するSkillの決定、適用形態の決定、Skill Descriptionが定めるOutput、Process構成の定義、構成全体のOutput、実行および意思決定の記録である。これらは唯一の実行方法を規定するものではない。
 
 ## Entry Criteria
 
@@ -84,12 +84,12 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 - 候補Skillの発見情報にアクセスできる。または、候補を利用できない状態が明示されている。
 - 適用判断を安全に開始するための優先Controlおよび重大なConstraintを識別できる。
 
-このEntry Criteriaは、本適用Processを開始できる条件である。選択した各SkillのEntry Criteriaは、発動前に別途判定する必要がある。
+このEntry Criteriaは、本適用Processを開始できる条件である。選択した各ProcessのEntry Criteriaは、その提供Skillを通じた発動前に別途判定する必要がある。
 
 ## Exit Criteria
 
 - ニーズ、条件、選択結果、適用形態およびリスク判断が記録されている。
-- 選択した各SkillのEntry/Exit Criteria、要求事項として記述されたTask、Outcomeの証拠および未解決事項が判定されている。
+- 選択した各ProcessのEntry/Exit Criteria、要求事項として記述されたTask、Outcomeの証拠および未解決事項が判定されている。
 - 複合適用では、OutputとInputの対応、共有情報の状態およびIntegrationが確認されている。
 - Outputを引き渡したか、保留したか、ニーズを定義Processに引き渡したか、管理ProcessにTailoring判断を依頼したか、または終了したかが明示されている。
 - Conformanceを主張する場合、その基準と証拠が検証されている。
@@ -97,7 +97,7 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 ## Controls
 
 - Process FrameworkとALPSを適用する必要がある。両者が矛盾する場合はProcess Frameworkを優先する必要がある。
-- 規範語とその意味は、Process Frameworkの定めによる。本Skillはこれらを再定義しない。
+- 規範語とその意味は、Process Frameworkの定めによる。本Process Descriptionはこれらを再定義しない。
 - 適用されるシステム指示、利用者指示、安全・プライバシー方針、法令、規格および合意を適用する必要がある。
 - 選択した各SkillのSkill Description、Frameworkレベルの宣言および管理Processが承認したTailoringの決定を適用する必要がある。
 - 実行環境の権限、確認および外部作用に関する規則に従う必要がある。
@@ -105,8 +105,8 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 ## Constraints
 
 - Agent、モデル、Skill、ツールおよび実行環境をInputとして扱ってはならない。これらはEnablerとして扱う必要がある。
-- Skillを実行する前に、そのSkill Descriptionのうち実行に必要な内容を確認する必要がある。候補識別のための情報だけで実行してはならない。
-- Entry Criteriaの成立前に発動してはならない。Exit Criteriaの判定前に完了を宣言してはならない。
+- Processを実行する前に、そのSkill Descriptionのうち実行に必要な内容を確認する必要がある。候補識別のための情報だけで実行してはならない。
+- ProcessのEntry Criteriaが成立する前に、その提供Skillを通じてProcessを発動してはならない。Exit Criteriaの判定前に完了を宣言してはならない。
 - 明示されていない実行順序を仮定してはならない。
 - Tailoringを暗黙に行ってはならない。適用されるControlおよびConstraintならびに管理判断を追跡可能にする必要がある。変更の範囲および根拠も記録するのが望ましい。
 - 不可逆的または高影響の外部作用では、実行環境のControlまたはConstraintがDecision Gateの通過を要求する場合、その通過前に実行してはならない。
@@ -120,20 +120,20 @@ description: 適用状況のニーズ、条件およびリスクに合うAgent S
 - Conformanceを主張する場合、対象、適用範囲、およびOutcome、Taskまたは双方のどれを基準にするかを明示する必要がある。
 - OutcomeへのFull Conformanceでは、Outcomes節に列挙したすべてのOutcomeの達成を示す必要がある。
 - TaskへのFull Conformanceでは、ActivityおよびTaskにおいて「〜する必要がある」または「〜してはならない」で示されたすべての要求事項の充足を示す必要がある。
-- 「いずれのSkillも適用しない」と決定してOutcomeの一部が適用対象外となる場合、適用対象外となるOutcomeを宣言し、Full Conformanceを主張せず、ALPS 12.3のTailored Conformanceを用いる必要がある。
-- 変更または除外の結果、選択したFull Conformance基準を満たさない場合、Tailored Conformanceの主張では、管理ProcessでTailoringしたSkillまたはProcessとその適用範囲を宣言し、その適用範囲に残されたOutcomeおよびActivity・Taskに含まれる要求事項の充足を示す必要がある。
+- 「いずれのProcessも適用しない」と決定してOutcomeの一部が適用対象外となる場合、適用対象外となるOutcomeを宣言し、Full Conformanceを主張せず、ALPS 12.3のTailored Conformanceを用いる必要がある。
+- 変更または除外の結果、選択したFull Conformance基準を満たさない場合、Tailored Conformanceの主張では、管理ProcessでTailoringしたProcessとその適用範囲を宣言し、その適用範囲に残されたOutcomeおよびActivity・Taskに含まれる要求事項の充足を示す必要がある。
 - 個別のActivityについてのみ、独立したProcess Outcome Conformanceを主張してはならない。
 
 ## Interfaces & Traceability
 
 | 提供元 | Outputまたは情報項目 | 受領先 | 関連情報 |
 |---|---|---|---|
-| 管理Process | 管理されたSkill情報、Tailoring決定、適用条件 | 適用Process | 受領Activity: Skill選択およびSkill実行。資産、版、状態、範囲および条件。 |
-| Skill A | 宣言されたOutput | Skill B | 受領側Input: Skill Bの宣言されたInput。名称、意味、範囲、品質条件および状態。 |
-| 本適用Process | 実行記録、意思決定、教訓、測定結果 | 管理Process | 受領Activity: Skill評価・改善。Skill Instance、証拠、制限および変更候補。 |
+| 管理Process | 管理されたSkill情報、Tailoring決定、適用条件 | 適用Process | 受領Activity: Skill選択およびProcess実行。資産、版、状態、範囲および条件。 |
+| Process A | 宣言されたOutput | Process B | 受領側Input: Process Bの宣言されたInput。名称、意味、範囲、品質条件および状態。 |
+| 本適用Process | 実行記録、意思決定、教訓、測定結果 | 管理Process | 受領Activity: Assessment・改善。Process Instance、証拠、制限および変更候補。 |
 | 本適用Process | 未充足ニーズ | 定義Process | 受領Activity: Skillニーズ識別。文脈、期待、候補不在の根拠およびリスク。 |
 
-Outputの変更が他のSkillのInputに影響する場合、影響を受けるSkillとInputを識別し、必要な再評価を行うのが望ましい。
+Outputの変更が他のProcessのInputに影響する場合、影響を受けるProcessとInputを識別し、必要な再評価を行うのが望ましい。
 
 ## Shared Normative References
 
@@ -156,7 +156,7 @@ Outputの変更が他のSkillのInputに影響する場合、影響を受けるS
 - Process Instance記録は実行前に作成し、実行後に同じファイルを完成させることができる。詳細は品質リスクに比例させ、該当しない任意ブロックは省略するとよい。
 - 管理された出典を記録し、局所的なレビュー可能性が重要な場合は、適用される基準記述も記録するとよい。Instance固有の記述または成功基準が存在するだけではTailoringとみなさず、意味、規範上の強さまたは適用可能性を変更する場合は管理Processを用いる。
 - 候補がなければ定義Processにニーズを引き渡し、Tailoringが必要なら管理Processに判断を引き渡すと、暗黙の変更を避けやすい。
-- 複合適用では、提供Skill、Output、受領Skill、Input、意味、範囲および品質条件を表にすると授受を確認しやすい。
+- 複合適用では、提供Process、Output、受領Process、Input、意味、範囲および品質条件を表にすると授受を確認しやすい。
 - 管理された出典への参照と可読な記述を組み合わせると、記録単独での確認可能性とTraceabilityを両立しやすい。
 - 非決定性が重要な場合、単一の実行だけでOutcomeの達成を判断せず、観察された変動、証拠の限界および未解決の不確実性を記録すると、後の評価の根拠を保ちやすい。反復試行または継続監視の要否は、品質リスクに応じて決めるとよい。
-- 人間による承認および介入の記録、介入を必要とした条件、変更または却下された提案、検出されなかった失敗、判断に不十分だった説明またはログ、automation biasまたは過剰介入の兆候、監督者の負荷および応答遅延、Decision Gateの過不足、ならびに使用した証拠の品質および限界は、管理ProcessのSkill評価・改善に引き渡せる。
+- 人間による承認および介入の記録、介入を必要とした条件、変更または却下された提案、検出されなかった失敗、判断に不十分だった説明またはログ、automation biasまたは過剰介入の兆候、監督者の負荷および応答遅延、Decision Gateの過不足、ならびに使用した証拠の品質および限界は、管理ProcessのAssessment・改善に引き渡せる。

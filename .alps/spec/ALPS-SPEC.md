@@ -4,9 +4,9 @@
 
 ## Foreword
 
-This specification, ALPS (Agent Lifecycle Process Skills), applies the Process Framework (hereafter “PF”) to Agent Skills. Authors vary in the granularity, normative force, life cycle management, and conformance criteria they use for Agent Skills. A shared Skill Description structure makes results more consistent and supports Skill deployment, Tailoring, improvement, and Assessment. Name, Purpose, and Outcomes establish shared reference points for Skill execution and Assessment (PF 1.2). This specification therefore establishes common rules for Skill description, life cycle management, and conformance.
+This specification, ALPS (Agent Lifecycle Process Skills), applies the Process Framework (hereafter “PF”) to Agent Skills. Authors vary in the granularity, normative force, life cycle management, and conformance criteria they use for Agent Skills. A shared Process Description structure makes results more consistent and supports deployment, Tailoring, improvement, and Assessment of the described Process. Name, Purpose, and Outcomes establish shared reference points for Process application and Assessment (PF 1.2). This specification therefore establishes common rules for Skill description, life cycle management, and conformance.
 
-This specification treats a Skill as a Process Description and applies the PF design principles throughout the Skill life cycle.
+This specification treats a Skill as an asset that provides an authoritative Process Description and applies the PF design principles throughout the Skill life cycle.
 
 ---
 
@@ -19,10 +19,10 @@ This specification treats a Skill as a Process Description and applies the PF de
 - 5. Fundamental Concepts
 - 6. Requirements for Skill Descriptions
 - 7. Skill Life Cycle and ALPS Reference Model
-- 8. Skill Execution Structures and Relationships
+- 8. Process Application Structures and Relationships
 - 9. Controls, Constraints, and Enablers
 - 10. Entry/Exit Criteria, Decision Gates, and Reviews
-- 11. Tailoring and Skill Instantiation
+- 11. Tailoring and Process Instantiation
 - 12. Conformance, Capability, and Assessment
 - Appendix A (informative) Examples of a Skill Description and Skill Package
 - Appendix B (informative) Correspondence with the Process Framework
@@ -41,13 +41,13 @@ a) Requirements, recommendations, and writing rules for describing an Agent Skil
 
 b) A reference model defining the three Processes that constitute the Skill life cycle and their constituent Activities and Tasks (the ALPS Reference Model; Clause 7).
 
-c) Rules for execution structures, interfaces, exchanges, and Skill Views used to apply multiple Skills in combination (Clause 8).
+c) Rules for execution structures, interfaces, exchanges, and Process Views used to apply multiple Processes in combination (Clause 8).
 
-d) The declaration and handling of Controls, Constraints, and Enablers applicable to Skills (Clause 9), and the application of Entry/Exit Criteria, Decision Gates, reviews, and audits (Clause 10).
+d) The declaration and handling of Controls, Constraints, and Enablers applicable to Processes described by Skills (Clause 9), and the application of Entry/Exit Criteria, Decision Gates, reviews, and audits (Clause 10).
 
-e) Rules for Skill Tailoring and Instantiation (Clause 11), criteria for claims of Conformance to this specification and to Skills, and treatment of Capability (Clause 12).
+e) Rules for Tailoring and Process Instantiation (Clause 11), criteria for claims of Conformance to this specification and to Processes described by Skills, and treatment of Capability (Clause 12).
 
-f) The logical composition and integrity of a Skill Package comprising a Skill Description and accompanying resources that support understanding or executing the Skill or creating its Outputs (5.7).
+f) The logical composition and integrity of a Skill Package comprising a Skill Description and accompanying resources that support understanding or applying the described Process or creating its Outputs (5.7).
 
 ### 1.2 Matters Not Specified by This Specification
 
@@ -59,11 +59,11 @@ b) A particular Agent implementation, model, execution environment, or vendor.
 
 c) Details of technical information-security and safety measures. Requirements arising from such measures are handled as Controls or Constraints within the framework of this specification (Clause 9).
 
-d) The content of the individual business domains described by Skills.
+d) The content of the individual business domains addressed by Processes described through Skills.
 
 ### 1.3 Intended Users
 
-This specification is intended for authors who draft Skills, managers of Skill assets, providers and operators of Agents that execute Skills, and assessors of Conformance of a Skill or its execution.
+This specification is intended for authors who draft Skill Descriptions, managers of Skill assets, providers and operators of Agents that apply Processes through Skills, and assessors of Conformance of a Skill Description or Process execution.
 
 ## 2. Normative Reference and Precedence
 
@@ -81,41 +81,30 @@ Terms defined or used in the PF are used with the meanings given in the PF. In a
 An executing entity capable of performing Activities and Tasks under a stated Purpose, with some autonomy in observing its environment, making judgments, and acting. This includes software systems operating under human direction or supervision.
 
 **3.2 Agent Skill (Skill)**
-A unit consisting of a reusable Process Description, and accompanying resources when needed, made into an asset in a form that an Agent can discover, load, and execute. It is referred to simply as a “Skill” in this specification.
+A unit consisting of a reusable Process Description, and accompanying resources when needed, made into an asset in a form that an Agent can discover, load, and use to apply the described Process. It is referred to simply as a “Skill” in this specification.
 
 **3.3 Skill Description**
-The Process Description constituting the content of a Skill. It has Name, Purpose, and Outcomes as mandatory elements and can include optional elements and reference information (see Clause 6).
+The authoritative Process Description provided as the content of a Skill. It has Name, Purpose, and Outcomes as mandatory elements and can include optional elements and reference information (see Clause 6).
 
 **3.4 Discovery Layer and Execution Layer**
-ALPS-specific functional presentation layers through which a Skill Description is made available to an Agent. The discovery layer presents the Name and concise reference information used to discover the Skill and determine its applicability before the complete Skill Description is loaded. The execution layer presents the authoritative Process Description elements and reference information used to execute and assess the Skill.
+ALPS-specific functional presentation layers through which a Skill Description is made available to an Agent. The discovery layer presents the Name and concise reference information used to discover the Skill and determine its applicability before the complete Skill Description is loaded. The execution layer presents the authoritative Process Description elements and reference information used to execute and assess the described Process.
 
 These layers do not add Process Description elements and do not require a particular physical separation, file format, or storage structure.
 
-**3.5 Skill Model**
-A Process Model defining a set of Skills selected or defined for a particular application domain and the relationships among them.
-
-**3.6 ALPS Reference Model**
+**3.5 ALPS Reference Model**
 The Process Reference Model in Clause 7 of this specification, which defines the ALPS definition process, ALPS application process, and ALPS management process through their respective Purposes and Outcomes. Each Process comprises three Activities. The model can be used as a frame of reference for assessment and improvement of the Skill life cycle.
 
-**3.7 Skill View**
-A Process View that organizes Activities and Tasks spanning multiple Skills around a particular concern or Purpose (see 8.3).
+**3.6 Invocation**
+Determining that Entry Criteria are satisfied and beginning execution of a Process Instance through a selected Skill.
 
-NOTE: A Skill View does not define a Skill as an independent Process; it presents a perspective that cuts across existing Skills.
+**3.7 Skill Asset**
+A Skill or Skill Package that has been adopted and placed under management.
 
-**3.8 Skill Instance**
-One application of a Skill in a particular context of application (Process Instance).
+**3.8 Skill Discovery Description**
+Concise reference information placed in the ALPS-specific discovery layer that an Agent uses to discover a Skill and determine its applicability before loading the complete Skill Description. It states what the described Process does, when the Skill is used, and the information needed to determine applicability.
 
-**3.9 Invocation**
-Determining that Entry Criteria are satisfied and beginning execution of a Skill Instance.
-
-**3.10 Skill Asset**
-The totality of adopted and managed Skills, Skill Models, and Skill Views.
-
-**3.11 Skill Discovery Description**
-Concise reference information placed in the ALPS-specific discovery layer that an Agent uses to discover a Skill and determine its applicability before loading the complete Skill Description. It states what the Skill does, when the Skill is used, and the information needed to determine applicability.
-
-**3.12 Skill Package**
-A unit managed as a whole that contains one Skill Description and any accompanying resources that support understanding or executing the Skill or creating its Outputs.
+**3.9 Skill Package**
+A unit managed as a whole that contains one Skill Description and any accompanying resources that support understanding or applying the described Process or creating its Outputs.
 
 ## 4. Normative Language and Conventions
 
@@ -140,15 +129,15 @@ The main text of this specification (Clauses 1 through 12) is normative. Notes, 
 
 ## 5. Fundamental Concepts
 
-### 5.1 A Skill Is a Process Description
+### 5.1 A Skill Provides a Process Description
 
-The content of a Skill must be written as a Process Description conforming to the PF.
+The authoritative content of a Skill must be written as a Process Description conforming to the PF.
 
-6.2 applies to a **general Skill** that describes a general Process. An **instance-specific Skill** that describes a particular Instance states that fact and its context of application and can specify the required capabilities, resources, Inputs, Outputs, Constraints, Controls, and time (PF 1.1).
+A Skill Description can describe a general Process or, when explicitly scoped to a particular context, a Process Instance. A description of a Process Instance can specify the required capabilities, resources, Inputs, Outputs, Constraints, Controls, and time (PF 1.1).
 
-### 5.2 Dual Nature of a Skill: Process Description and Enabler
+### 5.2 Dual Nature of a Skill: Descriptive Asset and Enabler
 
-A Skill is a Process Description in its content and functions as an Enabler for the Process that uses it.
+A Skill provides a Process Description as its authoritative content and functions as an Enabler for application of the described Process.
 
 Skills, Agents, and tools must be treated as Enablers, not as Inputs (PF 4.1).
 
@@ -158,11 +147,11 @@ A Skill Description must not prescribe the structure of the performer or allocat
 
 ### 5.4 Skill Boundary and Granularity
 
-Skill boundaries are typically established from primary Outputs and Outcomes rather than from intermediate Outputs of Activities (PF 3.1). Within a Skill, strong relationships are maintained among Outcomes, Activities, and Tasks, while dependencies on other Skills are reduced as far as practicable.
+The boundary of a Process described by a Skill is typically established from primary Outputs and Outcomes rather than from intermediate Outputs of Activities (PF 3.1). Within the described Process, strong relationships are maintained among Outcomes, Activities, and Tasks, while dependencies on other Processes are reduced as far as practicable.
 
-A significant Activity containing many Tasks may be described as a separate Skill with its own Purpose and Outcomes (PF 3.1).
+A significant Activity containing many Tasks may be treated as a separate Process with its own Purpose and Outcomes and described by a separate Skill (PF 3.1).
 
-When the definition, maintenance, assessment, or change handling of an information item spanning multiple Skills has an independent Purpose and Outcomes and mutually cohesive Activities, and can be bounded as one Process, it may be described as a separate Skill. By contrast, when no independent Process boundary is established and relationships among existing Skills are presented as a cross-cutting concern, it can be described as a Skill View (8.3).
+When the definition, maintenance, assessment, or change handling of an information item spanning multiple Processes has an independent Purpose and Outcomes and mutually cohesive Activities, and can be bounded as one Process, that Process may be described by a separate Skill. By contrast, when no independent Process boundary is established and relationships among existing Processes are presented as a cross-cutting concern, they can be described as a Process View (8.3).
 
 ### 5.5 Functional Layers and Progressive Disclosure
 
@@ -170,27 +159,29 @@ PF 1.3 permits a Process Description to present information in layers for reader
 
 A Skill Description claiming Description Conformance must provide both layers and make their functions distinguishable. The layers may be represented together or separately, provided that one authoritative Skill Description remains identifiable and mandatory references are resolvable.
 
-a) The **discovery layer** must present the Name and Skill Discovery Description. The Skill Discovery Description must state what the Skill does, when it is used, and the information needed to determine applicability.
+a) The **discovery layer** must present the Name and Skill Discovery Description. The Skill Discovery Description must state what the described Process does, when the Skill is used, and the information needed to determine applicability.
 
-b) The **execution layer** must present or provide access to the complete Skill Description used for execution and Assessment. It includes Name, Purpose, and Outcomes, together with any optional elements and reference information included under 6.1.
+b) The **execution layer** must present or provide access to the complete Skill Description used for Process execution and Assessment. It includes Name, Purpose, and Outcomes, together with any optional elements and reference information included under 6.1.
 
-c) Matters that cut across multiple Skills should be treated separately from an individual Skill's execution layer. Common Controls and Enablers may be declared as Framework-level elements.
+c) Matters that cut across multiple Processes should be treated separately from an individual Skill's execution layer. Common Controls and Enablers may be declared as Framework-level elements.
 
 NOTE: These functional layers support progressive disclosure without requiring two files, two sections, or another particular physical structure.
 
-### 5.6 Skill Models and Life Cycle Models
+### 5.6 Process Models and Life Cycle Models
 
-A Skill Model is a Framework of interrelated Skills and can provide a basis for composing Process Models, including life cycle models (PF 5.1). A subset can be selected from a Skill Model and applied according to Purpose. Selection of Skills and the timing of their execution need continual review in response to changes affecting the subject or context of application (PF 5.2).
+Process Models and life cycle models are interpreted with the meanings established by the PF. When Processes in a Process Model are made available as Skills, the Model may identify the Skill Package that supplies each authoritative Process Description and the relationships among the Processes.
+
+A subset of Processes can be selected from a Process Model according to Purpose. The selected Processes can then be applied singly or in combination through the Skills that describe them. Selection and timing need continual review when the subject or context of application changes (PF 5.1 and 5.2).
 
 ### 5.7 Skill Packages and Accompanying Resources
 
 A Skill Package must contain one authoritative Skill Description.
 
-A Skill Package may include, as needed, reference information, execution resources, and deliverable resources that support understanding or executing the Skill or creating its Outputs. When accompanying resources are included, their roles and conditions of use must be identifiable from the Skill Description. Mandatory references must be resolvable.
+A Skill Package may include, as needed, reference information, execution resources, and deliverable resources that support understanding or applying the described Process or creating its Outputs. When accompanying resources are included, their roles and conditions of use must be identifiable from the Skill Description. Mandatory references must be resolvable.
 
-Unnecessary duplication or conflict must not arise between a Skill Description and accompanying resources. Accompanying resources must be treated as reference information, Inputs, Outputs, Controls, Constraints, or Enablers based on the function they perform in Skill execution, not on where they are stored (9.1).
+Unnecessary duplication or conflict must not arise between a Skill Description and accompanying resources. Accompanying resources must be treated as reference information, Inputs, Outputs, Controls, Constraints, or Enablers based on the function they perform in Process execution, not on where they are stored (9.1).
 
-A Skill Package should contain only resources that directly support understanding or executing the Skill or creating its Outputs.
+A Skill Package should contain only resources that directly support understanding or applying the described Process or creating its Outputs.
 
 ### 5.8 Specialization of the Process Framework
 
@@ -199,9 +190,6 @@ ALPS specializes the general constructs of the PF for Agent Skills. The normativ
 | PF construct | ALPS specialization |
 |---|---|
 | Process Description | Skill Description (3.3) |
-| Process Instance | Skill Instance (3.8) |
-| Process Model | Skill Model (3.5) |
-| Process View | Skill View (3.7) |
 | Resources that perform or support a Process | Agents, models, tools, and execution environments, treated as Enablers (5.2, 9.3) |
 
 ALPS may make a PF rule concrete for the Agent context and may strengthen it where needed. ALPS must not change the meaning of a PF concept, weaken a PF requirement, or replace a PF concept with a different one (see Clause 2).
@@ -212,7 +200,7 @@ ALPS may make a PF rule concrete for the Agent context and may strengthen it whe
 
 A Skill Description must contain Name, Purpose, and Outcomes (PF 1.2).
 
-Activities, Tasks, Inputs, Outputs, Controls, Constraints, Enablers, Entry Criteria, Exit Criteria, and reference information are optional elements added according to the Purpose of the description and the required level of detail. A Decision Gate is not a component of a Skill Description; it is treated as a decision mechanism that controls application of the Skill (PF 1.2 and 8.1, Clause 10).
+Activities, Tasks, Inputs, Outputs, Controls, Constraints, Enablers, Entry Criteria, Exit Criteria, and reference information are optional elements added according to the Purpose of the description and the required level of detail. A Decision Gate is not a component of a Skill Description; it is treated as a decision mechanism that controls application of the described Process (PF 1.2 and 8.1, Clause 10).
 
 ### 6.2 General Writing Rules
 
@@ -220,7 +208,7 @@ a) The roles of Name, Purpose, Outcomes, Activities, and Tasks must be distingui
 
 b) Each sentence should address only one meaning, and independent objectives, results, or actions should not be joined in one sentence. Each statement should contain enough context to remain meaningful when referenced independently within its Skill Description. When supplementary explanation is needed, it can be separated as a reference statement or note rather than superimposing meaning on the primary statement.
 
-c) A general Skill must not require a specific method, technique, tool, metric, management method, or execution sequence. Any necessary temporal relationship should be stated explicitly as a Constraint.
+c) A general Process Description must not require a specific method, technique, tool, metric, management method, or execution sequence. Any necessary temporal relationship should be stated explicitly as a Constraint.
 
 d) Activities and Tasks must not be interpreted as procedural steps (PF 1.4).
 
@@ -232,25 +220,25 @@ NOTE: Rule d) also protects against an Agent misreading the listed order of Acti
 
 #### 6.3.1 Name
 
-A Skill Name must use a concise noun phrase as the Skill heading. The Name states the Skill's central concern and differentiates it from other Skills in the Skill Model. The Name must not be written as a summary of the Purpose (PF 2.1).
+The Name in a Skill Description must use a concise noun phrase as the Skill heading. The Name states the described Process's central concern and differentiates it from other Processes represented in the applicable Process Model. The Name must not be written as a summary of the Purpose (PF 2.1).
 
 #### 6.3.2 Purpose
 
-A Skill Purpose must state one or more high-level objectives that belong together. The Purpose should be stated concisely in one sentence wherever possible. Summarizing Activities or Outcomes in the Purpose should be avoided. Combining multiple independent Purposes in one sentence should also be avoided. If further explanation is needed, it can be placed in a reference statement or note. When Skill scopes appear to overlap, the Purpose should characterize the scope or boundary of the Skill (PF 2.1).
+The Purpose in a Skill Description must state one or more related high-level objectives for performing the described Process. The Purpose should be stated concisely in one sentence wherever possible. Summarizing Activities or Outcomes in the Purpose should be avoided. Combining multiple independent Purposes in one sentence should also be avoided. If further explanation is needed, it can be placed in a reference statement or note. When Process scopes appear to overlap, the Purpose should characterize the scope or boundary of the described Process (PF 2.1).
 
 #### 6.3.3 Outcome
 
-A Skill Outcome represents a measurable and tangible result achieved by the Skill. An Outcome must be observable and assessable and must be clearly distinguished from an Output. The creation of a document, record, or information item itself must not be written as an Outcome (PF 2.2).
+An Outcome in a Skill Description represents a measurable and tangible result condition achieved through the described Process. An Outcome must be observable and assessable and must be clearly distinguished from an Output. The creation of a document, record, or information item itself must not be written as an Outcome (PF 2.2).
 
-An Outcome must be written as a declarative statement of a condition in which a positive and observable result is established. Each Outcome must describe only one result, and joining multiple independent results with conjunctions must be avoided. An Outcome of a general Skill must be meaningful in every applicable scope.
+An Outcome must be written as a declarative statement of a condition in which a positive and observable result is established. Each Outcome must describe only one result, and joining multiple independent results with conjunctions must be avoided. An Outcome of a general Process must be meaningful in every applicable scope.
 
-Taken together, the Outcomes must fully support attainment of the Skill Purpose, and no listed Outcome must be irrelevant to that attainment. Each Outcome should remain meaningful when read independently. Singularity and clarity of meaning take precedence over brevity, and the size of the Outcome set follows from what attainment of the Purpose needs. Benefits of a Skill should be distinguished from Outcomes and, when useful, explained separately in a non-normative note attached to the Purpose.
+Taken together, the Outcomes must fully support attainment of the Process Purpose, and no listed Outcome must be irrelevant to that attainment. Each Outcome should remain meaningful when read independently. Singularity and clarity of meaning take precedence over brevity, and the size of the Outcome set follows from what attainment of the Purpose needs. Benefits of performing the Process should be distinguished from Outcomes and, when useful, explained separately in a non-normative note attached to the Purpose.
 
 #### 6.3.4 Activity
 
-An Activity describes a set of actions for achieving or performing a Skill and functions as an organizing construct for classifying related Tasks. An Activity should contain Tasks that are strongly related to one another and weakly related to Tasks belonging to other Activities or Skills.
+An Activity describes a cohesive set of actions within the Process described by a Skill and functions as an organizing construct for classifying related Tasks. An Activity should contain Tasks that are strongly related to one another and weakly related to Tasks belonging to other Activities or Processes.
 
-The Activities and any separated Skills must collectively cover all Outcomes and satisfy the Skill Purpose. Activities need not map individually to Outcomes (PF 2.3).
+The Activities and any separated Processes must collectively cover all Outcomes and satisfy the Process Purpose. Activities need not map individually to Outcomes (PF 2.3).
 
 #### 6.3.5 Task
 
@@ -258,15 +246,15 @@ A Task must have the primary function of expressing an individual action that su
 
 #### 6.3.6 Input and Output
 
-Inputs and Outputs represent connections between a Skill and its external environment. It is optional whether mandatory or representative Inputs are specified, and it is also optional whether Outputs are specified when achievement of the Outcomes can be demonstrated (PF 4.1 and 4.2). An Output can be expressed as an artifact or information item. An Output of one Skill can become an Input to another Skill or Process.
+Inputs and Outputs represent connections between the described Process and its external environment. It is optional whether mandatory or representative Inputs are specified, and it is also optional whether Outputs are specified when achievement of the Outcomes can be demonstrated (PF 4.1 and 4.2). An Output can be expressed as an artifact or information item. An Output of one Process can become an Input to another Process.
 
-When the Output of one Skill is used as an Input to another Skill or Process, their names, meanings, and scopes should be aligned. The level of detail used to describe the relationship should be determined according to the Purpose of the Skill Description, dependencies among Skills, and quality risk.
+When the Output of one Process is used as an Input to another Process, their names, meanings, and scopes should be aligned. The level of detail used to describe the relationship should be determined according to the Purpose of the Process Description, dependencies among Processes, and quality risk.
 
-Representative Inputs and Outputs do not prescribe the only manner of execution. A Skill should be understood from the entire Skill Description (PF 4.2).
+Representative Inputs and Outputs do not prescribe the only manner of execution. The described Process should be understood from the entire Skill Description (PF 4.2).
 
 #### 6.3.7 Control, Constraint, Enabler, Entry Criteria, and Exit Criteria
 
-Controls and Constraints declare conditions that direct or limit Skill execution. Enablers make Skill execution possible or assist it. Entry Criteria state conditions under which a Skill can be invoked; Exit Criteria state conditions under which a Skill Instance can be completed. These elements are used according to the Purpose of the description and the required level of detail. Details are given in Clauses 9 and 10.
+Controls and Constraints declare conditions that direct or limit execution of the described Process. Enablers make Process execution possible or assist it. Entry Criteria state conditions under which the described Process can begin; Exit Criteria state conditions under which a Process Instance can be completed. These elements are used according to the Purpose of the description and the required level of detail. Details are given in Clauses 9 and 10.
 
 The primary function of a Control or Constraint statement must be to declare a condition that directs or limits execution. A statement whose primary function is an individual action must be classified as a Task.
 
@@ -274,9 +262,9 @@ When a summary of Entry Criteria is placed in the discovery layer, it must not c
 
 #### 6.3.8 Reference Information
 
-Overviews, descriptions, Common Approach, practical tips, notes, and examples are used as reference information to support understanding or application of a Skill. Reference information must not alter the meaning or normative force of primary Skill elements (PF 1.4).
+Overviews, descriptions, Common Approach, practical tips, notes, and examples are used as reference information to support understanding or application of the described Process. Reference information must not alter the meaning or normative force of primary Process elements (PF 1.4).
 
-As reference information placed in the ALPS-specific discovery layer, a Skill Discovery Description must state concisely what the Skill does, when it is used, and the information needed to determine applicability. It must be consistent with the authoritative Name, Purpose, Outcomes, scope, Entry Criteria, and Constraints available through the execution layer and must not replace those elements or alter their normative meanings.
+As reference information placed in the ALPS-specific discovery layer, a Skill Discovery Description must state concisely what the described Process does, when the Skill is used, and the information needed to determine applicability. It must be consistent with the authoritative Name, Purpose, Outcomes, scope, Entry Criteria, and Constraints available through the execution layer and must not replace those elements or alter their normative meanings.
 
 The Skill Discovery Description of a Skill claiming Description Conformance to this specification must end with a short ALPS conformance marker in the language of the description. The marker must be exactly `ALPS-conformant.` in English and `ALPS準拠。` in Japanese. This marker is a standardized shorthand claim whose subject is the containing Skill Description and whose criteria are Description Conformance under 12.1 a); it does not assert Reference Model Conformance or Execution Conformance.
 
@@ -290,7 +278,7 @@ a) **Concept Stage** — Needs for treatment as Skills are identified and select
 
 b) **Definition Stage** — Skill Descriptions are designed and verified.
 
-c) **Operation Stage** — Skills are selected, invoked, executed, and orchestrated with other Skills.
+c) **Operation Stage** — Skills are selected and loaded, and the Processes they describe are invoked, executed, and orchestrated with other Processes.
 
 d) **Evolution Stage** — Skills are assessed, tailored, and improved.
 
@@ -305,8 +293,8 @@ The ALPS Reference Model comprises the following three Processes. Each Process i
 | Process | Activities |
 |---|---|
 | ALPS definition process | Skill Need Identification / Skill Design / Skill Verification |
-| ALPS application process | Skill Selection / Skill Execution / Skill Orchestration |
-| ALPS management process | Skill Asset Management / Skill Tailoring / Skill Assessment and Improvement |
+| ALPS application process | Skill Selection / Process Execution / Process Orchestration |
+| ALPS management process | ALPS Asset Management / Tailoring / Assessment and Improvement |
 
 Interpret the Reference Model as follows:
 
@@ -325,7 +313,7 @@ Representative exchanges among the three Processes are shown below. This table d
 | Provider Process | Representative exchange item | Recipient Process |
 |---|---|---|
 | ALPS definition process | Verified Skill Description and verification results | ALPS management process |
-| ALPS management process | Information about managed Skills, Tailoring decisions, and conditions of application | ALPS application process |
+| ALPS management process | Information about managed Agent Skills, Skill Packages, Process Models, and Process Views; Tailoring decisions; and conditions of application | ALPS application process |
 | ALPS application process | Execution and decision records, lessons learned, and measurable results | ALPS management process |
 | ALPS management process | Change requests, redefinition requests, and reverification requests | ALPS definition process |
 
@@ -337,7 +325,7 @@ Representative exchanges among the three Processes are shown below. This table d
 
 a) The need to be addressed as a Skill and the intended contexts of use are identified.
 
-b) The Skill Purpose, Outcomes, and boundary are aligned with the selected need.
+b) The Process Purpose, Outcomes, and boundary are aligned with the selected need.
 
 c) The Skill Description satisfies the applicable description requirements of this specification.
 
@@ -375,13 +363,13 @@ f) Candidates may be prioritized by frequency of use or impact when selecting a 
 
 This Activity determines the structure and content of a Skill Description that satisfies the selected need.
 
-a) The Skill boundary must be established from the primary Outputs and Outcomes (5.4).
+a) The Process boundary must be established from the primary Outputs and Outcomes (5.4).
 
-b) Dependencies on other Skills must be reduced as far as practicable.
+b) Dependencies on other Processes must be reduced as far as practicable.
 
 c) The Skill Description must provide distinguishable discovery-layer and execution-layer information. Their physical separation is not required (5.5).
 
-d) A significant Activity that benefits from detailed treatment may be separated into another Skill.
+d) A significant Activity that benefits from detailed treatment may be separated into another Process described by another Skill.
 
 e) Name, Purpose, and Outcomes must be written in accordance with 6.3.1 through 6.3.3.
 
@@ -397,9 +385,9 @@ j) It must be confirmed that the set of Activities covers all Outcomes and satis
 
 k) Relationships between Tasks and Outcomes should be identified (8.2).
 
-l) The Skill Discovery Description must be written in accordance with 3.11, 5.5, and 6.3.8.
+l) The Skill Discovery Description must state what the Process does, when the Skill is used, and the information needed to determine applicability in accordance with 3.11, 5.5, and 6.3.8.
 
-m) When representative Inputs and Outputs are shown, the principal relationships with other Skills or Processes should be identified as needed (6.3.6, 8.2).
+m) When representative Inputs and Outputs are shown, the principal relationships with other Processes should be identified as needed (6.3.6, 8.2).
 
 n) When a Skill Package is composed, the need, role, and conditions of use for its accompanying resources must be identified (5.7).
 
@@ -415,7 +403,7 @@ c) It must be confirmed that the element classification of each statement is con
 
 d) It must be confirmed that normative attributes are distinguishable (4.1).
 
-e) When a general Skill is verified, it must be confirmed that its normative part does not require a specific method, technique, tool, or execution sequence (6.2 c)).
+e) When a general Process Description is verified, it must be confirmed that its normative part does not require a specific method, technique, tool, or execution sequence (6.2 c)).
 
 f) It must be confirmed that the discovery-layer and execution-layer information are consistent (5.5, 6.3.8).
 
@@ -431,7 +419,7 @@ k) Detected defects should be recorded, and actions with due dates and completio
 
 l) Completion of defect treatment should be confirmed before the Decision Gate for the adoption decision.
 
-m) When the Skill Description identifies an exchange with another Skill or Process, it should be evaluated whether the Output can be used as the intended recipient's Input.
+m) When the Skill Description identifies an exchange with another Process, it should be evaluated whether the Output can be used as the intended recipient's Input.
 
 n) When the Skill Package is included in the verification scope, the existence of the authoritative Skill Description, resolvability of mandatory references, roles and conditions of use of accompanying resources, and consistency between the Skill Description and those resources must be evaluated (5.7).
 
@@ -443,41 +431,41 @@ NOTE: Appendix D gives reference guidance on evidence for Skills whose behavior 
 
 ### 7.4 ALPS Application Process
 
-**Purpose**: This Process achieves intended Outcomes by applying, individually or in combination, Skills suited to the context of application.
+**Purpose**: This Process achieves intended Outcomes by applying, individually or in combination, Processes represented by Skills suited to the context of application.
 
 **Outcomes**: When this Process succeeds, the following conditions are established:
 
 a) The needs and conditions of the context of application are identified.
 
-b) The Skills to apply and the form of application are determined with rationale.
+b) The Processes to apply, the Skills providing their authoritative descriptions, and the form of application are determined with rationale.
 
 c) Applicable Controls, Constraints, and Tailoring decisions are identified.
 
-d) The results of applying a Skill Instance conform to the declared scope, applicable Controls and Constraints, and Tailoring decisions.
+d) The results of applying a Process Instance conform to the declared scope, applicable Controls and Constraints, and Tailoring decisions.
 
-e) The declared Outcomes of the Skills subject to application are achieved.
+e) The declared Outcomes of the Processes subject to application are achieved.
 
-f) Necessary exchanges among Skills are established.
+f) Necessary exchanges among Processes are established.
 
-g) Completeness and consistency of the Skill composition are established.
+g) Completeness and consistency of the Process composition are established.
 
 | Activity | Outcomes primarily supported |
 |---|---|
 | Skill Selection | a), b), c) |
-| Skill Execution | c), d), e) |
-| Skill Orchestration | e), f), g) |
+| Process Execution | c), d), e) |
+| Process Orchestration | e), f), g) |
 
-NOTE: A decision to apply no Skill can also be a legitimate judgment for the context of application. When this decision makes some Outcomes of this Process inapplicable, Full Conformance to this Process must not be claimed. The inapplicable Outcomes must be declared, and Tailored Conformance under 12.3 must be used.
+NOTE: A decision to apply no Process can also be a legitimate judgment for the context of application. When this decision makes some Outcomes of this Process inapplicable, Full Conformance to this Process must not be claimed. The inapplicable Outcomes must be declared, and Tailored Conformance under 12.3 must be used.
 
 **Activities and Tasks**:
 
 #### 7.4.1 Skill Selection
 
-This Activity determines the Skills to use for the context of application and their form of application.
+This Activity determines the Processes to apply, the Skills providing their authoritative descriptions, and their form of application.
 
 a) The needs and conditions of the context of application and applicable Constraints must be identified.
 
-b) The needs are typically compared with Skill Purposes and Outcomes.
+b) The needs are typically compared with the Purposes and Outcomes of the Processes described by candidate Skills.
 
 c) Candidate Skills are typically identified from discovery-layer information, including Skill Discovery Descriptions.
 
@@ -489,11 +477,11 @@ f) It must be determined whether the uncertainty and risk associated with the ap
 
 g) The rationale for the decision should be recorded.
 
-#### 7.4.2 Skill Execution
+#### 7.4.2 Process Execution
 
-This Activity executes an Instance of a selected Skill and achieves its declared Outcomes.
+This Activity uses a selected Skill to execute an Instance of the represented Process and achieve the Outcomes declared in its Process Description.
 
-a) A Skill must be invoked only after determining that its Entry Criteria are satisfied. If they are not satisfied, invocation must be deferred or resolution of the deficiency must precede it.
+a) The described Process must be invoked through its providing Skill only after determining that the Process Entry Criteria are satisfied. If they are not satisfied, invocation must be deferred or resolution of the deficiency must precede it.
 
 b) Availability of necessary Inputs and Enablers should be confirmed.
 
@@ -515,17 +503,17 @@ j) Outputs should be transferred to recipients in accordance with the exchange d
 
 k) Significant execution decisions, their rationale, and assumptions should be recorded and placed under necessary change management (PF 8.1).
 
-l) Lessons learned through execution may be transferred to Skill Assessment and Improvement in the ALPS management process.
+l) Lessons learned through execution may be transferred to Assessment and Improvement in the ALPS management process.
 
-#### 7.4.3 Skill Orchestration
+#### 7.4.3 Process Orchestration
 
-This Activity combines multiple Skills and manages their interfaces, exchanges, and the completeness and consistency of the composition as a whole.
+This Activity combines multiple Processes and manages their interfaces, exchanges, and the completeness and consistency of the composition as a whole.
 
 a) The target set of Outcomes must be identified.
 
-b) The source of each Skill used in the composition should be identified (8.3).
+b) The source of each Process and the Skill providing its authoritative description should be identified (8.3).
 
-c) A repeatedly used composition may be documented as a Skill View (8.3).
+c) A repeatedly used composition may be documented as a Process View (8.3).
 
 d) The mapping between each provider Output and recipient Input must be made explicit (8.2).
 
@@ -537,11 +525,11 @@ g) Integration must ensure completeness within a level and consistency across le
 
 h) Achievement of Outcomes for the composition as a whole should be determined.
 
-i) When the same information item is changed by multiple Skills, handling of its integrity, status, and change must be established according to quality risk (8.2).
+i) When the same information item is changed by multiple Processes, handling of its integrity, status, and change must be established according to quality risk (8.2).
 
 **Representative Inputs**: Needs of the context of application, invocation requests, Skill discovery layers and Skill Descriptions, the target set of Outcomes, Inputs specified by Skill Descriptions, Framework-level declarations, and Tailoring decisions.
 
-**Representative Outputs**: Decisions on applied Skills and forms of application, Outputs specified by Skill Descriptions, definitions of Skill compositions, Outputs of the compositions as a whole, and execution and decision records.
+**Representative Outputs**: Decisions on applied Processes and the Skills providing their descriptions, forms of application, Outputs specified by Skill Descriptions, definitions of Process compositions, Outputs of the compositions as a whole, and execution and decision records.
 
 **Representative Enablers**: Managed Skill assets, Agent capabilities, necessary tools, and execution environments.
 
@@ -549,161 +537,179 @@ NOTE: Records of human approval, intervention, and oversight can form part of th
 
 ### 7.5 ALPS Management Process
 
-**Purpose**: This Process governs Skill assets and their application and maintains the continual availability of suitable Skills.
+**Purpose**: This Process governs adopted ALPS assets and their application so that suitable Agent Skills, Skill Packages, Process Models, and Process Views remain available, controlled, and fit for their intended use.
 
-**Outcomes**: A successful application of this Process establishes the following conditions:
+**Outcomes**: Success of this Process establishes the following conditions:
 
-a) Policies and guidance for Skill management, deployment, and Tailoring are established.
+a) Policies and guidance for adoption, deployment, Tailoring, assessment, change, and retirement are established.
 
-b) Adopted Skills are discoverable in a managed state.
+b) Adopted Agent Skills, Skill Packages, Process Models, and Process Views are discoverable in a managed state.
 
-c) Changes to and retirement of Skills are controlled, including their impacts on affected users.
+c) Identity, status, version, references, change, and retirement of managed subjects are controlled.
 
 d) Tailoring decisions and rationale are traceable to applicable Controls and Constraints.
 
-e) Skill performance and effectiveness are assessed against established criteria.
+e) Process application performance is assessed against declared criteria.
 
-f) Improvement opportunities are prioritized from lessons learned and assessment results.
+f) The fitness of managed Process Models and Process Views is assessed against declared criteria.
 
-g) Decided improvements are implemented.
+g) Improvement opportunities are prioritized from evidence, lessons learned, and assessment results.
+
+h) Decided improvements are implemented.
+
+i) Subjects affected by implemented improvements are reverified as needed.
 
 | Activity | Outcomes primarily supported |
 |---|---|
-| Skill Asset Management | a), b), c), g) |
-| Skill Tailoring | a), d) |
-| Skill Assessment and Improvement | e), f), g) |
+| ALPS Asset Management | a), b), c), h), i) |
+| Tailoring | a), d) |
+| Assessment and Improvement | e), f), g), h), i) |
 
 **Activities and Tasks**:
 
-#### 7.5.1 Skill Asset Management
+#### 7.5.1 ALPS Asset Management
 
-This Activity manages adoption, discoverability, change communication, configuration, and retirement of Skill assets.
+This Activity manages adoption, discoverability, reference integrity, change communication, configuration, and retirement of managed ALPS subjects.
 
-a) The means for managing and deploying Skills, together with Tailoring guidance, should be established (PF 9.1).
+a) The means for managing and deploying Agent Skills, Skill Packages, Process Models, and Process Views, together with Tailoring guidance, should be established.
 
-b) Framework-level Controls and Enablers must be declared together with their scope, exceptions, and whether Tailoring is permitted (9.1).
+b) Framework-level Controls and Enablers must be declared together with their scope, exceptions, and whether Tailoring is permitted.
 
-c) Evidence from Skill Verification in the ALPS definition process should be confirmed before a Skill is adopted.
+c) Verification evidence from the ALPS definition process should be confirmed before an authoritative description or representation is adopted.
 
-d) When management guidance or a Skill changes, the change should be communicated to affected users (PF 9.1).
+d) The authority, version or state, applicability, references, and management status of each adopted subject should be recorded.
 
-e) A Skill for which the need no longer exists or that has become harmful must be identified and retired.
+e) Mandatory references among Process Descriptions, Process Models, Process Views, and accompanying resources must be checked for resolvability.
 
-f) The description of a retired Skill may be retained for reference.
+f) Changes to management guidance or a managed subject should be communicated to affected users and dependent subjects.
 
-g) Duplication and gaps within the Skill Model should be continually identified.
+g) A managed subject for which the need no longer exists or that has become harmful must be identified for retirement.
 
-h) Skills established as standards should be used consistently across multiple subjects of application (PF 9.2).
+h) A subject identified for retirement must be retired through a controlled decision.
 
-i) When a component of a Skill Package changes, affected Skill Descriptions and accompanying resources should be identified and necessary reverification performed.
+i) A retired description or representation may be retained for reference when its status and conditions of use remain explicit.
 
-#### 7.5.2 Skill Tailoring
+j) Duplication, gaps, and inconsistent relationships within applicable Process Models and Process Views should be continually identified.
 
-This Activity adapts Skills and Skill Models to the needs, conditions, and risks of a particular context of application.
+k) When a Skill Package component or referenced subject changes, affected descriptions, representations, and accompanying resources should be identified.
 
-a) Application-related risks, requirements, complexity, available capabilities and resources, and relevant standards must be identified (PF 7.3).
+l) Affected descriptions, representations, and accompanying resources that require reverification must be reverified.
 
-b) Candidate Skills or life cycle models must be evaluated by considering conditions of application, available expertise and experience, stakeholder expectations or requirements, and risk tolerance (PF 7.3).
+#### 7.5.2 Tailoring
 
-c) Tailoring decisions should be based on facts and evidence (PF 7.3).
+This Activity adapts applicable Processes and Process Models to the needs, conditions, and risks of a particular context of application.
 
-d) Outcomes, Activities, Tasks, representative Inputs, and representative Outputs may be deleted, modified, or added (PF 7.2).
+a) Application-related risks, requirements, complexity, available capabilities and resources, and relevant standards must be identified.
 
-e) Tailoring must comply with applicable Controls and Constraints (PF 7.3).
+b) Candidate Processes or life cycle models must be evaluated against the conditions of application, available expertise, stakeholder expectations, and risk tolerance.
 
-f) Input must be obtained from affected parties (PF 7.3).
+c) Tailoring decisions should be based on facts and evidence.
 
-g) The rigor of Skill application should be set on the basis of risk so that Activities can be performed with sufficient rigor at an acceptable level of risk (PF 7.1).
+d) Outcomes, Activities, Tasks, representative Inputs, and representative Outputs may be deleted, modified, or added within the declared Tailoring scope.
 
-h) The scope of Tailoring should be made clear. Assumptions and criteria should be identified, and the rationale for decisions should be recorded (PF 7.3).
+e) Tailoring must comply with applicable Controls and Constraints.
 
-i) Tailoring is typically performed dynamically throughout the period of application according to risk and context (PF 7.1).
+f) Input must be obtained from affected parties.
 
-j) Tailoring operation should be reviewed throughout application and revised when conditions warrant.
+g) The rigor of Process application should be set according to risk.
 
-k) A means of continually assessing the performance of the tailored Skill should be established (PF 7.3).
+h) The Tailoring scope should be recorded.
 
-l) The level of detail used to describe Inputs, Outputs, and their exchanges should be adjusted according to dependencies among Skills, concurrent or iterative application, and quality risk.
+i) Tailoring assumptions should be recorded.
 
-#### 7.5.3 Skill Assessment and Improvement
+j) Tailoring criteria should be recorded.
 
-This Activity assesses Skill performance and effectiveness and connects the results to improvement.
+k) The rationale for each Tailoring decision should be recorded.
 
-a) Measures should be established to gain insight into Skill performance and effectiveness (PF 9.3).
+l) Tailoring should be reviewed throughout application.
 
-b) Lessons learned should be identified and collected throughout the period of Skill execution.
+m) Tailoring should be revised when conditions warrant.
 
-c) Collection of lessons learned at predefined milestones should also be planned (PF 9.3).
+n) A means of assessing the performance of a tailored Process should be established.
 
-d) Measures should be analyzed to determine Skill effectiveness (PF 9.3).
+o) The detail used to describe Inputs, Outputs, and their exchanges should be adjusted according to dependencies, concurrency, iteration, and quality risk.
 
-e) Skill strengths and weaknesses should be assessed, and reviews and audits should be established (Clause 10).
+#### 7.5.3 Assessment and Improvement
 
-f) Skill performance may be compared with established criteria, applicable standards, or comparators to identify improvement opportunities. The comparison should analyze performance, effectiveness, conformance, benefits, and costs (PF 9.2).
+This Activity assesses managed subjects and connects the results to controlled improvement.
 
-g) Improvement opportunities should be continually identified, prioritized, and implemented (PF 9.1).
+a) Assessment criteria should be established according to the subject being assessed.
 
-h) Mechanisms should be established both to collect lessons learned and connect them to action and to analyze candidate changes for improvement (PF 9.3).
+b) Process application should be assessed using relevant performance, effectiveness, Outcome, Task, and Conformance evidence.
 
-i) A changed Skill should undergo confirmation through Skill Verification in the ALPS definition process.
+c) A Process Model should be assessed for coverage, relationships, consistency, applicability, and resolvability of referenced Process Descriptions.
 
-j) Inconsistency and rework arising from exchanges among Skills may be used to identify improvement opportunities.
+d) A Process View should be assessed for fitness to its Concern or Purpose, source integrity, application guidance, and achievement of its declared Outcomes.
 
-**Representative Inputs**: Verified Skill Descriptions, change requests, contexts of application, Tailoring guidance, Input from affected parties, execution and decision records, lessons learned, and measurement results.
+e) Lessons learned should be collected throughout application and at planned review points.
 
-**Representative Outputs**: Managed Skill assets, tailored Skills, Tailoring decisions and rationale, assessment results, prioritized improvement opportunities, change requests for Skills, and retirement decisions.
+f) Strengths, weaknesses, gaps, duplication, and inconsistent exchanges should be assessed.
 
-## 8. Skill Execution Structures and Relationships
+g) Improvement opportunities should be continually identified.
+
+h) Improvement opportunities should be prioritized according to available evidence.
+
+i) Decided improvements should be implemented.
+
+j) Candidate changes should be analysed for impacts on dependent subjects, references, users, and Conformance claims.
+
+k) A changed authoritative description or representation should be submitted to the ALPS definition process for reverification.
+
+**Representative Inputs**: Verified Skill Descriptions and other verified ALPS representations, change requests, contexts of application, Tailoring guidance, Input from affected parties, Process Instance and decision records, lessons learned, measurement results, and reference-integrity findings.
+
+**Representative Outputs**: Managed Agent Skills, Skill Packages, Process Models, and Process Views; Tailoring decisions and rationale; assessment results; prioritized improvements; change or redefinition requests; reverification requests; and retirement decisions.
+
+## 8. Process Application Structures and Relationships
 
 ### 8.1 Concurrency, Iteration, Recursion, and Integration
 
-Skills can be executed in structures other than a serial sequence. The following execution structures can be applied (PF 6.1):
+Processes can be executed in structures other than a serial sequence. The following execution structures can be applied (PF 6.1):
 
-a) **Concurrency** — Applying two or more Skills in parallel at the same structural level.
+a) **Concurrency** — Applying two or more Processes in parallel at the same structural level.
 
-b) **Iteration** — Repeatedly applying the same Skill or set of Skills at the same level. It should continue as far as needed to resolve problems and refine Outputs.
+b) **Iteration** — Repeatedly applying the same Process or set of Processes at the same level. It should continue as far as needed to resolve problems and refine Outputs.
 
-c) **Recursion** — Repeatedly applying the same Skill or set of Skills at successive structural levels of the subject of application. The Output of a Skill applied at one structural level can become an Input to a Skill applied at the next structural level.
+c) **Recursion** — Repeatedly applying the same Process or set of Processes at successive structural levels of the subject of application. The Output of a Process applied at one structural level can become an Input to a Process applied at the next structural level.
 
 d) **Integration** — Ensuring completeness within a level and consistency across levels.
 
-These relationships do not prescribe execution order. The actual flow is determined through Tailoring, with consideration for the effects of Output changes on Inputs to other Skills (PF 6.2).
+These relationships do not prescribe execution order. The actual flow is determined through Tailoring, with consideration for the effects of Output changes on Inputs to other Processes (PF 6.2).
 
-### 8.2 Interfaces, Exchanges, and Traceability Among Skills
+### 8.2 Interfaces, Exchanges, and Traceability Among Processes
 
-An interface and exchange between Skills is treated as a mapping from a provider's Output to a recipient's Input. An interface is not an independent Skill element, and an undefined exchange can be added through Tailoring (PF 4.4).
+An interface and exchange between Processes represented by Skills is treated as a mapping from a provider Process's Output to a recipient Process's Input. An interface is not an independent Skill element, and an undefined exchange can be added through Tailoring (PF 4.4).
 
-When multiple Skills are composed for application, the mapping from each provider Output to each recipient Input must be made explicit (7.4.3 d)).
+When multiple Processes are composed for application, the mapping from each provider Output to each recipient Input must be made explicit (7.4.3 d)).
 
-When Skills are applied concurrently, iteratively, or recursively, shared or interdependent information items and the reference or change relationships among them should be identified to the extent needed for application. When the same information item is changed by multiple Skills, handling of its integrity, status, and change must be established according to quality risk.
+When Processes are applied concurrently, iteratively, or recursively, shared or interdependent information items and the reference or change relationships among them should be identified to the extent needed for application. When the same information item is changed by multiple Processes, handling of its integrity, status, and change must be established according to quality risk.
 
-When a change to an Output affects an Input to another Skill, the affected Skill and mapping should be identified and necessary reassessment performed.
+When a change to an Output affects an Input to another Process, the affected Process and mapping should be identified and necessary reassessment performed.
 
 When Output quality affects a subsequent Outcome or stakeholder acceptance, the determination conditions and necessary evidence should be related to Entry Criteria, Exit Criteria, a review, or a Decision Gate.
 
 Traceability should cover Outcomes, Activities, Tasks, and information items. These mappings provide a basis for integrity and Process Assessment (PF 4.4).
 
-NOTE: Explicit exchange mappings keep the meaning, scope, state, and quality conditions of an information item from being lost as it passes between Skills.
+NOTE: Explicit exchange mappings keep the meaning, scope, state, and quality conditions of an information item from being lost as it passes between Processes.
 
-### 8.3 Skill View
+### 8.3 Process View
 
-A Skill View organizes Activities and Tasks spanning multiple Skills around a particular concern or Purpose (PF 5.3).
+A Process View organizes Activities and Tasks spanning multiple Processes around a particular concern or Purpose (PF 5.3).
 
-When an independent Process boundary is established, the subject can be described as a separate Skill in accordance with 5.4.
+When an independent Process boundary is established, the Process can be described by a separate Skill in accordance with 5.4.
 
-a) Every Skill View must state its Name, Purpose, and Outcomes.
+a) Every Process View must state its Name, Purpose, and Outcomes.
 
-b) To achieve the Outcomes, a Skill View may include Activities and Tasks selected from an existing Skill Model, adapted Activities and Tasks, or Activities and Tasks specific to the Skill View.
+b) To achieve the Outcomes, a Process View may include Activities and Tasks selected from an existing Process Model, adapted Activities and Tasks, or Activities and Tasks specific to the Process View.
 
-c) A Skill View must include explanations and guidance for applying those Activities and Tasks.
+c) A Process View must include explanations and guidance for applying those Activities and Tasks.
 
-d) A Skill View must explicitly identify the source of each Activity and Task and whether it is selected, adapted, or new. Elements selected from an existing Skill Model must retain their source.
+d) A Process View must explicitly identify the source Process of each Activity and Task and whether it is selected, adapted, or new. Elements selected from an existing Process Model must retain their source Process and source statement.
 
-e) Adapted elements and elements specific to the Skill View are not treated as changes to the original Skill Model. Unless Tailoring or formal adoption into the Skill Model occurs, these elements do not count toward Conformance to the original Skill.
+e) Adapted elements and elements specific to the Process View are not treated as changes to the original Process Model. Unless Tailoring or formal adoption into the Process Model occurs, these elements do not count toward Conformance to the source Process.
 
-f) Operation of a particular Skill Model may adopt a restricted Skill View that uses only Activities and Tasks from existing Skills. Under this approach, Activities and Tasks specific to the Skill View must not be included.
+f) Operation of a particular Process Model may adopt a restricted Process View that uses only Activities and Tasks from existing Processes. Under this approach, Activities and Tasks specific to the Process View must not be included.
 
-g) A Skill View may show connections among Skills and the sources of the Skills used in its composition.
+g) A Process View may show connections among Processes and the sources of the Processes used in its composition.
 
 ## 9. Controls, Constraints, and Enablers
 
@@ -711,37 +717,37 @@ g) A Skill View may show connections among Skills and the sources of the Skills 
 
 Framework-level Controls and Enablers must state their scope, exceptions, and whether Tailoring is permitted (PF 4.5).
 
-Elements common to Skills within the declared scope may be declared once rather than repeated in each Skill (PF 4.1 and 4.5).
+Elements common to Processes within the declared scope may be declared once rather than repeated in each Skill Description (PF 4.1 and 4.5).
 
-Information resources that apply in common to multiple Skills can be declared as Framework-level Controls or Enablers according to their function. An item transformed by a Skill is treated as an Input or Output. These classifications must be based on the function performed by the information resource in Skill execution, not on its form or location.
+Information resources that apply in common to multiple Processes can be declared as Framework-level Controls or Enablers according to their function. An item transformed by a Process is treated as an Input or Output. These classifications must be based on the function performed by the information resource in Process execution, not on its form or location.
 
 ### 9.2 Skill-Level Controls and Constraints
 
-Controls and Constraints declare conditions or permissible boundaries for Skill execution. Controls can arise from applicable laws or regulatory requirements, policies, conformance to voluntary standards, or agreements. Constraints can arise from environmental factors or conditions of application external to the Skill (PF 4.1 and 4.5).
+Controls and Constraints declare conditions or permissible boundaries for execution of the described Process. Controls can arise from applicable laws or regulatory requirements, policies, conformance to voluntary standards, or agreements. Constraints can arise from environmental factors or conditions of application external to the Process (PF 4.1 and 4.5).
 
 A Control or Constraint statement must be classified according to its primary function as specified in 6.3.7.
 
-Controls and Constraints can be described in separate sections of a Skill Description or as conditions associated with other Skill elements. Any temporal relationship needed in a general Skill should be declared explicitly as a Constraint (6.2 c)).
+Controls and Constraints can be described in separate sections of a Skill Description or as conditions associated with other Skill elements. Any temporal relationship needed in a general Process should be declared explicitly as a Constraint (6.2 c)).
 
 ### 9.3 Enablers, Capabilities, and Tools
 
-Human or Agent capabilities, tools, and technologies support a Skill as Enablers (PF 4.1 and 4.5).
+Human or Agent capabilities, tools, and technologies support Process execution as Enablers (PF 4.1 and 4.5).
 
-Human and automated resources that execute a Skill, including Agents, models, execution environments, and tools, are not treated as Process Inputs (PF 4.1 and 4.2). When described as elements, they must be described as Enablers.
+Human and automated resources that execute a Process, including Agents, models, execution environments, and tools, are not treated as Process Inputs (PF 4.1 and 4.2). When described as elements, they must be described as Enablers.
 
-NOTE: Treating Agents, models, tools, and execution environments as Enablers keeps the items a Skill transforms distinct from the capability that performs the transformation.
+NOTE: Treating Agents, models, tools, and execution environments as Enablers keeps the items a Process transforms distinct from the capability that performs the transformation.
 
 ## 10. Entry/Exit Criteria, Decision Gates, and Reviews
 
 ### 10.1 Entry Criteria and Exit Criteria
 
-a) Entry Criteria state conditions under which a Skill can be invoked. A summary should be placed in the discovery layer as reference information for determining applicability (5.5).
+a) Entry Criteria state conditions under which the described Process can begin. A summary should be placed in the discovery layer as reference information for determining applicability (5.5).
 
-b) Exit Criteria state conditions under which a Skill Instance can be completed. Exit Criteria should be related to determining achievement of the Outcomes.
+b) Exit Criteria state conditions under which a Process Instance can be completed. Exit Criteria should be related to determining achievement of the Outcomes.
 
 ### 10.2 Decision Gate
 
-A Decision Gate is not a component of a Skill Description; it is treated as a decision mechanism that controls application of the Skill (PF 8.1).
+A Decision Gate is not a component of a Skill Description; it is treated as a decision mechanism that controls application of the described Process (PF 8.1).
 
 a) A Decision Gate uses Decision Criteria based on the Purpose, Outcomes, conditions of application, and risk to determine whether a state transition can occur (PF 8.1).
 
@@ -755,27 +761,27 @@ NOTE: Confirmation and human escalation before an irreversible or high-impact ac
 
 ### 10.3 Reviews and Audits
 
-A review evaluates Skill performance, Outputs, and achievement of Outcomes using agreed criteria. An audit includes a detailed review of evidence demonstrating conformance to the Skill, Outputs, and requirements and confirms that mandatory attributes and applicable requirements are satisfied (PF 8.2).
+A review evaluates Process performance, Outputs, and achievement of Outcomes using agreed criteria. An audit includes a detailed review of evidence demonstrating conformance to the Process, Outputs, and requirements and confirms that mandatory attributes and applicable requirements are satisfied (PF 8.2).
 
 When an Output is transferred to another Skill or a stakeholder, it should be evaluated against applicable criteria to determine whether the Output can be used as the intended Input or result.
 
 Reviews and audits should be tailored to the needs and risks of the subject of application, and their Entry Criteria, Exit Criteria, and responses to problems should be established (PF 8.2).
 
-## 11. Tailoring and Skill Instantiation
+## 11. Tailoring and Process Instantiation
 
 ### 11.1 Discipline of Tailoring
 
-Tailoring must be performed in accordance with Skill Tailoring in the ALPS management process (7.5.2), whose requirements are prerequisites for Tailored Conformance (12.3).
+Tailoring must be performed in accordance with Tailoring in the ALPS management process (7.5.2), whose requirements are prerequisites for Tailored Conformance (12.3).
 
-NOTE: Requiring Tailoring to pass through the ALPS management process prevents unrecorded changes to a Skill's meaning, normative force, or applicability.
+NOTE: Requiring Tailoring to pass through the ALPS management process prevents unrecorded changes to a Process's meaning, normative force, or applicability.
 
 ### 11.2 Levels of Tailoring
 
-Common-level Tailoring adapts an external standard, including this specification, to needs shared across an intended application domain. Individual-level Tailoring adapts the resulting common Skill to the needs of a particular subject of application (PF 7.2).
+Common-level Tailoring adapts an external standard, including this specification, to needs shared across an intended application domain. Individual-level Tailoring adapts the resulting common Process to the needs of a particular subject of application (PF 7.2).
 
-### 11.3 Skill Instantiation
+### 11.3 Process Instantiation
 
-When justified by quality risk, a Skill Instance can be detailed and Instance-specific success criteria, Activities, and Tasks can be identified (PF 7.4).
+When justified by quality risk, a Process Instance can be described in greater detail, and instance-specific success criteria, Activities, and Tasks can be identified (PF 7.4).
 
 ## 12. Conformance, Capability, and Assessment
 
@@ -783,27 +789,27 @@ When justified by quality risk, a Skill Instance can be detailed and Instance-sp
 
 Conformance relating to this specification can be claimed for the following subjects. Every claim must identify the subject and the selected criteria.
 
-a) **Description Conformance** — A Skill Description, or Skill View, satisfies the applicable requirements of Clauses 4 through 6, and also 8.3 for a Skill View. When a Skill Package is included in the subject of conformance, the Package satisfies the applicable requirements of 5.7.
+a) **Description Conformance** — A Skill Description satisfies the applicable requirements of Clauses 4 through 6. When a Skill Package is included in the subject of conformance, the Package also satisfies the applicable requirements of 5.7.
 
-b) **Reference Model Conformance** — For definition, application, or management of a Skill Model, Conformance under 12.2 or 12.3 is established for the declared Process among the three Processes in Clause 7.
+b) **Reference Model Conformance** — For definition, application, or management of Skills, Conformance under 12.2 or 12.3 is established for the declared Process among the three Processes in Clause 7.
 
-c) **Execution Conformance** — Execution of a Skill, as a Skill Instance, establishes Conformance under 12.2 or 12.3 to the declared Skill.
+c) **Execution Conformance** — Execution of a Process Instance through a Skill establishes Conformance under 12.2 or 12.3 to the Process described by that Skill.
 
 ### 12.2 Full Conformance
 
 Full Conformance must be claimed as Conformance to Outcomes, Tasks, or both, and the selected criteria must be stated. When both are selected, both must be satisfied (PF 8.3).
 
 
-a) **Full Conformance to Outcomes** requires achievement of all mandatory Outcomes in the declared Skill or Reference Model Process. This approach provides greater freedom in how the conformant Process is implemented; Activities and Tasks are treated as guidance.
+a) **Full Conformance to Outcomes** requires achievement of all mandatory Outcomes in the declared Process described by a Skill or in the declared Reference Model Process. This approach provides greater freedom in how the conformant Process is implemented; Activities and Tasks are treated as guidance.
 
-b) **Full Conformance to Tasks** requires satisfaction of every requirement stated with **must** or **must not** by an Activity or Task in the declared Skill or Reference Model Process. Recommendations, permissible actions, and typical actions are not, solely by virtue of those attributes, mandatory conditions for Full Conformance to Tasks. When this approach is selected, Outcomes are treated as guidance.
+b) **Full Conformance to Tasks** requires satisfaction of every requirement stated with **must** or **must not** by an Activity or Task in the declared Process described by a Skill or in the declared Reference Model Process. Recommendations, permissible actions, and typical actions are not, solely by virtue of those attributes, mandatory conditions for Full Conformance to Tasks. When this approach is selected, Outcomes are treated as guidance.
 
 
 For Conformance to the Reference Model, the units for which Outcome Conformance to a Process can be claimed are the ALPS definition process, ALPS application process, and ALPS management process. Independent Outcome Conformance must not be claimed for an individual constituent Activity.
 
 ### 12.3 Tailored Conformance
 
-Tailored Conformance may be claimed for a Skill or Reference Model Process that does not meet Full Conformance. The claim must declare the Skill or Process tailored in accordance with Skill Tailoring in the ALPS management process (7.5.2) and its scope of application. It must also demonstrate satisfaction of every Outcome and Activity/Task requirement remaining within that scope (PF 8.3 and 8.4).
+Tailored Conformance may be claimed for a Process described by a Skill or for a Reference Model Process that does not meet Full Conformance. The claim must declare the Process tailored in accordance with Tailoring in the ALPS management process (7.5.2) and its scope of application. It must also demonstrate satisfaction of every Outcome and Activity/Task requirement remaining within that scope (PF 8.3 and 8.4).
 
 When only some Activities constituting a Reference Model Process are applied, the application must not be claimed as independent Process Conformance to those Activities. It must be declared as a tailored scope of the parent Process, and the Tailored Conformance criteria must be used.
 
@@ -811,7 +817,7 @@ When only some Activities constituting a Reference Model Process are applied, th
 
 Capability is treated as a dimension of assessment separate from Conformance. Specifically performing Activities and Tasks can require a higher Capability level than achieving Outcomes alone. However, Capability level alone does not establish Conformance, nor does Conformance alone determine Capability level (PF 8.5).
 
-Skill Outcomes and the Purposes and Outcomes of the three Processes can be used for Process Assessment and effectiveness assessment (PF 8.5, 7.5.3).
+Outcomes in Skill Descriptions and the Purposes and Outcomes of the three Processes can be used for Process Assessment and effectiveness assessment (PF 8.5, 7.5.3).
 
 Assessment of a Skill Package can evaluate the existence of the authoritative Skill Description, resolvability of mandatory references, consistency between the Skill Description and accompanying resources, roles and conditions of use of accompanying resources, and reverification after changes (5.7, 7.3.3, 7.5.1).
 
@@ -837,11 +843,11 @@ description: Extract decisions, action items, and open issues from meeting notes
 
 ## Purpose
 
-This Skill establishes a state in which decisions, action items, and open issues can be distinguished from the meeting record.
+This Process establishes a state in which decisions, action items, and open issues can be distinguished from the meeting record.
 
 ## Outcomes
 
-When this Skill succeeds, the following conditions are established:
+When this Process succeeds, the following conditions are established:
 
 a) Decisions made in the meeting are identified.
 
@@ -916,7 +922,7 @@ This section is reference information and has no normative force.
 - For a lengthy record, progressive refinement can use Iteration by agenda item.
 ```
 
-NOTE 1: `description` states what the Skill does and when it is used, making that information available before Skill selection (3.11).
+NOTE 1: `description` states what the described Process does and when the Skill is used, making that information available before Skill selection (3.11).
 
 NOTE 2: “Consolidated meeting minutes” is an Output, not an Outcome (6.3.3). The Constraint declares the permitted transfer condition, while the corresponding transfer action is stated as a Task (6.3.7, 9.2). Enablers are not Inputs (9.3), and this Skill does not prescribe a performer (5.3).
 
@@ -1010,16 +1016,16 @@ Non-determinism, emergent behavior, supervisor cognitive load, automation bias, 
 
 Traceability is the property that the relationships among Inputs, judgments, Tasks, Outputs, evidence, and changes can be followed.
 
-Accountability is the relationship that determines who holds decision authority, supervisory responsibility, or the obligation to answer for a particular Skill Instance.
+Accountability is the relationship that determines who holds decision authority, supervisory responsibility, or the obligation to answer for a particular Process Instance.
 
-Traceability supports Accountability but does not by itself assign responsibility. A general Process Description fixes neither a performer nor an organizational structure; a particular Process Instance or Skill Instance can define the responsibilities, authority, approvers, and escalation paths that it needs. Logs and audit evidence support after-the-fact verification and help clarify responsibility relationships.
+Traceability supports Accountability but does not by itself assign responsibility. A general Process Description fixes neither a performer nor an organizational structure; a particular Process Instance can define the responsibilities, authority, approvers, and escalation paths that it needs. Logs and audit evidence support after-the-fact verification and help clarify responsibility relationships.
 
 ### D.4 Human Capability as Enabler and Constraint
 
 - Human expertise, judgment, and the capacity to intervene can be Enablers.
 - Cognitive load, response time, and supervisor availability can be Constraints.
 - When the needed oversight capability cannot be secured, Entry Criteria may fail to hold.
-- Conformance of a Skill Instance does not demonstrate the general Capability of a supervisor or an oversight regime, and a high Capability assessment does not demonstrate the Conformance of an individual execution (12.4).
+- Conformance of a Process Instance does not demonstrate the general Capability of a supervisor or an oversight regime, and a high Capability assessment does not demonstrate the Conformance of an individual execution (12.4).
 
 ALPS defines no human capability levels, maturity model, or certification scheme.
 
@@ -1037,7 +1043,7 @@ Non-determinism and the difficulty of defining a unique expected result can comp
 
 ### D.6 Returning Oversight Results to the ALPS Management Process
 
-The following are representative information items that the ALPS application process can hand to Skill Assessment and Improvement in the ALPS management process as execution records and lessons learned:
+The following are representative information items that the ALPS application process can hand to Assessment and Improvement in the ALPS management process as execution records and lessons learned:
 
 - records of human approval and intervention;
 - the conditions that made intervention necessary;

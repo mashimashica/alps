@@ -9,14 +9,14 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 
 ## Purpose
 
-本Skillは、識別されたステークホルダーのニーズを満たす、評価可能で利用可能なSkill Descriptionを確立する。
+本Processは、識別されたステークホルダーのニーズを満たす、評価可能で利用可能なSkill Descriptionを確立する。
 
 ## Outcomes
 
-本Skillが成功すると、次の状態が成立している。
+本Processの成功によって、次の状態が成立している。
 
 - a) Skill化の対象となるニーズおよび想定利用文脈が識別されている。
-- b) SkillのPurpose、Outcomeおよび境界が、選定されたニーズと整合している。
+- b) ProcessのPurpose、Outcomeおよび境界が、選定されたニーズと整合している。
 - c) Skill Descriptionが、ALPSの適用される記述要求を満たしている。
 - d) Skill Description内の要素および外部との授受が追跡可能である。
 - e) 代表的な適用文脈におけるOutcomeの達成可能性が確認されている。
@@ -41,10 +41,10 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 
 このActivityは、選定されたニーズを満たすSkill Descriptionの構造および内容を定める。主にOutcomes b)、c)およびd)に寄与する。
 
-1. Skillの境界を、主要なOutputおよびOutcomeに基づいて定める必要がある。
-2. 他のSkillへの依存を、実行可能な限り縮小する必要がある。
+1. Processの境界を、主要なOutputおよびOutcomeに基づいて定める必要がある。
+2. 他のProcessへの依存を、実行可能な限り縮小する必要がある。
 3. Skill Descriptionは、判別可能な発見層の情報および実行層の情報を提供する必要がある。両者を物理的に分離する必要はない。
-4. 詳細に扱うことが有用な重要なActivityは、別のSkillとして分離してよい。
+4. 詳細に扱うことが有用な重要なActivityは、別のSkillが記述する別のProcessとして分離してよい。
 5. Name、PurposeおよびOutcomeを、適用される記述規則に従って記述する必要がある。
 6. 各Taskは、一つ以上のOutcomeの達成を支援する個別の行為を表すことを主たる機能とする必要がある。各Taskは、その行為の対象と実行内容を判別できるように記述する必要がある。
 7. 各記述を、その主たる機能に対応するSkill要素として分類する必要がある。
@@ -52,8 +52,8 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 9. 適用方法に関する指針は、Common Approachおよび実務上のヒントとして分離して記述するのが望ましい。
 10. Activityの集合が全Outcomeを網羅し、Purposeを満たすことを確認する必要がある。
 11. TaskとOutcomeとのあいだの対応関係を識別するのが望ましい。
-12. Skill Discovery Descriptionに、そのSkillが記述する作業、そのSkillを適用する状況および適用可否の判別に必要な情報を記述する必要がある。ALPSの記述適合を主張するSkill Discovery Descriptionは、`ALPS準拠。`で終わる必要がある。
-13. 代表的なInputおよびOutputを示す場合、他のSkillまたはProcessとの主要な対応関係を、必要に応じて識別するのが望ましい。
+12. Skill Discovery Descriptionに、Processが行うこと、そのSkillを用いる状況および適用可否の判別に必要な情報を記述する必要がある。ALPSの記述適合を主張するSkill Discovery Descriptionは、`ALPS準拠。`で終わる必要がある。
+13. 代表的なInputおよびOutputを示す場合、他のProcessとの主要な対応関係を、必要に応じて識別するのが望ましい。
 14. Skill Packageを構成する場合、付随資源の必要性、役割および利用条件を識別する必要がある。
 
 ### Skill検証
@@ -64,7 +64,7 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 2. 各Taskが、一つ以上のOutcomeの達成を支援する個別の行為を表すことを主たる機能としていることを確認する必要がある。また、各Taskについて、その行為の対象と実行内容を判別できることを確認する必要がある。
 3. 各記述の要素分類が、その主たる機能と整合していることを確認する必要がある。
 4. 規範属性の判別可能性を確認する必要がある。
-5. 一般Skillを検証する場合、その規範部分が特定の方法、技法、ツールまたは実行順序を要求していないことを確認する必要がある。
+5. 一般Process Descriptionを検証する場合、その規範部分が特定の方法、技法、ツールまたは実行順序を要求していないことを確認する必要がある。
 6. 発見層の情報と実行層の情報が整合していることを確認する必要がある。
 7. レビューには、Skillの起草者から独立した観点を取り入れるのが望ましい。
 8. 代表的な適用文脈における試行によって、Outcomeの達成可能性を評価するのが望ましい。
@@ -72,7 +72,7 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 10. 想定利用文脈の境界事例を評価に含めてよい。
 11. 検出された欠陥を記録し、期限と完了条件を伴う対応を設定するのが望ましい。
 12. 欠陥処置が完了したことを、採用の判断（Decision Gate）に先立って確認するのが望ましい。
-13. Skill Descriptionが他のSkillまたはProcessとの授受を示す場合、Outputが想定される受領側のInputとして利用可能であるかを評価するのが望ましい。
+13. Skill Descriptionが他のProcessとの授受を示す場合、Outputが想定される受領側のInputとして利用可能であるかを評価するのが望ましい。
 14. Skill Packageを検証対象に含める場合、基準となるSkill Descriptionの存在、必須の参照先を対象環境から特定して取得できること、付随資源の役割および利用条件、ならびにSkill Descriptionと付随資源との整合性を評価する必要がある。
 
 ## Inputs
@@ -104,14 +104,14 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 ## Controls
 
 - Process FrameworkとALPSを適用する必要がある。両者が矛盾する場合はProcess Frameworkを優先する必要がある。
-- 規範語とその意味は、Process Frameworkの定めによる。本Skillはこれらを再定義しない。
-- Process FrameworkまたはALPSの要求解釈、規範属性の確認、Conformance判定または本Skillの変更には、[process-framework.md](../../../../../.alps/spec/locales/ja/process-framework.md)および[ALPS-SPEC.md](../../../../../.alps/spec/locales/ja/ALPS-SPEC.md)の該当箇条を参照する必要がある。
-- Nameを、他のSkillと区別できる短い名詞句にする必要がある。NameをPurposeの要約にしてはならない。
+- 規範語とその意味は、Process Frameworkの定めによる。本Process Descriptionはこれらを再定義しない。
+- Process FrameworkまたはALPSの要求解釈、規範属性の確認、Conformance判定または本Process Descriptionの変更には、[process-framework.md](../../../../../.alps/spec/locales/ja/process-framework.md)および[ALPS-SPEC.md](../../../../../.alps/spec/locales/ja/ALPS-SPEC.md)の該当箇条を参照する必要がある。
+- Nameを、他のProcessと区別できる短い名詞句にする必要がある。NameをPurposeの要約にしてはならない。
 - Purposeは、相互に関連する一つまたは複数の上位目的を示す必要がある。
 - Purposeは、可能な限り一文で簡潔に記述するのが望ましい。
 - Outcomeは、Outputの作成ではなく、一つの肯定的で観察可能かつ評価可能な結果状態として記述する必要がある。
 - Outcomeの集合は、Purposeの達成に必要な結果を過不足なく含む必要がある。
-- Activity、および必要に応じて独立したSkillとして分離された部分は、全体としてすべてのOutcomeを網羅する必要がある。OutcomeとActivityの一対一対応を仮定しなくてよい。
+- Activity、および必要に応じて独立したProcessとして分離された部分は、全体としてすべてのOutcomeを網羅する必要がある。OutcomeとActivityの一対一対応を仮定しなくてよい。
 - 一つの文では一つの意味だけを扱うのが望ましい。
 - 参考情報によって主要要素の意味または規範上の強さを変更してはならない。
 - 適用法令、規制要求、方針、任意規格および合意を、宣言された適用範囲で適用する必要がある。
@@ -119,7 +119,7 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 
 ## Constraints
 
-- 一般Skillは、特定の実行主体、Taskの割当て、方法、ツール、測定指標または実行順序を規範として固定してはならない。
+- 一般Process Descriptionは、特定の実行主体、Taskの割当て、方法、ツール、測定指標または実行順序を規範として固定してはならない。
 - Agent、モデル、ツールおよび実行環境をInputとして扱ってはならない。これらはEnablerとして扱う必要がある。
 - Decision GateをSkill Descriptionの構成要素として扱ってはならない。採用、保留、変更、再実行または終了を制御する別個の意思決定機構として扱う必要がある。
 - 必須の参照先は、対象環境から特定し、取得できる必要がある。Skill Descriptionと付随資源のあいだに不要な重複または矛盾を生じさせてはならない。
@@ -137,19 +137,19 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 - Conformanceを主張する場合、対象、適用範囲、およびOutcome、Taskまたは双方のどれを基準にするかを明示する必要がある。
 - OutcomeへのFull Conformanceでは、Outcomes節に列挙したすべてのOutcomeの達成を示す必要がある。ActivityおよびTaskは指針として扱う。
 - TaskへのFull Conformanceでは、ActivityおよびTaskにおいて「〜する必要がある」または「〜してはならない」で示されたすべての要求事項の充足を示す必要がある。Outcomeは指針として扱う。
-- 選択したFull Conformance基準を満たさないSkillまたはProcessには、Tailored Conformanceを主張してよい。その主張では、ALPS管理ProcessのSkill Tailoringに従ってTailoringしたSkillまたはProcessと、その適用範囲とを宣言する必要がある。また、その範囲に残るOutcomeならびにActivityおよびTaskに含まれる要求事項の充足を示す必要がある。
+- 選択したFull Conformance基準を満たさない、Skillが記述するProcessには、Tailored Conformanceを主張してよい。その主張では、ALPS管理ProcessのTailoringに従ってTailoringしたProcessと、その適用範囲とを宣言する必要がある。また、その範囲に残るOutcomeならびにActivityおよびTaskに含まれる要求事項の充足を示す必要がある。
 - 個別のActivityについてのみ、独立したProcess Outcome Conformanceを主張してはならない。
 
 ## Interfaces & Traceability
 
 | 提供する情報項目 | 主な受領先 | 関連情報 |
 |---|---|---|
-| 検証済みSkill Description | Skill資産管理 | 採用対象、版、適用条件および検証結果。 |
+| 検証済みSkill Description | ALPS資産管理 | 採用対象、版、適用条件および検証結果。 |
 | 検証結果・欠陥処置 | 採用Decision Gate | 判定基準、証拠、未解決制限および決定。 |
 | Task–Outcome対応 | Assessmentまたは再検証 | Task、Outcome、証拠および状態。 |
 | 再定義・再検証結果 | Skill管理 | 変更要求、影響範囲および変更後の証拠。 |
 
-Outputが他のSkillのInputになる場合、名称、意味および適用範囲を整合させるのが望ましい。
+Outputが他のProcessのInputになる場合、名称、意味および適用範囲を整合させるのが望ましい。
 
 ## Shared Normative References
 

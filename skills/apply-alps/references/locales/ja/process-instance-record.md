@@ -1,6 +1,6 @@
 # Process Instance記録
 
-この参考Bindingは、ProcessまたはSkillのInstance化時に作成し、実行後に同じファイルを完成させられる、人間が読める記録形式を提供する。品質リスク、適用されるControl、レビューや授受の必要性、またはConformance主張に照らして、詳細化が正当化される場合に限って用いる。
+この参考Bindingは、Process Instanceを記述するときに作成し、実行後に同じファイルを完成させられる、人間が読める記録形式を提供する。品質リスク、適用されるControl、レビューや授受の必要性、またはConformance主張に照らして、詳細化が正当化される場合に限って用いる。
 
 これは任意のEnvironment Bindingである。このファイル形式、フィールドおよび検査規則はBinding固有であり、ALPSの要求ではない。見出しは人間向けであり、名称および順序を変更できる。可視的な``- `key`: value``フィールドおよび`kind`値によって、生成された記録を機械判読可能にする。
 
@@ -33,7 +33,7 @@
 ## 適用の基礎
 - `kind`: application
 - `record_format`: process-instance-record/1
-- `source`: <管理されたSkillまたはProcessの出典および版>
+- `source`: <管理されたProcess Descriptionおよび版。該当する場合は提供するSkillも含む>
 - `context`: <適用状況およびニーズ>
 - `scope`: <適用範囲。関連する対象外範囲、または対象外なしの明示を含む>
 
@@ -58,7 +58,7 @@
 - `limitations`:
 ```
 
-重要な場合は、`activity`、`purpose`、`input`、`output`、`entry_criterion`、`exit_criterion`、`control`、`constraint`、`enabler`、`exchange`または`decision`などの中核`kind`値を持つブロックを追加できる。ローカル拡張の`kind`には、例えば`x_review_note`のように`x_`接頭辞を付ける。これにより、中核`kind`の誤記と意図的な拡張を区別できる。検査器は`kind`フィールドを持たない説明用の節を無視し、すべてのInstanceに完全なALPSモデルを強制しない。
+重要な場合は、`activity`、`purpose`、`input`、`output`、`entry_criterion`、`exit_criterion`、`control`、`constraint`、`enabler`、`exchange`または`decision`などの中核`kind`値を持つブロックを追加できる。ローカル拡張の`kind`には、例えば`x_review_note`のように`x_`接頭辞を付ける。これにより、中核`kind`の誤記と意図的な拡張を区別できる。検査器は`kind`フィールドを持たない説明用の節を無視し、すべてのProcess Instanceに完全なProcess Descriptionを強制しない。
 
 ## 条件付きブロック
 
@@ -67,9 +67,9 @@
 ```markdown
 ## 授受
 - `kind`: handoff
-- `provider`: <提供SkillまたはInstance>
+- `provider`: <提供側のProcessまたはProcess Instance>
 - `output`: <Output>
-- `receiver`: <受領SkillまたはInstance>
+- `receiver`: <受領側のProcessまたはProcess Instance>
 - `input`: <Input>
 - `correspondence`: <意味、範囲および品質条件>
 - `status`:
@@ -84,7 +84,7 @@
 - `before`: <任意: 変更前の管理された記述>
 - `after`: <任意: 変更後の承認された記述>
 - `basis`: <リスク、要求事項、複雑性、利用可能な能力および資源、ならびに関連規格>
-- `candidate_evaluation`: <適用条件、専門知識・経験、ステークホルダーの期待・要求事項およびリスク許容度に照らした候補Skillまたはライフサイクルモデルの評価>
+- `candidate_evaluation`: <適用条件、専門知識・経験、ステークホルダーの期待・要求事項およびリスク許容度に照らした候補Processまたはライフサイクルモデルの評価>
 - `rationale`: <推奨: 判断根拠>
 - `decision`: <管理判断、および該当する場合はその判断に到達できる参照>
 - `affected_party_input`: <影響当事者および取得したInput、または該当者なしの明示>
@@ -107,11 +107,11 @@ Conformanceを主張する場合だけConformanceブロックを用いる。
 - `evidence`: <主張を支える証拠>
 ```
 
-Tailored Conformanceでは、Conformanceブロックの`subject`、`scope`および`remaining_requirements`によって、TailoringしたSkillまたはProcess、主張範囲、ならびにその範囲に残るOutcomeおよびActivity・Taskに含まれる要求事項を識別する。さらに、局所的な`tailoring`ブロックまたは詳細に到達できる`tailoring_decision`への参照のいずれかを記載する。`tailoring_decision`への参照は、Conformanceブロックの`scope`または`remaining_requirements`を置き換えない。ALPSの主張では、証拠によって適用範囲に残るOutcomeおよび要求事項の充足を示す必要があるが、検査器が検査するのは`evidence`フィールドの存在だけである。
+Tailored Conformanceでは、Conformanceブロックの`subject`、`scope`および`remaining_requirements`によって、TailoringしたProcess、主張範囲、ならびにその範囲に残るOutcomeおよびActivity・Taskに含まれる要求事項を識別する。該当する場合は、Process Descriptionを提供するSkillも識別してよい。さらに、局所的な`tailoring`ブロックまたは詳細に到達できる`tailoring_decision`への参照のいずれかを記載する。`tailoring_decision`への参照は、Conformanceブロックの`scope`または`remaining_requirements`を置き換えない。ALPSの主張では、証拠によって適用範囲に残るOutcomeおよび要求事項の充足を示す必要があるが、検査器が検査するのは`evidence`フィールドの存在だけである。
 
 ## 生成器および検査器
 
-生成器はコマンドラインで明示した値だけを転記する。Skillを読み取ってPurpose、Outcome、Task、規範属性またはTailoringを推定しない。内容全体を準備してから出力先にアトミックに配置するため、置換に失敗しても既存記録を切り詰めない。
+生成器はコマンドラインで明示した値だけを転記する。Process Descriptionを読み取ってPurpose、Outcome、Task、規範属性またはTailoringを推定しない。内容全体を準備してから出力先にアトミックに配置するため、置換に失敗しても既存記録を切り詰めない。
 
 ```bash
 python3 ../../../scripts/process_instance_record.py --locale ja new \
