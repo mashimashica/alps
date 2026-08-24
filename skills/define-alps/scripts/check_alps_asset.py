@@ -14,7 +14,7 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable
+from typing import Callable, Iterable
 from urllib.parse import unquote, urlsplit
 
 
@@ -1009,7 +1009,7 @@ def check_process_model(
     process_references = references(processes)
     declared_references = set(normalized_references(processes, current_package_id))
     declared_names = {
-        source_identity(entry) for entry in process_model_entries(processes)
+        process_display_name(entry) for entry in process_model_entries(processes)
     } - {""}
     for reference in process_references:
         try:
@@ -1031,7 +1031,7 @@ def check_process_model(
         target_name = heading1(target.path.read_text(encoding="utf-8"))
         if (
             normalized_references(reference, current_package_id)[0] not in declared_references
-            and source_identity(target_name or "") not in declared_names
+            and process_display_name(target_name or "") not in declared_names
         ):
             errors.append(f"{path}: relationship endpoint {reference} is not declared in Processes")
     errors.extend(
@@ -1133,10 +1133,10 @@ def named_relationship_endpoint_errors(
                     f"reference {reference} does not resolve to a Process representation"
                 )
                 continue
-            target_name = source_identity(
+            target_name = process_display_name(
                 heading1(target.path.read_text(encoding="utf-8")) or ""
             )
-            displayed_name = source_identity(cell)
+            displayed_name = process_display_name(cell)
             if displayed_name and displayed_name != target_name:
                 errors.append(
                     f"{path}: relationship {entry_kind} {entry_number} {role} "
@@ -1149,7 +1149,7 @@ def named_relationship_endpoint_errors(
                     f"endpoint {reference} is not declared in Processes"
                 )
             continue
-        endpoint = source_identity(cell)
+        endpoint = process_display_name(cell)
         if endpoint in declared_names:
             continue
         errors.append(
@@ -1279,19 +1279,45 @@ def source_identity(value: str) -> str:
     return re.sub(r"\s+", " ", value).strip(" |-:()（）")
 
 
-def process_reference_model_identities(
-    value: str,
+def process_display_name(value: str) -> str:
+    """Return a displayed Process name without an optional entry description."""
+    identity = source_identity(value)
+    if not identity:
+        return ""
+    parenthesis_depth = 0
+    for index, character in enumerate(identity):
+        if character in "（(":
+            parenthesis_depth += 1
+        elif character in "）)":
+            parenthesis_depth = max(0, parenthesis_depth - 1)
+        elif parenthesis_depth == 0 and character in ":：":
+            return identity[:index].strip()
+        elif (
+            parenthesis_depth == 0
+            and character in "–—-"
+            and index > 0
+            and index + 1 < len(identity)
+            and identity[index - 1].isspace()
+            and identity[index + 1].isspace()
+        ):
+            return identity[:index].strip()
+    return identity
+
+
+def declared_process_identities(
+    entries: Iterable[tuple[str, Iterable[str]]],
     current_package_id: str | None,
+    name_normalizer: Callable[[str], str],
 ) -> dict[str, str | None]:
-    """Map each locale's displayed Process name to its declared identity."""
+    """Map displayed Process names to locale-independent declared identities."""
     identities: dict[str, str | None] = {}
-    for index, (displayed_name, body) in enumerate(process_blocks(value), start=1):
-        process_references = references(body)
+    for index, (raw_name, raw_references) in enumerate(entries, start=1):
+        process_references = list(raw_references)
         if len(process_references) == 1:
             identity = normalized_reference_key(process_references[0], current_package_id)
         else:
             identity = f"declared:{index}"
-        name = source_identity(displayed_name)
+        name = name_normalizer(raw_name)
         if not name:
             continue
         if name not in identities:
@@ -1299,6 +1325,34 @@ def process_reference_model_identities(
         elif identities[name] != identity:
             identities[name] = None
     return identities
+
+
+def process_model_identities(
+    value: str,
+    current_package_id: str | None,
+) -> dict[str, str | None]:
+    return declared_process_identities(
+        (
+            (entry, references(entry))
+            for entry in process_model_entries(value)
+        ),
+        current_package_id,
+        process_display_name,
+    )
+
+
+def process_reference_model_identities(
+    value: str,
+    current_package_id: str | None,
+) -> dict[str, str | None]:
+    return declared_process_identities(
+        (
+            (displayed_name, references(body))
+            for displayed_name, body in process_blocks(value)
+        ),
+        current_package_id,
+        source_identity,
+    )
 
 
 def normalized_relationship_endpoint_pairs(
@@ -1322,7 +1376,7 @@ def normalized_relationship_endpoint_pairs(
         elif cell_references:
             identity = None
         else:
-            identity = process_identities.get(source_identity(cell))
+            identity = process_identities.get(process_display_name(cell))
         grouped[entry_key][role] = identity
     return tuple(
         (
@@ -1330,6 +1384,35 @@ def normalized_relationship_endpoint_pairs(
             grouped[entry_key].get("recipient"),
         )
         for entry_key in order
+    )
+
+
+def relationship_endpoint_pairs_differ(
+    english_relationships: str,
+    japanese_relationships: str,
+    english_process_identities: dict[str, str | None],
+    japanese_process_identities: dict[str, str | None],
+    current_package_id: str | None,
+) -> bool:
+    english_pairs = normalized_relationship_endpoint_pairs(
+        english_relationships,
+        english_process_identities,
+        current_package_id,
+    )
+    japanese_pairs = normalized_relationship_endpoint_pairs(
+        japanese_relationships,
+        japanese_process_identities,
+        current_package_id,
+    )
+    return bool(
+        english_pairs
+        and len(english_pairs) == len(japanese_pairs)
+        and all(
+            identity is not None
+            for endpoint_pair in (*english_pairs, *japanese_pairs)
+            for identity in endpoint_pair
+        )
+        and english_pairs != japanese_pairs
     )
 
 
@@ -1793,18 +1876,14 @@ def check_pair(
 
     errors.extend(japanese_naturalness_errors(japanese, ja_text, allowed_terms))
     if en_kind == "process-model":
-        en_processes = process_model_entries(
-            section(en_text, HEADINGS["en"]["processes"]) or ""
-        )
-        ja_processes = process_model_entries(
-            section(ja_text, HEADINGS["ja"]["processes"]) or ""
-        )
-        en_relationships = process_model_entries(
-            section(en_text, HEADINGS["en"]["relationships"]) or ""
-        )
-        ja_relationships = process_model_entries(
-            section(ja_text, HEADINGS["ja"]["relationships"]) or ""
-        )
+        en_process_text = section(en_text, HEADINGS["en"]["processes"]) or ""
+        ja_process_text = section(ja_text, HEADINGS["ja"]["processes"]) or ""
+        en_relationship_text = section(en_text, HEADINGS["en"]["relationships"]) or ""
+        ja_relationship_text = section(ja_text, HEADINGS["ja"]["relationships"]) or ""
+        en_processes = process_model_entries(en_process_text)
+        ja_processes = process_model_entries(ja_process_text)
+        en_relationships = process_model_entries(en_relationship_text)
+        ja_relationships = process_model_entries(ja_relationship_text)
         if len(en_processes) != len(ja_processes):
             errors.append(
                 f"{english} / {japanese}: Process count differs ({len(en_processes)} != {len(ja_processes)})"
@@ -1814,23 +1893,38 @@ def check_pair(
                 f"{english} / {japanese}: Relationship count differs "
                 f"({len(en_relationships)} != {len(ja_relationships)})"
             )
-        en_refs = normalized_references(
-            section(en_text, HEADINGS["en"]["processes"]) or "", current_package_id
-        )
-        ja_refs = normalized_references(
-            section(ja_text, HEADINGS["ja"]["processes"]) or "", current_package_id
-        )
+        en_refs = normalized_references(en_process_text, current_package_id)
+        ja_refs = normalized_references(ja_process_text, current_package_id)
         if en_refs != ja_refs:
             errors.append(f"{english} / {japanese}: Process reference identity or order differs")
         en_relationship_refs = normalized_references(
-            section(en_text, HEADINGS["en"]["relationships"]) or "", current_package_id
+            en_relationship_text, current_package_id
         )
         ja_relationship_refs = normalized_references(
-            section(ja_text, HEADINGS["ja"]["relationships"]) or "", current_package_id
+            ja_relationship_text, current_package_id
         )
         if en_relationship_refs != ja_relationship_refs:
             errors.append(
                 f"{english} / {japanese}: Relationship reference identity or order differs"
+            )
+        en_process_identities = process_model_identities(
+            en_process_text,
+            current_package_id,
+        )
+        ja_process_identities = process_model_identities(
+            ja_process_text,
+            current_package_id,
+        )
+        if relationship_endpoint_pairs_differ(
+            en_relationship_text,
+            ja_relationship_text,
+            en_process_identities,
+            ja_process_identities,
+            current_package_id,
+        ):
+            errors.append(
+                f"{english} / {japanese}: relationship provider/recipient "
+                "endpoint identity or order differs"
             )
         return errors, warnings
     if en_kind == "process-reference-model":
@@ -1879,21 +1973,12 @@ def check_pair(
             section(ja_text, HEADINGS["ja"]["processes"]) or "",
             current_package_id,
         )
-        en_endpoint_pairs = normalized_relationship_endpoint_pairs(
-            en_relationship_text, en_process_identities, current_package_id
-        )
-        ja_endpoint_pairs = normalized_relationship_endpoint_pairs(
-            ja_relationship_text, ja_process_identities, current_package_id
-        )
-        if (
-            en_endpoint_pairs
-            and len(en_endpoint_pairs) == len(ja_endpoint_pairs)
-            and all(
-                identity is not None
-                for endpoint_pair in (*en_endpoint_pairs, *ja_endpoint_pairs)
-                for identity in endpoint_pair
-            )
-            and en_endpoint_pairs != ja_endpoint_pairs
+        if relationship_endpoint_pairs_differ(
+            en_relationship_text,
+            ja_relationship_text,
+            en_process_identities,
+            ja_process_identities,
+            current_package_id,
         ):
             errors.append(
                 f"{english} / {japanese}: relationship provider/recipient "

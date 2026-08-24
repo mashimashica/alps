@@ -27,7 +27,11 @@ def process_skill(root: Path, name: str, title: str) -> None:
     )
 
 
-def process_model(root: Path, relationships: str) -> Path:
+def process_model(
+    root: Path,
+    relationships: str,
+    processes: str = "- One\n- Two",
+) -> Path:
     path = root / "skills" / "fixture-model" / "SKILL.md"
     write(
         path,
@@ -46,8 +50,9 @@ The fixture organizes two Processes.
 
 ## Processes
 
-- One
-- Two
+"""
+        + processes
+        + """
 
 ## Relationships
 
@@ -58,12 +63,15 @@ The fixture organizes two Processes.
     return path
 
 
-def check_model(relationships: str) -> list[str]:
+def check_model(
+    relationships: str,
+    processes: str = "- One\n- Two",
+) -> list[str]:
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
         process_skill(root, "one", "One")
         process_skill(root, "two", "Two")
-        path = process_model(root, relationships)
+        path = process_model(root, relationships, processes)
         errors, _ = CHECKER.check_asset(path, {"": root}, None)
         return errors
 
@@ -247,6 +255,75 @@ The fixture organizes source Processes.
             )
         errors, _ = CHECKER.check_asset(path, {"": root}, None)
         return CHECKER.representation_kind(path), errors
+
+
+def write_process_model_pair(
+    root: Path,
+    japanese_relationships: str,
+) -> tuple[Path, Path]:
+    english = root / "model" / "SKILL.md"
+    japanese = english.parent / "references" / "locales" / "ja" / "SKILL.md"
+    write(
+        english,
+        """---
+name: fixture-process-model
+description: Fixture Process Model.
+metadata:
+  alps.kind: process-model
+---
+
+# Fixture Process Model
+
+## Purpose
+
+The fixture organizes two Processes.
+
+## Processes
+
+- One
+- Two
+
+## Relationships
+
+- One -> Two
+
+## Application
+
+The fixture is applicable.
+""",
+    )
+    write(
+        japanese,
+        """---
+name: fixture-process-model
+description: フィクスチャのプロセスモデル。
+metadata:
+  alps.kind: process-model
+---
+
+# フィクスチャプロセスモデル
+
+## 目的
+
+二つのプロセスを整理する。
+
+## プロセス
+
+- 一
+- 二
+
+## 関係
+
+"""
+        + japanese_relationships
+        + """
+
+## 適用
+
+フィクスチャを適用できる。
+""",
+    )
+    return english, japanese
 
 
 def write_reference_model_pair(
@@ -491,6 +568,30 @@ class CheckerRegressionTests(unittest.TestCase):
             errors,
         )
 
+
+    def test_process_model_accepts_list_process_descriptions(self) -> None:
+        processes = "- One: the first Process\n- Two: the second Process"
+        self.assertEqual(check_model("- One -> Two", processes), [])
+
+    def test_process_model_preserves_meaningful_parenthetical_names(self) -> None:
+        processes = (
+            "- One (intake): the first Process\n"
+            "- Two (review): the second Process"
+        )
+        self.assertEqual(
+            check_model("- One (intake) -> Two (review)", processes),
+            [],
+        )
+        self.assertEqual(CHECKER.process_display_name("skill:#one"), "")
+        self.assertEqual(
+            CHECKER.process_display_name("One (intake): the first Process"),
+            "One (intake)",
+        )
+        self.assertEqual(
+            CHECKER.process_display_name("One (v2: beta): the first Process"),
+            "One (v2: beta)",
+        )
+
     def test_process_model_accepts_declared_named_table_endpoints(self) -> None:
         relationships = """| Provider | Information | Recipient | Relationship |
 | --- | --- | --- | --- |
@@ -553,6 +654,42 @@ class CheckerRegressionTests(unittest.TestCase):
             any("Process representation requires" in error for error in errors),
             errors,
         )
+
+
+    def test_process_model_pair_accepts_translated_named_endpoints(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_process_model_pair(
+                Path(directory),
+                "- 一 -> 二",
+            )
+            errors, _ = CHECKER.check_pair(
+                english,
+                japanese,
+                set(CHECKER.DEFAULT_JA_TERMS),
+                "fixture",
+            )
+            self.assertEqual(errors, [], errors)
+
+    def test_process_model_pair_rejects_reversed_translated_endpoints(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_process_model_pair(
+                Path(directory),
+                "- 二 -> 一",
+            )
+            errors, _ = CHECKER.check_pair(
+                english,
+                japanese,
+                set(CHECKER.DEFAULT_JA_TERMS),
+                "fixture",
+            )
+            self.assertTrue(
+                any(
+                    "relationship provider/recipient endpoint identity or order differs"
+                    in error
+                    for error in errors
+                ),
+                errors,
+            )
 
     def test_reference_model_pair_accepts_translated_named_endpoints(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
