@@ -423,17 +423,30 @@ def table_row_cells(line: str) -> list[str]:
 
 
 def table(text: str) -> tuple[list[str], list[list[str]]]:
-    lines = [
-        line.strip()
-        for line in text.splitlines()
-        if line.strip().startswith("|") and line.strip().endswith("|")
-    ]
+    lines = text.splitlines()
     for index in range(1, len(lines)):
+        if not lines[index].strip() or "|" not in lines[index]:
+            continue
         separators = table_row_cells(lines[index])
-        if separators and all(re.fullmatch(r":?-{3,}:?", cell) for cell in separators):
-            header = table_row_cells(lines[index - 1])
-            rows = [table_row_cells(line) for line in lines[index + 1 :]]
-            return header, rows
+        if not separators or not all(
+            re.fullmatch(r":?-{3,}:?", cell) for cell in separators
+        ):
+            continue
+        if not lines[index - 1].strip() or "|" not in lines[index - 1]:
+            continue
+        header = table_row_cells(lines[index - 1])
+        column_count = len(separators)
+        if len(header) != column_count:
+            continue
+        rows: list[list[str]] = []
+        for line in lines[index + 1 :]:
+            if not line.strip() or "|" not in line:
+                break
+            row = table_row_cells(line)
+            if len(row) != column_count:
+                break
+            rows.append(row)
+        return header, rows
     return [], []
 
 
@@ -1005,6 +1018,7 @@ def check_process_model(
         errors.append(f"{path}: Process Model requires identifiable Process entries")
     if not relationship_rows and not relationship_items:
         errors.append(f"{path}: Process Model requires identifiable relationship entries")
+    errors.extend(relationship_list_endpoint_errors(path, relationships))
 
     process_references = references(processes)
     declared_references = set(normalized_references(processes, current_package_id))
@@ -1089,9 +1103,7 @@ def relationship_endpoint_cells(value: str) -> list[tuple[str, int, str, str]]:
         provider = item[: arrow.start()].strip()
         recipient = item[arrow.end() :].strip()
         if not references(recipient):
-            recipient = re.split(
-                r"\s*(?:[:：]|\s+[–—-]\s+)\s*", recipient, maxsplit=1
-            )[0].strip()
+            recipient = process_display_name(recipient)
         if provider and recipient:
             endpoints.extend(
                 (
@@ -1100,6 +1112,33 @@ def relationship_endpoint_cells(value: str) -> list[tuple[str, int, str, str]]:
                 )
             )
     return endpoints
+
+
+def relationship_list_endpoint_errors(path: Path, value: str) -> list[str]:
+    """Reject list relationship items that do not identify both endpoints."""
+    _, rows = table(value)
+    if rows:
+        return []
+    items = process_model_entries(value)
+    if not items:
+        return []
+    endpoint_items = {
+        (entry_kind, entry_number)
+        for entry_kind, entry_number, _, _ in relationship_endpoint_cells(value)
+    }
+    errors: list[str] = []
+    for item_number, item in enumerate(items, start=1):
+        if ("item", item_number) in endpoint_items:
+            continue
+        # A single canonical reference is a supported reference-form entry;
+        # its target is validated by the reference loop above.
+        if len(references(item)) == 1:
+            continue
+        errors.append(
+            f"{path}: relationship item {item_number} must identify "
+            "provider and recipient Processes"
+        )
+    return errors
 
 
 def named_relationship_endpoint_errors(
@@ -1187,6 +1226,7 @@ def check_reference_model(
         errors.append(
             f"{path}: Process Reference Model requires identifiable relationship entries"
         )
+    errors.extend(relationship_list_endpoint_errors(path, relationships))
 
     declared_references = set(normalized_references(processes, current_package_id))
     declared_names = {model_name for model_name, _ in blocks}
@@ -1269,19 +1309,20 @@ def source_entries(value: str) -> list[str]:
     return structured or normalized_lines(value)
 
 
-def source_identity(value: str) -> str:
+def source_identity(value: str, *, preserve_parentheses: bool = False) -> str:
     value = re.sub(
         r"`?skill:[^\s`<>()\[\]{}\"',;!?。、，；：！？）」』】〉》]+`?",
         "",
         value,
     )
     value = re.sub(r"[（(]\s*[）)]", "", value)
-    return re.sub(r"\s+", " ", value).strip(" |-:()（）")
+    strip_characters = " |-" if preserve_parentheses else " |-:()（）"
+    return re.sub(r"\s+", " ", value).strip(strip_characters)
 
 
 def process_display_name(value: str) -> str:
     """Return a displayed Process name without an optional entry description."""
-    identity = source_identity(value)
+    identity = source_identity(value, preserve_parentheses=True)
     if not identity:
         return ""
     parenthesis_depth = 0

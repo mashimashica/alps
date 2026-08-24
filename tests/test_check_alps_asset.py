@@ -260,6 +260,7 @@ The fixture organizes source Processes.
 def write_process_model_pair(
     root: Path,
     japanese_relationships: str,
+    english_relationships: str = "- One -> Two",
 ) -> tuple[Path, Path]:
     english = root / "model" / "SKILL.md"
     japanese = english.parent / "references" / "locales" / "ja" / "SKILL.md"
@@ -285,7 +286,9 @@ The fixture organizes two Processes.
 
 ## Relationships
 
-- One -> Two
+"""
+        + english_relationships
+        + """
 
 ## Application
 
@@ -477,6 +480,61 @@ class CheckerRegressionTests(unittest.TestCase):
         self.assertEqual(check_model(escaped), [])
         self.assertEqual(check_model(inline), [])
 
+    def test_table_accepts_outer_and_unpiped_gfm_rows(self) -> None:
+        outer = """| Provider | Information | Recipient | Relationship |
+| :--- | :---: | ---: | --- |
+| One | information | Two | relates the Processes. |"""
+        unpiped = """Provider | Information | Recipient | Relationship
+:--- | :---: | ---: | ---
+One | information | Two | relates the Processes."""
+        leading_only = """| Provider | Information | Recipient | Relationship
+| :--- | :---: | ---: | ---
+| One | information | Two | relates the Processes. |"""
+        trailing_only = """Provider | Information | Recipient | Relationship |
+:--- | :---: | ---: | ---: |
+One | information | Two | relates the Processes. |"""
+        self.assertEqual(CHECKER.table(outer), CHECKER.table(unpiped))
+        self.assertEqual(CHECKER.table(outer), CHECKER.table(leading_only))
+        self.assertEqual(CHECKER.table(outer), CHECKER.table(trailing_only))
+        self.assertEqual(check_model(outer), [])
+        self.assertEqual(check_model(unpiped), [])
+        self.assertEqual(check_model(leading_only), [])
+        self.assertEqual(check_model(trailing_only), [])
+
+    def test_table_ignores_unrelated_pipe_prose_around_contiguous_block(self) -> None:
+        text = """Unrelated | prose
+Provider | Information | Recipient | Relationship
+--- | --- | --- | ---
+One | information | Two | relates the Processes.
+Unrelated | prose"""
+        header, rows = CHECKER.table(text)
+        self.assertEqual(
+            header,
+            ["Provider", "Information", "Recipient", "Relationship"],
+        )
+        self.assertEqual(
+            rows,
+            [["One", "information", "Two", "relates the Processes."]],
+        )
+
+    def test_table_stops_before_blank_and_second_table(self) -> None:
+        text = """Provider | Information | Recipient | Relationship
+--- | --- | --- | ---
+One | information | Two | relates the Processes.
+
+Second Provider | Information | Second Recipient | Relationship
+--- | --- | --- | ---
+Three | information | Four | relates the Processes."""
+        header, rows = CHECKER.table(text)
+        self.assertEqual(
+            header,
+            ["Provider", "Information", "Recipient", "Relationship"],
+        )
+        self.assertEqual(
+            rows,
+            [["One", "information", "Two", "relates the Processes."]],
+        )
+
     def test_process_model_checks_canonical_endpoint_display_name(self) -> None:
         invalid = """| Provider | Information | Recipient | Relationship |
 | --- | --- | --- | --- |
@@ -579,7 +637,25 @@ class CheckerRegressionTests(unittest.TestCase):
             "- Two (review): the second Process"
         )
         self.assertEqual(
-            check_model("- One (intake) -> Two (review)", processes),
+            check_model("- One (intake) -> Two (review): carries information", processes),
+            [],
+        )
+        self.assertEqual(
+            check_model(
+                "- One (intake) -> Two (review) - carries information",
+                processes,
+            ),
+            [],
+        )
+        full_width_processes = (
+            "- One （intake）: the first Process\n"
+            "- Two （review）: the second Process"
+        )
+        self.assertEqual(
+            check_model(
+                "- One （intake） -> Two （review）: carries information",
+                full_width_processes,
+            ),
             [],
         )
         self.assertEqual(CHECKER.process_display_name("skill:#one"), "")
@@ -588,8 +664,16 @@ class CheckerRegressionTests(unittest.TestCase):
             "One (intake)",
         )
         self.assertEqual(
+            CHECKER.process_display_name("One （intake）: the first Process"),
+            "One （intake）",
+        )
+        self.assertEqual(
             CHECKER.process_display_name("One (v2: beta): the first Process"),
             "One (v2: beta)",
+        )
+        self.assertEqual(
+            CHECKER.process_display_name("One (intake) - the first Process"),
+            "One (intake)",
         )
 
     def test_process_model_accepts_declared_named_table_endpoints(self) -> None:
@@ -611,6 +695,28 @@ class CheckerRegressionTests(unittest.TestCase):
 
     def test_process_model_accepts_declared_named_list_endpoints(self) -> None:
         self.assertEqual(check_model("- One -> Two"), [])
+
+    def test_process_model_rejects_endpointless_relationship_list_item(self) -> None:
+        errors = check_model("- Nothing structured here")
+        self.assertTrue(
+            any(
+                "relationship item 1 must identify provider and recipient Processes"
+                in error
+                for error in errors
+            ),
+            errors,
+        )
+
+    def test_process_reference_model_rejects_endpointless_relationship_list_item(self) -> None:
+        errors = check_reference_model_fixture("- Nothing structured here")
+        self.assertTrue(
+            any(
+                "relationship item 1 must identify provider and recipient Processes"
+                in error
+                for error in errors
+            ),
+            errors,
+        )
 
     def test_process_model_trims_named_recipient_description(self) -> None:
         self.assertEqual(check_model("- One -> Two: carries information"), [])
@@ -669,6 +775,43 @@ class CheckerRegressionTests(unittest.TestCase):
                 "fixture",
             )
             self.assertEqual(errors, [], errors)
+
+    def test_process_model_pair_accepts_outer_and_unpiped_relationship_tables(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_process_model_pair(
+                Path(directory),
+                "提供側プロセス | 情報 | 受領側プロセス | 関係\n--- | --- | --- | ---\n一 | 情報 | 二 | プロセス間の関係。",
+                "| Provider Process | Information | Recipient Process | Relationship |\n| --- | --- | --- | --- |\n| One | information | Two | relates the Processes. |",
+            )
+            errors, _ = CHECKER.check_pair(
+                english,
+                japanese,
+                set(CHECKER.DEFAULT_JA_TERMS),
+                "fixture",
+            )
+            self.assertEqual(errors, [], errors)
+
+    def test_process_model_pair_rejects_reversed_unpiped_relationship_table(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_process_model_pair(
+                Path(directory),
+                "提供側プロセス | 情報 | 受領側プロセス | 関係\n--- | --- | --- | ---\n二 | 情報 | 一 | プロセス間の関係。",
+                "| Provider Process | Information | Recipient Process | Relationship |\n| --- | --- | --- | --- |\n| One | information | Two | relates the Processes. |",
+            )
+            errors, _ = CHECKER.check_pair(
+                english,
+                japanese,
+                set(CHECKER.DEFAULT_JA_TERMS),
+                "fixture",
+            )
+            self.assertTrue(
+                any(
+                    "relationship provider/recipient endpoint identity or order differs"
+                    in error
+                    for error in errors
+                ),
+                errors,
+            )
 
     def test_process_model_pair_rejects_reversed_translated_endpoints(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
