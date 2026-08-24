@@ -202,6 +202,175 @@ def check_view_fixture(sources: str, included: str) -> list[str]:
         return errors
 
 
+def check_anchored_view_fixture(complete: bool) -> tuple[str, list[str]]:
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        process_skill(root, "one", "One")
+        process_skill(root, "two", "Two")
+        if complete:
+            path = process_view(
+                root,
+                "- One (`skill:#one`)\n- Two (`skill:#two`)",
+                """| Source Process | Source element |
+| --- | --- |
+| One (`skill:#one`) | Activity |
+| Two (`skill:#two`) | Task |""",
+            )
+            write(
+                path,
+                path.read_text(encoding="utf-8").replace(
+                    "metadata:\n",
+                    "metadata: &representation\n",
+                ),
+            )
+        else:
+            path = root / "skills" / "fixture-view" / "SKILL.md"
+            write(
+                path,
+                """---
+name: fixture-view
+description: A fixture Process View.
+metadata: &representation
+  alps.kind: process-view
+---
+
+# Fixture View
+
+## Purpose
+
+The fixture organizes source Processes.
+
+## Outcomes
+
+- The source Processes are represented.
+""",
+            )
+        errors, _ = CHECKER.check_asset(path, {"": root}, None)
+        return CHECKER.representation_kind(path), errors
+
+
+def write_reference_model_pair(
+    root: Path,
+    japanese_relationships: str,
+) -> tuple[Path, Path]:
+    english = root / "fixture" / "SKILL.md"
+    japanese = english.parent / "references" / "locales" / "ja" / "SKILL.md"
+    skill_ref = chr(96) + "skill:#" + "{}" + chr(96)
+    write(
+        english,
+        """---
+name: fixture-reference-model
+description: Fixture Process Reference Model.
+metadata:
+  alps.kind: process-reference-model
+---
+
+# Fixture Reference Model
+
+## Purpose
+
+The fixture defines two Processes.
+
+## Processes
+
+### Define ALPS
+
+Skill: """
+        + skill_ref.format("define-alps")
+        + """
+
+#### Purpose
+
+Define purpose.
+
+#### Outcomes
+
+- Define is achieved.
+
+### Apply ALPS
+
+Skill: """
+        + skill_ref.format("apply-alps")
+        + """
+
+#### Purpose
+
+Apply purpose.
+
+#### Outcomes
+
+- Apply is achieved.
+
+## Relationships
+
+| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+| Define ALPS | information | Apply ALPS | relates the Processes. |
+
+## Application
+
+The fixture is applicable.
+""",
+    )
+    write(
+        japanese,
+        """---
+name: fixture-reference-model
+description: フィクスチャのプロセス参照モデル。
+metadata:
+  alps.kind: process-reference-model
+---
+
+# フィクスチャ参照モデル
+
+## 目的
+
+二つのプロセスを定める。
+
+## プロセス
+
+### ALPS定義
+
+スキル: """
+        + skill_ref.format("define-alps")
+        + """
+
+#### 目的
+
+定義目的。
+
+#### 成果
+
+- 定義が達成されている。
+
+### ALPS適用
+
+スキル: """
+        + skill_ref.format("apply-alps")
+        + """
+
+#### 目的
+
+適用目的。
+
+#### 成果
+
+- 適用が達成されている。
+
+## 関係
+
+"""
+        + japanese_relationships
+        + """
+
+## 適用
+
+フィクスチャを適用できる。
+""",
+    )
+    return english, japanese
+
+
 class CheckerRegressionTests(unittest.TestCase):
     def test_table_tokenizer_honors_escape_parity_and_exact_code_run(self) -> None:
         self.assertEqual(
@@ -367,6 +536,61 @@ class CheckerRegressionTests(unittest.TestCase):
         self.assertEqual(CHECKER.references(chr(96) + "skill:#one" + chr(96)), ["skill:#one"])
         inline_comment = chr(96) + chr(60) + "!--" + chr(96)
         self.assertEqual(check_model("- " + inline_comment + " skill:#one"), [])
+
+    def test_anchored_metadata_kind_is_preserved_for_valid_view(self) -> None:
+        kind, errors = check_anchored_view_fixture(True)
+        self.assertEqual(kind, "process-view")
+        self.assertEqual(errors, [])
+
+    def test_anchored_process_view_requires_view_sections(self) -> None:
+        kind, errors = check_anchored_view_fixture(False)
+        self.assertEqual(kind, "process-view")
+        self.assertTrue(
+            any("Process View requires Source Processes" in error for error in errors),
+            errors,
+        )
+        self.assertFalse(
+            any("Process representation requires" in error for error in errors),
+            errors,
+        )
+
+    def test_reference_model_pair_accepts_translated_named_endpoints(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_reference_model_pair(
+                Path(directory),
+                """| 提供側プロセス | 情報 | 受領側プロセス | 関係 |
+| --- | --- | --- | --- |
+| ALPS定義 | 情報 | ALPS適用 | プロセス間の関係。 |""",
+            )
+            errors, _ = CHECKER.check_pair(english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture")
+            self.assertEqual(errors, [], errors)
+
+    def test_reference_model_pair_rejects_reversed_named_endpoints(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_reference_model_pair(
+                Path(directory),
+                """| 提供側プロセス | 情報 | 受領側プロセス | 関係 |
+| --- | --- | --- | --- |
+| ALPS適用 | 情報 | ALPS定義 | プロセス間の関係。 |""",
+            )
+            errors, _ = CHECKER.check_pair(english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture")
+            self.assertTrue(
+                any(
+                    "relationship provider/recipient endpoint identity or order differs"
+                    in error
+                    for error in errors
+                ),
+                errors,
+            )
+
+    def test_shipped_reference_model_pair_passes_named_endpoint_comparison(self) -> None:
+        root = Path(__file__).parents[1]
+        english = root / "skills" / "alps-reference-model" / "SKILL.md"
+        japanese = (
+            english.parent / "references" / "locales" / "ja" / "SKILL.md"
+        )
+        errors, _ = CHECKER.check_pair(english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "mashimashica/alps")
+        self.assertEqual(errors, [], errors)
 
 
 if __name__ == "__main__":

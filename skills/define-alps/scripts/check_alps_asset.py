@@ -293,7 +293,8 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
         if re.match(r"^ *\t", raw):
             errors.append(f"frontmatter line {number} uses a tab for indentation")
             continue
-        if re.fullmatch(r"metadata:\s*(?:#.*)?", raw):
+        # YAML mapping nodes may carry anchors or tags before nested entries.
+        if re.fullmatch(r"metadata:\s*(?:(?:[&!][^\s#]+)\s*)*(?:#.*)?", raw):
             in_metadata = True
             metadata_child_indent = None
             continue
@@ -1278,6 +1279,60 @@ def source_identity(value: str) -> str:
     return re.sub(r"\s+", " ", value).strip(" |-:()（）")
 
 
+def process_reference_model_identities(
+    value: str,
+    current_package_id: str | None,
+) -> dict[str, str | None]:
+    """Map each locale's displayed Process name to its declared identity."""
+    identities: dict[str, str | None] = {}
+    for index, (displayed_name, body) in enumerate(process_blocks(value), start=1):
+        process_references = references(body)
+        if len(process_references) == 1:
+            identity = normalized_reference_key(process_references[0], current_package_id)
+        else:
+            identity = f"declared:{index}"
+        name = source_identity(displayed_name)
+        if not name:
+            continue
+        if name not in identities:
+            identities[name] = identity
+        elif identities[name] != identity:
+            identities[name] = None
+    return identities
+
+
+def normalized_relationship_endpoint_pairs(
+    value: str,
+    process_identities: dict[str, str | None],
+    current_package_id: str | None,
+) -> tuple[tuple[str | None, str | None], ...]:
+    """Normalize parsed provider/recipient endpoints to declared Process identities."""
+    grouped: dict[tuple[str, int], dict[str, str | None]] = {}
+    order: list[tuple[str, int]] = []
+    for entry_kind, entry_number, role, cell in relationship_endpoint_cells(value):
+        entry_key = (entry_kind, entry_number)
+        if entry_key not in grouped:
+            grouped[entry_key] = {}
+            order.append(entry_key)
+        cell_references = references(cell)
+        if len(cell_references) == 1:
+            identity: str | None = normalized_reference_key(
+                cell_references[0], current_package_id
+            )
+        elif cell_references:
+            identity = None
+        else:
+            identity = process_identities.get(source_identity(cell))
+        grouped[entry_key][role] = identity
+    return tuple(
+        (
+            grouped[entry_key].get("provider"),
+            grouped[entry_key].get("recipient"),
+        )
+        for entry_key in order
+    )
+
+
 def source_cell_reference_errors(
     path: Path,
     context: str,
@@ -1813,6 +1868,36 @@ def check_pair(
         if en_relationship_refs != ja_relationship_refs:
             errors.append(
                 f"{english} / {japanese}: Relationship reference identity or order differs"
+            )
+        en_relationship_text = section(en_text, HEADINGS["en"]["relationships"]) or ""
+        ja_relationship_text = section(ja_text, HEADINGS["ja"]["relationships"]) or ""
+        en_process_identities = process_reference_model_identities(
+            section(en_text, HEADINGS["en"]["processes"]) or "",
+            current_package_id,
+        )
+        ja_process_identities = process_reference_model_identities(
+            section(ja_text, HEADINGS["ja"]["processes"]) or "",
+            current_package_id,
+        )
+        en_endpoint_pairs = normalized_relationship_endpoint_pairs(
+            en_relationship_text, en_process_identities, current_package_id
+        )
+        ja_endpoint_pairs = normalized_relationship_endpoint_pairs(
+            ja_relationship_text, ja_process_identities, current_package_id
+        )
+        if (
+            en_endpoint_pairs
+            and len(en_endpoint_pairs) == len(ja_endpoint_pairs)
+            and all(
+                identity is not None
+                for endpoint_pair in (*en_endpoint_pairs, *ja_endpoint_pairs)
+                for identity in endpoint_pair
+            )
+            and en_endpoint_pairs != ja_endpoint_pairs
+        ):
+            errors.append(
+                f"{english} / {japanese}: relationship provider/recipient "
+                "endpoint identity or order differs"
             )
         return errors, warnings
     if en_kind == "process-view":
