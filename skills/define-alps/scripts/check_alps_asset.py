@@ -106,6 +106,35 @@ class ProcessStructure:
     tasks: tuple[tuple[str, ...], ...]
 
 
+@dataclass(frozen=True)
+class YAMLScalarNode:
+    value: str
+    line: int
+
+
+@dataclass(frozen=True)
+class YAMLAliasNode:
+    name: str
+    line: int
+
+
+@dataclass(frozen=True)
+class YAMLMappingNode:
+    items: dict[str, "YAMLNode"]
+    line: int
+
+
+@dataclass(frozen=True)
+class YAMLNullNode:
+    line: int
+
+
+YAMLNode = YAMLScalarNode | YAMLAliasNode | YAMLMappingNode | YAMLNullNode
+YAMLResolved = str | dict[str, "YAMLResolved"] | None
+YAML_MAX_DEPTH = 32
+YAML_MAX_NODES = 512
+
+
 def locale_for(path: Path) -> str:
     parts = path.as_posix().split("/")
     for index in range(len(parts) - 2):
@@ -154,9 +183,10 @@ def inline_code_end(text: str, start: int, delimiter_length: int) -> int | None:
     return None
 
 
-def strip_yaml_node_properties(value: str) -> str:
-    """Remove YAML anchors and tags that precede a scalar value."""
+def yaml_node_properties(value: str) -> tuple[tuple[str, ...], str]:
+    """Return YAML tags/anchors and the value that follows them."""
     value = value.lstrip()
+    properties: list[str] = []
     while value:
         if value.startswith("&"):
             match = re.match(r"&[^\s#]+", value)
@@ -169,108 +199,382 @@ def strip_yaml_node_properties(value: str) -> str:
             break
         if match is None:
             break
+        properties.append(match.group(0))
         value = value[match.end() :].lstrip()
+    return tuple(properties), value
+
+
+def strip_yaml_node_properties(value: str) -> str:
+    """Remove YAML anchors and tags that precede a scalar value."""
+    _, value = yaml_node_properties(value)
     return value
 
 
-def flow_mapping_items(value: str) -> dict[str, str] | None:
-    """Return scalar entries from a YAML flow mapping used by metadata."""
-    value = value.strip()
+def yaml_without_comment(value: str) -> str:
+    """Remove an unquoted YAML comment without changing quoted content."""
+    quote: str | None = None
+    escaped = False
+    for index, character in enumerate(value):
+        if quote:
+            if quote == '"' and escaped:
+                escaped = False
+            elif quote == '"' and character == "\\":
+                escaped = True
+            elif character == quote and not (
+                quote == "'" and index + 1 < len(value) and value[index + 1] == "'"
+            ):
+                quote = None
+            continue
+        if character in ("'", '"'):
+            quote = character
+        elif character == "#" and (index == 0 or value[index - 1].isspace()):
+            return value[:index].rstrip()
+    return value.strip()
+
+
+def yaml_alias_name(value: str) -> str | None:
+    """Return a complete YAML alias name, excluding comments."""
+    _, value = yaml_node_properties(value.strip())
+    value = yaml_without_comment(value)
+    match = re.fullmatch(r"\*([^\s#]+)", value)
+    return None if match is None else match.group(1)
+
+
+@dataclass
+class YAMLParseState:
+    anchors: dict[str, YAMLNode]
+    errors: list[tuple[int, str]]
+    node_count: int = 0
+
+    def add_error(self, line: int, message: str) -> None:
+        item = (line, message)
+        if item not in self.errors:
+            self.errors.append(item)
+
+    def count_node(self, line: int) -> bool:
+        self.node_count += 1
+        if self.node_count > YAML_MAX_NODES:
+            self.add_error(line, "YAML frontmatter node limit exceeded")
+            return False
+        return True
+
+
+def yaml_register_anchors(
+    properties: Iterable[str], node: YAMLNode, line: int, state: YAMLParseState
+) -> None:
+    for property_name in properties:
+        if not property_name.startswith("&"):
+            continue
+        name = property_name[1:]
+        if name in state.anchors:
+            state.add_error(line, f"duplicate YAML anchor &{name}")
+        elif len(state.anchors) >= YAML_MAX_NODES:
+            state.add_error(line, "YAML frontmatter anchor limit exceeded")
+        else:
+            state.anchors[name] = node
+
+
+def yaml_flow_close(value: str) -> int | None:
     if not value.startswith("{"):
         return None
     depth = 0
     quote: str | None = None
     escaped = False
-    close = -1
-    for index, char in enumerate(value):
+    for index, character in enumerate(value):
         if quote:
             if quote == '"' and escaped:
                 escaped = False
-            elif quote == '"' and char == "\\":
+            elif quote == '"' and character == "\\":
                 escaped = True
-            elif char == quote:
-                if quote == "'" and index + 1 < len(value) and value[index + 1] == "'":
-                    continue
+            elif character == quote and not (
+                quote == "'" and index + 1 < len(value) and value[index + 1] == "'"
+            ):
                 quote = None
             continue
-        if char in ("'", '"'):
-            quote = char
-        elif char in "[{":
+        if character in ("'", '"'):
+            quote = character
+        elif character in "[{":
             depth += 1
-        elif char in "]}":
+        elif character in "]}":
             depth -= 1
-            if depth == 0:
-                close = index
-                break
-    if close < 0 or value[close + 1 :].strip() not in {"", "#"} and not value[close + 1 :].lstrip().startswith("#"):
-        return None
+            if depth == 0 and character == "}":
+                return index
+            if depth < 0:
+                return None
+    return None
 
+
+def yaml_flow_parts(value: str) -> list[str] | None:
+    close = yaml_flow_close(value)
+    if close is None or yaml_without_comment(value[close + 1 :]).strip():
+        return None
     body = value[1:close]
     parts: list[str] = []
     start = 0
     depth = 0
-    quote = None
+    quote: str | None = None
     escaped = False
-    for index, char in enumerate(body):
+    for index, character in enumerate(body):
         if quote:
             if quote == '"' and escaped:
                 escaped = False
-            elif quote == '"' and char == "\\":
+            elif quote == '"' and character == "\\":
                 escaped = True
-            elif char == quote:
+            elif character == quote and not (
+                quote == "'" and index + 1 < len(body) and body[index + 1] == "'"
+            ):
                 quote = None
             continue
-        if char in ("'", '"'):
-            quote = char
-        elif char in "[{":
+        if character in ("'", '"'):
+            quote = character
+        elif character in "[{":
             depth += 1
-        elif char in "]}":
+        elif character in "]}":
             depth -= 1
-        elif char == "," and depth == 0:
+        elif character == "," and depth == 0:
             parts.append(body[start:index])
             start = index + 1
     parts.append(body[start:])
+    return parts
 
-    result: dict[str, str] = {}
+
+def yaml_flow_separator(value: str) -> int:
+    depth = 0
+    quote: str | None = None
+    escaped = False
+    for index, character in enumerate(value):
+        if quote:
+            if quote == '"' and escaped:
+                escaped = False
+            elif quote == '"' and character == "\\":
+                escaped = True
+            elif character == quote and not (
+                quote == "'" and index + 1 < len(value) and value[index + 1] == "'"
+            ):
+                quote = None
+            continue
+        if character in ("'", '"'):
+            quote = character
+        elif character in "[{":
+            depth += 1
+        elif character in "]}":
+            depth -= 1
+        elif character == ":" and depth == 0:
+            return index
+    return -1
+
+
+def yaml_scalar_value(value: str) -> str:
+    value = yaml_without_comment(value.strip())
+    if value.startswith(("'", '"')):
+        end = quoted_scalar_end(value)
+        if end is not None and end >= 0:
+            return value[1:end].replace("''", "'")
+    return value
+
+
+def yaml_inline_node(
+    value: str,
+    line: int,
+    depth: int,
+    state: YAMLParseState,
+) -> YAMLNode:
+    if depth > YAML_MAX_DEPTH:
+        state.add_error(line, "YAML frontmatter nesting limit exceeded")
+        return YAMLNullNode(line)
+    properties, remainder = yaml_node_properties(value)
+    remainder = yaml_without_comment(remainder)
+    alias = yaml_alias_name(remainder)
+    if alias is not None:
+        node: YAMLNode = YAMLAliasNode(alias, line)
+    elif remainder.startswith("{"):
+        node = yaml_flow_mapping(remainder, line, depth + 1, state)
+    elif remainder.startswith("["):
+        # Sequences are outside the inspected frontmatter subset. Keep their
+        # source text so an alias to one is rejected as a non-mapping value.
+        node = YAMLScalarNode(remainder, line)
+    elif not remainder:
+        node = YAMLNullNode(line)
+    else:
+        node = YAMLScalarNode(yaml_scalar_value(remainder), line)
+    if state.count_node(line):
+        yaml_register_anchors(properties, node, line, state)
+    return node
+
+
+def yaml_flow_mapping(
+    value: str,
+    line: int,
+    depth: int,
+    state: YAMLParseState,
+) -> YAMLMappingNode:
+    items: dict[str, YAMLNode] = {}
+    parts = yaml_flow_parts(value)
+    if parts is None:
+        state.add_error(line, "invalid YAML flow mapping")
+        return YAMLMappingNode(items, line)
     for part in parts:
         if not part.strip():
             continue
-        depth = 0
-        quote = None
-        escaped = False
-        separator = -1
-        for index, char in enumerate(part):
-            if quote:
-                if quote == '"' and escaped:
-                    escaped = False
-                elif quote == '"' and char == "\\":
-                    escaped = True
-                elif char == quote:
-                    quote = None
-                continue
-            if char in ("'", '"'):
-                quote = char
-            elif char in "[{":
-                depth += 1
-            elif char in "]}":
-                depth -= 1
-            elif char == ":" and depth == 0:
-                separator = index
-                break
+        separator = yaml_flow_separator(part)
         if separator < 0:
-            return None
-        key = part[:separator].strip()
-        item_value = strip_yaml_node_properties(part[separator + 1 :].strip())
-        if key.startswith(("'", '"')) and quoted_scalar_end(key) == len(key) - 1:
-            key = key[1:-1].replace("''", "'")
-        if item_value.startswith(("'", '"')):
-            end = quoted_scalar_end(item_value)
-            if end != len(item_value) - 1:
-                continue
-            item_value = item_value[1:end].replace("''", "'")
-        elif item_value.startswith(("{", "[")):
+            state.add_error(line, "invalid YAML flow mapping entry")
             continue
-        result[key] = item_value
+        key = yaml_scalar_value(part[:separator].strip())
+        if not key:
+            state.add_error(line, "invalid YAML flow mapping key")
+            continue
+        items[key] = yaml_inline_node(part[separator + 1 :], line, depth, state)
+    return YAMLMappingNode(items, line)
+
+
+def yaml_block_scalar(
+    lines: list[str], index: int, base_indent: int, line: int, state: YAMLParseState
+) -> tuple[YAMLScalarNode, int]:
+    parts: list[str] = []
+    cursor = index + 1
+    while cursor < len(lines):
+        raw = lines[cursor]
+        if raw.strip():
+            indent = len(raw) - len(raw.lstrip(" "))
+            if indent <= base_indent:
+                break
+            parts.append(raw.strip())
+        else:
+            parts.append("")
+        cursor += 1
+    if not state.count_node(line):
+        return YAMLScalarNode("", line), cursor
+    return YAMLScalarNode(" ".join(part for part in parts if part), line), cursor
+
+
+def yaml_mapping(
+    lines: list[str],
+    index: int,
+    indent: int,
+    depth: int,
+    state: YAMLParseState,
+) -> tuple[YAMLMappingNode, int]:
+    items: dict[str, YAMLNode] = {}
+    if depth > YAML_MAX_DEPTH:
+        state.add_error(index + 2, "YAML frontmatter nesting limit exceeded")
+        return YAMLMappingNode(items, index + 2), index
+    if not state.count_node(index + 2):
+        return YAMLMappingNode(items, index + 2), index
+    cursor = index
+    while cursor < len(lines):
+        raw = lines[cursor]
+        if not raw.strip() or raw.lstrip().startswith("#"):
+            cursor += 1
+            continue
+        current_indent = len(raw) - len(raw.lstrip(" "))
+        if current_indent < indent:
+            break
+        if current_indent > indent:
+            break
+        match = re.match(r"^([ ]*)([A-Za-z0-9_.-]+):(?:[ \t]*(.*))?$", raw)
+        if not match:
+            cursor += 1
+            continue
+        key = match.group(2)
+        raw_value = match.group(3) or ""
+        line = cursor + 2
+        properties, remainder = yaml_node_properties(raw_value.strip())
+        remainder = yaml_without_comment(remainder)
+        if re.fullmatch(r"[>|](?:[+-]?[1-9]?|[1-9][+-]?)?", remainder):
+            node, cursor = yaml_block_scalar(lines, cursor, indent, line, state)
+            yaml_register_anchors(properties, node, line, state)
+        elif not remainder:
+            child = cursor + 1
+            while child < len(lines) and (
+                not lines[child].strip() or lines[child].lstrip().startswith("#")
+            ):
+                child += 1
+            if child < len(lines):
+                child_indent = len(lines[child]) - len(lines[child].lstrip(" "))
+            else:
+                child_indent = indent
+            if child < len(lines) and child_indent > indent:
+                node, cursor = yaml_mapping(lines, child, child_indent, depth + 1, state)
+            else:
+                node = YAMLNullNode(line)
+                state.count_node(line)
+                cursor += 1
+            yaml_register_anchors(properties, node, line, state)
+        else:
+            node = yaml_inline_node(raw_value.strip(), line, depth, state)
+            cursor += 1
+        items[key] = node
+    return YAMLMappingNode(items, index + 2), cursor
+
+
+def resolve_yaml_node(
+    node: YAMLNode,
+    anchors: dict[str, YAMLNode],
+    stack: tuple[str, ...],
+    depth: int,
+    errors: list[tuple[int, str]],
+) -> YAMLResolved:
+    if depth > YAML_MAX_DEPTH:
+        item = (getattr(node, "line", 0), "YAML alias resolution depth exceeded")
+        if item not in errors:
+            errors.append(item)
+        return None
+    if isinstance(node, YAMLScalarNode):
+        return node.value
+    if isinstance(node, YAMLNullNode):
+        return None
+    if isinstance(node, YAMLAliasNode):
+        if node.name not in anchors:
+            item = (node.line, f"unresolved YAML alias *{node.name}")
+            if item not in errors:
+                errors.append(item)
+            return None
+        if node.name in stack:
+            item = (node.line, f"cyclic YAML alias *{node.name}")
+            if item not in errors:
+                errors.append(item)
+            return None
+        return resolve_yaml_node(
+            anchors[node.name], anchors, (*stack, node.name), depth + 1, errors
+        )
+    result: dict[str, YAMLResolved] = {}
+    for key, child in node.items.items():
+        result[key] = resolve_yaml_node(child, anchors, stack, depth + 1, errors)
+    return result
+
+
+def yaml_frontmatter_nodes(
+    lines: list[str],
+) -> tuple[
+    dict[str, YAMLResolved],
+    dict[str, YAMLResolved],
+    list[tuple[int, str]],
+]:
+    state = YAMLParseState({}, [])
+    root, _ = yaml_mapping(lines, 0, 0, 0, state)
+    errors = list(state.errors)
+    resolved_root = resolve_yaml_node(root, state.anchors, (), 0, errors)
+    resolved_anchors: dict[str, YAMLResolved] = {}
+    for name, node in state.anchors.items():
+        resolved_anchors[name] = resolve_yaml_node(node, state.anchors, (name,), 0, errors)
+    return (
+        resolved_root if isinstance(resolved_root, dict) else {},
+        resolved_anchors,
+        errors,
+    )
+
+
+def yaml_flatten_mapping(value: YAMLResolved, prefix: str = "") -> dict[str, str]:
+    if not isinstance(value, dict):
+        return {}
+    result: dict[str, str] = {}
+    for key, child in value.items():
+        full_key = f"{prefix}.{key}" if prefix else key
+        if isinstance(child, str):
+            result[full_key] = child
+        elif isinstance(child, dict):
+            result.update(yaml_flatten_mapping(child, full_key))
     return result
 
 
@@ -282,6 +586,8 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
         return {}, ["YAML frontmatter is not closed"]
 
     lines = text[4:end].splitlines()
+    resolved_yaml, resolved_yaml_anchors, yaml_errors = yaml_frontmatter_nodes(lines)
+    errors = [f"frontmatter line {line} {message}" for line, message in yaml_errors]
     block_values: dict[int, str] = {}
     for index, raw in enumerate(lines):
         block = re.match(
@@ -333,7 +639,6 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
         quoted_continuations.update(range(index + 1, last + 1))
 
     values: dict[str, str] = {}
-    errors: list[str] = []
     in_metadata = False
     metadata_child_indent: int | None = None
     for index, original in enumerate(lines):
@@ -345,6 +650,30 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
             continue
         if re.match(r"^ *\t", raw):
             errors.append(f"frontmatter line {number} uses a tab for indentation")
+            continue
+        metadata_alias_match = re.match(r"^metadata:\s*(.*?)\s*$", raw)
+        metadata_alias = (
+            yaml_alias_name(metadata_alias_match.group(1))
+            if metadata_alias_match
+            else None
+        )
+        if metadata_alias is not None:
+            resolved = resolved_yaml_anchors.get(metadata_alias)
+            alias_error = any(
+                line == number and "YAML alias" in message
+                for line, message in yaml_errors
+            )
+            alias_resolution_error = any("YAML alias" in message for _, message in yaml_errors)
+            if not alias_error and isinstance(resolved, dict):
+                for key, value in yaml_flatten_mapping(resolved).items():
+                    values[f"metadata.{key}"] = value
+            elif not alias_error and not (resolved is None and alias_resolution_error):
+                errors.append(
+                    f"frontmatter line {number} YAML alias *{metadata_alias} "
+                    "must resolve to a mapping for metadata"
+                )
+            in_metadata = False
+            metadata_child_indent = None
             continue
         # YAML mapping nodes may carry anchors or tags before nested entries.
         if re.fullmatch(r"metadata:\s*(?:(?:[&!][^\s#]+)\s*)*(?:#.*)?", raw):
@@ -358,11 +687,17 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
             else ""
         )
         if flow_metadata and flow_value.startswith("{"):
-            items = flow_mapping_items(flow_value)
-            if items is None:
+            resolved_metadata = resolved_yaml.get("metadata")
+            flow_error = any(
+                line == number and message.startswith("invalid YAML flow mapping")
+                for line, message in yaml_errors
+            )
+            if flow_error or not isinstance(resolved_metadata, dict):
                 errors.append(f"frontmatter line {number} has an invalid metadata flow mapping")
-            elif "alps.kind" in items:
-                values["metadata.alps.kind"] = items["alps.kind"]
+            else:
+                items = yaml_flatten_mapping(resolved_metadata)
+                if "alps.kind" in items:
+                    values["metadata.alps.kind"] = items["alps.kind"]
             in_metadata = False
             metadata_child_indent = None
             continue
@@ -394,6 +729,9 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
         if in_metadata:
             key = f"metadata.{key}"
         value = value.strip()
+        alias = yaml_alias_name(value)
+        if alias is not None and isinstance(resolved_yaml_anchors.get(alias), str):
+            value = resolved_yaml_anchors[alias]
         if index not in block_values:
             value = strip_yaml_node_properties(value)
             if value.startswith(("'", '"')):
@@ -577,7 +915,9 @@ def outcome_items(value: str | None) -> list[str]:
 
 
 def representation_kind(path: Path) -> str:
-    meta, _ = frontmatter(path.read_text(encoding="utf-8"))
+    meta, frontmatter_errors = frontmatter(path.read_text(encoding="utf-8"))
+    if frontmatter_errors and "alps.kind" not in meta:
+        return ""
     return meta.get("alps.kind", "process")
 
 
@@ -1467,20 +1807,20 @@ def declared_process_identities(
     current_package_id: str | None,
     name_normalizer: Callable[[str], str],
 ) -> dict[str, str | None]:
-    """Map displayed Process names to locale-independent declared identities."""
+    """Map displayed Process names to stable identities when available."""
     identities: dict[str, str | None] = {}
-    for index, (raw_name, raw_references) in enumerate(entries, start=1):
+    for raw_name, raw_references in entries:
         process_references = list(raw_references)
-        if len(process_references) == 1:
-            identity = normalized_reference_key(process_references[0], current_package_id)
-        else:
-            identity = f"declared:{index}"
         name = name_normalizer(raw_name)
         if not name:
             continue
-        if name not in identities:
+        if len(process_references) == 1:
+            identity = normalized_reference_key(process_references[0], current_package_id)
+        else:
+            identity = f"name:{name}"
+        if name not in identities or identities[name] is None:
             identities[name] = identity
-        elif identities[name] != identity:
+        elif identities[name] != identity or identity is None:
             identities[name] = None
     return identities
 
@@ -1545,13 +1885,14 @@ def normalized_relationship_endpoint_pairs(
     )
 
 
-def relationship_endpoint_pairs_differ(
+def relationship_endpoint_pair_status(
     english_relationships: str,
     japanese_relationships: str,
     english_process_identities: dict[str, str | None],
     japanese_process_identities: dict[str, str | None],
     current_package_id: str | None,
-) -> bool:
+) -> tuple[bool, bool]:
+    """Return (stable mismatch, unverified) for paired relationship endpoints."""
     english_pairs = normalized_relationship_endpoint_pairs(
         english_relationships,
         english_process_identities,
@@ -1562,15 +1903,48 @@ def relationship_endpoint_pairs_differ(
         japanese_process_identities,
         current_package_id,
     )
-    return bool(
-        english_pairs
-        and len(english_pairs) == len(japanese_pairs)
-        and all(
-            identity is not None
-            for endpoint_pair in (*english_pairs, *japanese_pairs)
-            for identity in endpoint_pair
-        )
-        and english_pairs != japanese_pairs
+    if not english_pairs or len(english_pairs) != len(japanese_pairs):
+        return False, False
+    mismatch = False
+    unverified = False
+    for english_pair, japanese_pair in zip(english_pairs, japanese_pairs):
+        for english_identity, japanese_identity in zip(english_pair, japanese_pair):
+            if english_identity is None or japanese_identity is None:
+                unverified = True
+            elif english_identity.startswith("ref:") and japanese_identity.startswith("ref:"):
+                if english_identity != japanese_identity:
+                    mismatch = True
+            elif english_identity.startswith("name:") and japanese_identity.startswith("name:"):
+                if english_identity != japanese_identity:
+                    unverified = True
+            else:
+                unverified = True
+    return mismatch, unverified
+
+
+def relationship_endpoint_pairs_differ(
+    english_relationships: str,
+    japanese_relationships: str,
+    english_process_identities: dict[str, str | None],
+    japanese_process_identities: dict[str, str | None],
+    current_package_id: str | None,
+) -> bool:
+    """Return whether stable endpoint identities differ across locales."""
+    mismatch, _ = relationship_endpoint_pair_status(
+        english_relationships,
+        japanese_relationships,
+        english_process_identities,
+        japanese_process_identities,
+        current_package_id,
+    )
+    return mismatch
+
+
+def unverified_relationship_warning(english: Path, japanese: Path) -> str:
+    return (
+        f"{english} / {japanese}: Process relationship endpoint identity is unverified "
+        "because one or more translated endpoints lack a stable canonical reference "
+        "or matching displayed name"
     )
 
 
@@ -1923,7 +2297,9 @@ def check_asset(
     warnings: list[str] = []
     if not heading1(text):
         errors.append(f"{path}: representation requires Name as a level-one heading")
-    meta, _ = frontmatter(text)
+    meta, frontmatter_errors = frontmatter(text)
+    if frontmatter_errors and "alps.kind" not in meta:
+        return errors, warnings
     kind = meta.get("alps.kind", "process")
     if kind not in SUPPORTED_KINDS:
         return errors, warnings
@@ -2080,17 +2456,20 @@ def check_pair(
             ja_process_text,
             current_package_id,
         )
-        if relationship_endpoint_pairs_differ(
+        endpoint_mismatch, endpoint_unverified = relationship_endpoint_pair_status(
             en_relationship_text,
             ja_relationship_text,
             en_process_identities,
             ja_process_identities,
             current_package_id,
-        ):
+        )
+        if endpoint_mismatch:
             errors.append(
                 f"{english} / {japanese}: relationship provider/recipient "
                 "endpoint identity or order differs"
             )
+        if endpoint_unverified:
+            warnings.append(unverified_relationship_warning(english, japanese))
         return errors, warnings
     if en_kind == "process-reference-model":
         en_processes = process_blocks(section(en_text, HEADINGS["en"]["processes"]) or "")
@@ -2138,17 +2517,20 @@ def check_pair(
             section(ja_text, HEADINGS["ja"]["processes"]) or "",
             current_package_id,
         )
-        if relationship_endpoint_pairs_differ(
+        endpoint_mismatch, endpoint_unverified = relationship_endpoint_pair_status(
             en_relationship_text,
             ja_relationship_text,
             en_process_identities,
             ja_process_identities,
             current_package_id,
-        ):
+        )
+        if endpoint_mismatch:
             errors.append(
                 f"{english} / {japanese}: relationship provider/recipient "
                 "endpoint identity or order differs"
             )
+        if endpoint_unverified:
+            warnings.append(unverified_relationship_warning(english, japanese))
         return errors, warnings
     if en_kind == "process-view":
         en_outcomes = outcome_items(section(en_text, HEADINGS["en"]["outcomes"]))

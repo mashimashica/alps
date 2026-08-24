@@ -791,6 +791,109 @@ Three | information | Four | relates the Processes."""
             errors,
         )
 
+    def test_frontmatter_aliases_select_view_kind_and_validate_view_sections(self) -> None:
+        forms = (
+            "view-kind: &view-kind {alps.kind: process-view}\n"
+            "metadata: *view-kind\n",
+            "view-kind: &view-kind {alps.kind: process-view}\n"
+            "metadata: !!map *view-kind\n",
+            "representations:\n"
+            "  view-kind: &view-kind\n"
+            "    alps.kind: process-view\n"
+            "metadata: *view-kind\n",
+        )
+        for form in forms:
+            with self.subTest(form=form):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    path = root / "skills" / "fixture" / "SKILL.md"
+                    write(
+                        path,
+                        "---\n"
+                        "name: fixture\n"
+                        "description: Fixture process. ALPS-conformant.\n"
+                        + form
+                        + "---\n\n"
+                        "# Fixture\n\n"
+                        "## Purpose\n\n"
+                        "The fixture has a purpose.\n\n"
+                        "## Outcomes\n\n"
+                        "- The fixture is complete.\n",
+                    )
+                    values, frontmatter_errors = CHECKER.frontmatter(
+                        path.read_text(encoding="utf-8")
+                    )
+                    self.assertEqual(frontmatter_errors, [], frontmatter_errors)
+                    self.assertEqual(values["alps.kind"], "process-view")
+                    self.assertEqual(CHECKER.representation_kind(path), "process-view")
+                    errors, _ = CHECKER.check_asset(path, {"": root}, None)
+                    self.assertTrue(
+                        any("Process View requires Source Processes" in error for error in errors),
+                        errors,
+                    )
+                    self.assertFalse(
+                        any("Process representation requires" in error for error in errors),
+                        errors,
+                    )
+
+    def test_frontmatter_aliases_report_unresolved_cyclic_and_wrong_nodes(self) -> None:
+        cases = (
+            (
+                "metadata: *missing\n",
+                "unresolved YAML alias *missing",
+            ),
+            (
+                "kind: &kind process\nmetadata: *kind\n",
+                "must resolve to a mapping for metadata",
+            ),
+            (
+                "first: &first *second\n"
+                "second: &second *first\n"
+                "metadata: *first\n",
+                "cyclic YAML alias",
+            ),
+        )
+        for form, expected in cases:
+            with self.subTest(form=form):
+                text = (
+                    "---\n"
+                    "name: fixture\n"
+                    "description: Fixture process. ALPS-conformant.\n"
+                    + form
+                    + "---\n"
+                )
+                values, errors = CHECKER.frontmatter(text)
+                self.assertNotIn("alps.kind", values)
+                self.assertTrue(any(expected in error for error in errors), errors)
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    path = root / "skills" / "fixture" / "SKILL.md"
+                    write(
+                        path,
+                        text
+                        + "\n# Fixture\n\n## Purpose\n\nPurpose.\n\n"
+                        "## Outcomes\n\n- Outcome.\n",
+                    )
+                    self.assertEqual(CHECKER.representation_kind(path), "")
+                    asset_errors, _ = CHECKER.check_asset(path, {"": root}, None)
+                    self.assertFalse(
+                        any("Process representation requires" in error for error in asset_errors),
+                        asset_errors,
+                    )
+
+    def test_frontmatter_scalar_aliases_resolve_and_mapping_aliases_remain_non_scalar(self) -> None:
+        text = "---\n"
+        text += "name: &skill-name fixture\n"
+        text += "description: Fixture process. ALPS-conformant.\n"
+        text += "metadata: &representation {alps.kind: process}\n"
+        text += "alias: *skill-name\n"
+        text += "mapping-alias: *representation\n"
+        text += "---\n"
+        values, errors = CHECKER.frontmatter(text)
+        self.assertEqual(errors, [], errors)
+        self.assertEqual(values["alias"], "fixture")
+        self.assertEqual(values["mapping-alias"], "*representation")
+
 
     def test_process_model_pair_accepts_translated_named_endpoints(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -798,13 +901,52 @@ Three | information | Four | relates the Processes."""
                 Path(directory),
                 "- 一 -> 二",
             )
-            errors, _ = CHECKER.check_pair(
+            errors, warnings = CHECKER.check_pair(
                 english,
                 japanese,
                 set(CHECKER.DEFAULT_JA_TERMS),
                 "fixture",
             )
             self.assertEqual(errors, [], errors)
+            self.assertTrue(any("unverified" in warning for warning in warnings), warnings)
+
+    def test_process_model_pair_preserves_canonical_endpoint_comparison(self) -> None:
+        english_relationships = "- One (`skill:#one`) -> Two (`skill:#two`)"
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_process_model_pair(
+                Path(directory),
+                "- 一 (`skill:#one`) -> 二 (`skill:#two`)",
+                english_relationships,
+            )
+            errors, warnings = CHECKER.check_pair(
+                english,
+                japanese,
+                set(CHECKER.DEFAULT_JA_TERMS),
+                "fixture",
+            )
+            self.assertEqual(errors, [], errors)
+            self.assertEqual(warnings, [], warnings)
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_process_model_pair(
+                Path(directory),
+                "- 二 (`skill:#two`) -> 一 (`skill:#one`)",
+                english_relationships,
+            )
+            errors, warnings = CHECKER.check_pair(
+                english,
+                japanese,
+                set(CHECKER.DEFAULT_JA_TERMS),
+                "fixture",
+            )
+            self.assertTrue(
+                any(
+                    "relationship provider/recipient endpoint identity or order differs"
+                    in error
+                    for error in errors
+                ),
+                errors,
+            )
+            self.assertEqual(warnings, [], warnings)
 
     def test_process_model_pair_accepts_outer_and_unpiped_relationship_tables(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -813,56 +955,45 @@ Three | information | Four | relates the Processes."""
                 "提供側プロセス | 情報 | 受領側プロセス | 関係\n--- | --- | --- | ---\n一 | 情報 | 二 | プロセス間の関係。",
                 "| Provider Process | Information | Recipient Process | Relationship |\n| --- | --- | --- | --- |\n| One | information | Two | relates the Processes. |",
             )
-            errors, _ = CHECKER.check_pair(
+            errors, warnings = CHECKER.check_pair(
                 english,
                 japanese,
                 set(CHECKER.DEFAULT_JA_TERMS),
                 "fixture",
             )
             self.assertEqual(errors, [], errors)
+            self.assertTrue(any("unverified" in warning for warning in warnings), warnings)
 
-    def test_process_model_pair_rejects_reversed_unpiped_relationship_table(self) -> None:
+    def test_process_model_pair_reports_reversed_unpiped_relationship_as_unverified(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             english, japanese = write_process_model_pair(
                 Path(directory),
                 "提供側プロセス | 情報 | 受領側プロセス | 関係\n--- | --- | --- | ---\n二 | 情報 | 一 | プロセス間の関係。",
                 "| Provider Process | Information | Recipient Process | Relationship |\n| --- | --- | --- | --- |\n| One | information | Two | relates the Processes. |",
             )
-            errors, _ = CHECKER.check_pair(
+            errors, warnings = CHECKER.check_pair(
                 english,
                 japanese,
                 set(CHECKER.DEFAULT_JA_TERMS),
                 "fixture",
             )
-            self.assertTrue(
-                any(
-                    "relationship provider/recipient endpoint identity or order differs"
-                    in error
-                    for error in errors
-                ),
-                errors,
-            )
+            self.assertEqual(errors, [], errors)
+            self.assertTrue(any("unverified" in warning for warning in warnings), warnings)
 
-    def test_process_model_pair_rejects_reversed_translated_endpoints(self) -> None:
+    def test_process_model_pair_reports_reversed_translated_endpoints_as_unverified(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             english, japanese = write_process_model_pair(
                 Path(directory),
                 "- 二 -> 一",
             )
-            errors, _ = CHECKER.check_pair(
+            errors, warnings = CHECKER.check_pair(
                 english,
                 japanese,
                 set(CHECKER.DEFAULT_JA_TERMS),
                 "fixture",
             )
-            self.assertTrue(
-                any(
-                    "relationship provider/recipient endpoint identity or order differs"
-                    in error
-                    for error in errors
-                ),
-                errors,
-            )
+            self.assertEqual(errors, [], errors)
+            self.assertTrue(any("unverified" in warning for warning in warnings), warnings)
 
     def test_reference_model_pair_accepts_translated_named_endpoints(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -950,27 +1081,21 @@ Missing | Also Missing"""
             errors,
         )
 
-    def test_process_model_pair_detects_reversed_two_column_relationship_table(self) -> None:
+    def test_process_model_pair_reports_reversed_two_column_relationship_as_unverified(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             english, japanese = write_process_model_pair(
                 Path(directory),
                 "提供側プロセス | 受領側プロセス\n--- | ---\n二 | 一",
                 "Provider | Recipient\n--- | ---\nOne | Two",
             )
-            errors, _ = CHECKER.check_pair(
+            errors, warnings = CHECKER.check_pair(
                 english,
                 japanese,
                 set(CHECKER.DEFAULT_JA_TERMS),
                 "fixture",
             )
-            self.assertTrue(
-                any(
-                    "relationship provider/recipient endpoint identity or order differs"
-                    in error
-                    for error in errors
-                ),
-                errors,
-            )
+            self.assertEqual(errors, [], errors)
+            self.assertTrue(any("unverified" in warning for warning in warnings), warnings)
 
     def test_frontmatter_parses_scalar_anchors_tags_and_preserves_yaml_forms(self) -> None:
         text = """---
