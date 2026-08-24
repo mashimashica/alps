@@ -103,6 +103,15 @@ class CheckerRegressionTests(unittest.TestCase):
     def test_process_model_accepts_declared_named_list_endpoints(self) -> None:
         self.assertEqual(check_model("- One -> Two"), [])
 
+    def test_process_model_trims_named_recipient_description(self) -> None:
+        self.assertEqual(check_model("- One -> Two: carries information"), [])
+
+    def test_process_model_accepts_canonical_provider_in_arrow_list(self) -> None:
+        self.assertEqual(check_model("- skill:#one -> Two"), [])
+
+    def test_process_model_accepts_canonical_recipient_in_arrow_list(self) -> None:
+        self.assertEqual(check_model("- One -> skill:#two"), [])
+
     def test_inline_code_cannot_hide_following_canonical_reference(self) -> None:
         inline_comment = chr(96) + chr(60) + "!--" + chr(96)
         self.assertEqual(

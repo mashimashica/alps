@@ -1029,7 +1029,10 @@ def relationship_endpoint_cells(value: str) -> list[tuple[str, int, str, str]]:
             continue
         provider = item[: arrow.start()].strip()
         recipient = item[arrow.end() :].strip()
-        recipient = re.split(r"\s*(?:[:：]|\s+[–—-]\s+)\s*", recipient, maxsplit=1)[0].strip()
+        if not references(recipient):
+            recipient = re.split(
+                r"\s*(?:[:：]|\s+[–—-]\s+)\s*", recipient, maxsplit=1
+            )[0].strip()
         if provider and recipient:
             endpoints.extend(
                 (
