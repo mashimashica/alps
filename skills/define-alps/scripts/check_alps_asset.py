@@ -59,6 +59,10 @@ HEADINGS = {
         "application": "適用",
     },
 }
+TASK_SECTION_HEADINGS = {
+    "en": frozenset({"task", "tasks"}),
+    "ja": frozenset({"タスク", "作業"}),
+}
 NORMATIVE_PATTERNS = {
     "en": (
         ("must_not", re.compile(r"\bmust not\b", re.I)),
@@ -77,6 +81,11 @@ NORMATIVE_PATTERNS = {
         ("typically", re.compile(r"通常|典型的")),
     ),
 }
+MARKDOWN_LIST_ITEM_RE = re.compile(
+    r"(?ms)^(?P<indent>[ \t]{0,3})(?:\d+[.)]|[-*+])\s+"
+    r"(?P<item>.*?)(?=^(?P=indent)(?:\d+[.)]|[-*+])\s+|"
+    r"^[ \t]*$\n(?=\S)|\Z)"
+)
 RAW_ENGLISH = re.compile(r"(?<![A-Za-z])[A-Za-z][A-Za-z-]{1,}(?![A-Za-z])")
 DEFAULT_JA_TERMS = {
     "ALPS",
@@ -1822,9 +1831,16 @@ def classify_normative(task: str, locale: str) -> str | None:
     return max(matches)[2]
 
 
+def is_task_section_heading(value: str, locale: str) -> bool:
+    normalized = re.sub(r"\s+", " ", value.strip()).rstrip(":：").strip()
+    return normalized.casefold() in TASK_SECTION_HEADINGS[locale]
+
+
 def parse_process_structure(text: str, locale: str) -> ProcessStructure:
     outcomes = tuple(outcome_items(section(text, HEADINGS[locale]["outcomes"])))
-    activity_text = section(text, HEADINGS[locale]["activities"]) or ""
+    activity_text = without_indented_code(
+        section(text, HEADINGS[locale]["activities"]) or ""
+    )
     heading_matches = list(re.finditer(r"(?m)^(#{3,6}) ([^\n]+?)\s*$", activity_text))
     activity_level = min(
         (len(match.group(1)) for match in heading_matches),
@@ -1842,23 +1858,37 @@ def parse_process_structure(text: str, locale: str) -> ProcessStructure:
         start = match.end()
         end = matches[index + 1].start() if index + 1 < len(matches) else len(activity_text)
         block = activity_text[start:end]
-        task_block = block
-        if activity_level is not None and activity_level < 6:
-            child_heading = re.search(
-                rf"(?m)^#{{{activity_level + 1},6}} [^\n]+?\s*$",
-                block,
-            )
-            if child_heading is not None:
-                task_block = block[: child_heading.start()]
-        task_values = tuple(
-            re.sub(r"\s+", " ", item.group("item")).strip()
-            for item in re.finditer(
-                r"(?ms)^(?P<indent>[ \t]{0,3})(?:\d+[.)]|[-*+])\s+"
-                r"(?P<item>.*?)(?=^(?P=indent)(?:\d+[.)]|[-*+])\s+|"
-                r"^[ \t]*$\n(?=\S)|\Z)",
-                task_block,
-            )
+        child_matches = list(
+            re.finditer(r"(?m)^(#{2,6}) ([^\n]+?)\s*$", block)
         )
+        child_matches = [
+            child
+            for child in child_matches
+            if len(child.group(1)) > activity_level
+        ]
+        task_events: list[tuple[int, str]] = []
+
+        def collect_task_items(value: str, offset: int) -> None:
+            for item in MARKDOWN_LIST_ITEM_RE.finditer(value):
+                task_events.append(
+                    (
+                        offset + item.start(),
+                        re.sub(r"\s+", " ", item.group("item")).strip(),
+                    )
+                )
+
+        direct_end = child_matches[0].start() if child_matches else len(block)
+        collect_task_items(block[:direct_end], 0)
+        for child_index, child in enumerate(child_matches):
+            child_end = (
+                child_matches[child_index + 1].start()
+                if child_index + 1 < len(child_matches)
+                else len(block)
+            )
+            if is_task_section_heading(child.group(2), locale):
+                collect_task_items(block[child.end() : child_end], child.end())
+
+        task_values = tuple(value for _, value in sorted(task_events))
         tasks.append(task_values)
     return ProcessStructure(outcomes, tuple(activities), tuple(tasks))
 

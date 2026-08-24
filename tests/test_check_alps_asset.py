@@ -3278,6 +3278,191 @@ The fixture has a purpose.
                 errors,
             )
 
+    def test_process_tasks_under_recognized_child_sections_preserve_order_and_boundaries(self) -> None:
+        text = """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+---
+
+# Fixture
+
+## Purpose
+
+The fixture has a purpose.
+
+## Outcomes
+
+- The fixture is complete.
+
+## Activities & Tasks
+
+### Work
+
+1. The agent must prepare.
+   The preparation continues here.
+
+#### Tasks
+
+2. The agent should record.
+   The record action continues here.
+
+##### Notes
+
+- This explanatory item is not a Task.
+
+##### Tasks
+
+3. The agent may verify.
+
+#### Notes
+
+- This second explanatory item is not a Task.
+
+#### Task
+
+4. The agent must finish.
+
+### Review
+
+- The agent may review.
+"""
+        structure = CHECKER.parse_process_structure(text, "en")
+        self.assertEqual(structure.activities, ("Work", "Review"))
+        self.assertEqual(
+            structure.tasks,
+            (
+                (
+                    "The agent must prepare. The preparation continues here.",
+                    "The agent should record. The record action continues here.",
+                    "The agent may verify.",
+                    "The agent must finish.",
+                ),
+                ("The agent may review.",),
+            ),
+        )
+
+    def test_process_tasks_under_child_heading_require_normative_force(self) -> None:
+        def document(activities: str) -> str:
+            return """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+---
+
+# Fixture
+
+## Purpose
+
+The fixture has a purpose.
+
+## Outcomes
+
+- The fixture is complete.
+
+## Activities & Tasks
+
+""" + activities + "\n"
+
+        for activities, expected_error in (
+            ("### Work\n#### Tasks\n1. Perform the action.", True),
+            ("### Work\n#### Tasks\n1. The agent must perform the action.", False),
+        ):
+            with self.subTest(expected_error=expected_error), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                path = root / "skills" / "fixture" / "SKILL.md"
+                write(path, document(activities))
+                errors, _ = CHECKER.check_asset(path, {"": root}, None)
+                has_normative_error = any(
+                    "Activity 1 Task 1 has no recognizable normative attribute" in error
+                    for error in errors
+                )
+                self.assertEqual(has_normative_error, expected_error, errors)
+
+    def test_process_pair_counts_child_tasks_and_compares_normative_force(self) -> None:
+        english_activities = """### Work
+1. The agent must prepare.
+#### Tasks
+2. The agent should record.
+#### Notes
+- Explanatory note.
+### Review
+- The agent may review.
+"""
+        japanese_activities = """### 作業
+1. 担当者は準備する必要がある。
+#### タスク
+2. 担当者は記録することが望ましい。
+#### 注記
+- 説明用の注記。
+### 確認
+- 担当者は確認してもよい。
+"""
+
+        def write_pair(root: Path, ja_activities: str) -> tuple[Path, Path]:
+            english = root / "process" / "SKILL.md"
+            japanese = english.parent / "references" / "locales" / "ja" / "SKILL.md"
+            write(
+                english,
+                """---
+name: fixture-process
+description: Fixture process.
+---
+
+# Fixture Process
+
+## Purpose
+
+The fixture has a purpose.
+
+## Outcomes
+
+- The fixture is complete.
+
+## Activities & Tasks
+
+""" + english_activities,
+            )
+            write(
+                japanese,
+                """---
+name: fixture-process
+description: フィクスチャのプロセス。
+---
+
+# フィクスチャプロセス
+
+## 目的
+
+フィクスチャには目的がある。
+
+## 成果
+
+- フィクスチャが完成している。
+
+## 活動とタスク
+
+""" + ja_activities,
+            )
+            return english, japanese
+
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_pair(Path(directory), japanese_activities)
+            errors, _ = CHECKER.check_pair(
+                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
+            )
+            self.assertEqual(errors, [], errors)
+
+            japanese_text = japanese.read_text(encoding="utf-8").replace(
+                "#### タスク\n2. 担当者は記録することが望ましい。\n", ""
+            )
+            write(japanese, japanese_text)
+            errors, _ = CHECKER.check_pair(
+                english, japanese, set(CHECKER.DEFAULT_JA_TERMS), "fixture"
+            )
+            self.assertTrue(
+                any("Task counts by Activity differ" in error for error in errors),
+                errors,
+            )
+
     def test_process_view_rejects_unstructured_included_content_and_keeps_supported_forms(self) -> None:
         for included in (
             "Nothing structured here.",
