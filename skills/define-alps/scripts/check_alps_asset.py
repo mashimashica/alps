@@ -143,6 +143,88 @@ def locale_for(path: Path) -> str:
     return "en"
 
 
+YAML_DOUBLE_ESCAPES = {
+    "0": "\0",
+    "a": "\a",
+    "b": "\b",
+    "t": "\t",
+    "n": "\n",
+    "v": "\v",
+    "f": "\f",
+    "r": "\r",
+    "e": "\x1b",
+    " ": " ",
+    '"': '"',
+    "/": "/",
+    "\\": "\\",
+    "N": "\x85",
+    "_": "\xa0",
+    "L": "\u2028",
+    "P": "\u2029",
+}
+
+
+def yaml_decode_quoted_scalar(
+    value: str,
+) -> tuple[str, int | None, str | None]:
+    """Decode one bounded YAML quoted scalar and return its closing index."""
+    if not value.startswith(("'", '"')):
+        return value, None, None
+    quote = value[0]
+    decoded: list[str] = []
+    cursor = 1
+    while cursor < len(value):
+        character = value[cursor]
+        if character == quote:
+            if quote == "'" and cursor + 1 < len(value) and value[cursor + 1] == quote:
+                decoded.append("'")
+                cursor += 2
+                continue
+            return "".join(decoded), cursor, None
+        if quote == '"' and character == "\\":
+            if cursor + 1 >= len(value):
+                return "", None, "unbalanced quoted scalar"
+            escaped = value[cursor + 1]
+            if escaped in "\r\n":
+                cursor += 2
+                if escaped == "\r" and cursor < len(value) and value[cursor] == "\n":
+                    cursor += 1
+                while cursor < len(value) and value[cursor] in " \t":
+                    cursor += 1
+                continue
+            if escaped in YAML_DOUBLE_ESCAPES:
+                decoded.append(YAML_DOUBLE_ESCAPES[escaped])
+                cursor += 2
+                continue
+            if escaped in "xuU":
+                width = {"x": 2, "u": 4, "U": 8}[escaped]
+                digits = value[cursor + 2 : cursor + 2 + width]
+                if len(digits) != width or not re.fullmatch(r"[0-9A-Fa-f]+", digits):
+                    return "", None, "invalid YAML double-quoted escape"
+                codepoint = int(digits, 16)
+                if codepoint > 0x10FFFF or 0xD800 <= codepoint <= 0xDFFF:
+                    return "", None, "invalid YAML double-quoted codepoint"
+                decoded.append(chr(codepoint))
+                cursor += 2 + width
+                continue
+            return "", None, "invalid YAML double-quoted escape"
+        if character in "\r\n":
+            line_breaks = 0
+            while cursor < len(value) and value[cursor] in "\r\n":
+                line_breaks += 1
+                if value[cursor] == "\r" and cursor + 1 < len(value) and value[cursor + 1] == "\n":
+                    cursor += 2
+                else:
+                    cursor += 1
+                while cursor < len(value) and value[cursor] in " \t":
+                    cursor += 1
+            decoded.append(" " if line_breaks == 1 else "\n" * (line_breaks - 1))
+            continue
+        decoded.append(character)
+        cursor += 1
+    return "", None, "unbalanced quoted scalar"
+
+
 def quoted_scalar_end(value: str) -> int | None:
     if not value.startswith(("'", '"')):
         return None
@@ -150,7 +232,14 @@ def quoted_scalar_end(value: str) -> int | None:
     cursor = 1
     while cursor < len(value):
         if quote == '"' and value[cursor] == "\\":
-            cursor += 2
+            if cursor + 1 < len(value) and value[cursor + 1] in "\r\n":
+                cursor += 2
+                if value[cursor - 1] == "\r" and cursor < len(value) and value[cursor] == "\n":
+                    cursor += 1
+                while cursor < len(value) and value[cursor] in " \t":
+                    cursor += 1
+            else:
+                cursor += 2
             continue
         if value[cursor] == quote:
             if quote == "'" and cursor + 1 < len(value) and value[cursor + 1] == quote:
@@ -212,24 +301,8 @@ def strip_yaml_node_properties(value: str) -> str:
 
 def yaml_quoted_end(value: str, start: int) -> int | None:
     """Return the end after a quoted scalar, honoring YAML quote escapes."""
-    quote = value[start]
-    cursor = start + 1
-    while cursor < len(value):
-        if quote == '"' and value[cursor] == "\\":
-            cursor += 2
-            continue
-        if (
-            quote == "'"
-            and value[cursor] == "'"
-            and cursor + 1 < len(value)
-            and value[cursor + 1] == "'"
-        ):
-            cursor += 2
-            continue
-        if value[cursor] == quote:
-            return cursor + 1
-        cursor += 1
-    return None
+    end = quoted_scalar_end(value[start:])
+    return None if end is None or end < 0 else start + end + 1
 
 
 def yaml_without_flow_comments(value: str, stop_at_comment: bool = False) -> str:
@@ -373,6 +446,31 @@ def yaml_collect_flow(lines: list[str], index: int, value: str) -> tuple[str, in
     return yaml_without_flow_comments("\n".join((*properties, *parts))), cursor
 
 
+def yaml_collect_quoted(lines: list[str], index: int, value: str) -> tuple[str, int]:
+    """Collect a possibly multiline quoted scalar before parsing its value."""
+    properties, remainder = yaml_node_properties(value.strip())
+    if not remainder.startswith(("'", '"')):
+        return value, index + 1
+    parts = [remainder]
+    cursor = index + 1
+    while yaml_quoted_end("\n".join(parts), 0) is None and cursor < len(lines):
+        parts.append(lines[cursor].strip())
+        cursor += 1
+    prefix = " ".join(properties)
+    return (f"{prefix} " if prefix else "") + yaml_join_quoted_parts(parts), cursor
+
+
+def yaml_join_quoted_parts(parts: list[str]) -> str:
+    """Fold collected quoted lines while retaining escaped line breaks."""
+    if not parts:
+        return ""
+    result = parts[0]
+    for part in parts[1:]:
+        trailing = len(result) - len(result.rstrip("\\"))
+        result += ("\n" if trailing % 2 else " ") + part
+    return result
+
+
 def yaml_flow_separator(value: str) -> int:
     value = yaml_without_flow_comments(value)
     depth = 0
@@ -396,32 +494,27 @@ def yaml_flow_separator(value: str) -> int:
     return -1
 
 
-def yaml_scalar_value(value: str) -> str:
+def yaml_scalar_value(
+    value: str,
+    line: int | None = None,
+    state: YAMLParseState | None = None,
+) -> str:
     value = yaml_without_comment(value.strip())
     if value.startswith(("'", '"')):
-        end = quoted_scalar_end(value)
-        if end is not None and end >= 0:
-            scalar = value[1:end]
-            if value[0] == "'":
-                return scalar.replace("''", "'")
-            decoded: list[str] = []
-            cursor = 0
-            while cursor < len(scalar):
-                if (
-                    scalar[cursor] == "\\"
-                    and cursor + 1 < len(scalar)
-                    and scalar[cursor + 1] in {'"', "\\"}
-                ):
-                    decoded.append(scalar[cursor + 1])
-                    cursor += 2
-                else:
-                    decoded.append(scalar[cursor])
-                    cursor += 1
-            return "".join(decoded)
+        scalar, _, error = yaml_decode_quoted_scalar(value)
+        if error is not None:
+            if state is not None and line is not None:
+                state.add_error(line, error)
+            return ""
+        return scalar
     return value
 
 
-def yaml_mapping_line(value: str) -> tuple[int, str, str] | None:
+def yaml_mapping_line(
+    value: str,
+    line: int | None = None,
+    state: YAMLParseState | None = None,
+) -> tuple[int, str, str] | None:
     """Parse a block mapping line with a scalar or quoted scalar key."""
     indentation = len(value) - len(value.lstrip(" "))
     _, content = yaml_node_properties(value[indentation:])
@@ -429,12 +522,16 @@ def yaml_mapping_line(value: str) -> tuple[int, str, str] | None:
         end = quoted_scalar_end(content)
         if end in {None, -1}:
             return None
-        separator = re.match(r"^[ \t]*:[ \t]*(.*)$", content[end + 1 :])
+        separator = re.match(
+            r"^[ \t]*:[ \t]*(.*)$", content[end + 1 :], re.S
+        )
         if not separator:
             return None
-        key = yaml_scalar_value(content[: end + 1])
+        key = yaml_scalar_value(content[: end + 1], line, state)
         return None if not key else (indentation, key, separator.group(1))
-    match = re.fullmatch(r"([A-Za-z0-9_.-]+):(?:[ \t]*(.*))?", content)
+    match = re.fullmatch(
+        r"([A-Za-z0-9_.-]+):(?:[ \t]*(.*))?", content, re.S
+    )
     if not match:
         return None
     return indentation, match.group(1), match.group(2) or ""
@@ -463,7 +560,7 @@ def yaml_inline_node(
     elif not remainder:
         node = YAMLNullNode(line)
     else:
-        node = YAMLScalarNode(yaml_scalar_value(remainder), line)
+        node = YAMLScalarNode(yaml_scalar_value(remainder, line, state), line)
     if state.count_node(line):
         yaml_register_anchors(properties, node, line, state)
     return node
@@ -492,7 +589,7 @@ def yaml_flow_mapping(
         if separator < 0:
             state.add_error(line, "invalid YAML flow mapping entry")
             continue
-        key = yaml_scalar_value(part[:separator].strip())
+        key = yaml_scalar_value(part[:separator].strip(), line, state)
         if not key:
             state.add_error(line, "invalid YAML flow mapping key")
             continue
@@ -544,7 +641,7 @@ def yaml_mapping(
             break
         if current_indent > indent:
             break
-        mapping = yaml_mapping_line(raw)
+        mapping = yaml_mapping_line(raw, cursor + 2, state)
         if mapping is None:
             if raw.lstrip().startswith(("'", '"', "?", "[", "{")):
                 state.add_error(cursor + 2, "invalid YAML mapping key")
@@ -575,8 +672,11 @@ def yaml_mapping(
                 cursor += 1
             yaml_register_anchors(properties, node, line, state)
         else:
-            flow_value, next_cursor = yaml_collect_flow(lines, cursor, raw_value)
-            node = yaml_inline_node(flow_value, line, depth, state)
+            if remainder.startswith(("'", '"')):
+                scalar_value, next_cursor = yaml_collect_quoted(lines, cursor, raw_value)
+            else:
+                scalar_value, next_cursor = yaml_collect_flow(lines, cursor, raw_value)
+            node = yaml_inline_node(scalar_value, line, depth, state)
             cursor = next_cursor
         items[key] = node
     return YAMLMappingNode(items, index + 2), cursor
@@ -701,11 +801,11 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
         for continuation_index in range(index + 1, len(lines)):
             pieces.append(lines[continuation_index].strip())
             last = continuation_index
-            combined = " ".join(pieces)
+            combined = "\n".join(pieces)
             if quoted_scalar_end(combined) not in {None, -1}:
                 break
         quoted_values[index] = (
-            " " * indentation + key + ": " + property_prefix + " ".join(pieces)
+            " " * indentation + key + ": " + property_prefix + yaml_join_quoted_parts(pieces)
         )
         quoted_continuations.update(range(index + 1, last + 1))
 
@@ -881,7 +981,7 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
                 if remainder and not remainder.startswith("#"):
                     errors.append(f"frontmatter line {number} has content after a quoted scalar")
                     continue
-                value = value[1:cursor]
+                value = yaml_scalar_value(value[: cursor + 1], number)
             else:
                 value = re.split(r"\s+#", value, maxsplit=1)[0].rstrip()
         values[key] = value
@@ -2357,6 +2457,73 @@ def source_process_keys(
     return set(ordered)
 
 
+def included_kind_pattern(locale: str) -> re.Pattern[str]:
+    if locale == "en":
+        return re.compile(r"\b(?:Activity|Task)\b", re.I)
+    return re.compile(r"活動|タスク")
+
+
+def included_visible_text(value: str) -> str:
+    """Mask code while retaining nested list markers under a visible list."""
+    cleaned = without_html_comments(without_fenced_code(value))
+    visible: list[str] = []
+    list_indent: int | None = None
+    for line in cleaned.splitlines(keepends=True):
+        content = line.rstrip("\r\n")
+        newline = line[len(content) :]
+        if not content.strip():
+            visible.append(line)
+            list_indent = None
+            continue
+        expanded = content.expandtabs(4)
+        indent = len(expanded) - len(expanded.lstrip(" "))
+        marker = re.match(r"^ *(?:[-*+]|\d+[.)])\s+", expanded)
+        if marker:
+            if indent <= 3 or (list_indent is not None and indent <= 32):
+                visible.append(expanded[indent:] + newline if indent > 3 else line)
+                list_indent = indent
+            else:
+                visible.append(newline)
+            continue
+        if list_indent is not None and indent <= list_indent:
+            list_indent = None
+        if indent >= 4:
+            visible.append(newline)
+            continue
+        visible.append(line)
+    return "".join(visible)
+
+
+def included_semantic_elements(
+    value: str,
+    locale: str,
+    current_package_id: str | None,
+) -> list[tuple[str, str | None]]:
+    """Extract structured Activity/Task elements without comparing names."""
+    visible = included_visible_text(value)
+    pattern = included_kind_pattern(locale)
+    events: list[tuple[int, str, str | None]] = []
+    for line_number, line in enumerate(visible.splitlines()):
+        heading = re.match(r"^ {0,3}#{3,6}\s+(.+?)\s*$", line)
+        item = re.match(r"^ {0,3}(?:[-*+]|\d+[.)])\s+(.+?)\s*$", line)
+        candidate_match = heading or item
+        if candidate_match is None:
+            continue
+        candidate = candidate_match.group(1)
+        kind_match = pattern.search(without_inline_code(candidate))
+        if kind_match is None:
+            continue
+        kind = "activity" if kind_match.group(0).casefold() in {"activity", "活動"} else "task"
+        refs = references(candidate)
+        identity = (
+            normalized_reference_key(refs[0], current_package_id)
+            if len(refs) == 1
+            else None
+        )
+        events.append((line_number, kind, identity))
+    return [(kind, identity) for _, kind, identity in events]
+
+
 def check_view(
     path: Path,
     text: str,
@@ -2452,7 +2619,9 @@ def check_view(
             if row_source not in declared_keys:
                 errors.append(f"{path}: provenance row {row_number} names an undeclared Source Process: {row[0]}")
     elif included.strip():
-        if re.search(r"(?im)\b(?:Activity|Task)\b|活動|タスク", included):
+        structured = included_semantic_elements(included, locale, current_package_id)
+        visible = included_visible_text(included)
+        if structured or included_kind_pattern(locale).search(without_inline_code(visible)):
             warnings.append(
                 f"{path}: source-element provenance could not be established mechanically"
             )
@@ -2719,10 +2888,14 @@ def check_pair(
     if en_kind == "process-view":
         en_outcomes = outcome_items(section(en_text, HEADINGS["en"]["outcomes"]))
         ja_outcomes = outcome_items(section(ja_text, HEADINGS["ja"]["outcomes"]))
-        en_sources = source_entries(section(en_text, HEADINGS["en"]["sources"]) or "")
-        ja_sources = source_entries(section(ja_text, HEADINGS["ja"]["sources"]) or "")
-        en_included = table(section(en_text, HEADINGS["en"]["included"]) or "")[1]
-        ja_included = table(section(ja_text, HEADINGS["ja"]["included"]) or "")[1]
+        en_source_text = section(en_text, HEADINGS["en"]["sources"]) or ""
+        ja_source_text = section(ja_text, HEADINGS["ja"]["sources"]) or ""
+        en_included_text = section(en_text, HEADINGS["en"]["included"]) or ""
+        ja_included_text = section(ja_text, HEADINGS["ja"]["included"]) or ""
+        en_sources = source_entries(en_source_text)
+        ja_sources = source_entries(ja_source_text)
+        en_included = table(en_included_text)[1]
+        ja_included = table(ja_included_text)[1]
         if len(en_outcomes) != len(ja_outcomes):
             errors.append(
                 f"{english} / {japanese}: Outcome count differs ({len(en_outcomes)} != {len(ja_outcomes)})"
@@ -2745,8 +2918,6 @@ def check_pair(
         )
         if en_refs != ja_refs:
             errors.append(f"{english} / {japanese}: Source Process reference identity or order differs")
-        en_source_text = section(en_text, HEADINGS["en"]["sources"]) or ""
-        ja_source_text = section(ja_text, HEADINGS["ja"]["sources"]) or ""
         en_names = source_canonical_names(
             en_source_text, current_package_id, None, "en"
         )
@@ -2774,6 +2945,42 @@ def check_pair(
             errors.append(
                 f"{english} / {japanese}: included source provenance or order differs"
             )
+        if not en_included and not ja_included:
+            en_elements = included_semantic_elements(
+                en_included_text, "en", current_package_id
+            )
+            ja_elements = included_semantic_elements(
+                ja_included_text, "ja", current_package_id
+            )
+            if en_elements and ja_elements:
+                if len(en_elements) != len(ja_elements):
+                    errors.append(
+                        f"{english} / {japanese}: included Activity/Task count differs "
+                        f"({len(en_elements)} != {len(ja_elements)})"
+                    )
+                elif tuple(kind for kind, _ in en_elements) != tuple(
+                    kind for kind, _ in ja_elements
+                ):
+                    errors.append(
+                        f"{english} / {japanese}: included Activity/Task kind/order differs"
+                    )
+                if len(en_elements) == len(ja_elements):
+                    en_identities = tuple(identity for _, identity in en_elements)
+                    ja_identities = tuple(identity for _, identity in ja_elements)
+                    if all(identity is not None for identity in en_identities + ja_identities):
+                        if en_identities != ja_identities:
+                            errors.append(
+                                f"{english} / {japanese}: included source identity or order differs"
+                            )
+                    elif any(identity is not None for identity in en_identities + ja_identities):
+                        warnings.append(
+                            f"{english} / {japanese}: included Activity/Task source identity is unverified"
+                        )
+            elif en_elements or ja_elements:
+                warnings.append(
+                    f"{english} / {japanese}: included Activity/Task structure is unverified "
+                    "because one locale has no comparable structured elements"
+                )
         return errors, warnings
     if en_kind != "process":
         return errors, warnings

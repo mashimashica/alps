@@ -286,6 +286,86 @@ def check_view_fixture(sources: str, included: str) -> list[str]:
         return errors
 
 
+def write_process_view_pair(
+    root: Path,
+    english_included: str,
+    japanese_included: str,
+) -> tuple[Path, Path]:
+    english = root / "view" / "SKILL.md"
+    japanese = english.parent / "references" / "locales" / "ja" / "SKILL.md"
+    write(
+        english,
+        """---
+name: fixture-view
+description: Fixture Process View.
+metadata:
+  alps.kind: process-view
+---
+
+# Fixture View
+
+## Purpose
+
+The fixture organizes source Processes.
+
+## Outcomes
+
+- The source Processes are represented.
+
+## Source Processes
+
+- One
+- Two
+
+## Included Activities and Tasks
+
+"""
+        + english_included
+        + """
+
+## Application
+
+The fixture provides application guidance.
+""",
+    )
+    write(
+        japanese,
+        """---
+name: fixture-view
+description: フィクスチャのプロセスビュー。
+metadata:
+  alps.kind: process-view
+---
+
+# フィクスチャビュー
+
+## 目的
+
+出典プロセスを整理する。
+
+## 成果
+
+- 出典プロセスを表現する。
+
+## 出典プロセス
+
+- 一
+- 二
+
+## 含まれる活動およびタスク
+
+"""
+        + japanese_included
+        + """
+
+## 適用
+
+フィクスチャを適用できる。
+""",
+    )
+    return english, japanese
+
+
 def check_anchored_view_fixture(complete: bool) -> tuple[str, list[str]]:
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
@@ -710,6 +790,145 @@ Three | information | Four | relates the Processes."""
 | skill:#two | Task |"""
         self.assertEqual(check_view_fixture(valid_sources, valid_included), [])
 
+    def test_process_view_pair_compares_structured_non_table_included_elements(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            english, japanese = write_process_view_pair(
+                Path(directory),
+                "- Activity: Work\n- Task: Review",
+                "- 活動: 作業\n- タスク: 確認",
+            )
+            self.assertEqual(
+                CHECKER.check_asset(english, {"": root}, "fixture")[0],
+                [],
+            )
+            self.assertEqual(
+                CHECKER.check_asset(japanese, {"": root}, "fixture")[0],
+                [],
+            )
+            errors, warnings = CHECKER.check_pair(
+                english,
+                japanese,
+                set(CHECKER.DEFAULT_JA_TERMS),
+                "fixture",
+            )
+            self.assertEqual(errors, [], errors)
+            self.assertEqual(warnings, [], warnings)
+
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_process_view_pair(
+                Path(directory),
+                "### Activity: Work\n#### Task: Review",
+                "### 活動: 作業\n#### タスク: 確認",
+            )
+            errors, warnings = CHECKER.check_pair(
+                english,
+                japanese,
+                set(CHECKER.DEFAULT_JA_TERMS),
+                "fixture",
+            )
+            self.assertEqual(errors, [], errors)
+            self.assertEqual(warnings, [], warnings)
+
+        for english_included, japanese_included, expected in (
+            (
+                "- Activity: Work\n- Task: Review",
+                "- 活動: 作業",
+                "included Activity/Task count differs",
+            ),
+            (
+                "- Activity: Work\n    - Task: Review",
+                "- 活動: 作業",
+                "included Activity/Task count differs",
+            ),
+            (
+                "- Activity: Work\n- Task: Review",
+                "- タスク: 確認\n- 活動: 作業",
+                "included Activity/Task kind/order differs",
+            ),
+        ):
+            with self.subTest(expected=expected), tempfile.TemporaryDirectory() as directory:
+                english, japanese = write_process_view_pair(
+                    Path(directory), english_included, japanese_included
+                )
+                errors, _ = CHECKER.check_pair(
+                    english,
+                    japanese,
+                    set(CHECKER.DEFAULT_JA_TERMS),
+                    "fixture",
+                )
+                self.assertTrue(any(expected in error for error in errors), errors)
+
+    def test_process_view_pair_compares_stable_included_source_identity(self) -> None:
+        reference_one = chr(96) + "skill:#one" + chr(96)
+        reference_two = chr(96) + "skill:#two" + chr(96)
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_process_view_pair(
+                Path(directory),
+                "- Activity: Work (" + reference_one + ")\n"
+                "- Task: Review (" + reference_two + ")",
+                "- 活動: 作業 (" + reference_two + ")\n"
+                "- タスク: 確認 (" + reference_one + ")",
+            )
+            errors, _ = CHECKER.check_pair(
+                english,
+                japanese,
+                set(CHECKER.DEFAULT_JA_TERMS),
+                "fixture",
+            )
+            self.assertTrue(
+                any("included source identity or order differs" in error for error in errors),
+                errors,
+            )
+
+    def test_process_view_non_table_extractor_ignores_code_and_comments(self) -> None:
+        fence = chr(96) * 3
+        included = (
+            fence
+            + "markdown\n### Activity: Hidden\n"
+            + fence
+            + "\n<!--\n- Task: Hidden\n-->\n"
+            "- Activity: Work\n"
+            "    - Task: Hidden continuation code\n"
+        )
+        self.assertEqual(
+            CHECKER.included_semantic_elements(included, "en", "fixture"),
+            [("activity", None), ("task", None)],
+        )
+        self.assertEqual(
+            CHECKER.included_semantic_elements(
+                "- 活動: 作業\n    - タスク: 確認\n", "ja", "fixture"
+            ),
+            [("activity", None), ("task", None)],
+        )
+        self.assertEqual(
+            CHECKER.included_semantic_elements(
+                "Paragraph\n\n    - Activity: Hidden\n    - Task: Hidden\n",
+                "en",
+                "fixture",
+            ),
+            [],
+        )
+        self.assertEqual(
+            CHECKER.included_semantic_elements(
+                "    Activity: Hidden\n        Task: Hidden\n",
+                "en",
+                "fixture",
+            ),
+            [],
+        )
+        self.assertEqual(
+            check_view_fixture("- One\n- Two", included),
+            [],
+        )
+        self.assertEqual(
+            check_view_fixture(
+                "- One\n- Two",
+                "### Activity: Work\n#### Task: Review",
+            ),
+            [],
+        )
+
     def test_process_view_checks_source_table_display_name_and_canonical_only(self) -> None:
         invalid_sources = """| Source Process | Reference |
 | --- | --- |
@@ -1084,6 +1303,7 @@ Three | information | Four | relates the Processes."""
             "description: Fixture process. ALPS-conformant.\n"
             "metadata: {\n"
             "  note: \"line one\n"
+            "\n"
             "    # } remains quoted\",\n"
             "  alps: {kind: process-view}\n"
             "} # representation comment\n"
@@ -1093,6 +1313,33 @@ Three | information | Four | relates the Processes."""
         self.assertEqual(errors, [], errors)
         self.assertEqual(values["metadata.note"], "line one\n# } remains quoted")
         self.assertEqual(values["alps.kind"], "process-view")
+
+    def test_frontmatter_flow_double_quoted_line_breaks_fold_and_preserve_blanks(self) -> None:
+        text = (
+            "---\n"
+            "name: fixture\n"
+            "description: Fixture process. ALPS-conformant.\n"
+            "metadata: {\n"
+            '  "alps.kind": process-view,\n'
+            '  note: "line one\n'
+            '    line two",\n'
+            '  "display\n'
+            '    name": "value",\n'
+            '  blank: "first\n'
+            "\n"
+            '    third"\n'
+            "}\n"
+            "---\n"
+        )
+        values, errors = CHECKER.frontmatter(text)
+        self.assertEqual(errors, [], errors)
+        self.assertEqual(values["alps.kind"], "process-view")
+        self.assertEqual(values["metadata.note"], "line one line two")
+        self.assertEqual(values["metadata.display name"], "value")
+        self.assertEqual(values["metadata.blank"], "first\nthird")
+        decoded, _, error = CHECKER.yaml_decode_quoted_scalar('"one\r\ntwo"')
+        self.assertIsNone(error)
+        self.assertEqual(decoded, "one two")
 
     def test_frontmatter_reports_invalid_and_unclosed_flow_mappings(self) -> None:
         invalid = (
@@ -1548,6 +1795,89 @@ The fixture has a purpose.
                     "Fixture process. ALPS-conformant.",
                     (quote, properties, values),
                 )
+
+    def test_frontmatter_decodes_full_yaml_double_quoted_escape_set(self) -> None:
+        text = (
+            "---\n"
+            'value: "\\0\\a\\b\\t\\n\\v\\f\\r\\e\\ \\"\\/\\\\\\N\\_\\L\\P\\x70\\u0072\\U0000006f"\n'
+            "---\n"
+        )
+        values, errors = CHECKER.frontmatter(text)
+        expected = (
+            "\0\a\b\t\n\v\f\r\x1b "
+            + '"'
+            + "/"
+            + "\\"
+            + "\x85\xa0\u2028\u2029pro"
+        )
+        self.assertEqual(errors, [], errors)
+        self.assertEqual(values["value"], expected)
+
+    def test_frontmatter_double_quoted_escapes_decode_name_description_and_kind(self) -> None:
+        text = r'''---
+name: "\x70"
+description: "Fixture process. ALPS-conformant."
+metadata:
+  "alps.\x6bind": "process-view"
+---
+'''
+        values, errors = CHECKER.frontmatter(text)
+        self.assertEqual(errors, [], errors)
+        self.assertEqual(values["name"], "p")
+        self.assertEqual(values["description"], "Fixture process. ALPS-conformant.")
+        self.assertEqual(values["alps.kind"], "process-view")
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "skills" / "fixture" / "SKILL.md"
+            write(
+                path,
+                text
+                + "# Fixture\n\n## Purpose\n\nPurpose.\n\n"
+                "## Outcomes\n\n- Outcome.\n",
+            )
+            asset_errors, _ = CHECKER.check_asset(path, {"": root}, None)
+            self.assertTrue(
+                any("Process View requires Source Processes" in error for error in asset_errors),
+                asset_errors,
+            )
+            self.assertFalse(
+                any("Process representation requires" in error for error in asset_errors),
+                asset_errors,
+            )
+
+    def test_frontmatter_double_quoted_escaped_line_break_is_folded(self) -> None:
+        text = r'''---
+name: fixture
+description: "Fixture process.\
+  ALPS-conformant."
+metadata:
+  alps.kind: process
+---
+'''
+        values, errors = CHECKER.frontmatter(text)
+        self.assertEqual(errors, [], errors)
+        self.assertEqual(values["description"], "Fixture process.ALPS-conformant.")
+
+    def test_frontmatter_rejects_invalid_yaml_double_quoted_escapes(self) -> None:
+        for escape in (r"\q", r"\x1", r"\uD800", r"\U00110000"):
+            with self.subTest(escape=escape):
+                text = (
+                    "---\n"
+                    "name: fixture\n"
+                    "description: Fixture process. ALPS-conformant.\n"
+                    'metadata:\n  alps.kind: "' + escape + '"\n'
+                    "---\n"
+                )
+                values, errors = CHECKER.frontmatter(text)
+                self.assertTrue(
+                    any(
+                        "invalid YAML double-quoted" in error
+                        for error in errors
+                    ),
+                    (escape, errors),
+                )
+                self.assertNotEqual(values.get("alps.kind"), escape)
 
     def test_frontmatter_parses_anchored_tagged_flow_metadata_with_comments(self) -> None:
         for metadata in (
