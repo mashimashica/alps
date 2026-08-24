@@ -6,7 +6,7 @@
 
 This specification, ALPS (Agent Lifecycle Process Skills), applies the Process Framework (hereafter “PF”) to Agent Skills. Authors vary in the granularity, normative force, life cycle management, and conformance criteria they use for Agent Skills. A shared Process Description structure makes results more consistent and supports deployment, Tailoring, improvement, and Assessment of the described Process. Name, Purpose, and Outcomes establish shared reference points for Process application and Assessment (PF 1.2). This specification therefore establishes common rules for Skill description, life cycle management, and conformance.
 
-This specification treats a Skill as an asset that provides an authoritative Process Description and applies the PF design principles throughout the Skill life cycle.
+This specification treats an Agent Skill as an asset that, by default, provides an authoritative Process Description, and applies the PF design principles throughout the Skill life cycle. It also permits Agent Skills to represent Process Models, Process Reference Models, and Process Views without changing the meanings of those PF constructs.
 
 ---
 
@@ -47,13 +47,15 @@ d) The declaration and handling of Controls, Constraints, and Enablers applicabl
 
 e) Rules for Tailoring and Process Instantiation (Clause 11), criteria for claims of Conformance to this specification and to Processes described by Skills, and treatment of Capability (Clause 12).
 
-f) The logical composition and integrity of a Skill Package comprising a Skill Description and accompanying resources that support understanding or applying the described Process or creating its Outputs (5.7).
+f) The logical composition and integrity of a Skill Package comprising an authoritative Agent Skill representation and accompanying resources that support understanding or applying the represented PF construct (5.7).
+
+g) Rules for representing a Process, Process Model, Process Reference Model, or Process View through an Agent Skill and for resolving references among those representations (5.1, 5.6, and 8.3).
 
 ### 1.2 Matters Not Specified by This Specification
 
 This specification does not establish:
 
-a) A concrete implementation form for a Skill Package. File formats, metadata formats, physical storage structures, distribution mechanisms, and toolchains are outside the scope of this specification. However, 5.7 applies to the logical composition and integrity of the Skill Description and accompanying resources.
+a) A concrete implementation form for a Skill Package beyond the minimum representation metadata and logical references specified in 5.1 and 5.6. Other file formats, metadata formats, physical storage structures, distribution mechanisms, and toolchains are outside the scope of this specification. However, 5.7 applies to the logical composition and integrity of the authoritative Agent Skill representation and accompanying resources.
 
 b) A particular Agent implementation, model, execution environment, or vendor.
 
@@ -81,10 +83,10 @@ Terms defined or used in the PF are used with the meanings given in the PF. In a
 An executing entity capable of performing Activities and Tasks under a stated Purpose, with some autonomy in observing its environment, making judgments, and acting. This includes software systems operating under human direction or supervision.
 
 **3.2 Agent Skill (Skill)**
-A unit consisting of a reusable Process Description, and accompanying resources when needed, made into an asset in a form that an Agent can discover, load, and use to apply the described Process. It is referred to simply as a “Skill” in this specification.
+A unit that an Agent can discover and load. By default, it provides an authoritative reusable Process Description through which the described Process can be applied. As specified in 5.1, it may instead represent a Process Model, Process Reference Model, or Process View. Accompanying resources may be included when needed. It is referred to simply as a “Skill” in this specification.
 
 **3.3 Skill Description**
-The authoritative Process Description provided as the content of a Skill. It has Name, Purpose, and Outcomes as mandatory elements and can include optional elements and reference information (see Clause 6).
+The authoritative Process Description provided by an Agent Skill representing a Process. It has Name, Purpose, and Outcomes as mandatory elements and can include optional elements and reference information (see Clause 6).
 
 **3.4 Discovery Layer and Execution Layer**
 ALPS-specific functional presentation layers through which a Skill Description is made available to an Agent. The discovery layer presents the Name and concise reference information used to discover the Skill and determine its applicability before the complete Skill Description is loaded. The execution layer presents the authoritative Process Description elements and reference information used to execute and assess the described Process.
@@ -95,16 +97,16 @@ These layers do not add Process Description elements and do not require a partic
 The Process Reference Model in Clause 7 of this specification, which defines the ALPS definition process, ALPS application process, and ALPS management process through their respective Purposes and Outcomes. Each Process comprises three Activities. The model can be used as a frame of reference for assessment and improvement of the Skill life cycle.
 
 **3.6 Invocation**
-Determining that Entry Criteria are satisfied and beginning execution of a Process Instance through a selected Skill.
+Determining that Entry Criteria are satisfied and beginning execution of a Process Instance through a selected Agent Skill representing a Process.
 
 **3.7 Skill Asset**
-A Skill or Skill Package that has been adopted and placed under management.
+An Agent Skill or Skill Package that has been adopted and placed under management.
 
 **3.8 Skill Discovery Description**
 Concise reference information placed in the ALPS-specific discovery layer that an Agent uses to discover a Skill and determine its applicability before loading the complete Skill Description. It states what the described Process does, when the Skill is used, and the information needed to determine applicability.
 
 **3.9 Skill Package**
-A unit managed as a whole that contains one Skill Description and any accompanying resources that support understanding or applying the described Process or creating its Outputs.
+A unit managed as a whole that contains one authoritative Agent Skill representation and any accompanying resources that support understanding or applying the represented PF construct.
 
 ## 4. Normative Language and Conventions
 
@@ -129,15 +131,25 @@ The main text of this specification (Clauses 1 through 12) is normative. Notes, 
 
 ## 5. Fundamental Concepts
 
-### 5.1 A Skill Provides a Process Description
+### 5.1 Agent Skills and Process Descriptions
 
-The authoritative content of a Skill must be written as a Process Description conforming to the PF.
+An Agent Skill represents a Process by default. When an Agent Skill represents a Process, its authoritative content must be a Process Description conforming to the PF. This is the base ALPS case and requires no explicit asset-kind declaration.
 
 A Skill Description can describe a general Process or, when explicitly scoped to a particular context, a Process Instance. A description of a Process Instance can specify the required capabilities, resources, Inputs, Outputs, Constraints, Controls, and time (PF 1.1).
 
-### 5.2 Dual Nature of a Skill: Descriptive Asset and Enabler
+ALPS also permits an Agent Skill to represent a Process Model, Process Reference Model, or Process View. An Agent Skill representing one of these constructs must declare `metadata.alps.kind` in its `SKILL.md` frontmatter as one of the following values:
 
-A Skill provides a Process Description as its authoritative content and functions as an Enabler for application of the described Process.
+- `process-model`;
+- `process-reference-model`; or
+- `process-view`.
+
+The `skills/` directory and `SKILL.md` are Agent Skill packaging and discovery conventions. They do not change the meaning of the represented PF construct and do not make a Process Model, Process Reference Model, or Process View into a Process.
+
+Agent Skill activation means that an Agent selects and loads an Agent Skill representation. Process Invocation means that execution of a Process Instance begins. Only an Agent Skill representing a Process directly represents an invokable Process. Activating a Process Model, Process Reference Model, or Process View does not itself begin a Process Instance.
+
+### 5.2 Dual Nature of a Process Skill: Descriptive Asset and Enabler
+
+An Agent Skill representing a Process provides a Process Description as its authoritative content and functions as an Enabler for application of the described Process.
 
 Skills, Agents, and tools must be treated as Enablers, not as Inputs (PF 4.1).
 
@@ -155,7 +167,7 @@ When the definition, maintenance, assessment, or change handling of an informati
 
 ### 5.5 Functional Layers and Progressive Disclosure
 
-PF 1.3 permits a Process Description to present information in layers for readers with different needs. For Agent Skills, ALPS defines a discovery layer and an execution layer as functional presentation layers for progressive disclosure. The names and functions of these layers are specific to ALPS and are not PF constructs.
+PF 1.3 permits a Process Description to present information in layers for readers with different needs. For Agent Skills representing Processes, ALPS defines a discovery layer and an execution layer as functional presentation layers for progressive disclosure. The names and functions of these layers are specific to ALPS and are not PF constructs.
 
 A Skill Description claiming Description Conformance must provide both layers and make their functions distinguishable. The layers may be represented together or separately, provided that one authoritative Skill Description remains identifiable and mandatory references are resolvable.
 
@@ -167,29 +179,44 @@ c) Matters that cut across multiple Processes should be treated separately from 
 
 NOTE: These functional layers support progressive disclosure without requiring two files, two sections, or another particular physical structure.
 
-### 5.6 Process Models and Life Cycle Models
+### 5.6 Process Models, Process Reference Models, and Life Cycle Models
 
-Process Models and life cycle models are interpreted with the meanings established by the PF. When Processes in a Process Model are made available as Skills, the Model may identify the Skill Package that supplies each authoritative Process Description and the relationships among the Processes.
+Process Models, Process Reference Models, and life cycle models are interpreted with the meanings established by the PF.
+
+A Process Model represented through an Agent Skill identifies a set of related Processes and their relationships. Each Process may identify the Agent Skill that supplies its authoritative Process Description. A Process Model does not need to repeat each Process Purpose and Outcomes.
+
+A Process Reference Model represented through an Agent Skill must identify its Processes by Name, Purpose, and Outcomes and place their relationships in an explicit structure. For every referenced Process Skill, the Process Name must identify the same Process, the Purpose in the Process Reference Model must equal the Purpose in the authoritative Process Description, and the Outcomes in the Process Reference Model must equal the Outcomes in the authoritative Process Description. A mismatch makes the representation invalid; neither representation silently overrides the other.
+
+A Process Model, Process Reference Model, or Process View refers to an Agent Skill by logical package identity and Skill name rather than by repository-relative file path. The canonical form is:
+
+```text
+skill:<package-id>#<skill-name>
+```
+
+Within the same package, the short form `skill:#<skill-name>` may be used. A resolver must normalize the short form to the full form using the containing package identity before semantic checks are performed. The applicable package binding supplies `package-id`; ALPS does not require GitHub to be the package identity authority.
 
 A subset of Processes can be selected from a Process Model according to Purpose. The selected Processes can then be applied singly or in combination through the Skills that describe them. Selection and timing need continual review when the subject or context of application changes (PF 5.1 and 5.2).
 
 ### 5.7 Skill Packages and Accompanying Resources
 
-A Skill Package must contain one authoritative Skill Description.
+A Skill Package must contain one authoritative Agent Skill representation.
 
-A Skill Package may include, as needed, reference information, execution resources, and deliverable resources that support understanding or applying the described Process or creating its Outputs. When accompanying resources are included, their roles and conditions of use must be identifiable from the Skill Description. Mandatory references must be resolvable.
+A Skill Package may include, as needed, reference information, execution resources, and deliverable resources that support understanding or applying the represented PF construct. When accompanying resources are included, their roles and conditions of use must be identifiable from the authoritative representation. Mandatory references must be resolvable.
 
-Unnecessary duplication or conflict must not arise between a Skill Description and accompanying resources. Accompanying resources must be treated as reference information, Inputs, Outputs, Controls, Constraints, or Enablers based on the function they perform in Process execution, not on where they are stored (9.1).
+Unnecessary duplication or conflict must not arise between the authoritative representation and accompanying resources. Accompanying resources must be treated according to their function rather than where they are stored. For a Skill Description, they are treated as reference information, Inputs, Outputs, Controls, Constraints, or Enablers according to the function they perform in Process execution (9.1).
 
-A Skill Package should contain only resources that directly support understanding or applying the described Process or creating its Outputs.
+A Skill Package should contain only resources that directly support understanding or applying the represented PF construct.
 
 ### 5.8 Specialization of the Process Framework
 
 ALPS specializes the general constructs of the PF for Agent Skills. The normative source for each general concept remains the PF; this specification does not restate general definitions and adds only what is specific to Agent Skills.
 
-| PF construct | ALPS specialization |
+| PF construct | ALPS treatment |
 |---|---|
-| Process Description | Skill Description (3.3) |
+| Process Description | Skill Description (3.3) when the Agent Skill represents a Process |
+| Process Model | May be represented directly by an Agent Skill with `metadata.alps.kind: process-model` (5.1, 5.6) |
+| Process Reference Model | May be represented directly by an Agent Skill with `metadata.alps.kind: process-reference-model` (5.1, 5.6) |
+| Process View | May be represented directly by an Agent Skill with `metadata.alps.kind: process-view` (5.1, 8.3) |
 | Resources that perform or support a Process | Agents, models, tools, and execution environments, treated as Enablers (5.2, 9.3) |
 
 ALPS may make a PF rule concrete for the Agent context and may strengthen it where needed. ALPS must not change the meaning of a PF concept, weaken a PF requirement, or replace a PF concept with a different one (see Clause 2).
@@ -385,7 +412,7 @@ j) It must be confirmed that the set of Activities covers all Outcomes and satis
 
 k) Relationships between Tasks and Outcomes should be identified (8.2).
 
-l) The Skill Discovery Description must state what the Process does, when the Skill is used, and the information needed to determine applicability in accordance with 3.11, 5.5, and 6.3.8.
+l) The Skill Discovery Description must state what the Process does, when the Skill is used, and the information needed to determine applicability in accordance with 3.8, 5.5, and 6.3.8.
 
 m) When representative Inputs and Outputs are shown, the principal relationships with other Processes should be identified as needed (6.3.6, 8.2).
 
@@ -697,19 +724,27 @@ A Process View organizes Activities and Tasks spanning multiple Processes around
 
 When an independent Process boundary is established, the Process can be described by a separate Skill in accordance with 5.4.
 
+A Process View represented through an Agent Skill must declare `metadata.alps.kind: process-view`. Activating that Agent Skill loads the View representation and does not itself invoke a Process.
+
 a) Every Process View must state its Name, Purpose, and Outcomes.
 
 b) To achieve the Outcomes, a Process View may include Activities and Tasks selected from an existing Process Model, adapted Activities and Tasks, or Activities and Tasks specific to the Process View.
 
 c) A Process View must include explanations and guidance for applying those Activities and Tasks.
 
-d) A Process View must explicitly identify the source Process of each Activity and Task and whether it is selected, adapted, or new. Elements selected from an existing Process Model must retain their source Process and source statement.
+d) A Process View must explicitly identify the source Process of each Activity and Task and whether it is `selected`, `adapted`, or `new`. Elements selected from an existing Process Model must retain their source Process and source statement. Source Process Skills must be identified by the canonical Skill references specified in 5.6.
 
 e) Adapted elements and elements specific to the Process View are not treated as changes to the original Process Model. Unless Tailoring or formal adoption into the Process Model occurs, these elements do not count toward Conformance to the source Process.
 
 f) Operation of a particular Process Model may adopt a restricted Process View that uses only Activities and Tasks from existing Processes. Under this approach, Activities and Tasks specific to the Process View must not be included.
 
 g) A Process View may show connections among Processes and the sources of the Processes used in its composition.
+
+Process View Description Conformance concerns the View representation itself. It requires the View Purpose, Outcomes, source provenance, treatment classifications, relationships or handoffs, and application guidance to be complete and internally consistent.
+
+Source Process Conformance remains a claim about the applicable source Process. A `selected` element can contribute to that claim according to the source Process Conformance basis. `adapted` and `new` elements do not contribute to Source Process Conformance unless managed Tailoring or formal adoption incorporates them into that Process.
+
+Achievement of the Process View Outcomes can be assessed separately. That assessment is not Process Outcome Conformance for a source Process.
 
 ## 9. Controls, Constraints, and Enablers
 
@@ -789,11 +824,13 @@ When justified by quality risk, a Process Instance can be described in greater d
 
 Conformance relating to this specification can be claimed for the following subjects. Every claim must identify the subject and the selected criteria.
 
-a) **Description Conformance** — A Skill Description satisfies the applicable requirements of Clauses 4 through 6. When a Skill Package is included in the subject of conformance, the Package also satisfies the applicable requirements of 5.7.
+a) **Description Conformance** — A Skill Description satisfies the applicable requirements of Clauses 4 through 6. When a Skill Package containing a Process representation is included in the subject of conformance, the Package also satisfies the applicable requirements of 5.7.
 
 b) **Reference Model Conformance** — For definition, application, or management of Skills, Conformance under 12.2 or 12.3 is established for the declared Process among the three Processes in Clause 7.
 
 c) **Execution Conformance** — Execution of a Process Instance through a Skill establishes Conformance under 12.2 or 12.3 to the Process described by that Skill.
+
+d) **Process View Description Conformance** — An Agent Skill representation of a Process View satisfies the applicable representation, source-provenance, treatment-classification, relationship, application-guidance, and internal-consistency requirements of 5.1, 5.6, and 8.3.
 
 ### 12.2 Full Conformance
 
@@ -804,8 +841,9 @@ a) **Full Conformance to Outcomes** requires achievement of all mandatory Outcom
 
 b) **Full Conformance to Tasks** requires satisfaction of every requirement stated with **must** or **must not** by an Activity or Task in the declared Process described by a Skill or in the declared Reference Model Process. Recommendations, permissible actions, and typical actions are not, solely by virtue of those attributes, mandatory conditions for Full Conformance to Tasks. When this approach is selected, Outcomes are treated as guidance.
 
-
 For Conformance to the Reference Model, the units for which Outcome Conformance to a Process can be claimed are the ALPS definition process, ALPS application process, and ALPS management process. Independent Outcome Conformance must not be claimed for an individual constituent Activity.
+
+Assessment of Process View Outcomes is separate from Process Outcome Conformance for a source Process.
 
 ### 12.3 Tailored Conformance
 
@@ -819,7 +857,7 @@ Capability is treated as a dimension of assessment separate from Conformance. Sp
 
 Outcomes in Skill Descriptions and the Purposes and Outcomes of the three Processes can be used for Process Assessment and effectiveness assessment (PF 8.5, 7.5.3).
 
-Assessment of a Skill Package can evaluate the existence of the authoritative Skill Description, resolvability of mandatory references, consistency between the Skill Description and accompanying resources, roles and conditions of use of accompanying resources, and reverification after changes (5.7, 7.3.3, 7.5.1).
+Assessment of a Skill Package can evaluate the existence of the authoritative Agent Skill representation, resolvability of mandatory references, consistency between the authoritative representation and accompanying resources, roles and conditions of use of accompanying resources, and reverification after changes (5.7, 7.3.3, 7.5.1).
 
 ---
 
@@ -922,13 +960,13 @@ This section is reference information and has no normative force.
 - For a lengthy record, progressive refinement can use Iteration by agenda item.
 ```
 
-NOTE 1: `description` states what the described Process does and when the Skill is used, making that information available before Skill selection (3.11).
+NOTE 1: `description` states what the described Process does and when the Skill is used, making that information available before Skill selection (3.8).
 
 NOTE 2: “Consolidated meeting minutes” is an Output, not an Outcome (6.3.3). The Constraint declares the permitted transfer condition, while the corresponding transfer action is stated as a Task (6.3.7, 9.2). Enablers are not Inputs (9.3), and this Skill does not prescribe a performer (5.3).
 
 ### A.3 Example Composition of a File-Based Skill Package
 
-The following is an informative example of applying 5.7 through a file-based Environment Binding. This composition and these names are not requirements (1.2). Storage groupings other than `SKILL.md` are optional and are established only when necessary accompanying resources exist. The authoritative Skill Description remains the semantic source for both discovery-layer and execution-layer information; an Environment Binding may project discovery information into frontmatter or a separate registration record without changing its meaning or normative force.
+The following is an informative example of applying 5.7 through a file-based Environment Binding. This composition and these names are not requirements (1.2). Storage groupings other than `SKILL.md` are optional and are established only when necessary accompanying resources exist. The authoritative Agent Skill representation remains the semantic source; an Environment Binding may project discovery information into frontmatter or a separate registration record without changing its meaning or normative force.
 
 ```text
 <skill-name>/
@@ -941,17 +979,17 @@ The following is an informative example of applying 5.7 through a file-based Env
 
 | Component | ALPS treatment |
 |---|---|
-| `SKILL.md` | Authoritative Skill Description for the Skill. In this representative Environment Binding, frontmatter projects discovery-layer information and the body provides execution-layer information; ALPS does not require this physical arrangement. |
+| `SKILL.md` | Authoritative Agent Skill representation. For a Process representation, the body provides the authoritative Skill Description and frontmatter can project discovery-layer information. Non-Process representations declare `metadata.alps.kind` as specified in 5.1. |
 | `references/` | Reference information loaded as needed. Individual filenames are not prescribed. |
-| `scripts/` | Execution resources that support reproducibility or reliability. They are typically treated as Enablers. |
-| `assets/` | Resources used to create Outputs. They are treated as Inputs, Outputs, or Enablers according to function. |
+| `scripts/` | Execution resources that support reproducibility or reliability. For Process execution they are typically treated as Enablers. |
+| `assets/` | Resources used to create Outputs or support the representation. They are treated according to function. |
 
 ## Appendix B (informative) Correspondence with the Process Framework
 
 | PF clause | Subject | Corresponding clause in this specification |
 |---|---|---|
 | 1.1 | Process, Process Description, and Process Instance | 5.1, 5.8 |
-| 1.2–1.3 | Required elements, optional detail, and the two-part form | 3.11, 5.1, 5.5, 6.1 |
+| 1.2–1.3 | Required elements, optional detail, and the two-part form | 3.8, 5.1, 5.5, 6.1 |
 | 1.4 | Description and interpretation rules | 4.1, 6.2, 6.3.8 |
 | 2.1–2.3 | Name, Purpose, Outcome, Output, Activity, and Task | 6.3.1–6.3.6 |
 | 3.1 | Boundary, granularity, and cohesion | 5.4 |
@@ -960,7 +998,7 @@ The following is an informative example of applying 5.7 through a file-based Env
 | 4.3 | Entry Criteria and Exit Criteria | 10.1 |
 | 4.4 | Traceability and handoffs | 8.2 |
 | 4.5 | Framework-level Controls and Enablers | 9.1 |
-| 5.1–5.2 | Models, Frameworks, and life cycle models | 3.5, 3.6, 5.6, 5.8, 7.1–7.2 |
+| 5.1–5.2 | Models, Frameworks, and life cycle models | 3.5, 5.6, 5.8, 7.1–7.2 |
 | 5.3 | Process View | 5.8, 8.3 |
 | 6.1–6.2 | Concurrency, Iteration, Recursion, and Integration | 8.1 |
 | 7.1–7.4 | Tailoring and Instantiation | 7.5.2, Clause 11 |
@@ -974,7 +1012,7 @@ The following documents are related to ALPS. They are informative references, no
 
 ### C.1 Agent Skills Specification
 
-The [Agent Skills Specification](https://agentskills.io/specification) defines an open, file-based format centered on `SKILL.md`, with optional directories for scripts, references, and assets. When this format is used for an ALPS-conformant Skill, it supplies an implementation form for the Skill Package; ALPS supplies the Process Description semantics, life cycle, and Conformance rules. ALPS does not require this implementation form (1.2 a)).
+The [Agent Skills Specification](https://agentskills.io/specification) defines an open, file-based format centered on `SKILL.md`, with optional directories for scripts, references, and assets. When this format is used for an ALPS representation, it supplies the Agent-facing packaging, discovery, and loading form; ALPS supplies the PF-based semantics, life cycle, representation rules, and Conformance rules. ALPS requires only the minimum representation metadata and logical references specified in this specification and otherwise does not require a particular file-based implementation form (1.2 a)).
 
 ### C.2 AGENTS.md
 

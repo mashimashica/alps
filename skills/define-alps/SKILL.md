@@ -128,7 +128,7 @@ The selected Skill need and selection rationale, verified Skill Description, rec
 - Managed Skill assets and change history
 - Agents or tools that support drafting, comparison, search, and trials
 - Review capability independent of the author
-- Mechanical pre-checking with `scripts/check_skill_description.py`
+- Mechanical pre-checking with `skills/define-alps/scripts/check_alps_asset.py`
 
 ## Conformance
 
@@ -164,7 +164,7 @@ This section is reference information and does not require a specific manner of 
 - When drafting an ALPS-conformant Skill Description, [SKILL-template.md](references/SKILL-template.md) can be used as an informative example. Select the structure to apply according to the Purpose and required level of detail.
 - When designing the composition of a Skill Package and the roles of accompanying resources, [skill-package-format.md](references/skill-package-format.md) can be used as an informative example. Adopt only the resources that are needed.
 - When producing a formal need record, Skill Description, traceability table, verification record, or adoption-decision record, [record-templates.md](references/record-templates.md) can be tailored to the subject of application.
-- For the representative Markdown Environment Binding used by this Package, `python3 scripts/check_skill_description.py <SKILL.md>` can pre-check YAML frontmatter, canonical headings, and related structural signals. Those representations are binding-specific rather than ALPS requirements; the script does not by itself demonstrate Conformance or achievement of Outcomes.
+- For the representative Markdown Environment Binding used by this Package, `python3 skills/define-alps/scripts/check_alps_asset.py --root . <SKILL.md>` can pre-check YAML frontmatter, canonical headings, and related structural signals. Those representations are binding-specific rather than ALPS requirements; the script does not by itself demonstrate Conformance or achievement of Outcomes.
 
 ## Common Approach
 

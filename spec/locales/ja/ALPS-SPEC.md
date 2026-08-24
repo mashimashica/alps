@@ -6,7 +6,7 @@
 
 本規格 ALPS（Agent Lifecycle Process Skills）は、Process Framework（以下「PF」という）をAgent Skillsに適用する。Agent Skillの記述粒度、規範上の強さ、ライフサイクル管理および適合基準には、作成者間のばらつきがある。共通のProcess Description構造は、結果の一貫性を高め、記述対象Processの導入、Tailoring、改善およびAssessmentを支援する。Name、PurposeおよびOutcomeは、Processの適用とAssessmentの双方で用いる共通の参照点となる（PF 1.2）。このため、本規格は、Skillの記述、ライフサイクル管理および適合に共通する規則を定める。
 
-本規格は、Skillを正本となるProcess Descriptionを提供する資産として扱い、PFの設計原則をSkillの全ライフサイクルに適用する。
+本規格は、Agent Skillを、既定では正本となるProcess Descriptionを提供する資産として扱い、PFの設計原則をSkillの全ライフサイクルに適用する。さらに、PFの概念の意味を変更することなく、Agent SkillによってProcess Model、Process Reference ModelおよびProcess Viewを表現できるようにする。
 
 ---
 
@@ -47,13 +47,15 @@ d) Skillが記述するProcessに適用されるControl、ConstraintおよびEna
 
 e) TailoringおよびProcess Instantiationの規則（箇条11）、ならびに本規格およびSkillが記述するProcessへのConformanceの主張基準とCapabilityの扱い（箇条12）。
 
-f) Skill Description、および記述対象Processの理解・適用・Output作成を支援する付随資源から構成されるSkill Packageの論理的な構成および整合性（5.7）。
+f) 基準となるAgent Skill表現、および表現対象となるPF構成概念の理解または適用を支援する付随資源から構成されるSkill Packageの論理的な構成および整合性（5.7）。
+
+g) Agent SkillによってProcess、Process Model、Process Reference ModelまたはProcess Viewを表現し、それらの表現間の参照を解決するための規則（5.1、5.6、8.3）。
 
 ### 1.2 本規格が規定しない事項
 
 本規格は、次の事項を規定しない。
 
-a) Skill Packageの具体的な実装形式。ファイル形式、メタデータ書式、物理的な格納構造、配布機構およびツールチェーンは、本規格の適用範囲外である。ただし、Skill Descriptionと付随資源との論理的な構成および整合性には、5.7を適用する。
+a) 5.1および5.6に定める最小限の表現メタデータおよび論理参照を除く、Skill Packageの具体的な実装形式。その他のファイル形式、メタデータ書式、物理的な格納構造、配布機構およびツールチェーンは、本規格の適用範囲外である。ただし、基準となるAgent Skill表現と付随資源との論理的な構成および整合性には、5.7を適用する。
 
 b) 特定のAgent実装、モデル、実行環境またはベンダー。
 
@@ -81,10 +83,10 @@ PFに定義または使用されている用語は、PFの意味で用いる。�
 明示されたPurposeのもとでActivityおよびTaskを実行し得る実行主体のうち、環境の観測、判断および行為をある程度自律的に行うもの。人間の指示または監督のもとで動作するソフトウェアシステムを含む。
 
 **3.2 Agent Skill（Skill）**
-Agentが発見し、読み込み、記述対象Processの適用に利用できる形で資産化された、再利用可能なProcess Description、および必要に応じてそれに付随する資源の単位。本規格では単に「Skill」という。
+Agentが発見し、読み込むことのできる単位。既定では、記述対象Processの適用に用いる、正本となる再利用可能なProcess Descriptionを提供する。5.1に従い、Process Model、Process Reference ModelまたはProcess Viewを表現することもできる。必要に応じて付随資源を含めてよい。本規格では単に「Skill」という。
 
 **3.3 Skill Description**
-Skillが正本の内容として提供するProcess Description。Name、PurposeおよびOutcomeを必須の要素とし、任意の要素および参考情報を加えたもの（箇条6参照）。
+Processを表現するAgent Skillが正本の内容として提供するProcess Description。Name、PurposeおよびOutcomeを必須の要素とし、任意の要素および参考情報を加えたもの（箇条6参照）。
 
 **3.4 発見層および実行層**
 AgentがSkill Descriptionを利用するためにALPSが定める、機能上の提示層。発見層は、完全なSkill Descriptionを読み込む前にSkillを発見し、その適用可能性を判定するためのNameおよび簡潔な参考情報を提示する。実行層は、記述対象Processの実行およびAssessmentに用いる、正本のProcess Description要素および参考情報を提示する。
@@ -95,16 +97,16 @@ AgentがSkill Descriptionを利用するためにALPSが定める、機能上の
 本規格の箇条7において、ALPS定義Process、ALPS適用ProcessおよびALPS管理Processを、それぞれのPurposeおよびOutcomeによって定義したProcess Reference Model。各Processは三つのActivityによって構成される。Skillライフサイクルの評価および改善の参照枠として利用できる。
 
 **3.6 発動（Invocation）**
-Entry Criteriaの成立を判定し、選択したSkillを用いるProcess Instanceの実行を開始すること。
+Entry Criteriaの成立を判定し、Processを表現する選択済みAgent Skillを用いてProcess Instanceの実行を開始すること。
 
 **3.7 Skill資産（Skill Asset）**
-採用され、管理下に置かれたSkillまたはSkill Package。
+採用され、管理下に置かれたAgent SkillまたはSkill Package。
 
 **3.8 Skill Discovery Description（Skill発見記述）**
 Agentが完全なSkill Descriptionを読み込む前にSkillを発見し、その適用可能性を判定するために用いる、ALPS固有の発見層に置く簡潔な参考情報。記述対象Processが行うこと、そのSkillを用いる状況、および適用可能性の判定に必要な情報を示す。
 
 **3.9 Skill Package**
-一つのSkill Description、および記述対象Processの理解・適用・Output作成を支援する任意の付随資源を、一体として管理する単位。
+基準となるAgent Skill表現を一つ含み、表現対象となるPF構成概念の理解または適用を支援する任意の付随資源とともに、一体として管理する単位。
 
 ## 4. 規範語および表記法
 
@@ -129,15 +131,25 @@ Agentが完全なSkill Descriptionを読み込む前にSkillを発見し、そ�
 
 ## 5. 基本概念
 
-### 5.1 SkillはProcess Descriptionを提供する
+### 5.1 Agent SkillとProcess Description
 
-Skillの正本となる内容は、PFに適合するProcess Descriptionとして記述する必要がある。
+Agent Skillは、既定ではProcessを表現する。Agent SkillがProcessを表現する場合、その正本となる内容は、PFに適合するProcess Descriptionである必要がある。これはALPSの基本形であり、明示的な資産種別の宣言を必要としない。
 
 Skill Descriptionは、一般的なProcessを記述できるほか、特定の適用文脈を明示したProcess Instanceを記述できる。Process Instanceの記述では、必要な能力、資源、Input、Output、Constraint、Controlおよび時間を具体化できる（PF 1.1）。
 
-### 5.2 Skillの二重性: 記述資産かつEnabler
+ALPSではさらに、Agent SkillによってProcess Model、Process Reference ModelまたはProcess Viewを表現できる。これらの構成概念を表現するAgent Skillは、`SKILL.md`のfrontmatterに`metadata.alps.kind`を宣言し、次のいずれかの値を用いる必要がある。
 
-Skillは、正本の内容としてProcess Descriptionを提供し、記述対象Processの適用に対してはEnablerとして機能する。
+- `process-model`
+- `process-reference-model`
+- `process-view`
+
+`skills/`ディレクトリおよび`SKILL.md`は、Agent SkillのPackage化および発見のための慣例である。これらは表現対象となるPF構成概念の意味を変更せず、Process Model、Process Reference ModelまたはProcess ViewをProcessに変えるものではない。
+
+Agent SkillのActivationは、AgentがAgent Skill表現を選択し、読み込むことを意味する。Process Invocationは、Process Instanceの実行を開始することを意味する。Processを表現するAgent Skillだけが、直接発動可能なProcessを表現する。Process Model、Process Reference ModelまたはProcess ViewをActivationしても、それ自体ではProcess Instanceを開始しない。
+
+### 5.2 Process Skillの二重性: 記述資産かつEnabler
+
+Processを表現するAgent Skillは、正本の内容としてProcess Descriptionを提供し、記述対象Processの適用に対してはEnablerとして機能する。
 
 Skill、AgentおよびツールはInputではなく、Enablerとして扱う必要がある（PF 4.1）。
 
@@ -155,7 +167,7 @@ Skillが記述するProcessの境界は、通常、Activityの中間Outputでは
 
 ### 5.5 機能上の層と段階的開示
 
-PF 1.3は、異なるニーズをもつ読者に応じて、Process Descriptionの情報を層として提示することを許容する。ALPSは、Agent Skillの段階的開示に用いる機能上の提示層として、発見層および実行層を定める。これらの名称および機能はALPSに固有であり、PFの構成概念ではない。
+PF 1.3は、異なるニーズをもつ読者に応じて、Process Descriptionの情報を層として提示することを許容する。Processを表現するAgent Skillについて、ALPSは段階的開示に用いる機能上の提示層として、発見層および実行層を定める。これらの名称および機能はALPSに固有であり、PFの構成概念ではない。
 
 記述適合を主張するSkill Descriptionは、両方の層を提供し、それぞれの機能を判別可能にする必要がある。正本となるSkill Descriptionを一意に識別でき、必須の参照先を解決できる限り、両方の層を一体として表現しても、分けて表現してもよい。
 
@@ -167,29 +179,44 @@ c) 複数のProcessにまたがる事項は、個々のSkillの実行層とは�
 
 注記: これらの機能上の層は、二つのファイル、二つの節その他の特定の物理構造を要求せずに、段階的開示を支援する。
 
-### 5.6 Process Modelとライフサイクルモデル
+### 5.6 Process Model、Process Reference Modelおよびライフサイクルモデル
 
-Process Modelおよびライフサイクルモデルは、PFによって定められた意味で解釈する。Process Model内のProcessがSkillとして利用可能にされる場合、Modelは、各Processの正本となるProcess Descriptionを提供するSkill Packageと、Process間の関係を識別してよい。
+Process Model、Process Reference Modelおよびライフサイクルモデルは、PFによって定められた意味で解釈する。
+
+Agent Skillによって表現するProcess Modelは、関連するProcessの集合と、それらの関係を識別する。各Processについて、その基準となるProcess Descriptionを提供するAgent Skillを識別してよい。Process Modelでは、各ProcessのPurposeおよびOutcomeを反復して記述する必要はない。
+
+Agent Skillによって表現するProcess Reference Modelは、そのProcessをName、PurposeおよびOutcomeによって識別し、それらの関係を明示的な構造に配置する必要がある。参照するProcess Skillごとに、Process Nameは同じProcessを識別し、Process Reference ModelのPurposeは基準となるProcess DescriptionのPurposeと一致し、Process Reference ModelのOutcomeは基準となるProcess DescriptionのOutcomeと一致する必要がある。不一致がある表現は無効であり、いずれか一方が暗黙に他方を上書きするものとして扱ってはならない。
+
+Process Model、Process Reference ModelまたはProcess ViewからAgent Skillを参照する場合、リポジトリ相対パスではなく、Packageの論理識別子とSkill Nameを用いる。Canonical formは次による。
+
+```text
+skill:<package-id>#<skill-name>
+```
+
+同じPackage内では、短縮形`skill:#<skill-name>`を用いてよい。Resolverは、意味上の検査に先立って、包含するPackageの識別子を用いて短縮形を完全形に正規化する必要がある。`package-id`は適用されるPackage Bindingが与える。ALPSはGitHubをPackage識別子の権威として要求しない。
 
 Purposeに応じてProcess ModelからProcessの部分集合を選択できる。選択したProcessは、それを記述するSkillを通じて単独または組み合わせて適用できる。適用対象または適用文脈が変化する場合、Processの選択とTimingを継続的に見直す必要がある（PF 5.1、5.2）。
 
 ### 5.7 Skill Packageおよび付随資源
 
-Skill Packageは、Skillの基準となるSkill Descriptionを一つ含む必要がある。
+Skill Packageは、基準となるAgent Skill表現を一つ含む必要がある。
 
-Skill Packageには、記述対象Processの理解、適用またはOutputの作成を支援する参考情報、実行資源および成果物用資源を、必要に応じて含めてよい。付随資源を含める場合、その役割および利用条件をSkill Descriptionから識別できるようにする必要がある。必須の参照先は、対象環境から特定し、取得できる必要がある。
+Skill Packageには、表現対象となるPF構成概念の理解または適用を支援する参考情報、実行資源および成果物用資源を、必要に応じて含めてよい。付随資源を含める場合、その役割および利用条件を基準となる表現から識別できるようにする必要がある。必須の参照先は、対象環境から特定し、取得できる必要がある。
 
-Skill Descriptionと付随資源とのあいだに、不要な重複または矛盾を生じさせてはならない。付随資源は、その格納場所ではなく、Processの実行において果たす機能に基づいて、参考情報、Input、Output、Control、ConstraintまたはEnablerとして扱う必要がある（9.1）。
+基準となる表現と付随資源とのあいだに、不要な重複または矛盾を生じさせてはならない。付随資源は、その格納場所ではなく、その機能に基づいて扱う必要がある。Skill Descriptionの場合、付随資源はProcessの実行において果たす機能に基づいて、参考情報、Input、Output、Control、ConstraintまたはEnablerとして扱う必要がある（9.1）。
 
-Skill Packageには、記述対象Processの理解、適用またはOutputの作成を直接支援する資源だけを含めるのが望ましい。
+Skill Packageには、表現対象となるPF構成概念の理解または適用を直接支援する資源だけを含めるのが望ましい。
 
 ### 5.8 Process Frameworkの特殊化
 
 ALPSは、PFの一般的な構成概念をAgent Skill向けに特殊化する。一般概念の規範的な正本はPFに置く。本規格は、一般定義を重複して展開せず、Agent Skillに固有の追加事項だけを記述する。
 
-| PFの構成概念 | ALPSにおける特殊化 |
+| PFの構成概念 | ALPSにおける扱い |
 |---|---|
-| Process Description | Skill Description（3.3） |
+| Process Description | Agent SkillがProcessを表現する場合のSkill Description（3.3） |
+| Process Model | `metadata.alps.kind: process-model`を持つAgent Skillによって直接表現してよい（5.1、5.6） |
+| Process Reference Model | `metadata.alps.kind: process-reference-model`を持つAgent Skillによって直接表現してよい（5.1、5.6） |
+| Process View | `metadata.alps.kind: process-view`を持つAgent Skillによって直接表現してよい（5.1、8.3） |
 | Processを実行または支援する資源 | Agent、モデル、ツールおよび実行環境として具体化し、Enablerとして扱う（5.2、9.3） |
 
 ALPSは、PFの規則をAgent文脈に合わせて具体化し、必要に応じて強めることができる。ただし、PFの概念の意味を変更し、PFの要求事項を弱め、または異なる概念に置き換えてはならない（箇条2参照）。
@@ -385,7 +412,7 @@ j) Activityの集合が全Outcomeを網羅し、Purposeを満たすことを確�
 
 k) TaskとOutcomeとのあいだの対応関係を識別するのが望ましい（8.2）。
 
-l) Skill Discovery Descriptionに、Processが行うこと、そのSkillを用いる状況および適用可否の判別に必要な情報を、3.11、5.5および6.3.8に従って記述する必要がある。
+l) Skill Discovery Descriptionに、Processが行うこと、そのSkillを用いる状況および適用可否の判別に必要な情報を、3.8、5.5および6.3.8に従って記述する必要がある。
 
 m) 代表的なInputおよびOutputを示す場合、他のProcessとの主要な対応関係を、必要に応じて識別するのが望ましい（6.3.6、8.2）。
 
@@ -697,19 +724,27 @@ Process Viewは、特定の関心またはPurposeについて、複数のProcess
 
 独立したProcess境界を与える場合は、そのProcessを5.4に従って別のSkillによって記述できる。
 
+Agent Skillによって表現するProcess Viewは、`metadata.alps.kind: process-view`を宣言する必要がある。そのAgent SkillをActivationするとView表現を読み込むが、それ自体ではProcessを発動しない。
+
 a) すべてのProcess Viewは、そのName、PurposeおよびOutcomeを示す必要がある。
 
 b) Process Viewには、Outcomeを達成するために、既存のProcess Modelから選択したActivityおよびTaskに加えて、適応したActivityおよびTask、またはProcess Viewに固有のActivityおよびTaskを含めてよい。
 
 c) Process Viewには、それらのActivityおよびTaskを適用するための説明と指針を含める必要がある。
 
-d) Process Viewでは、各ActivityおよびTaskの出典Processと、それが選択、適応または新規のいずれであるかを明示する必要がある。既存のProcess Modelから選択した要素は、その出典Processおよび出典記述を維持する必要がある。
+d) Process Viewでは、各ActivityおよびTaskの出典Processと、それが`selected`、`adapted`または`new`のいずれであるかを明示する必要がある。既存のProcess Modelから選択した要素は、その出典Processおよび出典記述を維持する必要がある。Source Process Skillは、5.6に定めるCanonical Skill Referenceによって識別する必要がある。
 
 e) 適応した要素およびProcess Viewに固有の要素は、元のProcess Modelを変更したものとしては扱わない。これらの要素は、TailoringまたはProcess Modelへの正式な採用が行われない限り、出典ProcessへのConformanceには算入しない。
 
 f) 特定のProcess Modelを運用する際には、既存ProcessのActivityおよびTaskだけを用いる、制限付きのProcess Viewを採用してよい。この方式のもとでは、Process Viewに固有のActivityおよびTaskを含めてはならない。
 
 g) Process Viewには、Process間の接続と、その構成に用いたProcessの出典を示してよい。
+
+Process View Description Conformanceは、View表現そのものを対象とする。ViewのPurpose、Outcome、Source Provenance、Treatment Classification、RelationshipまたはHandoff、およびApplication Guidanceが完全かつ内部整合していることを要求する。
+
+Source Process Conformanceは、適用されるSource Processに関する主張のままである。`selected`要素は、Source ProcessのConformance basisに従ってその主張に寄与できる。`adapted`および`new`要素は、Managed Tailoringまたは正式な採用によってSource Processへ取り込まれない限り、Source Process Conformanceには寄与しない。
+
+Process ViewのOutcome達成状況は、別途Assessmentできる。このAssessmentは、Source ProcessのProcess Outcome Conformanceではない。
 
 ## 9. Control、ConstraintおよびEnabler
 
@@ -789,11 +824,13 @@ Tailoringは、ALPS管理ProcessのTailoring（7.5.2）に従って実施する�
 
 本規格に関する適合は、次の対象について主張できる。いずれの主張においても、対象と、選択した基準とを明示する必要がある。
 
-a) **記述適合** — Skill Descriptionが、箇条4〜6の該当する要求事項を満たすこと。Skill Packageを適合対象に含める場合は、そのPackageが5.7の該当する要求事項も満たすこと。
+a) **記述適合** — Skill Descriptionが、箇条4〜6の該当する要求事項を満たすこと。Process表現を含むSkill Packageを適合対象に含める場合は、そのPackageが5.7の該当する要求事項も満たすこと。
 
 b) **Reference Model適合** — Skillの定義、適用または管理について、箇条7の三つのProcessのうち宣言したProcessに対するConformance（12.2、12.3）が成立すること。
 
 c) **実行適合** — Skillを用いたProcess Instanceの実行が、そのSkillの記述するProcessに対するConformanceの基準（12.2、12.3）を満たすこと。
+
+d) **Process View Description Conformance** — Process Viewを表現するAgent Skillが、5.1、5.6および8.3に定める表現、Source Provenance、Treatment Classification、Relationship、Application Guidanceおよび内部整合性に関する要求事項を満たすこと。
 
 ### 12.2 Full Conformance
 
@@ -804,8 +841,9 @@ a) **OutcomeへのFull Conformance**は、Skillが記述する宣言Processま�
 
 b) **TaskへのFull Conformance**は、Skillが記述する宣言Processまたは宣言したReference Model ProcessのActivityまたはTaskにおいて、**〜する必要がある**または**〜してはならない**と記述されたすべての要求事項を満たすことを要求する。推奨事項、許容される行為および通常実施される行為は、その規範属性だけを理由としてTaskへのFull Conformanceの必須条件にはならない。この方法を選択する場合、Outcomeを指針として扱う。
 
-
 Reference ModelへのConformanceについて、ProcessへのOutcome Conformanceを主張できる単位は、ALPS定義Process、ALPS適用ProcessおよびALPS管理Processである。個別の構成Activityについて独立したOutcome Conformanceを主張してはならない。
+
+Process ViewのOutcome達成状況のAssessmentは、Source ProcessのProcess Outcome Conformanceとは別である。
 
 ### 12.3 Tailored Conformance
 
@@ -819,7 +857,7 @@ Capabilityは、Conformanceとは別の評価次元として扱う。Activityお
 
 Skill DescriptionのOutcomeならびに三つのProcessのPurposeおよびOutcomeは、Process Assessmentと有効性評価に利用できる（PF 8.5、7.5.3）。
 
-Skill PackageのAssessmentでは、基準となるSkill Descriptionの存在、必須の参照先を対象環境から特定して取得できること、Skill Descriptionと付随資源との整合性、付随資源の役割および利用条件、ならびに変更後の再検証を評価対象にできる（5.7、7.3.3、7.5.1）。
+Skill PackageのAssessmentでは、基準となるAgent Skill表現の存在、必須の参照先を対象環境から特定して取得できること、基準となる表現と付随資源との整合性、付随資源の役割および利用条件、ならびに変更後の再検証を評価対象にできる（5.7、7.3.3、7.5.1）。
 
 ---
 
@@ -922,13 +960,13 @@ d) 整備された内容と元の記録との対応が追跡可能である。
 - 長大な記録では、議題単位のIterationによって段階的に精緻化できる。
 ```
 
-注記1: `description`は、記述対象Processが行うことと、そのSkillを用いる状況とを示し、Skillの選択前に利用できるようにする（3.11）。
+注記1: `description`は、記述対象Processが行うことと、そのSkillを用いる状況とを示し、Skillの選択前に利用できるようにする（3.8）。
 
 注記2: 「整備済み議事録」はOutputであって、Outcomeではない（6.3.3）。Constraintは引渡し可能となる条件を宣言し、対応する引渡し行為はTaskに記述している（6.3.7、9.2）。EnablerはInputではなく（9.3）、本Skillは実行主体を規定しない（5.3）。
 
 ### A.3 ファイルベースSkill Packageの構成例
 
-次の構成は、5.7をファイルベースのEnvironment Bindingとして適用する場合の参考例である。この構成および名称は要求事項ではない（1.2）。`SKILL.md`以外の格納区分は任意であり、必要な付随資源がある場合にだけ設ける。正本となるSkill Descriptionは、発見層および実行層双方の意味上の正本であり、Environment Bindingはその意味または規範上の強さを変えずに、発見情報をfrontmatterまたは別の登録情報へ投影できる。
+次の構成は、5.7をファイルベースのEnvironment Bindingとして適用する場合の参考例である。この構成および名称は要求事項ではない（1.2）。`SKILL.md`以外の格納区分は任意であり、必要な付随資源がある場合にだけ設ける。基準となるAgent Skill表現は意味上の正本であり、Environment Bindingはその意味または規範上の強さを変えずに、発見情報をfrontmatterまたは別の登録情報へ投影できる。
 
 ```text
 <skill-name>/
@@ -941,17 +979,17 @@ d) 整備された内容と元の記録との対応が追跡可能である。
 
 | 構成要素 | ALPS上の位置付け |
 |---|---|
-| `SKILL.md` | Skillの正本となるSkill Description。本例のEnvironment Bindingではfrontmatterが発見層の情報を投影し、本文が実行層の情報を提供するが、ALPSはこの物理構造を要求しない。 |
+| `SKILL.md` | 基準となるAgent Skill表現。Process表現では本文が基準となるSkill Descriptionを提供し、frontmatterは発見層の情報を投影できる。Process以外の表現は5.1に従って`metadata.alps.kind`を宣言する。 |
 | `references/` | 必要に応じて読み込まれる参考情報。個々のファイル名は規定しない。 |
-| `scripts/` | 再現性または信頼性を支援する実行資源。通常、Enablerとして扱う。 |
-| `assets/` | Outputの作成に用いる資源。機能に応じてInput、OutputまたはEnablerとして扱う。 |
+| `scripts/` | 再現性または信頼性を支援する実行資源。Process実行では通常Enablerとして扱う。 |
+| `assets/` | Output作成または表現の利用を支援する資源。機能に応じて扱う。 |
 
 ## 付録B（参考）Process Frameworkとの対応
 
 | PF 箇条 | 主題 | 本規格の対応箇条 |
 |---|---|---|
 | 1.1 | Process、Process DescriptionおよびProcess Instance | 5.1、5.8 |
-| 1.2〜1.3 | 必須要素、任意の詳細および二部構成 | 3.11、5.1、5.5、6.1 |
+| 1.2〜1.3 | 必須要素、任意の詳細および二部構成 | 3.8、5.1、5.5、6.1 |
 | 1.4 | 記述および解釈の規則 | 4.1、6.2、6.3.8 |
 | 2.1〜2.3 | Name、Purpose、Outcome、Output、ActivityおよびTask | 6.3.1〜6.3.6 |
 | 3.1 | 境界、粒度および凝集性 | 5.4 |
@@ -960,7 +998,7 @@ d) 整備された内容と元の記録との対応が追跡可能である。
 | 4.3 | Entry CriteriaおよびExit Criteria | 10.1 |
 | 4.4 | Traceabilityおよび受け渡し | 8.2 |
 | 4.5 | FrameworkレベルのControlおよびEnabler | 9.1 |
-| 5.1〜5.2 | Model、Frameworkおよびライフサイクルモデル | 3.5、3.6、5.6、5.8、7.1〜7.2 |
+| 5.1〜5.2 | Model、Frameworkおよびライフサイクルモデル | 3.5、5.6、5.8、7.1〜7.2 |
 | 5.3 | Process View | 5.8、8.3 |
 | 6.1〜6.2 | Concurrency、Iteration、RecursionおよびIntegration | 8.1 |
 | 7.1〜7.4 | TailoringおよびInstantiation | 7.5.2、箇条11 |
@@ -974,7 +1012,7 @@ d) 整備された内容と元の記録との対応が追跡可能である。
 
 ### C.1 Agent Skills Specification
 
-[Agent Skills Specification](https://agentskills.io/specification)は、`SKILL.md`を中心とし、スクリプト、参考資料および資産のための任意のディレクトリを伴う、ファイルベースの公開形式を定義する。この形式をALPS準拠のSkillに用いる場合、この形式はSkill Packageの実装形態を提供し、ALPSはProcess Descriptionの意味論、ライフサイクルおよびConformanceの規則を提供する。ALPSは、この実装形態を要求しない（1.2 a)）。
+[Agent Skills Specification](https://agentskills.io/specification)は、`SKILL.md`を中心とし、スクリプト、参考資料および資産のための任意のディレクトリを伴う、ファイルベースの公開形式を定義する。この形式をALPS表現に用いる場合、この形式はAgent向けのPackage化、発見および読み込みの形式を提供し、ALPSはPFに基づく意味論、ライフサイクル、表現規則およびConformance規則を提供する。ALPSは、本規格に定める最小限の表現メタデータおよび論理参照だけを要求し、それ以外の特定のファイルベース実装形式を要求しない（1.2 a)）。
 
 ### C.2 AGENTS.md
 

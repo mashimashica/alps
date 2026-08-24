@@ -130,7 +130,7 @@ description: Skillニーズを識別し、ALPSおよびProcess Frameworkに適�
 - 管理されたSkill資産および変更履歴
 - 起草、比較、検索および試行を支援するAgentまたはツール
 - 起草者から独立したレビュー能力
-- `../../../scripts/check_skill_description.py`による機械的な事前確認
+- `skills/define-alps/scripts/check_alps_asset.py`による機械的な事前確認
 
 ## Conformance
 
@@ -165,7 +165,7 @@ Outputが他のProcessのInputになる場合、名称、意味および適用�
 - ALPS準拠のSkill Descriptionを起草する場合は、[SKILL-template.md](SKILL-template.md)を参考例として利用できる。適用する構成は、Purposeと必要な詳細度に応じて選ぶ。
 - Skill Packageの構成と付随資源の役割を設計する場合は、[skill-package-format.md](skill-package-format.md)を参考例として利用できる。必要な資源だけを採用する。
 - 正式なニーズ記録、Skill Description、トレーサビリティ表、検証記録または採用判断記録を作る場合は、[record-templates.md](record-templates.md)を適用対象に合わせてTailoringして利用できる。
-- 本Packageの代表的なMarkdown Environment Bindingについては、`python3 ../../../scripts/check_skill_description.py --locale ja <SKILL.md>`でYAML frontmatter、基準見出しおよび関連する構造上の徴候を事前確認できる。これらの表現はBinding固有であり、ALPSの要求ではない。スクリプトはConformanceまたはOutcome達成を単独では証明しない。
+- 本Packageの代表的なMarkdown Environment Bindingについては、`python3 skills/define-alps/scripts/check_alps_asset.py --root . <SKILL.md>`でYAML frontmatter、基準見出しおよび関連する構造上の徴候を事前確認できる。これらの表現はBinding固有であり、ALPSの要求ではない。スクリプトはConformanceまたはOutcome達成を単独では証明しない。
 
 ## Common Approach
 
