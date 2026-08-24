@@ -375,13 +375,63 @@ def prose_paragraphs(value: str) -> list[str]:
     return [re.sub(r"\s+", " ", block.strip()) for block in re.split(r"\n\s*\n", value) if block.strip()]
 
 
+def table_row_cells(line: str) -> list[str]:
+    """Split a Markdown table row without changing cell text.
+
+    A pipe is a delimiter only when it is outside an inline code span and is
+    preceded by an even number of backslashes.  Inline code closes only on a
+    backtick run whose length exactly matches the opening run.  The optional
+    leading and trailing table delimiters are removed after tokenization so an
+    escaped edge pipe remains part of its cell.
+    """
+
+    line = line.strip()
+    cells: list[str] = []
+    start = 0
+    code_run: int | None = None
+    index = 0
+    separators: list[int] = []
+    while index < len(line):
+        if line[index] == "`":
+            run = 1
+            while index + run < len(line) and line[index + run] == "`":
+                run += 1
+            if code_run is None:
+                code_run = run
+            elif run == code_run:
+                code_run = None
+            index += run
+            continue
+        if line[index] == "|" and code_run is None:
+            backslashes = 0
+            cursor = index - 1
+            while cursor >= 0 and line[cursor] == "\\":
+                backslashes += 1
+                cursor -= 1
+            if backslashes % 2 == 0:
+                separators.append(index)
+                cells.append(line[start:index].strip())
+                start = index + 1
+        index += 1
+    cells.append(line[start:].strip())
+    if separators and separators[0] == 0:
+        cells = cells[1:]
+    if separators and separators[-1] == len(line) - 1:
+        cells = cells[:-1]
+    return cells
+
+
 def table(text: str) -> tuple[list[str], list[list[str]]]:
-    lines = [line.strip() for line in text.splitlines() if line.strip().startswith("|") and line.strip().endswith("|")]
+    lines = [
+        line.strip()
+        for line in text.splitlines()
+        if line.strip().startswith("|") and line.strip().endswith("|")
+    ]
     for index in range(1, len(lines)):
-        separators = [cell.strip() for cell in lines[index].strip("|").split("|")]
+        separators = table_row_cells(lines[index])
         if separators and all(re.fullmatch(r":?-{3,}:?", cell) for cell in separators):
-            header = [cell.strip() for cell in lines[index - 1].strip("|").split("|")]
-            rows = [[cell.strip() for cell in line.strip("|").split("|")] for line in lines[index + 1 :]]
+            header = table_row_cells(lines[index - 1])
+            rows = [table_row_cells(line) for line in lines[index + 1 :]]
             return header, rows
     return [], []
 
@@ -984,7 +1034,15 @@ def check_process_model(
         ):
             errors.append(f"{path}: relationship endpoint {reference} is not declared in Processes")
     errors.extend(
-        named_relationship_endpoint_errors(path, relationships, declared_names)
+        named_relationship_endpoint_errors(
+            path,
+            relationships,
+            declared_names,
+            declared_references,
+            roots,
+            locale,
+            current_package_id,
+        )
     )
     return errors
 
@@ -1015,7 +1073,7 @@ def relationship_endpoint_cells(value: str) -> list[tuple[str, int, str, str]]:
 
     endpoints: list[tuple[str, int, str, str]] = []
     for item_number, item in enumerate(process_model_entries(value), start=1):
-        cells = [cell.strip() for cell in item.split("|")]
+        cells = table_row_cells(item)
         if len(cells) >= 3:
             endpoints.extend(
                 (
@@ -1047,10 +1105,48 @@ def named_relationship_endpoint_errors(
     path: Path,
     relationships: str,
     declared_names: set[str],
+    declared_references: set[tuple[str, str]],
+    roots: dict[str, Path],
+    locale: str,
+    current_package_id: str | None,
 ) -> list[str]:
     errors: list[str] = []
     for entry_kind, entry_number, role, cell in relationship_endpoint_cells(relationships):
-        if references(cell):
+        cell_references = references(cell)
+        if len(cell_references) > 1:
+            errors.append(
+                f"{path}: relationship {entry_kind} {entry_number} {role} Process "
+                "must identify at most one canonical Skill reference"
+            )
+            continue
+        if cell_references:
+            reference = cell_references[0]
+            try:
+                target = resolve_skill(reference, roots, locale, current_package_id)
+            except ValueError as exc:
+                errors.append(f"{path}: relationship {entry_kind} {entry_number} {role}: {exc}")
+                continue
+            if representation_kind(target.path) != "process":
+                errors.append(
+                    f"{path}: relationship {entry_kind} {entry_number} {role} "
+                    f"reference {reference} does not resolve to a Process representation"
+                )
+                continue
+            target_name = source_identity(
+                heading1(target.path.read_text(encoding="utf-8")) or ""
+            )
+            displayed_name = source_identity(cell)
+            if displayed_name and displayed_name != target_name:
+                errors.append(
+                    f"{path}: relationship {entry_kind} {entry_number} {role} "
+                    f"Process name {displayed_name!r} differs from referenced Process {target_name!r}"
+                )
+            reference_key = normalized_references(reference, current_package_id)[0]
+            if reference_key not in declared_references and target_name not in declared_names:
+                errors.append(
+                    f"{path}: relationship {entry_kind} {entry_number} {role} "
+                    f"endpoint {reference} is not declared in Processes"
+                )
             continue
         endpoint = source_identity(cell)
         if endpoint in declared_names:
@@ -1147,7 +1243,15 @@ def check_reference_model(
                     f"{path}: relationship row {row_number} must identify provider and recipient Processes"
                 )
     errors.extend(
-        named_relationship_endpoint_errors(path, relationships, declared_names)
+        named_relationship_endpoint_errors(
+            path,
+            relationships,
+            declared_names,
+            declared_references,
+            roots,
+            locale,
+            current_package_id,
+        )
     )
     return errors
 
@@ -1165,9 +1269,92 @@ def source_entries(value: str) -> list[str]:
 
 
 def source_identity(value: str) -> str:
-    value = re.sub(r"`?skill:[^\s`]+`?", "", value)
+    value = re.sub(
+        r"`?skill:[^\s`<>()\[\]{}\"',;!?。、，；：！？）」』】〉》]+`?",
+        "",
+        value,
+    )
     value = re.sub(r"[（(]\s*[）)]", "", value)
-    return re.sub(r"\s+", " ", value).strip(" |-:")
+    return re.sub(r"\s+", " ", value).strip(" |-:()（）")
+
+
+def source_cell_reference_errors(
+    path: Path,
+    context: str,
+    value: str,
+    roots: dict[str, Path],
+    locale: str,
+    current_package_id: str | None,
+    displayed_value: str | None = None,
+) -> list[str]:
+    errors: list[str] = []
+    cell_references = references(value)
+    if len(cell_references) > 1:
+        errors.append(
+            f"{path}: {context} must identify at most one canonical Skill reference"
+        )
+        return errors
+    if not cell_references:
+        return errors
+    reference = cell_references[0]
+    try:
+        target = resolve_skill(reference, roots, locale, current_package_id)
+    except ValueError as exc:
+        errors.append(f"{path}: {context}: {exc}")
+        return errors
+    if representation_kind(target.path) != "process":
+        errors.append(
+            f"{path}: {context} reference {reference} does not resolve to a Process representation"
+        )
+        return errors
+    target_name = source_identity(
+        heading1(target.path.read_text(encoding="utf-8")) or ""
+    )
+    displayed_name = source_identity(
+        value if displayed_value is None else displayed_value
+    )
+    if displayed_name and displayed_name != target_name:
+        errors.append(
+            f"{path}: {context} Process name {displayed_name!r} differs from "
+            f"referenced Process {target_name!r}"
+        )
+    return errors
+
+
+def source_reference_errors(
+    path: Path,
+    value: str,
+    roots: dict[str, Path],
+    locale: str,
+    current_package_id: str | None,
+) -> list[str]:
+    """Validate displayed Source Process names before canonical binding."""
+
+    _, rows = table(value)
+    if rows:
+        candidates = [
+            ("source row", row_number, " ".join(row), row[0] if row else "")
+            for row_number, row in enumerate(rows, start=1)
+        ]
+    else:
+        candidates = [
+            ("source entry", entry_number, entry, None)
+            for entry_number, entry in enumerate(source_entries(value), start=1)
+        ]
+    errors: list[str] = []
+    for entry_kind, entry_number, entry, displayed_value in candidates:
+        errors.extend(
+            source_cell_reference_errors(
+                path,
+                f"{entry_kind} {entry_number}",
+                entry,
+                roots,
+                locale,
+                current_package_id,
+                displayed_value,
+            )
+        )
+    return errors
 
 
 def normalized_reference_key(
@@ -1202,18 +1389,40 @@ def source_canonical_names(
 
     for entry in source_entries(value):
         refs = references(entry)
-        if not refs:
+        if len(refs) != 1:
             continue
-        key = normalized_reference_key(refs[0], current_package_id, roots)
+        reference = refs[0]
+        key = normalized_reference_key(reference, current_package_id, roots)
         displayed_name = source_identity(entry)
         if displayed_name:
+            if roots is not None:
+                try:
+                    target = resolve_skill(reference, roots, locale, current_package_id)
+                except ValueError:
+                    continue
+                target_name = source_identity(
+                    heading1(target.path.read_text(encoding="utf-8")) or ""
+                )
+                if target_name and displayed_name != target_name:
+                    continue
             bind(displayed_name, key)
     _, rows = table(value)
     for row in rows:
         refs = references(" ".join(row))
-        if refs and row and source_identity(row[0]):
+        if len(refs) == 1 and row and source_identity(row[0]):
+            displayed_name = source_identity(row[0])
+            if roots is not None:
+                try:
+                    target = resolve_skill(refs[0], roots, locale, current_package_id)
+                except ValueError:
+                    continue
+                target_name = source_identity(
+                    heading1(target.path.read_text(encoding="utf-8")) or ""
+                )
+                if target_name and displayed_name != target_name:
+                    continue
             bind(
-                source_identity(row[0]),
+                displayed_name,
                 normalized_reference_key(refs[0], current_package_id, roots),
             )
     if roots is not None:
@@ -1313,6 +1522,11 @@ def check_view(
         errors.append(f"{path}: Process View requires at least one Outcome")
 
     source_text = section(text, HEADINGS[locale]["sources"]) or ""
+    errors.extend(
+        source_reference_errors(
+            path, source_text, roots, locale, current_package_id
+        )
+    )
     source_values = source_entries(source_text)
     if len(source_process_keys(source_text, current_package_id, roots, locale)) < 2:
         errors.append(f"{path}: Process View requires at least two distinct Source Processes")
@@ -1351,6 +1565,16 @@ def check_view(
                     f"{path}: provenance row {row_number} must identify exactly one Source Process"
                 )
                 continue
+            errors.extend(
+                source_cell_reference_errors(
+                    path,
+                    f"provenance row {row_number}",
+                    row[0],
+                    roots,
+                    locale,
+                    current_package_id,
+                )
+            )
             row_source = source_identity_key(
                 row[0], current_package_id, roots, canonical_names
             )
