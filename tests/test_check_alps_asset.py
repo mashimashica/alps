@@ -969,6 +969,304 @@ Three | information | Four | relates the Processes."""
             errors,
         )
 
+    def test_process_view_validates_all_source_process_tables(self) -> None:
+        valid_sources = """| Source Process | Reference |
+| --- | --- |
+| One | skill:#one |
+
+### Other Sources
+
+| Source Process | Reference |
+| --- | --- |
+| Two | skill:#two |"""
+        included = """| Source Process | Source element |
+| --- | --- |
+| One | Activity |
+| Two | Task |"""
+        self.assertEqual(check_view_fixture(valid_sources, included), [])
+
+    def test_process_view_rejects_wrong_source_in_later_source_table(self) -> None:
+        sources = """| Source Process | Reference |
+| --- | --- |
+| One | skill:#one |
+| Two | skill:#two |
+
+### Other Sources
+
+| Source Process | Reference |
+| --- | --- |
+| Totally Wrong | skill:#one |"""
+        included = """| Source Process | Source element |
+| --- | --- |
+| One | Activity |
+| Two | Task |"""
+        errors = check_view_fixture(sources, included)
+        self.assertTrue(
+            any("differs from referenced Process 'One'" in error for error in errors),
+            errors,
+        )
+
+    def test_process_view_combines_source_tables_and_outside_entries(self) -> None:
+        valid_sources = """| Source Process | Reference |
+| --- | --- |
+| One | `skill:#one` |
+
+- Two (`skill:#two`)
+
+```markdown
+| Source Process | Reference |
+| --- | --- |
+| Missing | `skill:#does-not-exist` |
+- Missing (`skill:#does-not-exist`)
+```"""
+        self.assertEqual(
+            CHECKER.source_entries(valid_sources),
+            ["One", "Two (`skill:#two`)",],
+        )
+        included = """| Source Process | Source element |
+| --- | --- |
+| One | Activity |"""
+        self.assertEqual(check_view_fixture(valid_sources, included), [])
+
+        wrong_sources = valid_sources.split("\n\n```", 1)[0].replace(
+            "- Two (`skill:#two`)",
+            "- Totally Wrong (`skill:#one`)",
+        )
+        wrong_errors = check_view_fixture(wrong_sources, included)
+        self.assertTrue(
+            any("differs from referenced Process 'One'" in error for error in wrong_errors),
+            wrong_errors,
+        )
+
+        missing_sources = valid_sources.split("\n\n```", 1)[0].replace(
+            "- Two (`skill:#two`)",
+            "- Missing (`skill:#does-not-exist`)",
+        )
+        missing_errors = check_view_fixture(missing_sources, included)
+        self.assertTrue(
+            any("unresolved Skill reference skill:#does-not-exist" in error for error in missing_errors),
+            missing_errors,
+        )
+
+    def test_process_view_pair_combines_mixed_source_table_and_outside_order(self) -> None:
+        table_en = """| Source Process | Reference |
+| --- | --- |
+| One | `skill:#one` |"""
+        table_ja = """| 出典プロセス | 参照 |
+| --- | --- |
+| 一 | `skill:#one` |"""
+
+        def check_pair_case(english_sources: str, japanese_sources: str) -> list[str]:
+            with tempfile.TemporaryDirectory() as directory:
+                english, japanese = write_process_view_pair(
+                    Path(directory), "- Activity: Work", "- 活動: 作業"
+                )
+                write(
+                    english,
+                    english.read_text(encoding="utf-8").replace(
+                        "- One\n- Two", english_sources
+                    ),
+                )
+                write(
+                    japanese,
+                    japanese.read_text(encoding="utf-8").replace(
+                        "- 一\n- 二", japanese_sources
+                    ),
+                )
+                errors, _ = CHECKER.check_pair(
+                    english,
+                    japanese,
+                    set(CHECKER.DEFAULT_JA_TERMS),
+                    "fixture",
+                )
+                return errors
+
+        mixed_en = table_en + "\n\n- Two (`skill:#two`)"
+        mixed_ja = table_ja + "\n\n- 二 (`skill:#two`)"
+        cases = (
+            ("valid mixed source form", mixed_en, mixed_ja, None),
+            ("outside omission", mixed_en, table_ja, "Source Process count differs"),
+            (
+                "outside order",
+                mixed_en,
+                "- 二 (`skill:#two`)\n\n" + table_ja,
+                "Source Process reference identity or order differs",
+            ),
+            (
+                "outside identity",
+                mixed_en,
+                table_ja + "\n\n- 一 (`skill:#one`)",
+                "Source Process reference identity or order differs",
+            ),
+        )
+        for name, english_sources, japanese_sources, expected in cases:
+            with self.subTest(name=name):
+                errors = check_pair_case(english_sources, japanese_sources)
+                if expected is None:
+                    self.assertEqual(errors, [], errors)
+                else:
+                    self.assertTrue(any(expected in error for error in errors), errors)
+
+    def test_process_view_pair_compares_all_source_process_tables(self) -> None:
+        def source_table(
+            header: str, rows: str, reference_header: str = "Reference"
+        ) -> str:
+            return f"""| {header} | {reference_header} |
+| --- | --- |
+{rows}"""
+
+        first_en = source_table("Source Process", "| One | `skill:#one` |")
+        second_en = source_table("Source Process", "| Two | `skill:#two` |")
+        first_ja = source_table("出典プロセス", "| 一 | `skill:#one` |", "参照")
+        second_ja = source_table("出典プロセス", "| 二 | `skill:#two` |", "参照")
+
+        def check_pair_case(english_sources: str, japanese_sources: str) -> list[str]:
+            with tempfile.TemporaryDirectory() as directory:
+                english, japanese = write_process_view_pair(
+                    Path(directory), "- Activity: Work", "- 活動: 作業"
+                )
+                write(
+                    english,
+                    english.read_text(encoding="utf-8").replace(
+                        "- One\n- Two", english_sources
+                    ),
+                )
+                write(
+                    japanese,
+                    japanese.read_text(encoding="utf-8").replace(
+                        "- 一\n- 二", japanese_sources
+                    ),
+                )
+                errors, _ = CHECKER.check_pair(
+                    english,
+                    japanese,
+                    set(CHECKER.DEFAULT_JA_TERMS),
+                    "fixture",
+                )
+                return errors
+
+        cases = (
+            (
+                "multiple valid tables",
+                first_en + "\n\n" + second_en,
+                first_ja + "\n\n" + second_ja,
+                None,
+            ),
+            (
+                "later-table omission",
+                first_en + "\n\n" + second_en,
+                first_ja,
+                "Source Process count differs",
+            ),
+            (
+                "later-table order",
+                first_en + "\n\n" + second_en,
+                second_ja + "\n\n" + first_ja,
+                "Source Process reference identity or order differs",
+            ),
+            (
+                "later-table identity",
+                first_en + "\n\n" + second_en,
+                first_ja
+                + "\n\n"
+                + source_table("出典プロセス", "| 一 | `skill:#one` |", "参照"),
+                "Source Process reference identity or order differs",
+            ),
+        )
+        for name, english_sources, japanese_sources, expected in cases:
+            with self.subTest(name=name):
+                errors = check_pair_case(english_sources, japanese_sources)
+                if expected is None:
+                    self.assertEqual(errors, [], errors)
+                else:
+                    self.assertTrue(any(expected in error for error in errors), errors)
+
+    def test_process_view_validates_non_table_items_after_provenance_table(self) -> None:
+        valid = """| Source Process | Source element |
+| --- | --- |
+| One | Activity |
+
+### Activity: Work
+- Task Two (`skill:#two`)"""
+        self.assertEqual(check_view_fixture("- One\n- Two", valid), [])
+
+        missing = valid.replace(
+            "Task Two (`skill:#two`)",
+            "Task Missing (`skill:#does-not-exist`)",
+        )
+        errors = check_view_fixture("- One\n- Two", missing)
+        self.assertTrue(
+            any("unresolved Skill reference skill:#does-not-exist" in error for error in errors),
+            errors,
+        )
+
+    def test_process_view_pair_compares_mixed_provenance_and_non_table_items(self) -> None:
+        table_en = """| Source Process | Source element |
+| --- | --- |
+| One (`skill:#one`) | Activity |"""
+        table_ja = """| 出典プロセス | 出典要素 |
+| --- | --- |
+| 一 (`skill:#one`) | 活動 |"""
+        outside_en = "### Activity: Work\n- Task Two (`skill:#two`)"
+        outside_ja = "### 活動: 作業\n- タスク 二 (`skill:#two`)"
+
+        def check_pair_case(english_included: str, japanese_included: str) -> list[str]:
+            with tempfile.TemporaryDirectory() as directory:
+                english, japanese = write_process_view_pair(
+                    Path(directory), english_included, japanese_included
+                )
+                english_text = english.read_text(encoding="utf-8").replace(
+                    "- One\n- Two",
+                    "- One (`skill:#one`)\n- Two (`skill:#two`)",
+                )
+                japanese_text = japanese.read_text(encoding="utf-8").replace(
+                    "- 一\n- 二",
+                    "- 一 (`skill:#one`)\n- 二 (`skill:#two`)",
+                )
+                write(english, english_text)
+                write(japanese, japanese_text)
+                errors, _ = CHECKER.check_pair(
+                    english,
+                    japanese,
+                    set(CHECKER.DEFAULT_JA_TERMS),
+                    "fixture",
+                )
+                return errors
+
+        cases = (
+            (
+                "valid mixed forms",
+                table_en + "\n\n" + outside_en,
+                table_ja + "\n\n" + outside_ja,
+                None,
+            ),
+            (
+                "outside omission",
+                table_en + "\n\n" + outside_en,
+                table_ja,
+                "included Activity/Task count differs",
+            ),
+            (
+                "outside order",
+                table_en + "\n\n" + outside_en,
+                outside_ja + "\n\n" + table_ja,
+                "included source identity or order differs",
+            ),
+            (
+                "outside identity",
+                table_en + "\n\n" + outside_en,
+                table_ja + "\n\n" + outside_ja.replace("skill:#two", "skill:#one"),
+                "included source identity or order differs",
+            ),
+        )
+        for name, english_included, japanese_included, expected in cases:
+            with self.subTest(name=name):
+                errors = check_pair_case(english_included, japanese_included)
+                if expected is None:
+                    self.assertEqual(errors, [], errors)
+                else:
+                    self.assertTrue(any(expected in error for error in errors), errors)
+
     def test_process_view_validates_every_provenance_table_and_ignores_fenced_tables(self) -> None:
         included = """| Source Process | Source element |
 | --- | --- |

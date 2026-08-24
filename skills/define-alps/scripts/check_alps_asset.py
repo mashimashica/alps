@@ -107,6 +107,14 @@ class ProcessStructure:
 
 
 @dataclass(frozen=True)
+class SourceSemanticEntry:
+    value: str
+    displayed_value: str | None
+    line: int
+    is_table: bool
+
+
+@dataclass(frozen=True)
 class YAMLScalarNode:
     value: str
     line: int
@@ -1087,10 +1095,16 @@ def table_row_cells(line: str) -> list[str]:
     return cells
 
 
-def markdown_tables(text: str) -> list[tuple[list[str], list[list[str]]]]:
-    """Return every Markdown table block in document order."""
-    lines = text.splitlines()
-    tables: list[tuple[list[str], list[list[str]]]] = []
+def markdown_table_blocks(
+    text: str,
+) -> list[tuple[list[str], list[list[str]], int, int, int]]:
+    """Return table blocks with character spans and starting line numbers."""
+    raw_lines = text.splitlines(keepends=True)
+    lines = [line.rstrip("\r\n") for line in raw_lines]
+    offsets = [0]
+    for line in raw_lines:
+        offsets.append(offsets[-1] + len(line))
+    tables: list[tuple[list[str], list[list[str]], int, int, int]] = []
     index = 1
     while index < len(lines):
         if not lines[index].strip() or "|" not in lines[index]:
@@ -1121,9 +1135,44 @@ def markdown_tables(text: str) -> list[tuple[list[str], list[list[str]]]]:
                 break
             rows.append(row)
             cursor += 1
-        tables.append((header, rows))
+        tables.append(
+            (
+                header,
+                rows,
+                offsets[index - 1],
+                offsets[cursor],
+                index - 1,
+            )
+        )
         index = max(cursor, index + 1)
     return tables
+
+
+def markdown_tables(text: str) -> list[tuple[list[str], list[list[str]]]]:
+    """Return every Markdown table block in document order."""
+    return [
+        (header, rows)
+        for header, rows, _, _, _ in markdown_table_blocks(text)
+    ]
+
+
+def markdown_table_rows(text: str) -> list[list[str]]:
+    """Return all Markdown table rows in document order."""
+    return [
+        row
+        for _, rows, _, _, _ in markdown_table_blocks(text)
+        for row in rows
+    ]
+
+
+def mask_markdown_table_spans(text: str) -> str:
+    """Mask recognized table blocks while preserving line positions."""
+    masked = list(text)
+    for _, _, start, end, _ in markdown_table_blocks(text):
+        for index in range(start, end):
+            if masked[index] not in "\r\n":
+                masked[index] = " "
+    return "".join(masked)
 
 
 def table(text: str) -> tuple[list[str], list[list[str]]]:
@@ -2140,16 +2189,97 @@ def check_reference_model(
     return errors
 
 
-def source_entries(value: str) -> list[str]:
-    _, rows = table(value)
-    if rows:
-        return [row[0] for row in rows if row and row[0]]
+def source_semantic_entries(value: str) -> list[SourceSemanticEntry]:
+    """Extract Source Process table rows and outside structured entries once."""
+    visible = without_html_comments(without_fenced_code(value))
+    table_blocks = markdown_table_blocks(visible)
+    entries: list[SourceSemanticEntry] = []
+    for _, rows, _, _, start_line in table_blocks:
+        for row_number, row in enumerate(rows):
+            entries.append(
+                SourceSemanticEntry(
+                    value=" ".join(row),
+                    displayed_value=row[0] if row else "",
+                    line=start_line + row_number + 2,
+                    is_table=True,
+                )
+            )
+
+    table_free = mask_markdown_table_spans(visible)
+    lines = table_free.splitlines()
+    normalized = [
+        (line_number, re.sub(r"\s+", " ", line.strip()))
+        for line_number, line in enumerate(lines)
+        if line.strip()
+    ]
     structured = [
-        re.sub(r"^(?:[-*+]\s+|\d+[.)]\s+|#{3,}\s+)", "", line)
-        for line in normalized_lines(value)
+        (
+            line_number,
+            re.sub(r"^(?:[-*+]\s+|\d+[.)]\s+|#{3,}\s+)", "", line),
+        )
+        for line_number, line in normalized
         if re.match(r"^(?:[-*+]\s+|\d+[.)]\s+|#{3,}\s+)", line)
     ]
-    return structured or normalized_lines(value)
+    selected = structured if structured or table_blocks else normalized
+    for line_number, line in selected:
+        entries.append(
+            SourceSemanticEntry(
+                value=line,
+                displayed_value=None,
+                line=line_number,
+                is_table=False,
+            )
+        )
+    entries.sort(key=lambda entry: (entry.line, not entry.is_table))
+    return entries
+
+
+def source_entries(value: str) -> list[str]:
+    return [
+        entry.displayed_value if entry.is_table else entry.value
+        for entry in source_semantic_entries(value)
+        if (entry.is_table and entry.displayed_value) or not entry.is_table
+    ]
+
+
+def source_reference_sequence(
+    value: str,
+    current_package_id: str | None,
+) -> tuple[str, ...]:
+    """Return canonical references from Source Process entries in document order."""
+    return tuple(
+        normalized_reference_key(reference, current_package_id)
+        for entry in source_semantic_entries(value)
+        for reference in references(entry.value)
+    )
+
+
+def source_identity_sequence(
+    value: str,
+    current_package_id: str | None,
+    canonical_names: dict[str, str],
+) -> tuple[str | None, ...]:
+    """Return stable Source Process identities in semantic-entry order."""
+    identities: list[str | None] = []
+    for entry in source_semantic_entries(value):
+        entry_references = references(entry.value)
+        if len(entry_references) == 1:
+            identities.append(
+                normalized_reference_key(entry_references[0], current_package_id)
+            )
+            continue
+        if entry_references:
+            identities.append(None)
+            continue
+        displayed_value = (
+            entry.displayed_value
+            if entry.is_table and entry.displayed_value is not None
+            else entry.value
+        )
+        identity = source_identity(displayed_value)
+        key = canonical_names.get(identity) if identity else None
+        identities.append(key if key and key.startswith("ref:") else None)
+    return tuple(identities)
 
 
 def source_identity(value: str, *, preserve_parentheses: bool = False) -> str:
@@ -2394,29 +2524,20 @@ def source_reference_errors(
     current_package_id: str | None,
 ) -> list[str]:
     """Validate displayed Source Process names before canonical binding."""
-
-    _, rows = table(value)
-    if rows:
-        candidates = [
-            ("source row", row_number, " ".join(row), row[0] if row else "")
-            for row_number, row in enumerate(rows, start=1)
-        ]
-    else:
-        candidates = [
-            ("source entry", entry_number, entry, None)
-            for entry_number, entry in enumerate(source_entries(value), start=1)
-        ]
     errors: list[str] = []
-    for entry_kind, entry_number, entry, displayed_value in candidates:
+    for entry_number, semantic_entry in enumerate(
+        source_semantic_entries(value), start=1
+    ):
+        entry_kind = "source row" if semantic_entry.is_table else "source entry"
         errors.extend(
             source_cell_reference_errors(
                 path,
                 f"{entry_kind} {entry_number}",
-                entry,
+                semantic_entry.value,
                 roots,
                 locale,
                 current_package_id,
-                displayed_value,
+                semantic_entry.displayed_value,
             )
         )
     return errors
@@ -2452,13 +2573,17 @@ def source_canonical_names(
         existing = canonical_names.get(name)
         canonical_names[name] = key if existing is None or existing == key else ""
 
-    for entry in source_entries(value):
-        refs = references(entry)
+    for semantic_entry in source_semantic_entries(value):
+        refs = references(semantic_entry.value)
         if len(refs) != 1:
             continue
         reference = refs[0]
         key = normalized_reference_key(reference, current_package_id, roots)
-        displayed_name = source_identity(entry)
+        displayed_name = source_identity(
+            semantic_entry.displayed_value
+            if semantic_entry.is_table and semantic_entry.displayed_value is not None
+            else semantic_entry.value
+        )
         if displayed_name:
             if roots is not None:
                 try:
@@ -2471,25 +2596,6 @@ def source_canonical_names(
                 if target_name and displayed_name != target_name:
                     continue
             bind(displayed_name, key)
-    _, rows = table(value)
-    for row in rows:
-        refs = references(" ".join(row))
-        if len(refs) == 1 and row and source_identity(row[0]):
-            displayed_name = source_identity(row[0])
-            if roots is not None:
-                try:
-                    target = resolve_skill(refs[0], roots, locale, current_package_id)
-                except ValueError:
-                    continue
-                target_name = source_identity(
-                    heading1(target.path.read_text(encoding="utf-8")) or ""
-                )
-                if target_name and displayed_name != target_name:
-                    continue
-            bind(
-                displayed_name,
-                normalized_reference_key(refs[0], current_package_id, roots),
-            )
     if roots is not None:
         for reference in references(value):
             try:
@@ -2532,37 +2638,32 @@ def source_process_keys(
     identify one source, not two independent sources.
     """
 
-    _, rows = table(value)
     canonical_names = source_canonical_names(value, current_package_id, roots, locale)
 
     keys: set[str] = set()
-    if rows:
-        for row in rows:
-            row_text = " ".join(row)
-            refs = references(row_text)
-            if refs:
-                keys.add(normalized_reference_key(refs[0], current_package_id, roots))
-            elif row and source_identity(row[0]):
-                identity = source_identity(row[0])
-                keys.add(canonical_names.get(identity, f"name:{identity}"))
-        return keys
     ordered: list[str] = []
     pending_name_index: int | None = None
-    for entry in source_entries(value):
+    for semantic_entry in source_semantic_entries(value):
+        entry = semantic_entry.value
+        displayed_value = (
+            semantic_entry.displayed_value
+            if semantic_entry.is_table and semantic_entry.displayed_value is not None
+            else entry
+        )
         refs = references(entry)
         if refs:
             key = normalized_reference_key(refs[0], current_package_id, roots)
             # Plain Markdown can place a displayed Process name on one line
             # and its canonical reference on the next.  Replace that pending
             # displayed-name key instead of counting the same source twice.
-            if not source_identity(entry) and pending_name_index is not None:
+            if not source_identity(displayed_value) and pending_name_index is not None:
                 ordered[pending_name_index] = key
                 pending_name_index = None
             else:
                 ordered.append(key)
                 pending_name_index = None
-        elif source_identity(entry):
-            identity = source_identity(entry)
+        elif source_identity(displayed_value):
+            identity = source_identity(displayed_value)
             ordered.append(canonical_names.get(identity, f"name:{identity}"))
             pending_name_index = len(ordered) - 1
     return set(ordered)
@@ -2605,10 +2706,10 @@ def included_visible_text(value: str) -> str:
     return "".join(visible)
 
 
-def included_semantic_items(
+def included_semantic_events(
     value: str,
     locale: str,
-) -> list[tuple[str, str]]:
+) -> list[tuple[int, str, str]]:
     """Extract structured Activity/Task items without comparing names."""
     visible = included_visible_text(value)
     pattern = included_kind_pattern(locale)
@@ -2681,7 +2782,18 @@ def included_semantic_items(
                     continue
                 kind = "activity" if kind_match.group(0).casefold() in {"activity", "活動"} else "task"
         events.append((line_number, kind, candidate))
-    return [(kind, candidate) for _, kind, candidate in events]
+    return events
+
+
+def included_semantic_items(
+    value: str,
+    locale: str,
+) -> list[tuple[str, str]]:
+    """Extract structured Activity/Task items without comparing names."""
+    return [
+        (kind, candidate)
+        for _, kind, candidate in included_semantic_events(value, locale)
+    ]
 
 
 def included_semantic_elements(
@@ -2690,9 +2802,9 @@ def included_semantic_elements(
     current_package_id: str | None,
 ) -> list[tuple[str, str | None]]:
     """Extract structured Activity/Task elements without comparing names."""
-    events = included_semantic_items(value, locale)
+    events = included_semantic_events(value, locale)
     result: list[tuple[str, str | None]] = []
-    for kind, candidate in events:
+    for _, kind, candidate in events:
         refs = references(candidate)
         identity = (
             normalized_reference_key(refs[0], current_package_id)
@@ -2701,6 +2813,52 @@ def included_semantic_elements(
         )
         result.append((kind, identity))
     return result
+
+
+def included_structured_elements(
+    value: str,
+    locale: str,
+    current_package_id: str | None,
+    canonical_names: dict[str, str],
+) -> list[tuple[str | None, str | None]]:
+    """Return table and non-table Included items once, in document order."""
+    pattern = included_kind_pattern(locale)
+    ordered: list[tuple[int, int, int, str, str | None]] = []
+    for _, rows, _, _, start_line in markdown_table_blocks(value):
+        for row_number, row in enumerate(rows):
+            if len(row) < 2:
+                continue
+            kind_match = pattern.search(without_inline_code(row[1]))
+            kind = None
+            if kind_match is not None:
+                kind = (
+                    "activity"
+                    if kind_match.group(0).casefold() in {"activity", "活動"}
+                    else "task"
+                )
+            refs = references(row[0])
+            identity = (
+                normalized_reference_key(refs[0], current_package_id)
+                if len(refs) == 1
+                else source_identity_key(
+                    row[0], current_package_id, None, canonical_names
+                )
+            )
+            ordered.append((start_line, 0, row_number, kind or "", identity))
+
+    visible = mask_markdown_table_spans(value)
+    for event_number, (line_number, kind, candidate) in enumerate(
+        included_semantic_events(visible, locale)
+    ):
+        refs = references(candidate)
+        identity = (
+            normalized_reference_key(refs[0], current_package_id)
+            if len(refs) == 1
+            else None
+        )
+        ordered.append((line_number, 1, event_number, kind, identity))
+    ordered.sort(key=lambda item: (item[0], item[1], item[2]))
+    return [(kind or None, identity) for _, _, _, kind, identity in ordered]
 
 
 def included_reference_errors(
@@ -2865,8 +3023,9 @@ def check_view(
                     errors.append(
                         f"{path}: {row_label} names an undeclared Source Process: {row[0]}"
                     )
-    elif included.strip():
-        structured_items = included_semantic_items(included, locale)
+    if included_tables or included.strip():
+        table_free_included = mask_markdown_table_spans(included)
+        structured_items = included_semantic_items(table_free_included, locale)
         if structured_items:
             errors.extend(
                 included_reference_errors(
@@ -2881,7 +3040,7 @@ def check_view(
             warnings.append(
                 f"{path}: source-element provenance could not be established mechanically"
             )
-        else:
+        elif not included_tables and included.strip():
             errors.append(
                 f"{path}: Process View Included Activities and Tasks must identify at least one Activity or Task"
             )
@@ -3220,12 +3379,8 @@ def check_pair(
                 f"{english} / {japanese}: included provenance table count differs "
                 f"({len(en_included_tables)} != {len(ja_included_tables)})"
             )
-        en_refs = normalized_references(
-            section(en_text, HEADINGS["en"]["sources"]) or "", current_package_id
-        )
-        ja_refs = normalized_references(
-            section(ja_text, HEADINGS["ja"]["sources"]) or "", current_package_id
-        )
+        en_refs = source_reference_sequence(en_source_text, current_package_id)
+        ja_refs = source_reference_sequence(ja_source_text, current_package_id)
         if en_refs != ja_refs:
             errors.append(f"{english} / {japanese}: Source Process reference identity or order differs")
         en_names = source_canonical_names(
@@ -3234,6 +3389,23 @@ def check_pair(
         ja_names = source_canonical_names(
             ja_source_text, current_package_id, None, "ja"
         )
+        en_source_identities = source_identity_sequence(
+            en_source_text, current_package_id, en_names
+        )
+        ja_source_identities = source_identity_sequence(
+            ja_source_text, current_package_id, ja_names
+        )
+        if en_refs == ja_refs and any(
+            en_identity is not None
+            and ja_identity is not None
+            and en_identity != ja_identity
+            for en_identity, ja_identity in zip(
+                en_source_identities, ja_source_identities
+            )
+        ):
+            errors.append(
+                f"{english} / {japanese}: Source Process reference identity or order differs"
+            )
 
         def provenance_identity(
             rows: list[list[str]], canonical_names: dict[str, str]
@@ -3249,19 +3421,65 @@ def check_pair(
                 )
             return tuple(result)
 
-        if provenance_identity(en_included, en_names) != provenance_identity(
-            ja_included, ja_names
-        ):
-            errors.append(
-                f"{english} / {japanese}: included source provenance or order differs"
-            )
-        if not en_included_tables and not ja_included_tables:
-            en_elements = included_semantic_elements(
-                en_included_text, "en", current_package_id
-            )
-            ja_elements = included_semantic_elements(
-                ja_included_text, "ja", current_package_id
-            )
+        en_elements = included_structured_elements(
+            en_included_text, "en", current_package_id, en_names
+        )
+        ja_elements = included_structured_elements(
+            ja_included_text, "ja", current_package_id, ja_names
+        )
+        en_outside = included_semantic_elements(
+            mask_markdown_table_spans(en_included_text),
+            "en",
+            current_package_id,
+        )
+        ja_outside = included_semantic_elements(
+            mask_markdown_table_spans(ja_included_text),
+            "ja",
+            current_package_id,
+        )
+        table_identity_mismatch = provenance_identity(
+            en_included, en_names
+        ) != provenance_identity(ja_included, ja_names)
+        if en_included_tables or ja_included_tables:
+            if table_identity_mismatch:
+                errors.append(
+                    f"{english} / {japanese}: included source provenance or order differs"
+                )
+            if en_outside or ja_outside:
+                if len(en_elements) != len(ja_elements) and len(en_included) == len(ja_included):
+                    errors.append(
+                        f"{english} / {japanese}: included Activity/Task count differs "
+                        f"({len(en_elements)} != {len(ja_elements)})"
+                    )
+                if len(en_elements) == len(ja_elements):
+                    en_kinds = tuple(kind for kind, _ in en_elements)
+                    ja_kinds = tuple(kind for kind, _ in ja_elements)
+                    if (
+                        all(kind is not None for kind in en_kinds + ja_kinds)
+                        and en_kinds != ja_kinds
+                    ):
+                        errors.append(
+                            f"{english} / {japanese}: included Activity/Task kind/order differs"
+                        )
+                    identity_mismatch = False
+                    identity_unverified = False
+                    for (_, en_identity), (_, ja_identity) in zip(
+                        en_elements, ja_elements
+                    ):
+                        if en_identity is None or ja_identity is None:
+                            if en_identity != ja_identity:
+                                identity_unverified = True
+                        elif en_identity != ja_identity:
+                            identity_mismatch = True
+                    if identity_mismatch and not table_identity_mismatch:
+                        errors.append(
+                            f"{english} / {japanese}: included source identity or order differs"
+                        )
+                    elif identity_unverified:
+                        warnings.append(
+                            f"{english} / {japanese}: included Activity/Task source identity is unverified"
+                        )
+        else:
             if en_elements and ja_elements:
                 if len(en_elements) != len(ja_elements):
                     errors.append(
