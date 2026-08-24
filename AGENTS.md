@@ -4,29 +4,46 @@
 
 ## ALPS
 
-This repository contains Agent Skills that represent Process Framework constructs under ALPS.
+This repository contains Agent Skill representations governed by ALPS (Agent Lifecycle Process Skills).
 
-ALPS starts from the ordinary Process case: an Agent Skill represents a Process through an authoritative Process Description. ALPS also permits Agent Skills to represent a Process Model, Process Reference Model, or Process View. These non-Process representations are identified by `metadata.alps.kind`; activating them loads selection or composition context and does not itself invoke a Process.
+A Process representation is the default ALPS case: its `SKILL.md` is the authoritative Process Description used to understand, invoke, and assess the Process. An Agent Skill may also represent a Process Model, Process Reference Model, or Process View when `metadata.alps.kind` declares that non-Process kind. Loading one of those representations provides selection or composition context; it does not invoke a Process.
 
-The ALPS Reference Model is represented by `alps-reference-model` and defines three reference Processes: Define ALPS, Apply ALPS, and Manage ALPS. They are not fixed phases and may be selected, combined, iterated, or revisited according to the application situation.
+The ALPS Reference Model is represented by `alps-reference-model` and relates three reference Processes:
 
-### Using ALPS
+- `define-alps` defines and verifies Process Descriptions and other ALPS representations.
+- `apply-alps` selects and loads applicable representations, resolves Processes, and invokes only Process representations.
+- `manage-alps` governs adoption, change, Tailoring, assessment, improvement, and retirement.
 
-- Activate `alps-reference-model` when the ALPS Reference Model is needed to select, relate, assess, or improve the reference Processes.
-- Treat an Agent Skill as a Process representation by default. If `metadata.alps.kind` declares `process-model`, `process-reference-model`, or `process-view`, load the representation without treating activation as Process Invocation.
-- Read the complete `SKILL.md` for each selected representation before relying on it.
-- Use `define-alps` to define or verify an ALPS representation, including a Process Description, Process Model, Process Reference Model, or Process View.
-- Use `apply-alps` to activate applicable Models or Views, resolve referenced Processes, invoke only Process representations, and manage required handoffs.
-- Use `manage-alps` for adoption, status, controlled change, Tailoring, formal adoption, assessment, improvement, or retirement of managed representations.
-- Resolve canonical Skill references before relying on the referenced Process. Do not substitute a repository-relative path for representation identity.
-- For a Process View, preserve provenance and Traceability for referenced source elements and keep View-specific or modified Activities and Tasks distinct from changes to Source Processes.
+A Process View organizes Activities and Tasks across Processes for a Concern or Purpose. View-local or modified content does not change a Source Process or establish Source Process Conformance. Change the applicable Source Process through managed Tailoring, or change its authoritative Process Description through controlled redefinition with `define-alps`.
 
-## Repository Workflow
+## Skill layout
 
-- Keep the repository root on `main` by default. Perform development work in `.worktrees/<branch-name>` on a `<type>/<topic>` branch unless the user explicitly directs otherwise.
-- Choose `<type>` to describe the nature of the change, never the author, Agent, or tool performing it. Prefer a conventional type such as `feat`, `fix`, `docs`, `refactor`, `test`, `build`, `ci`, or `chore`, and write `<topic>` in concise kebab-case.
+`skills/` is the single source of truth for Agent Skills registered and exposed as distributed ALPS Plugin Skills. It contains one distributable Process Reference Model and three distributable reference Processes:
+
+- `skills/alps-reference-model/`
+- `skills/define-alps/`
+- `skills/apply-alps/`
+- `skills/manage-alps/`
+
+`.agents/skills/` is the integrated discovery view for repository-development Agents that are configured to inspect that path. It is not assumed to be a universal Host convention. Plugin Hosts continue to discover distributed Skills through `skills/` and their applicable Host adapters.
+
+The four distributed Agent Skill representations appear under `.agents/skills/` only as relative symbolic links to `skills/`; do not duplicate their contents.
+
+Repository-development Skills live as real directories under `.agents/skills/`:
+
+- `review-alps` reviews changes across the Process Framework, ALPS Specification, ALPS Reference Model, reference Processes, checker behavior, record bindings, locale counterparts, and the complete change diff.
+- `sync-locales` checks semantic equivalence and update coverage between authoritative English assets and supported Japanese counterparts.
+
+These repository-development Skills are not registered, exposed, or discovered as distributed Plugin Skills. They can still be present as ordinary files in a repository checkout or package archive.
+
+Add another repository-development Skill only after a repeated task has emerged that does not fit clearly within `review-alps` or `sync-locales`.
+
+## Repository workflow
+
+- Keep one source of truth for each information item and use relative links from consumers.
 - Inspect repository state before editing and preserve unrelated or user changes.
-- Keep one authoritative source for each information item. Where the Process Framework requires the same semantic center in more than one representation, verify equality mechanically rather than establishing precedence between divergent copies.
-- Assess the paired English or Japanese asset whenever one language variant changes.
-- Do not commit, push, publish, open a pull request, or make another external change unless the user requests it.
-- Follow the selected representations' validation requirements. At minimum, run `git diff --check`, verify changed relative links, run applicable ALPS asset checks, and inspect the final task-owned diff; report any required check not run and why.
+- Use `sync-locales` whenever English or Japanese paired assets change.
+- Use `review-alps` whenever a change can affect semantics across the PF, ALPS Specification, ALPS Reference Model, reference Processes, checker, bindings, or locales.
+- Follow the applicable Skill validation requirements. At minimum, check whitespace, changed relative links, canonical references, locale counterparts, and the complete task-owned diff.
+- Treat `skills/define-alps/scripts/check_alps_asset.py` as a structural and semantic preflight for the repository's Markdown Agent Skill representation. It does not by itself determine ALPS Conformance.
+- Do not commit, push, publish, open or update a pull request, or make another external change unless the user requests it.
