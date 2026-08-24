@@ -485,6 +485,39 @@ metadata:
     return english, japanese
 
 
+def write_table_process_model_pair(
+    root: Path,
+    japanese_relationships: str,
+    english_relationships: str = "- One -> Two",
+) -> tuple[Path, Path]:
+    english, japanese = write_process_model_pair(
+        root, japanese_relationships, english_relationships
+    )
+    write(
+        english,
+        english.read_text(encoding="utf-8").replace(
+            "## Processes\n\n- One\n- Two",
+            "## Processes\n\n"
+            "| Process | Skill |\n"
+            "| --- | --- |\n"
+            "| One | `skill:#one` |\n"
+            "| Two | `skill:#two` |",
+        ),
+    )
+    write(
+        japanese,
+        japanese.read_text(encoding="utf-8").replace(
+            "## プロセス\n\n- 一\n- 二",
+            "## プロセス\n\n"
+            "| プロセス | スキル |\n"
+            "| --- | --- |\n"
+            "| 一 | `skill:#one` |\n"
+            "| 二 | `skill:#two` |",
+        ),
+    )
+    return english, japanese
+
+
 def write_reference_model_pair(
     root: Path,
     japanese_relationships: str,
@@ -1426,6 +1459,56 @@ This deeper heading is not a Process entry.
                         errors,
                     )
 
+    def test_frontmatter_resolves_mapping_merge_before_kind_dispatch(self) -> None:
+        text = """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+defaults: &defaults {alps: {kind: process-view}}
+metadata:
+  <<: *defaults
+---
+"""
+        values, errors = CHECKER.frontmatter(text)
+        self.assertEqual(errors, [], errors)
+        self.assertEqual(values.get("alps.kind"), "process-view")
+
+        override = text.replace(
+            "metadata:\n  <<: *defaults",
+            "metadata:\n  <<: *defaults\n  alps:\n    kind: process-model",
+        )
+        override_values, override_errors = CHECKER.frontmatter(override)
+        self.assertEqual(override_errors, [], override_errors)
+        self.assertEqual(override_values.get("alps.kind"), "process-model")
+
+    def test_frontmatter_rejects_invalid_and_cyclic_mapping_merges(self) -> None:
+        invalid = """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+kind: &kind process-view
+metadata:
+  <<: *kind
+---
+"""
+        _, invalid_errors = CHECKER.frontmatter(invalid)
+        self.assertTrue(
+            any("YAML merge key" in error for error in invalid_errors),
+            invalid_errors,
+        )
+
+        cyclic = """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+defaults: &defaults {<<: *defaults}
+metadata:
+  <<: *defaults
+---
+"""
+        _, cyclic_errors = CHECKER.frontmatter(cyclic)
+        self.assertTrue(
+            any("cyclic YAML alias" in error for error in cyclic_errors),
+            cyclic_errors,
+        )
+
     def test_frontmatter_accumulates_multiline_flow_metadata_before_kind_dispatch(self) -> None:
         forms = (
             "metadata: {\n"
@@ -1683,6 +1766,28 @@ This deeper heading is not a Process entry.
             self.assertEqual(errors, [], errors)
             self.assertTrue(any("unverified" in warning for warning in warnings), warnings)
 
+    def test_process_model_pair_correlates_table_process_names_with_skill_references(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            english, japanese = write_table_process_model_pair(
+                Path(directory),
+                "- 二 -> 一",
+            )
+            errors, warnings = CHECKER.check_pair(
+                english,
+                japanese,
+                set(CHECKER.DEFAULT_JA_TERMS),
+                "fixture",
+            )
+            self.assertTrue(
+                any(
+                    "relationship provider/recipient endpoint identity or order differs"
+                    in error
+                    for error in errors
+                ),
+                errors,
+            )
+            self.assertEqual(warnings, [], warnings)
+
     def test_process_model_pair_reports_reversed_translated_endpoints_as_unverified(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             english, japanese = write_process_model_pair(
@@ -1765,6 +1870,22 @@ This deeper heading is not a Process entry.
         self.assertTrue(any("UnclosedWord" in error for error in unclosed), unclosed)
         self.assertTrue(any("VisibleUnclosed" in error for error in unclosed), unclosed)
 
+    def test_japanese_naturalness_checks_decoded_description_forms(self) -> None:
+        forms = (
+            '"description": "English prose ALPS準拠。"\n',
+            'description: "English prose ALPS準拠。"\n',
+            'description: "English\n  prose ALPS準拠。"\n',
+            "description: >-\n  English prose ALPS準拠。\n",
+        )
+        for description in forms:
+            with self.subTest(description=description):
+                text = "---\nname: fixture\n" + description + "---\n"
+                errors = CHECKER.japanese_naturalness_errors(
+                    Path("fixture"), text, set()
+                )
+                self.assertTrue(any("English" in error for error in errors), errors)
+                self.assertEqual(errors, list(dict.fromkeys(errors)), errors)
+
     def test_process_model_validates_two_column_provider_recipient_tables(self) -> None:
         outer = """| Provider | Recipient |
 | --- | --- |
@@ -1796,6 +1917,26 @@ Missing | Also Missing"""
         )
         self.assertTrue(
             any("two-column relationship table must identify Provider" in error for error in errors),
+            errors,
+        )
+
+    def test_process_model_validates_all_relationship_tables(self) -> None:
+        first = """| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+| One | information | Two | relates the Processes. |"""
+        second_valid = """| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+| Two | information | One | relates the Processes. |"""
+        second_invalid = """| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+| Two | information | Missing | relates the Processes. |"""
+        self.assertEqual(
+            check_model(first + "\n\nA second category.\n\n" + second_valid),
+            [],
+        )
+        errors = check_model(first + "\n\nA second category.\n\n" + second_invalid)
+        self.assertTrue(
+            any("recipient Process 'Missing' is not declared" in error for error in errors),
             errors,
         )
 

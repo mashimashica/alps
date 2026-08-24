@@ -530,7 +530,7 @@ def yaml_mapping_line(
         key = yaml_scalar_value(content[: end + 1], line, state)
         return None if not key else (indentation, key, separator.group(1))
     match = re.fullmatch(
-        r"([A-Za-z0-9_.-]+):(?:[ \t]*(.*))?", content, re.S
+        r"([A-Za-z0-9_.-]+|<<):(?:[ \t]*(.*))?", content, re.S
     )
     if not match:
         return None
@@ -712,8 +712,27 @@ def resolve_yaml_node(
         return resolve_yaml_node(
             anchors[node.name], anchors, (*stack, node.name), depth + 1, errors
         )
-    result: dict[str, YAMLResolved] = {}
+    merged: dict[str, YAMLResolved] = {}
     for key, child in node.items.items():
+        if key != "<<":
+            continue
+        merged_value = resolve_yaml_node(
+            child, anchors, stack, depth + 1, errors
+        )
+        if not isinstance(merged_value, dict):
+            item = (
+                getattr(child, "line", getattr(node, "line", 0)),
+                "YAML merge key must resolve to a mapping",
+            )
+            if item not in errors:
+                errors.append(item)
+            continue
+        for merged_key, merged_child in merged_value.items():
+            merged.setdefault(merged_key, merged_child)
+    result = dict(merged)
+    for key, child in node.items.items():
+        if key == "<<":
+            continue
         result[key] = resolve_yaml_node(child, anchors, stack, depth + 1, errors)
     return result
 
@@ -956,6 +975,8 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
             errors.append(f"frontmatter line {number} is not a key/value")
             continue
         _, key, value = match
+        if key == "<<":
+            continue
         if not in_metadata and key in {"alps.kind", "metadata.alps.kind"}:
             errors.append(
                 f"frontmatter line {number} must declare alps.kind under metadata"
@@ -1066,31 +1087,49 @@ def table_row_cells(line: str) -> list[str]:
     return cells
 
 
-def table(text: str) -> tuple[list[str], list[list[str]]]:
+def markdown_tables(text: str) -> list[tuple[list[str], list[list[str]]]]:
+    """Return every Markdown table block in document order."""
     lines = text.splitlines()
-    for index in range(1, len(lines)):
+    tables: list[tuple[list[str], list[list[str]]]] = []
+    index = 1
+    while index < len(lines):
         if not lines[index].strip() or "|" not in lines[index]:
+            index += 1
             continue
         separators = table_row_cells(lines[index])
         if not separators or not all(
             re.fullmatch(r":?-{3,}:?", cell) for cell in separators
         ):
+            index += 1
             continue
         if not lines[index - 1].strip() or "|" not in lines[index - 1]:
+            index += 1
             continue
         header = table_row_cells(lines[index - 1])
         column_count = len(separators)
         if len(header) != column_count:
+            index += 1
             continue
         rows: list[list[str]] = []
-        for line in lines[index + 1 :]:
+        cursor = index + 1
+        while cursor < len(lines):
+            line = lines[cursor]
             if not line.strip() or "|" not in line:
                 break
             row = table_row_cells(line)
             if len(row) != column_count:
                 break
             rows.append(row)
-        return header, rows
+            cursor += 1
+        tables.append((header, rows))
+        index = max(cursor, index + 1)
+    return tables
+
+
+def table(text: str) -> tuple[list[str], list[list[str]]]:
+    tables = markdown_tables(text)
+    if tables:
+        return tables[0]
     return [], []
 
 
@@ -1121,12 +1160,13 @@ def relationship_table_endpoint_indices(header: list[str]) -> tuple[int, int] | 
 
 def relationship_table_errors(path: Path, value: str) -> list[str]:
     """Reject a two-column table unless its columns identify both endpoints."""
-    header, rows = table(value)
-    if rows and len(header) == 2 and relationship_table_endpoint_indices(header) is None:
-        return [
-            f"{path}: two-column relationship table must identify Provider and Recipient Processes"
-        ]
-    return []
+    errors: list[str] = []
+    for header, rows in markdown_tables(value):
+        if rows and len(header) == 2 and relationship_table_endpoint_indices(header) is None:
+            errors.append(
+                f"{path}: two-column relationship table must identify Provider and Recipient Processes"
+            )
+    return errors
 
 
 def outcome_items(value: str | None) -> list[str]:
@@ -1745,7 +1785,10 @@ def check_process_model(
     errors = required_sections(path, text, "Process Model", locale, ("purpose", "processes", "relationships"))
     processes = section(text, HEADINGS[locale]["processes"]) or ""
     relationships = section(text, HEADINGS[locale]["relationships"]) or ""
-    _, relationship_rows = table(relationships)
+    relationship_tables = markdown_tables(relationships)
+    relationship_rows = [
+        row for _, rows in relationship_tables for row in rows
+    ]
     process_entries = process_model_entries(processes)
     relationship_items = re.findall(r"(?m)^\s{0,3}(?:[-*+]|\d+[.)])\s+\S", relationships)
     if not process_entries and not references(processes):
@@ -1798,9 +1841,9 @@ def check_process_model(
 
 
 def process_model_entries(value: str, *, include_headings: bool = True) -> list[str]:
-    _, rows = table(value)
-    if rows:
-        return [row[0] for row in rows if row and row[0]]
+    table_rows = [row for _, rows in markdown_tables(value) for row in rows]
+    if table_rows:
+        return [row[0] for row in table_rows if row and row[0]]
     entries = [
         match.group(1).strip()
         for match in re.finditer(
@@ -1826,16 +1869,22 @@ def process_model_entries(value: str, *, include_headings: bool = True) -> list[
 def relationship_endpoint_cells(value: str) -> list[tuple[str, int, str, str]]:
     """Return provider and recipient cells from recognized relationship structures."""
 
-    header, rows = table(value)
-    endpoint_indices = relationship_table_endpoint_indices(header)
-    if rows and endpoint_indices is not None:
+    table_endpoints: list[tuple[str, int, str, str]] = []
+    for header, rows in markdown_tables(value):
+        endpoint_indices = relationship_table_endpoint_indices(header)
+        if not rows or endpoint_indices is None:
+            continue
         provider_index, recipient_index = endpoint_indices
-        return [
-            ("row", row_number, role, row[index])
-            for row_number, row in enumerate(rows, start=1)
-            for role, index in (("provider", provider_index), ("recipient", recipient_index))
-            if len(row) > index
-        ]
+        table_endpoints.extend(
+            (
+                ("row", row_number, role, row[index])
+                for row_number, row in enumerate(rows, start=1)
+                for role, index in (("provider", provider_index), ("recipient", recipient_index))
+                if len(row) > index
+            )
+        )
+    if table_endpoints:
+        return table_endpoints
 
     endpoints: list[tuple[str, int, str, str]] = []
     for item_number, item in enumerate(
@@ -1869,8 +1918,7 @@ def relationship_endpoint_cells(value: str) -> list[tuple[str, int, str, str]]:
 
 def relationship_list_endpoint_errors(path: Path, value: str) -> list[str]:
     """Reject list relationship items that do not identify both endpoints."""
-    _, rows = table(value)
-    if rows:
+    if any(rows for _, rows in markdown_tables(value)):
         return []
     items = process_model_entries(value, include_headings=False)
     if not items:
@@ -1996,7 +2044,10 @@ def check_reference_model(
     blocks = process_block_details(processes)
     if not blocks:
         return errors + [f"{path}: no Process entries found"]
-    relationship_header, relationship_rows = table(relationships)
+    relationship_tables = markdown_tables(relationships)
+    relationship_rows = [
+        row for _, rows in relationship_tables for row in rows
+    ]
     relationship_items = re.findall(
         r"(?m)^\s{0,3}(?:[-*+]|\d+[.)])\s+\S", relationships
     )
@@ -2067,8 +2118,10 @@ def check_reference_model(
         reference_key = normalized_references(reference, current_package_id)[0]
         if reference_key not in declared_references and target_name not in declared_names:
             errors.append(f"{path}: relationship endpoint {reference} is not declared in Processes")
-    if relationship_rows and len(relationship_header) >= 3:
-        for row_number, row in enumerate(relationship_rows, start=1):
+    for relationship_header, relationship_table_rows in relationship_tables:
+        if len(relationship_header) < 3:
+            continue
+        for row_number, row in enumerate(relationship_table_rows, start=1):
             if len(row) < 3:
                 errors.append(
                     f"{path}: relationship row {row_number} must identify provider and recipient Processes"
@@ -2162,11 +2215,20 @@ def process_model_identities(
     value: str,
     current_package_id: str | None,
 ) -> dict[str, str | None]:
-    return declared_process_identities(
-        (
+    table_rows = [row for _, rows in markdown_tables(value) for row in rows]
+    if table_rows:
+        entries = (
+            (row[0], references(" ".join(row)))
+            for row in table_rows
+            if row and row[0]
+        )
+    else:
+        entries = (
             (entry, references(entry))
             for entry in process_model_entries(value)
-        ),
+        )
+    return declared_process_identities(
+        entries,
         current_package_id,
         process_display_name,
     )
@@ -2840,7 +2902,11 @@ def check_asset(
     return errors + more_errors, warnings + more_warnings
 
 
-def japanese_prose_lines(text: str) -> Iterable[tuple[int, str]]:
+def japanese_prose_lines(
+    text: str,
+    *,
+    include_description: bool = True,
+) -> Iterable[tuple[int, str]]:
     text = without_html_comments(without_fenced_code(text))
     in_frontmatter = False
     description_indent: int | None = None
@@ -2859,7 +2925,8 @@ def japanese_prose_lines(text: str) -> Iterable[tuple[int, str]]:
                 if not stripped:
                     continue
                 if indent > description_indent:
-                    yield number, original
+                    if include_description:
+                        yield number, original
                     continue
                 description_indent = None
             description = re.match(r"^(\s*)description:\s*(.*)$", original)
@@ -2867,7 +2934,7 @@ def japanese_prose_lines(text: str) -> Iterable[tuple[int, str]]:
                 indent_text, value = description.groups()
                 if re.fullmatch(r"[>|](?:[+-]?[1-9]?|[1-9][+-]?)", value.strip()):
                     description_indent = len(indent_text)
-                else:
+                elif include_description:
                     yield number, value
             continue
         if not stripped or stripped.startswith("<!--"):
@@ -2897,11 +2964,43 @@ def raw_english_words(line: str, allowed_terms: set[str]) -> list[str]:
     return words
 
 
+def frontmatter_field_line(text: str, field: str) -> int:
+    """Return the source line for a decoded top-level frontmatter field."""
+    if not text.startswith("---\n"):
+        return 1
+    end = text.find("\n---\n", 4)
+    if end < 0:
+        return 1
+    for index, raw in enumerate(text[4:end].splitlines(), start=2):
+        mapping = yaml_mapping_line(raw)
+        if mapping is not None and mapping[0] == 0 and mapping[1] == field:
+            return index
+    return 1
+
+
 def japanese_naturalness_errors(path: Path, text: str, allowed_terms: set[str]) -> list[str]:
     errors: list[str] = []
-    for number, line in japanese_prose_lines(text):
+    decoded_frontmatter, _ = frontmatter(text)
+    description = decoded_frontmatter.get("description")
+    seen: set[tuple[int, str]] = set()
+
+    def add_error(number: int, word: str) -> None:
+        item = (number, word)
+        if item in seen:
+            return
+        seen.add(item)
+        errors.append(f"{path}:{number}: untranslated English in Japanese prose: {word}")
+
+    for number, line in japanese_prose_lines(
+        text,
+        include_description=description is None,
+    ):
         for word in raw_english_words(line, allowed_terms):
-            errors.append(f"{path}:{number}: untranslated English in Japanese prose: {word}")
+            add_error(number, word)
+    if description is not None:
+        number = frontmatter_field_line(text, "description")
+        for word in raw_english_words(description, allowed_terms):
+            add_error(number, word)
     return errors
 
 
