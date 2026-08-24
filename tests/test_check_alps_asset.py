@@ -2271,16 +2271,138 @@ metadata:
 name: fixture
 description: Fixture process. ALPS-conformant.
 defaults: &defaults {alps: {kind: process-view}}
+overrides: &overrides {alps: {kind: process-model}}
 metadata:
   <<:
+
+    # Earlier mappings have precedence over later mappings.
     - *defaults
+
+    - *overrides
 ---
 """
-        _, block_errors = CHECKER.frontmatter(block_sequence)
-        self.assertTrue(
-            any("unsupported YAML block sequence" in error for error in block_errors),
-            block_errors,
+        block_values, block_errors = CHECKER.frontmatter(block_sequence)
+        self.assertEqual(block_errors, [], block_errors)
+        self.assertEqual(block_values.get("alps.kind"), "process-view")
+
+        explicit_block = block_sequence.replace(
+            "    - *overrides\n---",
+            "    - *overrides\n  alps:\n    kind: process-reference-model\n---",
         )
+        explicit_values, explicit_errors = CHECKER.frontmatter(explicit_block)
+        self.assertEqual(explicit_errors, [], explicit_errors)
+        self.assertEqual(explicit_values.get("alps.kind"), "process-reference-model")
+
+        invalid_block = block_sequence.replace(
+            "    - *overrides",
+            "    - scalar-member",
+        )
+        _, invalid_block_errors = CHECKER.frontmatter(invalid_block)
+        self.assertTrue(
+            any("YAML merge key must resolve to a mapping" in error for error in invalid_block_errors),
+            invalid_block_errors,
+        )
+
+        unresolved_block = block_sequence.replace(
+            "    - *overrides",
+            "    - *missing",
+        )
+        _, unresolved_block_errors = CHECKER.frontmatter(unresolved_block)
+        self.assertTrue(
+            any("unresolved YAML alias *missing" in error for error in unresolved_block_errors),
+            unresolved_block_errors,
+        )
+
+        malformed_block = block_sequence.replace(
+            "    - *overrides",
+            "   - *overrides",
+        )
+        _, malformed_block_errors = CHECKER.frontmatter(malformed_block)
+        self.assertTrue(malformed_block_errors, malformed_block_errors)
+
+        cyclic_block = """---
+name: fixture
+description: Fixture process. ALPS-conformant.
+defaults: &defaults
+  <<:
+    - *defaults
+metadata:
+  <<: *defaults
+---
+"""
+        _, cyclic_block_errors = CHECKER.frontmatter(cyclic_block)
+        self.assertTrue(
+            any("cyclic YAML alias" in error for error in cyclic_block_errors),
+            cyclic_block_errors,
+        )
+
+        unrelated_sequence = block_sequence.replace(
+            "metadata:\n  <<:",
+            "metadata:\n  values:",
+        )
+        _, unrelated_sequence_errors = CHECKER.frontmatter(unrelated_sequence)
+        self.assertTrue(
+            any("unsupported YAML block sequence" in error for error in unrelated_sequence_errors),
+            unrelated_sequence_errors,
+        )
+
+    def test_non_process_representations_resolve_operative_references(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            reference_process_skill(root, "one", "One")
+            reference_process_skill(root, "two", "Two")
+
+            model = process_model(root, "- One -> Two")
+            model_text = model.read_text(encoding="utf-8").replace(
+                "The fixture organizes two Processes.",
+                "The model uses skill:#does-not-exist.",
+            )
+            write(model, model_text)
+
+            reference_model = process_reference_model(root, "- skill:#one -> skill:#two")
+            reference_model_text = reference_model.read_text(encoding="utf-8").replace(
+                "The fixture defines two reference Processes.",
+                "The reference model uses skill:#does-not-exist.",
+            )
+            write(reference_model, reference_model_text)
+
+            view = process_view(
+                root,
+                "- One\n- Two",
+                """| Source Process | Source element |
+| --- | --- |
+| One | Activity |
+| Two | Task |""",
+            )
+            view_text = view.read_text(encoding="utf-8").replace(
+                "The fixture provides application guidance.",
+                "The application uses skill:#does-not-exist.",
+            )
+            write(view, view_text)
+
+            for path in (model, reference_model, view):
+                with self.subTest(kind=CHECKER.representation_kind(path)):
+                    errors, _ = CHECKER.check_asset(path, {"": root}, None)
+                    self.assertTrue(
+                        any("unresolved Skill reference skill:#does-not-exist" in error for error in errors),
+                        (path, errors),
+                    )
+
+            other_root = Path(directory) / "other-package"
+            reference_process_skill(other_root, "two", "Two")
+            for path in (model, reference_model, view):
+                valid_text = path.read_text(encoding="utf-8").replace(
+                    "skill:#does-not-exist",
+                    "skill:#one skill:other#two",
+                )
+                write(path, valid_text)
+                with self.subTest(valid_kind=CHECKER.representation_kind(path)):
+                    errors, _ = CHECKER.check_asset(
+                        path,
+                        {"": root, "other": other_root},
+                        None,
+                    )
+                    self.assertEqual(errors, [], (path, errors))
 
     def test_frontmatter_accumulates_multiline_flow_metadata_before_kind_dispatch(self) -> None:
         forms = (
@@ -3833,6 +3955,64 @@ The fixture has a purpose.
         for value in invalid_forms:
             with self.subTest(value=value):
                 self.assertIsNone(CHECKER.heading1(value))
+
+    def test_indented_atx_headings_are_semantic_but_four_spaces_are_code(self) -> None:
+        for indent in (1, 2, 3):
+            with self.subTest(indent=indent):
+                prefix = " " * indent
+                text = f"""---
+name: fixture
+description: Fixture process. ALPS-conformant.
+---
+
+{prefix}# Fixture
+
+{prefix}## Purpose
+
+The fixture has a purpose.
+
+{prefix}## Outcomes
+
+- The fixture is complete.
+
+{prefix}## Activities & Tasks
+
+{prefix}### Work
+
+1. The agent must work.
+"""
+                self.assertEqual(CHECKER.heading1(text), "Fixture")
+                self.assertEqual(
+                    CHECKER.section(text, "Purpose"),
+                    "The fixture has a purpose.",
+                )
+                self.assertEqual(
+                    CHECKER.parse_process_structure(text, "en").activities,
+                    ("Work",),
+                )
+
+        self.assertEqual(
+            CHECKER.process_model_entries("  ### One\n   ### Two"),
+            ["One", "Two"],
+        )
+        self.assertEqual(
+            [name for name, _, _ in CHECKER.process_block_details(
+                "  ### One\n  #### Purpose\n\nOne purpose.\n\n"
+                "  #### Outcomes\n\n- One is achieved.\n\n"
+                "  ### Two\n"
+            )],
+            ["One", "Two"],
+        )
+
+        self.assertIsNone(CHECKER.heading1("    # Fake\n"))
+        self.assertIsNone(CHECKER.section("    ## Purpose\n\nFake\n", "Purpose"))
+        masked = (
+            "```markdown\n"
+            "   ## Purpose\n\nFake\n"
+            "```\n\n"
+            "<!--\n   ## Purpose\n\nFake\n-->\n"
+        )
+        self.assertIsNone(CHECKER.section(masked, "Purpose"))
 
     def test_closing_markers_apply_to_model_reference_and_view_extractors(self) -> None:
         processes = "### One ###\n\n### Two ###\n\n### C# value# ###"

@@ -634,6 +634,72 @@ def yaml_flow_sequence(
     return YAMLSequenceNode(tuple(items), line)
 
 
+def yaml_block_sequence(
+    lines: list[str],
+    index: int,
+    indent: int,
+    depth: int,
+    state: YAMLParseState,
+) -> tuple[YAMLSequenceNode, int]:
+    """Parse the bounded block-sequence form used by YAML merge keys.
+
+    General block sequences remain unsupported.  This narrow parser accepts
+    merge members as inline aliases, flow mappings, or scalars; resolution
+    later rejects anything other than mappings.
+    """
+    items: list[YAMLNode] = []
+    if depth > YAML_MAX_DEPTH:
+        state.add_error(index + 2, "YAML frontmatter nesting limit exceeded")
+        return YAMLSequenceNode(tuple(items), index + 1)
+    if not state.count_node(index + 2):
+        return YAMLSequenceNode(tuple(items), index + 1)
+    cursor = index
+    while cursor < len(lines):
+        raw = lines[cursor]
+        if not raw.strip() or raw.lstrip().startswith("#"):
+            cursor += 1
+            continue
+        current_indent = len(raw) - len(raw.lstrip(" "))
+        if current_indent < indent:
+            if raw.lstrip().startswith("-"):
+                state.add_error(
+                    cursor + 2,
+                    "invalid YAML merge sequence indentation",
+                )
+                cursor += 1
+            break
+        if current_indent > indent:
+            state.add_error(
+                cursor + 2,
+                "invalid YAML merge sequence indentation",
+            )
+            cursor += 1
+            continue
+        item_match = re.fullmatch(r" {" + str(indent) + r"}-(?:[ \t]+(.*))?", raw)
+        if item_match is None:
+            break
+        raw_value = item_match.group(1) or ""
+        line = cursor + 2
+        if not yaml_without_comment(raw_value).strip():
+            state.add_error(line, "invalid YAML merge sequence item")
+            node = YAMLNullNode(line)
+            state.count_node(line)
+            cursor += 1
+        else:
+            _, remainder = yaml_node_properties(raw_value.strip())
+            if remainder.startswith(("{", "[")):
+                scalar_value, next_cursor = yaml_collect_flow(
+                    lines, cursor, raw_value
+                )
+                node = yaml_inline_node(scalar_value, line, depth + 1, state)
+                cursor = next_cursor
+            else:
+                node = yaml_inline_node(raw_value, line, depth + 1, state)
+                cursor += 1
+        items.append(node)
+    return YAMLSequenceNode(tuple(items), index + 2), cursor
+
+
 def yaml_flow_mapping(
     value: str,
     line: int,
@@ -736,17 +802,22 @@ def yaml_mapping(
                 child_indent = indent
             if child < len(lines) and child_indent > indent:
                 if lines[child].lstrip().startswith("-"):
-                    state.add_error(child + 2, "unsupported YAML block sequence")
-                    cursor = child
-                    while cursor < len(lines):
-                        child_line = lines[cursor]
-                        if child_line.strip():
-                            child_line_indent = len(child_line) - len(child_line.lstrip(" "))
-                            if child_line_indent <= indent:
-                                break
-                        cursor += 1
-                    node = YAMLNullNode(line)
-                    state.count_node(line)
+                    if key == "<<":
+                        node, cursor = yaml_block_sequence(
+                            lines, child, child_indent, depth + 1, state
+                        )
+                    else:
+                        state.add_error(child + 2, "unsupported YAML block sequence")
+                        cursor = child
+                        while cursor < len(lines):
+                            child_line = lines[cursor]
+                            if child_line.strip():
+                                child_line_indent = len(child_line) - len(child_line.lstrip(" "))
+                                if child_line_indent <= indent:
+                                    break
+                            cursor += 1
+                        node = YAMLNullNode(line)
+                        state.count_node(line)
                 else:
                     node, cursor = yaml_mapping(lines, child, child_indent, depth + 1, state)
             else:
@@ -1127,7 +1198,7 @@ def normalize_atx_heading_text(value: str) -> str:
 
 def heading1(text: str) -> str | None:
     text = without_html_comments(without_indented_code(without_fenced_code(text)))
-    atx_match = re.search(r"(?m)^# ([^\n]+?)\s*$", text)
+    atx_match = re.search(r"(?m)^ {0,3}# ([^\n]+?)\s*$", text)
     setext_match = re.search(
         r"(?m)^ {0,3}(?P<name>(?!(?:[-+*]|\d+[.)])(?:[ \t]+|$)|>|#(?:[ \t]|$))"
         r"\S[^\n]*?)\n {0,3}=+[ \t]*$",
@@ -1151,9 +1222,13 @@ def section(
 ) -> str | None:
     text = without_html_comments(without_fenced_code(text))
     marker = "#" * level + " " + heading
-    boundary = r"^#{1,6}\s" if stop_at_any_heading else rf"^#{{1,{level}}}\s"
+    boundary = (
+        r"^ {0,3}#{1,6}[ \t]"
+        if stop_at_any_heading
+        else rf"^ {{0,3}}#{{1,{level}}}[ \t]"
+    )
     pattern = re.compile(
-        rf"(?ms)^{re.escape(marker)}(?:[ \t]+#+)?[ \t]*\n(.*?)(?={boundary}|\Z)"
+        rf"(?ms)^ {{0,3}}{re.escape(marker)}(?:[ \t]+#+)?[ \t]*\n(.*?)(?={boundary}|\Z)"
     )
     match = pattern.search(text)
     return match.group(1).strip() if match else None
@@ -1975,14 +2050,14 @@ def process_core(path: Path) -> tuple[str, str, list[str]]:
     return name, purpose_value, outcome_values
 
 
-def process_reference_errors(
+def operative_reference_errors(
     path: Path,
     text: str,
     roots: dict[str, Path],
     locale: str,
     current_package_id: str | None,
 ) -> list[str]:
-    """Resolve every operative canonical reference in a Process representation."""
+    """Resolve every operative canonical reference in the representation."""
 
     errors: list[str] = []
     seen: set[str] = set()
@@ -1995,6 +2070,40 @@ def process_reference_errors(
                 seen.add(message)
                 errors.append(message)
     return errors
+
+
+def process_reference_errors(
+    path: Path,
+    text: str,
+    roots: dict[str, Path],
+    locale: str,
+    current_package_id: str | None,
+) -> list[str]:
+    """Backward-compatible Process-context name for the shared reference pass."""
+    return operative_reference_errors(path, text, roots, locale, current_package_id)
+
+
+def deduplicate_resolution_errors(errors: Iterable[str]) -> list[str]:
+    """Keep one diagnostic for the same failed resolution across validators."""
+    result: list[str] = []
+    seen: set[str] = set()
+    markers = (
+        "unresolved Skill reference ",
+        "unresolved package identity ",
+        "Skill reference escapes package root:",
+    )
+    for error in errors:
+        key = error
+        for marker in markers:
+            marker_index = error.find(marker)
+            if marker_index >= 0:
+                key = error[marker_index:]
+                break
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(error)
+    return result
 
 
 def classify_normative(task: str, locale: str) -> str | None:
@@ -2021,7 +2130,9 @@ def parse_process_structure(text: str, locale: str) -> ProcessStructure:
     activity_text = without_indented_code(
         section(text, HEADINGS[locale]["activities"]) or ""
     )
-    heading_matches = list(re.finditer(r"(?m)^(#{3,6}) ([^\n]+?)\s*$", activity_text))
+    heading_matches = list(
+        re.finditer(r"(?m)^ {0,3}(#{3,6})[ \t]+([^\n]+?)\s*$", activity_text)
+    )
     activity_level = min(
         (len(match.group(1)) for match in heading_matches),
         default=None,
@@ -2039,7 +2150,7 @@ def parse_process_structure(text: str, locale: str) -> ProcessStructure:
         end = matches[index + 1].start() if index + 1 < len(matches) else len(activity_text)
         block = activity_text[start:end]
         child_matches = list(
-            re.finditer(r"(?m)^(#{2,6}) ([^\n]+?)\s*$", block)
+            re.finditer(r"(?m)^ {0,3}(#{2,6})[ \t]+([^\n]+?)\s*$", block)
         )
         child_matches = [
             child
@@ -2104,13 +2215,7 @@ def semantic_process_findings(
     roots: dict[str, Path],
     current_package_id: str | None,
 ) -> tuple[list[str], list[str]]:
-    errors = process_reference_errors(
-        path,
-        text,
-        roots,
-        locale,
-        current_package_id,
-    )
+    errors: list[str] = []
     warnings: list[str] = []
     try:
         process_core(path)
@@ -2457,7 +2562,9 @@ def named_relationship_endpoint_errors(
 
 
 def process_block_details(value: str) -> list[tuple[str, str, int]]:
-    visible = without_html_comments(without_fenced_code(value))
+    visible = without_html_comments(
+        without_indented_code(without_fenced_code(value))
+    )
     child_headings = {
         HEADINGS[locale][key]
         for locale in HEADINGS
@@ -2465,7 +2572,9 @@ def process_block_details(value: str) -> list[tuple[str, str, int]]:
     }
     candidates = [
         match
-        for match in re.finditer(r"(?m)^(#{3,5}) ([^\n]+?)\s*$", visible)
+        for match in re.finditer(
+            r"(?m)^ {0,3}(#{3,5})[ \t]+([^\n]+?)\s*$", visible
+        )
         if normalize_atx_heading_text(match.group(2)) not in child_headings
     ]
     entry_level = min((len(match.group(1)) for match in candidates), default=None)
@@ -2598,7 +2707,9 @@ def check_reference_model(
 
 def source_semantic_entries(value: str) -> list[SourceSemanticEntry]:
     """Extract Source Process table rows and outside structured entries once."""
-    visible = without_html_comments(without_fenced_code(value))
+    visible = without_html_comments(
+        without_indented_code(without_fenced_code(value))
+    )
     table_blocks = markdown_table_blocks(visible)
     entries: list[SourceSemanticEntry] = []
     for _, rows, _, _, start_line in table_blocks:
@@ -2619,18 +2730,31 @@ def source_semantic_entries(value: str) -> list[SourceSemanticEntry]:
         for line_number, line in enumerate(lines)
         if line.strip()
     ]
+    structured_lines = [
+        (line_number, line.expandtabs(4).rstrip())
+        for line_number, line in enumerate(lines)
+        if line.strip()
+    ]
 
     def structured_value(line: str) -> str:
-        value = re.sub(r"^(?:[-*+]\s+|\d+[.)]\s+|#{3,}\s+)", "", line)
-        return normalize_atx_heading_text(value) if re.match(r"^#{3,}\s+", line) else value
+        value = re.sub(
+            r"^(?:[-*+]\s+|\d+[.)]\s+| {0,3}#{3,}[ \t]+)",
+            "",
+            line,
+        )
+        return (
+            normalize_atx_heading_text(value)
+            if re.match(r"^ {0,3}#{3,}[ \t]+", line)
+            else value
+        )
 
     structured = [
         (
             line_number,
             structured_value(line),
         )
-        for line_number, line in normalized
-        if re.match(r"^(?:[-*+]\s+|\d+[.)]\s+|#{3,}\s+)", line)
+        for line_number, line in structured_lines
+        if re.match(r"^(?:[-*+]\s+|\d+[.)]\s+| {0,3}#{3,}[ \t]+)", line)
     ]
     selected = structured if structured or table_blocks else normalized
     for line_number, line in selected:
@@ -3475,15 +3599,22 @@ def check_asset(
         errors.append(f"{path}: representation is outside the declared package roots")
     else:
         errors.extend(local_link_errors(path, text, package_root))
+    operative_errors = operative_reference_errors(
+        path,
+        text,
+        roots,
+        locale,
+        package_identity,
+    )
     warnings: list[str] = []
     if not heading1(text):
         errors.append(f"{path}: representation requires Name as a level-one heading")
     meta, frontmatter_errors = frontmatter(text)
     if frontmatter_errors and "alps.kind" not in meta:
-        return errors, warnings
+        return deduplicate_resolution_errors(errors + operative_errors), warnings
     kind = meta.get("alps.kind", "process")
     if kind not in SUPPORTED_KINDS:
-        return errors, warnings
+        return deduplicate_resolution_errors(errors + operative_errors), warnings
     if kind == "process":
         more_errors, more_warnings = semantic_process_findings(
             path,
@@ -3492,13 +3623,30 @@ def check_asset(
             roots,
             package_identity,
         )
-        return errors + more_errors, warnings + more_warnings
+        return deduplicate_resolution_errors(errors + operative_errors + more_errors), warnings + more_warnings
     if kind == "process-model":
-        return errors + check_process_model(path, text, locale, roots, package_identity), warnings
+        return (
+            deduplicate_resolution_errors(
+                errors + operative_errors + check_process_model(
+                    path, text, locale, roots, package_identity
+                )
+            ),
+            warnings,
+        )
     if kind == "process-reference-model":
-        return errors + check_reference_model(path, text, locale, roots, package_identity), warnings
+        return (
+            deduplicate_resolution_errors(
+                errors + operative_errors + check_reference_model(
+                    path, text, locale, roots, package_identity
+                )
+            ),
+            warnings,
+        )
     more_errors, more_warnings = check_view(path, text, locale, roots, package_identity)
-    return errors + more_errors, warnings + more_warnings
+    return (
+        deduplicate_resolution_errors(errors + operative_errors + more_errors),
+        warnings + more_warnings,
+    )
 
 
 def japanese_prose_lines(
