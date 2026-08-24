@@ -137,7 +137,7 @@ When a change to an Output affects another Process's Input, the affected Process
 
 This section is informative and has no normative force.
 
-- When ambiguity, conflict, normative-attribute interpretation, Conformance, or Tailoring requires consultation of the governing texts, use the repository-shared [Process Framework](../../.alps/spec/process-framework.md) and [ALPS Specification](../../.alps/spec/ALPS-SPEC.md). Routine application continues to use the selected authoritative Skill Description, applicable Framework-level declarations, and managed Tailoring decisions as its direct basis.
+- When ambiguity, conflict, normative-attribute interpretation, Conformance, or Tailoring requires consultation of the governing texts, use the repository-shared [Process Framework](../../spec/process-framework.md) and [ALPS Specification](../../spec/ALPS-SPEC.md). Routine application continues to use the selected authoritative Skill Description, applicable Framework-level declarations, and managed Tailoring decisions as its direct basis.
 
 ## Bundled Resources
 

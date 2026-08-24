@@ -155,8 +155,8 @@ ALPS applies this Framework to Skill description, life cycle management, Tailori
 
 | Resource | English | Japanese |
 | --- | --- | --- |
-| Process Framework | [process-framework.md](.alps/spec/process-framework.md) | [process-framework.md](.alps/spec/locales/ja/process-framework.md) |
-| ALPS Specification | [ALPS-SPEC.md](.alps/spec/ALPS-SPEC.md) | [ALPS-SPEC.md](.alps/spec/locales/ja/ALPS-SPEC.md) |
+| Process Framework | [process-framework.md](spec/process-framework.md) | [process-framework.md](spec/locales/ja/process-framework.md) |
+| ALPS Specification | [ALPS-SPEC.md](spec/ALPS-SPEC.md) | [ALPS-SPEC.md](spec/locales/ja/ALPS-SPEC.md) |
 | `define-alps` — Definition Process | [SKILL.md](skills/define-alps/SKILL.md) | [SKILL.md](skills/define-alps/references/locales/ja/SKILL.md) |
 | `apply-alps` — Application Process | [SKILL.md](skills/apply-alps/SKILL.md) | [SKILL.md](skills/apply-alps/references/locales/ja/SKILL.md) |
 | `manage-alps` — Management Process | [SKILL.md](skills/manage-alps/SKILL.md) | [SKILL.md](skills/manage-alps/references/locales/ja/SKILL.md) |

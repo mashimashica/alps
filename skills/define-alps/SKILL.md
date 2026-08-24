@@ -103,7 +103,7 @@ The selected Skill need and selection rationale, verified Skill Description, rec
 
 - Apply the Process Framework and ALPS. If they conflict, the Process Framework must take precedence.
 - The normative words and their meanings are those defined in the Process Framework. This Process Description does not redefine them.
-- The applicable clauses of [process-framework.md](../../.alps/spec/process-framework.md) and [ALPS-SPEC.md](../../.alps/spec/ALPS-SPEC.md) must be consulted when interpreting a Process Framework or ALPS requirement, confirming a normative attribute, determining Conformance, or changing this Process Description.
+- The applicable clauses of [process-framework.md](../../spec/process-framework.md) and [ALPS-SPEC.md](../../spec/ALPS-SPEC.md) must be consulted when interpreting a Process Framework or ALPS requirement, confirming a normative attribute, determining Conformance, or changing this Process Description.
 - The Name must be a short noun phrase that distinguishes the Process from other Processes. The Name must not summarize the Purpose.
 - The Purpose must state the high-level objective or objectives that belong together.
 - The Purpose should be stated concisely in one sentence wherever possible.
@@ -153,8 +153,8 @@ When an Output becomes another Process's Input, their names, meanings, and scope
 
 This section identifies repository-level normative assets and does not require a specific manner of execution.
 
-- Use the repository-shared [Process Framework](../../.alps/spec/process-framework.md) as the higher-order normative source for Process Descriptions. It takes precedence if it conflicts with ALPS.
-- Use the repository-shared [ALPS Specification](../../.alps/spec/ALPS-SPEC.md) to confirm ALPS normative requirements. Consult the relevant clauses according to the interpretation needed.
+- Use the repository-shared [Process Framework](../../spec/process-framework.md) as the higher-order normative source for Process Descriptions. It takes precedence if it conflicts with ALPS.
+- Use the repository-shared [ALPS Specification](../../spec/ALPS-SPEC.md) to confirm ALPS normative requirements. Consult the relevant clauses according to the interpretation needed.
 
 ## Bundled Resources
 

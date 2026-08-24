@@ -147,7 +147,7 @@ Provider Outputs and recipient Inputs must retain identifiable meaning, scope, s
 
 This section is informative and has no normative force.
 
-- Use the repository-shared [Process Framework](../../.alps/spec/process-framework.md) and [ALPS Specification](../../.alps/spec/ALPS-SPEC.md) when interpretation of governing concepts, Conformance, or Tailoring is required.
+- Use the repository-shared [Process Framework](../../spec/process-framework.md) and [ALPS Specification](../../spec/ALPS-SPEC.md) when interpretation of governing concepts, Conformance, or Tailoring is required.
 
 ## Bundled Resources
 

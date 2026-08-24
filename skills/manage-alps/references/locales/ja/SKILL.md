@@ -153,7 +153,7 @@ description: Agent Skill、Skill Package、Process ModelまたはProcess Viewに
 
 この節は参考情報であり、規範上の強さを持たない。
 
-- Process FrameworkまたはALPSの解釈、競合解決、規範属性、ConformanceまたはTailoringに正本が必要な場合は、リポジトリ共通の[Process Framework](../../../../../.alps/spec/locales/ja/process-framework.md)および[ALPS Specification](../../../../../.alps/spec/locales/ja/ALPS-SPEC.md)を参照する。これらはリポジトリ共通の規範資産であり、本Skill Packageが所有する文書ではない。
+- Process FrameworkまたはALPSの解釈、競合解決、規範属性、ConformanceまたはTailoringに正本が必要な場合は、リポジトリ共通の[Process Framework](../../../../../spec/locales/ja/process-framework.md)および[ALPS Specification](../../../../../spec/locales/ja/ALPS-SPEC.md)を参照する。これらはリポジトリ共通の規範資産であり、本Skill Packageが所有する文書ではない。
 
 ## Bundled Resources
 

@@ -155,8 +155,8 @@ ALPSは、このFrameworkをSkillの記述、ライフサイクル管理、Tailo
 
 | 内容 | 英語 | 日本語 |
 | --- | --- | --- |
-| Process Framework | [process-framework.md](../../.alps/spec/process-framework.md) | [process-framework.md](../../.alps/spec/locales/ja/process-framework.md) |
-| ALPS Specification | [ALPS-SPEC.md](../../.alps/spec/ALPS-SPEC.md) | [ALPS-SPEC.md](../../.alps/spec/locales/ja/ALPS-SPEC.md) |
+| Process Framework | [process-framework.md](../../spec/process-framework.md) | [process-framework.md](../../spec/locales/ja/process-framework.md) |
+| ALPS Specification | [ALPS-SPEC.md](../../spec/ALPS-SPEC.md) | [ALPS-SPEC.md](../../spec/locales/ja/ALPS-SPEC.md) |
 | `define-alps` — 定義Process | [SKILL.md](../../skills/define-alps/SKILL.md) | [SKILL.md](../../skills/define-alps/references/locales/ja/SKILL.md) |
 | `apply-alps` — 適用Process | [SKILL.md](../../skills/apply-alps/SKILL.md) | [SKILL.md](../../skills/apply-alps/references/locales/ja/SKILL.md) |
 | `manage-alps` — 管理Process | [SKILL.md](../../skills/manage-alps/SKILL.md) | [SKILL.md](../../skills/manage-alps/references/locales/ja/SKILL.md) |
