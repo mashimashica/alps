@@ -2787,63 +2787,84 @@ def check_view(
             errors.append(f"{path}: source reference {reference} does not resolve to a Process representation")
 
     included = section(text, HEADINGS[locale]["included"]) or ""
-    header, rows = table(included)
+    included_tables = markdown_tables(included)
     expected = (
         ("Source Process", "Source element")
         if locale == "en"
         else ("出典プロセス", "出典要素")
     )
-    if rows:
-        if len(header) < 2 or tuple(header[:2]) != expected:
-            errors.append(f"{path}: Process View provenance table must begin with {expected[0]} and {expected[1]}")
+    if included_tables:
         canonical_names = source_canonical_names(
             source_text, current_package_id, roots, locale
         )
         declared_keys = source_process_keys(
             source_text, current_package_id, roots, locale
         )
-        for row_number, row in enumerate(rows, start=1):
-            if len(row) < 2 or not row[0] or not row[1]:
-                errors.append(f"{path}: provenance row {row_number} must identify Source Process and source element")
-                continue
-            row_refs = references(row[0])
-            if len(row_refs) > 1:
-                errors.append(
-                    f"{path}: provenance row {row_number} must identify exactly one Source Process"
-                )
-                continue
-            errors.extend(
-                source_cell_reference_errors(
-                    path,
-                    f"provenance row {row_number}",
-                    row[0],
-                    roots,
-                    locale,
-                    current_package_id,
-                )
+        multiple_tables = len(included_tables) > 1
+        for table_number, (header, rows) in enumerate(included_tables, start=1):
+            table_label = (
+                f"provenance table {table_number}"
+                if multiple_tables
+                else "provenance table"
             )
-            row_source = source_identity_key(
-                row[0], current_package_id, roots, canonical_names
-            )
-            if not row_source:
+            if len(header) < 2 or tuple(header[:2]) != expected:
                 errors.append(
-                    f"{path}: provenance row {row_number} has no usable Source Process identity"
+                    f"{path}: Process View {table_label} must begin with "
+                    f"{expected[0]} and {expected[1]}"
                 )
-                continue
-            if row_refs:
-                try:
-                    target = resolve_skill(row_refs[0], roots, locale, current_package_id)
-                except ValueError as exc:
-                    errors.append(f"{path}: provenance row {row_number}: {exc}")
-                    continue
-                if representation_kind(target.path) != "process":
+            if not rows:
+                errors.append(f"{path}: {table_label} must contain at least one row")
+            for row_number, row in enumerate(rows, start=1):
+                row_label = (
+                    f"{table_label} row {row_number}"
+                    if multiple_tables
+                    else f"provenance row {row_number}"
+                )
+                if len(row) < 2 or not row[0] or not row[1]:
                     errors.append(
-                        f"{path}: provenance row {row_number} source reference "
-                        f"{row_refs[0]} does not resolve to a Process representation"
+                        f"{path}: {row_label} must identify Source Process and source element"
                     )
                     continue
-            if row_source not in declared_keys:
-                errors.append(f"{path}: provenance row {row_number} names an undeclared Source Process: {row[0]}")
+                row_refs = references(row[0])
+                if len(row_refs) > 1:
+                    errors.append(
+                        f"{path}: {row_label} must identify exactly one Source Process"
+                    )
+                    continue
+                errors.extend(
+                    source_cell_reference_errors(
+                        path,
+                        row_label,
+                        row[0],
+                        roots,
+                        locale,
+                        current_package_id,
+                    )
+                )
+                row_source = source_identity_key(
+                    row[0], current_package_id, roots, canonical_names
+                )
+                if not row_source:
+                    errors.append(
+                        f"{path}: {row_label} has no usable Source Process identity"
+                    )
+                    continue
+                if row_refs:
+                    try:
+                        target = resolve_skill(row_refs[0], roots, locale, current_package_id)
+                    except ValueError as exc:
+                        errors.append(f"{path}: {row_label}: {exc}")
+                        continue
+                    if representation_kind(target.path) != "process":
+                        errors.append(
+                            f"{path}: {row_label} source reference "
+                            f"{row_refs[0]} does not resolve to a Process representation"
+                        )
+                        continue
+                if row_source not in declared_keys:
+                    errors.append(
+                        f"{path}: {row_label} names an undeclared Source Process: {row[0]}"
+                    )
     elif included.strip():
         structured_items = included_semantic_items(included, locale)
         if structured_items:
@@ -3172,8 +3193,14 @@ def check_pair(
         ja_included_text = section(ja_text, HEADINGS["ja"]["included"]) or ""
         en_sources = source_entries(en_source_text)
         ja_sources = source_entries(ja_source_text)
-        en_included = table(en_included_text)[1]
-        ja_included = table(ja_included_text)[1]
+        en_included_tables = markdown_tables(en_included_text)
+        ja_included_tables = markdown_tables(ja_included_text)
+        en_included = [
+            row for _, rows in en_included_tables for row in rows
+        ]
+        ja_included = [
+            row for _, rows in ja_included_tables for row in rows
+        ]
         if len(en_outcomes) != len(ja_outcomes):
             errors.append(
                 f"{english} / {japanese}: Outcome count differs ({len(en_outcomes)} != {len(ja_outcomes)})"
@@ -3187,6 +3214,11 @@ def check_pair(
             errors.append(
                 f"{english} / {japanese}: included source-element count differs "
                 f"({len(en_included)} != {len(ja_included)})"
+            )
+        if len(en_included_tables) != len(ja_included_tables):
+            errors.append(
+                f"{english} / {japanese}: included provenance table count differs "
+                f"({len(en_included_tables)} != {len(ja_included_tables)})"
             )
         en_refs = normalized_references(
             section(en_text, HEADINGS["en"]["sources"]) or "", current_package_id
@@ -3223,7 +3255,7 @@ def check_pair(
             errors.append(
                 f"{english} / {japanese}: included source provenance or order differs"
             )
-        if not en_included and not ja_included:
+        if not en_included_tables and not ja_included_tables:
             en_elements = included_semantic_elements(
                 en_included_text, "en", current_package_id
             )

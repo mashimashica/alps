@@ -969,6 +969,119 @@ Three | information | Four | relates the Processes."""
             errors,
         )
 
+    def test_process_view_validates_every_provenance_table_and_ignores_fenced_tables(self) -> None:
+        included = """| Source Process | Source element |
+| --- | --- |
+| One | Activity |
+
+### Categorized Tasks
+
+```markdown
+| Source Process | Source element |
+| --- | --- |
+| Missing | Task |
+```
+
+| Source Process | Source element |
+| --- | --- |
+| Two | Task |"""
+        self.assertEqual(check_view_fixture("- One\n- Two", included), [])
+
+    def test_process_view_rejects_undeclared_source_in_later_provenance_table(self) -> None:
+        included = """| Source Process | Source element |
+| --- | --- |
+| One | Activity |
+
+### Categorized Tasks
+
+| Source Process | Source element |
+| --- | --- |
+| Missing | Task |"""
+        errors = check_view_fixture("- One\n- Two", included)
+        self.assertTrue(any("undeclared Source Process" in error for error in errors), errors)
+
+    def test_process_view_pair_compares_every_provenance_table(self) -> None:
+        first_en = """| Source Process | Source element |
+| --- | --- |
+| One (`skill:#one`) | Activity |"""
+        first_ja = """| 出典プロセス | 出典要素 |
+| --- | --- |
+| 一 (`skill:#one`) | 活動 |"""
+        second_en_one = """| Source Process | Source element |
+| --- | --- |
+| Two (`skill:#two`) | Task |"""
+        second_ja_one = """| 出典プロセス | 出典要素 |
+| --- | --- |
+| 二 (`skill:#two`) | タスク |"""
+
+        def check_pair_case(english_included: str, japanese_included: str) -> list[str]:
+            with tempfile.TemporaryDirectory() as directory:
+                english, japanese = write_process_view_pair(
+                    Path(directory), english_included, japanese_included
+                )
+                english_text = english.read_text(encoding="utf-8").replace(
+                    "- One\n- Two",
+                    "- One (`skill:#one`)\n- Two (`skill:#two`)",
+                )
+                japanese_text = japanese.read_text(encoding="utf-8").replace(
+                    "- 一\n- 二",
+                    "- 一 (`skill:#one`)\n- 二 (`skill:#two`)",
+                )
+                write(english, english_text)
+                write(japanese, japanese_text)
+                errors, _ = CHECKER.check_pair(
+                    english,
+                    japanese,
+                    set(CHECKER.DEFAULT_JA_TERMS),
+                    "fixture",
+                )
+                return errors
+
+        cases = (
+            (
+                "second-table omission",
+                first_en + "\n\n" + second_en_one,
+                first_ja,
+                "included provenance table count differs",
+            ),
+            (
+                "second-table count",
+                first_en + "\n\n" + second_en_one + "\n| One (`skill:#one`) | Task |",
+                first_ja + "\n\n" + second_ja_one,
+                "included source-element count differs",
+            ),
+            (
+                "second-table order",
+                first_en
+                + "\n\n"
+                + """| Source Process | Source element |
+| --- | --- |
+| One (`skill:#one`) | Task |
+| Two (`skill:#two`) | Task |""",
+                first_ja
+                + "\n\n"
+                + """| 出典プロセス | 出典要素 |
+| --- | --- |
+| 二 (`skill:#two`) | タスク |
+| 一 (`skill:#one`) | タスク |""",
+                "included source provenance or order differs",
+            ),
+            (
+                "second-table identity",
+                first_en + "\n\n" + second_en_one,
+                first_ja
+                + "\n\n"
+                + """| 出典プロセス | 出典要素 |
+| --- | --- |
+| 一 (`skill:#one`) | タスク |""",
+                "included source provenance or order differs",
+            ),
+        )
+        for name, english_included, japanese_included, expected in cases:
+            with self.subTest(name=name):
+                errors = check_pair_case(english_included, japanese_included)
+                self.assertTrue(any(expected in error for error in errors), errors)
+
     def test_process_view_pair_compares_stable_included_source_identity(self) -> None:
         reference_one = chr(96) + "skill:#one" + chr(96)
         reference_two = chr(96) + "skill:#two" + chr(96)
