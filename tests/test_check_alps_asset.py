@@ -836,6 +836,49 @@ Three | information | Four | relates the Processes."""
                         errors,
                     )
 
+    def test_frontmatter_merges_nested_metadata_aliases_before_kind_dispatch(self) -> None:
+        forms = (
+            "view: &view {kind: process-view}\n"
+            "metadata:\n"
+            "  alps: *view\n",
+            "view: !!map &view {kind: !!str process-view}\n"
+            "metadata:\n"
+            "  alps: !!map *view\n",
+            "kind: &kind process-view\n"
+            "metadata: {alps: {kind: *kind}}\n",
+        )
+        for form in forms:
+            with self.subTest(form=form):
+                text = (
+                    "---\n"
+                    "name: fixture\n"
+                    "description: Fixture process. ALPS-conformant.\n"
+                    + form
+                    + "---\n"
+                )
+                values, frontmatter_errors = CHECKER.frontmatter(text)
+                self.assertEqual(frontmatter_errors, [], frontmatter_errors)
+                self.assertEqual(values["alps.kind"], "process-view")
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    path = root / "skills" / "fixture" / "SKILL.md"
+                    write(
+                        path,
+                        text
+                        + "\n# Fixture\n\n## Purpose\n\nPurpose.\n\n"
+                        "## Outcomes\n\n- Outcome.\n",
+                    )
+                    self.assertEqual(CHECKER.representation_kind(path), "process-view")
+                    errors, _ = CHECKER.check_asset(path, {"": root}, None)
+                    self.assertTrue(
+                        any("Process View requires Source Processes" in error for error in errors),
+                        errors,
+                    )
+                    self.assertFalse(
+                        any("Process representation requires" in error for error in errors),
+                        errors,
+                    )
+
     def test_frontmatter_aliases_report_unresolved_cyclic_and_wrong_nodes(self) -> None:
         cases = (
             (

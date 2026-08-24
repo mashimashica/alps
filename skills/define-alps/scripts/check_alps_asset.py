@@ -747,6 +747,10 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
             else:
                 value = re.split(r"\s+#", value, maxsplit=1)[0].rstrip()
         values[key] = value
+    resolved_metadata = resolved_yaml.get("metadata")
+    if isinstance(resolved_metadata, dict):
+        for key, value in yaml_flatten_mapping(resolved_metadata).items():
+            values.setdefault(f"metadata.{key}", value)
     if "metadata.alps.kind" in values:
         values["alps.kind"] = values["metadata.alps.kind"]
     return values, errors
