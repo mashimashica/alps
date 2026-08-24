@@ -744,6 +744,36 @@ Three | information | Four | relates the Processes."""
         inline_comment = chr(96) + chr(60) + "!--" + chr(96)
         self.assertEqual(check_model("- " + inline_comment + " skill:#one"), [])
 
+    def test_reference_scan_ignores_top_level_and_list_indented_code(self) -> None:
+        value = """Relationships:
+
+    skill:#missing
+
+- One -> Two skill:#one
+  Continuation keeps skill:#two operative.
+
+      skill:#missing
+"""
+        self.assertEqual(
+            CHECKER.references(value),
+            ["skill:#one", "skill:#two"],
+        )
+
+    def test_reference_scan_masks_only_markdown_link_destination_spans(self) -> None:
+        inline = "[one](skill:#missing) [two](skill:#missing)\nskill:#missing"
+        self.assertEqual(
+            CHECKER.markdown_link_targets(inline),
+            ["skill:#missing", "skill:#missing"],
+        )
+        self.assertEqual(CHECKER.references(inline), ["skill:#missing"])
+
+        definitions = "[one]: skill:#missing\n[two]: skill:#missing\n\nskill:#missing"
+        self.assertEqual(
+            CHECKER.markdown_link_targets(definitions),
+            ["skill:#missing", "skill:#missing"],
+        )
+        self.assertEqual(CHECKER.references(definitions), ["skill:#missing"])
+
     def test_anchored_metadata_kind_is_preserved_for_valid_view(self) -> None:
         kind, errors = check_anchored_view_fixture(True)
         self.assertEqual(kind, "process-view")

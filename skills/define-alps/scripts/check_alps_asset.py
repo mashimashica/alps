@@ -717,10 +717,11 @@ def reference_scan_text(text: str) -> str:
     """Keep prose and exact inline canonical references, excluding code examples."""
 
     value = without_fenced_code(text)
+    value = without_indented_code(value)
     value = mask_inline_code_for_reference_scan(value)
     value = without_html_comments(value)
-    for target in markdown_link_targets(value):
-        value = value.replace(target, " " * len(target))
+    for start, end in reversed(markdown_link_target_spans(value)):
+        value = value[:start] + " " * (end - start) + value[end:]
     value = re.sub(r"\b(?:https?|ftp)://[^\s<]+", "", value)
     return value
 
@@ -754,14 +755,18 @@ def reference_syntax_errors(path: Path, text: str) -> list[str]:
     ]
 
 
-def markdown_link_targets(text: str) -> list[str]:
-    """Return inline and reference-definition Markdown link destinations."""
+def markdown_link_scan_text(text: str) -> str:
+    """Prepare Markdown text before locating link destinations."""
 
-    value = without_html_comments(
+    return without_html_comments(
         without_inline_code(without_indented_code(without_fenced_code(text)))
     )
 
-    targets: list[str] = []
+
+def markdown_link_target_spans(value: str) -> list[tuple[int, int]]:
+    """Return source spans for inline and reference-definition destinations."""
+
+    spans: list[tuple[int, int]] = []
     index = 0
     while index < len(value):
         if value[index] == "`":
@@ -798,7 +803,7 @@ def markdown_link_targets(text: str) -> list[str]:
                     cursor += 2
                     continue
                 if value[cursor] == ">":
-                    targets.append(value[start : cursor + 1])
+                    spans.append((start, cursor + 1))
                     cursor += 1
                     break
                 cursor += 1
@@ -814,18 +819,25 @@ def markdown_link_targets(text: str) -> list[str]:
                     parentheses += 1
                 elif character == ")":
                     if parentheses == 0:
-                        targets.append(value[start:cursor])
+                        spans.append((start, cursor))
                         cursor += 1
                         break
                     parentheses -= 1
                 elif character in " \t\n" and parentheses == 0:
-                    targets.append(value[start:cursor])
+                    spans.append((start, cursor))
                     break
                 cursor += 1
         index = max(index + 1, cursor)
 
-    lines = value.splitlines()
-    for line_index, line in enumerate(lines):
+    lines = value.splitlines(keepends=True)
+    line_starts: list[int] = []
+    offset = 0
+    for raw_line in lines:
+        line_starts.append(offset)
+        offset += len(raw_line)
+    for line_index, raw_line in enumerate(lines):
+        line = raw_line.rstrip("\r\n")
+        line_start = line_starts[line_index]
         label = re.match(r"^ {0,3}\[", line)
         if not label:
             continue
@@ -845,7 +857,8 @@ def markdown_link_targets(text: str) -> list[str]:
         if cursor >= len(line):
             if line_index + 1 >= len(lines) or not re.match(r"^[ \t]+\S", lines[line_index + 1]):
                 continue
-            line = lines[line_index + 1]
+            line_start = line_starts[line_index + 1]
+            line = lines[line_index + 1].rstrip("\r\n")
             cursor = len(line) - len(line.lstrip(" \t"))
         if line[cursor] == "<":
             end = cursor + 1
@@ -854,7 +867,7 @@ def markdown_link_targets(text: str) -> list[str]:
                     end += 2
                     continue
                 if line[end] == ">":
-                    targets.append(line[cursor : end + 1])
+                    spans.append((line_start + cursor, line_start + end + 1))
                     break
                 end += 1
         else:
@@ -864,8 +877,15 @@ def markdown_link_targets(text: str) -> list[str]:
                     end += 2
                 else:
                     end += 1
-            targets.append(line[cursor:end])
-    return targets
+            spans.append((line_start + cursor, line_start + end))
+    return spans
+
+
+def markdown_link_targets(text: str) -> list[str]:
+    """Return inline and reference-definition Markdown link destinations."""
+
+    value = markdown_link_scan_text(text)
+    return [value[start:end] for start, end in markdown_link_target_spans(value)]
 
 
 def containing_package_root(path: Path, roots: dict[str, Path]) -> Path | None:
