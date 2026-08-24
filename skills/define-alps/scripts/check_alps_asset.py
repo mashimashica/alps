@@ -1418,8 +1418,10 @@ def markdown_table_blocks(
             if not line.strip() or "|" not in line:
                 break
             row = table_row_cells(line)
-            if len(row) != column_count:
+            if len(row) > column_count:
                 break
+            if len(row) < column_count:
+                row.extend([""] * (column_count - len(row)))
             rows.append(row)
             cursor += 1
         tables.append(
@@ -2523,6 +2525,19 @@ def relationship_list_endpoint_pair(item: str) -> tuple[str, str] | None:
     return provider, recipient
 
 
+def relationship_endpoint_display_name(value: str) -> str:
+    """Return a displayed endpoint name without prose after a reference-only endpoint."""
+    cell_references = references(value)
+    if len(cell_references) == 1:
+        reference = cell_references[0]
+        visible = reference_scan_text(value).strip()
+        if visible == reference or re.match(
+            rf"^{re.escape(reference)}(?=$|[ \t:：(\[<])", visible
+        ):
+            return ""
+    return process_display_name(value)
+
+
 def relationship_semantic_entries(value: str) -> list[RelationshipSemanticEntry]:
     """Extract table rows and outside relationship list items in document order."""
     visible = without_html_comments(
@@ -2664,7 +2679,7 @@ def named_relationship_endpoint_errors(
             target_name = process_display_name(
                 heading1(target.path.read_text(encoding="utf-8")) or ""
             )
-            displayed_name = process_display_name(cell)
+            displayed_name = relationship_endpoint_display_name(cell)
             if displayed_name and displayed_name != target_name:
                 errors.append(
                     f"{path}: relationship {entry_kind} {entry_number} {role} "

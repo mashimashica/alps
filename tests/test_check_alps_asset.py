@@ -695,7 +695,7 @@ One | information | Two | relates the Processes. |"""
 Provider | Information | Recipient | Relationship
 --- | --- | --- | ---
 One | information | Two | relates the Processes.
-Unrelated | prose"""
+Unrelated prose"""
         header, rows = CHECKER.table(text)
         self.assertEqual(
             header,
@@ -723,6 +723,77 @@ Three | information | Four | relates the Processes."""
             rows,
             [["One", "information", "Two", "relates the Processes."]],
         )
+
+    def test_markdown_tables_pad_short_rows_without_absorbing_prose_or_extra_cells(self) -> None:
+        text = """| Provider | Information | Recipient | Relationship |
+| --- | --- | --- | --- |
+| One | information |
+| Two | information | One | relates the Processes. |
+| Three | information |
+Four | information
+
+Unrelated prose
+
+Second Provider | Information | Second Recipient | Relationship
+--- | --- | --- | ---
+Four | information | Three | relates the Processes.
+| Five | information | Four |
+| Six | information | Five | relates the Processes. | extra |
+"""
+        tables = CHECKER.markdown_tables(text)
+        self.assertEqual(len(tables), 2)
+        self.assertEqual(
+            tables[0][1],
+            [
+                ["One", "information", "", ""],
+                ["Two", "information", "One", "relates the Processes."],
+                ["Three", "information", "", ""],
+                ["Four", "information", "", ""],
+            ],
+        )
+        self.assertEqual(
+            tables[1][1],
+            [
+                ["Four", "information", "Three", "relates the Processes."],
+                ["Five", "information", "Four", ""],
+            ],
+        )
+        errors = check_model(
+            """| Provider | Information | Recipient | Relationship |
+| --- | --- | --- | --- |
+| One | information | Two | relates the Processes. |
+One | information
+"""
+        )
+        self.assertTrue(
+            any("recipient Process" in error for error in errors),
+            errors,
+        )
+
+    def test_process_model_pair_sees_short_relationship_row_omission(self) -> None:
+        english = """| Provider Process | Information | Recipient Process | Relationship |
+| --- | --- | --- | --- |
+| One | information | Two | relates the Processes. |
+One | information
+"""
+        japanese = """提供側プロセス | 情報 | 受領側プロセス | 関係
+--- | --- | --- | ---
+一 | 情報 | 二 | プロセス間の関係。
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            english_path, japanese_path = write_process_model_pair(
+                Path(directory), japanese, english
+            )
+            errors, _ = CHECKER.check_pair(
+                english_path,
+                japanese_path,
+                set(CHECKER.DEFAULT_JA_TERMS),
+                "fixture",
+            )
+            self.assertTrue(
+                any("Relationship count differs" in error for error in errors),
+                errors,
+            )
 
     def test_process_model_checks_canonical_endpoint_display_name(self) -> None:
         invalid = """| Provider | Information | Recipient | Relationship |
@@ -1918,6 +1989,41 @@ This is explanatory text.
 
     def test_process_model_accepts_canonical_recipient_in_arrow_list(self) -> None:
         self.assertEqual(check_model("- One -> skill:#two"), [])
+
+    def test_process_models_separate_reference_only_endpoint_descriptions(self) -> None:
+        valid_relationships = (
+            "- One -> skill:#two: carries information",
+            "- skill:#one: provides information -> Two",
+            "- skill:#one: provides information -> skill:#two: carries information",
+            "- Two (`skill:#two`): carries information -> One (`skill:#one`)",
+        )
+        for relationship in valid_relationships:
+            with self.subTest(relationship=relationship):
+                self.assertEqual(check_model(relationship), [])
+                self.assertEqual(check_reference_model_fixture(relationship), [])
+
+        mismatch = check_model(
+            "- One -> Wrong (`skill:#two`): carries information"
+        )
+        self.assertTrue(
+            any("differs from referenced Process 'Two'" in error for error in mismatch),
+            mismatch,
+        )
+
+    def test_process_model_pair_compares_reference_only_endpoint_descriptions(self) -> None:
+        english = "- One -> skill:#two: carries information"
+        japanese = "- 一 -> skill:#two: 情報を運ぶ。"
+        with tempfile.TemporaryDirectory() as directory:
+            english_path, japanese_path = write_process_model_pair(
+                Path(directory), japanese, english
+            )
+            errors, _ = CHECKER.check_pair(
+                english_path,
+                japanese_path,
+                set(CHECKER.DEFAULT_JA_TERMS) | {"skill", "two"},
+                "fixture",
+            )
+            self.assertEqual(errors, [], errors)
 
     def test_inline_code_cannot_hide_following_canonical_reference(self) -> None:
         inline_comment = chr(96) + chr(60) + "!--" + chr(96)
