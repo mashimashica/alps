@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <strong>Version 0.3.0</strong><br>
+  <strong>Version 0.4.0</strong><br>
   Initial development
 </p>
 
@@ -158,7 +158,7 @@ Mechanical profile checks support review; they do not by themselves establish AL
 
 ## Versioning
 
-ALPS versions the repository as one release unit. The current version is **0.3.0** and remains in initial development. Git tags and the commits they identify define exact release contents. See [CHANGELOG.md](CHANGELOG.md) and [Versioning](docs/versioning.md).
+ALPS versions the repository as one release unit. The current version is **0.4.0** and remains in initial development. Git tags and the commits they identify define exact release contents. See [CHANGELOG.md](CHANGELOG.md) and [Versioning](docs/versioning.md).
 
 ## License and Reuse
 
