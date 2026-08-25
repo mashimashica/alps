@@ -1,174 +1,165 @@
-# ALPS — Agent Lifecycle Process Skills
+# ALPS — エージェントライフサイクルプロセススキル
 
 <p align="right">
   <a href="../../README.md">英語</a> | <strong>日本語</strong>
 </p>
 
 <p align="center">
-  <img src="../../assets/icon.svg" alt="ALPS アイコン" width="160">
+  <img src="../../assets/icon.svg" alt="ALPSアイコン" width="160">
 </p>
 
 <p align="center">
-  <strong>Version 0.3.0</strong><br>
+  <strong>バージョン0.3.0</strong><br>
   初期開発版
 </p>
 
 ## ALPSとは
 
-ALPSは、再利用可能なAgent Skillを記述するための共通言語です。
+ALPSは、再利用可能なプロセス知識をエージェントスキルとして記述・利用するための共通言語です。
 
-ALPSでは、次のように区別します。
+出発点はプロセス記述です。
 
-- **Process**は、実行される作業です。
-- **Process Description**は、その作業を説明します。
-- **Agent Skill**は、Process Descriptionとして扱います。
+- **プロセス**は、実行される作業です。
+- **プロセス記述**は、その作業を説明します。
+- 既定では、**エージェントスキル**は正本となるプロセス記述によってプロセスを表現します。
 
-有用な記述によって、読者は、作業がなぜ存在するか、何を成功とみなすか、どの作業がProcessに属するか、何が入り何が出るか、どの条件が適用されるかを理解できます。特定の実行主体または実装方法を一つに固定する必要はありません。
+ALPSではさらに、エージェントスキルによって、**関係するプロセスを一つの構造にまとめるプロセスモデル**、**プロセスを名称、目的、成果で定義して関係を示すプロセス参照モデル**、**特定の関心事または目的について複数プロセスを横断して活動とタスクを構成し、その適用方法を説明するプロセスビュー**も表現できます。プロセスビューは既存プロセスの活動やタスクを参照でき、必要に応じてビュー内で活動やタスクを記述できます。出典要素を参照する場合は来歴と追跡可能性を維持し、ビュー内の記述だけで出典プロセスそのものを変更することはありません。これらをエージェントスキルで表現してもプロセスになるわけではありません。モデルやビューを読み込むことと、プロセスを呼び出して実行を開始することは区別します。
 
-ALPSは、Agent Skillの定義・適用・管理を扱う三つの参照Skillも提供します。
+有用なプロセス記述を読めば、作業が存在する理由、成功とみなす状態、そのプロセスに属する作業、出入りするもの、および適用条件を理解できます。特定の実行主体や実装方法を一つに固定する必要はありません。
 
 ## ALPSを利用する
 
-### Pluginをインストールする
+### プラグインをインストールする
 
-ALPSは、[Agent Plugins](https://agent-plugins.org/) v1のPackageとして配布します。Node.js 18以降が利用できる環境で、[`plugins` CLI](https://www.npmjs.com/package/plugins)からインストールします。
+ALPSは[Agent Plugins](https://agent-plugins.org/) v1パッケージとして配布します。Node.js 18以降の環境で次を実行します。
 
 ```console
 npx plugins add mashimashica/alps
 ```
 
-インストーラーはPackageを検出し、対応するAgentクライアントを判別し、確認後にインストールします。インストール後は、Skillを再読み込みできるよう、対象クライアントを再起動してください。
+インストール後は、対象エージェントクライアントがスキルを再読込みできるよう再起動してください。
 
-### 参照Skillを選択する
+### ALPS参照モデルから始める
 
-| Skill | 使用する状況 |
-| --- | --- |
-| `define-alps` | Skillニーズが満たされていない場合、またはSkillを設計、再定義もしくは検証する場合。 |
-| `apply-alps` | 既存Skillを選択、実行、編成または授受する場合。 |
-| `manage-alps` | Skillを採用、Tailoring、評価、変更、改善または廃止する場合。 |
+`alps-reference-model`はALPSのプロセス参照モデルを表現します。ALPSの参照プロセスを選択する場合や、その関係を確認する場合に読み込みます。モデルの読込み自体はプロセスの呼び出しではありません。
 
-### 参照Skillを明示的に呼び出す
+| エージェントスキル | ALPS表現 | 使用する状況 |
+| --- | --- | --- |
+| `alps-reference-model` | プロセス参照モデル | ALPSの参照プロセスとその関係を、プロセスの選択、アセスメントまたは改善に用いる場合。 |
+| `define-alps` | プロセス | ALPS表現を作成、再定義または検証する場合。 |
+| `apply-alps` | プロセス | 既存表現をプロセス選択、呼び出し、組み合わせまたは受け渡しに用いる場合。 |
+| `manage-alps` | プロセス | 表現を採用、テーラリング、アセスメント、変更、改善または廃止する場合。 |
 
-クライアントは、発見用の記述からSkillを選択できます。特定のALPS Processを用いる場合は、依頼の中でSkill識別子を直接指定します。この自然言語形式は、クライアント固有のスラッシュコマンド構文に依存しません。
+他のプラグインが提供するプロセスモデルやプロセスビューも同じように読み込めます。`apply-alps`は読み込んだモデルまたはビューからプロセスを解決し、プロセスを表現するエージェントスキルだけを呼び出します。
+
+### 参照プロセスを明示的に利用する
 
 ```text
-`define-alps`を使って、この反復的なインシデントレビュー作業をALPS準拠のSkillとして設計・検証してください。
+`alps-reference-model`を読み込み、この依頼に適用するALPSの参照プロセスを決めてください。
 
-`apply-alps`を使って、この依頼に必要なSkillを選択・編成し、すべてのOutput/Inputの授受を明示してください。
+`define-alps`を使って、この横断的関心事を扱うALPSのプロセスビューを定義・検証してください。
 
-`manage-alps`を使って、このSkillを実行記録に基づいて評価し、統制された改善案を提示してください。
+`apply-alps`を使って、適用するモデルまたはビューを読み込み、必要なプロセスを解決して、すべての出力と入力の受け渡しを明示してください。
+
+`manage-alps`を使って、これらの表現と実行記録をアセスメントし、統制された改善を提案してください。
 ```
 
 ### AGENTS.mdに利用方針を記載する
 
-ALPSを継続的に利用するリポジトリでは、以後のAgentセッションでも同じ選択・編成規則を適用できるように、[AGENTS.md](https://agents.md/)へ短い方針を追加します。以下は利用側リポジトリ向けの正本となる最小方針です。ALPS自身の[`AGENTS.md`](../../AGENTS.md)も同じ中核方針を適用し、リポジトリ保守の作業規則を追加しています。
+ALPSを継続利用するリポジトリでは、[AGENTS.md](https://agents.md/)へ次のような方針を記載できます。
 
 ```md
 ## ALPS
 
-本リポジトリではALPS Reference Modelを使用します。
+このリポジトリではALPSを使用します。
 
-- 実質的な依頼ごとに、ALPS Reference Modelを基準として、`define-alps`、`apply-alps`および`manage-alps`から適用する参照Skillを選択します。
-- その他のALPS準拠Skillは、`description`末尾の`ALPS準拠。`表示によって識別し、発見用の記述から依頼への適合性を判断します。
-- 選択した各Skillの`SKILL.md`を、適用前に最後まで読みます。
-- 既存Skillを適用する作業には`apply-alps`、未充足ニーズまたはSkillの再定義には`define-alps`、採用、Tailoring、評価、変更または廃止には`manage-alps`を用います。
-- 複数Skillを組み合わせる場合は、すべてのOutput/Inputの授受を明示します。
+- ALPS参照モデルがプロセス選択やアセスメントに必要な場合は`alps-reference-model`を読み込みます。
+- エージェントスキルは既定ではプロセスを表現します。`metadata.alps.kind`が`process-model`、`process-reference-model`または`process-view`を宣言する場合は、その表現を読み込み、その読込みをプロセスの呼び出しとして扱いません。
+- 選択した各表現の`SKILL.md`を最後まで読みます。
+- ALPS表現の定義・検証には`define-alps`、プロセス解決・呼び出しには`apply-alps`、採用、テーラリング、アセスメント、変更、廃止には`manage-alps`を用います。
+- プロセスビューで出典プロセスの要素を参照する場合は来歴と追跡可能性を維持し、ビュー内の記述と出典プロセスの変更を区別します。
+- プロセスを組み合わせる場合は必要な出力と入力の受け渡しを明示します。
 ```
 
 ## ALPS参照モデル
 
-ALPSは、Skillのライフサイクルを三つのProcessによって定義します。これらは固定された段階ではなく、必要に応じて並行的、反復的または再帰的に適用できます。矢印は代表的なOutputとInputの受け渡しを示します。
-
-このリポジトリは、ALPSの規格文書と、これら三つのProcessに対応するAgent Skillを提供します。英語版を正本とし、各Skillに日本語ローカライズを収録します。
+ALPS自身のライフサイクルは三つのプロセスで定義します。これらは固定段階ではなく、必要に応じて並行的、反復的または再帰的に適用できます。
 
 ```mermaid
 flowchart LR
-    DEFINE["Definition Process<br/>Skillを定義・検証する"]
-    MANAGE["Management Process<br/>Skill資産を統制・改善する"]
-    APPLY["Application Process<br/>Skillを選択・実行・編成する"]
+    DEFINE["Define ALPS<br/>ALPS表現を定義・検証"]
+    MANAGE["Manage ALPS<br/>表現とその適用を統制"]
+    APPLY["Apply ALPS<br/>表現を読み込みプロセスを呼び出し"]
 
-    DEFINE -->|"検証済みのSkill Description"| MANAGE
-    MANAGE -->|"管理されたSkill・適用条件"| APPLY
-    APPLY -->|"実行記録・教訓・測定結果"| MANAGE
-    MANAGE -->|"変更・再検証要求"| DEFINE
+    DEFINE -->|"検証済み表現"| MANAGE
+    MANAGE -->|"管理された表現・適用条件"| APPLY
+    APPLY -->|"選択・実行証拠"| MANAGE
+    MANAGE -->|"再定義・再検証要求"| DEFINE
 ```
 
-ALPS規格は、この参照モデルに加えて、Skill Description、Skill Package、複数Skillの組合せと受け渡し、Control、Constraint、Enabler、Entry/Exit Criteria、Decision Gate、TailoringおよびConformanceの規則を定めます。
+正本となるプロセス参照モデルは[`skills/alps-reference-model/SKILL.md`](../../skills/alps-reference-model/SKILL.md)として収録します。そこに三つの参照プロセスの名称、目的、成果を保持し、正本となる各プロセス記述との一致を機械的に検査できます。
 
-## Skillの読み方
+## 表現種別
 
-ALPSは、通常の記述では混ざりやすい問いを分けて扱います。
+エージェントスキルは既定ではプロセスを表現します。プロセス以外の表現では、`SKILL.md`のメタデータで`kind`を宣言します。
+
+```yaml
+metadata:
+  alps.kind: process-view
+```
+
+明示的に利用できる`kind`は次の三つです。
+
+- `process-model`
+- `process-reference-model`
+- `process-view`
+
+直接呼び出しの対象となるのはプロセスだけです。プロセスモデル、プロセス参照モデル、プロセスビューは、プロセスの構造、選択文脈、または横断的ビューを提供します。
+
+## プロセススキルの読み方
+
+ALPSは、一般的な記述で混同されやすい問いを区別します。
 
 | 日常語の問い | ALPSの用語 |
 |---|---|
-| この作業はなぜ存在するか？ | **Purpose** |
-| どの状態を成功とみなすか？ | **Outcome** |
-| 何が生み出されるか？ | **Output** |
-| 何が変換されるか？ | **Input** |
-| どの作業がProcessに属するか？ | **ActivityとTask** |
-| 何が作業を方向付け、制限し、または支援するか？ | **Control、ConstraintおよびEnabler** |
-| いつ作業を開始でき、いつ完了とみなせるか？ | **Entry CriteriaとExit Criteria** |
-| Processの範囲はどこまでで、どの状況に適用されるか？ | **境界と適用状況** |
-| 誰が実行するか？ | 一般Processは固定しません。 |
-| どのように実装するか？ | 一般Process Descriptionは規定しません。 |
+| この作業はなぜ存在するか？ | **目的** |
+| どの状態を成功とみなすか？ | **成果** |
+| 何が生み出されるか？ | **出力** |
+| 何が変換されるか？ | **入力** |
+| どの作業がプロセスに属するか？ | **活動とタスク** |
+| 何が作業を方向付け、制限し、または支援するか？ | **統制事項、制約、実行支援要素** |
+| いつ作業を開始でき、いつ完了とみなせるか？ | **開始基準と完了基準** |
+| プロセスはどこに適用されるか？ | **境界と適用文脈** |
+| 誰が実行するか？ | 一般プロセスは固定しません。 |
+| どのように実装するか？ | 一般プロセス記述は規定しません。 |
 
-### 例：会議記録を利用可能な要約にする
+## プロセスフレームワーク
 
-Agent Skillが会議記録を処理する場合を考えます。
+[プロセスフレームワーク](../../spec/process-framework.md)は、ALPSが用いる再利用可能な語彙と意味を定義します。プロセス記述には、名称、目的および成果が必要です。活動とタスクは作業内容であり、実装手順ではありません。入力は出力へ変換される項目です。人、エージェント、ツールおよび実行環境は、入力ではなく資源または実行支援要素です。
 
-- **Purpose** — 会議後も議論を利用できるようにする。
-- **Outcome** — 意思決定、実行事項および未解決事項が識別されている。
-- **Input** — 会議メモ、書き起こしまたは提供資料。
-- **Output** — 構造化された会議要約。
-- **ActivityとTask** — 関係する記述を識別し、分類し、出所との対応を維持する。
-- **ControlとConstraint** — 適用されるプライバシー規則、必須形式および宣言された制限。
-- **Enabler** — 言語能力、ツールおよび実行環境。
-
-Outputは、生み出される要約です。Outcomeは、Processが成功したかを判断するための状態です。両者は関係しますが、同じものではありません。
-
-このSkillは、特定の人、Agentまたはツールによる実行を要求せず、特定の実装方法も規定しません。
-
-## Process Framework
-
-Process Frameworkは、これらの区別を形式化し、意図、作業内容、変換、適用状況、Process間の関係、TailoringおよびAssessmentを扱う再利用可能な語彙をALPSに提供します。
-
-```mermaid
-flowchart TD
-    WHY["なぜ?<br/>Purpose"] --> PROCESS["Process<br/>実行される作業"]
-
-    INPUT["何が変換される?<br/>Input"] --> PROCESS
-    PROCESS --> OUTPUT["何が生み出される?<br/>Output"]
-    PROCESS --> OUTCOME["何を成功とみなす?<br/>Outcome"]
-
-    WORK["どの作業が属する?<br/>ActivityとTask"] --> PROCESS
-    CONDITIONS["何が方向付け、制限し、支援する?<br/>Control、Constraint、Enabler"] --> PROCESS
-    TIMING["いつ?<br/>Entry CriteriaとExit Criteria"] --> PROCESS
-
-    OPEN["誰が、どのように?<br/>適用時に選択"] -.-> PROCESS
-```
-
-`Name`、`Purpose`および`Outcomes`は、Process Descriptionの必須要素です。ActivityとTaskは作業内容を記述し、記載順だけを理由として、実装方法や手順上の段階として解釈されるものではありません。InputはOutputに変換される項目です。人、Agent、ツールおよび実行環境はInputではなく、資源またはEnablerです。
-
-ALPSは、このFrameworkをSkillの記述、ライフサイクル管理、Tailoring、AssessmentおよびConformanceに適用します。Frameworkは、ライフサイクル、段階の順序または特定の実装方法を規定しません。
+フレームワークはプロセスモデル、プロセス参照モデル、プロセスビューも定義します。ALPSは、それらをエージェントスキルで表現する場合にも元の意味を保持します。
 
 ## 収録内容
 
 | 内容 | 英語 | 日本語 |
 | --- | --- | --- |
-| Process Framework | [process-framework.md](../../.alps/spec/process-framework.md) | [process-framework.md](../../.alps/spec/locales/ja/process-framework.md) |
-| ALPS Specification | [ALPS-SPEC.md](../../.alps/spec/ALPS-SPEC.md) | [ALPS-SPEC.md](../../.alps/spec/locales/ja/ALPS-SPEC.md) |
-| `define-alps` — 定義Process | [SKILL.md](../../skills/define-alps/SKILL.md) | [SKILL.md](../../skills/define-alps/references/locales/ja/SKILL.md) |
-| `apply-alps` — 適用Process | [SKILL.md](../../skills/apply-alps/SKILL.md) | [SKILL.md](../../skills/apply-alps/references/locales/ja/SKILL.md) |
-| `manage-alps` — 管理Process | [SKILL.md](../../skills/manage-alps/SKILL.md) | [SKILL.md](../../skills/manage-alps/references/locales/ja/SKILL.md) |
+| プロセスフレームワーク | [process-framework.md](../../spec/process-framework.md) | [process-framework.md](../../spec/locales/ja/process-framework.md) |
+| ALPS仕様 | [ALPS-SPEC.md](../../spec/ALPS-SPEC.md) | [ALPS-SPEC.md](../../spec/locales/ja/ALPS-SPEC.md) |
+| `alps-reference-model` — プロセス参照モデル | [SKILL.md](../../skills/alps-reference-model/SKILL.md) | [SKILL.md](../../skills/alps-reference-model/references/locales/ja/SKILL.md) |
+| `define-alps` — Define ALPSプロセス | [SKILL.md](../../skills/define-alps/SKILL.md) | [SKILL.md](../../skills/define-alps/references/locales/ja/SKILL.md) |
+| `apply-alps` — Apply ALPSプロセス | [SKILL.md](../../skills/apply-alps/SKILL.md) | [SKILL.md](../../skills/apply-alps/references/locales/ja/SKILL.md) |
+| `manage-alps` — Manage ALPSプロセス | [SKILL.md](../../skills/manage-alps/SKILL.md) | [SKILL.md](../../skills/manage-alps/references/locales/ja/SKILL.md) |
+
+## 検証
+
+`skills/define-alps/scripts/check_alps_asset.py`は表現種別に応じて検査を振り分けます。プロセス参照モデルでは、参照プロセススキルを解決し、名称、目的、成果を正本となるプロセス記述と比較します。外部パッケージ参照は`--package-root`で明示的に対応付けできます。
+
+機械検査はレビューを支援しますが、それだけで成果達成またはプロセス実行適合を成立させるものではありません。
 
 ## バージョン管理
 
-ALPSは、リポジトリ全体を一つのリリース単位としてバージョン管理します。現在のVersionは**0.3.0**であり、初期開発段階にあります。Releaseの正確な内容は、Git TagとCommitによって特定します。[CHANGELOG.md](../../CHANGELOG.md)および[バージョン管理方針](versioning.md)を参照してください。
+ALPSはリポジトリ全体を一つのリリース単位として版管理します。現在の版は**0.3.0**であり、初期開発段階にあります。正確なリリース内容はGitタグとコミットで特定します。[CHANGELOG.md](../../CHANGELOG.md)および[バージョン管理](versioning.md)を参照してください。
 
 ## ライセンスと再利用
 
-明示した第三者資料を除き、本リポジトリには[Apache License, Version 2.0](../../LICENSE)を適用します。ライセンスの対象は、規格、文書、Skill Package、スクリプトおよび本プロジェクトが作成したアイコン一点です。帰属表示が必要な資料、および本リポジトリのライセンス対象外となる資料については、[NOTICE](../../NOTICE)を参照してください。
-
-## 貢献
-
-貢献は、リポジトリのライセンスおよび[Developer Certificate of Origin 1.1](../../DCO)に基づいて受け入れます。貢献するすべてのコミットには`Signed-off-by`トレーラーが必要です。変更を提出する前に[CONTRIBUTING.md](../../CONTRIBUTING.md)を確認してください。
+明示した第三者資料を除き、本リポジトリには[Apache License 2.0](../../LICENSE)を適用します。[NOTICE](../../NOTICE)も参照してください。

@@ -1,71 +1,75 @@
-# Definition Process Record Templates
+# Define ALPS Record Templates
 
-Select only the records that are needed and tailor them to the context of application and risk. Do not fill blanks by conjecture; mark them `Unconfirmed`, `Not applicable`, or `On hold`.
+Select only the records needed for the representation kind, application context, and risk. Do not fill missing information by conjecture; mark it `Unconfirmed`, `Not applicable`, or `On hold`.
 
-## 1. Skill Need Record
+## 1. Representation Need Record
 
 ```markdown
-# Skill Need Record
+# Representation Need Record
 
 - Record ID:
 - Status: Candidate / Selected / Deferred / Reconsideration
-- Need or problem:
-- Intended users:
-- Stakeholders and expectations:
+- Need or concern:
+- Intended users and stakeholders:
 - Intended contexts of use:
-- Recurrence or impact:
-- Duplication, adjacency, or gap relative to existing Skills:
+- Existing representations and relevant gaps:
+- Selected PF construct: Process / Process Model / Process Reference Model / Process View
+- Selection rationale:
 - Expected benefits:
-- Risks:
-- Costs or constraints:
-- Decision:
-- Rationale and evidence:
+- Risks and constraints:
+- Required level of detail:
 - Unresolved matters:
 ```
 
-## 2. Traceability Among Elements
+## 2. Representation Traceability
 
-For Outcome and Task references, use a reference method suited to the context of application, such as a stable identifier, short name, heading, list position, or brief quotation.
+Use stable references suited to the representation and context. For a Process, trace Outcomes, Activities, Tasks, Inputs/Outputs, and evidence. For Models and Views, trace represented or source Processes, canonical Skill references, relationships, and provenance as applicable. When a Process View references an Activity or Task from a source Process, retain enough provenance and Traceability to identify that source relationship.
 
-| Outcome reference | Contributing Activity | Contributing Task reference | Related Input/Output | Verification evidence | Status |
-|---|---|---|---|---|---|
-| | | | | | Not assessed / Conformant / Defect / Out of scope |
+| Source or element | Relationship | Target or related element | Evidence or reference | Status |
+|---|---|---|---|---|
+| | | | | Not assessed / Conformant / Defect / Out of scope |
 
 Review points:
 
-- The set of Activities and any separated Skills must cover every Outcome.
-- Relationships among Outcomes, Activities, and Tasks should be identifiable.
-- For external exchanges, the names, meanings, and scopes of provider Outputs and recipient Inputs should be aligned.
-- When an Output change affects another Skill's Input, the affected Skill and mapping should be identified and the necessary reassessment should be performed.
+- The represented PF construct and declared/default representation kind agree.
+- Mandatory canonical Skill references resolve.
+- A Process Reference Model retains the same Name, Purpose, and Outcomes as each referenced authoritative Process Description.
+- A Process View maintains source provenance and Traceability for referenced source elements and keeps View-local descriptions distinct from changes to source Processes.
+- Process Output/Input handoffs have aligned meaning and scope when they affect successful application.
 
 ## 3. Verification Record
 
 ```markdown
-# Skill Verification Record
+# ALPS Representation Verification Record
 
-- Skill and version under verification:
-- Verification scope: Skill Description / Skill Package / Both
-- Conformance subject: Description / Reference Model / Execution
-- Conformance mode (for a Reference Model or Execution subject): Full / Tailored
-- Conformance basis:
-  - Description: applicable ALPS clauses
-  - Full: Outcomes / Tasks / Both
-  - Tailored: Tailored Skill or Process and scope of application, with every Outcome and Activity/Task requirement remaining in scope
-- Applicable norms and Controls:
+- Representation and version under verification:
+- Representation kind: process / process-model / process-reference-model / process-view
+- Verification scope: authoritative representation / Skill Package / both
+- Applicable Conformance subject:
+  - Process: Description Conformance; optional Process execution claim assessed separately
+  - Process Model: Process Model Description Conformance
+  - Process Reference Model: Process Reference Model Description Conformance
+  - Process View: Process View Description Conformance
+- Applicable Process Framework and ALPS clauses:
+- Applicable Controls and Constraints:
 - Review criteria:
-- Independent perspective:
-- Representative contexts of use:
-- Boundary cases:
+- Independent perspective, when used:
+- Representative contexts or concern:
 
 ## Results
 | Verification item | Evidence | Determination | Defect ID |
 |---|---|---|---|
 | | | Conformant / Nonconformant / Not assessed | |
 
+## Reference and Semantic Checks
+| Reference or semantic center | Expected target or value | Result | Evidence |
+|---|---|---|---|
+| | | | |
+
 ## Defect Treatment
-| Defect ID | Description | Impact | Action | Completion condition | Due date | Status |
-|---|---|---|---|---|---|---|
-| | | | | | | |
+| Defect ID | Description | Impact | Action | Completion condition | Status |
+|---|---|---|---|---|---|
+| | | | | | |
 
 ## Limitations and Assumptions
 -
@@ -76,13 +80,15 @@ Review points:
 ```markdown
 # Adoption Decision Gate
 
-- Skill and version under decision:
-- Decision Criteria:
-- Evidence consulted:
-- Unresolved defects and residual risk:
-- Decision: Adopt / Conditionally adopt / Hold / Redesign / Reject
+- Representation and version under decision:
+- Representation kind:
+- Verification evidence consulted:
+- Mandatory-reference status:
+- Unresolved defects, assumptions, and residual risk:
+- Decision criteria:
+- Decision: Adopt / Conditionally adopt / Hold / Redefine / Reject
 - Rationale:
-- Assumptions:
 - Conditions of application:
+- Required management state or follow-up:
 - Next recipient:
 ```

@@ -1,164 +1,166 @@
 ---
 name: manage-alps
-description: Govern the adoption, discoverability, change, retirement, tailoring, assessment, and improvement of Agent Skills, Skill Packages, Skill Models, or Skill Views. Use when managing Skill asset registration, updates, deactivation, tailoring decisions, performance assessment, improvement prioritization, change impacts, communication, or reverification. Use the definition Process instead when only defining a new Skill Description, and the application Process when only executing a selected Skill. ALPS-conformant.
+description: Govern adopted ALPS representations and their application, including Process Descriptions, Process Models, Process Reference Models, Process Views, and their Skill Packages. Use for adoption, discoverability, controlled change, retirement, Tailoring or formal adoption, assessment, improvement, change impact, communication, or reverification. Use define-alps to create or redefine an authoritative representation and apply-alps to activate representations and invoke selected Processes. ALPS-conformant.
 ---
 
-# Agent Lifecycle Process Skill Management
+# Manage ALPS
 
 ## Purpose
 
-This Skill governs Skill assets and their application and maintains the continual availability of suitable Skills.
+This Process governs ALPS representations and their application and maintains the continual availability of suitable, coherent, and trustworthy ALPS assets.
 
 ## Outcomes
 
-A successful application of this Skill establishes the following conditions.
+Success of this Process establishes the following conditions.
 
-- a) Policies and guidance for Skill management, deployment, and Tailoring are established.
-- b) Adopted Skills are discoverable in a managed state.
-- c) Changes to and retirement of Skills are controlled, including their impacts on affected users.
-- d) Tailoring decisions and rationale are traceable to applicable Controls and Constraints.
-- e) Skill performance and effectiveness are assessed against established criteria.
-- f) Improvement opportunities are prioritized from lessons learned and assessment results.
-- g) Decided improvements are implemented.
+- a) Policies and guidance for managing, deploying, Tailoring, and adopting ALPS representations are established.
+- b) Adopted ALPS representations are discoverable with their identity, kind, status, version, and applicable conditions under management.
+- c) Changes and retirement are controlled with their impacts, reference integrity, and affected users or representations identified.
+- d) Tailoring, formal adoption, and other management decisions are traceable to applicable Controls, Constraints, scope, evidence, and rationale.
+- e) Process execution is assessed using criteria appropriate to its declared subject, including Conformance, performance, and effectiveness where relevant.
+- f) Managed ALPS representations are assessed using criteria appropriate to their kind, including semantic consistency, description Conformance, relationship coherence, and applicability where relevant.
+- g) Improvement opportunities are prioritized from execution evidence, lessons learned, representation assessments, and change impacts.
+- h) Decided improvements are implemented through controlled change.
+- i) Representations affected by implemented improvements are reverified.
+- j) Resulting management states are updated.
 
 ## Activities & Tasks
 
-The order in which the following headings, Activities, Tasks, and numbers appear does not prescribe a procedure or execution sequence. Entry Criteria are conditions evaluated before invocation, and Exit Criteria are conditions evaluated before declaring completion. Controls and Constraints apply irrespective of where they appear. Each Activity can be applied concurrently, iteratively, or recursively as needed.
+The order of headings, Activities, Tasks, and numbers does not prescribe an execution sequence. Entry Criteria are evaluated before invocation and Exit Criteria before completion is declared. Controls and Constraints apply irrespective of where they appear. Activities may be applied concurrently, iteratively, or recursively as needed.
 
-### Skill Asset Management
+### Representation Asset Management
 
-This Activity manages adoption, discoverability, change communication, configuration, and retirement of Skill assets. It primarily contributes to Outcomes a), b), c), and g).
+This Activity manages adoption, discoverability, configuration, controlled change, communication, reference integrity, and retirement. It primarily contributes to Outcomes a), b), c), h), i), and j).
 
-1. The means for managing and deploying Skills, together with Tailoring guidance, should be established.
-2. Framework-level Controls and Enablers must be declared together with their scope, exceptions, and whether Tailoring is permitted.
-3. Evidence from Skill Verification in the ALPS definition process should be confirmed before a Skill is adopted.
-4. When management guidance or a Skill changes, the change should be communicated to affected users.
-5. A Skill for which the need no longer exists or that has become harmful must be identified and retired.
-6. The description of a retired Skill may be retained for reference.
-7. Duplication and gaps within the Skill Model should be continually identified.
-8. Skills established as standards should be used consistently across multiple subjects of application.
-9. When a component of a Skill Package changes, affected Skill Descriptions and accompanying resources should be identified and necessary reverification performed.
+1. Means for managing and deploying ALPS representations, together with applicable Tailoring and adoption guidance, should be established.
+2. Framework-level Controls and Enablers must be declared together with scope, exceptions, and whether Tailoring is permitted.
+3. Verification evidence from Define ALPS should be confirmed before an authoritative representation is adopted.
+4. An adopted representation must retain an identifiable representation kind, authoritative source, management status, and applicable conditions.
+5. Canonical references affected by adoption, replacement, relocation, version change, or retirement must be identified and their resolvability preserved or deliberately changed through a controlled decision.
+6. Changes to a Process Reference Model must identify affected Process semantic centers and referenced Process Descriptions.
+7. Changes to a Process Model must identify affected Process membership and relationships.
+8. Changes to a Process View must identify affected Source Processes, referenced Activities and Tasks and their Traceability, and application guidance.
+9. Changes to a Process Description must identify affected Process Models, Process Reference Models, Process Views, and consumers where applicable.
+10. Changes with material impact should be communicated to affected users and representations.
+11. A representation whose need no longer exists, that has become unsafe or misleading, or that has been superseded should be retired under a controlled decision.
+12. Retired representations may be retained for traceability or reference when permitted by applicable Controls and Constraints.
 
-### Skill Tailoring
+### Tailoring and Formal Adoption
 
-This Activity adapts Skills and Skill Models to the needs, conditions, and risks of a particular context of application. It primarily contributes to Outcomes a) and d).
+This Activity controls context-specific changes and determines when View content or Process application requires a change to a managed Process or Model. It primarily contributes to Outcomes a) and d).
 
-1. Application-related risks, requirements, complexity, available capabilities and resources, and relevant standards must be identified.
-2. Candidate Skills or life cycle models must be evaluated by considering conditions of application, available expertise and experience, stakeholder expectations or requirements, and risk tolerance.
-3. Tailoring decisions should be based on facts and evidence.
-4. Outcomes, Activities, Tasks, representative Inputs, and representative Outputs may be deleted, modified, or added.
-5. Tailoring must comply with applicable Controls and Constraints.
-6. Input must be obtained from affected parties.
-7. The rigor of Skill application should be set on the basis of risk so that Activities can be performed with sufficient rigor at an acceptable level of risk.
-8. The scope of Tailoring should be made clear. Assumptions and criteria should be identified, and the rationale for decisions should be recorded.
-9. Tailoring is typically performed dynamically throughout the period of application according to risk and context.
-10. Tailoring operation should be reviewed throughout application and revised when conditions warrant.
-11. A means of continually assessing the performance of the tailored Skill should be established.
-12. The level of detail used to describe Inputs, Outputs, and their exchanges should be adjusted according to dependencies among Skills, concurrent or iterative application, and quality risk.
+1. Application risks, requirements, complexity, capabilities, resources, stakeholder expectations, and relevant standards must be identified.
+2. Each proposed change must be distinguished as context-specific Tailoring or an authoritative redefinition.
+3. Tailoring must comply with applicable Controls and Constraints.
+4. The Tailoring scope must be stated.
+5. Tailoring assumptions should be recorded.
+6. Tailoring decision criteria should be recorded.
+7. Input from materially affected parties must be obtained when required by applicable Controls or quality risk.
+8. The rationale for each Tailoring decision should be recorded.
+9. Changes to Process Outcomes, Activities, Tasks, Inputs, Outputs, Controls, Constraints, or Enablers must be traceable when they affect the declared Conformance basis.
+10. A View-specific or modified Activity or Task must not contribute to Source Process Conformance merely because it appears in a Process View.
+11. A change to an applicable Source Process for a particular application must be handled through managed Tailoring.
+12. An authoritative semantic change to an ALPS representation must be handed to Define ALPS for controlled redefinition.
+13. Formal adoption of a changed semantic element must occur only after controlled redefinition and verification.
+14. Tailoring effectiveness should be reviewed during application.
+15. Tailoring should be revised when conditions change.
+16. The rigor of application and evidence should be proportional to risk.
 
-### Skill Assessment and Improvement
+### Representation and Process Assessment & Improvement
 
-This Activity assesses Skill performance and effectiveness and connects the results to improvement. It primarily contributes to Outcomes e), f), and g).
+This Activity assesses representations and Process execution and connects the results to controlled improvement. It primarily contributes to Outcomes e), f), g), h), i), and j).
 
-1. Measures should be established to gain insight into Skill performance and effectiveness.
-2. Lessons learned should be identified and collected throughout the period of Skill execution.
-3. Collection of lessons learned at predefined milestones should also be planned.
-4. Measures should be analyzed to determine Skill effectiveness.
-5. Skill strengths and weaknesses should be assessed, and reviews and audits should be established.
-6. Skill performance may be compared with established criteria, applicable standards, or comparators to identify improvement opportunities. The comparison should analyze performance, effectiveness, conformance, benefits, and costs.
-7. Improvement opportunities should be continually identified, prioritized, and implemented.
-8. Mechanisms should be established both to collect lessons learned and connect them to action and to analyze candidate changes for improvement.
-9. A changed Skill should undergo confirmation through Skill Verification in the ALPS definition process.
-10. Inconsistency and rework arising from exchanges among Skills may be used to identify improvement opportunities.
+1. Assessment criteria must be selected according to the representation kind and declared subject.
+2. A Process representation may be assessed for Description Conformance, Process execution Conformance, Outcome achievement, performance, and effectiveness as applicable.
+3. A Process Model should be assessed for Process coverage, relationship coherence, resolvability, and applicability to its intended Purpose.
+4. A Process Reference Model should be assessed for Process identity, Name/Purpose/Outcomes consistency, relationship coherence, resolvability, and suitability as a frame of reference.
+5. A Process View should be assessed for Purpose and Outcomes, Source Process provenance and Traceability where source elements are referenced, preservation of source meaning, handoffs, application guidance, and usefulness for its intended concern.
+6. Assessment of Process View Outcomes must remain distinct from Source Process Outcome Conformance.
+7. Lessons learned and execution evidence should be collected throughout application and at useful review points.
+8. Strengths, weaknesses, defects, gaps, duplication, and inconsistencies should be identified.
+9. Improvement opportunities should be prioritized according to evidence, benefit, cost, risk, and impact.
+10. A decided change to an authoritative representation must be handed to Define ALPS for controlled redefinition and verification.
+11. Rework or inconsistency arising at references, relationships, or handoffs may be used as an improvement signal.
+12. Decided improvements must be implemented through the applicable controlled change.
+13. Representations affected by an implemented improvement must be reverified.
+14. Management state must be updated after decided improvements are implemented and verified.
 
 ## Inputs
 
-The following are representative Inputs and do not prescribe the only method of execution.
-
-Verified Skill Descriptions, change requests, application context, Tailoring guidance, Input from affected parties, execution and decision records, lessons learned, and measurement results.
+Representative Inputs include verified ALPS representations, adoption and change requests, application context, Tailoring guidance, affected-party input, execution and decision records, lessons learned, measurement results, representation-assessment results, and reference-resolution information.
 
 ## Outputs
 
-The following are representative Outputs and do not prescribe the only method of execution.
-
-Managed Skill assets, tailored Skills, Tailoring decisions and rationale, assessment results, prioritized improvement opportunities, change requests for Skills, and retirement decisions.
+Representative Outputs include managed ALPS representations, adoption and retirement decisions, Tailoring and formal-adoption decisions, change-impact and reference-integrity records, assessment results, prioritized improvements, redefinition or reverification requests, and updated management states.
 
 ## Entry Criteria
 
-- A management trigger concerning adoption, change, retirement, Tailoring, assessment, or improvement of a Skill asset has been identified.
-- The Skill asset to be managed, scope of application, baseline, or assessment period can be identified.
-- The primary applicable Controls and Constraints can be confirmed, or their absence can be recorded as an open issue.
-- When an irreversible or high-impact management action is anticipated, the need for a Decision Gate and the necessary authority can be determined.
+- A management trigger concerning adoption, change, retirement, Tailoring, formal adoption, assessment, or improvement has been identified.
+- The representation or Process subject, its kind, scope, baseline, or assessment period can be identified.
+- Primary applicable Controls and Constraints can be confirmed or their absence recorded as unresolved.
+- When an irreversible or high-impact management action is anticipated, the necessary authority and Decision Gate can be determined.
 
 ## Exit Criteria
 
-- The scope, criteria, and applied Activities are recorded.
-- Management decisions, their rationale, assumptions, and evidence are traceable.
-- Impacts of changes, retirement, or Tailoring; communication to relevant parties; and the need for reverification are recorded.
-- Achievement of the declared Outcomes and unresolved risks are determined.
-- Handoffs to the subsequent definition Process or application Process are explicit.
+- The management subject, representation kind, scope, criteria, and applied Activities are recorded.
+- Management decisions, rationale, assumptions, evidence, and affected references are traceable.
+- Change, retirement, Tailoring, or adoption impacts and the need for redefinition or reverification are recorded.
+- Applicable representation or Process assessment results and unresolved risks are determined.
+- Handoffs to Define ALPS or Apply ALPS are explicit.
 
 ## Controls
 
-- The Process Framework and ALPS must be applied. If they conflict, the Process Framework must take precedence.
-- The normative words and their meanings are those defined in the Process Framework. This Skill does not redefine them.
-- Applicable laws, regulations, policies, contracts, information-management requirements, safety requirements, and the user-specified scope of change must be applied.
-- The scope, exceptions, and whether Tailoring is permitted must be stated for Framework-level Controls and Enablers.
-- Controls and Constraints for Skill management, change, retention, reference, recovery, and deletion that are effective in the execution environment must be followed. These requirements arise from the execution environment rather than from ALPS itself; where applicable, they remain part of the declared execution scope and assessment.
+- Apply the [Process Framework](../../spec/process-framework.md) and [ALPS Specification](../../spec/ALPS-SPEC.md). If they conflict, the Process Framework takes precedence.
+- Normative words and their meanings are those defined in the Process Framework.
+- Applicable laws, regulations, policies, contracts, information-management requirements, safety requirements, and user-defined change scope must be applied.
+- Framework-level Controls and Enablers must state scope, exceptions, and whether Tailoring is permitted.
+- Execution-environment Controls and Constraints governing retention, reference, recovery, deletion, permissions, and external effects must be followed within their declared scope.
 
 ## Constraints
 
-- The normative part of a general Skill must not require a specific executor, tool, technique, measure, or fixed execution sequence.
-- Agents, models, tools, management systems, and execution environments must not be treated as Inputs. They must be treated as Enablers.
-- A Decision Gate should be applied before irreversible or high-impact adoption, change, retirement, or Tailoring. When an applicable Control or Constraint requires passage through a Decision Gate, the action must not be performed before passage.
-- A determination of Conformance or effectiveness must be based on sufficient evidence.
+- A general Process Description must not require a specific executor, tool, technique, measure, or fixed execution sequence.
+- A Process Model, Process Reference Model, or Process View must not be assessed as though it were Process execution.
+- A Conformance or effectiveness determination must be based on evidence appropriate to the declared subject and kind.
+- Tailoring must not silently change an authoritative representation.
+- Formal adoption of a changed semantic element must pass through controlled redefinition and verification when it changes the authoritative representation.
+- Agents, models, tools, management systems, and execution environments are Enablers rather than Process Inputs.
 
 ## Enablers
 
-- Managed Skill registers, versions, configurations, and change histories
-- Expertise in stakeholders, business domains, and risk domains
-- Agents or tools that support Skill creation, verification, search, version comparison, retention, communication, and assessment
+- Managed representation registers, versions, configurations, canonical references, and change histories
+- Stakeholder, domain, risk, and governance expertise
+- Agents or tools supporting creation, resolution, comparison, retention, communication, and assessment
 - Independent review or audit capability
 
 ## Conformance
 
-- A claim of Conformance must identify the target, scope, and whether Outcomes, Tasks, or both are used as the basis.
-- Full Conformance to Outcomes must demonstrate achievement of every Outcome listed in the Outcomes section.
-- Full Conformance to Tasks must demonstrate satisfaction of every requirement stated with must or must not by an Activity or Task.
-- To claim Tailored Conformance when the selected Full Conformance basis is not satisfied, the tailored Process and its scope must be declared, and satisfaction of every Outcome and Activity/Task requirement that remains within that scope must be demonstrated.
-- Independent Process Outcome Conformance must not be claimed for an individual Activity alone.
-- Capability and Conformance must be treated as separate assessment dimensions.
+This Skill represents the Manage ALPS Process. Its Process Conformance is assessed separately from the Conformance or validity of the representations being managed. Management assessment must state the subject and representation kind. Process Model, Process Reference Model, and Process View assessments must not be reported as Process execution Conformance. Tailored Process Conformance remains a claim about the applicable Process and declared Tailoring scope.
 
 ## Interfaces & Traceability
 
 | Provider | Information item | Recipient |
 |---|---|---|
-| Definition Process | Verified Skill Description and verification results | This management Process |
-| This management Process | Managed Skill information, Tailoring decisions, and application conditions | Application Process |
-| Application Process | Execution and decision records, lessons learned, and measurable results | This management Process |
-| This management Process | Change requests, redefinition requests, and reverification requests | Definition Process |
+| Define ALPS | Verified authoritative representation and verification evidence | Manage ALPS |
+| Manage ALPS | Managed representation identity, kind, status, Tailoring decisions, and application conditions | Apply ALPS |
+| Apply ALPS | Execution evidence, decisions, lessons, measurements, and unresolved needs | Manage ALPS |
+| Manage ALPS | Redefinition, reverification, or formal-adoption request | Define ALPS |
 
-When multiple Skills are composed for application, the correspondence between provider Outputs and recipient Inputs must be explicit. The provider and recipient should align the name, meaning, and scope of information items handed off. When the same information item is changed by multiple Skills, its integrity, state, and change handling must be determined according to quality risk.
+Reference relationships affected by a management decision must remain traceable from the prior state to the resulting state.
 
 ## Shared Normative References
 
-This section is informative and has no normative force.
-
-- When interpretation of the Process Framework or ALPS, conflict resolution, normative attributes, Conformance, or Tailoring requires the governing texts, use the repository-shared [Process Framework](../../.alps/spec/process-framework.md) and [ALPS Specification](../../.alps/spec/ALPS-SPEC.md). These documents are repository-level normative assets and are not owned by this Skill Package.
+- Use the repository-shared [Process Framework](../../spec/process-framework.md) as the higher-order normative source.
+- Use the repository-shared [ALPS Specification](../../spec/ALPS-SPEC.md) for representation, management, Tailoring, and Conformance rules.
 
 ## Bundled Resources
 
-This section is informative and does not require a specific method of execution.
-
-- This root `SKILL.md` is the authoritative English Skill Description. For Japanese-language work, use the [Japanese localization](references/locales/ja/SKILL.md) and its adjacent localized resources. Respond in the user's language; if the localization conflicts with this file, this English description governs.
-- [management-records.md](references/management-records.md) provides optional, human-readable blocks for asset management, Tailoring, assessment and improvement, Decision Gates, changes, retirement, and handoffs. The needed blocks can be included in a general Process Instance Record or kept as referenced management Outputs.
+- This root `SKILL.md` is the authoritative English Process Description. For Japanese-language work, use the [Japanese localization](references/locales/ja/SKILL.md); if the localization conflicts with this file, this English description governs.
+- [management-records.md](references/management-records.md) provides optional record blocks for asset management, Tailoring, assessment, improvement, Decision Gates, changes, retirement, and handoffs.
 
 ## Common Approach
 
-This section is informative and has no normative force.
-
-- Classifying a management trigger into one or more of Skill Asset Management, Skill Tailoring, and Skill Assessment and Improvement can make it easier to organize the necessary evidence and recipients.
-- Relating the target, baseline, scope, Controls, Constraints, relevant parties, and evidence in a single management record can make change impacts easier to trace.
-- For an irreversible or high-impact management decision, a Decision Gate suited to the application context and risk can be useful.
-- For retirement, new invocations, impacts on dependencies and users, retention of necessary reference records, and recovery conditions can be considered according to the application context.
-- Oversight records received from the application Process — approvals and interventions, undetected failures, insufficient explanations or logs, signs of automation bias, supervisor load, and the adequacy of Decision Gates — can serve as Inputs to Skill Assessment and Improvement.
+- Identify the representation kind before choosing assessment criteria.
+- Treat reference integrity as part of change impact whenever Models, Reference Models, or Views are changed.
+- Keep context-specific Tailoring distinct from authoritative redefinition.
+- Route authoritative semantic changes through Define ALPS and route application evidence back from Apply ALPS.
+- Preserve source provenance and Traceability when a View references source elements, and keep View-local descriptions distinct from changes to Source Processes.

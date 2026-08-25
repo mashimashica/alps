@@ -4,6 +4,11 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+### Changed
+
+- Moved the public ALPS normative assets from `.alps/` to `spec/` and moved repository localization metadata to `localization.yaml`. Consumers using the former `.alps/spec/` or `.alps/localization.yaml` paths must update synchronization and pinned-path references.
+- This repository path-contract change is a pre-1.0 MINOR change under [Versioning](docs/versioning.md).
+
 ## [0.3.0] - 2026-08-22
 
 Release notes: [ALPS 0.3.0](docs/releases/0.3.0.md).

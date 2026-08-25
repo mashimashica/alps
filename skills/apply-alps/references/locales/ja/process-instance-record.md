@@ -1,27 +1,27 @@
-# Process Instance記録
+# プロセスインスタンス記録
 
-この参考Bindingは、ProcessまたはSkillのInstance化時に作成し、実行後に同じファイルを完成させられる、人間が読める記録形式を提供する。品質リスク、適用されるControl、レビューや授受の必要性、またはConformance主張に照らして、詳細化が正当化される場合に限って用いる。
+この環境対応付けは参考情報であり、エージェントスキルが表現するプロセスを呼び出して作成するプロセスインスタンスについて、人間が読める記録形式を提供する。記録は呼び出し前に作成し、実行後に同じファイルで完成させられる。品質リスク、適用される統制事項、レビューや受け渡しの必要性、または適合主張に照らして、詳細化が正当化される場合に限って用いる。プロセスモデル、プロセス参照モデルまたはプロセスビューの読込みは、プロセスインスタンスを作成しない。
 
-これは任意のEnvironment Bindingである。このファイル形式、フィールドおよび検査規則はBinding固有であり、ALPSの要求ではない。見出しは人間向けであり、名称および順序を変更できる。可視的な``- `key`: value``フィールドおよび`kind`値によって、生成された記録を機械判読可能にする。
+これは任意に利用できる環境対応付けである。このファイル形式、フィールドおよび検査規則は対応付け固有であり、ALPSの要求ではない。見出しは人間向けであり、名称および順序を変更できる。可視的な``- `key`: value``フィールドおよび`kind`値によって、生成された記録を機械判読可能にする。
 
 ## 目次
 
-- [Binding規則](#binding規則)
+- [対応付け規則](#対応付け規則)
 - [基本記録](#基本記録)
 - [条件付きブロック](#条件付きブロック)
 - [生成器および検査器](#生成器および検査器)
 
-## Binding規則
+## 対応付け規則
 
 - 一つのフィールドを一行に記録する。複数の値が必要な`evidence`などのフィールドは繰り返す。
-- 単一値のフィールドを繰り返さない。矛盾する重複値はBindingを曖昧にするため、検査器が拒否する。
-- Bindingフィールドは可視的な通常のMarkdownとして記録する。コードフェンス内またはインデントされたコードはBindingデータではない。raw HTMLおよびHTMLコメントは可視性がRendererに依存するため拒否される。
+- 単一値のフィールドを繰り返さない。矛盾する重複値は対応付けを曖昧にするため、検査器が拒否する。
+- 対応付けフィールドは可視的な通常のMarkdownとして記録する。コードフェンス内またはインデントされたコードは対応付けデータではない。生のHTMLおよびHTMLコメントは可視性がレンダラーに依存するため拒否される。
 - 不足する値を推測しない。記録の準備中は値を空欄とし、状況に応じて後から値を記入するか、不要なフィールドを削除する。
-- 管理された出典を識別する。出典を再度参照しなくても、記録単独でレビューできることが重要な場合は、適用される正確な`source_statement`を加える。低リスクの用途では、出典への参照だけとする詳細度が、リスクに見合う場合がある。
-- `instance_statement`は、適用固有の表現が必要な場合だけ用いる。その存在だけではTailoringの成立を意味しない。
-- Instance固有の成功条件が必要な場合は`criterion`を加える。実行後に`result`および`assessment`を記録し、リスクに応じて`evidence`および`limitations`を加える。
-- 意味、規範上の強さまたは適用可能性を変更した場合は`tailoring`ブロックを追加し、管理Processを適用する。この形式を用いても、Tailoringを暗黙に行ってはならない。
-- 授受およびConformanceブロックは、該当する場合だけ追加する。Conformanceブロックは主張を記録するものであり、形式および検査器はその主張を証明しない。
+- 実際に呼び出した正本となるプロセス表現と、その管理されたベースラインを識別する。出典を再度参照しなくても、記録単独でレビューできることが重要な場合は、適用される正確な`source_statement`を加える。低リスクの用途では、出典への参照だけとする詳細度が、リスクに見合う場合がある。
+- `instance_statement`には、適用固有の表現だけを記載する。その存在だけではテーラリングの成立を意味しない。
+- インスタンス固有の成功条件が必要な場合は`criterion`を加える。実行後に`result`および`assessment`を記録し、リスクに応じて`evidence`および`limitations`を加える。
+- 意味、規範的効力または適用可能性を変更した場合は`tailoring`ブロックを追加し、管理プロセスを適用する。この形式を用いても、テーラリングを暗黙に行ってはならない。
+- 受け渡しおよび適合ブロックは、該当する場合だけ追加する。適合ブロックは主張を記録するものであり、形式および検査器はその主張を証明しない。
 
 ## 基本記録
 
@@ -33,23 +33,24 @@
 ## 適用の基礎
 - `kind`: application
 - `record_format`: process-instance-record/1
-- `source`: <管理されたSkillまたはProcessの出典および版>
+- `source`: <正本となるプロセススキルの参照および管理されたベースライン>
+- `resolved_from`: <プロセスの解決に用いたプロセスモデル、プロセス参照モデルまたはプロセスビュー（任意）>
 - `context`: <適用状況およびニーズ>
 - `scope`: <適用範囲。関連する対象外範囲、または対象外なしの明示を含む>
 
-## 意図するOutcome
+## 意図する成果
 - `kind`: outcome
-- `source_statement`: <適用される正確なOutcome記述>
+- `source_statement`: <適用される正確な成果記述>
 - `instance_statement`: <必要な場合の適用固有の表現>
-- `criterion`: <必要な場合のInstance固有の成功条件>
+- `criterion`: <必要な場合のインスタンス固有の成功条件>
 - `result`:
 - `assessment`:
 - `evidence`:
 - `limitations`:
 
-## Task
+## タスク
 - `kind`: task
-- `source_statement`: <適用される正確なTask記述>
+- `source_statement`: <適用される正確なタスク記述>
 - `instance_statement`: <必要な場合の適用固有の表現>
 - `criterion`:
 - `result`:
@@ -58,60 +59,62 @@
 - `limitations`:
 ```
 
-重要な場合は、`activity`、`purpose`、`input`、`output`、`entry_criterion`、`exit_criterion`、`control`、`constraint`、`enabler`、`exchange`または`decision`などの中核`kind`値を持つブロックを追加できる。ローカル拡張の`kind`には、例えば`x_review_note`のように`x_`接頭辞を付ける。これにより、中核`kind`の誤記と意図的な拡張を区別できる。検査器は`kind`フィールドを持たない説明用の節を無視し、すべてのInstanceに完全なALPSモデルを強制しない。
+重要な場合は、`activity`、`purpose`、`input`、`output`、`entry_criterion`、`exit_criterion`、`control`、`constraint`、`enabler`、`exchange`または`decision`などの中核`kind`値を持つブロックを追加できる。ローカル拡張の`kind`には、例えば`x_review_note`のように`x_`接頭辞を付ける。これにより、中核`kind`の誤記と意図的な拡張を区別できる。検査器は`kind`フィールドを持たない説明用の節を無視し、すべてのプロセスインスタンスに完全なプロセス記述を強制しない。
 
 ## 条件付きブロック
 
-重要なOutputとInputの対応には授受ブロックを用いる。完了時には状態を記録する。
+重要な出力と入力の対応には受け渡しブロックを用いる。完了時には状態を記録する。
 
 ```markdown
-## 授受
+## 受け渡し
 - `kind`: handoff
-- `provider`: <提供SkillまたはInstance>
-- `output`: <Output>
-- `receiver`: <受領SkillまたはInstance>
-- `input`: <Input>
+- `provider`: <提供側のプロセスまたはプロセスインスタンス>
+- `output`: <出力>
+- `receiver`: <受領側のプロセスまたはプロセスインスタンス>
+- `input`: <入力>
 - `correspondence`: <意味、範囲および品質条件>
 - `status`:
 ```
 
-管理されたTailoringによって要素を追加、変更または除外した場合だけTailoringブロックを用いる。このBindingの検査器は、`basis`、`candidate_evaluation`、`decision`、`affected_party_input`および`controls_constraints`の値を要求する。`scope`および`rationale`は記録するのが望ましいが、検査器では任意とする。`before`、`after`、`assumptions_criteria`および`performance_assessment`も適用状況に応じた任意フィールドである。これらのフィールド名および一行表現はBinding固有であり、Tailoringに関する判断の妥当性を証明しない。
+管理されたテーラリングによって要素を追加、変更または除外した場合だけテーラリングブロックを用いる。プロセスビューにビュー固有または変更された活動もしくはタスクが含まれることだけを理由として、このブロックを用いない。これらの記述は、適用される出典プロセスを管理されたテーラリングまたは統制されたプロセス再定義によって変更しない限り、ビュー内に留まる。
+
+この対応付けの検査器は、`basis`、`candidate_evaluation`、`decision`、`affected_party_input`および`controls_constraints`の値を要求する。`scope`および`rationale`は記録するのが望ましいが、検査器では任意とする。`before`、`after`、`assumptions_criteria`および`performance_assessment`も適用状況に応じた任意フィールドである。これらのフィールド名および一行表現は対応付け固有であり、テーラリングに関する判断の妥当性を証明しない。
 
 ```markdown
-## Tailoring
+## テーラリング
 - `kind`: tailoring
 - `scope`: <推奨: 影響要素および適用範囲>
 - `before`: <任意: 変更前の管理された記述>
 - `after`: <任意: 変更後の承認された記述>
 - `basis`: <リスク、要求事項、複雑性、利用可能な能力および資源、ならびに関連規格>
-- `candidate_evaluation`: <適用条件、専門知識・経験、ステークホルダーの期待・要求事項およびリスク許容度に照らした候補Skillまたはライフサイクルモデルの評価>
+- `candidate_evaluation`: <適用条件、専門知識・経験、ステークホルダーの期待・要求事項およびリスク許容度に照らした候補プロセスまたはライフサイクルモデルの評価>
 - `rationale`: <推奨: 判断根拠>
 - `decision`: <管理判断、および該当する場合はその判断に到達できる参照>
-- `affected_party_input`: <影響当事者および取得したInput、または該当者なしの明示>
-- `controls_constraints`: <適用ControlおよびConstraint、または該当なしの明示>
+- `affected_party_input`: <影響当事者および取得した入力、または該当者なしの明示>
+- `controls_constraints`: <適用統制事項および制約、または該当なしの明示>
 - `assumptions_criteria`: <任意: 前提および判断基準>
-- `performance_assessment`: <任意: Tailoring済み適用の監視・評価方法>
+- `performance_assessment`: <任意: テーラリング済み適用の監視・評価方法>
 ```
 
-Conformanceを主張する場合だけConformanceブロックを用いる。
+適合を主張する場合だけ適合ブロックを用いる。
 
 ```markdown
-## Conformance
+## 適合
 - `kind`: conformance
 - `subject`: <主張対象>
 - `scope`: <主張範囲>
-- `basis`: <Outcome、Taskまたは双方>
+- `basis`: <成果、タスクまたは双方>
 - `claim`: <FullまたはTailored>
-- `tailoring_decision`: <Tailoringの詳細を局所的に再掲しない場合の管理されたTailoringの判断への参照>
-- `remaining_requirements`: <Tailored Conformanceの場合に適用範囲に残るOutcomeおよびActivity・Taskに含まれる要求事項>
+- `tailoring_decision`: <テーラリングの詳細を局所的に再掲しない場合の管理されたテーラリングの判断への参照>
+- `remaining_requirements`: <テーラリング適合の場合に適用範囲に残る成果および活動・タスクに含まれる要求事項>
 - `evidence`: <主張を支える証拠>
 ```
 
-Tailored Conformanceでは、Conformanceブロックの`subject`、`scope`および`remaining_requirements`によって、TailoringしたSkillまたはProcess、主張範囲、ならびにその範囲に残るOutcomeおよびActivity・Taskに含まれる要求事項を識別する。さらに、局所的な`tailoring`ブロックまたは詳細に到達できる`tailoring_decision`への参照のいずれかを記載する。`tailoring_decision`への参照は、Conformanceブロックの`scope`または`remaining_requirements`を置き換えない。ALPSの主張では、証拠によって適用範囲に残るOutcomeおよび要求事項の充足を示す必要があるが、検査器が検査するのは`evidence`フィールドの存在だけである。
+テーラリング適合では、適合ブロックの`subject`、`scope`および`remaining_requirements`によって、テーラリングしたプロセス、主張範囲、ならびにその範囲に残る成果および活動・タスクに含まれる要求事項を識別する。該当する場合は、プロセス記述を提供するスキルも識別してよい。さらに、局所的な`tailoring`ブロックまたは詳細に到達できる`tailoring_decision`への参照のいずれかを記載する。`tailoring_decision`への参照は、適合ブロックの`scope`または`remaining_requirements`を置き換えない。ALPSの主張では、証拠によって適用範囲に残る成果および要求事項の充足を示す必要があるが、検査器が検査するのは`evidence`フィールドの存在だけである。適合ブロックは、呼び出したプロセスを対象とする。プロセスビューの成果のアセスメントまたはプロセスモデル、プロセス参照モデルもしくはプロセスビューの記述適合は、プロセス実行適合と分けて記録する必要がある。
 
 ## 生成器および検査器
 
-生成器はコマンドラインで明示した値だけを転記する。Skillを読み取ってPurpose、Outcome、Task、規範属性またはTailoringを推定しない。内容全体を準備してから出力先にアトミックに配置するため、置換に失敗しても既存記録を切り詰めない。
+生成器はコマンドラインで明示した値だけを転記する。プロセス記述を読み取って目的、成果、タスク、規範属性またはテーラリングを推定しない。内容全体を準備してから、不可分な操作で出力先に配置するため、置換に失敗しても既存記録を切り詰めない。
 
 ```bash
 python3 ../../../scripts/process_instance_record.py --locale ja new \
@@ -127,4 +130,4 @@ python3 ../../../scripts/process_instance_record.py --locale ja check --at insta
 python3 ../../../scripts/process_instance_record.py --locale ja check --at completion contract-review.md
 ```
 
-Instance化時の検査は、`record_format: process-instance-record/1`を持つ`application`ブロックを一つだけ、出典、文脈、適用範囲および一つ以上の意図するOutcomeまたは成功基準を要求する。完了時の検査は、各Outcome、記録対象に含めたTask、独立した成功基準、および`criterion`を宣言した他の各ブロックの結果および判定も要求する。検査器が証拠を必須とするのはConformance主張だけであり、`claim`には`Full`または`Tailored`だけを認める。Tailored主張では`scope`および`remaining_requirements`に加え、局所的なTailoringブロックまたは`tailoring_decision`への参照を要求する。それ以外の条件付きブロックは、存在する場合だけ検査する。これらの検査は本Bindingへの適合だけを確認し、記載内容の真偽、Outcomeの達成、Tailoringの妥当性またはALPS Conformanceを証明しない。
+インスタンス化時の検査では、`record_format: process-instance-record/1`を持つ`application`ブロックが一つだけ存在することに加え、出典、文脈、適用範囲、および一つ以上の意図する成果または成功基準の記載を要求する。完了時の検査では、各成果、記録対象に含めたタスク、独立した成功基準、および`criterion`を宣言した他の各ブロックの結果および判定も要求する。検査器が証拠を必須とするのは適合主張だけであり、`claim`には`Full`または`Tailored`だけを認める。テーラリング適合の主張では、`scope`および`remaining_requirements`に加え、局所的なテーラリングブロックまたは`tailoring_decision`への参照を要求する。それ以外の条件付きブロックは、存在する場合だけ検査する。これらの検査で確認できるのは、この対応付け形式への準拠だけであり、記載内容の真偽、成果の達成、テーラリングの妥当性またはALPS適合を証明しない。

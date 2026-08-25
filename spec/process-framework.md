@@ -237,23 +237,19 @@ Process selection and timing need continual review when the subject or context c
 
 ### 5.3 Process Views
 
-A View changes the angle of attention, not the source Process Model.
+A View changes the angle of attention, not the source Processes.
 
-A **Process View** organizes Activities and Tasks from multiple Processes around a concern or Purpose and explains how its Outcomes are achieved. It makes cross-cutting concepts or a particular Purpose visible.
+A **Process View** organizes Activities and Tasks across multiple Processes around a particular concern or Purpose and explains how they are applied to achieve its Outcomes. It makes cross-cutting concepts or a particular Purpose visible.
 
-Every Process View must state its Name, Purpose, and Outcomes. It must provide explanation and guidance for applying the included Activities and Tasks.
+Every Process View must state its Name, Purpose, and Outcomes. It must provide explanation and guidance for applying the Activities and Tasks it includes.
 
-A Process View may contain Activities and Tasks with any of the following origins:
+A Process View may reference Activities and Tasks from existing Processes. It may also describe Activities and Tasks within the View when needed for its concern or Purpose.
 
-| Origin in the View | Required treatment |
-|---|---|
-| Selected from a Process Model | Identify the source, label the element as selected, and retain the source. |
-| Adapted from a Process Model | Identify the source and label the element as adapted. The adaptation does not change the source Process Model. |
-| Created specifically for the View | Label the element as new. The View-specific element does not change the source Process Model. |
+When a Process View references an Activity or Task from a source Process, the source and necessary Traceability must be maintained so that the relationship to the source remains clear.
 
-The View must identify the source of each Activity and Task and label it as selected, adapted, or new. Adapted and View-specific elements do not contribute to Conformance with a source Process unless Tailoring or formal adoption incorporates them into that Process.
+Activities and Tasks described within a Process View do not change the source Process merely by appearing in the View. View-specific or modified Activities and Tasks do not by themselves contribute to or alter Conformance to a source Process.
 
-A Process Framework may restrict a Process View to Activities and Tasks already present in a Process Model. A restricted View must not include View-specific Activities or Tasks.
+A change to the source Process itself must be handled through Tailoring or Process redefinition, as applicable.
 
 A Process View may also show connections among Processes and the sources of the Processes used in its composition.
 
