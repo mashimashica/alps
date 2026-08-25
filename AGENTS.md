@@ -52,7 +52,6 @@ Add another repository-development Skill only after a repeated task has emerged 
 ## Semantic Invariants
 
 - An Agent Skill represents a Process by default; a non-Process representation declares `metadata.alps.kind`.
-- Loading a Process Model, Process Reference Model, or Process View activates selection or composition context and does not invoke a Process.
 - A Process View preserves provenance and Traceability for referenced source elements. View-local or modified content does not change a source Process or establish source Process Conformance.
 - Change an applicable source Process through managed Tailoring, or change its authoritative Process Description through controlled redefinition with `define-alps`.
 - `skills/` remains the only source of truth for distributed Agent Skill representations.
