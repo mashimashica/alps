@@ -4,10 +4,41 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-25
+
+Release notes: [ALPS 0.4.0](docs/releases/0.4.0.md).
+
+### Added
+
+- Added explicit Agent Skill representation kinds for Process Model, Process Reference Model, and Process View while retaining Process as the default representation.
+- Added the distributed `alps-reference-model` Process Reference Model alongside the `define-alps`, `apply-alps`, and `manage-alps` Processes.
+- Added the optional ALPS Markdown Profile v1 Environment Binding, identified as `alps-markdown/v1`, with a typed and bounded checker bundled as an Application Enabler of the repository-development `review-alps` Process.
+- Added repository-development `review-alps` and `sync-locales` Process Skills under `.agents/skills/` without registering them as distributed Plugin Skills.
+
 ### Changed
 
-- Moved the public ALPS normative assets from `.alps/` to `spec/` and moved repository localization metadata to `localization.yaml`. Consumers using the former `.alps/spec/` or `.alps/localization.yaml` paths must update synchronization and pinned-path references.
-- This repository path-contract change is a pre-1.0 MINOR change under [Versioning](docs/versioning.md).
+- Recentered the Process Framework, ALPS Specification, reference Processes, records, and guidance on Process as the work performed and Agent Skill as its representation.
+- Distinguished representation activation from Process Invocation and preserved source provenance and Traceability for Process Views where source elements are referenced.
+- Aligned the Markdown Environment Binding with the ALPS semantic boundary: Process Activities and Tasks are optional, and Process Views may contain View-local Activities and Tasks without requiring source inclusion.
+- Moved the public normative assets from `.alps/spec/` to `spec/` and moved repository localization metadata from `.alps/localization.yaml` to `localization.yaml`.
+- Moved Japanese repository documentation from `docs/ja/` to `docs/locales/ja/`.
+- Established `skills/` as the source of truth for the four distributed Skills and `.agents/skills/` as a repository-development discovery view.
+- Clarified the logical roles of authoritative representations, Environment Bindings, Application Enablers, output-creation resources, Host metadata, and presentation resources.
+- Aligned English and Japanese representation semantics and naturalized remaining Japanese user-facing text.
+
+### Compatibility
+
+- The identifiers `define-alps`, `apply-alps`, and `manage-alps` and their root `skills/` paths remain unchanged from 0.3.0.
+- `alps-reference-model` is a new distributed Skill identifier in 0.4.0.
+- Consumers using `.alps/spec/`, `.alps/localization.yaml`, or `docs/ja/` must update stored paths, synchronization rules, and pinned references to `spec/`, `localization.yaml`, and `docs/locales/ja/`.
+- The distributed `skills/define-alps/scripts/check_skill_description.py` preflight from 0.3.0 is not retained. Repository-development validation is now provided by `.agents/skills/review-alps/scripts/validate_alps_markdown.py` for the optional `alps-markdown/v1` Environment Binding.
+- ALPS Markdown Profile v1 intentionally defines a bounded physical representation and may reject noncanonical YAML or Markdown forms; successful profile validation is not an ALPS Conformance claim.
+- These normative, representation, path-contract, and Environment Binding changes make this a pre-1.0 MINOR release.
+
+### Status
+
+- This release remains in initial development.
+- Compatibility is governed by the pre-1.0 rules in [Versioning](docs/versioning.md).
 
 ## [0.3.0] - 2026-08-22
 
