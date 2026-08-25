@@ -38,9 +38,9 @@ Restart affected clients after installation so they reload the Agent Skills.
 | [`apply-alps`](skills/apply-alps/SKILL.md) | Process | Existing representations must guide Process selection, Invocation, composition, or handoffs. |
 | [`manage-alps`](skills/manage-alps/SKILL.md) | Process | Representations must be adopted, tailored, assessed, changed, improved, or retired. |
 
-In most cases, start by activating `alps-reference-model` and use it to select the applicable reference Processes. Activation loads the model; it does not itself invoke a Process.
+In most cases, start with `alps-reference-model` and use it to select the applicable reference Processes.
 
-A Process Model or Process View supplied by another plugin can be activated in the same way. `apply-alps` resolves the Processes referenced by an active Model or View and invokes only Agent Skills that represent Processes.
+A Process Model or Process View supplied by another plugin can guide selection in the same way. `apply-alps` resolves the Processes referenced by the selected Model or View.
 
 ### 3. Ask the Agent
 
@@ -85,12 +85,14 @@ The [Process Framework](spec/process-framework.md) defines these concepts and th
 
 An Agent Skill represents a Process by default. It can also represent another Process Framework construct.
 
-| Representation | Role | Effect of loading it |
-| --- | --- | --- |
-| Process | Defines independent work through its Purpose and Outcomes. | The Process can be invoked. |
-| Process Model | Organizes related Processes and their relationships. | The model is activated; no Process is invoked merely by loading it. |
-| Process Reference Model | Defines Processes by Name, Purpose, and Outcomes and relates them explicitly. | The model is activated; no Process is invoked merely by loading it. |
-| Process View | Organizes Activities and Tasks across Processes around a Concern or Purpose and explains their application. | The View is activated; no Process is invoked merely by loading it. |
+| Representation | Role |
+| --- | --- |
+| Process | Defines independent work through its Purpose and Outcomes. |
+| Process Model | Organizes related Processes and their relationships. |
+| Process Reference Model | Defines Processes by Name, Purpose, and Outcomes and relates them explicitly. |
+| Process View | Organizes Activities and Tasks across Processes around a Concern or Purpose and explains their application. |
+
+Only a Process representation may be selected for direct Process Invocation. Process Models, Process Reference Models, and Process Views provide selection or composition context.
 
 Non-Process representations declare their kind in `SKILL.md` metadata:
 
@@ -147,7 +149,7 @@ For a repository that uses ALPS regularly, add a short policy to [AGENTS.md](htt
 This repository uses ALPS.
 
 - Activate `alps-reference-model` when the ALPS Reference Model is needed for Process selection or assessment.
-- Treat Agent Skills as Process representations by default. When `metadata.alps.kind` declares `process-model`, `process-reference-model`, or `process-view`, load that representation without treating activation as Process Invocation.
+- Treat Agent Skills as Process representations by default. Use `metadata.alps.kind` to distinguish `process-model`, `process-reference-model`, and `process-view` representations.
 - Read the complete `SKILL.md` for every selected representation.
 - Use `define-alps` to define or verify ALPS representations, `apply-alps` to resolve and invoke Processes, and `manage-alps` for adoption, Tailoring, assessment, change, or retirement.
 - For a Process View, preserve provenance and Traceability for referenced source elements and keep View-local descriptions distinct from changes to source Processes.
