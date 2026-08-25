@@ -119,9 +119,9 @@ flowchart LR
     MANAGE -->|"Redefinition or reverification request"| DEFINE
 ```
 
-The authoritative Process Reference Model is packaged as [`skills/alps-reference-model/SKILL.md`](skills/alps-reference-model/SKILL.md). It repeats the Name, Purpose, and Outcomes of the three reference Processes and is mechanically checkable against their authoritative Process Descriptions.
+The authoritative Process Reference Model is packaged as [`skills/alps-reference-model/SKILL.md`](skills/alps-reference-model/SKILL.md). It contains the Name, Purpose, and Outcomes of the three reference Processes.
 
-## Creating and Reviewing ALPS Representations
+## Creating ALPS Representations
 
 Use the following resources according to the question being answered.
 
@@ -131,13 +131,6 @@ Use the following resources according to the question being answered.
 | Understand how Agent Skills represent and govern those constructs | [ALPS Specification](spec/ALPS-SPEC.md) | Normative requirements for ALPS representations, lifecycle, and Conformance. |
 | Define, redefine, or verify a representation | [`define-alps`](skills/define-alps/SKILL.md) | Reference Process for establishing an assessable and usable ALPS representation. |
 | Draft a Process Description | [`SKILL-template.md`](skills/define-alps/references/SKILL-template.md) | Informative drafting example; it does not define an ALPS requirement. |
-| Use this repository's bounded Markdown form | [`alps-markdown/v1`](spec/alps-markdown.md) | Optional Environment Binding for Markdown and frontmatter. |
-
-The `SKILL-template.md` example is compatible with `alps-markdown/v1` after its placeholders are replaced, but its physical form, headings, and order are not ALPS requirements.
-
-The profile checker at `.agents/skills/review-alps/scripts/validate_alps_markdown.py` mechanically validates only `alps-markdown/v1`. It is an Application Enabler of the repository-development [`review-alps`](.agents/skills/review-alps/SKILL.md) Process, which reviews repository changes across the Process Framework, ALPS Specification, reference representations, bindings, locales, and distribution boundaries. The repository-development [`sync-locales`](.agents/skills/sync-locales/SKILL.md) Process checks semantic equivalence between authoritative English assets and their supported Japanese counterparts. Neither Process is distributed as a Plugin Skill.
-
-Neither the template nor a successful profile check establishes ALPS Conformance, Outcome achievability, Outcome achievement, or Process execution Conformance.
 
 ## Using ALPS in a Repository
 

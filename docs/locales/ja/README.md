@@ -119,9 +119,9 @@ flowchart LR
     MANAGE -->|"再定義・再検証要求"| DEFINE
 ```
 
-正本となるプロセス参照モデルは[`skills/alps-reference-model/SKILL.md`](../../../skills/alps-reference-model/SKILL.md)として収録します。そこに三つの参照プロセスの名称、目的、成果を保持し、正本となる各プロセス記述との一致を機械的に検査できます。
+正本となるプロセス参照モデルは[`skills/alps-reference-model/SKILL.md`](../../../skills/alps-reference-model/SKILL.md)として収録します。そこに三つの参照プロセスの名称、目的、成果を保持します。
 
-## ALPS表現の作成とレビュー
+## ALPS表現を作成する
 
 答えようとする問いに応じて、次の資産を使用します。
 
@@ -131,13 +131,6 @@ flowchart LR
 | エージェントスキルによる構成概念の表現と統制を理解する | [ALPS仕様](../../../spec/ALPS-SPEC.md) | ALPS表現、ライフサイクルおよび適合に関する規範要件。 |
 | 表現を定義、再定義または検証する | [`define-alps`](../../../skills/define-alps/references/locales/ja/SKILL.md) | アセスメント可能で利用可能なALPS表現を確立する参照プロセス。 |
 | プロセス記述を起草する | [`SKILL-template.md`](../../../skills/define-alps/references/locales/ja/SKILL-template.md) | 参考用の起草例。ALPSの要件を定義するものではありません。 |
-| 本リポジトリの範囲限定Markdown形式を使用する | [`alps-markdown/v1`](../../../spec/alps-markdown.md) | Markdownとフロントマターに関する任意の環境への対応付け。 |
-
-`SKILL-template.md`の例は、プレースホルダーを置き換えると`alps-markdown/v1`と互換になりますが、その物理形式、見出しおよび順序はALPSの要件ではありません。
-
-`.agents/skills/review-alps/scripts/validate_alps_markdown.py`に配置したプロファイル検査スクリプトは、`alps-markdown/v1`だけを機械的に検査します。このスクリプトは、プロセスフレームワーク、ALPS仕様、参照表現、対応付け、各言語版および配布境界を横断してリポジトリ変更をレビューする、リポジトリ開発用[`review-alps`](../../../.agents/skills/review-alps/SKILL.md)プロセスの実行支援要素です。リポジトリ開発用[`sync-locales`](../../../.agents/skills/sync-locales/SKILL.md)プロセスは、正本となる英語資産と対応する日本語資産の意味同等性を確認します。どちらのプロセスもプラグインスキルとして配布しません。
-
-テンプレートも、プロファイル検査の成功も、ALPSへの適合、成果の達成可能性、成果達成またはプロセス実行適合を確立するものではありません。
 
 ## リポジトリでALPSを利用する
 
