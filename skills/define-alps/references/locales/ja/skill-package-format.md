@@ -15,6 +15,18 @@
 
 資源の機能上の役割は、格納場所やファイル拡張子だけでなく、表現対象となるPFの構成概念の理解または適用において果たす機能に従って定める必要がある。同じ物理資源が複数の役割を持つ場合は、それぞれの役割と利用条件を識別できる必要がある。
 
+## リポジトリ内資産の具体的な役割対応
+
+| 適用範囲 | 資源 | 論理的役割 | 境界 |
+|---|---|---|---|
+| `define-alps`パッケージ | [`SKILL.md`](../../../SKILL.md) | 正本となるエージェントスキル表現 | 表現対象のDefine ALPSプロセスを統制する。 |
+| `define-alps`パッケージ | [`SKILL-template.md`](SKILL-template.md)および[`record-templates.md`](record-templates.md) | 出力作成用資源 | 起草および記録作成を支援するが、ALPS要求事項を追加しない。 |
+| `define-alps`パッケージ | 本`skill-package-format.md` | 参考情報 | 論理的な資源役割を説明するものであり、環境への対応付けではない。 |
+| `define-alps`パッケージ | [`agents/openai.yaml`](../../../agents/openai.yaml) | 環境への対応付け | 対象ホストの発見・提示メタデータへ対応付ける。 |
+| `define-alps`パッケージ | [`assets/alps.svg`](../../../assets/alps.svg) | 提示用資源 | 提示だけを支援する。 |
+| リポジトリレビュー | [`spec/alps-markdown.md`](../../../../../spec/alps-markdown.md) | 環境への対応付け | 任意の物理表現`alps-markdown/v1`を定義するものであり、ALPS自体ではない。 |
+| リポジトリレビュー | [`validate_alps_markdown.py`](../../../../../.agents/skills/review-alps/scripts/validate_alps_markdown.py) | 適用の実行支援要素 | `alps-markdown/v1`を検証してリポジトリ開発用`review-alps`プロセスを支援する。配布用`define-alps`パッケージには属さず、ALPSへの適合を成立させない。 |
+
 ## 環境への対応付けに含める代表項目
 
 - 対象となる実行環境および適用版

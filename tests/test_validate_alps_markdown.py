@@ -6,6 +6,7 @@ import io
 import importlib.util
 import json
 import os
+import re
 import sys
 import tempfile
 import textwrap
@@ -14,13 +15,13 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).parents[1]
-CHECKER_PATH = ROOT / "skills/define-alps/scripts/check_alps_asset.py"
-SPEC = importlib.util.spec_from_file_location("check_alps_asset", CHECKER_PATH)
+CHECKER_PATH = ROOT / ".agents/skills/review-alps/scripts/validate_alps_markdown.py"
+SPEC = importlib.util.spec_from_file_location("validate_alps_markdown", CHECKER_PATH)
 assert SPEC is not None and SPEC.loader is not None
 CHECKER = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = CHECKER
 SPEC.loader.exec_module(CHECKER)
-from alps_check import Severity  # noqa: E402
+from alps_markdown import Severity  # noqa: E402
 
 
 def _clean(value: str) -> str:
@@ -306,6 +307,56 @@ def _view_body(locale: str = "en") -> str:
     )
 
 
+def _local_view_body(locale: str = "en") -> str:
+    if locale == "ja":
+        return _clean(
+            """
+            # ローカルビュー
+
+            ## 目的
+
+            ビュー固有の観点を適用する。
+
+            ## 成果
+
+            - 観点 `skill:#local-view` が明確になる。
+
+            ## 活動とタスク
+
+            ### 確認
+
+            1. エージェントは観点を確認する必要がある。
+
+            ## 適用
+
+            関連するプロセスにこのビューを適用する。
+            """
+        )
+    return _clean(
+        """
+        # Local View
+
+        ## Purpose
+
+        Applies a View-local concern.
+
+        ## Outcomes
+
+        - The concern `skill:#local-view` is visible.
+
+        ## Activities & Tasks
+
+        ### Review
+
+        1. The agent must review the concern.
+
+        ## Application
+
+        Apply this View to the relevant Processes.
+        """
+    )
+
+
 def _asset(name: str, kind: str, locale: str, body: str, *, metadata: bool = True) -> str:
     return _frontmatter(name, kind, locale, metadata=metadata) + body
 
@@ -335,13 +386,13 @@ def _classes(result) -> tuple[str, ...]:
     return tuple(item.class_name for item in result.diagnostics)
 
 
-class CheckerProfileMilestoneATests(unittest.TestCase):
+class AlpsMarkdownProfileMilestoneATests(unittest.TestCase):
     def assert_no_errors(self, result) -> None:
         errors = [item.render() for item in result.diagnostics if item.severity.value == "error"]
         self.assertEqual(errors, [], "\n".join(errors))
 
     def test_profile_version_and_diagnostic_rendered_contract(self) -> None:
-        self.assertEqual(CHECKER.PROFILE_VERSION, "alps-repository-checker/v1")
+        self.assertEqual(CHECKER.PROFILE_VERSION, "alps-markdown/v1")
         diagnostic = CHECKER.Diagnostic(
             "unsupported-profile-syntax", "tab-heading", Severity.ERROR,
             "fixture.md", 12, "headings require one ASCII space",
@@ -394,6 +445,44 @@ class CheckerProfileMilestoneATests(unittest.TestCase):
                         self.assertEqual(len(result.ir.source_processes), 2)
                         self.assertEqual(len(result.ir.included_activities_tasks), 2)
                         self.assertEqual(len(result.ir.application), 1)
+
+            minimal_process = _clean(
+                """
+                # Minimal Process
+
+                ## Purpose
+
+                Establishes a minimal Process result.
+
+                ## Outcomes
+
+                - The minimal result is available.
+                """
+            )
+            minimal = _parse(
+                root,
+                _asset("minimal-process", "process", "en", minimal_process, metadata=False),
+                name="minimal-process",
+            )
+            self.assert_no_errors(minimal)
+            self.assertEqual(minimal.ir.activities, ())
+
+            local_en = _write(
+                root,
+                "local-view-en.md",
+                _asset("local-view", "process-view", "en", _local_view_body("en")),
+            )
+            local_ja = _write(
+                root,
+                "local-view-ja.md",
+                _asset("local-view", "process-view", "ja", _local_view_body("ja")),
+            )
+            local = CHECKER.parse_asset(local_en, "en")
+            self.assert_no_errors(local)
+            self.assertEqual(len(local.ir.activities), 1)
+            self.assertEqual(local.ir.source_processes, ())
+            self.assertEqual(local.ir.included_activities_tasks, ())
+            self.assertEqual(CHECKER.check_pair(local_en, local_ja), ([], []))
 
     def test_typed_ir_snapshot_keeps_spans_identities_and_roles(self) -> None:
         body = _process_body(
@@ -458,6 +547,11 @@ class CheckerProfileMilestoneATests(unittest.TestCase):
             self.assertEqual(len(aggregate_tokens), len(set(aggregate_tokens)))
 
     def test_shipped_assets_parse_and_cli_default_requires_japanese(self) -> None:
+        self.assertTrue(CHECKER_PATH.is_file())
+        self.assertFalse((ROOT / "skills/define-alps/scripts/check_alps_asset.py").exists())
+        self.assertFalse((ROOT / "skills/define-alps/scripts/alps_check").exists())
+        self.assertTrue((ROOT / "spec/alps-markdown.md").is_file())
+        self.assertFalse((ROOT / "spec/checker-profile.md").exists())
         shipped = sorted(ROOT.glob("skills/*/SKILL.md")) + sorted(ROOT.glob("skills/*/references/locales/ja/SKILL.md"))
         self.assertEqual(len(shipped), 8)
         for path in shipped:
@@ -465,6 +559,27 @@ class CheckerProfileMilestoneATests(unittest.TestCase):
                 result = CHECKER.parse_asset(path)
                 self.assert_no_errors(result)
                 self.assertIsNotNone(result.ir)
+
+        templates = (
+            ("en", ROOT / "skills/define-alps/references/SKILL-template.md", "Example"),
+            ("ja", ROOT / "skills/define-alps/references/locales/ja/SKILL-template.md", "例"),
+        )
+        with _temp_root() as root:
+            for locale, path, replacement in templates:
+                with self.subTest(template=locale):
+                    source = path.read_text(encoding="utf-8")
+                    self.assertIn("alps-markdown/v1", source)
+                    self.assertNotIn('description: "', source)
+                    fenced = source.split("```markdown\n", 1)[1].split("\n```", 1)[0] + "\n"
+                    fenced = fenced.replace(
+                        "name: <lowercase-hyphen-name>", "name: template-process"
+                    )
+                    materialized = re.sub(r"<[^>\n]+>", replacement, fenced)
+                    parsed = CHECKER.parse_asset(
+                        _write(root, f"template-{locale}.md", materialized), locale
+                    )
+                    self.assert_no_errors(parsed)
+                    self.assertEqual(parsed.ir.kind, "process")
 
         original = os.getcwd()
         try:
@@ -475,7 +590,7 @@ class CheckerProfileMilestoneATests(unittest.TestCase):
                     with redirect_stdout(stdout), redirect_stderr(stderr):
                         status = CHECKER.main(list(args))
                     self.assertEqual(status, 0, stderr.getvalue())
-                    self.assertIn("PROFILE_VERSION=alps-repository-checker/v1", stdout.getvalue())
+                    self.assertIn("PROFILE_VERSION=alps-markdown/v1", stdout.getvalue())
                     self.assertIn("not an ALPS Conformance claim", stdout.getvalue())
         finally:
             os.chdir(original)
@@ -733,7 +848,7 @@ class CheckerProfileMilestoneATests(unittest.TestCase):
             self.assertNotIn("internal", _classes(checked))
 
 
-class CheckerProfileMilestoneBTests(unittest.TestCase):
+class AlpsMarkdownProfileMilestoneBTests(unittest.TestCase):
     @staticmethod
     def _roots(root: Path, qualified: bool = False) -> dict[str, Path]:
         return {"mashimashica/alps": root} if qualified else {"": root}
@@ -768,7 +883,7 @@ class CheckerProfileMilestoneBTests(unittest.TestCase):
     @staticmethod
     def _check(root: Path, relative: str, content: str, *, qualified: bool = False, package_id: str | None = None):
         path = _write(root, relative, content)
-        return CHECKER.check_document(path, CheckerProfileMilestoneBTests._roots(root, qualified), package_id)
+        return CHECKER.check_document(path, AlpsMarkdownProfileMilestoneBTests._roots(root, qualified), package_id)
 
     @staticmethod
     def _reference_body(locale: str = "en", *, reversed_relationship: bool = False) -> str:
@@ -982,20 +1097,26 @@ class CheckerProfileMilestoneBTests(unittest.TestCase):
             self.assertEqual(warnings, [])
 
 
-class CheckerProfileMilestoneCTests(unittest.TestCase):
+class AlpsMarkdownProfileMilestoneCTests(unittest.TestCase):
     def assert_no_errors(self, result) -> None:
         errors = [item.render() for item in result.diagnostics if item.severity is Severity.ERROR]
         self.assertEqual(errors, [], "\n".join(errors))
 
     def test_process_view_sources_inclusions_and_locale_matrices(self) -> None:
-        helper = CheckerProfileMilestoneBTests
+        helper = AlpsMarkdownProfileMilestoneBTests
         with _temp_root() as root:
             helper._write_targets(root)
             valid = helper._check(root, "view.md", _asset("view", "process-view", "en", _view_body()))
             self.assert_no_errors(valid)
 
+            one_source = _view_body().replace("| Beta | `skill:#beta` |\n", "").replace(
+                "| Beta (`skill:#beta`) | Task: Record |\n", ""
+            )
+            self.assert_no_errors(
+                helper._check(root, "view-one-source.md", _asset("view", "process-view", "en", one_source))
+            )
+
             cases = (
-                ("one-source", _view_body().replace("| Beta | `skill:#beta` |\n", "").replace("| Beta (`skill:#beta`) | Task: Record |\n", ""), "source-count"),
                 ("duplicate-source", _view_body().replace("| Beta | `skill:#beta` |", "| Alpha | `skill:#alpha` |"), "source-duplicate"),
                 ("empty-source-reference", _view_body().replace("| Beta | `skill:#beta` |", "| Beta | |"), "malformed-reference"),
                 ("multiple-source-references", _view_body().replace("| Beta | `skill:#beta` |", "| Beta | `skill:#beta` `skill:#alpha` |"), "malformed-reference"),
@@ -1040,7 +1161,7 @@ class CheckerProfileMilestoneCTests(unittest.TestCase):
                     self.assertTrue(any(expected in item for item in pair_errors), pair_errors)
 
     def test_resolved_identity_duplicates_and_locale_context(self) -> None:
-        helper = CheckerProfileMilestoneBTests
+        helper = AlpsMarkdownProfileMilestoneBTests
         package = "mashimashica/alps"
 
         with _temp_root() as root:
@@ -1105,7 +1226,6 @@ class CheckerProfileMilestoneCTests(unittest.TestCase):
                 package_id=package,
             )
             self.assertIn("source-duplicate", _codes(duplicate_view))
-            self.assertIn("source-count", _codes(duplicate_view))
 
         with _temp_root() as root:
             _write(
@@ -1192,7 +1312,7 @@ class CheckerProfileMilestoneCTests(unittest.TestCase):
             self.assertTrue(any("process-outcome-reference-mismatch" in item for item in different_errors))
 
     def test_cli_passes_configured_package_identity_to_locale_comparison(self) -> None:
-        helper = CheckerProfileMilestoneBTests
+        helper = AlpsMarkdownProfileMilestoneBTests
         package = "mashimashica/alps"
         with _temp_root() as root:
             helper._write_targets(root, japanese=False)
@@ -1222,10 +1342,10 @@ class CheckerProfileMilestoneCTests(unittest.TestCase):
                 os.chdir(previous)
             self.assertTrue(model_ja.is_file())
             self.assertEqual(status, 0, errors.getvalue())
-            self.assertIn("PROFILE_VERSION=alps-repository-checker/v1", output.getvalue())
+            self.assertIn("PROFILE_VERSION=alps-markdown/v1", output.getvalue())
 
     def test_canonical_reference_resolution_and_package_containment(self) -> None:
-        helper = CheckerProfileMilestoneBTests
+        helper = AlpsMarkdownProfileMilestoneBTests
         with _temp_root() as root:
             helper._write_targets(root)
             local = helper._check(root, "local-model.md", _asset("model", "process-model", "en", _model_body()))
@@ -1314,9 +1434,9 @@ class CheckerProfileMilestoneCTests(unittest.TestCase):
     def test_ir_only_validator_locale_guard_parse_once_and_serialized_contract(self) -> None:
         import inspect
         from unittest import mock
-        import alps_check.checker as checker_module
-        import alps_check.locale_compare as locale_compare
-        import alps_check.validators as validators
+        import alps_markdown.checker as checker_module
+        import alps_markdown.locale_compare as locale_compare
+        import alps_markdown.validators as validators
 
         for function in (CHECKER.validate_ir, validators.validate_ir, locale_compare.compare_locale_ir):
             with self.subTest(function=function.__module__ + "." + function.__name__):
@@ -1350,7 +1470,7 @@ class CheckerProfileMilestoneCTests(unittest.TestCase):
 
     def test_cli_shares_parse_cache_across_top_level_and_referenced_assets(self) -> None:
         from unittest import mock
-        import alps_check.checker as checker_module
+        import alps_markdown.checker as checker_module
 
         with _temp_root() as root:
             process = _write(
@@ -1431,7 +1551,7 @@ class CheckerProfileMilestoneCTests(unittest.TestCase):
             self.assertEqual(parse_mock.call_count, len(expected))
 
     def test_locale_pair_frontmatter_process_model_reference_and_view_contracts(self) -> None:
-        helper = CheckerProfileMilestoneBTests
+        helper = AlpsMarkdownProfileMilestoneBTests
         en_outcomes = ("Outcome one `skill:#alpha`.", "Outcome two `skill:#beta`.")
         en_tasks = ("The agent must inspect `skill:#alpha`.", "The agent should review `skill:#beta`.")
         ja_outcomes = ("成果一 `skill:#alpha`。", "成果二 `skill:#beta`。")
@@ -1495,6 +1615,24 @@ class CheckerProfileMilestoneCTests(unittest.TestCase):
         errors, _ = pair(view_en, changed_view_ja, en_kind="process-view", ja_kind="process-view")
         self.assertTrue(any("view-outcome-identity-mismatch" in item for item in errors), errors)
 
+        local_view_en = _local_view_body("en")
+        local_view_ja = _local_view_body("ja")
+        errors, warnings = pair(
+            local_view_en,
+            local_view_ja,
+            en_kind="process-view",
+            ja_kind="process-view",
+        )
+        self.assertEqual((errors, warnings), ([], []))
+        changed_local_view_ja = local_view_ja.replace("確認する必要がある", "確認するのが望ましい")
+        errors, _ = pair(
+            local_view_en,
+            changed_local_view_ja,
+            en_kind="process-view",
+            ja_kind="process-view",
+        )
+        self.assertTrue(any("view-task-normative-class-mismatch" in item for item in errors), errors)
+
         empty_model_en = model_en.replace("| Alpha | `skill:#alpha` |", "| Alpha | |").replace("| Beta | `skill:#beta` |", "| Beta | |")
         empty_model_ja = model_ja.replace("| アルファ | `skill:#alpha` |", "| アルファ | |").replace("| ベータ | `skill:#beta` |", "| ベータ | |")
         errors, warnings = pair(empty_model_en, empty_model_ja, en_kind="process-model", ja_kind="process-model")
@@ -1504,7 +1642,7 @@ class CheckerProfileMilestoneCTests(unittest.TestCase):
 
     def test_cli_exit_statuses_version_warning_success_and_no_conformance_claim(self) -> None:
         from unittest import mock
-        import alps_check.cli as cli_module
+        import alps_markdown.cli as cli_module
 
         def run(root: Path, argv: list[str]):
             previous = Path.cwd()
@@ -1518,7 +1656,7 @@ class CheckerProfileMilestoneCTests(unittest.TestCase):
             return status, output.getvalue(), errors.getvalue()
 
         with _temp_root() as root:
-            helper = CheckerProfileMilestoneBTests
+            helper = AlpsMarkdownProfileMilestoneBTests
             helper._write_targets(root, japanese=True)
             model = _model_body().replace("| Alpha | `skill:#alpha` |", "| Alpha | |")
             model = model.replace("| Beta | |", "| Beta | |")
@@ -1660,8 +1798,8 @@ class CheckerProfileMilestoneCTests(unittest.TestCase):
 
     def test_exact_and_plus_one_resource_limits_records_and_container_state_bound(self) -> None:
         from unittest import mock
-        from alps_check import markdown_profile
-        from alps_check.model import (
+        from alps_markdown import markdown_profile
+        from alps_markdown.model import (
             MAX_ACTIVE_CONTAINER_STATES,
             MAX_FRONTMATTER_BYTES,
             MAX_INPUT_BYTES,
@@ -1879,7 +2017,7 @@ Bounded reference entries.
             self.assertIn("state-limit", tuple(item.code for item in limited))
 
     def test_diagnostic_class_whitelist_and_profile_version_serialization_contract(self) -> None:
-        from alps_check import locale_compare
+        from alps_markdown import locale_compare
 
         allowed = frozenset(
             {
@@ -1926,7 +2064,7 @@ Bounded reference entries.
             }
             encoded = json.dumps(contract, ensure_ascii=False, sort_keys=True)
             decoded = json.loads(encoded)
-            self.assertEqual(decoded["profile_version"], "alps-repository-checker/v1")
+            self.assertEqual(decoded["profile_version"], "alps-markdown/v1")
             self.assertEqual(decoded["ir"]["kind"], "process")
             self.assertIn("sections", decoded["ir"])
 

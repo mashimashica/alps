@@ -1,13 +1,13 @@
-# Representative Template for an ALPS-Conformant `SKILL.md`
+# Representative Process Template for an ALPS-Conformant `SKILL.md`
 
-This material is an informative example for drafting a readable Skill Description. It does not require a physical split between the discovery layer and execution layer. It does not require particular headings, order, clause numbers, or identifiers. Give precedence to the Process Framework, ALPS, and the rules of the applicable execution environment.
+This material is an informative example for drafting a readable Process Description. After its placeholders are replaced with plain text, the concrete Markdown and frontmatter form is compatible with the [`alps-markdown/v1`](../../../spec/alps-markdown.md) Environment Binding. That compatibility does not make this physical form, its headings, or its order an ALPS requirement. This template does not require a physical split between the discovery layer and execution layer. Give precedence to the Process Framework, ALPS, and the rules of the applicable execution environment.
 
 ## Template
 
 ```markdown
 ---
 name: <lowercase-hyphen-name>
-description: "<Briefly state what the Skill does, when to use it, and, if needed, when not to use it> ALPS-conformant."
+description: <Briefly state what the Skill does, when to use it, and, if needed, when not to use it> ALPS-conformant.
 ---
 
 # <Short Noun-Phrase Skill Name>
@@ -90,6 +90,7 @@ This section is reference information and has no normative force.
 
 ## Notes on Use
 
+- Use this example for a Process Description. Apply the kind-specific ALPS requirements and Environment Binding profile when representing a Process Model, Process Reference Model, or Process View.
 - Retain Name, Purpose, and Outcomes as mandatory elements. Other sections should be included according to the Purpose and required level of detail.
 - Distinguish the first sentence of the Purpose from subsequent reference explanation. Do not add to or change the Purpose through the reference explanation.
 - Write each Outcome as a condition in which a result is established, not as the creation of an Output.

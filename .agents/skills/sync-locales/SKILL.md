@@ -106,7 +106,7 @@ This Activity aligns the supported locale when requested and makes comparison li
 - Bilingual ALPS and Process Framework expertise.
 - Locale-aware comparison, search, and change-review capabilities.
 - Existing English/Japanese reference, template, binding, and guidance assets.
-- Structural and semantic preflight capabilities, including the packaged ALPS checker.
+- Structural and semantic preflight capabilities, including the ALPS Markdown profile checker bundled with `review-alps`.
 
 ## Conformance
 

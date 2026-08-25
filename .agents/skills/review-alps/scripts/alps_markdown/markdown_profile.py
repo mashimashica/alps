@@ -93,16 +93,16 @@ _SECTION_ORDER = {
         "conformance", "bundled",
     ),
     "process-view": (
-        "purpose", "outcomes", "source", "included", "application",
+        "purpose", "outcomes", "activities", "source", "included", "application",
         "conformance", "bundled",
     ),
 }
 
 _REQUIRED_SECTIONS = {
-    "process": frozenset(("purpose", "outcomes", "activities")),
+    "process": frozenset(("purpose", "outcomes")),
     "process-model": frozenset(("purpose", "processes", "relationships")),
     "process-reference-model": frozenset(("purpose", "processes", "relationships")),
-    "process-view": frozenset(("purpose", "outcomes", "source", "included", "application")),
+    "process-view": frozenset(("purpose", "outcomes", "application")),
 }
 
 _TABLE_HEADERS = {
@@ -1366,6 +1366,7 @@ def _extract_process_view(
 ) -> tuple[
     str | None,
     tuple[OutcomeIR, ...],
+    tuple[ActivityIR, ...],
     tuple[ApplicationIR, ...],
     tuple[SourceProcessIR, ...],
     tuple[IncludedActivityTaskIR, ...],
@@ -1389,6 +1390,11 @@ def _extract_process_view(
     if "outcomes" in blocks:
         outcomes, outcome_diagnostics = _parse_outcomes(path, blocks["outcomes"])
         diagnostics.extend(outcome_diagnostics)
+
+    activities: tuple[ActivityIR, ...] = ()
+    if "activities" in blocks:
+        activities, activity_diagnostics = _parse_activities(path, blocks["activities"])
+        diagnostics.extend(activity_diagnostics)
 
     applications: tuple[ApplicationIR, ...] = ()
     if "application" in blocks:
@@ -1424,9 +1430,9 @@ def _extract_process_view(
                     references.append(reference)
                 if len(sources) < MAX_RECORDS_PER_SECTION:
                     sources.append(source)
-        if len(source_by_name) < 2:
+        if table is not None and not sources:
             diagnostics.append(
-                _diagnostic(path, "source-count", "Process View requires at least two distinct Source Processes", table.line if table else None, class_name="semantic")
+                _diagnostic(path, "source-empty", "Source Processes requires at least one data row", table.line, class_name="profile-structure")
             )
 
     included: list[IncludedActivityTaskIR] = []
@@ -1500,8 +1506,11 @@ def _extract_process_view(
         references.extend(application.references)
     for outcome in outcomes:
         references.extend(outcome.references)
+    for activity in activities:
+        for task in activity.tasks:
+            references.extend(task.references)
     references.extend(
-        _non_machine_references(blocks, frozenset(("outcomes", "source", "included")))
+        _non_machine_references(blocks, frozenset(("outcomes", "activities", "source", "included")))
     )
     references = list(_unique_document_references(references))
     if len(references) > MAX_RECORDS_PER_SECTION:
@@ -1518,6 +1527,7 @@ def _extract_process_view(
     return (
         purpose,
         outcomes,
+        activities,
         applications,
         tuple(sources),
         tuple(included),
@@ -2023,6 +2033,7 @@ def parse_markdown(
             (
                 purpose,
                 outcomes,
+                activities,
                 application,
                 source_processes,
                 included_activities_tasks,

@@ -31,7 +31,7 @@ The four distributed Agent Skill representations appear under `.agents/skills/` 
 
 Repository-development Skills live as real directories under `.agents/skills/`:
 
-- `review-alps` reviews changes across the Process Framework, ALPS Specification, ALPS Reference Model, reference Processes, checker behavior, record bindings, locale counterparts, and the complete change diff.
+- `review-alps` reviews changes across the Process Framework, ALPS Specification, ALPS Reference Model, reference Processes, ALPS Markdown profile behavior, record bindings, locale counterparts, and the complete change diff.
 - `sync-locales` checks semantic equivalence and update coverage between authoritative English assets and supported Japanese counterparts.
 
 These repository-development Skills are not registered, exposed, or discovered as distributed Plugin Skills. They can still be present as ordinary files in a repository checkout or package archive.
@@ -43,7 +43,7 @@ Add another repository-development Skill only after a repeated task has emerged 
 - Keep one source of truth for each information item and use relative links from consumers.
 - Inspect repository state before editing and preserve unrelated or user changes.
 - Use `sync-locales` whenever English or Japanese paired assets change.
-- Use `review-alps` whenever a change can affect semantics across the PF, ALPS Specification, ALPS Reference Model, reference Processes, checker, bindings, or locales.
+- Use `review-alps` whenever a change can affect semantics across the PF, ALPS Specification, ALPS Reference Model, reference Processes, ALPS Markdown profile, bindings, or locales.
 - Follow the applicable Skill validation requirements. At minimum, check whitespace, changed relative links, canonical references, locale counterparts, and the complete task-owned diff.
-- Treat `skills/define-alps/scripts/check_alps_asset.py` as a structural and semantic preflight for the repository's Markdown Agent Skill representation. It does not by itself determine ALPS Conformance.
+- Treat `.agents/skills/review-alps/scripts/validate_alps_markdown.py` as the `review-alps` Application Enabler for validating the [`alps-markdown/v1`](spec/alps-markdown.md) Environment Binding. It does not by itself determine ALPS Conformance.
 - Do not commit, push, publish, open or update a pull request, or make another external change unless the user requests it.

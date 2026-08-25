@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CLI entry point for ALPS Repository Checker Profile v1."""
+"""CLI entry point for ALPS Markdown Profile v1."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ SCRIPT_DIRECTORY = Path(__file__).resolve().parent
 if str(SCRIPT_DIRECTORY) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIRECTORY))
 
-from alps_check import (  # noqa: E402,F401
+from alps_markdown import (  # noqa: E402,F401
     PROFILE_VERSION,
     Diagnostic,
     DocumentIR,

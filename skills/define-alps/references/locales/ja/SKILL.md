@@ -125,7 +125,6 @@ description: ALPS表現のニーズを識別し、プロセス記述、プロセ
 - 管理されたALPS表現および変更履歴
 - 起草、比較、検索、解決および試行を支援するエージェントまたはツール
 - 独立レビュー能力
-- `skills/define-alps/scripts/check_alps_asset.py`による機械的事前検査
 
 ## 適合
 
@@ -148,7 +147,10 @@ description: ALPS表現のニーズを識別し、プロセス記述、プロセ
 ## 同梱資源
 
 - 本書は英語版`SKILL.md`の日本語版である。内容が矛盾する場合は英語版を優先する。
-- [SKILL-template.md](../../SKILL-template.md)、[skill-package-format.md](../../skill-package-format.md)および[record-templates.md](../../record-templates.md)は参考補助資産であり、ALPSまたはプロセスフレームワークを上書きしない。
+- [SKILL-template.md](../../SKILL-template.md)は、具体的な形式が`alps-markdown/v1`と互換性を持つ、プロセス記述用の参考出力作成資源である。
+- [record-templates.md](../../record-templates.md)は、定義記録および検証記録用の参考出力作成資源である。
+- [skill-package-format.md](../../skill-package-format.md)は、スキルパッケージの論理的な資源役割を識別するための参考情報である。
+- これらの資源はALPSまたはプロセスフレームワークを上書きしない。機械的なプロファイル検証は、Define ALPS自体ではなく、適用される環境への対応付けまたはレビュープロセスが提供する。
 
 ## 一般的な進め方
 
