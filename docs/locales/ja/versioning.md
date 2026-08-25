@@ -1,7 +1,7 @@
 # バージョン管理
 
 <p align="right">
-  <a href="../versioning.md">英語</a> | <strong>日本語</strong>
+  <a href="../../versioning.md">英語</a> | <strong>日本語</strong>
 </p>
 
 ALPSは、`MAJOR.MINOR.PATCH`形式の版番号を用い、リポジトリ全体を一つのリリース単位として扱います。
@@ -46,7 +46,7 @@ ALPSのリリースには、プロセスフレームワーク、ALPS仕様、参
 
 公開したタグは不変とします。公開済みのタグを移動したり、異なる内容に再利用したりしません。ALPSの資産を別のリポジトリへ同期する利用者は、タグとコミットSHAの両方を固定します。
 
-`main`ブランチは、継続中の開発を表します。まだリリースへ割り当てていない変更は、[CHANGELOG.md](../../CHANGELOG.md)の`Unreleased`へ記録します。
+`main`ブランチは、継続中の開発を表します。まだリリースへ割り当てていない変更は、[CHANGELOG.md](../../../CHANGELOG.md)の`Unreleased`へ記録します。
 
 ## リリース手順
 

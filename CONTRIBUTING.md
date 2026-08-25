@@ -1,7 +1,7 @@
 # Contributing to ALPS
 
 <p align="right">
-  <strong>English</strong> | <a href="docs/ja/CONTRIBUTING.md">Japanese</a>
+  <strong>English</strong> | <a href="docs/locales/ja/CONTRIBUTING.md">Japanese</a>
 </p>
 
 Thank you for contributing to ALPS. Contributions are accepted under the repository license and the Developer Certificate of Origin 1.1 (DCO).

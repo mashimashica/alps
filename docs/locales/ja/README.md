@@ -1,11 +1,11 @@
 # ALPS — エージェントライフサイクルプロセススキル
 
 <p align="right">
-  <a href="../../README.md">英語</a> | <strong>日本語</strong>
+  <a href="../../../README.md">英語</a> | <strong>日本語</strong>
 </p>
 
 <p align="center">
-  <img src="../../assets/icon.svg" alt="ALPSアイコン" width="160">
+  <img src="../../../assets/icon.svg" alt="ALPSアイコン" width="160">
 </p>
 
 <p align="center">
@@ -97,7 +97,7 @@ flowchart LR
     MANAGE -->|"再定義・再検証要求"| DEFINE
 ```
 
-正本となるプロセス参照モデルは[`skills/alps-reference-model/SKILL.md`](../../skills/alps-reference-model/SKILL.md)として収録します。そこに三つの参照プロセスの名称、目的、成果を保持し、正本となる各プロセス記述との一致を機械的に検査できます。
+正本となるプロセス参照モデルは[`skills/alps-reference-model/SKILL.md`](../../../skills/alps-reference-model/SKILL.md)として収録します。そこに三つの参照プロセスの名称、目的、成果を保持し、正本となる各プロセス記述との一致を機械的に検査できます。
 
 ## 表現種別
 
@@ -135,7 +135,7 @@ ALPSは、一般的な記述で混同されやすい問いを区別します。
 
 ## プロセスフレームワーク
 
-[プロセスフレームワーク](../../spec/process-framework.md)は、ALPSが用いる再利用可能な語彙と意味を定義します。プロセス記述には、名称、目的および成果が必要です。活動とタスクは作業内容であり、実装手順ではありません。入力は出力へ変換される項目です。人、エージェント、ツールおよび実行環境は、入力ではなく資源または実行支援要素です。
+[プロセスフレームワーク](../../../spec/process-framework.md)は、ALPSが用いる再利用可能な語彙と意味を定義します。プロセス記述には、名称、目的および成果が必要です。活動とタスクは作業内容であり、実装手順ではありません。入力は出力へ変換される項目です。人、エージェント、ツールおよび実行環境は、入力ではなく資源または実行支援要素です。
 
 フレームワークはプロセスモデル、プロセス参照モデル、プロセスビューも定義します。ALPSは、それらをエージェントスキルで表現する場合にも元の意味を保持します。
 
@@ -143,12 +143,12 @@ ALPSは、一般的な記述で混同されやすい問いを区別します。
 
 | 内容 | 英語 | 日本語 |
 | --- | --- | --- |
-| プロセスフレームワーク | [process-framework.md](../../spec/process-framework.md) | [process-framework.md](../../spec/locales/ja/process-framework.md) |
-| ALPS仕様 | [ALPS-SPEC.md](../../spec/ALPS-SPEC.md) | [ALPS-SPEC.md](../../spec/locales/ja/ALPS-SPEC.md) |
-| `alps-reference-model` — プロセス参照モデル | [SKILL.md](../../skills/alps-reference-model/SKILL.md) | [SKILL.md](../../skills/alps-reference-model/references/locales/ja/SKILL.md) |
-| `define-alps` — Define ALPSプロセス | [SKILL.md](../../skills/define-alps/SKILL.md) | [SKILL.md](../../skills/define-alps/references/locales/ja/SKILL.md) |
-| `apply-alps` — Apply ALPSプロセス | [SKILL.md](../../skills/apply-alps/SKILL.md) | [SKILL.md](../../skills/apply-alps/references/locales/ja/SKILL.md) |
-| `manage-alps` — Manage ALPSプロセス | [SKILL.md](../../skills/manage-alps/SKILL.md) | [SKILL.md](../../skills/manage-alps/references/locales/ja/SKILL.md) |
+| プロセスフレームワーク | [process-framework.md](../../../spec/process-framework.md) | [process-framework.md](../../../spec/locales/ja/process-framework.md) |
+| ALPS仕様 | [ALPS-SPEC.md](../../../spec/ALPS-SPEC.md) | [ALPS-SPEC.md](../../../spec/locales/ja/ALPS-SPEC.md) |
+| `alps-reference-model` — プロセス参照モデル | [SKILL.md](../../../skills/alps-reference-model/SKILL.md) | [SKILL.md](../../../skills/alps-reference-model/references/locales/ja/SKILL.md) |
+| `define-alps` — Define ALPSプロセス | [SKILL.md](../../../skills/define-alps/SKILL.md) | [SKILL.md](../../../skills/define-alps/references/locales/ja/SKILL.md) |
+| `apply-alps` — Apply ALPSプロセス | [SKILL.md](../../../skills/apply-alps/SKILL.md) | [SKILL.md](../../../skills/apply-alps/references/locales/ja/SKILL.md) |
+| `manage-alps` — Manage ALPSプロセス | [SKILL.md](../../../skills/manage-alps/SKILL.md) | [SKILL.md](../../../skills/manage-alps/references/locales/ja/SKILL.md) |
 
 ## 検証
 
@@ -158,8 +158,8 @@ ALPSは、一般的な記述で混同されやすい問いを区別します。
 
 ## バージョン管理
 
-ALPSはリポジトリ全体を一つのリリース単位として版管理します。現在の版は**0.3.0**であり、初期開発段階にあります。正確なリリース内容はGitタグとコミットで特定します。[CHANGELOG.md](../../CHANGELOG.md)および[バージョン管理](versioning.md)を参照してください。
+ALPSはリポジトリ全体を一つのリリース単位として版管理します。現在の版は**0.3.0**であり、初期開発段階にあります。正確なリリース内容はGitタグとコミットで特定します。[CHANGELOG.md](../../../CHANGELOG.md)および[バージョン管理](versioning.md)を参照してください。
 
 ## ライセンスと再利用
 
-明示した第三者資料を除き、本リポジトリには[Apache License 2.0](../../LICENSE)を適用します。[NOTICE](../../NOTICE)も参照してください。
+明示した第三者資料を除き、本リポジトリには[Apache License 2.0](../../../LICENSE)を適用します。[NOTICE](../../../NOTICE)も参照してください。

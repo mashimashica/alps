@@ -31,7 +31,7 @@ This Activity establishes which assets are authoritative, supported, and in scop
 2. The corresponding English and Japanese assets for each changed specification, reference Process, guidance, template, binding, or related paired asset must be identified.
 3. `spec/*.md` and `spec/locales/ja/*.md` pairs must be considered when specification assets change.
 4. `skills/*/SKILL.md` and existing `skills/*/references/locales/ja/SKILL.md` pairs must be considered when distributed Skill assets change.
-5. Paired repository guidance such as `README.md` / `docs/ja/README.md` and `AGENTS.md` / `docs/ja/AGENTS.md` must be considered when those assets change.
+5. Paired repository guidance such as `README.md` / `docs/locales/ja/README.md` and `AGENTS.md` / `docs/locales/ja/AGENTS.md` must be considered when those assets change.
 6. Repository-development Skills under `.agents/skills/` must be excluded from Plugin locale scope unless localized counterparts are deliberately introduced.
 
 ### Semantic Equivalence Assessment

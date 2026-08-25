@@ -1,7 +1,7 @@
 # Versioning
 
 <p align="right">
-  <strong>English</strong> | <a href="ja/versioning.md">Japanese</a>
+  <strong>English</strong> | <a href="locales/ja/versioning.md">Japanese</a>
 </p>
 
 ALPS uses version numbers in `MAJOR.MINOR.PATCH` form and releases the repository as one versioned unit.
