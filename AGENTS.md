@@ -1,6 +1,6 @@
 # AGENTS.md
 
-[Japanese translation](docs/ja/AGENTS.md)
+[Japanese translation](docs/locales/ja/AGENTS.md)
 
 ## ALPS
 

@@ -1,6 +1,6 @@
 # AGENTS.md
 
-[英語版](../../AGENTS.md)
+[英語版](../../../AGENTS.md)
 
 ## ALPS
 

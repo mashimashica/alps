@@ -1,7 +1,7 @@
 # ALPS — Agent Lifecycle Process Skills
 
 <p align="right">
-  <strong>English</strong> | <a href="docs/ja/README.md">Japanese</a>
+  <strong>English</strong> | <a href="docs/locales/ja/README.md">Japanese</a>
 </p>
 
 <p align="center">
