@@ -1,4 +1,4 @@
-"""Command-line entry point for the ALPS repository checker."""
+"""Command-line entry point for the ALPS Markdown profile checker."""
 
 from __future__ import annotations
 
@@ -30,21 +30,21 @@ try:
     )
 except ImportError:  # pragma: no cover - supports direct script execution.
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-    from alps_check.checker import (  # type: ignore
+    from alps_markdown.checker import (  # type: ignore
         english_counterpart,
         japanese_counterpart,
         locale_for,
         check_document,
     )
-    from alps_check.locale_compare import compare_locale_ir  # type: ignore
-    from alps_check.model import (  # type: ignore
+    from alps_markdown.locale_compare import compare_locale_ir  # type: ignore
+    from alps_markdown.model import (  # type: ignore
         CheckResult,
         Diagnostic,
         PROFILE_VERSION,
         Severity,
         deterministic_diagnostics,
     )
-    from alps_check.reference_profile import (  # type: ignore
+    from alps_markdown.reference_profile import (  # type: ignore
         PackageRootConfig,
         containing_package_identity,
         package_roots,
@@ -154,7 +154,7 @@ def _status(diagnostics: tuple[Diagnostic, ...]) -> int:
 
 
 def _run(argv: list[str] | None) -> int:
-    parser = argparse.ArgumentParser(prog="alps-check")
+    parser = argparse.ArgumentParser(prog="alps-markdown")
     parser.add_argument("paths", nargs="*", type=Path)
     parser.add_argument("--root", type=Path)
     parser.add_argument("--package-id")
@@ -258,7 +258,7 @@ def _run(argv: list[str] | None) -> int:
     status = _status(ordered)
     if status == 0:
         print(f"PROFILE_VERSION={PROFILE_VERSION}")
-        print("Valid under the repository profile only; this is not an ALPS Conformance claim.")
+        print("Valid under ALPS Markdown Profile v1 only; this is not an ALPS Conformance claim.")
     return status
 
 

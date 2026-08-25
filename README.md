@@ -152,9 +152,9 @@ The Framework also defines Process Model, Process Reference Model, and Process V
 
 ## Validation
 
-`skills/define-alps/scripts/check_alps_asset.py` dispatches checks by representation kind. For a Process Reference Model, it resolves referenced Process Skills and compares Name, Purpose, and Outcomes with the authoritative Process Descriptions. External package references can be mapped explicitly with `--package-root`.
+The [`alps-markdown/v1`](spec/alps-markdown.md) Environment Binding defines the bounded Markdown/frontmatter representation used by the repository. Its profile checker, `.agents/skills/review-alps/scripts/validate_alps_markdown.py`, is an Application Enabler of the repository-development `review-alps` Process. It dispatches checks by representation kind. For a Process Reference Model, it resolves referenced Process Skills and compares Name, Purpose, and Outcomes with the authoritative Process Descriptions. External package references can be mapped explicitly with `--package-root`.
 
-Mechanical checks support review; they do not by themselves establish Outcome achievement or Process execution conformance.
+Mechanical profile checks support review; they do not by themselves establish ALPS Conformance, Outcome achievement, or Process execution conformance.
 
 ## Versioning
 

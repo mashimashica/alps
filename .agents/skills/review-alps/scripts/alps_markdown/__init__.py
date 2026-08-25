@@ -1,4 +1,4 @@
-"""Public ALPS repository checker API."""
+"""Public API for the ALPS Markdown profile checker."""
 
 from .model import (
     ActivityIR,

@@ -299,9 +299,6 @@ def validate_ir(ir: DocumentIR, configured_roots, *, current_package_id: str | N
             if comparable and source.name != target.h1_title:
                 diagnostics.append(_diag(ir, "source-display",
                     "Source Process display name must equal the target H1", line=source.line, reference=ref))
-        if len(sources) < 2 or len(resolved_identities) < 2:
-            diagnostics.append(_diag(ir, "source-count",
-                "Process View requires at least two distinct Source Processes"))
         included_keys = set()
         for inclusion in inclusions:
             ref = inclusion.source_reference

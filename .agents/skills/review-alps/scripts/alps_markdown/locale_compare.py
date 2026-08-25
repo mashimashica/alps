@@ -325,6 +325,16 @@ def _view(
                  left.source_display if lk is None else None, right.source_display if rk is None else None,
                  ll, rl, "view-included-source-reference-mismatch", f"included source {index + 1}", ls, rs,
                  left.source_reference, right.source_reference)
+    _count(out, english, japanese, english.activities, japanese.activities,
+           "view-activity-count-mismatch", "view-local activity")
+    for activity_index, (left, right) in enumerate(zip(english.activities, japanese.activities)):
+        _count(out, english, japanese, left.tasks, right.tasks, "view-task-count-mismatch",
+               f"view-local task count for activity {activity_index + 1}")
+        for task_index, (l_task, r_task) in enumerate(zip(left.tasks, right.tasks)):
+            ll, ls, rl, rs = (*_loc(l_task), *_loc(r_task))
+            _scalar(out, english, japanese, l_task.normative_class, r_task.normative_class,
+                    ll, rl, "view-task-normative-class-mismatch", "missing-normative-class",
+                    f"normative class for view-local task {task_index + 1}", ls, rs)
 
 
 def _frontmatter(english: DocumentIR, japanese: DocumentIR, out: list[Diagnostic]) -> None:

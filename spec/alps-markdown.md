@@ -1,47 +1,48 @@
-# ALPS Repository Checker Profile v1
+# ALPS Markdown Profile v1
 
-Status: Ratified and implemented repository profile.  Profile identifier:
-`alps-repository-checker/v1`.
+Status: Ratified and implemented Environment Binding.  Profile identifier:
+`alps-markdown/v1`.
 
-This document defines the machine-checkable profile for this repository.  It
-does not define ALPS, Markdown, YAML, CommonMark, or GFM conformance.
+This document defines a machine-checkable Markdown Environment Binding for ALPS
+representations.  It does not define ALPS, Markdown, YAML, CommonMark, or GFM
+conformance, and ALPS does not require this physical representation.
 
 ## 1. Purpose and scope
 
-The checker validates a deliberately small representation of an ALPS repository
-asset.  It answers questions such as:
+An ALPS Markdown profile checker validates a deliberately small representation
+of an ALPS asset.  It answers questions such as:
 
-- Is the asset written in the repository's canonical frontmatter and Markdown
-  profile?
+- Is the asset written in the canonical frontmatter and Markdown profile?
 - Does its declared representation kind have the required semantic sections?
 - Do canonical Skill references resolve within the configured package roots?
 - Do an English asset and its Japanese counterpart describe the same semantic
   shape and stable identities?
 
-The profile covers `SKILL.md` representations in this repository, their canonical
-Skill references, and the English/Japanese locale pairing convention.  It is a
-repository-specific interchange profile, not a general-purpose document parser.
-Existing or future assets MAY be migrated to this storage profile; v1 does not
-grandfather unshipped model/view variants merely because an older parser accepted
-them.
+The profile covers `SKILL.md` representations serialized in this form, their
+canonical Skill references, and an optional English/Japanese locale comparison
+operation.  A repository or Host MAY adopt this profile as an Environment
+Binding.  It is not the only permissible ALPS representation and is not a
+general-purpose document parser.  Existing or future assets MAY be migrated to
+this storage profile; v1 does not grandfather model/view variants merely because
+an older parser accepted them.
 
 The following words are normative: **MUST** and **MUST NOT** state requirements;
 **SHOULD** and **SHOULD NOT** state recommendations; **MAY** states permission.
 
 ### Non-goals
 
-The checker MUST NOT claim that a document is ALPS-conformant, that a Process can
-achieve its Outcomes, or that a Process was executed.  It MUST NOT become a
-general YAML or CommonMark/GFM implementation.  Rendering, link checking,
+The profile checker MUST NOT claim that a document is ALPS-conformant, that a
+Process can achieve its Outcomes, or that a Process was executed.  It MUST NOT
+become a general YAML or CommonMark/GFM implementation.  Rendering, link checking,
 translation quality, arbitrary Markdown extensions, execution evidence, and
 external-service lookups are out of scope.
 
-## 2. Host syntax versus the repository profile
+## 2. Host syntax and profile boundary
 
 External Host or distribution tooling MAY validate generic YAML or Markdown if it
-wants to.  That tooling owns generic-language validity, and the checker MUST NOT
-depend on it or reproduce it.  The checker only reads bounded UTF-8 input and
-applies the repository profile below.
+wants to.  That tooling owns generic-language validity, and the profile checker
+MUST NOT depend on it or reproduce it.  The profile checker only reads bounded
+UTF-8 input and applies the binding below.
 
 The checker has one bounded profile extractor.  It recognizes only the delimiters,
 headings, lists, tables, containers, and reference spans needed by this profile,
@@ -56,10 +57,10 @@ kind is `process`.
 
 | Literal value | Representation | Required semantic center |
 | --- | --- | --- |
-| `process` | Process (default) | Name, Purpose, Outcomes, Activities and Tasks |
-| `process-model` | Process Model | Purpose, declared Processes, Relationships |
-| `process-reference-model` | Process Reference Model | Purpose, Process entries with Name/Purpose/Outcomes, Relationships |
-| `process-view` | Process View | Purpose, Outcomes, Source Processes, Included Activities and Tasks, Application |
+| `process` | Process (default) | Name, Purpose, Outcomes |
+| `process-model` | Process Model | Name, Purpose, declared Processes, Relationships |
+| `process-reference-model` | Process Reference Model | Name, Purpose, Process entries with Name/Purpose/Outcomes, Relationships |
+| `process-view` | Process View | Name, Purpose, Outcomes, Application; source provenance when source elements are referenced |
 
 No other kind is supported in v1.  A kind value is a literal profile value, not a
 request to infer a kind from headings or references.
@@ -94,8 +95,9 @@ For inspected fields (`name`, `description`, and `metadata.alps.kind`):
 - `name` MUST match `[a-z0-9]+(?:-[a-z0-9]+)*` and MUST be at most 63 characters.
 - `description` MUST be non-empty.  For a Process it MUST end in
   `ALPS-conformant.` in English or `ALPS準拠。` in Japanese.  Other kinds need
-  only a non-empty description.  This suffix is a repository discovery marker;
-  checking its literal presence does not substantiate the Conformance claim.
+  only a non-empty description.  These suffixes are the standardized short
+  Description Conformance claims defined by ALPS.  Checking their literal
+  presence verifies only this binding field; it does not substantiate the claim.
 - `metadata.alps.kind` MUST be one of the four literals in section 3.
 - Duplicate keys, empty values, inline comments in an inspected value, and
   continuation lines for an inspected value are unsupported profile syntax.
@@ -125,8 +127,9 @@ in section 10.
 There MUST be exactly one unindented ATX H1, written as `# ` followed by a
 non-empty title.  It MUST be at column zero, MUST NOT use a closing `#` sequence,
 and MUST NOT be Setext.  The separator after `#` is one literal ASCII space; a
-tab is unsupported profile syntax.  The title is display text and need not equal the
-lowercase frontmatter `name` or the translated title in a locale file.
+tab is unsupported profile syntax.  The title supplies the represented
+construct's display Name in this binding.  It need not equal the lowercase
+Host-facing frontmatter `name` or the translated title in a locale file.
 
 Profile section headings MUST be unindented ATX H2 lines with exact, locale-specific
 text.  They MUST NOT have closing markers, Setext underlines, leading spaces, or
@@ -164,7 +167,7 @@ After translating the heading names with the table above, the following order is
 normative.  Optional headings MAY be omitted, but a present heading MUST appear
 in this order and MUST NOT be duplicated:
 
-- Process: `Purpose`, `Outcomes`, `Activities & Tasks`, then optional `Inputs`,
+- Process: `Purpose`, `Outcomes`, optional `Activities & Tasks`, then optional `Inputs`,
   `Outputs`, `Entry Criteria`, `Exit Criteria`, `Controls`, `Constraints`,
   `Enablers`, `Conformance`, `Interfaces & Traceability`, `Shared Normative
   References`, `Bundled Resources`, and `Common Approach`.
@@ -172,8 +175,10 @@ in this order and MUST NOT be duplicated:
   `Application`, `Verification`, `Conformance`, and `Bundled Resources`.
 - Process Reference Model: `Purpose`, `Processes`, `Relationships`, then
   optional `Application`, `Verification`, `Conformance`, and `Bundled Resources`.
-- Process View: `Purpose`, `Outcomes`, `Source Processes`, `Included Activities
-  and Tasks`, `Application`, then optional `Conformance` and `Bundled Resources`.
+- Process View: `Purpose`, `Outcomes`, optional View-local `Activities & Tasks`,
+  optional `Source Processes`, optional `Included Activities and Tasks`,
+  `Application`, then optional `Conformance` and `Bundled Resources`.  A present
+  inclusion table requires the corresponding source declarations.
 
 Every profile H3 or H4 role heading MUST be an unindented ATX heading without a
 closing marker or Setext underline.  Its text is an exact localized heading when
@@ -201,8 +206,10 @@ H3 and H4 are structural only where a kind assigns them a role:
   Process entry.  Its next semantic headings MUST be exact H4 `Purpose`/`目的`
   followed by exact H4 `Outcomes`/`成果`; no other H4-H6 is permitted in the
   entry block.
-- In a Process View, `Source Processes` and `Included Activities and Tasks` are
-  tables; H3-H6 in those machine-bearing sections are unsupported profile syntax.
+- In a Process View, View-local `Activities & Tasks` use the same bounded H3 and
+  ordered-list form as a Process.  `Source Processes` and `Included Activities
+  and Tasks` are tables; H3-H6 in those table sections are unsupported profile
+  syntax.
 - H3-H6 in optional opaque sections never create profile records and are not
   interpreted by this checker.  They cannot satisfy or replace a required H2,
   Activity, Process entry, list, or table.
@@ -211,7 +218,7 @@ H3 and H4 are structural only where a kind assigns them a role:
 
 In a machine-bearing section, profile lists use only an unindented `- ` bullet
 for Outcomes or an unindented contiguous decimal list (`1. `, `2. `, ...) for
-Process Tasks.  A Task list MUST start at `1.` and increment by one for each
+Process or View-local Tasks.  A Task list MUST start at `1.` and increment by one for each
 item.  `*`, `+`, `1)`, arrow relationship items, Process Model Process lists,
 View non-table items, nested lists, and indented list containers are unsupported.
 A continuation line MUST begin with exactly three spaces and non-empty text; it
@@ -372,13 +379,14 @@ text remains text rather than being guessed as an English translation.
 
 ### Process
 
-The asset MUST contain non-empty `Purpose`, at least one `Outcome`, at least one
-Activity, and at least one Task under every Activity.  Outcomes MUST come only
-from the one unindented hyphen list; introductory prose is opaque, and an Outcome
-table or paragraph is not an alternative.  Each Activity block MAY begin with
-opaque prose but MUST contain exactly one unindented ordered Task list before the
-next H3; H4-H6, a second list, or a child heading in that machine-bearing section
-is an error.  Each Task MUST contain at least one recognizable normative marker
+The asset MUST contain non-empty `Purpose` and at least one `Outcome`.  Outcomes
+MUST come only from the one unindented hyphen list; introductory prose is opaque,
+and an Outcome table or paragraph is not an alternative.  `Activities & Tasks`
+is optional.  When present, it MUST contain at least one Activity, and each
+Activity block MAY begin with opaque prose but MUST contain exactly one
+unindented ordered Task list before the next H3.  H4-H6, a second list, or a child
+heading in that machine-bearing section is an error.  Each present Task MUST
+contain at least one recognizable normative marker
 (`must`, `must not`, `should`, `should not`, `may`, or `typically`, with the
 defined Japanese equivalents).  Markers are recognized as non-overlapping
 tokens.  If two markers begin at the same position, the longer negative form is
@@ -453,27 +461,31 @@ relationship table, as in the Process Model.
 
 ### Process View
 
-`Purpose`, `Outcomes`, `Source Processes`, `Included Activities and Tasks`, and
-`Application` are required and non-empty.  The Purpose and Application heading
-rules above apply to these required blocks: H3-H6 are diagnosed and never count
-as prose.  At least two distinct Source Processes
-MUST be declared by exactly one `Source Process | Reference` table.  Each row's
+`Purpose`, `Outcomes`, and `Application` are required and non-empty.  The Purpose
+and Application heading rules above apply to these required blocks: H3-H6 are
+diagnosed and never count as prose.  A View MAY contain View-local `Activities &
+Tasks`; when present, that section follows the Process Activity and Task grammar.
+
+`Source Processes` is optional.  When present, it MUST declare at least one
+Source Process in exactly one `Source Process | Reference` table.  Each row's
 Reference cell MUST contain exactly one single-backtick Skill reference that
 resolves to a Process; its Source Process cell is the display name and MUST agree
 with the target.  Source display names and reference identities MUST each be
-unique within the declaration table.
+unique within the declaration table.  This binding does not impose a minimum
+source count beyond the sources actually referenced; judging the View's
+cross-Process meaning remains an ALPS semantic review concern.
 
-The `Included Activities and Tasks` section MUST contain exactly one
-`Source Process | Source element` table.  Each row's Source Process cell MUST
-identify one declared source with exactly one single-backtick reference, and its
-Source element cell MUST start with exact `Activity: <label>` or `Task: <label>`
-(localized `活動: <label>` or `タスク: <label>`).  Non-table inclusions, multiple
-provenance tables, and mixed forms are unsupported.  An undeclared source,
-unresolved reference, missing kind prefix, or duplicate complete
-`(source identity, kind, label)` inclusion is an error.  Multiple distinct
-included elements MAY use the same declared Source Process.  The View's local
-Outcomes and Application are not silently treated as source Process Outcomes or
-execution.
+`Included Activities and Tasks` is optional.  When present, it MUST contain
+exactly one non-empty `Source Process | Source element` table.  Each row's Source
+Process cell MUST identify one declared source with exactly one single-backtick
+reference, and its Source element cell MUST start with exact `Activity: <label>`
+or `Task: <label>` (localized `活動: <label>` or `タスク: <label>`).  Non-table
+inclusions, multiple provenance tables, and mixed forms are unsupported.  An
+undeclared source, unresolved reference, missing kind prefix, or duplicate
+complete `(source identity, kind, label)` inclusion is an error.  Multiple
+distinct included elements MAY use the same declared Source Process.  The View's
+local Outcomes, Activities, Tasks, and Application are not silently treated as
+source Process content or execution.
 
 ## 8. Locale pairing and comparison
 
@@ -503,9 +515,10 @@ identity.
 - Process Reference Model: resolved Process identity/order, each resolved
   referenced semantic center, and resolved relationship provider/recipient
   identity/order.
-- Process View: resolved Outcome identity/order, resolved Source Process
-  identity/order, and Included Activity/Task kind and resolved source
-  identity/order.
+- Process View: resolved Outcome identity/order; View-local Activity count, Task
+  counts, and Task normative classes when present; resolved Source Process
+  identity/order; and Included Activity/Task kind and resolved source
+  identity/order when present.
 
 Localized prose, headings, and display labels are not required to be byte-equal.
 Missing or unstable identity produces a warning only when the profile can still
@@ -533,7 +546,7 @@ when one or more document/profile/semantic/locale errors occur; and `2` for
 checker invocation, configuration, unreadable-input, or internal failures that
 prevent a reliable document finding.  Unsupported profile syntax is a document
 error and therefore returns `1`.  Internal failures MUST return `2`.  A status of
-`0` means only “valid under ALPS Repository Checker Profile v1”; it is not an
+`0` means only “valid under ALPS Markdown Profile v1”; it is not an
 ALPS Conformance claim.
 
 ## 10. Architecture and resource limits
@@ -593,6 +606,20 @@ metadata:
 ---
 ```
 
+Accepted minimal Process Markdown body:
+
+```markdown
+# Example Process
+
+## Purpose
+
+Establish an example result.
+
+## Outcomes
+
+- The example result is available.
+```
+
 Accepted canonical relationship table:
 
 ```markdown
@@ -601,7 +628,7 @@ Accepted canonical relationship table:
 | Define ALPS | Evidence | Manage ALPS | Supports adoption. |
 ```
 
-Accepted canonical Process task structure:
+Accepted optional Process or View-local task structure:
 
 ```markdown
 ## Activities & Tasks
@@ -610,6 +637,30 @@ Accepted canonical Process task structure:
 
 1. The agent must inspect the input.
 2. The agent should record the result.
+```
+
+Accepted Process View with View-local work and no source inclusion:
+
+```markdown
+# Example View
+
+## Purpose
+
+Apply a concern across the selected context.
+
+## Outcomes
+
+- The concern is visible.
+
+## Activities & Tasks
+
+### Review
+
+1. The agent must review the concern.
+
+## Application
+
+Apply the View to the relevant Processes.
 ```
 
 Accepted canonical Process Model declarations:

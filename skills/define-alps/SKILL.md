@@ -123,7 +123,6 @@ Representative Outputs include the selected representation need and rationale, a
 - Managed ALPS representations and change history
 - Agents or tools supporting drafting, comparison, search, resolution, and trials
 - Independent review capability
-- Mechanical pre-checking with `skills/define-alps/scripts/check_alps_asset.py`
 
 ## Conformance
 
@@ -146,7 +145,10 @@ This Skill represents the Define ALPS Process and is assessed as a Process Descr
 ## Bundled Resources
 
 - This root `SKILL.md` is the authoritative English Process Description. For Japanese-language work, use the [Japanese localization](references/locales/ja/SKILL.md); if the localization conflicts with this file, this English description governs.
-- [SKILL-template.md](references/SKILL-template.md), [skill-package-format.md](references/skill-package-format.md), and [record-templates.md](references/record-templates.md) remain informative aids and must not override ALPS or the Process Framework.
+- [SKILL-template.md](references/SKILL-template.md) is an informative Process Description output-creation resource whose concrete form is compatible with `alps-markdown/v1`.
+- [record-templates.md](references/record-templates.md) is an informative output-creation resource for definition and verification records.
+- [skill-package-format.md](references/skill-package-format.md) is reference information for identifying logical Package resource roles.
+- These resources must not override ALPS or the Process Framework. Mechanical profile validation is supplied by the applicable Environment Binding or review Process, not by Define ALPS itself.
 
 ## Common Approach
 

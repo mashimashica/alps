@@ -1,4 +1,4 @@
-"""Typed data model for the bounded ALPS checker profiles."""
+"""Typed data model for the bounded ALPS Markdown profile."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from enum import Enum
 from typing import Mapping, Sequence
 
 
-PROFILE_VERSION = "alps-repository-checker/v1"
+PROFILE_VERSION = "alps-markdown/v1"
 
 MAX_INPUT_BYTES = 1 * 1024 * 1024
 MAX_INPUT_LINES = 20_000

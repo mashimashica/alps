@@ -1,4 +1,4 @@
-"""Orchestration and compatibility helpers for the ALPS profile checker."""
+"""Orchestration and compatibility helpers for the ALPS Markdown profile checker."""
 
 from __future__ import annotations
 

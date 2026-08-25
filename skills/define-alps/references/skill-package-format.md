@@ -15,6 +15,18 @@ This material is an informative example of the logical composition of a Skill Pa
 
 The functional role of a resource must be determined from the function it performs when the represented PF construct is understood or applied rather than only from its storage location or file extension. When the same physical resource has multiple roles, each role and its conditions of use must be identifiable.
 
+## Concrete Repository Role Mapping
+
+| Scope | Resource | Logical role | Boundary |
+|---|---|---|---|
+| `define-alps` Package | [`SKILL.md`](../SKILL.md) | Authoritative Agent Skill representation | Governs the represented Define ALPS Process. |
+| `define-alps` Package | [`SKILL-template.md`](SKILL-template.md) and [`record-templates.md`](record-templates.md) | Output-creation resources | Inform drafting and record creation; they do not add ALPS requirements. |
+| `define-alps` Package | This `skill-package-format.md` | Reference information | Explains logical resource roles; it is not an Environment Binding. |
+| `define-alps` Package | [`agents/openai.yaml`](../agents/openai.yaml) | Environment Binding | Maps discovery and presentation metadata for a target Host. |
+| `define-alps` Package | [`assets/alps.svg`](../assets/alps.svg) | Presentation resource | Supports presentation only. |
+| Repository review | [`spec/alps-markdown.md`](../../../spec/alps-markdown.md) | Environment Binding | Defines the optional `alps-markdown/v1` physical representation; it is not ALPS itself. |
+| Repository review | [`validate_alps_markdown.py`](../../../.agents/skills/review-alps/scripts/validate_alps_markdown.py) | Application Enabler | Supports the repository-development `review-alps` Process by validating `alps-markdown/v1`; it is not part of the distributed `define-alps` Package and does not establish ALPS Conformance. |
+
 ## Representative Environment Binding Items
 
 - Target execution environment and applicable version
