@@ -6,7 +6,7 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ### Fixed
 
-- Aligned the OpenAI-facing name and icon for `alps-reference-model` with the other distributed Skills and replaced generic ALPS plugin listing metadata with concrete capabilities, starter prompts, and support information.
+- Aligned the OpenAI-facing name and icon for `alps-reference-model` with the other distributed Skills and replaced generic ALPS plugin listing metadata with concrete capabilities and starter prompts.
 
 ## [0.4.0] - 2026-08-25
 

@@ -32,7 +32,6 @@
       "Govern lifecycle changes"
     ],
     "websiteURL": "https://github.com/mashimashica/alps",
-    "supportURL": "https://github.com/mashimashica/alps/issues",
     "defaultPrompt": [
       "Apply the appropriate ALPS representation to this task.",
       "Define a reusable Agent Skill from this workflow using ALPS.",
