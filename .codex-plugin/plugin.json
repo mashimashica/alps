@@ -20,7 +20,7 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "ALPS",
-    "shortDescription": "Define and govern Agent Skills",
+    "shortDescription": "Agent Lifecycle Process Skills",
     "longDescription": "ALPS provides a process-based framework and reference model for reusable Agent Skills. It supports selecting the appropriate representation, defining and applying Processes, assessing conformance, and governing lifecycle changes.",
     "developerName": "mashimashica",
     "category": "Developer Tools",
@@ -33,9 +33,9 @@
     ],
     "websiteURL": "https://github.com/mashimashica/alps",
     "defaultPrompt": [
-      "Apply the appropriate ALPS representation to this task.",
-      "Define a reusable Agent Skill from this workflow using ALPS.",
-      "Assess and improve this Agent Skill for ALPS conformance."
+      "Select and apply the ALPS Processes appropriate to this task.",
+      "Define and verify a reusable Agent Skill against ALPS.",
+      "Assess an adopted ALPS representation and plan controlled improvements."
     ],
     "brandColor": "#4DB2FF",
     "composerIcon": "./assets/icon.svg",
