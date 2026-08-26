@@ -1,7 +1,7 @@
 interface:
   display_name: "Define ALPS"
-  short_description: "Design and verify ALPS-conformant Skills"
+  short_description: "Define and verify reusable ALPS Skills"
   icon_small: "./assets/alps.svg"
   icon_large: "./assets/alps.svg"
   brand_color: "#4DB2FF"
-  default_prompt: "Use $define-alps to design or verify an ALPS-conformant Skill."
+  default_prompt: "Use $define-alps to turn this recurring work into a reusable Process Skill with explicit Outcomes and verification evidence."

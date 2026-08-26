@@ -8,14 +8,22 @@
   <img src="assets/icon.svg" alt="ALPS icon" width="160">
 </p>
 
-<p align="center">
-  <strong>Version 0.4.0</strong><br>
-  Initial development
-</p>
+ALPS turns recurring agent work into reusable, assessable Process Skills. Instead of leaving a workflow as a one-off prompt or an undocumented convention, ALPS makes its Purpose, success conditions, boundary, Inputs, Outputs, and applicable conditions explicit.
 
-ALPS applies a Process Framework to Agent Skills so that people and Agents can define, select, invoke, and improve reusable work using the same semantics.
+ALPS is for teams and Agent builders who need work to be repeated, shared, composed, reviewed, or improved without tying it to one Agent, tool, or fixed execution sequence.
 
-A Process Skill makes its Purpose, Outcomes, work content, Inputs, Outputs, and applicable conditions explicit without prescribing a particular performer or implementation.
+## What ALPS Changes
+
+| Without ALPS | With ALPS |
+| --- | --- |
+| A recurring prompt works, but its intent and definition of done live in people's heads. | Purpose, Outcomes, boundary, and Entry/Exit Criteria establish a reusable definition of the work. |
+| Several Skills cooperate through hidden context or copied instructions. | Provider Outputs are mapped to recipient Inputs so handoffs can be traced and checked. |
+| A review says a Skill looks correct, but its claims and evidence are unclear. | References, assumptions, limitations, verification results, and Outcome evidence make the basis for a decision visible. |
+| A local edit quietly changes the reusable source. | Tailoring is kept distinct from controlled redefinition, reverification, and retirement. |
+
+A generic Agent Skill can package instructions and resources. ALPS adds a Process contract around that Skill: why the work exists, what condition counts as success, how it composes with other Processes, and how changes are assessed over time.
+
+Installing or activating a Skill does not by itself prove quality or Conformance. ALPS provides the structure and evidence points needed to assess those claims.
 
 ## Quick Start
 
@@ -44,14 +52,16 @@ A Process Model or Process View supplied by another plugin can guide selection i
 
 ### 3. Ask the Agent
 
+After installation, ask in plain language. Name a packaged Skill when your Host requires explicit activation.
+
 ```text
-Activate `alps-reference-model` and use it to decide which ALPS reference Processes apply.
+Turn this recurring release checklist into a reusable Process Skill. Make its Purpose, Outcomes, boundary, Inputs, Outputs, and verification evidence explicit.
 
-Use `define-alps` to define and verify an ALPS Process View for this cross-cutting concern.
+Review this Skill Package for unclear boundaries, unresolved references, and unsupported Conformance claims. Record defects, assumptions, and limitations.
 
-Use `apply-alps` to activate the applicable Model or View, resolve the required Processes, and make every Output/Input handoff explicit.
+Compose these Process Skills for the release workflow. Map every provider Output to its recipient Input and identify missing or inconsistent handoffs.
 
-Use `manage-alps` to assess these representations and execution records and propose controlled improvements.
+Assess this adopted Process Skill using the attached execution records. Separate Outcome evidence, Conformance claims, and controlled improvement proposals.
 ```
 
 ## How ALPS Works
