@@ -1,7 +1,7 @@
 {
   "name": "alps",
   "version": "0.4.0",
-  "description": "A process-based framework and reference model for defining, applying, and managing reusable Agent Skills.",
+  "description": "Agent Lifecycle Process Skills: a reusable Process Framework, ALPS Specification, and Process Reference Model for defining, applying, and managing Agent Skills.",
   "author": {
     "name": "mashimashica",
     "url": "https://github.com/mashimashica"
@@ -21,23 +21,25 @@
   "interface": {
     "displayName": "ALPS",
     "shortDescription": "Agent Lifecycle Process Skills",
-    "longDescription": "A process-based framework and reference model for defining, applying, and managing reusable Agent Skills.",
-    "developerName": "mashimashica",
+    "longDescription": "ALPS provides a reusable Process Framework, the ALPS Specification, and the ALPS Reference Model for defining, applying, and managing Agent Skills. Its four bundled Skills support Process selection and composition, Agent Skill definition and verification, Process application, and governed assessment and improvement.",
+    "developerName": "Mashimashica",
     "category": "Developer Tools",
     "capabilities": [
-      "Interactive",
-      "Write"
+      "Process selection and composition",
+      "Agent Skill definition and verification",
+      "Process application",
+      "Assessment and controlled improvement"
     ],
     "websiteURL": "https://github.com/mashimashica/alps",
+    "supportURL": "https://github.com/mashimashica/alps/issues",
     "defaultPrompt": [
-      "Apply the ALPS framework to this task.",
-      "Define a reusable Agent Skill using ALPS.",
-      "Review an Agent Skill for ALPS conformance."
+      "Select and apply the ALPS Processes appropriate to this task.",
+      "Define and verify a reusable Agent Skill against ALPS.",
+      "Assess an adopted ALPS representation and plan controlled improvements."
     ],
     "brandColor": "#4DB2FF",
     "composerIcon": "./assets/icon.svg",
     "logo": "./assets/icon.svg",
-    "logoDark": "./assets/icon.svg",
-    "screenshots": []
+    "logoDark": "./assets/icon.svg"
   }
 }
