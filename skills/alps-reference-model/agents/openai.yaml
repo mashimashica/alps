@@ -1,0 +1,7 @@
+interface:
+  display_name: "ALPS Reference Model"
+  short_description: "Select and compose ALPS representations"
+  icon_small: "./assets/alps.svg"
+  icon_large: "./assets/alps.svg"
+  brand_color: "#4DB2FF"
+  default_prompt: "Use $alps-reference-model to select, compose, or explain the appropriate ALPS representations for this task."
