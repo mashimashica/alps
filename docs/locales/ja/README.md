@@ -107,17 +107,9 @@ metadata:
 
 ALPS自身のライフサイクルは三つの参照プロセスで定義します。これらは固定段階ではなく、必要に応じて並行的、反復的または再帰的に適用できます。
 
-```mermaid
-flowchart LR
-    DEFINE["Define ALPS<br/>ALPS表現を定義・検証"]
-    MANAGE["Manage ALPS<br/>表現とその適用を統制"]
-    APPLY["Apply ALPS<br/>表現を読み込みプロセスを呼び出し"]
-
-    DEFINE -->|"検証済み表現"| MANAGE
-    MANAGE -->|"管理された表現・適用条件"| APPLY
-    APPLY -->|"選択・実行証拠"| MANAGE
-    MANAGE -->|"再定義・再検証要求"| DEFINE
-```
+<p align="center">
+  <img src="../../../assets/alps-reference-model-ja.svg" alt="ALPS参照モデル。Define ALPSからManage ALPSへ検証済み表現、Manage ALPSからApply ALPSへ管理された表現・適用条件、Apply ALPSからManage ALPSへ選択・実行証拠、Manage ALPSからDefine ALPSへ再定義・再検証要求を渡します。" width="100%">
+</p>
 
 正本となるプロセス参照モデルは[`skills/alps-reference-model/SKILL.md`](../../../skills/alps-reference-model/SKILL.md)として収録します。そこに三つの参照プロセスの名称、目的、成果を保持します。
 
