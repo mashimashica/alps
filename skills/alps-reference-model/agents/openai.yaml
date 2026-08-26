@@ -1,0 +1,7 @@
+interface:
+  display_name: "ALPS Reference Model"
+  short_description: "Load and explain the ALPS Reference Model"
+  icon_small: "./assets/alps.svg"
+  icon_large: "./assets/alps.svg"
+  brand_color: "#4DB2FF"
+  default_prompt: "Use $alps-reference-model to load and explain the ALPS Reference Model, then use $apply-alps to select and apply the relevant Processes."
