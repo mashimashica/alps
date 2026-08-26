@@ -1,7 +1,7 @@
 {
   "name": "alps",
   "version": "0.4.0",
-  "description": "Agent Lifecycle Process Skills: a process-based framework and reference model for defining, applying, and managing reusable Agent Skills.",
+  "description": "Turn recurring agent work into reusable, assessable Process Skills with explicit Outcomes, traceable handoffs, and controlled improvement.",
   "author": {
     "name": "mashimashica"
   },

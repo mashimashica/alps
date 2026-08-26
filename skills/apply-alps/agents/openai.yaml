@@ -1,7 +1,7 @@
 interface:
   display_name: "Apply ALPS"
-  short_description: "Select and apply ALPS representations"
+  short_description: "Select and compose Process Skills"
   icon_small: "./assets/alps.svg"
   icon_large: "./assets/alps.svg"
   brand_color: "#4DB2FF"
-  default_prompt: "Use $apply-alps to select and apply ALPS representations and invoke applicable Processes."
+  default_prompt: "Use $apply-alps to select and compose the Process Skills for this task, with explicit handoffs and Outcome evidence."
