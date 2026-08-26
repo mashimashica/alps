@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<title id="title">ALPS参照モデル</title>
+<desc id="desc">Define ALPS、Manage ALPS、Apply ALPSと、四つの統制された情報の流れを示すALPS参照モデル。</desc>
+<defs>
+<linearGradient id="background" x1="80" y1="36" x2="1120" y2="684" gradientUnits="userSpaceOnUse">
+<stop stop-color="#F9FDFF"/>
+<stop offset="1" stop-color="#EAF5FC"/>
+</linearGradient>
+<radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(600 320) rotate(90) scale(410 570)">
+<stop stop-color="#4DB2FF" stop-opacity="0.16"/>
+<stop offset="1" stop-color="#4DB2FF" stop-opacity="0"/>
+</radialGradient>
+<filter id="shadow" x="-20%" y="-20%" width="140%" height="160%" color-interpolation-filters="sRGB">
+<feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#0B4D7A" flood-opacity="0.10"/>
+</filter>
+<marker id="arrowPrimary" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+<path d="M1 1 9 5 1 9Z" fill="#168FC7"/>
+</marker>
+<marker id="arrowFeedback" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+<path d="M1 1 9 5 1 9Z" fill="#53718A"/>
+</marker>
+<style>
+text { font-family: "Noto Sans CJK JP", "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 3.2px; fill: #168FC7; }
+.heading { font-size: 36px; font-weight: 750; letter-spacing: -0.8px; fill: #0B1F33; }
+.subtitle { font-size: 16px; font-weight: 500; fill: #587083; }
+.number { font-size: 13px; font-weight: 800; letter-spacing: 1.6px; fill: #9AB3C5; }
+.cardTitle { font-size: 27px; font-weight: 750; letter-spacing: -0.4px; fill: #0B1F33; }
+.cardBody { font-size: 17px; font-weight: 500; fill: #52697B; }
+.action { font-size: 11px; font-weight: 800; letter-spacing: 1.4px; }
+.flowLabel { font-size: 13px; font-weight: 650; fill: #344D61; }
+.footer { font-size: 12px; font-weight: 750; letter-spacing: 2.2px; fill: #31536A; }
+</style>
+</defs>
+<rect x="12" y="12" width="1176" height="696" rx="36" fill="url(#background)" stroke="#D5E9F6"/>
+<rect x="12" y="12" width="1176" height="696" rx="36" fill="url(#glow)"/>
+<circle cx="1080" cy="84" r="104" fill="#4DB2FF" opacity="0.055"/>
+<circle cx="1110" cy="660" r="150" fill="#001858" opacity="0.025"/>
+<circle cx="80" cy="640" r="118" fill="#16A3D6" opacity="0.04"/>
+<text x="64" y="68" class="eyebrow">PROCESS REFERENCE MODEL</text>
+<text x="64" y="112" class="heading">ALPS参照モデル</text>
+<text x="64" y="144" class="subtitle">固定段階ではなく、並行的・反復的・再帰的に適用</text>
+<path d="M348 270 C386 196 430 196 468 248" fill="none" stroke="#168FC7" stroke-width="3.5" stroke-linecap="round" marker-end="url(#arrowPrimary)"/>
+<path d="M732 248 C770 196 814 196 852 270" fill="none" stroke="#168FC7" stroke-width="3.5" stroke-linecap="round" marker-end="url(#arrowPrimary)"/>
+<path d="M468 520 C430 606 386 606 348 502" fill="none" stroke="#53718A" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowFeedback)"/>
+<path d="M852 502 C814 606 770 606 732 520" fill="none" stroke="#53718A" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowFeedback)"/>
+<g>
+<rect x="290" y="174" width="168" height="42" rx="21" fill="#FFFFFF" stroke="#D3E6F4"/>
+<circle cx="310" cy="195" r="4" fill="#16A3D6"/>
+<text x="324" y="200" class="flowLabel">検証済み表現</text>
+</g>
+<g>
+<rect x="724" y="174" width="296" height="42" rx="21" fill="#FFFFFF" stroke="#D3E6F4"/>
+<circle cx="744" cy="195" r="4" fill="#16A3D6"/>
+<text x="758" y="200" class="flowLabel">管理された表現・適用条件</text>
+</g>
+<g>
+<rect x="246" y="568" width="224" height="42" rx="21" fill="#FFFFFF" stroke="#D3E6F4"/>
+<circle cx="266" cy="589" r="4" fill="#53718A"/>
+<text x="280" y="594" class="flowLabel">再定義・再検証要求</text>
+</g>
+<g>
+<rect x="778" y="568" width="196" height="42" rx="21" fill="#FFFFFF" stroke="#D3E6F4"/>
+<circle cx="798" cy="589" r="4" fill="#53718A"/>
+<text x="812" y="594" class="flowLabel">選択・実行証拠</text>
+</g>
+<g class="card">
+<rect x="64" y="258" width="304" height="266" rx="28" fill="#FFFFFF" stroke="#D7E9F6" filter="url(#shadow)"/>
+<rect x="64" y="258" width="304" height="8" rx="4" fill="#16A3D6"/>
+<circle cx="122" cy="322" r="30" fill="#16A3D6" opacity="0.10"/>
+<g transform="translate(96 296)" fill="none" stroke="#16A3D6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+<rect x="8" y="5" width="30" height="38" rx="6"/>
+<path d="M15 16h16M15 24h16M15 32h10"/>
+<path d="m31 39 9-9 5 5-9 9-7 2Z" fill="#FFFFFF" stroke="none"/>
+<path d="m31 39 9-9 5 5-9 9-7 2 2-7Z"/>
+</g>
+<text x="330" y="314" class="number" text-anchor="end">01</text>
+<text x="102" y="384" class="cardTitle">Define ALPS</text>
+<text x="102" y="422" class="cardBody" text-anchor="start"><tspan x="102" dy="0">ALPS表現を</tspan><tspan x="102" dy="25">定義・検証</tspan></text>
+<rect x="102" y="472" width="76" height="28" rx="14" fill="#16A3D6" opacity="0.09"/>
+<text x="140.0" y="491" class="action" text-anchor="middle" fill="#16A3D6">定義</text>
+</g>
+<g class="card">
+<rect x="448" y="238" width="304" height="306" rx="28" fill="#FFFFFF" stroke="#D7E9F6" filter="url(#shadow)"/>
+<rect x="448" y="238" width="304" height="8" rx="4" fill="#004BA6"/>
+<circle cx="506" cy="302" r="30" fill="#004BA6" opacity="0.10"/>
+<g transform="translate(480 276)" fill="none" stroke="#004BA6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+<path d="M26 4 43 11v13c0 12-7 21-17 26C16 45 9 36 9 24V11L26 4Z"/>
+<path d="m18 26 6 6 12-14"/>
+</g>
+<text x="714" y="294" class="number" text-anchor="end">02</text>
+<text x="486" y="364" class="cardTitle">Manage ALPS</text>
+<text x="486" y="402" class="cardBody" text-anchor="start"><tspan x="486" dy="0">表現とその適用を</tspan><tspan x="486" dy="25">統制</tspan></text>
+<rect x="486" y="492" width="76" height="28" rx="14" fill="#004BA6" opacity="0.09"/>
+<text x="524.0" y="511" class="action" text-anchor="middle" fill="#004BA6">統制</text>
+</g>
+<g class="card">
+<rect x="832" y="258" width="304" height="266" rx="28" fill="#FFFFFF" stroke="#D7E9F6" filter="url(#shadow)"/>
+<rect x="832" y="258" width="304" height="8" rx="4" fill="#001858"/>
+<circle cx="890" cy="322" r="30" fill="#001858" opacity="0.10"/>
+<g transform="translate(864 296)" fill="none" stroke="#001858" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+<path d="M8 16h28l-7-7M36 16l-7 7"/>
+<path d="M44 36H16l7-7M16 36l7 7"/>
+</g>
+<text x="1098" y="314" class="number" text-anchor="end">03</text>
+<text x="870" y="384" class="cardTitle">Apply ALPS</text>
+<text x="870" y="422" class="cardBody" text-anchor="start"><tspan x="870" dy="0">表現を読み込み</tspan><tspan x="870" dy="25">プロセスを呼び出し</tspan></text>
+<rect x="870" y="472" width="76" height="28" rx="14" fill="#001858" opacity="0.09"/>
+<text x="908.0" y="491" class="action" text-anchor="middle" fill="#001858">適用</text>
+</g>
+<g>
+<rect x="376" y="658" width="448" height="40" rx="20" fill="#FFFFFF" stroke="#CFE4F2"/>
+<path d="M407 678a8 8 0 1 1 5.8-13.5M413 660v6h-6" fill="none" stroke="#168FC7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="600" y="683" class="footer" text-anchor="middle">並行的  ·  反復的  ·  再帰的</text>
+</g>
+</svg>
