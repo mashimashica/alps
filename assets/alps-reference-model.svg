@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
   <title id="title">ALPS Reference Model</title>
-  <desc id="desc">Define ALPS, Manage ALPS, and Apply ALPS connected by four directed information flows.</desc>
+  <desc id="desc">Define ALPS sends a verified representation to Manage ALPS. Manage ALPS sends managed representations and conditions to Apply ALPS. Apply ALPS sends selection and execution evidence to Manage ALPS. Manage ALPS sends a redefinition or reverification request to Define ALPS.</desc>
   <defs>
     <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
       <path d="M0 0L8 4L0 8Z" fill="#667085"/>

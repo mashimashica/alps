@@ -108,7 +108,7 @@ Supported explicit kinds are `process-model`, `process-reference-model`, and `pr
 ALPS defines its own lifecycle through three reference Processes. They are not fixed phases and may be applied concurrently, iteratively, or recursively.
 
 <p align="center">
-  <img src="assets/alps-reference-model.svg" alt="ALPS Reference Model showing Define ALPS, Manage ALPS, and Apply ALPS connected by four governed information flows" width="100%">
+  <img src="assets/alps-reference-model.svg" alt="ALPS Reference Model: Define ALPS sends a verified representation to Manage ALPS; Manage ALPS sends managed representations and conditions to Apply ALPS; Apply ALPS sends selection and execution evidence to Manage ALPS; Manage ALPS sends a redefinition or reverification request to Define ALPS." width="100%">
 </p>
 
 The authoritative Process Reference Model is packaged as [`skills/alps-reference-model/SKILL.md`](skills/alps-reference-model/SKILL.md). It contains the Name, Purpose, and Outcomes of the three reference Processes.

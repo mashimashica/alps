@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
   <title id="title">ALPS参照モデル</title>
-  <desc id="desc">Define ALPS、Manage ALPS、Apply ALPSを四つの方向付き情報フローで接続したALPS参照モデル。</desc>
+  <desc id="desc">Define ALPSからManage ALPSへ検証済み表現を渡します。Manage ALPSからApply ALPSへ管理された表現・適用条件を渡します。Apply ALPSからManage ALPSへ選択・実行証拠を渡します。Manage ALPSからDefine ALPSへ再定義・再検証要求を渡します。</desc>
   <defs>
     <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
       <path d="M0 0L8 4L0 8Z" fill="#667085"/>

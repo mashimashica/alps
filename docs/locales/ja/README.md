@@ -74,7 +74,7 @@ npx plugins add mashimashica/alps
 | 何が変換されるか？ | **入力** |
 | どの作業がプロセスに属するか？ | **活動とタスク** |
 | 何が作業を方向付け、制限し、または支援するか？ | **統制事項、制約、実行支援要素** |
-| いつ作業を開始でき、いつ完了とみなせるか？ | **開始基準と完了基準** |
+| いつ作業を開始でき、いつ完了とみなせるか？ | **開始兺準と完了兺準** |
 | プロセスはどこに適用されるか？ | **境界と適用文脈** |
 | 誰が実行するか？ | 一般プロセスは固定しません。 |
 | どのように実装するか？ | 一般プロセス記述は規定しません。 |
@@ -108,7 +108,7 @@ metadata:
 ALPS自身のライフサイクルは三つの参照プロセスで定義します。これらは固定段階ではなく、必要に応じて並行的、反復的または再帰的に適用できます。
 
 <p align="center">
-  <img src="../../../assets/alps-reference-model-ja.svg" alt="Define ALPS、Manage ALPS、Apply ALPSと四つの統制された情報の流れを示すALPS参照モデル" width="100%">
+  <img src="../../../assets/alps-reference-model-ja.svg" alt="ALPS参照モデル。Define ALPSからManage ALPSへ検証済み表現、Manage ALPSからApply ALPSへ管理された表現・適用条件、Apply ALPSからManage ALPSへ選択・実行証拠、Manage ALPSからDefine ALPSへ再定義・再検証要求を渡します。" width="100%">
 </p>
 
 正本となるプロセス参照モデルは[`skills/alps-reference-model/SKILL.md`](../../../skills/alps-reference-model/SKILL.md)として収録します。そこに三つの参照プロセスの名称、目的、成果を保持します。
