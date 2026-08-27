@@ -4,6 +4,11 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+### Changed
+
+- Normalized the Process Framework and ALPS Specification so PF remains the sole source for general Process semantics, the ALPS Reference Model owns the reference relationship structure, and each reference Process Skill owns its complete Process Description.
+- Moved informative examples, related-document notes, and Agent-context oversight and evidence guidance from the ALPS Specification into paired informative guidance without changing their normative status.
+
 ### Fixed
 
 - Aligned the OpenAI-facing name and icon for `alps-reference-model` with the other distributed Skills and replaced generic ALPS plugin listing metadata with concrete capabilities and starter prompts.
