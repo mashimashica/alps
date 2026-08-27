@@ -29,6 +29,7 @@ Do not infer an ALPS requirement from a template, record, Environment Binding, c
 | `.agents/skills/alps-reference-model`, `.agents/skills/define-alps`, `.agents/skills/apply-alps`, `.agents/skills/manage-alps` | Relative symbolic links providing an integrated discovery view for repository-development Agents that inspect `.agents/skills/`. | The linked representations are distributed from `skills/`; do not duplicate them here. |
 | `.agents/skills/review-alps/` | Cross-layer review of ALPS repository changes and its bundled profile checker. | Repository-development only; not registered or exposed as a Plugin Skill. |
 | `.agents/skills/sync-locales/` | English/Japanese semantic-equivalence and update-coverage review. | Repository-development only; not registered or exposed as a Plugin Skill. |
+| `.agents/skills/vectorize-image/` | Reconstruction and verification of raster or flattened visual references as layered, editable vector assets. | Repository-development only; not registered or exposed as a Plugin Skill. |
 | `spec/` | Authoritative Process Framework, ALPS Specification, and Environment Binding. | Repository specification assets. |
 | `spec/locales/ja/` and `docs/locales/ja/` | Supported Japanese counterparts. | Localized assets; English remains authoritative. |
 | `.claude-plugin/`, `.cursor-plugin/`, `.codex-plugin/` | Host-specific discovery or presentation metadata. | Adapters; they must not redefine ALPS semantics. |
@@ -48,6 +49,7 @@ Add another repository-development Skill only after a repeated task has emerged 
 | `alps-markdown/v1`, its checker, or its tests | Treat the binding as the implementation contract, use `review-alps`, and verify that behavior does not create an additional ALPS requirement. |
 | README, AGENTS, CONTRIBUTING, or other paired guidance | Use `sync-locales`; check terminology, links, canonical paths, and any affected semantic or distribution boundary with `review-alps`. |
 | Plugin manifests, Host adapters, symlinks, or repository layout | Use `review-alps` to assess source-of-truth and distributed/repository-only boundaries. |
+| Raster or flattened visual assets | Use `vectorize-image` when an editable vector reconstruction is required; use `review-alps` when the asset change also affects Plugin metadata, repository distribution, or an ALPS representation. |
 
 ## Semantic Invariants
 
