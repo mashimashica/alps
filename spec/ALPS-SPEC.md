@@ -41,7 +41,7 @@ c) the ALPS life cycle and the integrity contract among the ALPS Reference Model
 
 d) ALPS-specific rules for activation, Process Invocation, composition, Tailoring, authoritative redefinition, and representation management; and
 
-e) subjects and criteria for Description Conformance, representation Conformance, Reference Process Conformance, and Execution Conformance.
+e) subjects and criteria for Description Conformance for Process and non-Process representations, Reference Process Conformance, and Execution Conformance.
 
 ### 1.2 Matters Not Specified
 
@@ -232,6 +232,8 @@ f) avoid conflict or unnecessary duplication between the authoritative represent
 
 A Process representation must satisfy the applicable PF requirements for a Process Description, including the required Name, Purpose, and Outcomes, and must satisfy 5.2 and 5.3.
 
+A Skill Name must use a concise noun phrase as the Skill heading.
+
 A general Skill Description must preserve PF's non-prescription of performer, Task allocation, method, tool, metric, management method, and execution sequence. An Instance-specific description must state its context and can include Instance-specific capabilities, resources, Inputs, Outputs, Controls, Constraints, criteria, and timing.
 
 A statement used as a Task must express an individual action supporting one or more Outcomes so that its operation and object are distinguishable. A statement whose primary function is to direct or limit execution must be classified as a Control or Constraint rather than a Task. Every Task must have a distinguishable normative attribute.
@@ -364,6 +366,10 @@ e) when the same information item is changed by multiple Processes, its integrit
 
 f) Integration must establish completeness within the selected scope and consistency across Process relationships and structural levels.
 
+When Processes are applied concurrently, iteratively, or recursively, shared or interdependent information items and the reference or change relationships among them should be identified to the extent needed for application.
+
+When Output quality affects a subsequent Outcome or stakeholder acceptance, the determination conditions and necessary evidence should be related to Entry Criteria, Exit Criteria, a review, or a Decision Gate.
+
 Concurrency, Iteration, Recursion, and Integration retain their PF meanings and do not themselves prescribe an execution sequence.
 
 ### 8.4 Process View Application
@@ -385,6 +391,8 @@ Framework-level Controls and Enablers must state scope, exceptions, and whether 
 Human and Agent capabilities, Agents, models, tools, Skills, automation, and execution environments used to perform or support a Process are Enablers rather than Process Inputs.
 
 A capability limitation, availability condition, response time, or other circumstance that limits permitted execution can instead be represented as a Constraint according to its function.
+
+Capabilities or conditions needed for execution should be stated as Enablers or Constraints without allocating Tasks.
 
 ## 10. Entry/Exit Criteria, Decision Gates, and Reviews
 

@@ -105,7 +105,7 @@ Inputs and Outputs connect a Process to its external environment. Controls, Cons
 |---|---|
 | **Input** | An item the Process transforms into an Output. It can come from another Process, an information source, or a source outside the Process. Specifying required or representative Inputs is optional. |
 | **Output** | A product, result, or service produced by the Process. |
-| **Control** | Directs Process execution or the basis on which it is judged. Controls can arise from laws, regulations, policies, voluntary standards, or agreements. |
+| **Control** | Directs Process execution or the basis on which it is judged. Controls can arise from applicable laws or regulatory requirements, policies, conformance to voluntary standards, or agreements. |
 | **Constraint** | Limits permitted Process execution. Constraints can arise from the environment or conditions of application outside the Process. |
 | **Enabler** | Supplies capability that makes execution possible or supports it, including relevant capabilities, specialized capabilities, tools, and technologies. |
 
@@ -117,7 +117,7 @@ Outputs are optional when Outcome achievement can be demonstrated. They can incl
 
 A representative transformation relates Inputs, Activities, and Outputs: Activities transform Inputs; Enablers support the transformation; Controls direct it; Constraints limit it. Naming an Output does not by itself require creation of a document.
 
-Representative Inputs and Outputs show one possible manner of performance and do not prescribe the only manner. A Process is understood from its complete Process Description.
+Representative Inputs and Outputs show one possible manner of performance and do not prescribe the only manner. A Process should be understood from the complete Process Description rather than only from its representative flow.
 
 ### 4.3 Entry and Exit Criteria
 
@@ -230,7 +230,7 @@ An Output accepted at a Gate can become a basis for later Activities. The decisi
 
 ### 8.2 Reviews and Audits
 
-A **review** evaluates Process performance, Outputs, and Outcome achievement against agreed criteria. An **audit** examines evidence of Conformance to Processes, Outputs, and requirements and confirms whether mandatory attributes and applicable requirements are satisfied.
+A **review** evaluates Process performance, Outputs, and Outcome achievement against agreed criteria. An **audit** examines evidence of Conformance to Processes, Outputs, and requirements in detail and confirms whether mandatory attributes and applicable requirements are satisfied.
 
 Reviews and audits should appear in the application plan and be tailored to the subject and methods. Good practice gives them unambiguous starting and completion conditions and triggers them by risk or events rather than schedule alone.
 
