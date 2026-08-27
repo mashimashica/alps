@@ -36,7 +36,7 @@ An explicit, systematic description supports consistent results, deployment of s
 
 ### 1.3 Layers and Reference Information
 
-A Process Description may present an overview and a detailed description for readers who need different depths of information. An overview can include Purpose, description, Inputs and Outputs, Activities, Common Approach, practical tips, and good-practice summaries. The detailed part treats matters specific to the Process; cross-cutting matters are treated separately.
+A Process Description can present an overview and a detailed description for readers who need different depths of information. An overview can include Purpose, description, Inputs and Outputs, Activities, Common Approach, practical tips, and good-practice summaries. The detailed part treats matters specific to the Process; cross-cutting matters are treated separately.
 
 This layered form is optional and does not replace Name, Purpose, and Outcomes. Overviews, descriptions, Common Approach, practical tips, notes, and examples are reference information.
 
@@ -46,7 +46,7 @@ A Process Description must keep the functions of Name, Purpose, Outcomes, Activi
 
 Each sentence should carry one meaning. Independent objectives, results, or actions should not be joined merely to shorten the text. Each statement should contain enough context to remain meaningful when referenced independently; supplementary explanation can be placed in reference information.
 
-A general Process Description must not require a particular performer, method, technique, tool, metric, management method, or execution sequence. Methods and examples may be offered as guidance without becoming Process requirements.
+A general Process Description must not require a particular performer, method, technique, tool, metric, management method, or execution sequence. Methods and examples can be offered as guidance without becoming Process requirements.
 
 A Procedure prescribes ordered steps. Activities and Tasks describe Process work and must not be interpreted as procedural steps merely because of their order on the page. Implicit timing, scheduling, and order should be avoided. A necessary temporal relationship should be stated explicitly as a Constraint; without such a Constraint, no particular execution sequence is required.
 
@@ -67,13 +67,13 @@ An **Outcome** is a measurable and tangible result condition achieved through th
 
 Each Outcome must state one positive, observable condition in a declarative statement. An English Outcome must use a present-tense verb. Independent results must not be joined in one Outcome.
 
-An Outcome of a general Process must remain meaningful throughout the Process's applicable scope. Together, the Outcomes must be sufficient for the Purpose, and every Outcome must be relevant to it. Each Outcome should remain meaningful when read separately. Outcomes should be concise, but one clear meaning takes priority over brevity; their number follows from what the Purpose requires. Benefits should be distinguished from Outcomes and may be explained in reference information.
+An Outcome of a general Process must remain meaningful throughout the Process's applicable scope. Together, the Outcomes must be sufficient for the Purpose, and every Outcome must be relevant to it. Each Outcome should remain meaningful when read separately. Outcomes should be concise, but one clear meaning takes priority over brevity; their number follows from what the Purpose requires. Benefits should be distinguished from Outcomes and can be explained in reference information.
 
 An **Output** is a product, result, or service produced by a Process. An Output leaves the work; an Outcome is a condition used to assess success. An Output of one Process can become an Input to another Process.
 
 ### 2.3 Activity and Task
 
-An **Activity** is a cohesive set of Tasks within a Process. It organizes related actions so that their contribution to the Process can be understood and communicated. A sufficiently cohesive and detailed Activity may be treated as a Sub-process with its own Purpose and Outcomes.
+An **Activity** is a cohesive set of Tasks within a Process. It organizes related actions so that their contribution to the Process can be understood and communicated. A sufficiently cohesive and detailed Activity can be treated as a Sub-process with its own Purpose and Outcomes.
 
 Taken together, the Activities and any Sub-processes must cover every Process Outcome and satisfy the Process Purpose; they need not map one-to-one to Outcomes. Tasks within an Activity should relate more closely to one another than to Tasks outside it. An Activity must be treated as a continuous or iterative function narrower than the Process as a whole. The Activity set should address all Outcomes and may extend beyond the minimum work needed to satisfy the Purpose.
 
@@ -87,7 +87,7 @@ Process, Sub-process, and Activity have no universal size boundaries. Primary Ou
 
 Closely connected automated work requiring little human intervention can share one Process Description. Decomposition is useful while it improves understanding of boundaries, responsibilities, or relationships and is omitted when another level would harm understanding or use.
 
-Within the boundary, Outcomes, Activities, and Tasks form a coherent explanation of why the work belongs together. Dependencies on other Processes are reduced as far as practicable. A significant Activity with many Tasks may be described as a separate Process when separate treatment is useful.
+Within the boundary, Outcomes, Activities, and Tasks form a coherent explanation of why the work belongs together. Dependencies on other Processes are reduced as far as practicable. A significant Activity with many Tasks can be described as a separate Process when separate treatment is useful.
 
 ### 3.2 What a General Process Leaves Open
 
@@ -109,7 +109,7 @@ Inputs and Outputs connect a Process to its external environment. Controls, Cons
 | **Constraint** | Limits permitted Process execution. Constraints can arise from the environment or conditions of application outside the Process. |
 | **Enabler** | Supplies capability that makes execution possible or supports it, including relevant capabilities, specialized capabilities, tools, and technologies. |
 
-People, Agents, automation, tools, and execution environments used to perform a Process are resources, not Inputs. When represented in a Process Description, they are Enablers. Controls and Constraints may have their own sections or be associated with other Process elements.
+People, Agents, automation, tools, and execution environments used to perform a Process are resources, not Inputs. When represented in a Process Description, they are Enablers. Controls and Constraints can have their own sections or be associated with other Process elements.
 
 ### 4.2 Transformation Without Method Prescription
 
@@ -176,7 +176,7 @@ View-local or modified Activities and Tasks do not change a source Process merel
 | **Recursion** | A Process or Process set is reapplied at successive structural levels of the subject of application. |
 | **Integration** | Completeness is established within one level and consistency between levels. |
 
-These relationships are independent and may be combined. Iteration returns without changing level; Recursion repeats across levels; Concurrency concerns coexistence; Integration concerns completeness and consistency.
+These relationships are independent and can be combined. Iteration returns without changing level; Recursion repeats across levels; Concurrency concerns coexistence; Integration concerns completeness and consistency.
 
 Process execution is not limited to serial arrangement. Iteration progressively refines Outputs, incorporates decisions and evolving understanding, addresses Constraints, and resolves trade-offs. It should continue until problems arising from the Processes are resolved. In Recursion, an Output at one level can become an Input at the next.
 
@@ -190,7 +190,7 @@ When Iteration or Recursion changes an Output, affected Process Inputs change as
 
 ### 7.1 Adaptation and Rigor
 
-**Tailoring** is the controlled Adaptation of a life cycle model or Process to the needs and conditions of a declared context. It sets enough rigor to perform Activities at an acceptable level of risk; too little raises the chance of problems, while too much can raise cost or schedule risk.
+**Tailoring** is the controlled Adaptation of a life cycle model or Process to the needs and conditions of a declared context. Such models and Processes typically cannot be applied unchanged in every context. It sets enough rigor to perform Activities at an acceptable level of risk; too little raises the chance of problems, while too much can raise cost or schedule risk.
 
 Tailoring typically continues dynamically as risk and context change and should be reviewed and revised when conditions warrant.
 
@@ -198,7 +198,7 @@ Tailoring typically continues dynamically as risk and context change and should 
 
 **Common-level Tailoring** adapts an external standard to needs shared across an intended application domain. **Individual-level Tailoring** adapts the resulting common Process to one subject of application.
 
-Tailoring may delete, modify, or add Outcomes, Activities, Tasks, representative Inputs, and representative Outputs.
+Tailoring can delete, modify, or add Outcomes, Activities, Tasks, representative Inputs, and representative Outputs.
 
 ### 7.3 Tailoring Decisions
 
@@ -214,7 +214,7 @@ Representative pitfalls include reusing another subject's tailored baseline with
 
 When justified by quality risk, **Process Instantiation** describes one Process Instance in greater detail. It derives Instance-specific success criteria from requirements and identifies the Activities and Tasks that will achieve them; those links support management of quality risk.
 
-Tailoring changes the Process or life cycle model that applies. Instantiation describes one application of that Process. A tailored Process may also be instantiated.
+Tailoring changes the Process or life cycle model that applies. Instantiation describes one application of that Process. A tailored Process can also be instantiated.
 
 ## 8. Evidence, Decisions, and Claims
 
@@ -222,7 +222,7 @@ Tailoring changes the Process or life cycle model that applies. Instantiation de
 
 A **Decision Gate** is a decision mechanism that controls Process application; it is not a Process Description component or a Process stage.
 
-Decision Criteria determine whether the uncertainty and risk of proceeding or changing Process state are acceptable and may draw from Purpose, Outcomes, conditions of application, and risk assessment. Gate frequency, scope, and formality can be adjusted to context.
+Decision Criteria determine whether the uncertainty and risk of proceeding or changing Process state are acceptable and can draw from Purpose, Outcomes, conditions of application, and risk assessment. Gate frequency, scope, and formality can be adjusted to context.
 
 A Gate decision should be explicit and recorded. Available decisions can include continue, hold, change, re-execute, or terminate. Before a Gate, a review should use necessary expertise and relevant Inputs. Passage should rest on evidence that Decision Criteria are met, and the criteria should be updated and reevaluated as context changes.
 
@@ -232,7 +232,9 @@ An Output accepted at a Gate can become a basis for later Activities. The decisi
 
 A **review** evaluates Process performance, Outputs, and Outcome achievement against agreed criteria. An **audit** examines evidence of Conformance to Processes, Outputs, and requirements and confirms whether mandatory attributes and applicable requirements are satisfied.
 
-Reviews and audits should appear in the application plan, be tailored to the subject and methods, have unambiguous starting and completion conditions, and be triggered by risk or events rather than schedule alone. Good practice provides clear preparation, conduct, and acceptance conditions; necessary expertise and an independent perspective; and tracked actions with due dates and completion conditions when problems are found.
+Reviews and audits should appear in the application plan and be tailored to the subject and methods. Good practice gives them unambiguous starting and completion conditions and triggers them by risk or events rather than schedule alone.
+
+It is good practice to make preparation, conduct, and acceptance methods and conditions clear and to include the necessary expertise and an independent perspective. When a problem is detected, it is also good practice to establish a clear action with a due date and completion conditions and to track it.
 
 ### 8.3 Full Conformance
 
@@ -277,6 +279,8 @@ Process benchmarking compares performance with declared criteria, applicable sta
 
 Process strengths and weaknesses should be assessed, and reviews and audits should be established.
 
-Measures should provide insight into Process performance and effectiveness and should be analyzed to determine effectiveness. Mechanisms should collect lessons, connect them to action, and analyze candidate Process changes.
+Measures should be established to provide insight into Process performance and effectiveness. Those measures should be analyzed to determine effectiveness.
+
+Mechanisms should collect lessons learned, connect them to action, and analyze candidate Process changes.
 
 Lessons should be collected throughout execution and at planned milestones. Lessons and measures should be reviewed periodically to improve Processes and practices.

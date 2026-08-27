@@ -159,7 +159,7 @@ a) a significant Activity may be represented as a separate Process Skill when an
 
 b) work concerning an information item that spans Processes may be represented as a separate Process Skill when it has an independent Purpose, Outcomes, and cohesive Activities; and
 
-c) a cross-cutting concern without an independent Process boundary is represented as a Process View rather than as a Process.
+c) a cross-cutting concern without an independent Process boundary can be represented as a Process View rather than as a Process.
 
 ### 5.3 Discovery and Execution Layers
 
@@ -187,7 +187,7 @@ skill:<package-id>#<skill-name>
 
 Within the same package, `skill:#<skill-name>` may be used. A resolver must resolve the short form within the containing package and must normalize it with the package identity supplied by the applicable package binding when a full identity is needed.
 
-Repository-relative paths may locate a physical copy but must not serve as the representation's logical identity. ALPS does not require GitHub or another particular service to be the package identity authority.
+Repository-relative paths can locate a physical copy but must not serve as the representation's logical identity. ALPS does not require GitHub or another particular service to be the package identity authority.
 
 ### 5.5 Skill Packages
 
@@ -232,7 +232,7 @@ f) avoid conflict or unnecessary duplication between the authoritative represent
 
 A Process representation must satisfy the applicable PF requirements for a Process Description, including the required Name, Purpose, and Outcomes, and must satisfy 5.2 and 5.3.
 
-A general Skill Description must preserve PF's non-prescription of performer, Task allocation, method, tool, metric, management method, and execution sequence. An Instance-specific description must state its context and may include Instance-specific capabilities, resources, Inputs, Outputs, Controls, Constraints, criteria, and timing.
+A general Skill Description must preserve PF's non-prescription of performer, Task allocation, method, tool, metric, management method, and execution sequence. An Instance-specific description must state its context and can include Instance-specific capabilities, resources, Inputs, Outputs, Controls, Constraints, criteria, and timing.
 
 A statement used as a Task must express an individual action supporting one or more Outcomes so that its operation and object are distinguishable. A statement whose primary function is to direct or limit execution must be classified as a Control or Constraint rather than a Task. Every Task must have a distinguishable normative attribute.
 
@@ -242,7 +242,7 @@ The Skill Discovery Description of a Process representation claiming Description
 
 A Process Model representation must identify its Processes and their relationships. It may identify the Agent Skills that provide their authoritative Process Descriptions and need not repeat each Process Purpose or Outcomes.
 
-A subset of Processes may be selected according to Purpose. Selection and timing should be reviewed as the application context changes.
+A subset of Processes can be selected according to Purpose. Selection and timing should be reviewed as the application context changes.
 
 ### 6.4 Process Reference Model Representations
 
@@ -296,7 +296,7 @@ The ALPS life cycle concerns definition, application, management, evolution, and
 | **Evolution** | Representations and Process execution are assessed, tailored, changed, and improved. |
 | **Retirement** | Representations that are unnecessary, unsafe, misleading, or superseded are withdrawn from active use under management. |
 
-The order shown does not prescribe execution order. Processes and Activities may span Stages and may be applied concurrently, iteratively, or recursively under PF.
+The order shown does not prescribe execution order. Processes and Activities can span Stages and can be applied concurrently, iteratively, or recursively under PF.
 
 ### 7.2 Reference Model Composition
 
@@ -314,9 +314,9 @@ The Name, Purpose, and Outcomes projected into the ALPS Reference Model must equ
 
 The three Reference Processes are general Processes. Their document order, Activity order, and Task order do not prescribe execution order.
 
-Agent Skill activation and Process Invocation remain distinct when the ALPS Reference Model is used. The Reference Model may guide Process selection and composition but is not itself invoked as a Process.
+Agent Skill activation and Process Invocation remain distinct when the ALPS Reference Model is used. The Reference Model can guide Process selection and composition but is not itself invoked as a Process.
 
-Subsets of the Reference Processes, Activities, and Tasks may be selected according to Purpose. A change to an applicable Reference Process is Tailoring; an authoritative change to its Process Description is controlled redefinition.
+Subsets of the Reference Processes, Activities, and Tasks can be selected according to Purpose. A change to an applicable Reference Process is Tailoring; an authoritative change to its Process Description is controlled redefinition.
 
 ### 7.4 Reference Process Conformance
 
@@ -360,7 +360,7 @@ c) an undefined handoff may be introduced only through an applicable controlled 
 
 d) when an Output changes, affected Inputs and applicable criteria should be reevaluated;
 
-e) shared information items must have integrity, state, and change handling proportionate to quality risk; and
+e) when the same information item is changed by multiple Processes, its integrity, state, and change handling must be defined in proportion to quality risk; and
 
 f) Integration must establish completeness within the selected scope and consistency across Process relationships and structural levels.
 
@@ -370,7 +370,7 @@ Concurrency, Iteration, Recursion, and Integration retain their PF meanings and 
 
 When a Process View is active, referenced source elements retain their source meaning. View-local or modified elements must not silently change the applicable source Process or its Conformance basis.
 
-Process View Outcome achievement may be assessed for the View as a whole but remains distinct from Source Process Outcome Conformance.
+Process View Outcome achievement can be assessed for the View as a whole but remains distinct from Source Process Outcome Conformance.
 
 ## 9. Controls, Constraints, and Enablers
 
@@ -384,13 +384,13 @@ Framework-level Controls and Enablers must state scope, exceptions, and whether 
 
 Human and Agent capabilities, Agents, models, tools, Skills, automation, and execution environments used to perform or support a Process are Enablers rather than Process Inputs.
 
-A capability limitation, availability condition, response time, or other circumstance that limits permitted execution may instead be represented as a Constraint according to its function.
+A capability limitation, availability condition, response time, or other circumstance that limits permitted execution can instead be represented as a Constraint according to its function.
 
 ## 10. Entry/Exit Criteria, Decision Gates, and Reviews
 
 ### 10.1 Entry and Exit Criteria
 
-Entry Criteria and Exit Criteria retain their PF meanings. A discovery-layer Entry Criteria summary should support applicability determination and must not conflict with the authoritative execution layer.
+Entry Criteria and Exit Criteria retain their PF meanings. An Entry Criteria summary should be placed in the discovery layer to support applicability determination and must not conflict with the authoritative execution layer.
 
 Exit Criteria should be related to determining Outcome achievement.
 
@@ -398,11 +398,11 @@ Exit Criteria should be related to determining Outcome achievement.
 
 Decision Gates retain their PF meaning and remain separate decision mechanisms rather than Skill Description elements.
 
-A Gate required for an irreversible or high-impact external effect must occur before that effect. Human confirmation or escalation may implement such a Gate. The decision, rationale, assumptions, criteria, and evidence should be recorded according to risk and applicable Controls.
+A Gate required for an irreversible or high-impact external effect must occur before that effect. Human confirmation or escalation can implement such a Gate. The decision, rationale, assumptions, criteria, and evidence should be recorded according to risk and applicable Controls.
 
 ### 10.3 Reviews and Audits
 
-Reviews and audits retain their PF meanings and should be tailored to the subject and risk.
+Reviews and audits retain their PF meanings and should be tailored to the subject and risk. Their Entry Criteria, Exit Criteria, and responses to problems should be established.
 
 When an Output is transferred to another Process or stakeholder, it should be evaluated against applicable conditions to determine whether it can serve as the intended Input or result.
 
@@ -410,7 +410,7 @@ When an Output is transferred to another Process or stakeholder, it should be ev
 
 ### 11.1 Managed Tailoring
 
-Tailoring retains its PF meaning and must be performed through the Tailoring and Formal Adoption Activity of Manage ALPS (`skill:#manage-alps`) when ALPS Conformance is claimed.
+Tailoring retains its PF meaning and must be performed through the Tailoring and Formal Adoption Activity of Manage ALPS (`skill:#manage-alps`). Those requirements are prerequisites for Tailored Conformance.
 
 The applicable requirements and recommendations of that Process govern the Tailoring scope, Controls and Constraints, affected elements, assumptions, criteria, evidence, affected-party Input, and rationale. Tailored Conformance requires the resulting decision and scope to remain traceable.
 
@@ -424,7 +424,7 @@ A Process View does not redefine a source Process merely by containing a modifie
 
 ### 11.3 Process Instantiation
 
-Process Instantiation retains its PF meaning. It may add Instance-specific success criteria, Activities, Tasks, capabilities, resources, conditions, and timing when quality risk justifies the detail. Instantiation does not replace Tailoring and may be applied to a tailored Process.
+Process Instantiation retains its PF meaning. It can add Instance-specific success criteria, Activities, Tasks, capabilities, resources, conditions, and timing when quality risk justifies the detail. Instantiation does not replace Tailoring and can be applied to a tailored Process.
 
 ## 12. Conformance, Capability, and Assessment
 
@@ -463,13 +463,13 @@ Assessment criteria must match the declared subject:
 
 a) a Process representation may be assessed for Description Conformance, execution Conformance, Outcome achievement, performance, and effectiveness as applicable;
 
-b) a Process Model may be assessed for Process coverage, relationship coherence, resolvability, and applicability;
+b) a Process Model should be assessed for Process coverage, relationship coherence, resolvability, and applicability;
 
-c) a Process Reference Model may be assessed for Process identity, semantic-center equality, relationship coherence, resolvability, and suitability as a frame of reference;
+c) a Process Reference Model should be assessed for Process identity, semantic-center equality, relationship coherence, resolvability, and suitability as a frame of reference;
 
-d) a Process View may be assessed for Purpose and Outcomes, source provenance and Traceability, source-meaning preservation, handoffs, application guidance, and usefulness;
+d) a Process View should be assessed for Purpose and Outcomes, source provenance and Traceability, source-meaning preservation, handoffs, application guidance, and usefulness;
 
-e) a Skill Package may be assessed for its authoritative representation, mandatory-reference resolution, resource roles and conditions of use, consistency, and reverification after change.
+e) a Skill Package can be assessed for its authoritative representation, mandatory-reference resolution, resource roles and conditions of use, consistency, and reverification after change.
 
 Assessment of a non-Process representation is not Process execution Conformance.
 
