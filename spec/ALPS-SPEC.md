@@ -215,7 +215,11 @@ A Skill Package is distinct from a Logical Package Scope. A Logical Package Scop
 
 Accompanying resources may provide reference information, execution resources, or deliverable resources. Their roles and conditions of use must be identifiable from the authoritative representation, and mandatory references must resolve.
 
-When the authoritative representation contains a mandatory reference to another Skill Package, both Skill Packages must belong to a declared Logical Package Scope, and an applicable Package Binding must make the reference resolvable under 5.4.
+When an authoritative representation contains a mandatory reference to another Skill Package, an applicable Package Binding must make the reference resolve to exactly one target under 5.4.
+
+For a full reference, the target Skill Package must belong to the Logical Package Scope selected for the referenced package ID and exact package version.
+
+For a short reference, the referring and target Skill Packages must belong to the same declared containing Logical Package Scope.
 
 Unnecessary duplication or conflict must not arise between the authoritative representation and accompanying resources. Each resource is classified by its function in Process application—reference information, Input, Output, Control, Constraint, or Enabler—not by its directory. A Skill Package should contain only resources that directly support understanding or applying the represented PF construct.
 
