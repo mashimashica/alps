@@ -245,9 +245,13 @@ For a same-scope short reference, the referring and target Skill Packages must b
 
 Unnecessary duplication or conflict must not arise between the authoritative representation and accompanying resources. Each resource is classified by its function in Process application—reference information, Input, Output, Control, Constraint, or Enabler—not by its directory. A Skill Package should contain only resources that directly support understanding or applying the represented PF construct.
 
-### 5.6 Allocation Between PF and ALPS
+### 5.6 Specialization of PF
 
 PF remains authoritative for every general Process concept. ALPS specializes those concepts only where Agent Skill representation or the ALPS life cycle requires additional rules.
+
+ALPS may make a PF rule concrete for the Agent context and may strengthen it where needed, subject to 2.1.
+
+#### 5.6.1 Allocation Between PF and ALPS (informative)
 
 | PF subject | PF authority | ALPS specialization |
 |---|---|---|
@@ -260,8 +264,6 @@ PF remains authoritative for every general Process concept. ALPS specializes tho
 | Adaptation | Tailoring and Process Instantiation | Managed Tailoring and authoritative redefinition through the ALPS Reference Processes |
 | Evidence and claims | Decision Gates, reviews, audits, Process Conformance, and Capability | ALPS-specific Conformance subjects and representation assessment boundaries |
 | Management and improvement | General Process governance, measures, benchmarking, and learning | Define ALPS, Apply ALPS, and Manage ALPS as the ALPS reference life cycle |
-
-ALPS may make a PF rule concrete for the Agent context and may strengthen it where needed, subject to 2.1.
 
 ### 5.7 File-Based Skill Package Example (informative)
 
