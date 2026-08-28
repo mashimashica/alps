@@ -53,7 +53,7 @@ This Activity invokes selected Process Skills and evaluates their execution. It 
 4. Required Inputs and Enablers should be confirmed as available.
 5. Applicable Controls, Constraints, Tailoring decisions, and required Decision Gates must be identified.
 6. When the selected Conformance basis includes Full Conformance to Tasks or a Tailored Conformance scope that retains Activity or Task requirements, the applicable Activities and Tasks in the authoritative Process Description must be applied according to their normative attributes.
-7. When the selected Conformance basis makes a requirement Task applicable, that Task must not be omitted unless it has been legitimately changed through managed Tailoring. When only Full Conformance to Outcomes is selected, Activities and Tasks are guidance rather than mandatory execution conditions.
+7. When the selected Conformance basis makes a requirement stated with must or must not in an Activity or Task applicable, that requirement must not be omitted unless it has been legitimately changed through managed Tailoring. When only Full Conformance to Outcomes is selected, Activities and Tasks are guidance rather than mandatory execution conditions.
 8. An execution sequence not explicitly established by a Constraint must not be assumed.
 9. A required Decision Gate must be passed before the governed irreversible or high-impact action occurs.
 10. Process Exit Criteria must be assessed before completion is declared.
@@ -67,7 +67,7 @@ This Activity combines Processes and manages interfaces, handoffs, and compositi
 
 1. The target set of Outcomes for the composition must be identified.
 2. The identity and provenance of each Process representation used in the composition should be recorded.
-3. The mapping from each provider Output to each recipient Input must be explicit where the exchange affects successful application.
+3. Every provider Output to recipient Input mapping must be explicit.
 4. Previously undefined handoffs may be introduced only through an applicable controlled change or Tailoring decision.
 5. When Iteration or Recursion changes an Output, affected Inputs and applicable criteria should be reevaluated.
 6. Integration must establish completeness within the selected scope and consistency across Process relationships.
@@ -93,7 +93,7 @@ Representative Outputs include activated representations, resolved Process selec
 ## Exit Criteria
 
 - The application needs, selected representations, resolved Processes, Invocation decisions, and rationale are recorded.
-- Entry/Exit Criteria, applicable requirement Tasks, Outcome evidence, and unresolved matters for each invoked Process have been assessed.
+- Entry/Exit Criteria, applicable Activity and Task requirements, Outcome evidence, and unresolved matters for each invoked Process have been assessed.
 - For combined application, Output/Input mappings and composition integrity have been evaluated.
 - Required handoffs, holds, requests to Define ALPS or Manage ALPS, or termination are explicit.
 - Any Conformance claim states its subject, scope, basis, and evidence.

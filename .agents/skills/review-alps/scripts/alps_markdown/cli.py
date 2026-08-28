@@ -24,6 +24,7 @@ try:
         deterministic_diagnostics,
     )
     from .reference_profile import (
+        LogicalPackageIdentity,
         PackageRootConfig,
         containing_package_identity,
         package_roots,
@@ -45,6 +46,7 @@ except ImportError:  # pragma: no cover - supports direct script execution.
         deterministic_diagnostics,
     )
     from alps_markdown.reference_profile import (  # type: ignore
+        LogicalPackageIdentity,
         PackageRootConfig,
         containing_package_identity,
         package_roots,
@@ -59,7 +61,10 @@ def _host(code: str, message: str) -> Diagnostic:
 
 
 def _merge(
-    roots: dict[str, Path], diagnostics: list[Diagnostic], addition: PackageRootConfig
+    roots: dict[str, Path],
+    versions: dict[str, str],
+    diagnostics: list[Diagnostic],
+    addition: PackageRootConfig,
 ) -> None:
     diagnostics.extend(addition.diagnostics)
     for package, root in addition.roots.items():
@@ -69,27 +74,59 @@ def _merge(
             )
         else:
             roots[package] = root
+            if package in addition.versions:
+                versions[package] = addition.versions[package]
 
 
 def _configure(args: argparse.Namespace) -> PackageRootConfig:
     cwd = Path.cwd()
     roots: dict[str, Path] = {}
+    versions: dict[str, str] = {}
     diagnostics: list[Diagnostic] = []
     if args.package_roots:
-        _merge(roots, diagnostics, package_roots(args.package_roots, cwd=cwd))
+        _merge(roots, versions, diagnostics, package_roots(args.package_roots, cwd=cwd))
 
     if args.root is not None:
-        key = args.package_id or ""
-        _merge(roots, diagnostics, package_roots({key: args.root}, cwd=cwd))
+        if (args.package_id is None) != (args.package_version is None):
+            diagnostics.append(_host(
+                "incomplete-root-compatibility",
+                "--root, --package-id, and --package-version must be supplied together",
+            ))
+        key = (
+            f"{args.package_id}@{args.package_version}"
+            if args.package_id is not None and args.package_version is not None
+            else ""
+        )
+        _merge(roots, versions, diagnostics, package_roots({key: args.root}, cwd=cwd))
     elif args.package_id is None:
-        _merge(roots, diagnostics, package_roots({"": cwd}, cwd=cwd))
+        if args.package_version is not None:
+            diagnostics.append(_host("incomplete-root-compatibility",
+                                     "--package-version requires --root and --package-id"))
+        if not roots:
+            _merge(roots, versions, diagnostics, package_roots({"": cwd}, cwd=cwd))
+    elif args.package_version is None:
+        diagnostics.append(_host("incomplete-root-compatibility",
+                                 "--package-id requires --package-version"))
     elif _PACKAGE_ID.fullmatch(args.package_id) is None:
         diagnostics.append(_host("invalid-package-id", f"invalid package ID: {args.package_id!r}"))
     elif args.package_id not in roots:
         diagnostics.append(
             _host("missing-package-root", f"no configured root exists for package ID {args.package_id!r}")
         )
-    return PackageRootConfig(dict(sorted(roots.items())), deterministic_diagnostics(diagnostics))
+    elif config_version := versions.get(args.package_id):
+        if config_version != args.package_version:
+            diagnostics.append(
+                _host(
+                    "conflicting-package-version",
+                    f"package ID {args.package_id!r} is bound to {config_version!r}, "
+                    f"not {args.package_version!r}",
+                )
+            )
+    return PackageRootConfig(
+        dict(sorted(roots.items())),
+        deterministic_diagnostics(diagnostics),
+        dict(sorted(versions.items())),
+    )
 
 
 def _path_key(path: Path) -> str:
@@ -134,12 +171,13 @@ def _pair_package_identity(
     japanese: Path,
     config: PackageRootConfig,
     configured: str | None,
-) -> str | None:
+) -> LogicalPackageIdentity | None:
     """Provide locale comparison with the package context already configured."""
     if configured:
-        return configured
-    left = containing_package_identity(english, config.roots)
-    right = containing_package_identity(japanese, config.roots)
+        version = config.versions.get(configured)
+        return LogicalPackageIdentity(configured, version) if version is not None else None
+    left = containing_package_identity(english, config)
+    right = containing_package_identity(japanese, config)
     return left if left is not None and left == right else None
 
 
@@ -158,7 +196,18 @@ def _run(argv: list[str] | None) -> int:
     parser.add_argument("paths", nargs="*", type=Path)
     parser.add_argument("--root", type=Path)
     parser.add_argument("--package-id")
-    parser.add_argument("--package-root", dest="package_roots", action="append", metavar="PACKAGE=PATH")
+    parser.add_argument("--package-version")
+    parser.add_argument(
+        "--package-binding",
+        "--package-root",
+        dest="package_roots",
+        action="append",
+        metavar="PACKAGE@VERSION=PATH",
+        help=(
+            "bind one package ID and exact version to a package root; "
+            "--package-root is retained as a compatibility alias"
+        ),
+    )
     parser.add_argument("--require-japanese", action="store_true")
     parser.add_argument("--no-locale-pairs", action="store_true")
     parser.add_argument("--version", action="version", version=PROFILE_VERSION)
@@ -221,7 +270,7 @@ def _run(argv: list[str] | None) -> int:
     for path in assets:
         result = check_document(
             path,
-            config.roots,
+            config,
             args.package_id,
             parse_cache=parse_cache,
         )
@@ -247,7 +296,10 @@ def _run(argv: list[str] | None) -> int:
                     compare_locale_ir(
                         left.ir,
                         right.ir,
-                        package_identity=_pair_package_identity(path, counterpart, config, args.package_id),
+                        package_identity=(
+                            _pair_package_identity(path, counterpart, config, args.package_id),
+                            config.versions,
+                        ),
                     )
                 )  # type: ignore[arg-type]
 
@@ -258,7 +310,7 @@ def _run(argv: list[str] | None) -> int:
     status = _status(ordered)
     if status == 0:
         print(f"PROFILE_VERSION={PROFILE_VERSION}")
-        print("Valid under ALPS Markdown Profile v1 only; this is not an ALPS Conformance claim.")
+        print("Valid under ALPS Markdown Profile v2 only; this is not an ALPS Conformance claim.")
     return status
 
 

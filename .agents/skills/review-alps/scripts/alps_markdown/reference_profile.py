@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, MutableSequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import ntpath
 import os
 from pathlib import Path
@@ -20,6 +20,7 @@ PathLike: TypeAlias = str | os.PathLike[str]
 _PACKAGE_ID = r"[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)*"
 _SKILL_NAME = r"[a-z0-9]+(?:-[a-z0-9]+)*"
 _PACKAGE_RE = re.compile(rf"\A{_PACKAGE_ID}\Z")
+_VERSION_RE = re.compile(r"\A[0-9A-Za-z]+(?:[._+-][0-9A-Za-z]+)*\Z")
 _REFERENCE_RE = re.compile(
     rf"\Askill:(?:(?P<package>{_PACKAGE_ID}))?#(?P<skill>{_SKILL_NAME})\Z"
 )
@@ -27,10 +28,11 @@ _REFERENCE_RE = re.compile(
 
 @dataclass(frozen=True)
 class PackageRootConfig:
-    """Validated package roots and host configuration diagnostics."""
+    """Validated versioned package bindings and host diagnostics."""
 
     roots: Mapping[str, Path]
     diagnostics: tuple[Diagnostic, ...] = ()
+    versions: Mapping[str, str] = field(default_factory=dict)
 
     def __getitem__(self, package_id: str) -> Path:
         return self.roots[package_id]
@@ -43,18 +45,44 @@ class PackageRootConfig:
 
 
 @dataclass(frozen=True)
+class LogicalPackageIdentity:
+    """A package ID paired with the exact version selected by a binding."""
+
+    package_id: str
+    exact_version: str
+
+    def __str__(self) -> str:
+        return f"{self.package_id}@{self.exact_version}"
+
+
+@dataclass(frozen=True)
+class LogicalSkillIdentity:
+    """The complete logical identity required by ALPS."""
+
+    package_id: str
+    exact_version: str
+    skill_name: str
+
+    def __str__(self) -> str:
+        return f"{self.package_id}@{self.exact_version}#{self.skill_name}"
+
+
+@dataclass(frozen=True)
 class ResolvedReference:
     """A canonical identity and its checked, package-contained target path."""
 
     reference: Reference
     package_id: str | None
+    exact_version: str | None
     skill_name: str
     package_root: Path
     target: Path
 
     @property
-    def identity(self) -> str:
-        return f"{self.package_id}#{self.skill_name}" if self.package_id else f"#{self.skill_name}"
+    def identity(self) -> LogicalSkillIdentity | None:
+        if self.package_id is None or self.exact_version is None:
+            return None
+        return LogicalSkillIdentity(self.package_id, self.exact_version, self.skill_name)
 
     @property
     def root(self) -> Path:
@@ -81,6 +109,8 @@ ResolutionResult = ReferenceResolution
 
 __all__ = [
     "PackageRootConfig",
+    "LogicalPackageIdentity",
+    "LogicalSkillIdentity",
     "ResolvedReference",
     "ReferenceResolution",
     "ResolutionResult",
@@ -126,14 +156,30 @@ def _valid_package_id(value: object) -> bool:
     return isinstance(value, str) and _PACKAGE_RE.fullmatch(value) is not None
 
 
+def _valid_version(value: object) -> bool:
+    return isinstance(value, str) and _VERSION_RE.fullmatch(value) is not None
+
+
+def _binding_key(value: object) -> tuple[str | None, str | None]:
+    if value == "":
+        return "", None
+    if not isinstance(value, str):
+        return None, None
+    package, separator, version = value.rpartition("@")
+    if not separator:
+        return value, None
+    return package, version
+
+
 def package_roots(
     packages: Iterable[str] | Mapping[str, PathLike] | str | None = None,
     root: PathLike | None = None,
     package_id: str | None = None,
+    package_version: str | None = None,
     *,
     cwd: PathLike | None = None,
 ) -> PackageRootConfig:
-    """Parse exact ``PACKAGE=PATH`` entries and legacy root/id options.
+    """Parse exact ``PACKAGE@VERSION=PATH`` bindings and root compatibility.
 
     Relative paths are resolved against ``cwd`` (or the current directory),
     and no default package is invented.  Invalid entries are retained as
@@ -145,7 +191,14 @@ def package_roots(
     allow_default_root = False
 
     if isinstance(packages, PackageRootConfig):
-        entries.extend((key, value, f"{key}={value}") for key, value in packages.roots.items())
+        entries.extend(
+            (
+                f"{key}@{packages.versions[key]}" if key and key in packages.versions else key,
+                value,
+                f"{key}={value}",
+            )
+            for key, value in packages.roots.items()
+        )
         diagnostics.extend(packages.diagnostics)
         allow_default_root = True
     elif isinstance(packages, Mapping):
@@ -160,7 +213,7 @@ def package_roots(
             if not separator or not package or not path:
                 diagnostics.append(
                     _diagnostic("host-input", "invalid-package-root-spec", "<package-config>",
-                                "package root must be exactly PACKAGE=PATH")
+                                "package binding must be exactly PACKAGE@VERSION=PATH")
                 )
             else:
                 entries.append((package, path, spec))
@@ -169,34 +222,53 @@ def package_roots(
             if not isinstance(spec, str):
                 diagnostics.append(
                     _diagnostic("host-input", "invalid-package-root-spec", "<package-config>",
-                                "package root must be a PACKAGE=PATH string")
+                                "package binding must be a PACKAGE@VERSION=PATH string")
                 )
                 continue
             package, separator, path = spec.partition("=")
             if not separator or not package or not path:
                 diagnostics.append(
                     _diagnostic("host-input", "invalid-package-root-spec", "<package-config>",
-                                "package root must be exactly PACKAGE=PATH")
+                                "package binding must be exactly PACKAGE@VERSION=PATH")
                 )
             else:
                 entries.append((package, path, spec))
 
-    if (root is None) != (package_id is None):
+    if root is None and (package_id is not None or package_version is not None):
         diagnostics.append(
             _diagnostic("host-input", "incomplete-root-compatibility", "<package-config>",
-                        "--root and --package-id must be supplied together")
+                        "--root, --package-id, and --package-version must be supplied together")
         )
-    elif root is not None and package_id is not None:
-        entries.append((package_id, root, f"{package_id}={root}"))
+    elif root is not None:
+        if package_id is None and package_version is None:
+            allow_default_root = True
+            entries.append(("", root, f"={root}"))
+        elif package_id is None or package_version is None:
+            diagnostics.append(
+                _diagnostic("host-input", "incomplete-root-compatibility", "<package-config>",
+                            "--root, --package-id, and --package-version must be supplied together")
+            )
+        else:
+            entries.append((f"{package_id}@{package_version}", root,
+                            f"{package_id}@{package_version}={root}"))
 
     roots: dict[str, Path] = {}
-    for package, raw_path, display in entries:
+    versions: dict[str, str] = {}
+    for binding, raw_path, display in entries:
+        package, version = _binding_key(binding)
         if package == "" and allow_default_root:
             pass
         elif not _valid_package_id(package):
             diagnostics.append(
                 _diagnostic("host-input", "invalid-package-id", "<package-config>",
                             f"invalid package ID in {display!r}")
+            )
+            continue
+        if package != "" and not _valid_version(version):
+            diagnostics.append(
+                _diagnostic("host-input", "missing-or-invalid-package-version",
+                            "<package-config>",
+                            f"package binding {display!r} must include an exact version")
             )
             continue
         if package in roots:
@@ -213,6 +285,8 @@ def package_roots(
             )
             continue
         roots[package] = absolute
+        if package and version is not None:
+            versions[package] = version
         try:
             is_directory = absolute.is_dir()
         except OSError:
@@ -228,16 +302,19 @@ def package_roots(
             _diagnostic("host-input", "no-package-roots", "<package-config>",
                         "at least one package root must be configured")
         )
-    return PackageRootConfig(dict(sorted(roots.items())), _sorted(diagnostics))
+    return PackageRootConfig(
+        dict(sorted(roots.items())),
+        _sorted(diagnostics),
+        dict(sorted(versions.items())),
+    )
 
 
-def _coerce_roots(
+def _coerce_config(
     configured: PackageRootConfig | Mapping[str, PathLike] | Iterable[str] | str | None,
-) -> tuple[Mapping[str, Path], tuple[Diagnostic, ...]]:
+) -> PackageRootConfig:
     if isinstance(configured, PackageRootConfig):
-        return configured.roots, configured.diagnostics
-    config = package_roots(configured)
-    return config.roots, config.diagnostics
+        return configured
+    return package_roots(configured)
 
 
 def _contained(candidate: Path, root: Path) -> bool:
@@ -344,21 +421,24 @@ def containing_package_identity(
     configured: PackageRootConfig | Mapping[str, PathLike] | Iterable[str] | str | None,
     *,
     diagnostics: MutableSequence[Diagnostic] | None = None,
-) -> str | None:
-    """Return the exact configured package containing ``path``.
+) -> LogicalPackageIdentity | None:
+    """Return the exact versioned package scope containing ``path``.
 
     Both lexical and real-path containment are required.  A default root (the
     empty mapping key) is usable for local resolution but has no identity, so
     this function returns ``None`` for that root.  An optional mutable
     diagnostics sequence receives deterministic diagnostics.
     """
-    roots, config_diagnostics = _coerce_roots(configured)
-    collected = list(config_diagnostics)
-    identity = _identity_for_path(path, roots, collected)
+    config = _coerce_config(configured)
+    collected = list(config.diagnostics)
+    identity = _identity_for_path(path, config.roots, collected)
     ordered = _sorted(collected)
     if diagnostics is not None:
         diagnostics[:] = ordered
-    return None if identity == "" else identity
+    if identity in (None, ""):
+        return None
+    version = config.versions.get(identity)
+    return LogicalPackageIdentity(identity, version) if version is not None else None
 
 
 def resolve_reference(
@@ -372,8 +452,9 @@ def resolve_reference(
     """Resolve one canonical reference without reading its target content."""
     if containing_path is None:
         containing_path = current_path
-    roots, config_diagnostics = _coerce_roots(configured)
-    diagnostics = list(config_diagnostics)
+    config = _coerce_config(configured)
+    roots = config.roots
+    diagnostics = list(config.diagnostics)
     parsed, qualified_package, skill, parse_error = _reference_parts(reference)
     if parse_error is not None:
         diagnostics.append(parse_error)
@@ -428,6 +509,19 @@ def resolve_reference(
         return ReferenceResolution(None, _sorted(diagnostics))
 
     package_root = roots[selected_root]
+    exact_version = config.versions.get(selected_root) if selected_root else None
+    if selected_root and exact_version is None:
+        diagnostics.append(
+            _diagnostic("host-input", "missing-package-version", "<reference>",
+                        f"no exact version is bound for package ID {selected_root!r}", parsed)
+        )
+        return ReferenceResolution(None, _sorted(diagnostics))
+    if not selected_root:
+        diagnostics.append(
+            _diagnostic("host-input", "missing-logical-package-scope", "<reference>",
+                        "reference resolution requires a versioned package binding", parsed)
+        )
+        return ReferenceResolution(None, _sorted(diagnostics))
     target = package_root / "skills" / skill / "SKILL.md"
     if not _contained(target, package_root):
         diagnostics.append(
@@ -454,7 +548,14 @@ def resolve_reference(
     if any(item.severity is Severity.ERROR for item in diagnostics):
         return ReferenceResolution(None, _sorted(diagnostics))
     return ReferenceResolution(
-        ResolvedReference(parsed, resolved_package_id, skill, package_root, target),
+        ResolvedReference(
+            parsed,
+            resolved_package_id,
+            exact_version,
+            skill,
+            package_root,
+            target,
+        ),
         _sorted(diagnostics),
     )
 

@@ -2,10 +2,20 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+from typing import TypeAlias
+
 from .model import Diagnostic, DocumentIR, Reference, Severity, Span, deterministic_diagnostics
+from .reference_profile import LogicalPackageIdentity, LogicalSkillIdentity
 
 
-_Key = str | tuple[str, ...]
+_PackageContext: TypeAlias = (
+    str
+    | LogicalPackageIdentity
+    | tuple[str | LogicalPackageIdentity | None, Mapping[str, str]]
+    | None
+)
+_Key = str | LogicalSkillIdentity | tuple[str | LogicalSkillIdentity, ...]
 
 
 def _present(value: str | None) -> bool:
@@ -13,25 +23,50 @@ def _present(value: str | None) -> bool:
 
 
 def _reference_identity(
-    reference: Reference | None, package_identity: str | None = None
-) -> str | None:
+    reference: Reference | None, package_identity: _PackageContext = None
+) -> str | LogicalSkillIdentity | None:
     """Return the semantic reference key while retaining lexical IR fields.
 
-    A short reference has no package in its lexical token.  The caller may
-    supply the package containing both locale assets; that context is the
-    locale-comparison equivalent of the resolver's canonical identity.
+    A short reference has no package or version in its lexical token.  The
+    caller supplies the versioned scope containing both locale assets and the
+    selected version for each qualified package ID.  Comparison then uses the
+    same three-part identity as the resolver.
     """
     if reference is None or not _present(reference.token):
         return None
     skill_name = getattr(reference, "skill_name", None)
     if not _present(skill_name):
         return reference.token
-    package = reference.package_id if _present(reference.package_id) else package_identity
-    return f"{package}#{skill_name}" if _present(package) else f"#{skill_name}"
+    context = package_identity
+    versions: Mapping[str, str] = {}
+    if (
+        isinstance(context, tuple)
+        and len(context) == 2
+        and isinstance(context[1], Mapping)
+    ):
+        context, versions = context
+    if isinstance(context, str) and "@" in context:
+        package_id, exact_version = context.rsplit("@", 1)
+        context = LogicalPackageIdentity(package_id, exact_version)
+    if isinstance(context, LogicalPackageIdentity):
+        versions = {**versions, context.package_id: context.exact_version}
+    package = (
+        reference.package_id
+        if _present(reference.package_id)
+        else context.package_id
+        if isinstance(context, LogicalPackageIdentity)
+        else None
+    )
+    if not _present(package):
+        return None
+    exact_version = versions.get(package)
+    if not _present(exact_version):
+        return None
+    return LogicalSkillIdentity(package, exact_version, skill_name)
 
 
 def _ref_key(
-    refs: tuple[Reference, ...], package_identity: str | None = None
+    refs: tuple[Reference, ...], package_identity: _PackageContext = None
 ) -> _Key | None:
     values = tuple(
         value for ref in refs
@@ -43,8 +78,8 @@ def _ref_key(
 
 
 def _operative_ref_key(
-    refs: tuple[Reference, ...], package_identity: str | None = None
-) -> tuple[str, ...]:
+    refs: tuple[Reference, ...], package_identity: _PackageContext = None
+) -> tuple[str | LogicalSkillIdentity, ...]:
     return tuple(
         value for ref in refs
         if (value := _reference_identity(ref, package_identity)) is not None
@@ -155,7 +190,7 @@ def _scalar(
 
 
 def _process_key(
-    process: object, package_identity: str | None = None
+    process: object, package_identity: _PackageContext = None
 ) -> tuple[_Key | None, str | None, Reference | None]:
     reference = getattr(process, "reference", None)
     key = _reference_identity(reference, package_identity)
@@ -164,7 +199,7 @@ def _process_key(
 
 
 def _outcome_key(
-    outcome: object, package_identity: str | None = None
+    outcome: object, package_identity: _PackageContext = None
 ) -> tuple[_Key | None, str | None, Reference | None]:
     refs = getattr(outcome, "references", ())
     key, first = _ref_key(refs, package_identity), refs[0] if refs else None
@@ -175,7 +210,7 @@ def _outcome_key(
 
 
 def _source_key(
-    source: object, package_identity: str | None = None
+    source: object, package_identity: _PackageContext = None
 ) -> tuple[_Key | None, str | None, Reference | None]:
     reference = getattr(source, "reference", None)
     key = _reference_identity(reference, package_identity)
@@ -184,7 +219,7 @@ def _source_key(
 
 
 def _endpoint_key(
-    doc: DocumentIR, value: str | None, package_identity: str | None = None
+    doc: DocumentIR, value: str | None, package_identity: _PackageContext = None
 ) -> tuple[_Key | None, str | None]:
     if not _present(value):
         return None, None
@@ -200,7 +235,7 @@ def _relationships(
     english: DocumentIR,
     japanese: DocumentIR,
     prefix: str,
-    package_identity: str | None = None,
+    package_identity: _PackageContext = None,
 ) -> None:
     _count(out, english, japanese, english.relationships, japanese.relationships,
            f"{prefix}-relationship-count-mismatch", "relationship")
@@ -220,7 +255,7 @@ def _entries(
     japanese: DocumentIR,
     prefix: str,
     centers: bool = False,
-    package_identity: str | None = None,
+    package_identity: _PackageContext = None,
 ) -> None:
     _count(out, english, japanese, english.processes, japanese.processes,
            f"{prefix}-process-count-mismatch", "process")
@@ -247,7 +282,7 @@ def _entries(
 
 
 def _process(
-    english: DocumentIR, japanese: DocumentIR, out: list[Diagnostic], package_identity: str | None = None
+    english: DocumentIR, japanese: DocumentIR, out: list[Diagnostic], package_identity: _PackageContext = None
 ) -> None:
     _count(out, english, japanese, english.outcomes, japanese.outcomes,
            "process-outcome-count-mismatch", "outcome")
@@ -271,7 +306,7 @@ def _process(
 
 
 def _applications(
-    out: list[Diagnostic], english: DocumentIR, japanese: DocumentIR, package_identity: str | None = None
+    out: list[Diagnostic], english: DocumentIR, japanese: DocumentIR, package_identity: _PackageContext = None
 ) -> None:
     _count(out, english, japanese, english.application, japanese.application,
            "reference-semantic-center-count-mismatch", "semantic center")
@@ -285,7 +320,7 @@ def _applications(
 
 
 def _reference_model(
-    english: DocumentIR, japanese: DocumentIR, out: list[Diagnostic], package_identity: str | None = None
+    english: DocumentIR, japanese: DocumentIR, out: list[Diagnostic], package_identity: _PackageContext = None
 ) -> None:
     has_applications = bool(english.application or japanese.application)
     _entries(out, english, japanese, "reference", centers=not has_applications,
@@ -296,7 +331,7 @@ def _reference_model(
 
 
 def _view(
-    english: DocumentIR, japanese: DocumentIR, out: list[Diagnostic], package_identity: str | None = None
+    english: DocumentIR, japanese: DocumentIR, out: list[Diagnostic], package_identity: _PackageContext = None
 ) -> None:
     _count(out, english, japanese, english.outcomes, japanese.outcomes, "view-outcome-count-mismatch", "outcome")
     for index, (left, right) in enumerate(zip(english.outcomes, japanese.outcomes)):
@@ -353,9 +388,9 @@ def _frontmatter(english: DocumentIR, japanese: DocumentIR, out: list[Diagnostic
 def compare_locale_ir(
     english: DocumentIR,
     japanese: DocumentIR,
-    package_identity: str | None = None,
+    package_identity: _PackageContext = None,
 ) -> tuple[Diagnostic, ...]:
-    """Compare locale IRs, normalizing short refs with the containing package."""
+    """Compare locale IRs using the applicable versioned package context."""
     out: list[Diagnostic] = []
     _frontmatter(english, japanese, out)
     left_kind = english.frontmatter.kind if english.frontmatter else english.kind

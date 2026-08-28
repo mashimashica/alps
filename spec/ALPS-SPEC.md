@@ -80,7 +80,11 @@ The following logical Skill references identify normative assets released with t
 
 PF, this specification, and the four assets above form one ALPS Release Package. Its package ID must be `alps`, and its package version must be the single ALPS release version declared by that release. The four assets are distinct Skill Packages within that Logical Package Scope. The ALPS Release Package is not itself a Skill Package; the one-authoritative-representation rule in 5.5 applies separately to each contained Skill Package.
 
-For every same-scope short reference in the table and every same-scope short reference from the ALPS Reference Model to a Reference Process, the Logical Package Scope containing its referring representation is the same-version ALPS Release Package. Before resolution, an applicable Package Binding must bind package ID `alps` and the exact declared package version to one concrete release instance and its four Skill Packages. A resolver must resolve each same-scope short reference to exactly one matching Skill Package in that scope and must not resolve it across package versions.
+For every same-scope short reference in the table, this specification declares the same-version ALPS Release Package as its Logical Package Scope.
+
+For every same-scope short reference from the ALPS Reference Model to a Reference Process, the referring representation's declared Logical Package Scope is the same-version ALPS Release Package.
+
+Before resolution, an applicable Package Binding must bind package ID `alps` and the exact declared package version to one concrete release instance and its four Skill Packages. A resolver must resolve each same-scope short reference to exactly one matching Skill Package in that scope and must not resolve it across package versions.
 
 Repository paths and Host manifests may implement a Package Binding but do not define or change these logical identities.
 
@@ -311,7 +315,7 @@ A Process representation must satisfy the applicable PF requirements for a Proce
 
 A Skill Name must use a concise noun phrase as the Skill heading.
 
-A general Skill Description must preserve PF's non-prescription of performer, Task allocation, method, tool, metric, management method, and execution sequence. An Instance-specific description must state its context and can include Instance-specific capabilities, resources, Inputs, Outputs, Controls, Constraints, criteria, and timing.
+A general Skill Description must preserve PF's non-prescription of performer, Task allocation, method, tool, metric, management method, and execution sequence. An Instance-specific description must state its context and can include Instance-specific roles and responsibilities, capabilities, resources, Inputs, Outputs, Controls, Constraints, criteria, and timing.
 
 The Activities and any separated Skills must collectively cover all Outcomes and satisfy the Skill Purpose.
 
@@ -495,7 +499,7 @@ The three Reference Processes are general Processes. Their document order, Activ
 
 Agent Skill activation and Process Invocation remain distinct when the ALPS Reference Model is used. The Reference Model can guide Process selection and composition but is not itself invoked as a Process.
 
-A subset of the Reference Processes can be selected according to Purpose. Under Outcome Conformance, Activities and Tasks are guidance and can be selected without changing the declared Process scope. Under Task Conformance, a requirement Task in scope must not be omitted unless managed Tailoring changes the scope. Applying only some Activities as a Conformance scope must be declared as a tailored scope of the parent Reference Process.
+A subset of the Reference Processes can be selected according to Purpose. Under Outcome Conformance, Activities and Tasks are guidance and can be selected without changing the declared Process scope. Under Task Conformance, every in-scope requirement stated with must or must not in an Activity or Task must be satisfied; managed Tailoring is required to change the requirement or remove it from scope. Applying only some Activities as a Conformance scope must be declared as a tailored scope of the parent Reference Process.
 
 A context-specific change to an applicable Reference Process is managed Tailoring; an authoritative semantic change to its Process Description is controlled redefinition.
 
@@ -525,7 +529,7 @@ c) applicable Controls, Constraints, Tailoring decisions, and required Decision 
 
 If Entry Criteria are not satisfied, Invocation must be deferred or the unmet conditions must first be resolved.
 
-The selected Conformance basis determines whether Activities and Tasks are guidance or mandatory execution conditions under PF 8.3. A requirement Task that is in scope must not be omitted unless managed Tailoring has changed it. An execution sequence not established by a Constraint must not be assumed.
+The selected Conformance basis determines the status of Activities and Tasks under PF 8.3. Under Outcome Conformance, Activities and Tasks are guidance. Under Task Conformance, every in-scope requirement stated with must or must not in an Activity or Task is a mandatory execution condition. Recommendations, permissions, and typical actions remain non-mandatory. An execution sequence not established by a Constraint must not be assumed.
 
 A required Decision Gate must be passed before the action it governs occurs. Process Exit Criteria must be assessed before completion is declared. Outcome achievement should be determined from observable evidence.
 
@@ -577,9 +581,9 @@ Process View Outcome achievement can be assessed for the View as a whole but rem
 
 PF governs the classification of Inputs, Outputs, Controls, Constraints, and Enablers. An ALPS resource must be classified by its function in the Process, not by file type, directory, or distribution mechanism.
 
-Framework-level Controls and Enablers must state scope, exceptions, and whether Tailoring is permitted. Elements common to a declared scope may be stated once rather than repeated in each Process Skill.
+Framework-level Controls, Constraints, and Enablers must state scope, exceptions, and whether Tailoring is permitted. Elements common to a declared scope may be stated once rather than repeated in each Process Skill.
 
-Information resources that apply in common to multiple Processes can be declared as Framework-level Controls or Enablers according to their function.
+Information resources that apply in common to multiple Processes can be declared as Framework-level Controls, Constraints, or Enablers according to their function.
 
 ### 9.2 Agent Resources
 

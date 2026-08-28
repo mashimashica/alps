@@ -24,8 +24,8 @@ The functional role of a resource must be determined from the function it perfor
 | `define-alps` Package | This `skill-package-format.md` | Reference information | Explains logical resource roles; it is not an Environment Binding. |
 | `define-alps` Package | [`agents/openai.yaml`](../agents/openai.yaml) | Environment Binding | Maps discovery and presentation metadata for a target Host. |
 | `define-alps` Package | [`assets/alps.svg`](../assets/alps.svg) | Presentation resource | Supports presentation only. |
-| Repository review | [`spec/alps-markdown.md`](../../../spec/alps-markdown.md) | Environment Binding | Defines the optional `alps-markdown/v1` physical representation; it is not ALPS itself. |
-| Repository review | [`validate_alps_markdown.py`](../../../.agents/skills/review-alps/scripts/validate_alps_markdown.py) | Application Enabler | Supports the repository-development `review-alps` Process by validating `alps-markdown/v1`; it is not part of the distributed `define-alps` Package and does not establish ALPS Conformance. |
+| Repository review | [`spec/alps-markdown-v2.md`](../../../spec/alps-markdown-v2.md) | Environment Binding | Defines the optional `alps-markdown/v2` physical representation; it is not ALPS itself. |
+| Repository review | [`validate_alps_markdown.py`](../../../.agents/skills/review-alps/scripts/validate_alps_markdown.py) | Application Enabler | Supports the repository-development `review-alps` Process by validating `alps-markdown/v2`; it is not part of the distributed `define-alps` Package and does not establish ALPS Conformance. |
 
 ## Representative Environment Binding Items
 

@@ -7,7 +7,7 @@ from enum import Enum
 from typing import Mapping, Sequence
 
 
-PROFILE_VERSION = "alps-markdown/v1"
+PROFILE_VERSION = "alps-markdown/v2"
 
 MAX_INPUT_BYTES = 1 * 1024 * 1024
 MAX_INPUT_LINES = 20_000
