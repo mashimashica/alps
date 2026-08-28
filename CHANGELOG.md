@@ -7,6 +7,7 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 ### Changed
 
 - Normalized the Process Framework and ALPS Specification so PF remains the sole source for general Process semantics, the ALPS Reference Model owns the reference relationship structure, and each reference Process Skill owns its complete Process Description.
+- Defined versioned logical Skill resolution through Logical Package Scope and Package Binding, including package ID, exact version, and Skill name as the complete logical identity, an `alps` same-version Release Package, and distinct resolution scopes for package-qualified and same-scope short references.
 - Moved informative examples, related-document notes, and Agent-context oversight and evidence guidance from the ALPS Specification into paired informative guidance without changing their normative status.
 
 ### Fixed

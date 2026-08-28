@@ -153,7 +153,7 @@ A Process Framework can establish a desired Process environment, support selecti
 
 A **life cycle model** brings life cycle Processes and Activities into a shared basis for communication and understanding. Its details are expressed through Processes, Outcomes, relationships, and ordering.
 
-The purpose of the application and the selected life cycle model determine actual Process order. Document clause order does not prescribe execution order. Process selection and timing need continual review when the subject or context changes.
+The purpose of the application and the selected life cycle model determine actual Process order. Document clause order does not prescribe execution order. Process selection and timing must be continually reviewed when the subject or context changes.
 
 ### 5.3 Process Views
 

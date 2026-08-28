@@ -80,7 +80,7 @@ The following logical Skill references identify normative assets released with t
 
 PF, this specification, and the four assets above form one ALPS Release Package. Its package ID must be `alps`, and its package version must be the single ALPS release version declared by that release. The four assets are distinct Skill Packages within that Logical Package Scope. The ALPS Release Package is not itself a Skill Package; the one-authoritative-representation rule in 5.5 applies separately to each contained Skill Package.
 
-For every short reference in the table and every short reference from the ALPS Reference Model to a Reference Process, the containing Logical Package Scope is the same-version ALPS Release Package. Before resolution, an applicable Package Binding must bind package ID `alps` and the exact declared package version to one concrete release instance and its four Skill Packages. A resolver must resolve each short reference to exactly one matching Skill Package in that scope and must not resolve it across package versions.
+For every same-scope short reference in the table and every same-scope short reference from the ALPS Reference Model to a Reference Process, the Logical Package Scope containing its referring representation is the same-version ALPS Release Package. Before resolution, an applicable Package Binding must bind package ID `alps` and the exact declared package version to one concrete release instance and its four Skill Packages. A resolver must resolve each same-scope short reference to exactly one matching Skill Package in that scope and must not resolve it across package versions.
 
 Repository paths and Host manifests may implement a Package Binding but do not define or change these logical identities.
 
@@ -195,7 +195,9 @@ Cross-cutting Controls, Constraints, Enablers, or guidance should be treated sep
 
 ### 5.4 Logical Skill References
 
-A Process Model, Process Reference Model, or Process View refers to an Agent Skill by logical package identity and Skill name:
+An ALPS representation that refers to another Agent Skill uses a logical package reference and Skill name as specified in this clause.
+
+A package-qualified reference has the following form:
 
 ```text
 skill:<package-id>#<skill-name>
@@ -203,7 +205,13 @@ skill:<package-id>#<skill-name>
 
 A Logical Package Scope is identified by a package ID and an exact package version. The reference syntax carries the package ID; an applicable Package Binding must supply the exact package version. The package ID, exact package version, and Skill name together form the complete logical identity.
 
-Within the same Logical Package Scope, `skill:#<skill-name>` may be used. The containing Logical Package Scope must be declared by the representation or a governing normative source and must not be inferred from a Skill Package directory or repository path. A resolver must resolve the short form to exactly one matching Skill Package within that declared scope and must normalize it with the scope's package ID and exact package version when a complete identity is needed. It must not silently resolve across Logical Package Scopes or package versions.
+Within the same Logical Package Scope, the following same-scope short reference may be used:
+
+```text
+skill:#<skill-name>
+```
+
+The Logical Package Scope containing the representation must be declared by the representation or a governing normative source and must not be inferred from a Skill Package directory or repository path. A resolver must resolve the same-scope short reference to exactly one matching Skill Package within that declared scope and must normalize it with the scope's package ID and exact package version when a complete identity is needed. It must not silently resolve across Logical Package Scopes or package versions.
 
 Repository-relative paths can locate a physical copy but must not serve as the representation's logical identity. ALPS does not require GitHub or another particular service to be the package identity authority.
 
@@ -217,9 +225,9 @@ Accompanying resources may provide reference information, execution resources, o
 
 When an authoritative representation contains a mandatory reference to another Skill Package, an applicable Package Binding must make the reference resolve to exactly one target under 5.4.
 
-For a full reference, the target Skill Package must belong to the Logical Package Scope selected for the referenced package ID and exact package version.
+For a package-qualified reference, the target Skill Package must belong to the Logical Package Scope selected for the referenced package ID and exact package version.
 
-For a short reference, the referring and target Skill Packages must belong to the same declared containing Logical Package Scope.
+For a same-scope short reference, the referring and target Skill Packages must belong to the same declared Logical Package Scope that contains the referring representation.
 
 Unnecessary duplication or conflict must not arise between the authoritative representation and accompanying resources. Each resource is classified by its function in Process application—reference information, Input, Output, Control, Constraint, or Enabler—not by its directory. A Skill Package should contain only resources that directly support understanding or applying the represented PF construct.
 
@@ -270,7 +278,7 @@ The Skill Discovery Description of a Process representation claiming Description
 
 A Process Model representation must identify its Processes and their relationships. It may identify the Agent Skills that provide their authoritative Process Descriptions and need not repeat each Process Purpose or Outcomes.
 
-A subset of Processes can be selected according to Purpose. Selection and timing should be reviewed as the application context changes.
+A subset of Processes can be selected according to Purpose.
 
 ### 6.4 Process Reference Model Representations
 
@@ -440,7 +448,7 @@ A Gate required for an irreversible or high-impact external effect must occur be
 
 Reviews and audits retain their PF meanings and should be tailored to the subject and risk. Their Entry Criteria, Exit Criteria, and responses to problems should be established.
 
-When an Output is transferred to another Process or stakeholder, it should be evaluated against applicable conditions to determine whether it can serve as the intended Input or result.
+When an Output is transferred to another Process or stakeholder, it should be evaluated against applicable criteria to determine whether it can serve as the intended Input or result.
 
 ## 11. Tailoring, Redefinition, and Instantiation
 
