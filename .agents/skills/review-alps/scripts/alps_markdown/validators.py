@@ -79,6 +79,7 @@ def _okey(outcome, path, diagnostics, limits):
     return outcome.text, outcome.identity, tuple(x.token for x in refs if isinstance(x, Reference))
 
 def validate_ir(ir: DocumentIR, configured_roots, *, current_package_id: str | None = None,
+                require_locale_counterpart: bool = False,
                 load_ir: LoadIR) -> tuple[Diagnostic, ...]:
     """Validate one already-parsed document and its IR-resolved dependencies."""
     if not isinstance(ir, DocumentIR):
@@ -156,6 +157,36 @@ def validate_ir(ir: DocumentIR, configured_roots, *, current_package_id: str | N
         diagnostics.extend(result.diagnostics)
         resolutions[key] = result
 
+    selection_cache = {}
+    def selected_target_for(ref):
+        result = resolutions.get(_rkey(ref))
+        if result is None or result.resolved is None:
+            return None
+        resolved = result.resolved
+        cache_key = (resolved.identity, ir.locale)
+        if cache_key in selection_cache:
+            return selection_cache[cache_key]
+        selected = []
+        try:
+            target_path = localized_target(
+                result,
+                ir.locale,
+                require_counterpart=require_locale_counterpart,
+                diagnostics=selected,
+            )
+        except Exception as error:
+            diagnostics.append(_diag(ir, "localized-target", f"localized target selection failed: {error}",
+                                     line=ref.line, class_name="internal", reference=ref))
+            selection_cache[cache_key] = None
+            return None
+        diagnostics.extend(selected)
+        selection_cache[cache_key] = target_path
+        return target_path
+
+    if require_locale_counterpart:
+        for ref in references:
+            selected_target_for(ref)
+
     target_cache = {}
     def target_for(ref):
         result = resolutions.get(_rkey(ref))
@@ -165,15 +196,7 @@ def validate_ir(ir: DocumentIR, configured_roots, *, current_package_id: str | N
         cache_key = (resolved.identity, ir.locale)
         if cache_key in target_cache:
             return target_cache[cache_key]
-        selected = []
-        try:
-            target_path = localized_target(result, ir.locale, diagnostics=selected)
-        except Exception as error:
-            diagnostics.append(_diag(ir, "localized-target", f"localized target selection failed: {error}",
-                                     line=ref.line, class_name="internal", reference=ref))
-            target_cache[cache_key] = (None, False)
-            return target_cache[cache_key]
-        diagnostics.extend(selected)
+        target_path = selected_target_for(ref)
         if target_path is None:
             diagnostics.append(_diag(ir, "target-not-selected", "reference has no target path",
                                      line=ref.line, reference=ref))

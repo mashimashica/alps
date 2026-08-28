@@ -37,11 +37,11 @@ a) how an Agent Skill represents a Process, Process Model, Process Reference Mod
 
 b) ALPS-specific discovery and execution layers, logical Skill references, and Skill Package integrity;
 
-c) the ALPS life cycle and the integrity contract between the ALPS Reference Model and the three reference Processes (Define ALPS, Apply ALPS, and Manage ALPS);
+c) the ALPS life cycle and the integrity contract between the ALPS Reference Model and the ALPS Definition, Application, and Management Processes;
 
 d) ALPS-specific rules for activation, Process Invocation, composition, Tailoring, authoritative redefinition, and representation management; and
 
-e) subjects and criteria for Description Conformance for Process and non-Process representations, Reference Process Conformance, and Execution Conformance.
+e) subjects and criteria for Description Conformance for Process and non-Process representations, Process Conformance, Reference Process Conformance, and Execution Conformance.
 
 ### 1.2 Matters Not Specified
 
@@ -74,9 +74,9 @@ The following logical Skill references identify normative assets released with t
 | Asset | Logical reference | Normative role |
 |---|---|---|
 | ALPS Reference Model | `skill:#alps-reference-model` | Defines the three reference Processes by Name, Purpose, and Outcomes and places their relationships in an explicit structure. |
-| Define ALPS | `skill:#define-alps` | Provides the authoritative complete Process Description for Define ALPS. |
-| Apply ALPS | `skill:#apply-alps` | Provides the authoritative complete Process Description for Apply ALPS. |
-| Manage ALPS | `skill:#manage-alps` | Provides the authoritative complete Process Description for Manage ALPS. |
+| ALPS Definition Process | `skill:#define-alps` | Provides the authoritative complete Process Description for the ALPS Definition Process. |
+| ALPS Application Process | `skill:#apply-alps` | Provides the authoritative complete Process Description for the ALPS Application Process. |
+| ALPS Management Process | `skill:#manage-alps` | Provides the authoritative complete Process Description for the ALPS Management Process. |
 
 PF, this specification, and the four assets above form one ALPS Release Package. Its package ID must be `alps`, and its package version must be the single ALPS release version declared by that release. The four assets are distinct Skill Packages within that Logical Package Scope. The ALPS Release Package is not itself a Skill Package; the one-authoritative-representation rule in 5.5 applies separately to each contained Skill Package.
 
@@ -84,17 +84,19 @@ For every same-scope short reference in the table, this specification declares t
 
 For every same-scope short reference from the ALPS Reference Model to a Reference Process, the referring representation's declared Logical Package Scope is the same-version ALPS Release Package.
 
-Before resolution, an applicable Package Binding must bind package ID `alps` and the exact declared package version to one concrete release instance and its four Skill Packages. A resolver must resolve each same-scope short reference to exactly one matching Skill Package in that scope and must not resolve it across package versions.
+Before resolution, an applicable Package Binding must bind package ID `alps` and the exact declared package version to one concrete release instance and its four Skill Packages. A resolver must normalize each same-scope short reference to exactly one complete logical Skill identity in that scope and, through the selected Skill Package, locate exactly one authoritative Agent Skill representation. It must not resolve a reference across package versions.
 
 Repository paths and Host manifests may implement a Package Binding but do not define or change these logical identities.
 
-If a reference asset conflicts with PF or this specification, the asset is nonconforming. If the ALPS Reference Model and a referenced Process Description disagree on Process Name, Purpose, or Outcomes, the Reference Model representation is invalid; neither representation silently overrides the other.
+If a reference asset conflicts with PF or this specification, its authoritative representation does not satisfy the applicable Description Conformance requirements. If the ALPS Reference Model and a referenced Process Description disagree on Process Name, Purpose, or Outcomes, the Reference Model representation does not satisfy Process Reference Model Description Conformance; neither representation silently overrides the other.
 
 ### 2.3 Related Agent Ecosystem Documents (informative)
 
 The [Agent Skills Specification](https://agentskills.io/specification) defines an open, file-based format centered on `SKILL.md`, with optional directories for scripts, references, and assets. When that format is used for an ALPS representation, it supplies an Agent-facing packaging, discovery, and loading form; ALPS supplies PF-based semantics, life-cycle rules, representation integrity, and Conformance rules.
 
 [AGENTS.md](https://agents.md/) is an open format for repository-scoped context and instructions to coding Agents. It can direct Agents to discover, select, apply, and manage ALPS representations and can state repository Controls and Constraints. It is not itself an ALPS representation and does not alter a normative source.
+
+These documents are informative references. Conformance to ALPS neither requires nor establishes Conformance to them.
 
 ## 3. Terms and Definitions
 
@@ -138,7 +140,7 @@ A unit managed as a whole that contains one authoritative Agent Skill representa
 
 **3.10 Reference Process**
 
-Define ALPS, Apply ALPS, or Manage ALPS as represented by the corresponding normative Process Skill identified in 2.2.
+The ALPS Definition Process, ALPS Application Process, or ALPS Management Process as represented by the corresponding normative Process Skill identified in 2.2.
 
 **3.11 Logical Package Scope**
 
@@ -227,9 +229,11 @@ Within the same Logical Package Scope, the following same-scope short reference 
 skill:#<skill-name>
 ```
 
-The Logical Package Scope containing the representation must be declared by the representation or a governing normative source and must not be inferred from a Skill Package directory or repository path. A resolver must resolve the same-scope short reference to exactly one matching Skill Package within that declared scope and must normalize it with the scope's package ID and exact package version when a complete identity is needed. It must not silently resolve across Logical Package Scopes or package versions.
+The Logical Package Scope containing the representation must be declared by the representation or a governing normative source and must not be inferred from a Skill Package directory or repository path. A resolver must normalize the same-scope short reference to exactly one complete logical Skill identity by adding the declared scope's package ID and exact package version. It must not silently resolve across Logical Package Scopes or package versions.
 
 The package-qualified reference and same-scope short reference are the canonical logical Skill-reference forms defined by ALPS.
+
+Reference processing has distinct logical and physical stages. First, a canonical reference is normalized to one complete logical Skill identity. Second, an applicable Package Binding locates the Skill Package selected by that identity. Under 5.5, that Skill Package contains exactly one authoritative Agent Skill representation. A rule that requires a Process representation is satisfied only after the representation kind of that authoritative representation has been checked. A physical location is an implementation result and is not a reference or logical identity.
 
 Repository-relative paths can locate a physical copy but must not serve as the representation's logical identity. ALPS does not require GitHub or another particular service to be the package identity authority.
 
@@ -241,7 +245,7 @@ A Skill Package is distinct from a Logical Package Scope. A Logical Package Scop
 
 Accompanying resources may provide reference information, execution resources, or deliverable resources. Their roles and conditions of use must be identifiable from the authoritative representation, and mandatory references must resolve.
 
-When an authoritative representation contains a mandatory reference to another Skill Package, an applicable Package Binding must make the reference resolve to exactly one target under 5.4.
+When an authoritative representation contains a mandatory reference to another Agent Skill, an applicable Package Binding must make the reference resolve under 5.4 to exactly one complete logical Skill identity, one selected Skill Package, and its exactly one authoritative Agent Skill representation.
 
 For a package-qualified reference, the target Skill Package must belong to the Logical Package Scope selected for the referenced package ID and exact package version.
 
@@ -267,7 +271,7 @@ ALPS may make a PF rule concrete for the Agent context and may strengthen it whe
 | Combined application | Concurrency, Iteration, Recursion, and Integration | Activation, Process resolution, Invocation, and Agent Skill composition |
 | Adaptation | Tailoring and Process Instantiation | Managed Tailoring and authoritative redefinition through the ALPS Reference Processes |
 | Evidence and claims | Decision Gates, reviews, audits, Process Conformance, and Capability | ALPS-specific Conformance subjects and representation assessment boundaries |
-| Management and improvement | General Process governance, measures, benchmarking, and learning | Define ALPS, Apply ALPS, and Manage ALPS as the ALPS reference life cycle |
+| Management and improvement | General Process governance, measures, benchmarking, and learning | The ALPS Definition, Application, and Management Processes as the ALPS reference life cycle |
 
 ### 5.7 File-Based Skill Package Example (informative)
 
@@ -313,19 +317,21 @@ f) avoid conflict or unnecessary duplication between the authoritative represent
 
 A Process representation must satisfy the applicable PF requirements for a Process Description, including the required Name, Purpose, and Outcomes, and must satisfy 5.2 and 5.3.
 
-A Skill Name must use a concise noun phrase as the Skill heading.
+The Process Name must use a concise noun phrase and must be presented as the Skill heading.
 
 A general Skill Description must preserve PF's non-prescription of performer, Task allocation, method, tool, metric, management method, and execution sequence. An Instance-specific description must state its context and can include Instance-specific roles and responsibilities, capabilities, resources, Inputs, Outputs, Controls, Constraints, criteria, and timing.
 
-The Activities and any separated Skills must collectively cover all Outcomes and satisfy the Skill Purpose.
+The Activities and any Sub-processes represented by separate Skills must collectively cover all Outcomes and satisfy the Process Purpose.
 
-A statement used as a Task must express an individual action supporting one or more Outcomes so that its operation and object are distinguishable. A statement whose primary function is not an individual action must not be treated as a Task and must be placed in the element corresponding to that function. A statement whose primary function is an individual action must be classified as a Task. A statement whose primary function is to direct or limit execution must be classified as a Control or Constraint rather than a Task. Every Task must have a distinguishable normative attribute.
+A statement used as a Task must express an individual action supporting one or more Outcomes so that its operation and object are distinguishable. A statement whose primary function is not an individual action must not be treated as a Task and must be placed in the element corresponding to that function. A statement whose primary function is an individual action must be classified as a Task. A statement whose primary function is to declare a condition that directs or limits execution must be classified as a Control or Constraint rather than a Task. Every Task must have a distinguishable normative attribute.
 
-The Skill Discovery Description of a Process representation claiming Description Conformance must end with exactly `ALPS-conformant.` in English or `ALPS準拠。` in Japanese. This marker is a shorthand Description Conformance claim about the containing Skill Description; it does not claim Reference Process Conformance, Outcome achievement, Capability, or Execution Conformance.
+The Skill Discovery Description of a Process representation claiming Description Conformance must end with exactly `ALPS-conformant.` in English or `ALPS準拠。` in Japanese. This marker is a shorthand Description Conformance claim about the containing Skill Description; it does not claim Process Conformance, Reference Process Conformance, Outcome achievement, Capability, or Execution Conformance.
 
 ### 6.3 Process Model Representations
 
-A Process Model representation must identify its Processes and their relationships. It may identify the Agent Skills that provide their authoritative Process Descriptions and need not repeat each Process Purpose or Outcomes.
+A Process Model representation must identify its Processes and their relationships. It may identify the Agent Skills that provide their authoritative Process Descriptions. It may omit repetition of each Process Purpose and Outcomes.
+
+When a Process Model identifies an Agent Skill as providing an authoritative Process Description, the logical reference must resolve to a Process representation and the Process Name in the target representation must identify the same Process that the Model identifies for that logical reference.
 
 A subset of Processes can be selected according to Purpose.
 
@@ -361,9 +367,13 @@ A Process View may describe View-local Activities and Tasks where needed for its
 
 A context-specific change to an applicable source Process must be handled through Tailoring. An authoritative semantic change to the source Process must be handled through controlled redefinition.
 
+When a Process View identifies a source Process by an Agent Skill reference, the reference must resolve to a Process representation and the Process Name must identify the same source Process.
+
 ### 6.6 Representation-Specific Assessment Boundaries
 
-Description Conformance concerns a representation. Process Conformance concerns a Process or Process Instance. Achievement of Process View Outcomes is a separate assessment from both Process View Description Conformance and Source Process Conformance.
+Description Conformance concerns a representation. Process Conformance concerns a Process, and Execution Conformance concerns a Process Instance. Achievement of Process View Outcomes is a separate assessment from both Process View Description Conformance and Source Process Conformance.
+
+**Source Process Conformance** means Full Conformance or Tailored Conformance assessed against an applicable source Process rather than against a Process View that references it. A Full Conformance claim selects Outcome Conformance, Task Conformance, or both as its basis. A Tailored Conformance claim uses its declared tailored scope, every Outcome remaining in that scope, and every in-scope requirement stated in an Activity or Task.
 
 Loading, parsing, resolving, or mechanically validating a representation does not by itself establish any of those claims.
 
@@ -499,7 +509,7 @@ The three Reference Processes are general Processes. Their document order, Activ
 
 Agent Skill activation and Process Invocation remain distinct when the ALPS Reference Model is used. The Reference Model can guide Process selection and composition but is not itself invoked as a Process.
 
-A subset of the Reference Processes can be selected according to Purpose. Under Outcome Conformance, Activities and Tasks are guidance and can be selected without changing the declared Process scope. Under Task Conformance, every in-scope requirement stated with must or must not in an Activity or Task must be satisfied; managed Tailoring is required to change the requirement or remove it from scope. Applying only some Activities as a Conformance scope must be declared as a tailored scope of the parent Reference Process.
+A subset of the Reference Processes can be selected according to Purpose. Under Full Conformance, Activities and Tasks are guidance when Outcome Conformance is selected and can be selected without changing the declared Process scope. When Task Conformance is selected, every in-scope requirement stated with must or must not in an Activity or Task must be satisfied. Such a requirement must not be changed or removed from scope except through managed Tailoring. Applying only some Activities as a Conformance scope must be declared as a tailored scope of the parent Reference Process.
 
 A context-specific change to an applicable Reference Process is managed Tailoring; an authoritative semantic change to its Process Description is controlled redefinition.
 
@@ -507,7 +517,9 @@ A context-specific change to an applicable Reference Process is managed Tailorin
 
 Reference Process Conformance is assessed against the authoritative Process Skill identified in 7.2, not against a duplicate Process Description in this specification.
 
-The valid Process units for Reference Process Conformance are Define ALPS, Apply ALPS, and Manage ALPS. A constituent Activity is not an independent unit of Process Conformance.
+The valid Process units for Reference Process Conformance are the ALPS Definition Process, ALPS Application Process, and ALPS Management Process. A constituent Activity is not an independent unit of Process Conformance.
+
+For Tailored Conformance under PF 8.4, one claim may cover a declared set of those Process units. The set does not become a separate Process unit, and every Process in the set must remain identifiable.
 
 ## 8. Activation, Invocation, and Composition
 
@@ -519,17 +531,17 @@ A Process Model, Process Reference Model, or Process View may be activated to su
 
 ### 8.2 Invocation and Completion
 
-Before Invocation:
+Before Invocation, the Process Entry Criteria must be satisfied. Required Inputs and Enablers should be confirmed as available.
 
-a) the Process Entry Criteria must be satisfied;
-
-b) required Inputs and Enablers should be confirmed as available; and
-
-c) applicable Controls, Constraints, Tailoring decisions, and required Decision Gates must be identified.
+Applicable Controls, Constraints, Tailoring decisions, and required Decision Gates must be identified before the affected action that they direct, limit, or govern occurs.
 
 If Entry Criteria are not satisfied, Invocation must be deferred or the unmet conditions must first be resolved.
 
-The selected Conformance basis determines the status of Activities and Tasks under PF 8.3. Under Outcome Conformance, Activities and Tasks are guidance. Under Task Conformance, every in-scope requirement stated with must or must not in an Activity or Task is a mandatory execution condition. Recommendations, permissions, and typical actions remain non-mandatory. An execution sequence not established by a Constraint must not be assumed.
+For Full Conformance, the selected basis determines the status of Activities and Tasks under PF 8.3. Under Outcome Conformance, Activities and Tasks are guidance. Under Task Conformance, every in-scope requirement stated with must or must not in an Activity or Task is a mandatory execution condition. Recommendations, permissions, and typical actions remain non-mandatory.
+
+When no Process Conformance is claimed, applicable statements in Activities and Tasks retain their normative attributes; the absence of a claim does not make a requirement optional.
+
+Irrespective of whether or which Conformance is claimed, an execution sequence not established by a Constraint must not be assumed.
 
 A required Decision Gate must be passed before the action it governs occurs. Process Exit Criteria must be assessed before completion is declared. Outcome achievement should be determined from observable evidence.
 
@@ -543,17 +555,23 @@ a) the target set of Outcomes for the composition must be identified;
 
 b) the identity and provenance of each Process representation used in the composition should be recorded;
 
-c) every provider Output to recipient Input mapping must be explicit, and the exchanged item names, meanings, and scopes should be aligned;
+c) every provider Output to recipient Input mapping must be explicit;
 
-d) an undefined handoff may be introduced only through an applicable controlled change or Tailoring decision;
+d) the exchanged item names, meanings, and scopes should be aligned;
 
-e) when Iteration or Recursion changes an Output, affected Inputs and applicable criteria should be reevaluated;
+e) an undefined handoff may be introduced only through an applicable controlled change or Tailoring decision;
 
-f) when a change to an Output affects an Input to another Process, the affected Process and mapping should be identified and necessary reassessment performed;
+f) when Iteration or Recursion changes an Output, affected Inputs and applicable criteria should be reevaluated;
 
-g) when the same information item is changed by multiple Processes, its integrity, state, and change handling must be defined in proportion to quality risk; and
+g) when a change to an Output affects an Input to another Process, the affected Process and mapping should be identified;
 
-h) Integration must establish completeness within the selected scope and consistency across Process relationships and structural levels.
+h) when a change to an Output affects an Input to another Process, the necessary reassessment should be performed;
+
+i) when the same information item is changed by multiple Processes, its integrity, state, and change handling must be defined in proportion to quality risk;
+
+j) Integration must establish completeness within the selected scope; and
+
+k) Integration must establish consistency across Process relationships and structural levels.
 
 The level of detail used to describe a provider Output to recipient Input relationship should be determined according to the Purpose of the Skill Description, dependencies among Skills, and quality risk.
 
@@ -573,7 +591,7 @@ When a Process View is active, referenced source elements retain their source me
 
 Referenced source Activities and Tasks contribute according to the applicable Source Process Conformance basis.
 
-Process View Outcome achievement can be assessed for the View as a whole but remains distinct from Source Process Outcome Conformance.
+Process View Outcome achievement can be assessed for the View as a whole but remains distinct from Outcome Conformance for the applicable source Process.
 
 ## 9. Controls, Constraints, and Enablers
 
@@ -617,15 +635,15 @@ When an Output is transferred to another Process or stakeholder, it should be ev
 
 ### 11.1 Managed Tailoring
 
-Tailoring retains its PF meaning and must be performed through the Tailoring and Formal Adoption Activity of Manage ALPS (`skill:#manage-alps`). Those requirements are prerequisites for Tailored Conformance.
+Tailoring retains its PF meaning and must be performed through the Tailoring and Formal Adoption Activity of the ALPS Management Process (`skill:#manage-alps`). Those requirements are prerequisites for Tailored Conformance.
 
-The applicable requirements and recommendations of that Process govern the Tailoring scope, Controls and Constraints, affected elements, assumptions, criteria, evidence, affected-party Input, and rationale. Tailored Conformance requires the resulting decision and scope to remain traceable.
+The applicable requirements and recommendations of that Process govern the Tailoring scope, Controls and Constraints, affected elements, assumptions, criteria, evidence, affected-party Input, and rationale. For Tailored Conformance, the resulting decision and scope must remain traceable.
 
 ### 11.2 Tailoring and Authoritative Redefinition
 
 A context-specific change to an applicable Process or life cycle model is Tailoring. A semantic change to an authoritative ALPS representation is redefinition.
 
-Authoritative redefinition must be performed and verified through Define ALPS (`skill:#define-alps`). A changed semantic element must not be formally adopted until controlled redefinition and verification are complete.
+Authoritative redefinition must be performed and verified through the ALPS Definition Process (`skill:#define-alps`). A changed semantic element must not be formally adopted until controlled redefinition and verification are complete.
 
 A Process View does not redefine a source Process merely by containing a modified or View-local Activity or Task.
 
@@ -641,26 +659,27 @@ Conformance relating to this specification can be claimed for the subjects in th
 
 Every Conformance claim must identify its subject and selected criteria.
 
-| Subject | Required basis |
-|---|---|
-| **Description Conformance** | A Skill Description for a Process representation satisfies PF and applicable Clauses 4 through 6. If its Skill Package is included in the subject, 5.5 also applies. |
-| **Process Model Description Conformance** | The representation satisfies applicable kind, Process identification, relationship, logical-reference, package, and internal-consistency requirements. |
-| **Process Reference Model Description Conformance** | The representation satisfies applicable kind, Process identity, Name/Purpose/Outcomes equality, relationship, logical-reference, package, and internal-consistency requirements. |
-| **Process View Description Conformance** | The representation satisfies applicable kind, Purpose and Outcomes, source provenance and Traceability, source-meaning preservation, relationships, application guidance, package, and internal-consistency requirements. |
-| **Reference Process Conformance** | Define ALPS, Apply ALPS, or Manage ALPS satisfies 12.2 or 12.3 against its authoritative Process Skill under Clause 7. |
-| **Execution Conformance** | A Process Instance executed through a Process Skill satisfies 12.2 or 12.3 against the Process described by that Skill. |
+| Claim type | Subject | Required basis |
+|---|---|---|
+| **Description Conformance** | A Skill Description for a Process representation | The representation satisfies PF and applicable Clauses 4 through 6. If the declared claim scope also includes its Skill Package, 5.5 applies. |
+| **Process Model Description Conformance** | A Process Model representation | The representation satisfies 6.1 and the applicable kind, Process identification, Process Name, relationship, logical-reference, and internal-consistency requirements. If the declared claim scope also includes its Skill Package, 5.5 applies. |
+| **Process Reference Model Description Conformance** | A Process Reference Model representation | The representation satisfies 6.1 and the applicable kind, Process identification, Name/Purpose/Outcomes equality, relationship, logical-reference, and internal-consistency requirements. If the declared claim scope also includes its Skill Package, 5.5 applies. |
+| **Process View Description Conformance** | A Process View representation | The representation satisfies 6.1 and the applicable kind, Name, Purpose and Outcomes, source Process Name, source provenance and Traceability, source-meaning preservation, relationships, application guidance, and internal-consistency requirements. If the declared claim scope also includes its Skill Package, 5.5 applies. |
+| **Process Conformance** | One Process other than a Reference Process, or a declared Process set that includes at least one non-Reference Process for Tailored Conformance | One Process satisfies 12.2 or 12.3 against its authoritative Process Description. In a declared set, every non-Reference Process satisfies 12.3 against its authoritative Process Description and every Reference Process satisfies 12.3 against its authoritative Process Skill. |
+| **Reference Process Conformance** | One of the ALPS Definition Process, ALPS Application Process, or ALPS Management Process, or a declared set of those Processes for Tailored Conformance | One Process satisfies 12.2 or 12.3 against its authoritative Process Skill under Clause 7. Every Process in a declared set satisfies 12.3 against its respective authoritative Process Skill. |
+| **Execution Conformance** | A Process Instance executed through a Process Skill | The subject satisfies 12.2 or 12.3 against the Process described by that Skill. |
 
 ### 12.2 Full Conformance to a Process
 
 PF 8.3 governs Full Conformance. A claim must select Outcome Conformance, Task Conformance, or both and satisfy the selected basis.
 
-For Reference Process Conformance, only Define ALPS, Apply ALPS, and Manage ALPS are Process units. Independent Process Conformance must not be claimed for a constituent Activity.
+For Reference Process Conformance, only the ALPS Definition Process, ALPS Application Process, and ALPS Management Process are Process units. Independent Process Conformance must not be claimed for a constituent Activity.
 
 Process View Outcome assessment remains separate from Process Conformance to a source Process.
 
 ### 12.3 Tailored Conformance
 
-PF 8.4 governs Tailored Conformance. A claim must identify the Process tailored through managed Tailoring, declare the application scope, and demonstrate satisfaction of every Outcome and Activity or Task requirement remaining in scope.
+PF 8.4 governs Tailored Conformance. A claim must identify the Process or Processes tailored through managed Tailoring, declare the application scope, and, for every identified Process, demonstrate satisfaction of every Outcome that remains in scope and every in-scope requirement stated in an Activity or Task.
 
 Applying only some Activities of a Reference Process must be declared as a tailored scope of the parent Process and must not be claimed as independent Process Conformance to those Activities.
 
@@ -672,16 +691,16 @@ Process Outcomes and the Purposes and Outcomes of the three Reference Processes 
 
 Assessment criteria must match the declared subject:
 
-a) a Process representation may be assessed for Description Conformance, execution Conformance, Outcome achievement, performance, and effectiveness as applicable;
+a) a Process representation may be assessed for Description Conformance, internal consistency, and usability; the Process that it describes may be assessed for the applicable Process Conformance; and a Process Instance may be assessed for Execution Conformance, Outcome achievement, performance, and effectiveness as applicable;
 
 b) a Process Model should be assessed for Process coverage, relationship coherence, resolvability, and applicability;
 
-c) a Process Reference Model should be assessed for Process identity, semantic-center equality, relationship coherence, resolvability, and suitability as a frame of reference;
+c) a Process Reference Model should be assessed for Process identification, semantic-center equality, relationship coherence, resolvability, and suitability as a frame of reference;
 
 d) a Process View should be assessed for Purpose and Outcomes, source provenance and Traceability, source-meaning preservation, handoffs, application guidance, and usefulness;
 
 e) a Skill Package can be assessed for its authoritative representation, mandatory-reference resolution, resource roles and conditions of use, consistency, and reverification after change.
 
-Assessment of a non-Process representation is not Process execution Conformance.
+Assessment of a non-Process representation is not Execution Conformance.
 
 (End)

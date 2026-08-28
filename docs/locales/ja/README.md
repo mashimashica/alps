@@ -115,10 +115,10 @@ metadata:
 
 ### ALPS参照モデル
 
-ALPS自身のライフサイクルは三つの参照プロセスで定義します。これらは固定段階ではなく、必要に応じて並行的、反復的または再帰的に適用できます。
+ALPS自身のライフサイクルは三つの参照プロセスで定義します。これらは固定段階ではなく、必要に応じて並行的、反復的または再帰的に適用してよいものです。
 
 <p align="center">
-  <img src="../../../assets/alps-reference-model-ja.svg" alt="ALPS参照モデル。Define ALPSからManage ALPSへ検証済み表現、Manage ALPSからApply ALPSへ管理された表現・適用条件、Apply ALPSからManage ALPSへ選択・実行証拠、Manage ALPSからDefine ALPSへ再定義・再検証要求を渡します。" width="100%">
+  <img src="../../../assets/alps-reference-model-ja.svg" alt="ALPS参照モデル。ALPS定義プロセスからALPS管理プロセスへ検証済み表現、ALPS管理プロセスからALPS適用プロセスへ管理された表現・適用条件、ALPS適用プロセスからALPS管理プロセスへ選択・実行証拠、ALPS管理プロセスからALPS定義プロセスへ再定義・再検証要求、ALPS適用プロセスからALPS定義プロセスへ未充足の表現ニーズを渡します。" width="100%">
 </p>
 
 正本となるプロセス参照モデルは[`skills/alps-reference-model/SKILL.md`](../../../skills/alps-reference-model/SKILL.md)として収録します。そこに三つの参照プロセスの名称、目的、成果を保持します。
@@ -148,7 +148,7 @@ ALPSを継続利用するリポジトリでは、[AGENTS.md](https://agents.md/)
 - 選択した各表現の`SKILL.md`を最後まで読みます。
 - ALPS表現の定義・検証には`define-alps`、プロセス解決・呼び出しには`apply-alps`、採用、テーラリング、アセスメント、変更、廃止には`manage-alps`を用います。
 - プロセスビューで出典プロセスの要素を参照する場合は来歴と追跡可能性を維持し、ビュー内の記述と出典プロセスの変更を区別します。
-- プロセスを組み合わせる場合は必要な出力と入力の受け渡しを明示します。
+- プロセスを組み合わせる場合は、提供側の出力から受領側の入力への対応をすべて明示します。
 ```
 
 ## 目的に合う資産を探す

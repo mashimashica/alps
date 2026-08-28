@@ -21,7 +21,7 @@ assert SPEC is not None and SPEC.loader is not None
 CHECKER = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = CHECKER
 SPEC.loader.exec_module(CHECKER)
-from alps_markdown import Severity, package_roots, resolve_reference  # noqa: E402
+from alps_markdown import Severity, locale_for, package_roots, resolve_reference  # noqa: E402
 
 
 def _clean(value: str) -> str:
@@ -394,12 +394,21 @@ def _check_pair(
     japanese: Path,
     allowed_terms: object = None,
     package_identity: object = None,
+    *,
+    roots: object = None,
+    package_id: str | None = None,
 ):
+    selected_identity = package_identity or "example/alps@1.2.3"
+    selected_package = package_id
+    if selected_package is None and isinstance(selected_identity, str):
+        selected_package = selected_identity.rsplit("@", 1)[0]
     return _RAW_CHECK_PAIR(
         english,
         japanese,
         allowed_terms,
-        package_identity=package_identity or "example/alps@1.2.3",
+        package_identity=selected_identity,
+        roots=roots,
+        package_id=selected_package,
     )
 
 
@@ -486,12 +495,12 @@ class AlpsMarkdownProfileMilestoneATests(unittest.TestCase):
 
             local_en = _write(
                 root,
-                "local-view-en.md",
+                "skills/local-view/SKILL.md",
                 _asset("local-view", "process-view", "en", _local_view_body("en")),
             )
             local_ja = _write(
                 root,
-                "local-view-ja.md",
+                "skills/local-view/references/locales/ja/SKILL.md",
                 _asset("local-view", "process-view", "ja", _local_view_body("ja")),
             )
             local = CHECKER.parse_asset(local_en, "en")
@@ -499,7 +508,14 @@ class AlpsMarkdownProfileMilestoneATests(unittest.TestCase):
             self.assertEqual(len(local.ir.activities), 1)
             self.assertEqual(local.ir.source_processes, ())
             self.assertEqual(local.ir.included_activities_tasks, ())
-            self.assertEqual(_check_pair(local_en, local_ja), ([], []))
+            self.assertEqual(
+                _check_pair(
+                    local_en,
+                    local_ja,
+                    roots={"example/alps@1.2.3": root},
+                ),
+                ([], []),
+            )
 
     def test_typed_ir_snapshot_keeps_spans_identities_and_roles(self) -> None:
         body = _process_body(
@@ -604,8 +620,8 @@ class AlpsMarkdownProfileMilestoneATests(unittest.TestCase):
             os.chdir(ROOT)
             binding = f"alps@0.5.0-test={ROOT}"
             for args in (
-                ("--package-binding", binding),
-                ("--package-binding", binding, "--require-japanese"),
+                ("--package-binding", binding, "--package-id", "alps", "--package-version", "0.5.0-test"),
+                ("--package-binding", binding, "--package-id", "alps", "--package-version", "0.5.0-test", "--require-japanese"),
             ):
                 with self.subTest(cli_args=args):
                     stdout, stderr = io.StringIO(), io.StringIO()
@@ -898,7 +914,10 @@ class AlpsMarkdownProfileMilestoneBTests(unittest.TestCase):
         japanese_titles: dict[str, str] | None = None,
     ) -> None:
         titles = titles or {"alpha": "Alpha", "beta": "Beta"}
-        japanese_titles = japanese_titles or {key: value for key, value in titles.items()}
+        japanese_titles = japanese_titles or {
+            key: {"alpha": "アルファ", "beta": "ベータ"}.get(key, value)
+            for key, value in titles.items()
+        }
         for skill, title in titles.items():
             _write(
                 root,
@@ -915,7 +934,12 @@ class AlpsMarkdownProfileMilestoneBTests(unittest.TestCase):
     @staticmethod
     def _check(root: Path, relative: str, content: str, *, qualified: bool = False, package_id: str | None = None):
         path = _write(root, relative, content)
-        return CHECKER.check_document(path, AlpsMarkdownProfileMilestoneBTests._roots(root, qualified), package_id)
+        current_package = package_id or AlpsMarkdownProfileMilestoneBTests.PACKAGE_ID
+        return CHECKER.check_document(
+            path,
+            AlpsMarkdownProfileMilestoneBTests._roots(root, qualified),
+            current_package,
+        )
 
     @staticmethod
     def _reference_body(locale: str = "en", *, reversed_relationship: bool = False) -> str:
@@ -1064,22 +1088,25 @@ class AlpsMarkdownProfileMilestoneBTests(unittest.TestCase):
         en_body = _model_body().replace("| Beta | |", "| Beta | `skill:#beta` |")
         ja_body = _model_body("ja").replace("| ベータ | |", "| ベータ | `skill:#beta` |")
         with _temp_root() as root:
+            self._write_targets(root)
             english = _write(root, "model-en.md", _asset("model", "process-model", "en", en_body))
             japanese = _write(root, "model-ja.md", _asset("model", "process-model", "ja", ja_body))
-            errors, warnings = _check_pair(english, japanese)
+            errors, warnings = _check_pair(english, japanese, roots=self._roots(root))
             self.assertEqual(errors, [])
             self.assertEqual(warnings, [])
 
             reversed_body = ja_body.replace("| アルファ | 情報 | ベータ |", "| ベータ | 情報 | アルファ |")
             reversed_path = _write(root, "model-reversed-ja.md", _asset("model", "process-model", "ja", reversed_body))
-            errors, _ = _check_pair(english, reversed_path)
+            errors, _ = _check_pair(english, reversed_path, roots=self._roots(root))
             self.assertTrue(any("model-relationship-provider-mismatch" in item for item in errors))
 
             empty_en = en_body.replace("| Alpha | `skill:#alpha` |", "| Alpha | |", 1).replace("| Beta | `skill:#beta` |", "| Beta | |", 1)
             empty_ja = ja_body.replace("| アルファ | `skill:#alpha` |", "| アルファ | |", 1).replace("| ベータ | `skill:#beta` |", "| ベータ | |", 1)
             empty_path = _write(root, "model-empty-ja.md", _asset("model", "process-model", "ja", empty_ja))
             warning_errors, warning_only = _check_pair(
-                _write(root, "model-empty-en.md", _asset("model", "process-model", "en", empty_en)), empty_path
+                _write(root, "model-empty-en.md", _asset("model", "process-model", "en", empty_en)),
+                empty_path,
+                roots=self._roots(root),
             )
             self.assertEqual(warning_errors, [])
             self.assertTrue(any("warning unverified-locale-identity" in item for item in warning_only))
@@ -1115,16 +1142,23 @@ class AlpsMarkdownProfileMilestoneBTests(unittest.TestCase):
             self.assertIn("reference-outcomes", _codes(result))
 
         with _temp_root() as root:
+            self._write_targets(root)
             english = _write(root, "reference-en.md", _asset("reference", "process-reference-model", "en", self._reference_body()))
             japanese = _write(root, "reference-ja-reversed.md", _asset("reference", "process-reference-model", "ja", self._reference_body("ja", reversed_relationship=True)))
-            errors, warnings = _check_pair(english, japanese)
+            errors, warnings = _check_pair(english, japanese, roots=self._roots(root))
             self.assertTrue(any("reference-relationship-provider-mismatch" in item for item in errors))
             self.assertTrue(all("error locale-mismatch/" in item for item in errors))
             self.assertEqual(warnings, [])
 
             shipped_en = ROOT / "skills/alps-reference-model/SKILL.md"
             shipped_ja = ROOT / "skills/alps-reference-model/references/locales/ja/SKILL.md"
-            errors, warnings = _check_pair(shipped_en, shipped_ja)
+            errors, warnings = _check_pair(
+                shipped_en,
+                shipped_ja,
+                package_identity="alps@0.5.0-candidate",
+                roots={"alps@0.5.0-candidate": ROOT},
+                package_id="alps",
+            )
             self.assertEqual(errors, [])
             self.assertEqual(warnings, [])
 
@@ -1173,7 +1207,11 @@ class AlpsMarkdownProfileMilestoneCTests(unittest.TestCase):
 
             japanese = _write(root, "view-ja.md", _asset("view", "process-view", "ja", _view_body("ja")))
             english = _write(root, "view-en.md", _asset("view", "process-view", "en", _view_body()))
-            errors, warnings = _check_pair(english, japanese)
+            errors, warnings = _check_pair(
+                english,
+                japanese,
+                roots=helper._roots(root),
+            )
             self.assertEqual(errors, [])
             self.assertTrue(all("warning unverified-locale-identity" in item for item in warnings), warnings)
 
@@ -1186,10 +1224,25 @@ class AlpsMarkdownProfileMilestoneCTests(unittest.TestCase):
                 with self.subTest(locale_case=label):
                     if label == "included-source-reference":
                         _write(root, "skills/gamma/SKILL.md", _asset("gamma", "process", "en", _process_body(title="Beta"), metadata=False))
+                        _write(
+                            root,
+                            "skills/gamma/references/locales/ja/SKILL.md",
+                            _asset(
+                                "gamma",
+                                "process",
+                                "ja",
+                                _process_body("ja", title="ベータ"),
+                                metadata=False,
+                            ),
+                        )
                         body = body.replace("| ベータ | `skill:#beta` |", "| ベータ | `skill:#gamma` |")
                         body = body.replace("ベータ (`skill:#beta`)", "ベータ (`skill:#gamma`)")
                     changed = _write(root, f"view-{label}-ja.md", _asset("view", "process-view", "ja", body))
-                    pair_errors, _ = _check_pair(english, changed)
+                    pair_errors, _ = _check_pair(
+                        english,
+                        changed,
+                        roots=helper._roots(root),
+                    )
                     self.assertTrue(any(expected in item for item in pair_errors), pair_errors)
 
     def test_resolved_identity_duplicates_and_locale_context(self) -> None:
@@ -1269,6 +1322,8 @@ class AlpsMarkdownProfileMilestoneCTests(unittest.TestCase):
             self.assertIn("target-not-found", _codes(unresolved))
 
         with _temp_root() as root:
+            helper._write_targets(root)
+            roots = helper._roots(root)
             process_en = _asset(
                 "identity-process",
                 "process",
@@ -1285,6 +1340,7 @@ class AlpsMarkdownProfileMilestoneCTests(unittest.TestCase):
                 _write(root, "identity-process-en.md", process_en),
                 _write(root, "identity-process-ja.md", process_ja),
                 package_identity=f"{package}@{helper.PACKAGE_VERSION}",
+                roots=roots,
             )
             self.assertEqual(process_errors, [])
             self.assertEqual(process_warnings, [])
@@ -1296,6 +1352,7 @@ class AlpsMarkdownProfileMilestoneCTests(unittest.TestCase):
                 _write(root, "identity-model-en.md", _asset("identity-model", "process-model", "en", model_en_body)),
                 _write(root, "identity-model-ja.md", _asset("identity-model", "process-model", "ja", model_ja_body)),
                 package_identity=f"{package}@{helper.PACKAGE_VERSION}",
+                roots=roots,
             )
             self.assertEqual(model_errors, [])
             self.assertEqual(model_warnings, [])
@@ -1312,6 +1369,7 @@ class AlpsMarkdownProfileMilestoneCTests(unittest.TestCase):
                 _write(root, "identity-view-en.md", _asset("identity-view", "process-view", "en", view_en_body)),
                 _write(root, "identity-view-ja.md", _asset("identity-view", "process-view", "ja", view_ja_body)),
                 package_identity=f"{package}@{helper.PACKAGE_VERSION}",
+                roots=roots,
             )
             self.assertEqual(view_errors, [])
             self.assertEqual(view_warnings, [])
@@ -1324,10 +1382,69 @@ class AlpsMarkdownProfileMilestoneCTests(unittest.TestCase):
                 "- 成果が準備される。",
                 f"- 成果 `skill:{package}#alpha` が整う。",
             ).replace("skill:#", f"skill:{package}#")
+            _write(
+                root,
+                "skills/alpha/SKILL.md",
+                _asset(
+                    "alpha",
+                    "process",
+                    "en",
+                    _process_body(
+                        outcome_lines=("The result `skill:#alpha` is ready.",),
+                        title="Alpha",
+                    ),
+                    metadata=False,
+                ),
+            )
+            _write(
+                root,
+                "skills/alpha/references/locales/ja/SKILL.md",
+                _asset(
+                    "alpha",
+                    "process",
+                    "ja",
+                    _process_body(
+                        "ja",
+                        outcome_lines=(f"成果 `skill:{package}#alpha` が整う。",),
+                        title="アルファ",
+                    ),
+                    metadata=False,
+                ),
+            )
+            _write(
+                root,
+                "skills/beta/SKILL.md",
+                _asset(
+                    "beta",
+                    "process",
+                    "en",
+                    _process_body(
+                        outcome_lines=("The result `skill:#alpha` is ready.",),
+                        title="Beta",
+                    ),
+                    metadata=False,
+                ),
+            )
+            _write(
+                root,
+                "skills/beta/references/locales/ja/SKILL.md",
+                _asset(
+                    "beta",
+                    "process",
+                    "ja",
+                    _process_body(
+                        "ja",
+                        outcome_lines=(f"成果 `skill:{package}#alpha` が整う。",),
+                        title="ベータ",
+                    ),
+                    metadata=False,
+                ),
+            )
             reference_errors, reference_warnings = _check_pair(
                 _write(root, "identity-reference-en.md", _asset("identity-reference", "process-reference-model", "en", reference_en_body)),
                 _write(root, "identity-reference-ja.md", _asset("identity-reference", "process-reference-model", "ja", reference_ja_body)),
                 package_identity=f"{package}@{helper.PACKAGE_VERSION}",
+                roots=roots,
             )
             self.assertEqual(reference_errors, [])
             self.assertEqual(reference_warnings, [])
@@ -1336,10 +1453,17 @@ class AlpsMarkdownProfileMilestoneCTests(unittest.TestCase):
                 "ja",
                 outcome_lines=("成果 `skill:other/pkg#alpha` が整う。",),
             )
+            other_root = root / "other-package"
+            helper._write_targets(other_root)
+            cross_package_roots = {
+                f"{package}@{helper.PACKAGE_VERSION}": root,
+                "other/pkg@9.0": other_root,
+            }
             different_errors, _ = _check_pair(
                 _write(root, "different-package-en.md", process_en),
                 _write(root, "different-package-ja.md", _asset("identity-process", "process", "ja", different_package_ja)),
                 package_identity=f"{package}@{helper.PACKAGE_VERSION}",
+                roots=cross_package_roots,
             )
             self.assertTrue(any("process-outcome-reference-mismatch" in item for item in different_errors))
 
@@ -1368,6 +1492,10 @@ class AlpsMarkdownProfileMilestoneCTests(unittest.TestCase):
                     status = CHECKER.main([
                         "--package-binding",
                         f"{package}@{helper.PACKAGE_VERSION}={root}",
+                        "--package-id",
+                        package,
+                        "--package-version",
+                        helper.PACKAGE_VERSION,
                         str(model_en),
                     ])
             finally:
@@ -1400,6 +1528,527 @@ class AlpsMarkdownProfileMilestoneCTests(unittest.TestCase):
                 f"{package}@1.2.4={root}",
             ])
             self.assertTrue(any(item.code == "duplicate-package-id" for item in duplicate.diagnostics))
+
+    def test_exact_version_grammar_accepts_slash_and_colon_and_rejects_unsafe_values(self) -> None:
+        helper = AlpsMarkdownProfileMilestoneBTests
+        package = helper.PACKAGE_ID
+        with _temp_root() as root:
+            helper._write_targets(root, japanese=False)
+            for version in ("release/2026:08", "候補版:2026/08"):
+                with self.subTest(valid=version):
+                    config = package_roots([f"{package}@{version}={root}"])
+                    self.assertEqual(config.diagnostics, ())
+                    result = resolve_reference(f"skill:{package}#alpha", config)
+                    self.assertIsNotNone(result.resolved)
+                    self.assertEqual(result.resolved.identity.exact_version, version)
+
+            for version in (
+                "",
+                "has space",
+                "bad@value",
+                "bad=value",
+                "bad\x7fvalue",
+                "bad\u202evalue",
+                "bad\u2066value",
+            ):
+                with self.subTest(invalid=repr(version)):
+                    config = package_roots({f"{package}@{version}": root})
+                    self.assertTrue(config.diagnostics)
+                    self.assertNotIn(package, config.roots)
+
+    def test_short_reference_requires_declared_scope_and_ignores_nested_root_inference(self) -> None:
+        helper = AlpsMarkdownProfileMilestoneBTests
+        with _temp_root() as root:
+            outer_package = "example/outer"
+            inner_package = "example/inner"
+            nested = root / "nested"
+            _write(
+                root,
+                "skills/alpha/SKILL.md",
+                _asset("alpha", "process", "en", _process_body(title="Outer Alpha"), metadata=False),
+            )
+            _write(
+                nested,
+                "skills/alpha/SKILL.md",
+                _asset("alpha", "process", "en", _process_body(title="Inner Alpha"), metadata=False),
+            )
+            referring = _write(nested, "skills/model/SKILL.md", _asset("model", "process-model", "en", _model_body()))
+            config = package_roots(
+                [
+                    f"{outer_package}@1.0={root}",
+                    f"{inner_package}@2.0={nested}",
+                ]
+            )
+
+            missing = resolve_reference("skill:#alpha", config, containing_path=referring)
+            self.assertIsNone(missing.resolved)
+            self.assertIn("missing-declared-package-scope", _codes(missing))
+
+            outer = resolve_reference(
+                "skill:#alpha",
+                config,
+                containing_path=referring,
+                current_package_id=outer_package,
+            )
+            self.assertIsNotNone(outer.resolved)
+            self.assertEqual(str(outer.resolved.identity), f"{outer_package}@1.0#alpha")
+            self.assertEqual(outer.resolved.target, root / "skills/alpha/SKILL.md")
+
+            inner = resolve_reference(
+                "skill:#alpha",
+                config,
+                containing_path=referring,
+                current_package_id=inner_package,
+            )
+            self.assertIsNotNone(inner.resolved)
+            self.assertEqual(str(inner.resolved.identity), f"{inner_package}@2.0#alpha")
+
+    def test_locale_comparison_requires_identity_context_and_required_dependency_locale(self) -> None:
+        helper = AlpsMarkdownProfileMilestoneBTests
+        with _temp_root() as root:
+            english = _write(
+                root,
+                "pair-en.md",
+                _asset(
+                    "pair",
+                    "process",
+                    "en",
+                    _process_body(outcome_lines=("The result `skill:#alpha` is ready.",)),
+                ),
+            )
+            japanese = _write(
+                root,
+                "pair-ja.md",
+                _asset(
+                    "pair",
+                    "process",
+                    "ja",
+                    _process_body("ja", outcome_lines=("成果 `skill:#beta` が整う。",)),
+                ),
+            )
+            errors, _ = _RAW_CHECK_PAIR(english, japanese)
+            self.assertTrue(
+                any("unresolved-locale-reference-identity" in item for item in errors),
+                errors,
+            )
+
+            matching_japanese = _write(
+                root,
+                "pair-matching-ja.md",
+                _asset(
+                    "pair",
+                    "process",
+                    "ja",
+                    _process_body("ja", outcome_lines=("成果 `skill:#alpha` が整う。",)),
+                ),
+            )
+            separated_errors, _ = _RAW_CHECK_PAIR(
+                english,
+                matching_japanese,
+                package_identity="example/alps",
+                package_versions={"example/alps": "1.2.3"},
+            )
+            self.assertTrue(
+                any("unresolved-locale-reference-identity" in item for item in separated_errors),
+                separated_errors,
+            )
+
+            helper._write_targets(root)
+            resolved_errors, resolved_warnings = _RAW_CHECK_PAIR(
+                english,
+                matching_japanese,
+                package_identity="example/alps",
+                package_versions={"example/alps": "1.2.3"},
+                roots=helper._roots(root),
+                package_id=helper.PACKAGE_ID,
+            )
+            self.assertEqual((resolved_errors, resolved_warnings), ([], []))
+
+        with _temp_root() as root:
+            helper._write_targets(root, japanese=False)
+            model = _write(
+                root,
+                "skills/model/SKILL.md",
+                _asset("model", "process-model", "en", _model_body()),
+            )
+            _write(
+                root,
+                "skills/model/references/locales/ja/SKILL.md",
+                _asset("model", "process-model", "ja", _model_body("ja")),
+            )
+            checked = CHECKER.check_document(
+                model,
+                helper._roots(root),
+                helper.PACKAGE_ID,
+                require_locale_counterpart=True,
+            )
+            self.assertIn("missing-japanese-reference-counterpart", _codes(checked))
+
+    def test_locale_dependency_completeness_is_explicit_and_transitive(self) -> None:
+        helper = AlpsMarkdownProfileMilestoneBTests
+        package = helper.PACKAGE_ID
+        with _temp_root() as root:
+            _write(
+                root,
+                "skills/alpha/SKILL.md",
+                _asset("alpha", "process", "en", _process_body(title="Alpha"), metadata=False),
+            )
+            english = _write(
+                root,
+                "pair-en.md",
+                _asset(
+                    "pair",
+                    "process",
+                    "en",
+                    _process_body(outcome_lines=("The result `skill:#alpha` is ready.",)),
+                ),
+            )
+            japanese = _write(
+                root,
+                "pair-ja.md",
+                _asset(
+                    "pair",
+                    "process",
+                    "ja",
+                    _process_body("ja", outcome_lines=("成果 `skill:#alpha` が整う。",)),
+                ),
+            )
+            default_errors, default_warnings = _RAW_CHECK_PAIR(
+                english,
+                japanese,
+                package_identity=f"{package}@{helper.PACKAGE_VERSION}",
+                roots=helper._roots(root),
+                package_id=package,
+            )
+            self.assertEqual((default_errors, default_warnings), ([], []))
+
+            required_errors, _ = _RAW_CHECK_PAIR(
+                english,
+                japanese,
+                package_identity=f"{package}@{helper.PACKAGE_VERSION}",
+                roots=helper._roots(root),
+                package_id=package,
+                require_locale_counterpart=True,
+            )
+            self.assertTrue(
+                any("missing-japanese-reference-counterpart" in item for item in required_errors),
+                required_errors,
+            )
+
+        with _temp_root() as root:
+            beta_outcome_en = "The result is ready."
+            beta_outcome_ja = "成果が準備される。"
+            alpha_outcome_en = "The result `skill:#beta` is ready."
+            alpha_outcome_ja = "成果 `skill:#beta` が整う。"
+            _write(
+                root,
+                "skills/alpha/SKILL.md",
+                _asset(
+                    "alpha",
+                    "process",
+                    "en",
+                    _process_body(outcome_lines=(alpha_outcome_en,), title="Alpha"),
+                    metadata=False,
+                ),
+            )
+            _write(
+                root,
+                "skills/alpha/references/locales/ja/SKILL.md",
+                _asset(
+                    "alpha",
+                    "process",
+                    "ja",
+                    _process_body("ja", outcome_lines=(alpha_outcome_ja,), title="アルファ"),
+                    metadata=False,
+                ),
+            )
+            _write(
+                root,
+                "skills/beta/SKILL.md",
+                _asset(
+                    "beta",
+                    "process",
+                    "en",
+                    _process_body(outcome_lines=(beta_outcome_en,), title="Beta"),
+                    metadata=False,
+                ),
+            )
+            top = _write(
+                root,
+                "skills/model/SKILL.md",
+                _asset(
+                    "model",
+                    "process",
+                    "en",
+                    _process_body(
+                        outcome_lines=("The result `skill:#alpha` is ready.",),
+                        title="Model",
+                    ),
+                ),
+            )
+            _write(
+                root,
+                "skills/model/references/locales/ja/SKILL.md",
+                _asset(
+                    "model",
+                    "process",
+                    "ja",
+                    _process_body(
+                        "ja",
+                        outcome_lines=("成果 `skill:#alpha` が整う。",),
+                        title="モデル",
+                    ),
+                ),
+            )
+            transitive = CHECKER.check_document(
+                top,
+                helper._roots(root),
+                package,
+                require_locale_counterpart=True,
+            )
+            self.assertIn("missing-japanese-reference-counterpart", _codes(transitive))
+
+            _write(
+                root,
+                "skills/beta/references/locales/ja/SKILL.md",
+                _asset(
+                    "beta",
+                    "process",
+                    "ja",
+                    _process_body("ja", outcome_lines=(beta_outcome_ja,), title="ベータ"),
+                    metadata=False,
+                ).replace("name: beta", "name beta", 1),
+            )
+            malformed = CHECKER.check_document(
+                top,
+                helper._roots(root),
+                package,
+                require_locale_counterpart=True,
+            )
+            self.assertNotEqual(malformed.exit_status, 0)
+            self.assertTrue(
+                any(item.path.endswith("skills/beta/references/locales/ja/SKILL.md") for item in malformed.diagnostics),
+                malformed.diagnostics,
+            )
+
+    def test_document_locale_completeness_includes_the_selected_root(self) -> None:
+        helper = AlpsMarkdownProfileMilestoneBTests
+        with _temp_root() as root:
+            english = _write(
+                root,
+                "skills/lonely/SKILL.md",
+                _asset("lonely", "process", "en", _process_body(title="Lonely")),
+            )
+            missing = CHECKER.check_document(
+                english,
+                helper._roots(root),
+                helper.PACKAGE_ID,
+                require_locale_counterpart=True,
+            )
+            self.assertIn("missing-japanese-counterpart", _codes(missing))
+
+            japanese = _write(
+                root,
+                "skills/lonely/references/locales/ja/SKILL.md",
+                _asset(
+                    "lonely",
+                    "process",
+                    "ja",
+                    _process_body("ja", title="単独"),
+                ).replace("name: lonely", "name lonely", 1),
+            )
+            malformed = CHECKER.check_document(
+                english,
+                helper._roots(root),
+                helper.PACKAGE_ID,
+                require_locale_counterpart=True,
+            )
+            self.assertNotEqual(malformed.exit_status, 0)
+            self.assertTrue(
+                any(item.path == os.fspath(japanese) for item in malformed.diagnostics),
+                malformed.diagnostics,
+            )
+
+            japanese.write_text(
+                _asset("lonely", "process", "ja", _process_body("ja", title="単独")),
+                encoding="utf-8",
+            )
+            complete = CHECKER.check_document(
+                english,
+                helper._roots(root),
+                helper.PACKAGE_ID,
+                require_locale_counterpart=True,
+            )
+            self.assert_no_errors(complete)
+
+    def test_locale_detection_ignores_ambient_japanese_path_prefix(self) -> None:
+        helper = AlpsMarkdownProfileMilestoneBTests
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "references/locales/ja/package"
+            root.mkdir(parents=True)
+            english = _write(
+                root,
+                "skills/ordinary/SKILL.md",
+                _asset("ordinary", "process", "en", _process_body(title="Ordinary")),
+            )
+            self.assertEqual(locale_for(english), "en")
+            checked = CHECKER.check_document(
+                english,
+                helper._roots(root),
+                helper.PACKAGE_ID,
+            )
+            self.assert_no_errors(checked)
+
+    def test_selected_root_locale_counterpart_cannot_escape_package_root(self) -> None:
+        helper = AlpsMarkdownProfileMilestoneBTests
+        with _temp_root() as root, _temp_root() as outside:
+            english = _write(
+                root,
+                "skills/root/SKILL.md",
+                _asset("root", "process", "en", _process_body(title="Root")),
+            )
+            external_japanese = _write(
+                outside,
+                "SKILL.md",
+                _asset("root", "process", "ja", _process_body("ja", title="ルート")),
+            )
+            japanese = root / "skills/root/references/locales/ja/SKILL.md"
+            japanese.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                japanese.symlink_to(external_japanese)
+            except OSError as error:
+                self.skipTest(f"symlinks unsupported: {error}")
+
+            checked = CHECKER.check_document(
+                english,
+                helper._roots(root),
+                helper.PACKAGE_ID,
+                require_locale_counterpart=True,
+            )
+            self.assertIn("source-outside-package-root", _codes(checked))
+
+    def test_locale_dependency_walk_handles_deep_cycles_without_recursion(self) -> None:
+        helper = AlpsMarkdownProfileMilestoneBTests
+        depth = 1020
+        with _temp_root() as root:
+            for index in range(depth):
+                name = f"s{index:04d}"
+                next_name = f"s{index + 1:04d}" if index + 1 < depth else "s0000"
+                _write(
+                    root,
+                    f"skills/{name}/SKILL.md",
+                    _asset(
+                        name,
+                        "process",
+                        "en",
+                        _process_body(
+                            outcome_lines=(f"The result `skill:#{next_name}` is ready.",),
+                            title=name,
+                        ),
+                        metadata=False,
+                    ),
+                )
+                _write(
+                    root,
+                    f"skills/{name}/references/locales/ja/SKILL.md",
+                    _asset(
+                        name,
+                        "process",
+                        "ja",
+                        _process_body(
+                            "ja",
+                            outcome_lines=(f"成果 `skill:#{next_name}` が整う。",),
+                            title=name,
+                        ),
+                        metadata=False,
+                    ),
+                )
+
+            checked = CHECKER.check_document(
+                root / "skills/s0000/SKILL.md",
+                helper._roots(root),
+                helper.PACKAGE_ID,
+                require_locale_counterpart=True,
+            )
+            self.assert_no_errors(checked)
+            self.assertFalse(
+                any(item.code in {"parse-failed", "locale-dependency-validation-failed"} for item in checked.diagnostics),
+                checked.diagnostics,
+            )
+
+    def test_pair_rejects_conflicting_containing_package_declarations(self) -> None:
+        helper = AlpsMarkdownProfileMilestoneBTests
+        with _temp_root() as root:
+            helper._write_targets(root)
+            english = _write(root, "pair-en.md", _asset("pair", "process", "en", _process_body()))
+            japanese = _write(root, "pair-ja.md", _asset("pair", "process", "ja", _process_body("ja")))
+            errors, _ = _RAW_CHECK_PAIR(
+                english,
+                japanese,
+                package_identity=f"{helper.PACKAGE_ID}@{helper.PACKAGE_VERSION}",
+                roots=helper._roots(root),
+                package_id="other/package",
+            )
+            self.assertTrue(any("conflicting-package-identity" in item for item in errors), errors)
+
+        with _temp_root() as root:
+            helper._write_targets(root, japanese=False)
+            process = _write(
+                root,
+                "skills/process/SKILL.md",
+                _asset(
+                    "process",
+                    "process",
+                    "en",
+                    _process_body(outcome_lines=("The result `skill:#alpha` is ready.",)),
+                ),
+            )
+            _write(
+                root,
+                "skills/process/references/locales/ja/SKILL.md",
+                _asset(
+                    "process",
+                    "process",
+                    "ja",
+                    _process_body(
+                        "ja",
+                        outcome_lines=("成果 `skill:#alpha` が整う。",),
+                    ),
+                ),
+            )
+            checked = CHECKER.check_document(
+                process,
+                helper._roots(root),
+                helper.PACKAGE_ID,
+                require_locale_counterpart=True,
+            )
+            self.assertIn("missing-japanese-reference-counterpart", _codes(checked))
+
+    def test_cli_rejects_declared_scope_that_does_not_contain_asset(self) -> None:
+        helper = AlpsMarkdownProfileMilestoneBTests
+        with _temp_root() as root, _temp_root() as outside:
+            helper._write_targets(root, japanese=False)
+            model = _write(
+                outside,
+                "model.md",
+                _asset("model", "process-model", "en", _model_body()),
+            )
+            stdout, stderr = io.StringIO(), io.StringIO()
+            with redirect_stdout(stdout), redirect_stderr(stderr):
+                status = CHECKER.main(
+                    [
+                        "--package-binding",
+                        f"{helper.PACKAGE_ID}@{helper.PACKAGE_VERSION}={root}",
+                        "--package-id",
+                        helper.PACKAGE_ID,
+                        "--package-version",
+                        helper.PACKAGE_VERSION,
+                        "--no-locale-pairs",
+                        str(model),
+                    ]
+                )
+            self.assertEqual(status, 2)
+            self.assertIn("source-outside-package-root", stderr.getvalue())
 
     def test_canonical_reference_resolution_and_package_containment(self) -> None:
         helper = AlpsMarkdownProfileMilestoneBTests
@@ -1442,8 +2091,12 @@ class AlpsMarkdownProfileMilestoneCTests(unittest.TestCase):
         with _temp_root() as root:
             outside = root.parent / "outside-package"
             _write(outside, "model.md", _asset("model", "process-model", "en", _model_body()))
-            outside_result = CHECKER.check_document(outside / "model.md", {"example/alps@1.2.3": root})
-            self.assertIn("containing-package-not-found", _codes(outside_result))
+            outside_result = CHECKER.check_document(
+                outside / "model.md",
+                {"example/alps@1.2.3": root},
+                "example/alps",
+            )
+            self.assertIn("source-outside-package-root", _codes(outside_result))
 
         with _temp_root() as root:
             if not hasattr(os, "symlink"):
@@ -1475,17 +2128,72 @@ class AlpsMarkdownProfileMilestoneCTests(unittest.TestCase):
             escaped = helper._check(root, "symlink-target.md", _asset("model", "process-model", "en", _model_body()))
             self.assertIn("target-escapes-package-root", _codes(escaped))
 
+        with _temp_root() as root, _temp_root() as outside:
+            if not hasattr(os, "symlink"):
+                self.skipTest("symlink support is unavailable")
+            helper._write_targets(root, japanese=False)
+            source = outside / "source.md"
+            source.write_text(_asset("source", "process", "en", _process_body()), encoding="utf-8")
+            link = root / "source.md"
+            try:
+                link.symlink_to(source)
+            except OSError as error:
+                self.skipTest(f"symlinks unsupported: {error}")
+            escaped_source = CHECKER.check_document(
+                link,
+                helper._roots(root),
+                helper.PACKAGE_ID,
+            )
+            self.assertIn("source-outside-package-root", _codes(escaped_source))
+
+        with _temp_root() as root, _temp_root() as outside:
+            if not hasattr(os, "symlink"):
+                self.skipTest("symlink support is unavailable")
+            helper._write_targets(root, japanese=False)
+            outside_ja = _write(
+                outside,
+                "SKILL.md",
+                _asset("alpha", "process", "ja", _process_body("ja", title="アルファ"), metadata=False),
+            )
+            localized = root / "skills/alpha/references/locales/ja/SKILL.md"
+            localized.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                localized.symlink_to(outside_ja)
+            except OSError as error:
+                self.skipTest(f"symlinks unsupported: {error}")
+            model = _write(root, "skills/model/SKILL.md", _asset("model", "process-model", "en", _model_body()))
+            _write(
+                root,
+                "skills/model/references/locales/ja/SKILL.md",
+                _asset("model", "process-model", "ja", _model_body("ja")),
+            )
+            escaped_locale = CHECKER.check_document(
+                model,
+                helper._roots(root),
+                helper.PACKAGE_ID,
+                require_locale_counterpart=True,
+            )
+            self.assertIn("localized-target-escapes-package-root", _codes(escaped_locale))
+
         with _temp_root() as root:
             helper._write_targets(root, japanese=True, japanese_titles={"alpha": "アルファ", "beta": "ベータ"})
             japanese_path = _write(root, "skills/model/references/locales/ja/SKILL.md", _asset("model", "process-model", "ja", _model_body("ja")))
-            localized = CHECKER.check_document(japanese_path, {"example/alps@1.2.3": root})
+            localized = CHECKER.check_document(
+                japanese_path,
+                {"example/alps@1.2.3": root},
+                "example/alps",
+            )
             self.assert_no_errors(localized)
 
         with _temp_root() as root:
             helper._write_targets(root, japanese=False)
             fallback_body = _model_body("ja").replace("アルファ", "Alpha").replace("ベータ", "Beta")
             japanese_path = _write(root, "skills/model/references/locales/ja/SKILL.md", _asset("model", "process-model", "ja", fallback_body))
-            fallback = CHECKER.check_document(japanese_path, {"example/alps@1.2.3": root})
+            fallback = CHECKER.check_document(
+                japanese_path,
+                {"example/alps@1.2.3": root},
+                "example/alps",
+            )
             self.assert_no_errors(fallback)
 
     def test_ir_only_validator_locale_guard_parse_once_and_serialized_contract(self) -> None:
@@ -1620,9 +2328,37 @@ class AlpsMarkdownProfileMilestoneCTests(unittest.TestCase):
 
         def pair(en_body: str, ja_body: str, *, en_kind: str = "process", ja_kind: str = "process", ja_name: str = "fixture"):
             with _temp_root() as root:
+                helper._write_targets(root)
+                if "skill:#local-view" in en_body or "skill:#local-view" in ja_body:
+                    _write(
+                        root,
+                        "skills/local-view/SKILL.md",
+                        _asset(
+                            "local-view",
+                            "process",
+                            "en",
+                            _process_body(title="Local View"),
+                            metadata=False,
+                        ),
+                    )
+                    _write(
+                        root,
+                        "skills/local-view/references/locales/ja/SKILL.md",
+                        _asset(
+                            "local-view",
+                            "process",
+                            "ja",
+                            _process_body("ja", title="ローカルビュー"),
+                            metadata=False,
+                        ),
+                    )
                 english = _write(root, "en.md", _asset("fixture", en_kind, "en", en_body))
                 japanese = _write(root, "ja.md", _asset(ja_name, ja_kind, "ja", ja_body))
-                return _check_pair(english, japanese)
+                return _check_pair(
+                    english,
+                    japanese,
+                    roots=helper._roots(root),
+                )
 
         errors, warnings = pair(
             _process_body("en", outcome_lines=en_outcomes, task_lines=en_tasks),

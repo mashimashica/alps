@@ -17,7 +17,7 @@ This is an optional Environment Binding. Its file format, fields, and checker ru
 - Do not repeat a single-valued field. Contradictory duplicate values make the binding ambiguous and are rejected by the checker.
 - Keep binding fields in visible ordinary Markdown. Fenced or indented code is not binding data; raw HTML and HTML comments are rejected because their visibility is renderer-dependent.
 - Do not invent missing values. Leave a value blank while the record is being prepared, then complete or remove it as appropriate.
-- Identify the authoritative Process representation actually invoked and its managed baseline. Add the exact applicable `source_statement` when the record must remain reviewable without reopening that source; a source reference alone may be proportionate in lower-risk use.
+- Identify the authoritative Process representation actually invoked by its canonical Skill reference, complete logical identity, and managed baseline. Add the exact applicable `source_statement` when the record must remain reviewable without reopening that source; the source identification without copied statements may be proportionate in lower-risk use.
 - Use `instance_statement` only to state the application-specific expression. Its presence alone does not establish Tailoring.
 - Add a `criterion` when an Instance-specific success condition is needed. Record `result` and `assessment` after execution; add `evidence` and `limitations` as justified by risk.
 - If meaning, normative strength, or applicability is changed, add a `tailoring` block and apply the management Process. Do not use this format to make Tailoring implicit.
@@ -33,7 +33,7 @@ The following is a representative layout, not a required heading set or order.
 ## Application basis
 - `kind`: application
 - `record_format`: process-instance-record/1
-- `source`: <authoritative Process Skill reference and managed baseline>
+- `source`: <canonical Process Skill reference, complete logical identity, and managed baseline>
 - `resolved_from`: <optional Process Model, Process Reference Model, or Process View used to resolve the Process>
 - `context`: <application situation and need>
 - `scope`: <application scope, including relevant exclusions or an explicit statement that none apply>
@@ -63,7 +63,7 @@ Use additional blocks with core `kind` values such as `activity`, `purpose`, `in
 
 ## Conditional blocks
 
-Use a handoff block for a material Output/Input correspondence. At completion, record its status.
+When Processes are composed, use a handoff block for every provider Output to recipient Input mapping. At completion, record its status.
 
 ```markdown
 ## Handoff
@@ -78,16 +78,19 @@ Use a handoff block for a material Output/Input correspondence. At completion, r
 
 Use a Tailoring block only when an element is added, changed, or excluded through managed Tailoring. Do not use it merely because a Process View contains View-local or modified Activities or Tasks. Those descriptions remain local to the View unless the applicable Source Process is changed through managed Tailoring or controlled Process redefinition.
 
-This binding's checker requires values for `basis`, `candidate_evaluation`, `decision`, `affected_party_input`, and `controls_constraints`. Recording `scope` and `rationale` is recommended, but the checker treats them as optional. `before`, `after`, `assumptions_criteria`, and `performance_assessment` are also optional according to the application situation. These field names and their one-line representation are binding-specific and do not establish the validity of the Tailoring decision.
+This binding's checker requires values for `scope`, `basis`, `candidate_evaluation`, `process_name_change`, `name_consistency`, `source_traceability`, `decision`, `affected_party_input`, and `controls_constraints`. Use `not changed` or `not applicable` for the three Process Name fields when Tailoring does not change the Process Name. Recording `rationale` is recommended. `before`, `after`, `rationale`, `assumptions_criteria`, and `performance_assessment` are optional according to the application situation. These field names and their one-line representation are binding-specific and do not establish the validity of the Tailoring decision.
 
 ```markdown
 ## Tailoring
 - `kind`: tailoring
-- `scope`: <recommended: affected elements and application scope>
+- `scope`: <affected elements and application scope>
 - `before`: <optional: managed statement before the change>
 - `after`: <optional: approved statement after the change>
 - `basis`: <risks, requirements, complexity, available capabilities and resources, and relevant standards>
 - `candidate_evaluation`: <evaluation of candidate Processes or lifecycle models against application conditions, expertise and experience, stakeholder expectations and requirements, and risk tolerance>
+- `process_name_change`: <Process Name before and after Tailoring, or not changed>
+- `name_consistency`: <evidence of consistency with Purpose and Outcomes when the Process Name changes, or not applicable>
+- `source_traceability`: <Traceability to the source Process when the Process Name changes, or not applicable>
 - `rationale`: <recommended: decision rationale>
 - `decision`: <management decision and, when applicable, its resolvable reference>
 - `affected_party_input`: <affected parties and the Input obtained, or an explicit statement that none were identified>
@@ -101,16 +104,17 @@ Use a Conformance block only when making a claim.
 ```markdown
 ## Conformance
 - `kind`: conformance
-- `subject`: <claim subject>
+- `subject`: <recorded Process Instance>
+- `process_basis`: <invoked Process and its authoritative Process Description>
 - `scope`: <claim scope>
-- `basis`: <Outcomes, Tasks, or both>
+- `basis`: <Outcome Conformance, Task Conformance, or both>
 - `claim`: <Full or Tailored>
 - `tailoring_decision`: <managed Tailoring decision reference when the Tailoring details are not restated locally>
-- `remaining_requirements`: <for Tailored Conformance, every Outcome and Activity/Task requirement remaining in scope>
+- `remaining_requirements`: <for Tailored Conformance, every Outcome remaining in scope and every in-scope requirement stated with must or must not in an Activity or Task>
 - `evidence`: <evidence supporting the claim>
 ```
 
-For Tailored Conformance, use `subject`, `scope`, and `remaining_requirements` in the Conformance block to identify the tailored Process, the claim scope, and every Outcome and Activity/Task requirement that remains within that scope. The providing Skill may also be identified when applicable. Also include either a local `tailoring` block or a `tailoring_decision` reference through which the details can be resolved. A `tailoring_decision` reference does not replace `scope` or `remaining_requirements` in the Conformance block. For an ALPS claim, the evidence must demonstrate satisfaction of those remaining Outcomes and requirements; the checker verifies only that the evidence field is present. A Conformance block concerns the invoked Process. Assessment of Process View Outcomes or Description Conformance of a Process Model, Process Reference Model, or Process View must be recorded separately from Process Execution Conformance.
+For Tailored Conformance, `subject` identifies the recorded Process Instance, `process_basis` identifies the tailored Process and its authoritative Process Description, and `scope` and `remaining_requirements` identify the claim scope, every Outcome remaining in scope, and every in-scope requirement stated with `must` or `must not` in an Activity or Task. Also include either a local `tailoring` block or a `tailoring_decision` reference through which the details can be resolved. A `tailoring_decision` reference does not replace `scope` or `remaining_requirements` in the Conformance block. For an ALPS claim, the evidence must demonstrate satisfaction of those remaining Outcomes and requirements; the checker verifies only that the evidence field is present. Assessment of Process View Outcomes or Description Conformance of a Process Model, Process Reference Model, or Process View must be recorded separately from Execution Conformance.
 
 ## Generator and checker
 
@@ -119,11 +123,11 @@ The generator transcribes only the values supplied on the command line. It does 
 ```bash
 python3 scripts/process_instance_record.py new \
   --title "Contract review" \
-  --source "contract-review SKILL.md, managed version 2026-08-15" \
+  --source "skill:contracts#contract-review -> contracts@2026-08-15#contract-review" \
   --context "Review contract A before internal approval" \
   --scope "Contract body and supplied appendices" \
   --outcome "Material contractual issues are identified." \
-  --task "Review the applicable contract terms." \
+  --task "The applicable contract terms must be reviewed." \
   --output contract-review.md
 
 python3 scripts/process_instance_record.py check --at instantiation contract-review.md

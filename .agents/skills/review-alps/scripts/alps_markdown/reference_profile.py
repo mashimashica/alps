@@ -8,6 +8,7 @@ import ntpath
 import os
 from pathlib import Path
 import re
+import unicodedata
 from typing import TypeAlias
 
 try:  # Package import is used by the checker; the fallback aids direct use.
@@ -20,7 +21,6 @@ PathLike: TypeAlias = str | os.PathLike[str]
 _PACKAGE_ID = r"[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)*"
 _SKILL_NAME = r"[a-z0-9]+(?:-[a-z0-9]+)*"
 _PACKAGE_RE = re.compile(rf"\A{_PACKAGE_ID}\Z")
-_VERSION_RE = re.compile(r"\A[0-9A-Za-z]+(?:[._+-][0-9A-Za-z]+)*\Z")
 _REFERENCE_RE = re.compile(
     rf"\Askill:(?:(?P<package>{_PACKAGE_ID}))?#(?P<skill>{_SKILL_NAME})\Z"
 )
@@ -69,7 +69,7 @@ class LogicalSkillIdentity:
 
 @dataclass(frozen=True)
 class ResolvedReference:
-    """A canonical identity and its checked, package-contained target path."""
+    """A complete logical identity and its checked, package-contained target path."""
 
     reference: Reference
     package_id: str | None
@@ -115,7 +115,6 @@ __all__ = [
     "ReferenceResolution",
     "ResolutionResult",
     "package_roots",
-    "containing_package_identity",
     "resolve_reference",
     "localized_target",
 ]
@@ -157,7 +156,14 @@ def _valid_package_id(value: object) -> bool:
 
 
 def _valid_version(value: object) -> bool:
-    return isinstance(value, str) and _VERSION_RE.fullmatch(value) is not None
+    if not isinstance(value, str) or not 1 <= len(value) <= 128:
+        return False
+    return all(
+        character not in "@="
+        and not character.isspace()
+        and unicodedata.category(character) not in {"Cc", "Cf", "Cs"}
+        for character in value
+    )
 
 
 def _binding_key(value: object) -> tuple[str | None, str | None]:
@@ -383,64 +389,6 @@ def _logical_reference_token(token: str) -> str | None:
     return token
 
 
-def _identity_for_path(
-    path: PathLike,
-    roots: Mapping[str, Path],
-    diagnostics: list[Diagnostic],
-) -> str | None:
-    try:
-        candidate = Path(os.path.abspath(os.fspath(path)))
-    except (TypeError, ValueError, OSError) as error:
-        diagnostics.append(_diagnostic("semantic", "invalid-containing-path", str(path), str(error)))
-        return None
-    matches = [
-        (package, package_root)
-        for package, package_root in roots.items()
-        if _contained(candidate, package_root)
-    ]
-    if not matches:
-        diagnostics.append(
-            _diagnostic("semantic", "containing-package-not-found", candidate,
-                        "current asset is not contained by a configured package root")
-        )
-        return None
-    deepest = max(len(os.path.realpath(os.fspath(root))) for _, root in matches)
-    matches = [item for item in matches if len(os.path.realpath(os.fspath(item[1]))) == deepest]
-    if len(matches) > 1:
-        names = ", ".join(sorted(package for package, _ in matches))
-        diagnostics.append(
-            _diagnostic("semantic", "ambiguous-containing-package", candidate,
-                        f"current asset is contained by multiple package roots: {names}")
-        )
-        return None
-    return matches[0][0]
-
-
-def containing_package_identity(
-    path: PathLike,
-    configured: PackageRootConfig | Mapping[str, PathLike] | Iterable[str] | str | None,
-    *,
-    diagnostics: MutableSequence[Diagnostic] | None = None,
-) -> LogicalPackageIdentity | None:
-    """Return the exact versioned package scope containing ``path``.
-
-    Both lexical and real-path containment are required.  A default root (the
-    empty mapping key) is usable for local resolution but has no identity, so
-    this function returns ``None`` for that root.  An optional mutable
-    diagnostics sequence receives deterministic diagnostics.
-    """
-    config = _coerce_config(configured)
-    collected = list(config.diagnostics)
-    identity = _identity_for_path(path, config.roots, collected)
-    ordered = _sorted(collected)
-    if diagnostics is not None:
-        diagnostics[:] = ordered
-    if identity in (None, ""):
-        return None
-    version = config.versions.get(identity)
-    return LogicalPackageIdentity(identity, version) if version is not None else None
-
-
 def resolve_reference(
     reference: Reference | str,
     configured: PackageRootConfig | Mapping[str, PathLike] | Iterable[str] | str | None,
@@ -449,7 +397,7 @@ def resolve_reference(
     current_package_id: str | None = None,
     current_path: PathLike | None = None,
 ) -> ReferenceResolution:
-    """Resolve one canonical reference without reading its target content."""
+    """Resolve one canonical lexical reference without reading its target content."""
     if containing_path is None:
         containing_path = current_path
     config = _coerce_config(configured)
@@ -464,41 +412,47 @@ def resolve_reference(
     selected_root = qualified_package
     resolved_package_id: str | None = qualified_package
     if qualified_package is None:
-        if current_package_id is not None:
-            if current_package_id == "" and "" in roots:
-                selected_root = ""
-                resolved_package_id = None
-            elif not _valid_package_id(current_package_id):
-                diagnostics.append(
-                    _diagnostic("host-input", "invalid-current-package-id", "<reference>",
-                                f"invalid current package ID: {current_package_id!r}", parsed)
+        if current_package_id in (None, ""):
+            diagnostics.append(
+                _diagnostic(
+                    "host-input",
+                    "missing-declared-package-scope",
+                    "<reference>",
+                    "a same-scope short reference requires an explicitly declared current package ID",
+                    parsed,
                 )
-            else:
-                resolved_package_id = current_package_id
-                selected_root = current_package_id if current_package_id in roots else ""
-                if selected_root not in roots:
-                    selected_root = current_package_id
-            if containing_path is not None and (
-                current_package_id == "" or _valid_package_id(current_package_id)
-            ):
-                discovered = _identity_for_path(containing_path, roots, diagnostics)
-                if discovered is not None and discovered != "" and discovered != current_package_id:
-                    diagnostics.append(
-                        _diagnostic("host-input", "conflicting-current-package", str(containing_path),
-                                    f"current package ID {current_package_id!r} does not contain the asset",
-                                    parsed)
-                    )
-        elif containing_path is not None:
-            selected_root = _identity_for_path(containing_path, roots, diagnostics)
-            resolved_package_id = None if selected_root == "" else selected_root
-        elif "" in roots:
-            selected_root = ""
+            )
+            selected_root = None
+            resolved_package_id = None
+        elif not _valid_package_id(current_package_id):
+            diagnostics.append(
+                _diagnostic(
+                    "host-input",
+                    "invalid-current-package-id",
+                    "<reference>",
+                    f"invalid current package ID: {current_package_id!r}",
+                    parsed,
+                )
+            )
+            selected_root = None
             resolved_package_id = None
         else:
-            diagnostics.append(
-                _diagnostic("host-input", "missing-containing-package", "<reference>",
-                            "a local reference requires a containing path or current package ID", parsed)
-            )
+            selected_root = current_package_id
+            resolved_package_id = current_package_id
+            if (
+                containing_path is not None
+                and selected_root in roots
+                and not _contained(Path(containing_path), roots[selected_root])
+            ):
+                diagnostics.append(
+                    _diagnostic(
+                        "host-input",
+                        "conflicting-current-package",
+                        str(containing_path),
+                        f"declared current package ID {current_package_id!r} does not contain the asset",
+                        parsed,
+                    )
+                )
 
     if selected_root is None or selected_root not in roots:
         if selected_root is not None and selected_root not in roots:
@@ -565,16 +519,18 @@ def localized_target(
     locale: str | None = None,
     *,
     requested_locale: str | None = None,
+    require_counterpart: bool = False,
     diagnostics: MutableSequence[Diagnostic] | None = None,
 ) -> Path | None:
-    """Select the optional Japanese counterpart while preserving identity."""
+    """Select or verify the Japanese counterpart while preserving identity."""
     if requested_locale is not None:
         locale = requested_locale
     item = resolved.resolved if isinstance(resolved, ReferenceResolution) else resolved
-    if item is None or not (
-        isinstance(locale, str) and (locale == "ja" or locale.startswith("ja-"))
-    ):
-        return item.target if item is not None else None
+    if item is None:
+        return None
+    japanese = isinstance(locale, str) and (locale == "ja" or locale.startswith("ja-"))
+    if not japanese and not require_counterpart:
+        return item.target
 
     candidate = item.target.parent / "references" / "locales" / "ja" / "SKILL.md"
     local_diagnostics: list[Diagnostic] = []
@@ -593,12 +549,22 @@ def localized_target(
         if exists and regular:
             if diagnostics is not None:
                 diagnostics[:] = _sorted((*diagnostics, *local_diagnostics))
-            return candidate
+            return candidate if japanese else item.target
         if exists and not regular:
             local_diagnostics.append(
                 _diagnostic("semantic", "localized-target-not-regular-file", candidate,
                             f"localized target is not a regular file: {candidate}", item.reference)
             )
+        elif require_counterpart:
+            local_diagnostics.append(
+                _diagnostic(
+                    "locale-mismatch",
+                    "missing-japanese-reference-counterpart",
+                    candidate,
+                    f"required Japanese counterpart does not exist: {candidate}",
+                    item.reference,
+                )
+            )
     if diagnostics is not None:
         diagnostics[:] = _sorted((*diagnostics, *local_diagnostics))
-    return item.target
+    return None if japanese and require_counterpart else item.target

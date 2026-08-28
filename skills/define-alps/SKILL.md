@@ -1,9 +1,9 @@
 ---
 name: define-alps
-description: Identify needs for ALPS representations; define and verify Process Descriptions, Process Models, Process Reference Models, and Process Views in accordance with ALPS and the Process Framework. Use when creating or redefining an ALPS representation, establishing its Purpose and boundary, reviewing representation conformance, verifying references and semantic consistency, trialing a Process Description in representative contexts, or producing evidence for adoption. Use manage-alps when the work concerns only adoption, controlled change, Tailoring, or retirement. ALPS-conformant.
+description: Identify needs for ALPS representations; define and verify Process Descriptions, Process Models, Process Reference Models, and Process Views in accordance with ALPS and the Process Framework. Use when creating or redefining an ALPS representation, establishing its Purpose and boundary, reviewing applicable Description Conformance, verifying references and semantic consistency, trialing a Process Description in representative contexts, or producing evidence for adoption. Use manage-alps when the work concerns only adoption, controlled change, Tailoring, or retirement. ALPS-conformant.
 ---
 
-# Define ALPS
+# ALPS Definition Process
 
 ## Purpose
 
@@ -46,25 +46,30 @@ This Activity determines the structure and content required by the selected repr
 1. The authoritative representation must preserve the meaning of the represented Process Framework construct.
 2. An Agent Skill representing a Process must contain a Process Description with Name, Purpose, and Outcomes.
 3. The Process Description must apply the applicable rules in Clause 6 of ALPS.
-4. A Process Description must distinguish discovery-layer and execution-layer information. Their physical separation is not required.
+4. Discovery-layer and execution-layer information must be distinguished in a Process Description.
 5. Each Task in a Process Description must express an individual action supporting one or more Outcomes so that its object and operation are distinguishable.
-6. Each normative statement in a Process Description must have a distinguishable normative attribute.
+6. The normative attribute of each normative statement in a Process Description must be made distinguishable.
 7. A Process Model must identify its Processes and their relationships.
 8. A Process Model may identify the Agent Skills that provide the authoritative Process Descriptions.
-9. A Process Reference Model must identify each included Process by Name, Purpose, and Outcomes, identify their relationships, and identify the corresponding Process Skill where one is supplied.
-10. A Process View must state Name, Purpose, and Outcomes; identify any source Processes it references; maintain provenance and Traceability for referenced source Activities and Tasks; permit Activities and Tasks to be described within the View where needed for its concern or Purpose; and provide application guidance.
-11. Logical references among Agent Skill representations must use the canonical Skill-reference rules in ALPS rather than repository-relative paths as identity.
-12. Reference information must not alter the meaning or normative force of the authoritative representation.
-13. When a Skill Package includes accompanying resources, their role and conditions of use must be identifiable.
-14. Relationships and handoffs that affect another representation or Process should be made explicit where needed.
+9. A Process Reference Model must identify each included Process by Name, Purpose, and Outcomes.
+10. A Process Reference Model must identify the relationships among its included Processes.
+11. A Process Reference Model must identify the corresponding Process Skill where one is supplied for an included Process.
+12. A Process View must state Name, Purpose, and Outcomes.
+13. A Process View must identify every source Process that it references.
+14. A Process View must maintain provenance and Traceability for referenced source Activities and Tasks.
+15. A Process View may describe View-local Activities and Tasks where needed for its concern or Purpose.
+16. A Process View must provide application guidance.
+17. Logical references among Agent Skill representations must use the canonical Skill-reference rules in ALPS rather than repository-relative paths as identity.
+18. When a Skill Package includes accompanying resources, their role and conditions of use must be identified.
+19. Relationships and handoffs that affect another representation or Process should be made explicit where needed.
 
 ### Representation Verification
 
 This Activity verifies the representation against its kind-specific requirements and its intended use. It primarily contributes to Outcomes c), d), e), and f).
 
 1. The authoritative representation must be reviewed against the Process Framework and the applicable ALPS requirements.
-2. The declared or default representation kind must match the construct actually represented.
-3. Mandatory references must resolve to the intended targets.
+2. The correspondence between the declared or default representation kind and the construct actually represented must be checked.
+3. Mandatory references must be resolved to the intended targets.
 4. A Process Description must be checked for Name, Purpose, Outcomes, element classification, normative attributes, non-prescription of implementation, and consistency between discovery and execution information.
 5. The achievability of Process Outcomes should be evaluated through representative trials when the representation is a Process Description.
 6. A Process Model must be checked for identifiable Processes and coherent relationships.
@@ -77,7 +82,7 @@ This Activity verifies the representation against its kind-specific requirements
 
 ## Inputs
 
-Representative Inputs include stakeholder expectations, needs and change requests, existing ALPS representations, Process Framework and ALPS requirements, verification criteria, execution evidence when relevant, and representative contexts of use.
+Representative Inputs include stakeholder expectations, needs and change requests, existing ALPS representations, execution evidence when relevant, and representative contexts of use.
 
 ## Outputs
 
@@ -101,10 +106,12 @@ Representative Outputs include the selected representation need and rationale, a
 
 ## Controls
 
-- Apply the [Process Framework](../../spec/process-framework.md) and [ALPS Specification](../../spec/ALPS-SPEC.md). If they conflict, the Process Framework takes precedence.
+- The [Process Framework](../../spec/process-framework.md) and [ALPS Specification](../../spec/ALPS-SPEC.md) must be applied. If they conflict, the Process Framework must take precedence.
 - Normative words and their meanings are those defined in the Process Framework.
 - A representation must preserve the meaning of the Process Framework construct it represents.
 - Name, Purpose, and Outcomes must be written and interpreted according to the applicable Process Framework rules.
+- Discovery-layer and execution-layer information may be represented together or separately, provided that they remain distinguishable and the authoritative Process Description remains identifiable.
+- Applicable verification criteria govern Representation Verification as Controls.
 - Applicable laws, regulatory requirements, policies, standards, and agreements must be applied within their declared scope.
 - Repository and execution-environment rules governing creation, verification, and saving must be followed.
 
@@ -115,6 +122,7 @@ Representative Outputs include the selected representation need and rationale, a
 - Agent Skill activation must not be treated as Process Invocation for a non-Process representation.
 - Agents, models, tools, and execution environments must not be treated as Inputs to a Process; they are Enablers.
 - A Decision Gate is a separate decision mechanism and must not be treated as a component of a Process Description.
+- Reference information must not alter the meaning or normative force of the authoritative representation.
 - Mandatory references must be resolvable, and unnecessary duplication or conflict must not arise between an authoritative representation and accompanying resources.
 
 ## Enablers
@@ -126,21 +134,21 @@ Representative Outputs include the selected representation need and rationale, a
 
 ## Conformance
 
-This Skill represents the Define ALPS Process and is assessed as a Process Description and, when invoked, as a Process. The representation produced by this Process is assessed separately according to its own kind. A successful execution of Define ALPS does not by itself establish Conformance of the produced representation unless the applicable representation checks and evidence have been satisfied.
+This Skill represents the ALPS Definition Process. Its Skill Description may be assessed for Description Conformance, the represented Process for Reference Process Conformance, and a Process Instance resulting from Process Invocation for Execution Conformance. The representation produced by this Process is assessed separately according to its own kind. A successful execution of the ALPS Definition Process does not by itself establish Conformance of the produced representation unless the applicable representation checks and evidence have been satisfied.
 
 ## Interfaces & Traceability
 
 | Information item provided | Primary recipient | Related information |
 |---|---|---|
-| Verified ALPS representation | Manage ALPS | Adoption subject, kind, version, conditions of use, and verification results. |
+| Verified ALPS representation | ALPS Management Process | Adoption subject, kind, version, conditions of use, and verification results. |
 | Verification results and defect treatment | Adoption Decision Gate | Decision criteria, evidence, unresolved limitations, and decision. |
 | Semantic mappings and references | Assessment or reverification | Source and target identities, required equality or provenance, and status. |
-| Redefinition and reverification results | Manage ALPS | Change request, affected scope, and post-change evidence. |
+| Redefinition and reverification results | ALPS Management Process | Change request, affected scope, and post-change evidence. |
 
 ## Shared Normative References
 
-- Use the repository-shared [Process Framework](../../spec/process-framework.md) as the higher-order normative source.
-- Use the repository-shared [ALPS Specification](../../spec/ALPS-SPEC.md) for Agent Skill representation, life-cycle, and Conformance rules.
+- The repository-shared [Process Framework](../../spec/process-framework.md) is the higher-order normative source.
+- The repository-shared [ALPS Specification](../../spec/ALPS-SPEC.md) supplies Agent Skill representation, life-cycle, and Conformance rules.
 
 ## Bundled Resources
 
@@ -148,7 +156,7 @@ This Skill represents the Define ALPS Process and is assessed as a Process Descr
 - [SKILL-template.md](references/SKILL-template.md) is an informative Process Description output-creation resource whose concrete form is compatible with `alps-markdown/v2`.
 - [record-templates.md](references/record-templates.md) is an informative output-creation resource for definition and verification records.
 - [skill-package-format.md](references/skill-package-format.md) is reference information for identifying logical Package resource roles.
-- These resources must not override ALPS or the Process Framework. Mechanical profile validation is supplied by the applicable Environment Binding or review Process, not by Define ALPS itself.
+- These resources must not override ALPS or the Process Framework. Mechanical profile validation is supplied by the applicable Environment Binding or review Process, not by the ALPS Definition Process itself.
 
 ## Common Approach
 

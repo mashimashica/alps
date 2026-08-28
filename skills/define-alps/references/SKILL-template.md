@@ -7,14 +7,14 @@ This material is an informative example for drafting a readable Process Descript
 ```markdown
 ---
 name: <lowercase-hyphen-name>
-description: <Briefly state what the Skill does, when to use it, and, if needed, when not to use it> ALPS-conformant.
+description: <Briefly state what the represented Process does, when to use this Skill, and, if needed, when not to use it> ALPS-conformant.
 ---
 
-# <Short Noun-Phrase Skill Name>
+# <Short Noun-Phrase Process Name>
 
 ## Purpose
 
-<State concisely the related high-level objective or objectives for which this Skill exists.>
+<State concisely the related high-level objective or objectives for performing this Process.>
 <If needed, add reference information about scope, subject domain, or degree of rigor without changing the meaning of the Purpose.>
 
 ## Outcomes
@@ -36,8 +36,8 @@ The following headings, Activities, Tasks, and numbers present the content for r
 
 ## Inputs
 
-- <An information item or artifact transformed by the Skill>
-- <An item received from another Skill or external source>
+- <An information item or artifact transformed by the Process>
+- <An item received from another Process or external source>
 
 ## Outputs
 
@@ -46,7 +46,7 @@ The following headings, Activities, Tasks, and numbers present the content for r
 
 ## Entry Criteria
 
-- <A condition under which the Skill can be invoked.>
+- <A condition under which the Process can be invoked.>
 
 ## Exit Criteria
 
@@ -68,11 +68,12 @@ The following headings, Activities, Tasks, and numbers present the content for r
 ## Conformance
 
 - <The subject, scope, and criteria of a Conformance claim.>
-- <Conditions for satisfaction when Outcomes or Tasks are used as the criteria.>
+- <Conditions for satisfaction when Outcome Conformance, Task Conformance, or both are selected.>
 
 ## Interfaces & Traceability
 
-- <Mappings among Outcomes, Activities, Tasks, and evidence should be identifiable.>
+- <Mappings among Outcomes, Activities, Tasks, and evidence should be identified.>
+- <Every provider Output to recipient Input mapping is explicit.>
 - <The names, meanings, and scopes of Outputs and recipient Inputs should be aligned.>
 
 ## Bundled Resources
@@ -99,5 +100,5 @@ This section is reference information and has no normative force.
 - Place a statement whose primary function is not an individual action in another element corresponding to that function.
 - For each Task, make one of requirement, prohibition, recommendation, permission, or typical action distinguishable through normative wording. The template does not require every kind.
 - Do not include an Agent, tool, or execution environment among the Inputs; treat it as an Enabler.
-- Mandatory references must be resolvable. A Package should include only accompanying resources that directly support understanding or executing the Skill or creating an Output.
-- Do not make a Decision Gate a component of the Skill Description; treat it as a separate decision mechanism that controls application of the Skill.
+- Mandatory references must be resolvable. A Package should include only accompanying resources that directly support understanding or applying the represented Process or creating an Output.
+- Do not make a Decision Gate a component of the Skill Description; treat it as a separate decision mechanism that controls application of the represented Process.

@@ -26,7 +26,6 @@ try:
     from .reference_profile import (
         LogicalPackageIdentity,
         PackageRootConfig,
-        containing_package_identity,
         package_roots,
     )
 except ImportError:  # pragma: no cover - supports direct script execution.
@@ -48,7 +47,6 @@ except ImportError:  # pragma: no cover - supports direct script execution.
     from alps_markdown.reference_profile import (  # type: ignore
         LogicalPackageIdentity,
         PackageRootConfig,
-        containing_package_identity,
         package_roots,
     )
 
@@ -167,18 +165,14 @@ def _valid(result: CheckResult) -> bool:
 
 
 def _pair_package_identity(
-    english: Path,
-    japanese: Path,
     config: PackageRootConfig,
     configured: str | None,
 ) -> LogicalPackageIdentity | None:
-    """Provide locale comparison with the package context already configured."""
+    """Provide locale comparison only with an explicitly declared package scope."""
     if configured:
         version = config.versions.get(configured)
         return LogicalPackageIdentity(configured, version) if version is not None else None
-    left = containing_package_identity(english, config)
-    right = containing_package_identity(japanese, config)
-    return left if left is not None and left == right else None
+    return None
 
 
 def _status(diagnostics: tuple[Diagnostic, ...]) -> int:
@@ -195,8 +189,14 @@ def _run(argv: list[str] | None) -> int:
     parser = argparse.ArgumentParser(prog="alps-markdown")
     parser.add_argument("paths", nargs="*", type=Path)
     parser.add_argument("--root", type=Path)
-    parser.add_argument("--package-id")
-    parser.add_argument("--package-version")
+    parser.add_argument(
+        "--package-id",
+        help="declare the containing Logical Package Scope used by same-scope short references",
+    )
+    parser.add_argument(
+        "--package-version",
+        help="exact version of the declared containing Logical Package Scope",
+    )
     parser.add_argument(
         "--package-binding",
         "--package-root",
@@ -208,7 +208,11 @@ def _run(argv: list[str] | None) -> int:
             "--package-root is retained as a compatibility alias"
         ),
     )
-    parser.add_argument("--require-japanese", action="store_true")
+    parser.add_argument(
+        "--require-japanese",
+        action="store_true",
+        help="require Japanese counterparts for selected assets and referenced dependencies",
+    )
     parser.add_argument("--no-locale-pairs", action="store_true")
     parser.add_argument("--version", action="version", version=PROFILE_VERSION)
     args = parser.parse_args(argv)
@@ -251,19 +255,6 @@ def _run(argv: list[str] | None) -> int:
                     assets = _dedupe(assets + [counterpart])
 
     diagnostics: list[Diagnostic] = []
-    if args.require_japanese:
-        for path in assets:
-            if locale_for(path) == "en" and not _is_file(japanese_counterpart(path)):
-                diagnostics.append(
-                    Diagnostic(
-                        "locale-mismatch",
-                        "missing-japanese-counterpart",
-                        Severity.ERROR,
-                        os.fspath(path),
-                        None,
-                        "required Japanese counterpart is missing",
-                    )
-                )
 
     parse_cache = {}
     results: dict[str, CheckResult] = {}
@@ -273,6 +264,7 @@ def _run(argv: list[str] | None) -> int:
             config,
             args.package_id,
             parse_cache=parse_cache,
+            require_locale_counterpart=args.require_japanese,
         )
         results[_path_key(path)] = result
         diagnostics.extend(result.diagnostics)
@@ -297,7 +289,7 @@ def _run(argv: list[str] | None) -> int:
                         left.ir,
                         right.ir,
                         package_identity=(
-                            _pair_package_identity(path, counterpart, config, args.package_id),
+                            _pair_package_identity(config, args.package_id),
                             config.versions,
                         ),
                     )

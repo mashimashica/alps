@@ -129,8 +129,8 @@ There MUST be exactly one unindented ATX H1, written as `# ` followed by a
 non-empty title.  It MUST be at column zero, MUST NOT use a closing `#` sequence,
 and MUST NOT be Setext.  The separator after `#` is one literal ASCII space; a
 tab is unsupported profile syntax.  The title supplies the represented
-construct's display Name in this binding.  It need not equal the lowercase
-Host-facing frontmatter `name` or the translated title in a locale file.
+construct's display Name in this binding.  It MAY differ from the lowercase
+Host-facing frontmatter `name` and from the translated title in a locale file.
 
 Profile section headings MUST be unindented ATX H2 lines with exact, locale-specific
 text.  They MUST NOT have closing markers, Setext underlines, leading spaces, or
@@ -347,13 +347,24 @@ NOT be resolved or create an IR identity.  A malformed reference in a designated
 reference field is an `unsupported-profile-syntax` error.
 
 Resolution MUST use an applicable Package Binding.  A configured binding has the
-host form `<package-id>@<exact-version>=<package-root>`.  The version is an
-opaque, non-empty exact identifier in this Environment Binding; the checker does
-not infer it from a manifest, directory name, repository state, or release tag.
+host form `<package-id>@<exact-version>=<package-root>`.  The exact version MUST
+contain 1 to 128 Unicode characters, MUST NOT contain whitespace, Unicode control
+or format characters, `@`, or `=`, and MAY contain `/` or `:`.  The checker does not infer
+the version from a manifest, directory name, repository state, or release tag.
 One validation context MUST select at most one exact version for each package
-ID.  A same-scope short reference MUST use the binding for the Logical Package
-Scope containing the referring representation.  A package-qualified reference
-MUST use the binding selected for its stated package ID.
+ID.  A same-scope short reference MUST use an explicitly declared containing
+Logical Package Scope; in the checker interface, `--package-id` and its exact
+version declare that scope.  Filesystem containment, including a more deeply
+nested configured package root, MUST NOT select or replace that logical scope.
+A package-qualified reference MUST use the binding selected for its stated
+package ID.
+
+In this binding, a source asset for which a containing Logical Package Scope is
+declared MUST be lexically and physically contained by the package root selected
+for that scope.  This containment check verifies an explicitly declared scope;
+it MUST NOT infer the scope from the path.  A symbolic link whose resolved target
+remains inside the selected package root is permitted, while a link that escapes
+that root is an error.
 
 The target path MUST be real and contained by the selected package root.  A `..`
 escape, or a symlink whose resolved target escapes the configured package root,
@@ -362,26 +373,30 @@ are permitted.  The target MUST be a Process representation where the
 surrounding rule requires a Process.  No network or registry lookup is
 permitted.
 
-After filesystem resolution succeeds, the canonical identity is exactly the
-structured `ResolvedReference.identity` value
+After filesystem resolution succeeds, the complete logical identity is exactly
+the structured `ResolvedReference.identity` value
 `(package_id, exact_version, skill_name)`.  Therefore, when `skill:#x`
 resolves within `pkg@1.2.3`, it and `skill:pkg#x` resolved by the same binding
-are one canonical identity and MUST be treated as one identity for uniqueness,
+are one complete logical identity and MUST be treated as one identity for uniqueness,
 binding, and semantic comparison.  The same Skill name in `pkg@1.2.4` is a
 different identity.  The lexical token, source span, and original qualification
 MUST remain unchanged in the IR; they are presentation/provenance data, not
 semantic identity.  A reference that does not resolve through a binding with an
-exact version has no canonical identity and MUST retain its resolution error;
+exact version has no complete logical identity and MUST retain its resolution error;
 the checker MUST NOT make an unresolved short or qualified token valid by
 falling back to lexical comparison.
 
-The canonical reference is the locale-independent three-part identity.  Its authoritative
-path is the target package's `skills/<skill-name>/SKILL.md`.  When validating a
-Japanese asset, the checker uses that target's
+The package-qualified reference and same-scope short reference are the canonical
+lexical Skill-reference forms.  Each normalizes to the locale-independent
+three-part complete logical identity.  The applicable Package Binding then
+locates the selected Skill Package and exactly one authoritative Agent Skill
+representation.  In this binding, that physical target is
+`skills/<skill-name>/SKILL.md`; the path is neither the logical identity nor a
+canonical reference form.  When validating a Japanese asset, the checker uses that target's
 `references/locales/ja/SKILL.md` for localized display and semantic-center
 comparison when the counterpart exists.  Absence of that counterpart is an
 error only when locale completeness is required.  Resolution never changes the
-canonical identity or infers one from translated text.
+complete logical identity or infers one from translated text.
 
 ## 7. Semantic requirements
 
@@ -508,9 +523,10 @@ documents have independently passed profile parsing and have produced IRs.  The
 checker MUST compare IR fields, never raw Markdown or regular-expression matches
 over the two source files.
 
-The pair MUST have the same frontmatter `name` and kind.  The applicable
-Package Binding MUST supply the containing package ID and exact version and the
-selected exact version for every qualified package ID used in the pair.
+The pair MUST have the same frontmatter `name` and kind.  The caller MUST
+explicitly declare the containing Logical Package Scope for same-scope short
+references, and the applicable Package Binding MUST supply its exact version and
+the selected exact version for every qualified package ID used in the pair.
 Comparison MUST use that context to normalize a local `skill:#x` to the same
 three-part identity as `skill:pkg#x` resolved in that versioned scope; a
 reference resolved to a different package ID or exact version remains a
@@ -536,10 +552,14 @@ identity.
   identity/order when present.
 
 Localized prose, headings, and display labels are not required to be byte-equal.
-Missing or unstable identity produces a warning only when the profile can still
-compare counts and kinds; a proven count, kind, or stable-reference mismatch is
-an error.  A missing required Japanese counterpart is an error only when the
-caller requests locale completeness.
+A display-only element without a Skill reference may produce a warning when the
+profile can still compare counts and kinds.  Every operative Skill reference
+MUST resolve to a complete logical identity before locale comparison; a missing
+binding or containing scope is an error rather than a lexical fallback.  A
+proven count, kind, or stable-reference mismatch is an error.  When the caller
+requests locale completeness, the selected root asset and every transitively
+referenced dependency MUST have a Japanese counterpart; a missing counterpart
+is an error.
 
 ## 9. Diagnostics and exit behavior
 
@@ -640,7 +660,7 @@ Accepted canonical relationship table:
 ```markdown
 | Provider Process | Information | Recipient Process | Relationship |
 | --- | --- | --- | --- |
-| Define ALPS | Evidence | Manage ALPS | Supports adoption. |
+| ALPS Definition Process | Evidence | ALPS Management Process | Supports adoption. |
 ```
 
 Accepted optional Process or View-local task structure:
@@ -683,14 +703,14 @@ Accepted canonical Process Model declarations:
 ```markdown
 | Process | Skill |
 | --- | --- |
-| Define ALPS | `skill:alps#define-alps` |
-| Manage ALPS | |
+| ALPS Definition Process | `skill:alps#define-alps` |
+| ALPS Management Process | |
 ```
 
 Accepted canonical Process Reference Model entry:
 
 ```markdown
-### Define ALPS
+### ALPS Definition Process
 
 Skill: `skill:alps#define-alps`
 
@@ -710,15 +730,15 @@ Accepted canonical Process View tables:
 
 | Source Process | Reference |
 | --- | --- |
-| Define ALPS | `skill:alps#define-alps` |
-| Manage ALPS | `skill:alps#manage-alps` |
+| ALPS Definition Process | `skill:alps#define-alps` |
+| ALPS Management Process | `skill:alps#manage-alps` |
 
 ## Included Activities and Tasks
 
 | Source Process | Source element |
 | --- | --- |
-| Define ALPS (`skill:alps#define-alps`) | Activity: Review |
-| Manage ALPS (`skill:alps#manage-alps`) | Task: Record result |
+| ALPS Definition Process (`skill:alps#define-alps`) | Activity: Review |
+| ALPS Management Process (`skill:alps#manage-alps`) | Task: Record result |
 ```
 
 Rejected as `unsupported-profile-syntax`, not invalid YAML/Markdown:
@@ -731,7 +751,7 @@ metadata: &m
 ```markdown
 Process | Skill
 --- | ---
-Define ALPS | `skill:#define-alps`
+ALPS Definition Process | `skill:#define-alps`
 ```
 
 ```markdown
@@ -743,7 +763,7 @@ Define ALPS | `skill:#define-alps`
 ```
 
 ```markdown
-- Define ALPS -> Manage ALPS
+- ALPS Definition Process -> ALPS Management Process
 ```
 
 ```markdown
@@ -761,8 +781,9 @@ profile form.
 
 The profile version is an explicit checker contract, currently `v2`.  Version 1
 remains frozen in [ALPS Markdown Profile v1](alps-markdown.md).  Version 2 keeps
-the v1 lexical representation and changes Package Binding and canonical identity
-normalization to preserve the exact package version required by ALPS.
+the v1 lexical representation and changes Package Binding and
+complete-logical-identity normalization to preserve the exact package version
+required by ALPS.
 
 A change that alters accepted syntax, rejected syntax, IR meaning, identity
 normalization, diagnostic class/severity, or exit behavior MUST use a new profile

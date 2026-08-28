@@ -41,9 +41,9 @@ Restart affected clients after installation so they reload the Agent Skills.
 
 | Agent Skill | Representation | Use it when |
 | --- | --- | --- |
-| [`alps-reference-model`](skills/alps-reference-model/SKILL.md) | Process Reference Model | The ALPS reference Processes and their relationships must guide selection, assessment, or improvement. |
+| [`alps-reference-model`](skills/alps-reference-model/SKILL.md) | Process Reference Model | The ALPS reference Processes and their relationships guide selection, assessment, or improvement. |
 | [`define-alps`](skills/define-alps/SKILL.md) | Process | An ALPS representation must be created, redefined, or verified. |
-| [`apply-alps`](skills/apply-alps/SKILL.md) | Process | Existing representations must guide Process selection, Invocation, composition, or handoffs. |
+| [`apply-alps`](skills/apply-alps/SKILL.md) | Process | Existing representations guide Process selection, Invocation, composition, or handoffs. |
 | [`manage-alps`](skills/manage-alps/SKILL.md) | Process | Representations must be adopted, tailored, assessed, changed, improved, or retired. |
 
 In most cases, start with `alps-reference-model` and use it to select the applicable reference Processes.
@@ -118,7 +118,7 @@ Supported explicit kinds are `process-model`, `process-reference-model`, and `pr
 ALPS defines its own lifecycle through three reference Processes. They are not fixed phases and may be applied concurrently, iteratively, or recursively.
 
 <p align="center">
-  <img src="assets/alps-reference-model.svg" alt="ALPS Reference Model: Define ALPS sends a verified representation to Manage ALPS; Manage ALPS sends managed representations and conditions to Apply ALPS; Apply ALPS sends selection and execution evidence to Manage ALPS; Manage ALPS sends a redefinition or reverification request to Define ALPS." width="100%">
+  <img src="assets/alps-reference-model.svg" alt="ALPS Reference Model: the ALPS Definition Process sends a verified representation to the ALPS Management Process; the ALPS Management Process sends managed representations and conditions to the ALPS Application Process; the ALPS Application Process sends selection and execution evidence to the ALPS Management Process; the ALPS Management Process sends a redefinition or reverification request to the ALPS Definition Process; and the ALPS Application Process sends an unmet representation need to the ALPS Definition Process." width="100%">
 </p>
 
 The authoritative Process Reference Model is packaged as [`skills/alps-reference-model/SKILL.md`](skills/alps-reference-model/SKILL.md). It contains the Name, Purpose, and Outcomes of the three reference Processes.
@@ -148,7 +148,7 @@ This repository uses ALPS.
 - Read the complete `SKILL.md` for every selected representation.
 - Use `define-alps` to define or verify ALPS representations, `apply-alps` to resolve and invoke Processes, and `manage-alps` for adoption, Tailoring, assessment, change, or retirement.
 - For a Process View, preserve provenance and Traceability for referenced source elements and keep View-local descriptions distinct from changes to source Processes.
-- When combining Processes, make required Output/Input handoffs explicit.
+- When combining Processes, make every provider Output to recipient Input mapping explicit.
 ```
 
 ## Find the Right Resource

@@ -22,6 +22,69 @@ def _present(value: str | None) -> bool:
     return value is not None and value != ""
 
 
+def _all_references(document: DocumentIR) -> tuple[Reference, ...]:
+    """Collect every operative reference without relying on one parser projection."""
+    result: list[Reference] = []
+    seen: set[tuple[str, int | None, int | None, int | None]] = set()
+
+    def add(reference: Reference | None) -> None:
+        if not isinstance(reference, Reference):
+            return
+        key = (
+            reference.token,
+            reference.line,
+            reference.span.start if reference.span is not None else None,
+            reference.span.end if reference.span is not None else None,
+        )
+        if key not in seen:
+            seen.add(key)
+            result.append(reference)
+
+    for reference in document.references:
+        add(reference)
+    for outcome in document.outcomes:
+        for reference in outcome.references:
+            add(reference)
+    for activity in document.activities:
+        for task in activity.tasks:
+            for reference in task.references:
+                add(reference)
+    for process in document.processes:
+        add(process.reference)
+        for outcome in process.outcomes:
+            for reference in outcome.references:
+                add(reference)
+    for source in document.source_processes:
+        add(source.reference)
+    for inclusion in document.included_activities_tasks:
+        add(inclusion.source_reference)
+    for application in document.application:
+        for reference in application.references:
+            add(reference)
+    return tuple(result)
+
+
+def _require_reference_identities(
+    out: list[Diagnostic],
+    document: DocumentIR,
+    package_identity: _PackageContext,
+) -> None:
+    for reference in _all_references(document):
+        identity = _reference_identity(reference, package_identity)
+        if not isinstance(identity, LogicalSkillIdentity):
+            _emit(
+                out,
+                document,
+                "unresolved-locale-reference-identity",
+                Severity.ERROR,
+                "locale comparison requires every Skill reference to resolve to a complete "
+                "logical identity through an explicit versioned package context",
+                reference.line,
+                reference.span,
+                reference,
+            )
+
+
 def _reference_identity(
     reference: Reference | None, package_identity: _PackageContext = None
 ) -> str | LogicalSkillIdentity | None:
@@ -45,9 +108,12 @@ def _reference_identity(
         and isinstance(context[1], Mapping)
     ):
         context, versions = context
-    if isinstance(context, str) and "@" in context:
-        package_id, exact_version = context.rsplit("@", 1)
-        context = LogicalPackageIdentity(package_id, exact_version)
+    if isinstance(context, str):
+        if "@" in context:
+            package_id, exact_version = context.rsplit("@", 1)
+            context = LogicalPackageIdentity(package_id, exact_version)
+        elif _present(versions.get(context)):
+            context = LogicalPackageIdentity(context, versions[context])
     if isinstance(context, LogicalPackageIdentity):
         versions = {**versions, context.package_id: context.exact_version}
     package = (
@@ -393,6 +459,8 @@ def compare_locale_ir(
     """Compare locale IRs using the applicable versioned package context."""
     out: list[Diagnostic] = []
     _frontmatter(english, japanese, out)
+    _require_reference_identities(out, english, package_identity)
+    _require_reference_identities(out, japanese, package_identity)
     left_kind = english.frontmatter.kind if english.frontmatter else english.kind
     right_kind = japanese.frontmatter.kind if japanese.frontmatter else japanese.kind
     if left_kind == right_kind:

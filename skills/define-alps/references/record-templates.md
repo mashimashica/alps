@@ -1,4 +1,4 @@
-# Define ALPS Record Templates
+# ALPS Definition Process Record Templates
 
 Select only the records needed for the representation kind, application context, and risk. Do not fill missing information by conjecture; mark it `Unconfirmed`, `Not applicable`, or `On hold`.
 
@@ -35,7 +35,7 @@ Review points:
 - Mandatory canonical Skill references resolve.
 - A Process Reference Model retains the same Name, Purpose, and Outcomes as each referenced authoritative Process Description.
 - A Process View maintains source provenance and Traceability for referenced source elements and keeps View-local descriptions distinct from changes to source Processes.
-- Process Output/Input handoffs have aligned meaning and scope when they affect successful application.
+- Every provider Output to recipient Input mapping is explicit, and the exchanged meanings and scopes are aligned.
 
 ## 3. Verification Record
 
@@ -46,7 +46,7 @@ Review points:
 - Representation kind: process / process-model / process-reference-model / process-view
 - Verification scope: authoritative representation / Skill Package / both
 - Applicable Conformance subject:
-  - Process: Description Conformance; optional Process execution claim assessed separately
+  - Process: Description Conformance; optional Process Conformance claim assessed separately
   - Process Model: Process Model Description Conformance
   - Process Reference Model: Process Reference Model Description Conformance
   - Process View: Process View Description Conformance

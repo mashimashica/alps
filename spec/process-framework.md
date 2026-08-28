@@ -81,9 +81,9 @@ An **Output** is a product, result, or service produced by a Process. An Output 
 
 An **Activity** is a cohesive set of Tasks within a Process. It organizes related actions so that their contribution to the Process can be understood and communicated. A sufficiently cohesive and detailed Activity can be treated as a Sub-process with its own Purpose and Outcomes.
 
-Taken together, the Activities and any Sub-processes must cover every Process Outcome and satisfy the Process Purpose; they need not map one-to-one to Outcomes. Tasks within an Activity should relate more closely to one another than to Tasks outside it. An Activity must be treated as a continuous or iterative function narrower than the Process as a whole. The Activity set should address all Outcomes and may extend beyond the minimum work needed to satisfy the Purpose.
+Taken together, the Activities and any Sub-processes must cover every Process Outcome and satisfy the Process Purpose. Activities and Sub-processes can map to Outcomes in any cardinality, including one-to-one, one-to-many, many-to-one, and many-to-many. Tasks within an Activity should relate more closely to one another than to Tasks outside it. An Activity must be treated as a continuous or iterative function narrower than the Process as a whole. The Activity set should address all Outcomes and may extend beyond the minimum work needed to satisfy the Purpose.
 
-A **Task** states an individual action intended to support one or more Outcomes. Each Task must make clear whether the action is required, recommended, permissible, or typical. The Tasks assigned to an Activity need not enumerate every possible action within the Activity's boundary. The timing and sequence rules in 1.4 apply to Activities and Tasks.
+A **Task** states an individual action intended to support one or more Outcomes. Each Task must make clear whether the action is required, recommended, permissible, or typical. The Tasks assigned to an Activity may omit possible actions within the Activity's boundary. The timing and sequence rules in 1.4 apply to Activities and Tasks.
 
 ## 3. Process Boundary
 
@@ -135,7 +135,7 @@ When Entry Criteria and Exit Criteria are needed for the Purpose of the descript
 
 ### 4.4 Handoffs and Traceability
 
-A Process need not stand alone.
+A Process can depend on or exchange information with other Processes.
 
 Traceability should cover Outcomes, Activities, Tasks, and information items and show consistency among Process elements. Useful mappings include Tasks to Outcomes, Inputs to Outcomes, and Outputs to Outcomes; the resulting evidence can support Process Assessment and can also inform the design of tools used for Process Assessment.
 
@@ -183,7 +183,7 @@ A Process View can make cross-cutting dependencies and consistency visible while
 
 ## 6. Applying Processes in Combination
 
-Processes need not advance along a single line. They can share a level, return at that level, recur at another level, and be integrated across the resulting structure.
+Processes can advance along more than one path. They can share a level, return at that level, recur at another level, and be integrated across the resulting structure.
 
 ### 6.1 Independent Relationships
 
@@ -279,7 +279,7 @@ Outcomes can be achieved and Activities or Tasks can be performed beyond what a 
 
 **Tailored Conformance** may be claimed when a Process or Process set does not satisfy the selected Full Conformance basis.
 
-The claim must identify the Process or Processes tailored through the Tailoring Process, declare the application scope, and demonstrate satisfaction of the Outcomes and Activity or Task requirements that remain in scope.
+The claim must identify the Process or Processes changed through Tailoring, declare the application scope, and demonstrate satisfaction of every Outcome that remains in scope and every in-scope requirement stated in an Activity or Task.
 
 ### 8.5 Capability and Process Assessment
 
@@ -323,6 +323,6 @@ ISO/IEC/IEEE 24774:2021 addresses the specification of Process descriptions. ISO
 
 These standards provide informative context for readers who also use them. This Framework was developed independently. Conformance to this Framework neither requires nor establishes Conformance to those standards, and this Framework is not developed, approved, or certified by their publishers.
 
-Terminology must be mapped before comparing claims. Some life-cycle standards use a Process View as a concern-oriented projection with profile-specific assessment rules. This Framework's Process View definition and Conformance boundary govern an applying specification; a claim made under another standard does not transfer automatically.
+A meaningful comparison begins by mapping the terminology. Some life-cycle standards use a Process View as a concern-oriented projection with profile-specific assessment rules. This Framework's Process View definition and Conformance boundary govern an applying specification; a claim made under another standard does not transfer automatically.
 
 Some life-cycle Process descriptions express production of an artifact in an Outcome. Under this Framework, the artifact is an Output; an observable result condition established or evidenced by that artifact is an Outcome. This distinction preserves the separation between work products and successful Process state.
