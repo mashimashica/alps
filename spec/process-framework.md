@@ -290,3 +290,9 @@ Measures should be established to provide insight into Process performance and e
 Mechanisms should collect lessons learned, connect them to action, and analyze candidate Process changes.
 
 Lessons should be collected throughout execution and at planned milestones. Lessons and measures should be reviewed periodically to improve Processes and practices.
+
+## Related Process Standards (informative)
+
+ISO/IEC/IEEE 24774:2021 addresses the specification of Process descriptions. ISO/IEC/IEEE 15288 and ISO/IEC/IEEE 12207 address system and software life cycle Processes, respectively.
+
+These standards provide informative context for readers who also use them. This Framework was developed independently. Conformance to this Framework neither requires nor establishes Conformance to those standards, and this Framework is not developed, approved, or certified by their publishers.

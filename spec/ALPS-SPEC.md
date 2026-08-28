@@ -86,19 +86,11 @@ Repository paths and Host manifests may implement a Package Binding but do not d
 
 If a reference asset conflicts with PF or this specification, the asset is nonconforming. If the ALPS Reference Model and a referenced Process Description disagree on Process Name, Purpose, or Outcomes, the Reference Model representation is invalid; neither representation silently overrides the other.
 
-### 2.3 Related Ecosystem Documents (informative)
+### 2.3 Related Agent Ecosystem Documents (informative)
 
 The [Agent Skills Specification](https://agentskills.io/specification) defines an open, file-based format centered on `SKILL.md`, with optional directories for scripts, references, and assets. When that format is used for an ALPS representation, it supplies an Agent-facing packaging, discovery, and loading form; ALPS supplies PF-based semantics, life-cycle rules, representation integrity, and Conformance rules.
 
 [AGENTS.md](https://agents.md/) is an open format for repository-scoped context and instructions to coding Agents. It can direct Agents to discover, select, apply, and manage ALPS representations and can state repository Controls and Constraints. It is not itself an ALPS representation and does not alter a normative source.
-
-The following standards address life-cycle Processes or Process description in related fields:
-
-- ISO/IEC/IEEE 15288 — system life-cycle Processes;
-- ISO/IEC/IEEE 12207 — software life-cycle Processes; and
-- ISO/IEC/IEEE 24774:2021 — specification for Process description.
-
-These standards are informative context for readers who also use them. ALPS and PF were written independently. Conformance to ALPS neither requires nor establishes Conformance to those standards, and ALPS is not developed, approved, or certified by their publishers.
 
 ## 3. Terms and Definitions
 
