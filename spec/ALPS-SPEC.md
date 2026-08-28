@@ -37,7 +37,7 @@ a) how an Agent Skill represents a Process, Process Model, Process Reference Mod
 
 b) ALPS-specific discovery and execution layers, logical Skill references, and Skill Package integrity;
 
-c) the ALPS life cycle and the integrity contract among the ALPS Reference Model and the Define ALPS, Apply ALPS, and Manage ALPS reference Processes;
+c) the ALPS life cycle and the integrity contract between the ALPS Reference Model and the three reference Processes (Define ALPS, Apply ALPS, and Manage ALPS);
 
 d) ALPS-specific rules for activation, Process Invocation, composition, Tailoring, authoritative redefinition, and representation management; and
 
@@ -51,7 +51,7 @@ a) a concrete file format, storage layout, distribution mechanism, or toolchain 
 
 b) a particular Agent implementation, model, execution environment, vendor, performer allocation, or execution method;
 
-c) technical information-security or safety controls, which are represented as applicable Controls or Constraints; or
+c) details of technical information-security and safety measures; the measures themselves are classified by function under PF, while requirements arising from them are handled as applicable Controls or Constraints; or
 
 d) the business-domain content of a represented Process or other PF construct.
 
@@ -78,7 +78,11 @@ The following logical Skill references identify normative assets released with t
 | Apply ALPS | `skill:#apply-alps` | Provides the authoritative complete Process Description for Apply ALPS. |
 | Manage ALPS | `skill:#manage-alps` | Provides the authoritative complete Process Description for Manage ALPS. |
 
-These assets and this specification form one versioned ALPS release. The short references above are resolved within the ALPS release package. Their logical identities are independent of repository paths.
+PF, this specification, and the four assets above form one ALPS Release Package. Its package ID must be `alps`, and its package version must be the single ALPS release version declared by that release. The four assets are distinct Skill Packages within that Logical Package Scope. The ALPS Release Package is not itself a Skill Package; the one-authoritative-representation rule in 5.5 applies separately to each contained Skill Package.
+
+For every short reference in the table and every short reference from the ALPS Reference Model to a Reference Process, the containing Logical Package Scope is the same-version ALPS Release Package. Before resolution, an applicable Package Binding must bind package ID `alps` and the exact declared package version to one concrete release instance and its four Skill Packages. A resolver must resolve each short reference to exactly one matching Skill Package in that scope and must not resolve it across package versions.
+
+Repository paths and Host manifests may implement a Package Binding but do not define or change these logical identities.
 
 If a reference asset conflicts with PF or this specification, the asset is nonconforming. If the ALPS Reference Model and a referenced Process Description disagree on Process Name, Purpose, or Outcomes, the Reference Model representation is invalid; neither representation silently overrides the other.
 
@@ -125,6 +129,18 @@ A unit managed as a whole that contains one authoritative Agent Skill representa
 **3.10 Reference Process**
 
 Define ALPS, Apply ALPS, or Manage ALPS as represented by the corresponding normative Process Skill identified in 2.2.
+
+**3.11 Logical Package Scope**
+
+A versioned namespace identified by a package ID and exact package version within which logical Skill references are resolved. It can contain multiple Skill Packages. It is distinct from a Skill Package and from a physical distribution layout.
+
+**3.12 Package Binding**
+
+A mapping that binds a Logical Package Scope's package ID and exact package version to one concrete release instance and its contained Skill Packages in a resolution environment.
+
+**3.13 ALPS Release Package**
+
+The Logical Package Scope whose package ID is `alps` and whose exact package version is the single ALPS release version declared by the release containing this specification. It contains PF, this specification, and the four normative Skill Packages identified in 2.2.
 
 ## 4. Normative Language and Conventions
 
@@ -185,7 +201,9 @@ A Process Model, Process Reference Model, or Process View refers to an Agent Ski
 skill:<package-id>#<skill-name>
 ```
 
-Within the same package, `skill:#<skill-name>` may be used. A resolver must resolve the short form within the containing package and must normalize it with the package identity supplied by the applicable package binding when a full identity is needed.
+A Logical Package Scope is identified by a package ID and an exact package version. The reference syntax carries the package ID; an applicable Package Binding must supply the exact package version. The package ID, exact package version, and Skill name together form the complete logical identity.
+
+Within the same Logical Package Scope, `skill:#<skill-name>` may be used. The containing Logical Package Scope must be declared by the representation or a governing normative source and must not be inferred from a Skill Package directory or repository path. A resolver must resolve the short form to exactly one matching Skill Package within that declared scope and must normalize it with the scope's package ID and exact package version when a complete identity is needed. It must not silently resolve across Logical Package Scopes or package versions.
 
 Repository-relative paths can locate a physical copy but must not serve as the representation's logical identity. ALPS does not require GitHub or another particular service to be the package identity authority.
 
@@ -193,7 +211,11 @@ Repository-relative paths can locate a physical copy but must not serve as the r
 
 A Skill Package must contain exactly one authoritative Agent Skill representation.
 
+A Skill Package is distinct from a Logical Package Scope. A Logical Package Scope can contain multiple Skill Packages, and the exactly-one rule above applies independently to each Skill Package.
+
 Accompanying resources may provide reference information, execution resources, or deliverable resources. Their roles and conditions of use must be identifiable from the authoritative representation, and mandatory references must resolve.
+
+When the authoritative representation contains a mandatory reference to another Skill Package, both Skill Packages must belong to a declared Logical Package Scope, and an applicable Package Binding must make the reference resolvable under 5.4.
 
 Unnecessary duplication or conflict must not arise between the authoritative representation and accompanying resources. Each resource is classified by its function in Process application—reference information, Input, Output, Control, Constraint, or Enabler—not by its directory. A Skill Package should contain only resources that directly support understanding or applying the represented PF construct.
 
@@ -318,7 +340,9 @@ The three Reference Processes are general Processes. Their document order, Activ
 
 Agent Skill activation and Process Invocation remain distinct when the ALPS Reference Model is used. The Reference Model can guide Process selection and composition but is not itself invoked as a Process.
 
-Subsets of the Reference Processes, Activities, and Tasks can be selected according to Purpose. A change to an applicable Reference Process is Tailoring; an authoritative change to its Process Description is controlled redefinition.
+A subset of the Reference Processes can be selected according to Purpose. Under Outcome Conformance, Activities and Tasks are guidance and can be selected without changing the declared Process scope. Under Task Conformance, a requirement Task in scope must not be omitted unless managed Tailoring changes the scope. Applying only some Activities as a Conformance scope must be declared as a tailored scope of the parent Reference Process.
+
+A context-specific change to an applicable Reference Process is managed Tailoring; an authoritative semantic change to its Process Description is controlled redefinition.
 
 ### 7.4 Reference Process Conformance
 
@@ -398,7 +422,7 @@ Capabilities or conditions needed for execution should be stated as Enablers or 
 
 ### 10.1 Entry and Exit Criteria
 
-Entry Criteria and Exit Criteria retain their PF meanings. An Entry Criteria summary should be placed in the discovery layer to support applicability determination and must not conflict with the authoritative execution layer.
+Entry Criteria and Exit Criteria retain their PF meanings. A summary of Entry Criteria should be placed in the discovery layer to support applicability determination and must not conflict with the authoritative execution layer.
 
 Exit Criteria should be related to determining Outcome achievement.
 
@@ -442,7 +466,7 @@ Every Conformance claim must identify its subject and selected criteria.
 
 | Subject | Required basis |
 |---|---|
-| **Description Conformance** | A Process Skill Description satisfies PF and applicable Clauses 4 through 6. If its Skill Package is included in the subject, 5.5 also applies. |
+| **Description Conformance** | A Skill Description for a Process representation satisfies PF and applicable Clauses 4 through 6. If its Skill Package is included in the subject, 5.5 also applies. |
 | **Process Model Description Conformance** | The representation satisfies applicable kind, Process identification, relationship, logical-reference, package, and internal-consistency requirements. |
 | **Process Reference Model Description Conformance** | The representation satisfies applicable kind, Process identity, Name/Purpose/Outcomes equality, relationship, logical-reference, package, and internal-consistency requirements. |
 | **Process View Description Conformance** | The representation satisfies applicable kind, Purpose and Outcomes, source provenance and Traceability, source-meaning preservation, relationships, application guidance, package, and internal-consistency requirements. |

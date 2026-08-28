@@ -59,7 +59,7 @@ Wording must distinguish requirements, recommendations, permissions, typical act
 | Element | Function and rules |
 |---|---|
 | **Name** | Identifies the Process and distinguishes it from other Processes in the applicable Process Model. It must be a concise noun phrase, must express the central concern, and must not summarize the Purpose. In English, the word “process” should connect the Name; this is a language convention, not a semantic requirement. |
-| **Purpose** | States the related high-level objective or objectives for performing the Process and encompasses the Outcomes expected from effective implementation. It should clarify the boundary where neighboring Processes appear to overlap, should be concise and wherever possible one sentence, and should not summarize Activities or Outcomes or combine independent objectives. Supplementary explanation can be reference information. |
+| **Purpose** | The Purpose must state the related high-level objective or objectives for performing the Process and must encompass the Outcomes expected from effective implementation. It should clarify the boundary where neighboring Processes appear to overlap, should be concise and wherever possible one sentence, and should not summarize Activities or Outcomes or combine independent objectives. Supplementary explanation can be reference information. |
 
 ### 2.2 Outcome and Output
 
@@ -224,7 +224,7 @@ A **Decision Gate** is a decision mechanism that controls Process application; i
 
 Decision Criteria determine whether the uncertainty and risk of proceeding or changing Process state are acceptable and can draw from Purpose, Outcomes, conditions of application, and risk assessment. Gate frequency, scope, and formality can be adjusted to context.
 
-A Gate decision should be explicit and recorded. Available decisions can include continue, hold, change, re-execute, or terminate. Before a Gate, a review should use necessary expertise and relevant Inputs. Passage should rest on evidence that Decision Criteria are met, and the criteria should be updated and reevaluated as context changes.
+A Gate decision should be explicit and recorded. Available decisions can include continue, hold, change, re-execute, or terminate. Before a Gate, a review should use necessary expertise and relevant Inputs. Passage should rest on evidence that Decision Criteria are met. The criteria should be updated and reevaluated at each Gate and whenever the context changes.
 
 An Output accepted at a Gate can become a basis for later Activities. The decision, rationale, and assumptions should be recorded under the change management needed for the context.
 
