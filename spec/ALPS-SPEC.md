@@ -86,6 +86,20 @@ Repository paths and Host manifests may implement a Package Binding but do not d
 
 If a reference asset conflicts with PF or this specification, the asset is nonconforming. If the ALPS Reference Model and a referenced Process Description disagree on Process Name, Purpose, or Outcomes, the Reference Model representation is invalid; neither representation silently overrides the other.
 
+### 2.3 Related Ecosystem Documents (informative)
+
+The [Agent Skills Specification](https://agentskills.io/specification) defines an open, file-based format centered on `SKILL.md`, with optional directories for scripts, references, and assets. When that format is used for an ALPS representation, it supplies an Agent-facing packaging, discovery, and loading form; ALPS supplies PF-based semantics, life-cycle rules, representation integrity, and Conformance rules.
+
+[AGENTS.md](https://agents.md/) is an open format for repository-scoped context and instructions to coding Agents. It can direct Agents to discover, select, apply, and manage ALPS representations and can state repository Controls and Constraints. It is not itself an ALPS representation and does not alter a normative source.
+
+The following standards address life-cycle Processes or Process description in related fields:
+
+- ISO/IEC/IEEE 15288 — system life-cycle Processes;
+- ISO/IEC/IEEE 12207 — software life-cycle Processes; and
+- ISO/IEC/IEEE 24774:2021 — specification for Process description.
+
+These standards are informative context for readers who also use them. ALPS and PF were written independently. Conformance to ALPS neither requires nor establishes Conformance to those standards, and ALPS is not developed, approved, or certified by their publishers.
+
 ## 3. Terms and Definitions
 
 Terms defined or used in PF retain the meanings given there. ALPS adds the following terms.
@@ -148,7 +162,7 @@ The normative words used in this specification and in Skill Descriptions, and th
 
 This specification and Skill Descriptions must use those words so that the normative attribute of a statement can be determined.
 
-Clauses 1 through 12 are normative. Notes and material explicitly identified as informative are informative and must not alter normative meaning or force.
+Clauses 1 through 12 are normative except for subclauses explicitly identified as informative. Informative material must not alter normative meaning or force.
 
 ## 5. Representation Model
 
@@ -239,18 +253,45 @@ For a same-scope short reference, the referring and target Skill Packages must b
 
 Unnecessary duplication or conflict must not arise between the authoritative representation and accompanying resources. Each resource is classified by its function in Process application—reference information, Input, Output, Control, Constraint, or Enabler—not by its directory. A Skill Package should contain only resources that directly support understanding or applying the represented PF construct.
 
-### 5.6 Specialization of PF
+### 5.6 Allocation Between PF and ALPS
 
-| PF construct | ALPS treatment |
-|---|---|
-| Process Description | Skill Description when represented by an Agent Skill |
-| Process | Default Agent Skill representation |
-| Process Model | Agent Skill representation with `metadata.alps.kind: process-model` |
-| Process Reference Model | Agent Skill representation with `metadata.alps.kind: process-reference-model` |
-| Process View | Agent Skill representation with `metadata.alps.kind: process-view` |
-| Resources that perform or support a Process | Agents, models, tools, Skills, and execution environments treated as Enablers |
+PF remains authoritative for every general Process concept. ALPS specializes those concepts only where Agent Skill representation or the ALPS life cycle requires additional rules.
+
+| PF subject | PF authority | ALPS specialization |
+|---|---|---|
+| Work and Process Description | Process, Process Description, Process Instance, required semantic core, layers, and writing rules | Skill Description plus discovery and execution layers |
+| Intent and work content | Name, Purpose, Outcome, Output, Activity, and Task | Agent-facing discovery consistency and distinguishable Task operation and object |
+| Process boundary | Granularity, cohesion, performer independence, and selection | Process Skill versus Process View representation boundary |
+| Boundary elements and exchanges | Inputs, Outputs, Controls, Constraints, Enablers, criteria, handoffs, and Traceability | Skill Package resource roles and cross-Skill composition |
+| Reusable structures | Process Model, Process Reference Model, Process Framework, life cycle model, and Process View | Representation kinds and the ALPS Reference Model integrity contract |
+| Combined application | Concurrency, Iteration, Recursion, and Integration | Activation, Process resolution, Invocation, and Agent Skill composition |
+| Adaptation | Tailoring and Process Instantiation | Managed Tailoring and authoritative redefinition through the ALPS Reference Processes |
+| Evidence and claims | Decision Gates, reviews, audits, Process Conformance, and Capability | ALPS-specific Conformance subjects and representation assessment boundaries |
+| Management and improvement | General Process governance, measures, benchmarking, and learning | Define ALPS, Apply ALPS, and Manage ALPS as the ALPS reference life cycle |
 
 ALPS may make a PF rule concrete for the Agent context and may strengthen it where needed, subject to 2.1.
+
+### 5.7 File-Based Skill Package Example (informative)
+
+A file-based Environment Binding can represent a Skill Package without changing the logical roles defined by ALPS.
+
+```text
+<skill-name>/
+├── SKILL.md
+├── references/
+│   └── <reference>.md
+├── scripts/
+└── assets/
+```
+
+| Component | Representative ALPS treatment |
+|---|---|
+| `SKILL.md` | The authoritative Agent Skill representation. For a Process, its body supplies the authoritative Skill Description; discovery information can be projected into frontmatter or another registration record. |
+| `references/` | Reference information loaded as needed. ALPS does not prescribe individual filenames. |
+| `scripts/` | Execution resources supporting reproducibility or reliability, typically treated as Enablers. |
+| `assets/` | Resources used to create Outputs or support application, classified according to function. |
+
+The storage groupings are optional. A Skill Package needs only the resources that directly support understanding or applying its represented PF construct.
 
 ## 6. Representation Requirements
 
@@ -327,6 +368,96 @@ A context-specific change to an applicable source Process must be handled throug
 Description Conformance concerns a representation. Process Conformance concerns a Process or Process Instance. Achievement of Process View Outcomes is a separate assessment from both Process View Description Conformance and Source Process Conformance.
 
 Loading, parsing, resolving, or mechanically validating a representation does not by itself establish any of those claims.
+
+### 6.7 Process Skill Example (informative)
+
+The following file-based Process Skill example illustrates the distinctions among Outcomes, Outputs, Tasks, Constraints, Enablers, and reference information. Its physical form is illustrative and does not establish an Environment Binding.
+
+```markdown
+---
+name: consolidate-meeting-minutes
+description: Extract decisions, action items, and open issues from meeting records, then produce minutes that preserve traceability to the source record. Use when asked to organize meeting records, produce minutes, or organize post-meeting actions. ALPS-conformant.
+---
+
+# Meeting Minutes Consolidation Process
+
+## Purpose
+
+This Process establishes a state in which decisions, action items, and open issues can be distinguished from the meeting record.
+
+## Outcomes
+
+- Decisions made in the meeting are identified.
+- Action items and their due dates are identified.
+- Open issues are identified.
+- Mappings between the consolidated content and the source record are traceable.
+
+## Activities & Tasks
+
+The order shown does not prescribe execution order.
+
+### Record Understanding
+
+1. The scope of consolidation and gaps in the records must be identified.
+2. Unclear statements must not be completed by conjecture.
+3. Applicable policies for handling confidential information must be applied.
+4. The list of participants and agenda items is typically confirmed.
+
+### Item Extraction
+
+1. Decisions, action items, and open issues must be distinguished and identified.
+2. A decision not present in the source records must not be included in the Output.
+3. Each action item should be associated with a due date.
+4. Items may be assigned a priority classification.
+
+### Establishment of Verifiability
+
+1. Mappings between extracted items and the source records must be maintained.
+2. The Output must be transferred only after those mappings have been established.
+3. Items that cannot be confirmed from the source records should be marked as requiring confirmation.
+
+## Inputs
+
+Meeting records, including notes, transcripts, and distributed materials.
+
+## Outputs
+
+Consolidated meeting minutes.
+
+## Entry Criteria
+
+- A meeting record is available.
+- The scope of consolidation is stated.
+
+## Exit Criteria
+
+- Achievement of every Outcome has been determined.
+- The Output has been transferred to the recipient.
+
+## Controls
+
+- Applicable policies for handling confidential information.
+
+## Constraints
+
+- The Output is limited to decisions, action items, and open issues supported by the source records.
+- Transfer is permitted only after mappings between extracted items and the source records have been established.
+
+## Enablers
+
+- Transcription support tools
+- Domain glossary
+- Natural-language-processing capability of the performer
+
+## Common Approach
+
+This section is reference information and has no normative force.
+
+- Decisions often appear near expressions of agreement or approval.
+- For a lengthy record, Iteration can proceed by agenda item.
+```
+
+The consolidated minutes are an Output, not an Outcome. The transfer condition is a Constraint, while the corresponding transfer action is a Task. Tools and performer capability are Enablers rather than Inputs.
 
 ## 7. ALPS Life Cycle and Reference Model
 
@@ -546,9 +677,5 @@ d) a Process View should be assessed for Purpose and Outcomes, source provenance
 e) a Skill Package can be assessed for its authoritative representation, mandatory-reference resolution, resource roles and conditions of use, consistency, and reverification after change.
 
 Assessment of a non-Process representation is not Process execution Conformance.
-
----
-
-Informative examples, related-document notes, and guidance on human oversight, accountability, and non-deterministic evidence are maintained in [ALPS Informative Guidance](../docs/alps-informative-guidance.md).
 
 (End)
