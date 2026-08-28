@@ -90,6 +90,12 @@ Repository paths and Host manifests may implement a Package Binding but do not d
 
 If a reference asset conflicts with PF or this specification, the asset is nonconforming. If the ALPS Reference Model and a referenced Process Description disagree on Process Name, Purpose, or Outcomes, the Reference Model representation is invalid; neither representation silently overrides the other.
 
+### 2.3 Related Agent Ecosystem Documents (informative)
+
+The [Agent Skills Specification](https://agentskills.io/specification) defines an open, file-based format centered on `SKILL.md`, with optional directories for scripts, references, and assets. When that format is used for an ALPS representation, it supplies an Agent-facing packaging, discovery, and loading form; ALPS supplies PF-based semantics, life-cycle rules, representation integrity, and Conformance rules.
+
+[AGENTS.md](https://agents.md/) is an open format for repository-scoped context and instructions to coding Agents. It can direct Agents to discover, select, apply, and manage ALPS representations and can state repository Controls and Constraints. It is not itself an ALPS representation and does not alter a normative source.
+
 ## 3. Terms and Definitions
 
 Terms defined or used in PF retain the meanings given there. ALPS adds the following terms.
@@ -152,7 +158,7 @@ The normative words used in this specification and in Skill Descriptions, and th
 
 This specification and Skill Descriptions must use those words so that the normative attribute of a statement can be determined.
 
-Clauses 1 through 12 are normative. Notes and material explicitly identified as informative are informative and must not alter normative meaning or force.
+Clauses 1 through 12 are normative except for subclauses explicitly identified as informative. Informative material must not alter normative meaning or force.
 
 ## 5. Representation Model
 
@@ -245,16 +251,45 @@ Unnecessary duplication or conflict must not arise between the authoritative rep
 
 ### 5.6 Specialization of PF
 
-| PF construct | ALPS treatment |
-|---|---|
-| Process Description | Skill Description when represented by an Agent Skill |
-| Process | Default Agent Skill representation |
-| Process Model | Agent Skill representation with `metadata.alps.kind: process-model` |
-| Process Reference Model | Agent Skill representation with `metadata.alps.kind: process-reference-model` |
-| Process View | Agent Skill representation with `metadata.alps.kind: process-view` |
-| Resources that perform or support a Process | Agents, models, tools, Skills, and execution environments treated as Enablers |
+PF remains authoritative for every general Process concept. ALPS specializes those concepts only where Agent Skill representation or the ALPS life cycle requires additional rules.
 
 ALPS may make a PF rule concrete for the Agent context and may strengthen it where needed, subject to 2.1.
+
+#### 5.6.1 Allocation Between PF and ALPS (informative)
+
+| PF subject | PF authority | ALPS specialization |
+|---|---|---|
+| Work and Process Description | Process, Process Description, Process Instance, required semantic core, layers, and writing rules | Skill Description plus discovery and execution layers |
+| Intent and work content | Name, Purpose, Outcome, Output, Activity, and Task | Agent-facing discovery consistency and distinguishable Task operation and object |
+| Process boundary | Granularity, cohesion, performer independence, and selection | Process Skill versus Process View representation boundary |
+| Boundary elements and exchanges | Inputs, Outputs, Controls, Constraints, Enablers, criteria, handoffs, and Traceability | Skill Package resource roles and cross-Skill composition |
+| Reusable structures | Process Model, Process Reference Model, Process Framework, life cycle model, and Process View | Representation kinds and the ALPS Reference Model integrity contract |
+| Combined application | Concurrency, Iteration, Recursion, and Integration | Activation, Process resolution, Invocation, and Agent Skill composition |
+| Adaptation | Tailoring and Process Instantiation | Managed Tailoring and authoritative redefinition through the ALPS Reference Processes |
+| Evidence and claims | Decision Gates, reviews, audits, Process Conformance, and Capability | ALPS-specific Conformance subjects and representation assessment boundaries |
+| Management and improvement | General Process governance, measures, benchmarking, and learning | Define ALPS, Apply ALPS, and Manage ALPS as the ALPS reference life cycle |
+
+### 5.7 File-Based Skill Package Example (informative)
+
+A file-based Environment Binding can represent a Skill Package without changing the logical roles defined by ALPS.
+
+```text
+<skill-name>/
+├── SKILL.md
+├── references/
+│   └── <reference>.md
+├── scripts/
+└── assets/
+```
+
+| Component | Representative ALPS treatment |
+|---|---|
+| `SKILL.md` | The authoritative Agent Skill representation. For a Process, its body supplies the authoritative Skill Description; discovery information can be projected into frontmatter or another registration record. |
+| `references/` | Reference information loaded as needed. ALPS does not prescribe individual filenames. |
+| `scripts/` | Execution resources supporting reproducibility or reliability, typically treated as Enablers. |
+| `assets/` | Resources used to create Outputs or support application, classified according to function. |
+
+The storage groupings are optional. A Skill Package needs only the resources that directly support understanding or applying its represented PF construct.
 
 ## 6. Representation Requirements
 
@@ -331,6 +366,104 @@ A context-specific change to an applicable source Process must be handled throug
 Description Conformance concerns a representation. Process Conformance concerns a Process or Process Instance. Achievement of Process View Outcomes is a separate assessment from both Process View Description Conformance and Source Process Conformance.
 
 Loading, parsing, resolving, or mechanically validating a representation does not by itself establish any of those claims.
+
+### 6.7 Process Skill Example (informative)
+
+The following file-based Process Skill example illustrates the distinctions among Outcomes, Outputs, Tasks, Inputs, Controls, Constraints, Enablers, and reference information. Its physical form is illustrative and does not establish an Environment Binding.
+
+```markdown
+---
+name: prepare-request-readiness
+description: Determine the readiness of a received request for the affected execution by identifying its intended result, scope, required conditions, and unresolved matters. Use before affected execution begins when a request requires readiness assessment, clarification, or routing. ALPS-conformant.
+---
+
+# Request Readiness Process
+
+## Purpose
+
+This Process determines the readiness of a received request for the affected execution.
+
+## Outcomes
+
+- The intended result of the request is identified.
+- The scope of the affected execution is identified.
+- Conditions required for the affected execution are identified and classified according to their function.
+- Confirmed information, assumptions, and unresolved matters are distinguished.
+- The request's readiness disposition—begin execution, hold the request, or hand it off to another Process—is determined from the assessed conditions with a traceable rationale.
+
+## Activities & Tasks
+
+The order shown does not prescribe execution order.
+
+### Request Characterization
+
+1. The intended result of the request must be identified.
+2. The scope of the affected execution must be identified.
+3. Confirmed information, assumptions, and unresolved matters must be distinguished.
+4. Information must not be treated as confirmed solely because it is plausible.
+
+### Execution Condition Identification
+
+1. Conditions required for the affected execution must be identified.
+2. Each identified condition must be classified according to its function as an Input, Enabler, Control, or Constraint.
+3. Each mandatory condition must be assessed as satisfied or unsatisfied.
+4. Sources that can resolve an unresolved matter should be identified from available conversation or working context, reference materials, or Outputs from preceding or supporting Processes.
+
+### Readiness Determination
+
+1. The effect of unresolved matters and unsatisfied conditions on the affected execution must be evaluated.
+2. A disposition to begin execution, hold the request, or hand it off to another Process must be determined from the assessed conditions with a traceable rationale.
+3. The clarified request, unresolved-items list, readiness disposition, and rationale must be recorded.
+
+## Inputs
+
+- Received request
+- Available conversation or working context used as source information
+- Applicable Outputs from preceding or supporting Processes
+- Reference materials used as source information
+
+## Outputs
+
+- Clarified request
+- Unresolved-items list
+- Readiness disposition and rationale
+
+## Entry Criteria
+
+- A request has been received.
+- The affected execution or intended recipient Process can be identified sufficiently to assess readiness.
+
+## Exit Criteria
+
+- Every Outcome has been achieved.
+- The readiness disposition and its traceable rationale have been recorded.
+- The Outputs are available to the affected executor or recipient Process.
+
+## Controls
+
+- Applicable authorization, privacy, and security policies
+- Applicable routing, escalation, and acceptance policies
+
+## Constraints
+
+- Affected execution must not begin while a mandatory condition required for that execution remains unsatisfied.
+- Assumptions and unresolved matters must not be represented as confirmed information.
+- A readiness disposition must remain traceable to the information and condition assessments on which it rests.
+
+## Enablers
+
+- Domain expertise
+- Search, retrieval, and reference-resolution capabilities
+
+## Common Approach
+
+This section is reference information and has no normative force.
+
+- Missing information can be resolved from existing context, reference materials, an Output from another Process, or communication with an affected party. Asking the user is one possible method, not a required default.
+- When new information changes a condition, Iteration can revisit the readiness disposition.
+```
+
+The clarified request and unresolved-items list are Outputs, not Outcomes. The determined readiness is the achieved state. The no-start condition is a Constraint, while identifying the request and conditions and determining the disposition are Tasks. In this example, the received request, available context, applicable Process Outputs, and reference materials are Inputs because the Tasks examine them as source information. Reference material that instead directs execution as a criterion or policy would be a Control. Domain expertise and search, retrieval, and reference-resolution capabilities are Enablers.
 
 ## 7. ALPS Life Cycle and Reference Model
 
@@ -550,9 +683,5 @@ d) a Process View should be assessed for Purpose and Outcomes, source provenance
 e) a Skill Package can be assessed for its authoritative representation, mandatory-reference resolution, resource roles and conditions of use, consistency, and reverification after change.
 
 Assessment of a non-Process representation is not Process execution Conformance.
-
----
-
-Informative examples, related-document notes, and guidance on human oversight, accountability, and non-deterministic evidence are maintained in [ALPS Informative Guidance](../docs/alps-informative-guidance.md).
 
 (End)

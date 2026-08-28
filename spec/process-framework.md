@@ -316,3 +316,13 @@ A measurement chain can relate an information need to defined measures, collecte
 Mechanisms should collect lessons learned, connect them to action, and analyze candidate Process changes.
 
 Lessons should be collected throughout execution and at planned milestones. Lessons and measures should be reviewed periodically to improve Processes and practices.
+
+## Related Process Standards (informative)
+
+ISO/IEC/IEEE 24774:2021 addresses the specification of Process descriptions. ISO/IEC/IEEE 15288 and ISO/IEC/IEEE 12207 address system and software life cycle Processes, respectively.
+
+These standards provide informative context for readers who also use them. This Framework was developed independently. Conformance to this Framework neither requires nor establishes Conformance to those standards, and this Framework is not developed, approved, or certified by their publishers.
+
+Terminology must be mapped before comparing claims. Some life-cycle standards use a Process View as a concern-oriented projection with profile-specific assessment rules. This Framework's Process View definition and Conformance boundary govern an applying specification; a claim made under another standard does not transfer automatically.
+
+Some life-cycle Process descriptions express production of an artifact in an Outcome. Under this Framework, the artifact is an Output; an observable result condition established or evidenced by that artifact is an Outcome. This distinction preserves the separation between work products and successful Process state.
