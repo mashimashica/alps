@@ -365,93 +365,101 @@ Loading, parsing, resolving, or mechanically validating a representation does no
 
 ### 6.7 Process Skill Example (informative)
 
-The following file-based Process Skill example illustrates the distinctions among Outcomes, Outputs, Tasks, Constraints, Enablers, and reference information. Its physical form is illustrative and does not establish an Environment Binding.
+The following file-based Process Skill example illustrates the distinctions among Outcomes, Outputs, Tasks, Inputs, Controls, Constraints, Enablers, and reference information. Its physical form is illustrative and does not establish an Environment Binding.
 
 ```markdown
 ---
-name: consolidate-meeting-minutes
-description: Extract decisions, action items, and open issues from meeting records, then produce minutes that preserve traceability to the source record. Use when asked to organize meeting records, produce minutes, or organize post-meeting actions. ALPS-conformant.
+name: prepare-request-readiness
+description: Determine the readiness of a received request for the affected execution by identifying its intended result, scope, required conditions, and unresolved matters. Use before affected execution begins when a request requires readiness assessment, clarification, or routing. ALPS-conformant.
 ---
 
-# Meeting Minutes Consolidation Process
+# Request Readiness Process
 
 ## Purpose
 
-This Process establishes a state in which decisions, action items, and open issues can be distinguished from the meeting record.
+This Process determines the readiness of a received request for the affected execution.
 
 ## Outcomes
 
-- Decisions made in the meeting are identified.
-- Action items and their due dates are identified.
-- Open issues are identified.
-- Mappings between the consolidated content and the source record are traceable.
+- The intended result of the request is identified.
+- The scope of the affected execution is identified.
+- Conditions required for the affected execution are identified and classified according to their function.
+- Confirmed information, assumptions, and unresolved matters are distinguished.
+- The request's readiness disposition—begin execution, hold the request, or hand it off to another Process—is determined from the assessed conditions with a traceable rationale.
 
 ## Activities & Tasks
 
 The order shown does not prescribe execution order.
 
-### Record Understanding
+### Request Characterization
 
-1. The scope of consolidation and gaps in the records must be identified.
-2. Unclear statements must not be completed by conjecture.
-3. Applicable policies for handling confidential information must be applied.
-4. The list of participants and agenda items is typically confirmed.
+1. The intended result of the request must be identified.
+2. The scope of the affected execution must be identified.
+3. Confirmed information, assumptions, and unresolved matters must be distinguished.
+4. Information must not be treated as confirmed solely because it is plausible.
 
-### Item Extraction
+### Execution Condition Identification
 
-1. Decisions, action items, and open issues must be distinguished and identified.
-2. A decision not present in the source records must not be included in the Output.
-3. Each action item should be associated with a due date.
-4. Items may be assigned a priority classification.
+1. Conditions required for the affected execution must be identified.
+2. Each identified condition must be classified according to its function as an Input, Enabler, Control, or Constraint.
+3. Each mandatory condition must be assessed as satisfied or unsatisfied.
+4. Sources that can resolve an unresolved matter should be identified from available conversation or working context, reference materials, or Outputs from preceding or supporting Processes.
 
-### Establishment of Verifiability
+### Readiness Determination
 
-1. Mappings between extracted items and the source records must be maintained.
-2. The Output must be transferred only after those mappings have been established.
-3. Items that cannot be confirmed from the source records should be marked as requiring confirmation.
+1. The effect of unresolved matters and unsatisfied conditions on the affected execution must be evaluated.
+2. A disposition to begin execution, hold the request, or hand it off to another Process must be determined from the assessed conditions with a traceable rationale.
+3. The clarified request, unresolved-items list, readiness disposition, and rationale must be recorded.
 
 ## Inputs
 
-Meeting records, including notes, transcripts, and distributed materials.
+- Received request
+- Available conversation or working context used as source information
+- Applicable Outputs from preceding or supporting Processes
+- Reference materials used as source information
 
 ## Outputs
 
-Consolidated meeting minutes.
+- Clarified request
+- Unresolved-items list
+- Readiness disposition and rationale
 
 ## Entry Criteria
 
-- A meeting record is available.
-- The scope of consolidation is stated.
+- A request has been received.
+- The affected execution or intended recipient Process can be identified sufficiently to assess readiness.
 
 ## Exit Criteria
 
-- Achievement of every Outcome has been determined.
-- The Output has been transferred to the recipient.
+- Every Outcome has been achieved.
+- The readiness disposition and its traceable rationale have been recorded.
+- The Outputs are available to the affected executor or recipient Process.
 
 ## Controls
 
-- Applicable policies for handling confidential information.
+- Applicable authorization, privacy, and security policies
+- Applicable routing, escalation, and acceptance policies
 
 ## Constraints
 
-- The Output is limited to decisions, action items, and open issues supported by the source records.
-- Transfer is permitted only after mappings between extracted items and the source records have been established.
+- Affected execution must not begin while a mandatory condition required for that execution remains unsatisfied.
+- Assumptions and unresolved matters must not be represented as confirmed information.
+- A readiness disposition must remain traceable to the information and condition assessments on which it rests.
 
 ## Enablers
 
-- Transcription support tools
-- Domain glossary
-- Natural-language-processing capability of the performer
+- Domain expertise
+- Search, retrieval, and reference-resolution capabilities
 
 ## Common Approach
 
 This section is reference information and has no normative force.
 
-- Decisions often appear near expressions of agreement or approval.
-- For a lengthy record, Iteration can proceed by agenda item.
+- Missing information can be resolved from existing context, reference materials, an Output from another Process, or communication with an affected party. Asking the user is one possible method, not a required default.
+- When new information changes a condition, Iteration can revisit the readiness disposition.
 ```
 
-The consolidated minutes are an Output, not an Outcome. The transfer condition is a Constraint, while the corresponding transfer action is a Task. Tools and performer capability are Enablers rather than Inputs.
+The clarified request and unresolved-items list are Outputs, not Outcomes. The determined readiness is the achieved state. The no-start condition is a Constraint, while identifying the request and conditions and determining the disposition are Tasks. In this example, the received request, available context, applicable Process Outputs, and reference materials are Inputs because the Tasks examine them as source information. Reference material that instead directs execution as a criterion or policy would be a Control. Domain expertise and search, retrieval, and reference-resolution capabilities are Enablers.
 
 ## 7. ALPS Life Cycle and Reference Model
 
