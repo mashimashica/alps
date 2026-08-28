@@ -96,7 +96,7 @@ An executing entity capable of performing Activities and Tasks under a stated Pu
 
 **3.2 Agent Skill (Skill)**
 
-A unit an Agent can discover and load. By default it contains a reusable Process Description and represents a Process. It may instead represent a Process Model, Process Reference Model, or Process View. It may include accompanying resources.
+A unit an Agent can discover and load. By default it contains a reusable Process Description and represents a Process. It may instead represent a Process Model, Process Reference Model, or Process View. It may include accompanying resources when needed.
 
 **3.3 Skill Description**
 
@@ -146,6 +146,8 @@ The Logical Package Scope whose package ID is `alps` and whose exact package ver
 
 The normative words used in this specification and in Skill Descriptions, and their meanings, are those defined by PF. This specification does not redefine them.
 
+This specification and Skill Descriptions must use those words so that the normative attribute of a statement can be determined.
+
 Clauses 1 through 12 are normative. Notes and material explicitly identified as informative are informative and must not alter normative meaning or force.
 
 ## 5. Representation Model
@@ -160,6 +162,8 @@ An Agent Skill represents one PF construct.
 | `process-model` | Process Model | Must identify related Processes and their relationships. |
 | `process-reference-model` | Process Reference Model | Must define included Processes by Name, Purpose, and Outcomes and place their relationships in an explicit structure. |
 | `process-view` | Process View | Must state Name, Purpose, and Outcomes and provide application guidance for its concern. |
+
+A Process representation may omit `metadata.alps.kind` or declare `metadata.alps.kind: process`; both have the same meaning. An Agent Skill may represent a Process Model, Process Reference Model, or Process View and must declare the corresponding `metadata.alps.kind` value in the table.
 
 The `skills/` directory, `SKILL.md`, frontmatter, and Host registration are packaging or discovery conventions. They do not change the represented PF construct and do not make a Process Model, Process Reference Model, or Process View into a Process.
 
@@ -180,6 +184,8 @@ c) a cross-cutting concern without an independent Process boundary can be repres
 ### 5.3 Discovery and Execution Layers
 
 A Skill Description claiming Description Conformance must provide distinguishable discovery and execution layers while retaining one identifiable authoritative Process Description.
+
+The layers may be represented together or separately, provided that the authoritative Process Description remains identifiable and mandatory references are resolvable.
 
 a) The discovery layer must present the Name and Skill Discovery Description.
 
@@ -212,6 +218,8 @@ skill:#<skill-name>
 ```
 
 The Logical Package Scope containing the representation must be declared by the representation or a governing normative source and must not be inferred from a Skill Package directory or repository path. A resolver must resolve the same-scope short reference to exactly one matching Skill Package within that declared scope and must normalize it with the scope's package ID and exact package version when a complete identity is needed. It must not silently resolve across Logical Package Scopes or package versions.
+
+The package-qualified reference and same-scope short reference are the canonical logical Skill-reference forms defined by ALPS.
 
 Repository-relative paths can locate a physical copy but must not serve as the representation's logical identity. ALPS does not require GitHub or another particular service to be the package identity authority.
 
@@ -270,7 +278,9 @@ A Skill Name must use a concise noun phrase as the Skill heading.
 
 A general Skill Description must preserve PF's non-prescription of performer, Task allocation, method, tool, metric, management method, and execution sequence. An Instance-specific description must state its context and can include Instance-specific capabilities, resources, Inputs, Outputs, Controls, Constraints, criteria, and timing.
 
-A statement used as a Task must express an individual action supporting one or more Outcomes so that its operation and object are distinguishable. A statement whose primary function is to direct or limit execution must be classified as a Control or Constraint rather than a Task. Every Task must have a distinguishable normative attribute.
+The Activities and any separated Skills must collectively cover all Outcomes and satisfy the Skill Purpose.
+
+A statement used as a Task must express an individual action supporting one or more Outcomes so that its operation and object are distinguishable. A statement whose primary function is not an individual action must not be treated as a Task and must be placed in the element corresponding to that function. A statement whose primary function is an individual action must be classified as a Task. A statement whose primary function is to direct or limit execution must be classified as a Control or Constraint rather than a Task. Every Task must have a distinguishable normative attribute.
 
 The Skill Discovery Description of a Process representation claiming Description Conformance must end with exactly `ALPS-conformant.` in English or `ALPS準拠。` in Japanese. This marker is a shorthand Description Conformance claim about the containing Skill Description; it does not claim Reference Process Conformance, Outcome achievement, Capability, or Execution Conformance.
 
@@ -376,7 +386,7 @@ Before Invocation:
 
 a) the Process Entry Criteria must be satisfied;
 
-b) required Inputs and Enablers should be available; and
+b) required Inputs and Enablers should be confirmed as available; and
 
 c) applicable Controls, Constraints, Tailoring decisions, and required Decision Gates must be identified.
 
@@ -388,19 +398,31 @@ A required Decision Gate must be passed before the action it governs occurs. Pro
 
 ### 8.3 Process Composition and Handoffs
 
+An interface between Process Skills is a mapping from a provider Process's Output to a recipient Process's Input and is not an independent Skill element.
+
 When multiple Processes are composed:
 
-a) the target Outcomes and the identity and provenance of each Process representation should be identifiable;
+a) the target set of Outcomes for the composition must be identified;
 
-b) every provider Output to recipient Input mapping that affects successful application must be explicit, and the exchanged item names, meanings, and scopes should be aligned;
+b) the identity and provenance of each Process representation used in the composition should be recorded;
 
-c) an undefined handoff may be introduced only through an applicable controlled change or Tailoring decision;
+c) every provider Output to recipient Input mapping must be explicit, and the exchanged item names, meanings, and scopes should be aligned;
 
-d) when an Output changes, affected Inputs and applicable criteria should be reevaluated;
+d) an undefined handoff may be introduced only through an applicable controlled change or Tailoring decision;
 
-e) when the same information item is changed by multiple Processes, its integrity, state, and change handling must be defined in proportion to quality risk; and
+e) when Iteration or Recursion changes an Output, affected Inputs and applicable criteria should be reevaluated;
 
-f) Integration must establish completeness within the selected scope and consistency across Process relationships and structural levels.
+f) when a change to an Output affects an Input to another Process, the affected Process and mapping should be identified and necessary reassessment performed;
+
+g) when the same information item is changed by multiple Processes, its integrity, state, and change handling must be defined in proportion to quality risk; and
+
+h) Integration must establish completeness within the selected scope and consistency across Process relationships and structural levels.
+
+The level of detail used to describe a provider Output to recipient Input relationship should be determined according to the Purpose of the Skill Description, dependencies among Skills, and quality risk.
+
+These mappings provide a basis for integrity and Process Assessment. Exchanges between Activities do not alter Process boundaries.
+
+NOTE: Explicit exchange mappings keep the meaning, scope, state, and quality conditions of an information item from being lost as it passes between Processes.
 
 When Processes are applied concurrently, iteratively, or recursively, shared or interdependent information items and the reference or change relationships among them should be identified to the extent needed for application.
 
@@ -412,6 +434,8 @@ Concurrency, Iteration, Recursion, and Integration retain their PF meanings and 
 
 When a Process View is active, referenced source elements retain their source meaning. View-local or modified elements must not silently change the applicable source Process or its Conformance basis.
 
+Referenced source Activities and Tasks contribute according to the applicable Source Process Conformance basis.
+
 Process View Outcome achievement can be assessed for the View as a whole but remains distinct from Source Process Outcome Conformance.
 
 ## 9. Controls, Constraints, and Enablers
@@ -422,9 +446,11 @@ PF governs the classification of Inputs, Outputs, Controls, Constraints, and Ena
 
 Framework-level Controls and Enablers must state scope, exceptions, and whether Tailoring is permitted. Elements common to a declared scope may be stated once rather than repeated in each Process Skill.
 
+Information resources that apply in common to multiple Processes can be declared as Framework-level Controls or Enablers according to their function.
+
 ### 9.2 Agent Resources
 
-Human and Agent capabilities, Agents, models, tools, Skills, automation, and execution environments used to perform or support a Process are Enablers rather than Process Inputs.
+Human and Agent capabilities, Agents, models, tools, Skills, automation, and execution environments used to perform or support a Process must be treated as Enablers rather than Process Inputs.
 
 A capability limitation, availability condition, response time, or other circumstance that limits permitted execution can instead be represented as a Constraint according to its function.
 
@@ -442,7 +468,7 @@ Exit Criteria should be related to determining Outcome achievement.
 
 Decision Gates retain their PF meaning and remain separate decision mechanisms rather than Skill Description elements.
 
-A Gate required for an irreversible or high-impact external effect must occur before that effect. Human confirmation or escalation can implement such a Gate. The decision, rationale, assumptions, criteria, and evidence should be recorded according to risk and applicable Controls.
+A Gate required for an irreversible or high-impact external effect must occur before that effect. Human confirmation or escalation can implement such a Gate. Such a Gate provides a controlled point at which the external effect can be held, changed, or stopped before it occurs. The decision, rationale, assumptions, criteria, and evidence should be recorded according to risk and applicable Controls.
 
 ### 10.3 Reviews and Audits
 
@@ -474,6 +500,8 @@ Process Instantiation retains its PF meaning. It can add Instance-specific succe
 
 ### 12.1 Subjects of Conformance
 
+Conformance relating to this specification can be claimed for the subjects in the following table.
+
 Every Conformance claim must identify its subject and selected criteria.
 
 | Subject | Required basis |
@@ -501,7 +529,9 @@ Applying only some Activities of a Reference Process must be declared as a tailo
 
 ### 12.4 Capability and Assessment
 
-Capability and Conformance are separate dimensions under PF 8.5. Neither establishes the other.
+Capability and Conformance are separate dimensions under PF 8.5. Capability alone does not establish Conformance, and Conformance alone does not determine Capability.
+
+Process Outcomes and the Purposes and Outcomes of the three Reference Processes can be used for Process Assessment and effectiveness assessment under PF 8.5.
 
 Assessment criteria must match the declared subject:
 

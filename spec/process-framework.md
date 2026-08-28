@@ -24,11 +24,13 @@ This Framework is the authoritative source for those meanings. A specification o
 |---|---|
 | **Process** | Related work performed under a stated Purpose to establish one or more Outcomes. It acts on Inputs, produces Outputs, and brings Activities and Tasks into a coherent whole. Its function is defined by its Purpose, Outcomes, and set of Activities and Tasks; its performance is intended to benefit stakeholders. |
 | **Process Description** | An account of a Process, not its performance. It can describe a general Process or a particular Process Instance. |
-| **Process Instance** | One application of a Process in a particular context. An Instance-specific description can identify needed capabilities and resources, incoming and outgoing items, applicable Controls and Constraints, and relevant timing. |
+| **Process Instance** | One application of a Process in a particular context. An Instance-specific description can identify needed capabilities and resources, required incoming and outgoing items, applicable Controls and Constraints, and relevant timing. |
 
 ### 1.2 Necessary Core and Optional Detail
 
 Every Process Description must contain Name, Purpose, and Outcomes. These elements preserve the Process's semantic center and provide common reference points for implementation and Assessment without requiring structural decomposition.
+
+A description can grow in detail while retaining the same semantic center.
 
 Activities, Tasks, Inputs, Outputs, Controls, Constraints, Enablers, Entry Criteria, Exit Criteria, and reference information are optional and are included according to the Purpose of the description and the detail needed. The selected detail can also help characterize maturity, Capability, or quality.
 
@@ -38,7 +40,7 @@ An explicit, systematic description supports consistent results, deployment of s
 
 A Process Description can present an overview and a detailed description for readers who need different depths of information. An overview can include Purpose, description, Inputs and Outputs, Activities, Common Approach, practical tips, and good-practice summaries. The detailed part treats matters specific to the Process; cross-cutting matters are treated separately.
 
-This layered form is optional and does not replace Name, Purpose, and Outcomes. Overviews, descriptions, Common Approach, practical tips, notes, and examples are reference information.
+This layered form is optional and does not replace Name, Purpose, and Outcomes. Overviews, descriptions, Common Approach, practical tips, notes, and examples are reference information that can support understanding or application of the Process.
 
 ### 1.4 Interpretation and Writing Rules
 
@@ -103,7 +105,7 @@ Inputs and Outputs connect a Process to its external environment. Controls, Cons
 
 | Element | Function |
 |---|---|
-| **Input** | An item the Process transforms into an Output. It can come from another Process, an information source, or a source outside the Process. Specifying required or representative Inputs is optional. |
+| **Input** | An item the Process transforms into an Output. It can come from another Process, an available information source, or a source outside the Process. Specifying required or representative Inputs is optional. |
 | **Output** | A product, result, or service produced by the Process. |
 | **Control** | Directs Process execution or the basis on which it is judged. Controls can arise from applicable laws or regulatory requirements, policies, conformance to voluntary standards, or agreements. |
 | **Constraint** | Limits permitted Process execution. Constraints can arise from the environment or conditions of application outside the Process. |
@@ -113,9 +115,9 @@ People, Agents, automation, tools, and execution environments used to perform a 
 
 ### 4.2 Transformation Without Method Prescription
 
-Outputs are optional when Outcome achievement can be demonstrated. They can include parts of a final product or service, intermediate work products used for validation or audit, and assets reusable by other Processes. Principal Output kinds include artifacts and information items.
+Outputs are optional when Outcome achievement can be demonstrated. They can include items needed in a final product or service, intermediate work products used for validation or audit, and assets reusable by other products or Processes. The principal Output kinds are artifacts and information items.
 
-A representative transformation relates Inputs, Activities, and Outputs: Activities transform Inputs; Enablers support the transformation; Controls direct it; Constraints limit it. Naming an Output does not by itself require creation of a document.
+A representative transformation relates Inputs, Activities, and Outputs: Activities transform Inputs; Enablers support the transformation; Controls direct it; Constraints limit it. Results from a group of Processes are often recorded in documents, artifacts, or models. Naming an Output does not by itself require creation of a document.
 
 Representative Inputs and Outputs show one possible manner of performance and do not prescribe the only manner. A Process should be understood from the complete Process Description rather than only from its representative flow.
 
@@ -127,7 +129,9 @@ When Entry Criteria and Exit Criteria are needed for the Purpose of the descript
 
 ### 4.4 Handoffs and Traceability
 
-Traceability should cover Outcomes, Activities, Tasks, and information items and show consistency among Process elements. Useful mappings include Tasks to Outcomes, Inputs to Outcomes, and Outputs to Outcomes; the resulting evidence can support Process Assessment.
+A Process need not stand alone.
+
+Traceability should cover Outcomes, Activities, Tasks, and information items and show consistency among Process elements. Useful mappings include Tasks to Outcomes, Inputs to Outcomes, and Outputs to Outcomes; the resulting evidence can support Process Assessment and can also inform the design of tools used for Process Assessment.
 
 A handoff maps a provider Process's Output to a recipient Process's Input. Making its direction and content explicit allows dependencies to be understood. A handoff not defined beforehand can be added through Tailoring.
 
@@ -153,7 +157,7 @@ A Process Framework can establish a desired Process environment, support selecti
 
 A **life cycle model** brings life cycle Processes and Activities into a shared basis for communication and understanding. Its details are expressed through Processes, Outcomes, relationships, and ordering.
 
-The purpose of the application and the selected life cycle model determine actual Process order. Document clause order does not prescribe execution order. Process selection and timing must be continually reviewed when the subject or context changes.
+The purpose of the application and the selected life cycle model determine actual Process order. Document clause order does not prescribe execution order. Process selection and timing must be continually reviewed when the subject or context changes. Process use can change dynamically in response to internal or external influences.
 
 ### 5.3 Process Views
 
@@ -161,11 +165,13 @@ A **Process View** organizes Activities and Tasks across multiple Processes arou
 
 Every Process View must state Name, Purpose, and Outcomes and must provide explanation and guidance for applying its Activities and Tasks.
 
-A Process View may reference Activities and Tasks from existing Processes and may describe View-local Activities and Tasks where needed for its concern. When it references a source element, the source and necessary Traceability must be maintained.
+A Process View may reference Activities and Tasks from existing Processes and may describe View-local Activities and Tasks where needed for its concern or Purpose. When it references a source element, the source and necessary Traceability must be maintained.
 
 View-local or modified Activities and Tasks do not change a source Process merely by appearing in the View and do not by themselves contribute to or alter source Process Conformance. A change to the source Process must be handled through Tailoring or Process redefinition, as applicable. A Process View may show connections among Processes and their sources.
 
 ## 6. Applying Processes in Combination
+
+Processes need not advance along a single line. They can share a level, return at that level, recur at another level, and be integrated across the resulting structure.
 
 ### 6.1 Independent Relationships
 
@@ -178,7 +184,7 @@ View-local or modified Activities and Tasks do not change a source Process merel
 
 These relationships are independent and can be combined. Iteration returns without changing level; Recursion repeats across levels; Concurrency concerns coexistence; Integration concerns completeness and consistency.
 
-Process execution is not limited to serial arrangement. Iteration progressively refines Outputs, incorporates decisions and evolving understanding, addresses Constraints, and resolves trade-offs. It should continue until problems arising from the Processes are resolved. In Recursion, an Output at one level can become an Input at the next.
+Process execution is not limited to serial arrangement. Iteration progressively refines Outputs, incorporates decisions and evolving understanding, addresses Constraints, and resolves trade-offs. Iteration is expected, not merely allowed. It should continue until problems arising from the Processes are resolved. In Recursion, an Output at one level can become an Input at the next.
 
 ### 6.2 Flow and Change Propagation
 
@@ -192,7 +198,7 @@ When Iteration or Recursion changes an Output, affected Process Inputs change as
 
 **Tailoring** is the controlled Adaptation of a life cycle model or Process to the needs and conditions of a declared context. Such models and Processes typically cannot be applied unchanged in every context. It sets enough rigor to perform Activities at an acceptable level of risk; too little raises the chance of problems, while too much can raise cost or schedule risk.
 
-Tailoring typically continues dynamically as risk and context change and should be reviewed and revised when conditions warrant.
+Tailoring typically continues dynamically throughout application as risk and context change and should be reviewed and revised when conditions warrant.
 
 ### 7.2 Levels and Permitted Changes
 
@@ -208,7 +214,7 @@ Candidate Processes or life cycle models must be evaluated using conditions of a
 
 Decisions should rest on facts and evidence. Their scope should be explicit; assumptions and criteria should be identified; and rationale should be recorded and maintained. A means of continually assessing the tailored Process should be established.
 
-Representative pitfalls include reusing another subject's tailored baseline without new Tailoring, including every Process or Activity merely as a precaution, treating one measure, risk, or Control as universal, applying a pre-established tailored baseline unchanged, or excluding affected stakeholders.
+Representative pitfalls include reusing another subject's tailored baseline without new Tailoring, including every Process and Activity merely as a precaution, treating one measure, risk, or Control as universal, applying a pre-established tailored baseline unchanged, or excluding affected stakeholders.
 
 ### 7.4 Process Instantiation
 
@@ -222,9 +228,9 @@ Tailoring changes the Process or life cycle model that applies. Instantiation de
 
 A **Decision Gate** is a decision mechanism that controls Process application; it is not a Process Description component or a Process stage.
 
-Decision Criteria determine whether the uncertainty and risk of proceeding or changing Process state are acceptable and can draw from Purpose, Outcomes, conditions of application, and risk assessment. Gate frequency, scope, and formality can be adjusted to context.
+Decision Criteria determine whether the uncertainty and risk of proceeding or changing Process state are acceptable and can draw from Purpose, Outcomes, conditions of application, and risk assessment. Gate frequency, scope, and formality can be adjusted to context. More frequent gates can use narrower scope and less formality.
 
-A Gate decision should be explicit and recorded. Available decisions can include continue, hold, change, re-execute, or terminate. Before a Gate, a review should use necessary expertise and relevant Inputs. Passage should rest on evidence that Decision Criteria are met. The criteria should be updated and reevaluated at each Gate and whenever the context changes.
+A Gate decision should be explicit and recorded. Available decisions can include continue, hold, change, re-execute, or terminate. The quality of current results and the risk of proceeding inform the choice. Before a Gate, a review should use necessary expertise and relevant Inputs. Passage should rest on evidence that Decision Criteria are met. The criteria should be updated and reevaluated at each Gate and whenever the context changes.
 
 An Output accepted at a Gate can become a basis for later Activities. The decision, rationale, and assumptions should be recorded under the change management needed for the context.
 
@@ -255,7 +261,7 @@ The claim must identify the Process or Processes tailored through the Tailoring 
 
 ### 8.5 Capability and Process Assessment
 
-Capability and Conformance are separate assessment dimensions. Performing specified Activities and Tasks can require a higher Capability level than achieving Outcomes alone. Neither Capability nor Conformance establishes the other.
+Capability and Conformance are separate assessment dimensions. Performing specified Activities and Tasks can require a higher Capability level than achieving Outcomes alone. Capability does not by itself establish Conformance, and Conformance does not by itself determine Capability.
 
 Process Outcomes can serve as the Process Reference Model for Assessment and improvement. Purpose and Outcomes state implementation objectives, enabling effectiveness to be assessed by means other than conformity alone.
 
