@@ -5,11 +5,11 @@ from typing import Callable
 try:
     from .model import (MAX_RECORDS_PER_SECTION, Diagnostic, DocumentIR, ParseResult,
                         Reference, Severity, deterministic_diagnostics)
-    from .reference_profile import localized_target, resolve_reference
+    from .reference_profile import LogicalSkillIdentity, localized_target, resolve_reference
 except ImportError:  # pragma: no cover
     from model import (MAX_RECORDS_PER_SECTION, Diagnostic, DocumentIR, ParseResult,
                        Reference, Severity, deterministic_diagnostics)  # type: ignore
-    from reference_profile import localized_target, resolve_reference  # type: ignore
+    from reference_profile import LogicalSkillIdentity, localized_target, resolve_reference  # type: ignore
 IR_ONLY = True
 LoadIR = Callable[[Path, str | None], ParseResult | DocumentIR | None]
 
@@ -35,7 +35,7 @@ def _rkey(reference: Reference):
     return reference.token, reference.skill_name, reference.package_id
 
 
-def _resolved_identity(reference: Reference | None, resolutions) -> str | None:
+def _resolved_identity(reference: Reference | None, resolutions) -> LogicalSkillIdentity | None:
     """Return the filesystem-resolved identity, never the lexical token."""
     if not isinstance(reference, Reference):
         return None

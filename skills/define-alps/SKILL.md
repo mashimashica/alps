@@ -145,7 +145,7 @@ This Skill represents the Define ALPS Process and is assessed as a Process Descr
 ## Bundled Resources
 
 - This root `SKILL.md` is the authoritative English Process Description. For Japanese-language work, use the [Japanese localization](references/locales/ja/SKILL.md); if the localization conflicts with this file, this English description governs.
-- [SKILL-template.md](references/SKILL-template.md) is an informative Process Description output-creation resource whose concrete form is compatible with `alps-markdown/v1`.
+- [SKILL-template.md](references/SKILL-template.md) is an informative Process Description output-creation resource whose concrete form is compatible with `alps-markdown/v2`.
 - [record-templates.md](references/record-templates.md) is an informative output-creation resource for definition and verification records.
 - [skill-package-format.md](references/skill-package-format.md) is reference information for identifying logical Package resource roles.
 - These resources must not override ALPS or the Process Framework. Mechanical profile validation is supplied by the applicable Environment Binding or review Process, not by Define ALPS itself.

@@ -147,7 +147,7 @@ description: ALPS表現のニーズを識別し、プロセス記述、プロセ
 ## 同梱資源
 
 - 本書は英語版`SKILL.md`の日本語版である。内容が矛盾する場合は英語版を優先する。
-- [SKILL-template.md](../../SKILL-template.md)は、具体的な形式が`alps-markdown/v1`と互換性を持つ、プロセス記述用の参考出力作成資源である。
+- [SKILL-template.md](../../SKILL-template.md)は、具体的な形式が`alps-markdown/v2`と互換性を持つ、プロセス記述用の参考出力作成資源である。
 - [record-templates.md](../../record-templates.md)は、定義記録および検証記録用の参考出力作成資源である。
 - [skill-package-format.md](../../skill-package-format.md)は、スキルパッケージの論理的な資源役割を識別するための参考情報である。
 - これらの資源はALPSまたはプロセスフレームワークを上書きしない。機械的なプロファイル検証は、Define ALPS自体ではなく、適用される環境への対応付けまたはレビュープロセスが提供する。

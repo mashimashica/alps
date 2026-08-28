@@ -4,15 +4,22 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+### Added
+
+- Added the optional `alps-markdown/v2` Environment Binding and checker contract. Version 2 preserves the v1 lexical Skill-reference forms while binding each package ID to one exact version and root, and it carries `(package ID, exact version, Skill name)` as the resolved logical identity. The ratified v1 profile remains frozen at `spec/alps-markdown.md`, with its implemented checker and golden fixtures preserved by the 0.4.0 release.
+
 ### Changed
 
 - Normalized the Process Framework and ALPS Specification so PF remains the sole source for general Process semantics, the ALPS Reference Model owns the reference relationship structure, and each reference Process Skill owns its complete Process Description.
 - Defined versioned logical Skill resolution through Logical Package Scope and Package Binding, including package ID, exact version, and Skill name as the complete logical identity, an `alps` same-version Release Package, and distinct resolution scopes for package-qualified and same-scope short references.
+- Clarified general Process semantics derived from the standards crosswalk, including Instance-specific responsibility, maturity and information-item meaning, Incremental application, structural levels, Name Tailoring, conditions of application, governance accountability, and measurement chains. Standard-specific organization, profile, and tailoring rules remain outside PF.
 - Moved informative examples, related-document notes, and Agent-context oversight and evidence guidance from the ALPS Specification into paired informative guidance without changing their normative status.
 
 ### Fixed
 
 - Closed a proposition-level semantic-preservation ledger for the Process Framework and ALPS Specification, restoring lost requirements, recommendations, permissions, possibilities, expectations, conditions, quantifiers, negation scope, and authoritative-reference connections in English and Japanese.
+- Aligned Task Conformance summaries with PF 8.3, including requirements stated in Activities, and aligned the canonical Apply ALPS handoff Task with the unconditional provider-Output to recipient-Input mapping requirement.
+- Restored Framework-level Constraint semantics alongside shared Controls and Enablers, clarified the specification-declared Logical Package Scope for ALPS reference assets, and restored the open-consideration status of Human Oversight guidance.
 - Aligned the OpenAI-facing name and icon for `alps-reference-model` with the other distributed Skills and replaced generic ALPS plugin listing metadata with concrete capabilities and starter prompts.
 
 ## [0.4.0] - 2026-08-25

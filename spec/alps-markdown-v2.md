@@ -1,8 +1,6 @@
-# ALPS Markdown Profile v1
+# ALPS Markdown Profile v2
 
-Status: Ratified and frozen Environment Binding.  Profile identifier:
-`alps-markdown/v1`.  The implemented v1 checker and golden fixtures are
-preserved by the ALPS 0.4.0 release; the current repository checker implements
+Status: Ratified and implemented Environment Binding.  Profile identifier:
 `alps-markdown/v2`.
 
 This document defines a machine-checkable Markdown Environment Binding for ALPS
@@ -16,7 +14,8 @@ of an ALPS asset.  It answers questions such as:
 
 - Is the asset written in the canonical frontmatter and Markdown profile?
 - Does its declared representation kind have the required semantic sections?
-- Do canonical Skill references resolve within the configured package roots?
+- Do canonical Skill references resolve within the configured versioned package
+  bindings?
 - Do an English asset and its Japanese counterpart describe the same semantic
   shape and stable identities?
 
@@ -25,7 +24,7 @@ canonical Skill references, and an optional English/Japanese locale comparison
 operation.  A repository or Host MAY adopt this profile as an Environment
 Binding.  It is not the only permissible ALPS representation and is not a
 general-purpose document parser.  Existing or future assets MAY be migrated to
-this storage profile; v1 does not grandfather model/view variants merely because
+this storage profile; v2 does not grandfather model/view variants merely because
 an older parser accepted them.
 
 The following words are normative: **MUST** and **MUST NOT** state requirements;
@@ -64,7 +63,7 @@ kind is `process`.
 | `process-reference-model` | Process Reference Model | Name, Purpose, Process entries with Name/Purpose/Outcomes, Relationships |
 | `process-view` | Process View | Name, Purpose, Outcomes, Application; source provenance when source elements are referenced |
 
-No other kind is supported in v1.  A kind value is a literal profile value, not a
+No other kind is supported in v2.  A kind value is a literal profile value, not a
 request to infer a kind from headings or references.
 
 ## 4. Canonical frontmatter
@@ -110,7 +109,7 @@ For inspected fields (`name`, `description`, and `metadata.alps.kind`):
   them.
 
 Unknown top-level keys and unknown children under `metadata` are errors of class
-`unsupported-profile-syntax`.  v1 does not preserve an “opaque frontmatter”
+`unsupported-profile-syntax`.  v2 does not preserve an “opaque frontmatter”
 namespace: a field is either one of the three inspected fields or unsupported.
 This rule bounds the profile extractor and makes typos visible.
 
@@ -247,7 +246,7 @@ table MUST have outer pipes on every line, an exact header row, an exact separat
 row, and data rows of exactly the header width.  The separator cells MUST be
 `---`; alignment markers, omitted outer pipes, blank separator lines, short rows,
 extra cells, and arbitrary row padding are unsupported.  A pipe inside a cell is
-unsupported in v1.  Each machine-bearing table below occurs exactly once; a
+unsupported in v2.  Each machine-bearing table below occurs exactly once; a
 second table, a mixed list/table representation, or a malformed neighboring line
 in that section is unsupported profile syntax.
 
@@ -323,16 +322,17 @@ token:
 `<skill-name>` is one lowercase-hyphen identifier.  `<package-id>` is one or more
 lowercase-hyphen segments separated by `/`, matching
 `[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)*`.  Empty segments, `.`, `..`,
-backslashes, and other separators are rejected.  Thus `mashimashica/alps` is
-valid, while `mashimashica//alps`, `mashimashica/./alps`, and
-`mashimashica/../alps` are not.
+backslashes, and other separators are rejected.  Thus `alps` is
+valid, while `example//alps`, `example/./alps`, and
+`example/../alps` are not.  An exact package version is deliberately absent
+from the lexical token and is supplied by the applicable Package Binding.
 
 Bare `skill:` text is always a non-operative lookalike, including in ordinary
 prose.  A dedicated line and a designated table cell still use the exact form,
 for example:
 
 ```markdown
-Skill: `skill:mashimashica/alps#define-alps`
+Skill: `skill:alps#define-alps`
 ```
 
 In an identity-bearing table row or Reference Model entry, the designated field
@@ -346,25 +346,36 @@ and package identifiers with empty, dot, or dot-dot segments.  A lookalike MUST
 NOT be resolved or create an IR identity.  A malformed reference in a designated
 reference field is an `unsupported-profile-syntax` error.
 
-Resolution MUST use the configured package identity and a real path contained by
-that package root.  A `..` escape, or a symlink whose resolved target escapes the
-configured package root, is an error.  Symlinks whose resolved target remains
-inside that package root are permitted.  The target MUST be a Process
-representation where the surrounding rule requires a Process.  No network or
-registry lookup is permitted.
+Resolution MUST use an applicable Package Binding.  A configured binding has the
+host form `<package-id>@<exact-version>=<package-root>`.  The version is an
+opaque, non-empty exact identifier in this Environment Binding; the checker does
+not infer it from a manifest, directory name, repository state, or release tag.
+One validation context MUST select at most one exact version for each package
+ID.  A same-scope short reference MUST use the binding for the Logical Package
+Scope containing the referring representation.  A package-qualified reference
+MUST use the binding selected for its stated package ID.
 
-After filesystem resolution succeeds, the canonical identity is exactly
-`ResolvedReference.identity`: the resolved package identity plus `#` plus the
-resolved skill name.  Therefore, when `skill:#x` resolves within package `pkg`,
-it and `skill:pkg#x` are the same canonical identity and MUST be treated as one
-identity for uniqueness, binding, and semantic comparison.  The lexical token,
-source span, and original qualification MUST remain unchanged in the IR; they
-are presentation/provenance data, not semantic identity.  A reference that does
-not resolve has no canonical identity and MUST retain its resolution error; the
-checker MUST NOT make an unresolved short or qualified token valid by falling
-back to lexical comparison.
+The target path MUST be real and contained by the selected package root.  A `..`
+escape, or a symlink whose resolved target escapes the configured package root,
+is an error.  Symlinks whose resolved target remains inside that package root
+are permitted.  The target MUST be a Process representation where the
+surrounding rule requires a Process.  No network or registry lookup is
+permitted.
 
-The canonical reference is the locale-independent identity.  Its authoritative
+After filesystem resolution succeeds, the canonical identity is exactly the
+structured `ResolvedReference.identity` value
+`(package_id, exact_version, skill_name)`.  Therefore, when `skill:#x`
+resolves within `pkg@1.2.3`, it and `skill:pkg#x` resolved by the same binding
+are one canonical identity and MUST be treated as one identity for uniqueness,
+binding, and semantic comparison.  The same Skill name in `pkg@1.2.4` is a
+different identity.  The lexical token, source span, and original qualification
+MUST remain unchanged in the IR; they are presentation/provenance data, not
+semantic identity.  A reference that does not resolve through a binding with an
+exact version has no canonical identity and MUST retain its resolution error;
+the checker MUST NOT make an unresolved short or qualified token valid by
+falling back to lexical comparison.
+
+The canonical reference is the locale-independent three-part identity.  Its authoritative
 path is the target package's `skills/<skill-name>/SKILL.md`.  When validating a
 Japanese asset, the checker uses that target's
 `references/locales/ja/SKILL.md` for localized display and semantic-center
@@ -413,7 +424,7 @@ only such headings or contains headings alongside prose.
 traceability, resource, and approach sections are optional opaque/profile
 sections in the canonical order; they do not create additional Process records.
 
-The only v1 natural-language heuristics beyond normative markers are bounded as
+The only v2 natural-language heuristics beyond normative markers are bounded as
 follows.  An Outcome matching English
 `\b(?:is|are|was|were)\s+(?:only\s+)?(?:recorded|documented)\b` (case-insensitive)
 or Japanese `(?:が|は)(?:記録|文書化)されている` produces a `quality-review`
@@ -421,7 +432,7 @@ warning; it does not fail the asset.  An `Inputs` section matching English
 `\bapplicable Controls?\b` (case-insensitive) or Japanese
 `適用(?:される)?(?:統制事項|Control)` is a `semantic` error because a Control has
 been classified as an Input.  The checker MUST NOT infer other natural-language
-classifications in v1.
+classifications in v2.
 
 ### Process Model
 
@@ -497,11 +508,13 @@ documents have independently passed profile parsing and have produced IRs.  The
 checker MUST compare IR fields, never raw Markdown or regular-expression matches
 over the two source files.
 
-The pair MUST have the same frontmatter `name` and kind.  If a containing or
-configured package identity is available, comparison MUST use that context to
-normalize a local `skill:#x` to the same semantic identity as a resolved
-same-package `skill:pkg#x`; a resolved reference to a different package remains
-a mismatch.  This normalization affects only comparison and never rewrites the
+The pair MUST have the same frontmatter `name` and kind.  The applicable
+Package Binding MUST supply the containing package ID and exact version and the
+selected exact version for every qualified package ID used in the pair.
+Comparison MUST use that context to normalize a local `skill:#x` to the same
+three-part identity as `skill:pkg#x` resolved in that versioned scope; a
+reference resolved to a different package ID or exact version remains a
+mismatch.  This normalization affects only comparison and never rewrites the
 lexical IR token or span.  The following semantic shape is compared in order.
 Identities come only from the parsed IR: canonical single-backtick references,
 fixed table fields, and the exact entry structures defined above.  A
@@ -548,7 +561,7 @@ when one or more document/profile/semantic/locale errors occur; and `2` for
 checker invocation, configuration, unreadable-input, or internal failures that
 prevent a reliable document finding.  Unsupported profile syntax is a document
 error and therefore returns `1`.  Internal failures MUST return `2`.  A status of
-`0` means only “valid under ALPS Markdown Profile v1”; it is not an
+`0` means only “valid under ALPS Markdown Profile v2”; it is not an
 ALPS Conformance claim.
 
 ## 10. Architecture and resource limits
@@ -564,16 +577,16 @@ The implementation SHOULD be stdlib-only and MUST have these boundaries:
 4. Run kind validators and locale validators over IR.  Validators MUST NOT read
    raw Markdown, call regex over raw source, or re-extract tables independently.
 
-A reasonable v1 implementation split is `input`, `frontmatter_profile`,
+A reasonable v2 implementation split is `input`, `frontmatter_profile`,
 `markdown_profile`, `reference_profile`, `ir`, `validators`, `locale_compare`,
 and `cli`.  The extractor MUST NOT import PyYAML, a Markdown parser, a network
 client, or a package registry.
 
-The v1 limits are: at most 1 MiB per asset, 20,000 normalized lines, 8 KiB per
+The v2 limits are: at most 1 MiB per asset, 20,000 normalized lines, 8 KiB per
 normalized line, 256 KiB of frontmatter, and 512 profile records per section.
 The scanner rejects nested opaque containers and has at most one simultaneously
 active opaque-container state (`MAX_ACTIVE_CONTAINER_STATES = 1`); a closed
-container releases that state.  This is a constant-space v1 rule, not a 32-state
+container releases that state.  This is a constant-space v2 rule, not a 32-state
 heading stack.  The implementation MUST enforce these bounds before allocating
 an unbounded collection.  Exceeding a limit is a `profile-structure` error.
 At most 512 distinct operative lexical reference tokens per asset are retained
@@ -583,7 +596,7 @@ that record's IR for locale comparison; short and qualified spellings remain
 distinct lexical tokens until validator resolution normalizes them.  Limits are
 part of the profile contract and MUST be tested.  The exact 256 KiB frontmatter
 guard is tested independently with deliberately rejected filler:
-canonical v1's five-line mapping reaches stricter field and line grammar before
+canonical v2's five-line mapping reaches stricter field and line grammar before
 that upper byte guard can be a valid asset.
 
 ## 11. Accepted and rejected examples
@@ -670,7 +683,7 @@ Accepted canonical Process Model declarations:
 ```markdown
 | Process | Skill |
 | --- | --- |
-| Define ALPS | `skill:mashimashica/alps#define-alps` |
+| Define ALPS | `skill:alps#define-alps` |
 | Manage ALPS | |
 ```
 
@@ -679,7 +692,7 @@ Accepted canonical Process Reference Model entry:
 ```markdown
 ### Define ALPS
 
-Skill: `skill:mashimashica/alps#define-alps`
+Skill: `skill:alps#define-alps`
 
 #### Purpose
 
@@ -697,15 +710,15 @@ Accepted canonical Process View tables:
 
 | Source Process | Reference |
 | --- | --- |
-| Define ALPS | `skill:mashimashica/alps#define-alps` |
-| Manage ALPS | `skill:mashimashica/alps#manage-alps` |
+| Define ALPS | `skill:alps#define-alps` |
+| Manage ALPS | `skill:alps#manage-alps` |
 
 ## Included Activities and Tasks
 
 | Source Process | Source element |
 | --- | --- |
-| Define ALPS (`skill:mashimashica/alps#define-alps`) | Activity: Review |
-| Manage ALPS (`skill:mashimashica/alps#manage-alps`) | Task: Record result |
+| Define ALPS (`skill:alps#define-alps`) | Activity: Review |
+| Manage ALPS (`skill:alps#manage-alps`) | Task: Record result |
 ```
 
 Rejected as `unsupported-profile-syntax`, not invalid YAML/Markdown:
@@ -734,30 +747,35 @@ Define ALPS | `skill:#define-alps`
 ```
 
 ```markdown
-Skill: skill:mashimashica/alps#define-alps
+Skill: skill:alps#define-alps
 ```
 
 Setext headings, `## Purpose ##`, a heading indented by one space, a table row
 with a missing or extra cell, a second or mixed machine-bearing table, an
 aliased/merged frontmatter mapping, a nested list, an indented code block, and a
-Skill token inside a fence are likewise outside v1.  The checker reports the
+Skill token inside a fence are likewise outside v2.  The checker reports the
 boundary and does not attempt to reinterpret the construct as a different
 profile form.
 
 ## 12. Change control and versioning
 
-The profile version is an explicit checker contract, currently `v1`.  A change
-that alters accepted syntax, rejected syntax, IR meaning, identity normalization,
-diagnostic class/severity, or exit behavior MUST use a new profile version and a
-new golden fixture set.  A narrower v1 implementation MAY clarify wording without
-changing behavior; it MUST record such clarifications in the change review.
+The profile version is an explicit checker contract, currently `v2`.  Version 1
+remains frozen in [ALPS Markdown Profile v1](alps-markdown.md).  Version 2 keeps
+the v1 lexical representation and changes Package Binding and canonical identity
+normalization to preserve the exact package version required by ALPS.
+
+A change that alters accepted syntax, rejected syntax, IR meaning, identity
+normalization, diagnostic class/severity, or exit behavior MUST use a new profile
+version and a new golden fixture set.  A narrower v2 implementation MAY clarify
+wording without changing behavior; it MUST record such clarifications in the
+change review.
 
 Adding a new optional syntax is still a profile change because it changes the
-machine-checkable language; it is not silently backported to v1.  The checker MUST
-report its profile version, and tests MUST pin that value.  This v1 profile is
-ratified together with the canonical assets, typed IR contract, diagnostics, and
-profile-focused replacement suite.  Future behavior changes MUST follow the
-versioning rule above and be reviewed as a new profile revision.
+machine-checkable language; it is not silently backported to v2.  The checker
+MUST report its profile version, and tests MUST pin that value.  This v2 profile
+is ratified together with the canonical assets, typed IR contract, diagnostics,
+and v2 golden fixture set.  Future behavior changes MUST follow the versioning
+rule above and be reviewed as a new profile revision.
 
 ## 13. Explicitly out of scope
 

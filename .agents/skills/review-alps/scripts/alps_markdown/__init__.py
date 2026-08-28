@@ -32,7 +32,15 @@ from .checker import (
     parse_asset,
 )
 from .validators import validate_ir
-from .reference_profile import PackageRootConfig, ReferenceResolution, ResolvedReference
+from .reference_profile import (
+    LogicalPackageIdentity,
+    LogicalSkillIdentity,
+    PackageRootConfig,
+    ReferenceResolution,
+    ResolvedReference,
+    package_roots,
+    resolve_reference,
+)
 
 
 def main(argv=None):
@@ -64,8 +72,12 @@ __all__ = [
     "ParseResult",
     "CheckResult",
     "PackageRootConfig",
+    "LogicalPackageIdentity",
+    "LogicalSkillIdentity",
     "ResolvedReference",
     "ReferenceResolution",
+    "package_roots",
+    "resolve_reference",
     "locale_for",
     "japanese_counterpart",
     "english_counterpart",

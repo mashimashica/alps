@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CLI entry point for ALPS Markdown Profile v1."""
+"""CLI entry point for ALPS Markdown Profile v2."""
 
 from __future__ import annotations
 

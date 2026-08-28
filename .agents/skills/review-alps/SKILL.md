@@ -91,7 +91,7 @@ This Activity makes the review judgment and its limitations usable by the change
 - `spec/ALPS-SPEC.md` governs Agent Skill representations, their boundaries, and their Conformance claims.
 - `AGENTS.md` governs repository layout, repository-development Skills, and distributed Plugin boundaries.
 - `localization.yaml` defines English as authoritative and Japanese as supported.
-- [`spec/alps-markdown.md`](../../../spec/alps-markdown.md) governs the optional `alps-markdown/v1` Environment Binding; it must not be treated as ALPS itself.
+- [`spec/alps-markdown-v2.md`](../../../spec/alps-markdown-v2.md) governs the optional `alps-markdown/v2` Environment Binding; it must not be treated as ALPS itself.
 - [`scripts/validate_alps_markdown.py`](scripts/validate_alps_markdown.py) validates that binding as a structural and semantic preflight; it must not be treated as the sole source of ALPS Conformance.
 
 ## Constraints
@@ -123,7 +123,7 @@ This Skill represents the ALPS Review Process and claims Description Conformance
 
 ## Bundled Resources
 
-- [`scripts/validate_alps_markdown.py`](scripts/validate_alps_markdown.py) is the Application Enabler for bounded `alps-markdown/v1` validation and English/Japanese IR comparison. Run it as a mechanical preflight before completing the cross-layer semantic review.
+- [`scripts/validate_alps_markdown.py`](scripts/validate_alps_markdown.py) is the Application Enabler for bounded `alps-markdown/v2` validation and English/Japanese IR comparison. Run it as a mechanical preflight before completing the cross-layer semantic review.
 - [`scripts/alps_markdown/`](scripts/alps_markdown/) contains the bounded input, frontmatter, Markdown, reference-resolution, typed-IR, semantic-validation, locale-comparison, and CLI modules used by that Enabler.
 - These resources validate only the Environment Binding they implement. They do not validate arbitrary ALPS representations, substantiate a Description Conformance claim, assess Outcome achievability, or establish Process execution Conformance.
 

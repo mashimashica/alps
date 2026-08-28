@@ -20,6 +20,7 @@ from .model import (
     deterministic_diagnostics,
 )
 from .reference_profile import (
+    LogicalPackageIdentity,
     PackageRootConfig,
     package_roots,
 )
@@ -166,7 +167,7 @@ def _check_document(
             diagnostics.extend(
                 validate_ir(
                     parsed.ir,
-                    config.roots,
+                    config,
                     current_package_id=package_id,
                     load_ir=load_ir,
                 )
@@ -219,7 +220,8 @@ def check_pair(
     english: os.PathLike[str] | str,
     japanese: os.PathLike[str] | str,
     allowed_terms: object = None,
-    package_identity: str | None = None,
+    package_identity: str | LogicalPackageIdentity | None = None,
+    package_versions: dict[str, str] | None = None,
 ) -> tuple[list[str], list[str]]:
     """Compatibility wrapper for comparison of two independently valid IRs."""
     del allowed_terms
@@ -233,7 +235,18 @@ def check_pair(
         and not _has_errors(right.diagnostics)
     ):
         try:
-            diagnostics.extend(compare_locale_ir(left.ir, right.ir, package_identity=package_identity))
+            locale_context = (
+                (package_identity, package_versions)
+                if package_versions is not None
+                else package_identity
+            )
+            diagnostics.extend(
+                compare_locale_ir(
+                    left.ir,
+                    right.ir,
+                    package_identity=locale_context,
+                )
+            )
         except Exception as error:
             diagnostics.append(_internal(_label(japanese), "locale-comparison-failed", str(error)))
     return _strings(_ordered(diagnostics))

@@ -138,6 +138,10 @@ The following standards address life-cycle Processes or Process description in r
 
 They are informative references for readers who also work with those standards. ALPS and the Process Framework were written independently; Conformance to ALPS neither requires nor establishes Conformance to those standards. ALPS is not developed, approved, or certified by their publishers.
 
+Terminology must be mapped before comparing claims. Some life-cycle standards use a Process View as a concern-oriented projection with profile-specific assessment rules. PF's Process View definition and Conformance boundary govern ALPS; a claim made under another standard does not transfer automatically.
+
+Some life-cycle Process descriptions express production of an artifact in an Outcome. Under PF, the artifact is an Output; an observable result condition established or evidenced by that artifact is an Outcome. This distinction preserves the separation between work products and successful Process state.
+
 ## 4. Allocation Between PF and ALPS
 
 PF remains authoritative for every general Process concept. ALPS specializes those concepts only where Agent Skill representation or the ALPS life cycle requires additional rules.
@@ -155,6 +159,8 @@ PF remains authoritative for every general Process concept. ALPS specializes tho
 | Management and improvement | General Process governance, measures, benchmarking, and learning | Define ALPS, Apply ALPS, and Manage ALPS as the ALPS reference life cycle |
 
 ## 5. Human Oversight, Accountability, and Evidence
+
+The matters in this section are open considerations rather than settled practice. They provide informative guidance for application and improvement only.
 
 ### 5.1 Composing Human Oversight
 
