@@ -296,8 +296,12 @@ def check_record(path: Path, at: str) -> list[str]:
         require(
             block,
             (
+                "scope",
                 "basis",
                 "candidate_evaluation",
+                "process_name_change",
+                "name_consistency",
+                "source_traceability",
                 "decision",
                 "affected_party_input",
                 "controls_constraints",
@@ -307,7 +311,21 @@ def check_record(path: Path, at: str) -> list[str]:
 
     conformances = [item for item in bound if item.value("kind") == "conformance"]
     for block in conformances:
-        require(block, ("subject", "scope", "basis", "claim", "evidence"), errors)
+        require(
+            block,
+            ("subject", "process_basis", "scope", "basis", "claim", "evidence"),
+            errors,
+        )
+        basis = block.value("basis")
+        if basis and basis not in {
+            "Outcome Conformance",
+            "Task Conformance",
+            "both",
+        }:
+            errors.append(
+                f"line {block.line} ({block.heading}): `basis` must be "
+                "`Outcome Conformance`, `Task Conformance`, or `both`"
+            )
         claim = block.value("claim")
         if claim and claim not in {"Full", "Tailored"}:
             errors.append(
@@ -412,7 +430,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     new = commands.add_parser("new", help="create a record from explicitly supplied statements")
     new.add_argument("--title", required=True)
-    new.add_argument("--source", required=True, help="managed source and version; not a file to parse")
+    new.add_argument(
+        "--source",
+        required=True,
+        help="canonical Skill reference, complete logical identity, and managed baseline; not a file to parse",
+    )
     new.add_argument("--context", required=True)
     new.add_argument("--scope", required=True)
     new.add_argument("--purpose", action="append", default=[], help="exact source statement; repeatable")

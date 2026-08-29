@@ -4,8 +4,33 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+### Added
+
+- Added pull-request and main-branch validation for the official Agent Skills form, the root Agent Plugins schema, the official Claude Plugin form, repository integrity, Process Instance Record behavior, relative Markdown links, and whitespace errors.
+
+### Changed
+
+- Normalized the Process Framework and ALPS Specification so PF remains the sole source for general Process semantics, the ALPS Reference Model owns the reference relationship structure, and each reference Process Skill owns its complete Process Description.
+- Defined versioned logical Skill resolution through Logical Package Scope and Package Binding, including package ID, exact version, and Skill name as the complete logical identity, an `alps` same-version Release Package, and distinct resolution scopes for package-qualified and same-scope short references.
+- Declared same-scope resolution context explicitly instead of inferring it from repository paths and retained package ID, exact version, and Skill name as the complete logical identity at the normative ALPS layer.
+- Renamed the three Reference Process display Names to the noun phrases ALPS Definition Process, ALPS Application Process, and ALPS Management Process while retaining the stable `define-alps`, `apply-alps`, and `manage-alps` Skill identifiers.
+- Integrated the Process Skill example, file-based Skill Package example, Agent ecosystem context, and PF/ALPS responsibility allocation into the paired ALPS Specification documents as informative subclauses, while placing related Process standards with the paired Process Framework documents.
+- Removed the former paired Appendix D guidance on Human Oversight, Accountability, and Evidence without relocation.
+- Clarified general Process semantics derived from the standards crosswalk, including Instance-specific responsibility, maturity and information-item meaning, Incremental application, structural levels, Name Tailoring, conditions of application, governance accountability, and measurement chains. Standard-specific organization, profile, and tailoring rules remain outside PF.
+
+### Removed
+
+- Removed the optional ALPS Markdown Profile v1 from the current specification and withdrew v2 without ratification or a compatibility layer.
+- Removed the bundled profile checker, typed intermediate representation, parser, resolver, locale comparator, fixtures, and checker-specific tests.
+- Replaced the profile-checking responsibility with separate official Agent Skills and Plugin validation, repository-integrity checks, and proposition-level cross-layer semantic review.
+
 ### Fixed
 
+- Closed a proposition-level semantic-preservation ledger for the Process Framework and ALPS Specification, restoring lost requirements, recommendations, permissions, possibilities, expectations, conditions, quantifiers, negation scope, and authoritative-reference connections in English and Japanese.
+- Aligned Task Conformance summaries with PF 8.3, including requirements stated in Activities, and aligned the canonical Apply ALPS handoff Task with the unconditional provider-Output to recipient-Input mapping requirement.
+- Restored Framework-level Constraint semantics alongside shared Controls and Enablers and clarified the specification-declared Logical Package Scope for ALPS reference assets.
+- Aligned informative record bindings with the normative sources by requiring Tailoring scope, recording candidate evaluation and Process Name Traceability, using typed representation-assessment subjects, and projecting unconditional handoff mappings.
+- Separated Description Conformance, Process Conformance, Reference Process Conformance, and Execution Conformance by subject, and aligned the reference Process Outcomes, atomic Tasks, and record bindings with those claim boundaries.
 - Aligned the OpenAI-facing name and icon for `alps-reference-model` with the other distributed Skills and replaced generic ALPS plugin listing metadata with concrete capabilities and starter prompts.
 
 ## [0.4.0] - 2026-08-25

@@ -1,6 +1,6 @@
 ---
 name: review-alps
-description: Review changed ALPS repository assets as an integrated Process system before a change is merged or when a change can affect the Process Framework, ALPS Specification, ALPS Reference Model, reference Processes, ALPS Markdown profile, bindings, locales, or repository distribution. Repository-development Skill; not part of the distributed ALPS Plugin. ALPS-conformant.
+description: Review changed ALPS repository assets as an integrated Process system before a change is merged or when a change can affect the Process Framework, ALPS Specification, ALPS Reference Model, reference Processes, record bindings, locales, or repository distribution. Repository-development Skill; not part of the distributed ALPS Plugin. ALPS-conformant.
 ---
 
 # ALPS Review
@@ -15,7 +15,7 @@ Success of this Process establishes the following conditions.
 
 - a) The semantic center of the change and its applicable ALPS and Process Framework dependencies are identified.
 - b) Terminology, normative meaning, Process boundaries, and execution semantics are consistent across the affected representations, or each divergence is made explicit with evidence.
-- c) ALPS Markdown profile behavior and record bindings preserve the ALPS specification boundary without introducing an additional normative requirement.
+- c) Standard validation, repository-integrity checks, and record bindings preserve the ALPS specification boundary without introducing an additional normative requirement.
 - d) Locale equivalence, canonical references, repository layout, and the boundary between repository-only and distributed assets are assessed.
 - e) Actionable findings identify their severity, location, evidence, impact, and smallest coherent correction, while unperformed checks and other limitations are explicit.
 
@@ -28,23 +28,25 @@ The headings, Activities, Tasks, and numbers below organize the review content a
 This Activity establishes the change boundary and the semantic material that can affect the assessment.
 
 1. The changed files and the semantic center of the change must be identified.
-2. The applicable Process Framework, ALPS Specification, ALPS Reference Model, reference Processes, ALPS Markdown profile logic, record bindings, and repository layout assumptions must be identified.
+2. The applicable Process Framework, ALPS Specification, ALPS Reference Model, reference Processes, record bindings, standard-validation boundaries, and repository layout assumptions must be identified.
 3. The complete task-owned diff must be included in the review scope.
 4. The English and Japanese counterparts affected by the change must be identified.
+5. The prior authoritative version and every dependent authoritative projection affected by the change must be identified.
 
 ### Cross-Layer Semantic Assessment
 
 This Activity assesses whether the affected ALPS layers preserve one coherent meaning.
 
 1. Terminology, definitions, normative force, Process boundaries, Outcomes, Activities, Tasks, Inputs, Outputs, Controls, Constraints, Enablers, references, Conformance subjects, Tailoring, and execution semantics must be compared where applicable.
-2. Repeated normative meaning across the Process Framework, ALPS Specification, ALPS Reference Model, reference Processes, ALPS Markdown profile, bindings, and locale counterparts must be traced.
+2. Repeated normative meaning across the Process Framework, ALPS Specification, ALPS Reference Model, reference Processes, record bindings, and locale counterparts must be traced to its authoritative source.
 3. A divergence between those layers must be reported even when each individual representation is internally coherent.
-4. ALPS Markdown profile behavior must be verified to enforce the intended binding invariant without creating an additional ALPS requirement.
-5. Record bindings must be verified to preserve the specification boundary.
-6. Binding fields must not silently be treated as ALPS requirements.
+4. Each changed, compressed, relocated, or deleted proposition must be compared across subject, modality, action or state, object, condition, quantifier, polarity, exception, and application scope.
+5. Reference Model Names, Purposes, and Outcomes must be compared semantically with the authoritative reference Process descriptions instead of treating string equality as meaning equivalence.
+6. Record bindings must be verified to preserve the specification boundary, and binding fields must not silently be treated as ALPS requirements.
 7. Changed relative links, canonical references, paths, and repository layout assumptions must be checked.
-8. A dedicated semantic-equivalence check must be applied to English and Japanese normative or guidance assets whenever either locale is affected.
+8. The result of `sync-locales` must be integrated whenever an English or Japanese normative or guidance asset is affected.
 9. Repository-only assets must be checked for unintended registration, discovery, or leakage into the distributed Plugin.
+10. Official form validation and repository-integrity checks must be treated as evidence about form and layout only, not as substitutes for semantic review.
 
 ### Finding Reporting
 
@@ -59,8 +61,8 @@ This Activity makes the review judgment and its limitations usable by the change
 ## Inputs
 
 - The task-owned change diff and the files it changes.
-- The applicable Process Framework, ALPS Specification, ALPS Reference Model, and reference Process representations.
-- Affected ALPS Markdown profile logic, record templates, record bindings, and canonical references.
+- The applicable Process Framework, ALPS Specification, ALPS Reference Model, and reference Process representations, including their prior authoritative revisions where meaning preservation is claimed.
+- Affected record templates, record bindings, canonical references, and repository-integrity rules.
 - The locale policy and the applicable English/Japanese assets.
 - Repository guidance, Plugin metadata, distributed symlink layout, and relevant change history.
 
@@ -81,7 +83,7 @@ This Activity makes the review judgment and its limitations usable by the change
 ## Exit Criteria
 
 - The change boundary and applicable semantic dependencies have been assessed.
-- Cross-layer consistency, profile and binding boundaries, locale coverage, and repository distribution scope have been judged.
+- Cross-layer consistency, validation and binding boundaries, locale coverage, and repository distribution scope have been judged.
 - Findings, no-action conclusions, assumptions, and unperformed validations are explicit.
 - The evidence is sufficient for a subsequent change, acceptance, or further-review decision.
 
@@ -91,8 +93,8 @@ This Activity makes the review judgment and its limitations usable by the change
 - `spec/ALPS-SPEC.md` governs Agent Skill representations, their boundaries, and their Conformance claims.
 - `AGENTS.md` governs repository layout, repository-development Skills, and distributed Plugin boundaries.
 - `localization.yaml` defines English as authoritative and Japanese as supported.
-- [`spec/alps-markdown.md`](../../../spec/alps-markdown.md) governs the optional `alps-markdown/v1` Environment Binding; it must not be treated as ALPS itself.
-- [`scripts/validate_alps_markdown.py`](scripts/validate_alps_markdown.py) validates that binding as a structural and semantic preflight; it must not be treated as the sole source of ALPS Conformance.
+- Applicable Agent Skills and Agent Plugins standards govern their physical forms without redefining ALPS semantics.
+- `AGENTS.md` separates official form validation, repository-integrity checks, and cross-layer semantic review.
 
 ## Constraints
 
@@ -106,7 +108,7 @@ This Activity makes the review judgment and its limitations usable by the change
 - Process Framework and ALPS Specification expertise.
 - ALPS Reference Model, reference Processes, record bindings, locale assets, and repository change history.
 - Independent review capability and the repository-development `sync-locales` Skill.
-- The bundled ALPS Markdown profile checker and its typed-IR comparison capabilities.
+- Official Agent Skill and Plugin validation, repository-integrity evidence, and version-control history.
 
 ## Conformance
 
@@ -121,12 +123,6 @@ This Skill represents the ALPS Review Process and claims Description Conformance
 | Locale and distribution assessment | Repository maintenance and subsequent review | Locale policy, counterpart coverage, Plugin registration, and symlink layout. |
 | Unperformed validations and limitations | Subsequent reviewer or decision maker | Assumptions, unresolved references, and evidence gaps. |
 
-## Bundled Resources
-
-- [`scripts/validate_alps_markdown.py`](scripts/validate_alps_markdown.py) is the Application Enabler for bounded `alps-markdown/v1` validation and English/Japanese IR comparison. Run it as a mechanical preflight before completing the cross-layer semantic review.
-- [`scripts/alps_markdown/`](scripts/alps_markdown/) contains the bounded input, frontmatter, Markdown, reference-resolution, typed-IR, semantic-validation, locale-comparison, and CLI modules used by that Enabler.
-- These resources validate only the Environment Binding they implement. They do not validate arbitrary ALPS representations, substantiate a Description Conformance claim, assess Outcome achievability, or establish Process execution Conformance.
-
 ## Common Approach
 
-A typical review begins with the changed files and then follows the semantic dependencies needed to judge the change. It treats the repository as one ALPS system, applies a dedicated locale-equivalence perspective when applicable, checks the complete task-owned diff, and reports concrete findings before summaries. The repository-development `sync-locales` Skill is the dedicated locale perspective; it is not a distributed Plugin asset.
+A typical review begins with the changed files, identifies the previous and current authoritative propositions, and follows every dependent authoritative projection. It records each proposition's subject, modality, action or state, object, condition, quantifier, polarity, exceptions, scope, target location, and English/Japanese disposition. It compares the Reference Model semantic centers with the three authoritative Process descriptions, integrates the dedicated `sync-locales` result, and distinguishes standard-validation or repository-integrity evidence from semantic judgment. The result reports concrete findings before summaries and identifies every unexamined scope, assumption, and judgment limit.

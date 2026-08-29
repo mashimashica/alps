@@ -1,5 +1,5 @@
 interface:
-  display_name: "Define ALPS"
+  display_name: "ALPS Definition Process"
   short_description: "Define and verify reusable ALPS Skills"
   icon_small: "./assets/alps.svg"
   icon_large: "./assets/alps.svg"
