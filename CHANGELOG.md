@@ -4,6 +4,29 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+### Changed
+
+- Made Process authoring minimal by default, starting with Name, Purpose, and Outcomes and adding optional detail only when justified.
+- Simplified user routing around definition, application, and management intent.
+- Compressed the work content of the three Reference Processes while preserving their Names, Purposes, and Outcomes.
+- Moved Conformance claims out of Skill Discovery Descriptions and into explicit assessment results with evidence and limitations.
+- Established the three-Process Reference Model as the single operational ALPS life-cycle model.
+
+### Removed
+
+- Removed the exact `ALPS-conformant.` / `ALPS準拠。` Skill Discovery Description suffix requirement.
+- Removed the embedded Request Readiness Process example from the ALPS Specification.
+- Removed the duplicated Skill Package reference aid.
+- Removed the `process-instance-record/1` binding.
+- Removed the Process Instance Record generator, checker, and dedicated tests.
+
+### Compatibility
+
+- The Task Conformance surface of the Reference Processes and the machine-consumed Process Instance Record format have changed.
+- This is a pre-1.0 MINOR-class change under the repository versioning policy.
+- No compatibility wrapper is introduced.
+- `VERSION` is not changed by this implementation task.
+
 ## [0.5.0] - 2026-08-29
 
 Release notes: [ALPS 0.5.0](docs/releases/0.5.0.md).

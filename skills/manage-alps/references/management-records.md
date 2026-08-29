@@ -68,10 +68,10 @@ Use this block for context-specific Tailoring of a Process or applicable Process
 - Conformance claim, if any:
 ```
 
-## Representation and Process Assessment and Improvement
+## Assessment and Improvement
 
 ```markdown
-# Representation and Process Assessment and Improvement
+# Assessment and Improvement
 
 - Target representation and baseline:
 - Representation kind:

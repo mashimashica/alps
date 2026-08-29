@@ -84,20 +84,8 @@ This Process governs ALPS representations and their application and maintains th
 
 The relationships do not prescribe an execution sequence. The three Processes may be applied iteratively, concurrently, or recursively according to the application situation.
 
-## Application
+## Use and Integrity
 
-Activate this Agent Skill to load the ALPS Reference Model. Use the ALPS Application Process to select or activate relevant Models and Views, resolve the required Processes, and invoke only Agent Skills that represent Processes. Loading this Reference Model does not itself invoke a Process.
+Activate this Agent Skill when the three Reference Processes and their relationships are needed to understand or select applicable Process work. This representation is not an invokable Process, and loading it does not invoke any Process.
 
-## Verification
-
-Each referenced Process Skill must resolve to a Process representation. The Process Name, Purpose, and Outcomes of each referenced Process Skill must match those represented here. A mismatch is an error and neither representation silently overrides the other.
-
-## Conformance
-
-This Process Reference Model representation can be assessed for Process Reference Model Description Conformance. Outcome Conformance and Task Conformance are selected bases for a Full Conformance claim made as Reference Process Conformance about an individual referenced Process. Tailored Conformance may concern one referenced Process or a declared set of referenced Processes within the declared tailored scope. Execution Conformance claims concern their Process Instances. Activation of this Agent Skill is not Process Invocation or Execution Conformance.
-
-## Bundled Resources
-
-- [Process Framework](../../spec/process-framework.md)
-- [ALPS Specification](../../spec/ALPS-SPEC.md)
-- [Japanese localization](references/locales/ja/SKILL.md)
+Each logical Process Skill reference must resolve to a Process representation whose Name, Purpose, and Outcomes equal those represented here. The [Process Framework](../../spec/process-framework.md) and [ALPS Specification](../../spec/ALPS-SPEC.md) provide the normative basis; a [Japanese localization](references/locales/ja/SKILL.md) is also available.

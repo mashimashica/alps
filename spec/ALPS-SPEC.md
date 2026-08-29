@@ -325,8 +325,6 @@ The Activities and any Sub-processes represented by separate Skills must collect
 
 A statement used as a Task must express an individual action supporting one or more Outcomes so that its operation and object are distinguishable. A statement whose primary function is not an individual action must not be treated as a Task and must be placed in the element corresponding to that function. A statement whose primary function is an individual action must be classified as a Task. A statement whose primary function is to declare a condition that directs or limits execution must be classified as a Control or Constraint rather than a Task. Every Task must have a distinguishable normative attribute.
 
-The Skill Discovery Description of a Process representation claiming Description Conformance must end with exactly `ALPS-conformant.` in English or `ALPS準拠。` in Japanese. This marker is a shorthand Description Conformance claim about the containing Skill Description; it does not claim Process Conformance, Reference Process Conformance, Outcome achievement, Capability, or Execution Conformance.
-
 ### 6.3 Process Model Representations
 
 A Process Model representation must identify its Processes and their relationships. It may identify the Agent Skills that provide their authoritative Process Descriptions. It may omit repetition of each Process Purpose and Outcomes.
@@ -377,119 +375,11 @@ Description Conformance concerns a representation. Process Conformance concerns 
 
 Loading, parsing, resolving, or mechanically validating a representation does not by itself establish any of those claims.
 
-### 6.7 Process Skill Example (informative)
-
-The following file-based Process Skill example illustrates the distinctions among Outcomes, Outputs, Tasks, Inputs, Controls, Constraints, Enablers, and reference information. Its physical form is illustrative and does not establish an Environment Binding.
-
-```markdown
----
-name: prepare-request-readiness
-description: Determine the readiness of a received request for the affected execution by identifying its intended result, scope, required conditions, and unresolved matters. Use before affected execution begins when a request requires readiness assessment, clarification, or routing. ALPS-conformant.
----
-
-# Request Readiness Process
-
-## Purpose
-
-This Process determines the readiness of a received request for the affected execution.
-
-## Outcomes
-
-- The intended result of the request is identified.
-- The scope of the affected execution is identified.
-- Conditions required for the affected execution are identified and classified according to their function.
-- Confirmed information, assumptions, and unresolved matters are distinguished.
-- The request's readiness disposition—begin execution, hold the request, or hand it off to another Process—is determined from the assessed conditions with a traceable rationale.
-
-## Activities & Tasks
-
-The order shown does not prescribe execution order.
-
-### Request Characterization
-
-1. The intended result of the request must be identified.
-2. The scope of the affected execution must be identified.
-3. Confirmed information, assumptions, and unresolved matters must be distinguished.
-4. Information must not be treated as confirmed solely because it is plausible.
-
-### Execution Condition Identification
-
-1. Conditions required for the affected execution must be identified.
-2. Each identified condition must be classified according to its function as an Input, Enabler, Control, or Constraint.
-3. Each mandatory condition must be assessed as satisfied or unsatisfied.
-4. Sources that can resolve an unresolved matter should be identified from available conversation or working context, reference materials, or Outputs from preceding or supporting Processes.
-
-### Readiness Determination
-
-1. The effect of unresolved matters and unsatisfied conditions on the affected execution must be evaluated.
-2. A disposition to begin execution, hold the request, or hand it off to another Process must be determined from the assessed conditions with a traceable rationale.
-3. The clarified request, unresolved-items list, readiness disposition, and rationale must be recorded.
-
-## Inputs
-
-- Received request
-- Available conversation or working context used as source information
-- Applicable Outputs from preceding or supporting Processes
-- Reference materials used as source information
-
-## Outputs
-
-- Clarified request
-- Unresolved-items list
-- Readiness disposition and rationale
-
-## Entry Criteria
-
-- A request has been received.
-- The affected execution or intended recipient Process can be identified sufficiently to assess readiness.
-
-## Exit Criteria
-
-- Every Outcome has been achieved.
-- The readiness disposition and its traceable rationale have been recorded.
-- The Outputs are available to the affected executor or recipient Process.
-
-## Controls
-
-- Applicable authorization, privacy, and security policies
-- Applicable routing, escalation, and acceptance policies
-
-## Constraints
-
-- Affected execution must not begin while a mandatory condition required for that execution remains unsatisfied.
-- Assumptions and unresolved matters must not be represented as confirmed information.
-- A readiness disposition must remain traceable to the information and condition assessments on which it rests.
-
-## Enablers
-
-- Domain expertise
-- Search, retrieval, and reference-resolution capabilities
-
-## Common Approach
-
-This section is reference information and has no normative force.
-
-- Missing information can be resolved from existing context, reference materials, an Output from another Process, or communication with an affected party. Asking the user is one possible method, not a required default.
-- When new information changes a condition, Iteration can revisit the readiness disposition.
-```
-
-The clarified request and unresolved-items list are Outputs, not Outcomes. The determined readiness is the achieved state. The no-start condition is a Constraint, while identifying the request and conditions and determining the disposition are Tasks. In this example, the received request, available context, applicable Process Outputs, and reference materials are Inputs because the Tasks examine them as source information. Reference material that instead directs execution as a criterion or policy would be a Control. Domain expertise and search, retrieval, and reference-resolution capabilities are Enablers.
-
 ## 7. ALPS Life Cycle and Reference Model
 
-### 7.1 Life Cycle
+### 7.1 Life-Cycle Concerns (informative)
 
-The ALPS life cycle concerns definition, application, management, evolution, and retirement of ALPS representations and the Processes they enable.
-
-| Stage | Concern |
-|---|---|
-| **Concept** | Needs for Process knowledge or another ALPS representation are identified and classified. |
-| **Definition** | Authoritative representations are defined and verified. |
-| **Operation** | Representations are activated, Processes are resolved and invoked, and compositions are executed. |
-| **Evolution** | Representations and Process execution are assessed, tailored, changed, and improved. |
-| **Retirement** | Representations that are unnecessary, unsafe, misleading, or superseded are withdrawn from active use under management. |
-
-The order shown does not prescribe execution order. Processes and Activities can span Stages and can be applied concurrently, iteratively, or recursively under PF.
+Definition, Application, and Management are concerns that can each span an ALPS representation from concept through retirement; they are not stages and do not prescribe an execution order. The three Reference Processes in 7.2 are the sole operational life-cycle map for ALPS and can be selected, combined, and reapplied under PF according to the situation.
 
 ### 7.2 Reference Model Composition
 
@@ -635,7 +525,7 @@ When an Output is transferred to another Process or stakeholder, it should be ev
 
 ### 11.1 Managed Tailoring
 
-Tailoring retains its PF meaning and must be performed through the Tailoring and Formal Adoption Activity of the ALPS Management Process (`skill:#manage-alps`). Those requirements are prerequisites for Tailored Conformance.
+Tailoring retains its PF meaning and must be performed through the Tailoring Control Activity of the ALPS Management Process (`skill:#manage-alps`). Those requirements are prerequisites for Tailored Conformance.
 
 The applicable requirements and recommendations of that Process govern the Tailoring scope, Controls and Constraints, affected elements, assumptions, criteria, evidence, affected-party Input, and rationale. For Tailored Conformance, the resulting decision and scope must remain traceable.
 
@@ -657,7 +547,7 @@ Process Instantiation retains its PF meaning. It can add Instance-specific succe
 
 Conformance relating to this specification can be claimed for the subjects in the following table.
 
-Every Conformance claim must identify its subject and selected criteria.
+Every Conformance claim must be an explicit assessment result and must identify its subject, applicable baseline, scope, selected basis, conclusion, supporting evidence, and limitations. This specification does not prescribe a physical format for a Conformance claim.
 
 | Claim type | Subject | Required basis |
 |---|---|---|

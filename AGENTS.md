@@ -55,6 +55,10 @@ Add another repository-development Skill only after a repeated task has emerged 
 - `skills/` remains the only source of truth for distributed Agent Skill representations.
 - Repository-development Skills remain real directories under `.agents/skills/` and are not distributed Plugin Skills.
 - Mechanical validation results do not determine ALPS Conformance, Outcome achievability, Outcome achievement, or Process execution Conformance.
+- A Process Skill owns only its Process-specific work, boundary, and Outputs; link to higher-order PF or ALPS requirements instead of restating them in each Process Skill.
+- Informative summaries must not duplicate normative modal wording from an authoritative source.
+- Include an optional Process element only when a declared need, risk, handoff, decision, or claim justifies it.
+- Do not add an ALPS semantic checker or a new physical profile; keep official form validation, repository integrity, and semantic review separate.
 
 ## Repository Workflow
 

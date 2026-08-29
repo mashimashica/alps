@@ -1,6 +1,6 @@
 ---
 name: review-alps
-description: Review changed ALPS repository assets as an integrated Process system before a change is merged or when a change can affect the Process Framework, ALPS Specification, ALPS Reference Model, reference Processes, record bindings, locales, or repository distribution. Repository-development Skill; not part of the distributed ALPS Plugin. ALPS-conformant.
+description: Review changed ALPS repository assets as an integrated Process system before a change is merged or when a change can affect the Process Framework, ALPS Specification, ALPS Reference Model, reference Processes, record aids, locales, or repository distribution. Repository-development Skill; not part of the distributed ALPS Plugin.
 ---
 
 # ALPS Review
@@ -15,7 +15,7 @@ Success of this Process establishes the following conditions.
 
 - a) The semantic center of the change and its applicable ALPS and Process Framework dependencies are identified.
 - b) Terminology, normative meaning, Process boundaries, and execution semantics are consistent across the affected representations, or each divergence is made explicit with evidence.
-- c) Standard validation, repository-integrity checks, and record bindings preserve the ALPS specification boundary without introducing an additional normative requirement.
+- c) Standard validation, repository-integrity checks, and record aids preserve the ALPS specification boundary without introducing an additional normative requirement.
 - d) Locale equivalence, canonical references, repository layout, and the boundary between repository-only and distributed assets are assessed.
 - e) Actionable findings identify their severity, location, evidence, impact, and smallest coherent correction, while unperformed checks and other limitations are explicit.
 
@@ -28,7 +28,7 @@ The headings, Activities, Tasks, and numbers below organize the review content a
 This Activity establishes the change boundary and the semantic material that can affect the assessment.
 
 1. The changed files and the semantic center of the change must be identified.
-2. The applicable Process Framework, ALPS Specification, ALPS Reference Model, reference Processes, record bindings, standard-validation boundaries, and repository layout assumptions must be identified.
+2. The applicable Process Framework, ALPS Specification, ALPS Reference Model, reference Processes, record aids, standard-validation boundaries, and repository layout assumptions must be identified.
 3. The complete task-owned diff must be included in the review scope.
 4. The English and Japanese counterparts affected by the change must be identified.
 5. The prior authoritative version and every dependent authoritative projection affected by the change must be identified.
@@ -38,11 +38,11 @@ This Activity establishes the change boundary and the semantic material that can
 This Activity assesses whether the affected ALPS layers preserve one coherent meaning.
 
 1. Terminology, definitions, normative force, Process boundaries, Outcomes, Activities, Tasks, Inputs, Outputs, Controls, Constraints, Enablers, references, Conformance subjects, Tailoring, and execution semantics must be compared where applicable.
-2. Repeated normative meaning across the Process Framework, ALPS Specification, ALPS Reference Model, reference Processes, record bindings, and locale counterparts must be traced to its authoritative source.
+2. Repeated normative meaning across the Process Framework, ALPS Specification, ALPS Reference Model, reference Processes, record aids, and locale counterparts must be traced to its authoritative source.
 3. A divergence between those layers must be reported even when each individual representation is internally coherent.
 4. Each changed, compressed, relocated, or deleted proposition must be compared across subject, modality, action or state, object, condition, quantifier, polarity, exception, and application scope.
 5. Reference Model Names, Purposes, and Outcomes must be compared semantically with the authoritative reference Process descriptions instead of treating string equality as meaning equivalence.
-6. Record bindings must be verified to preserve the specification boundary, and binding fields must not silently be treated as ALPS requirements.
+6. Record aids must be reviewed to preserve the specification boundary, and their headings or fields must not silently be treated as ALPS requirements.
 7. Changed relative links, canonical references, paths, and repository layout assumptions must be checked.
 8. The result of `sync-locales` must be integrated whenever an English or Japanese normative or guidance asset is affected.
 9. Repository-only assets must be checked for unintended registration, discovery, or leakage into the distributed Plugin.
@@ -62,7 +62,7 @@ This Activity makes the review judgment and its limitations usable by the change
 
 - The task-owned change diff and the files it changes.
 - The applicable Process Framework, ALPS Specification, ALPS Reference Model, and reference Process representations, including their prior authoritative revisions where meaning preservation is claimed.
-- Affected record templates, record bindings, canonical references, and repository-integrity rules.
+- Affected record aids, canonical references, and repository-integrity rules.
 - The locale policy and the applicable English/Japanese assets.
 - Repository guidance, Plugin metadata, distributed symlink layout, and relevant change history.
 
@@ -106,13 +106,9 @@ This Activity makes the review judgment and its limitations usable by the change
 ## Enablers
 
 - Process Framework and ALPS Specification expertise.
-- ALPS Reference Model, reference Processes, record bindings, locale assets, and repository change history.
+- ALPS Reference Model, reference Processes, record aids, locale assets, and repository change history.
 - Independent review capability and the repository-development `sync-locales` Skill.
 - Official Agent Skill and Plugin validation, repository-integrity evidence, and version-control history.
-
-## Conformance
-
-This Skill represents the ALPS Review Process and claims Description Conformance against the applicable Process Framework and ALPS Description requirements. Full Process Conformance may be assessed against Outcomes, Tasks, or both; the selected basis and evidence must be stated. A review result does not by itself establish Conformance of any reviewed source asset.
 
 ## Interfaces & Traceability
 

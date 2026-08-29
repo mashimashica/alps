@@ -8,7 +8,7 @@
   <img src="assets/icon.svg" alt="ALPS icon" width="160">
 </p>
 
-ALPS turns recurring agent work into reusable, assessable Process Skills. Instead of leaving a workflow as a one-off prompt or an undocumented convention, ALPS makes its Purpose, success conditions, boundary, Inputs, Outputs, and applicable conditions explicit.
+ALPS turns recurring agent work into reusable, assessable Process Skills. Instead of leaving a workflow as a one-off prompt or an undocumented convention, ALPS starts with its Purpose and Outcomes and adds boundary, work detail, and evidence only when the need or risk justifies them.
 
 ALPS is for teams and Agent builders who need work to be repeated, shared, composed, reviewed, or improved without tying it to one Agent, tool, or fixed execution sequence.
 
@@ -16,7 +16,7 @@ ALPS is for teams and Agent builders who need work to be repeated, shared, compo
 
 | Without ALPS | With ALPS |
 | --- | --- |
-| A recurring prompt works, but its intent and definition of done live in people's heads. | Purpose, Outcomes, boundary, and Entry/Exit Criteria establish a reusable definition of the work. |
+| A recurring prompt works, but its intent and definition of done live in people's heads. | Purpose and Outcomes establish the reusable minimum; boundary and criteria are added when needed. |
 | Several Skills cooperate through hidden context or copied instructions. | Provider Outputs are mapped to recipient Inputs so handoffs can be traced and checked. |
 | A review says a Skill looks correct, but its claims and evidence are unclear. | References, assumptions, limitations, verification results, and Outcome evidence make the basis for a decision visible. |
 | A local edit quietly changes the reusable source. | Tailoring is kept distinct from controlled redefinition, reverification, and retirement. |
@@ -39,23 +39,18 @@ Restart affected clients after installation so they reload the Agent Skills.
 
 ### 2. Choose what you need
 
-| Agent Skill | Representation | Use it when |
-| --- | --- | --- |
-| [`alps-reference-model`](skills/alps-reference-model/SKILL.md) | Process Reference Model | The ALPS reference Processes and their relationships guide selection, assessment, or improvement. |
-| [`define-alps`](skills/define-alps/SKILL.md) | Process | An ALPS representation must be created, redefined, or verified. |
-| [`apply-alps`](skills/apply-alps/SKILL.md) | Process | Existing representations guide Process selection, Invocation, composition, or handoffs. |
-| [`manage-alps`](skills/manage-alps/SKILL.md) | Process | Representations must be adopted, tailored, assessed, changed, improved, or retired. |
-
-In most cases, start with `alps-reference-model` and use it to select the applicable reference Processes.
-
-A Process Model or Process View supplied by another plugin can guide selection in the same way. `apply-alps` resolves the Processes referenced by the selected Model or View.
+| Intent | Use |
+| --- | --- |
+| Create, redefine, or verify an ALPS representation | [`define-alps`](skills/define-alps/SKILL.md) |
+| Use a representation, select a Process, invoke it, or compose Processes | [`apply-alps`](skills/apply-alps/SKILL.md) |
+| Adopt, tailor, assess, change, improve, or retire a representation | [`manage-alps`](skills/manage-alps/SKILL.md) |
 
 ### 3. Ask the Agent
 
 After installation, ask in plain language. Name a packaged Skill when your Host requires explicit activation.
 
 ```text
-Turn this recurring release checklist into a reusable Process Skill. Make its Purpose, Outcomes, boundary, Inputs, Outputs, and verification evidence explicit.
+Turn this recurring release checklist into a reusable Process Skill. Start with its Purpose and Outcomes, then add boundary, Inputs, Outputs, and verification evidence only where needed.
 
 Review this Skill Package for unclear boundaries, unresolved references, and unsupported Conformance claims. Record defects, assumptions, and limitations.
 
@@ -89,7 +84,7 @@ A useful Process Description lets a reader answer the following questions.
 | Who performs it? | A general Process leaves this open. |
 | How is it implemented? | A general Process Description does not prescribe this. |
 
-The [Process Framework](spec/process-framework.md) defines these concepts and their semantics. `Name`, `Purpose`, and `Outcomes` are required in a Process Description. Activities and Tasks describe work content rather than implementation steps. Inputs are transformed into Outputs. People, Agents, tools, and execution environments are resources or Enablers rather than Inputs.
+The [Process Framework](spec/process-framework.md) defines these concepts and their semantics. `Name`, `Purpose`, and `Outcomes` are required in a Process Description; the other elements are added only when the description needs them. Activities and Tasks describe work content rather than implementation steps. Inputs are transformed into Outputs. People, Agents, tools, and execution environments are resources or Enablers rather than Inputs.
 
 ### Representation kinds
 
@@ -115,7 +110,7 @@ Supported explicit kinds are `process-model`, `process-reference-model`, and `pr
 
 ### ALPS Reference Model
 
-ALPS defines its own lifecycle through three reference Processes. They are not fixed phases and may be applied concurrently, iteratively, or recursively.
+The [`alps-reference-model`](skills/alps-reference-model/SKILL.md) Skill is a supporting map for understanding and selecting the three operational Processes. It is not a fourth operation and is not invoked as a Process. The three Processes are not fixed phases and may be applied concurrently, iteratively, or recursively.
 
 <p align="center">
   <img src="assets/alps-reference-model.svg" alt="ALPS Reference Model: the ALPS Definition Process sends a verified representation to the ALPS Management Process; the ALPS Management Process sends managed representations and conditions to the ALPS Application Process; the ALPS Application Process sends selection and execution evidence to the ALPS Management Process; the ALPS Management Process sends a redefinition or reverification request to the ALPS Definition Process; and the ALPS Application Process sends an unmet representation need to the ALPS Definition Process." width="100%">

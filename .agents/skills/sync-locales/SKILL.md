@@ -1,6 +1,6 @@
 ---
 name: sync-locales
-description: Check and synchronize semantic equivalence between authoritative English ALPS assets and supported Japanese counterparts when paired specifications, reference Processes, guidance, templates, bindings, or related assets change, and report omissions or unverified pairs. Repository-development Skill; not part of the distributed ALPS Plugin. ALPS-conformant.
+description: Check and synchronize semantic equivalence between authoritative English ALPS assets and supported Japanese counterparts when paired specifications, reference Processes, guidance, templates, record aids, or related assets change, and report omissions or unverified pairs. Repository-development Skill; not part of the distributed ALPS Plugin.
 ---
 
 # Locale Synchronization
@@ -28,7 +28,7 @@ The headings, Activities, Tasks, and numbers below organize the synchronization 
 This Activity establishes which assets are authoritative, supported, and in scope.
 
 1. `localization.yaml` must be used to identify the source locale and supported locales.
-2. The corresponding English and Japanese assets for each changed specification, reference Process, guidance, template, binding, or related paired asset must be identified.
+2. The corresponding English and Japanese assets for each changed specification, reference Process, guidance, template, record aid, or related paired asset must be identified.
 3. `spec/*.md` and `spec/locales/ja/*.md` pairs must be considered when specification assets change.
 4. `skills/*/SKILL.md` and existing `skills/*/references/locales/ja/SKILL.md` pairs must be considered when distributed Skill assets change.
 5. Paired repository guidance such as `README.md` / `docs/locales/ja/README.md` and `AGENTS.md` / `docs/locales/ja/AGENTS.md` must be considered when those assets change.
@@ -62,7 +62,7 @@ This Activity aligns the supported locale when requested and makes comparison li
 
 - `localization.yaml` and other applicable locale policy.
 - Changed English or Japanese assets and the task-owned diff.
-- Corresponding specifications, reference Processes, guidance, templates, bindings, and existing localized counterparts.
+- Corresponding specifications, reference Processes, guidance, templates, record aids, and existing localized counterparts.
 - Canonical identifiers, paths, metadata, code, and references used by the paired assets.
 - Repository layout and distribution metadata relevant to the pair scope.
 
@@ -105,12 +105,8 @@ This Activity aligns the supported locale when requested and makes comparison li
 
 - Bilingual ALPS and Process Framework expertise.
 - Locale-aware comparison, search, and change-review capabilities.
-- Existing English/Japanese reference, template, binding, and guidance assets.
+- Existing English/Japanese reference, template, record-aid, and guidance assets.
 - Repository-integrity evidence for counterpart existence, canonical paths, and relative-link validity.
-
-## Conformance
-
-This Skill represents the Locale Synchronization Process and claims Description Conformance against the applicable Process Framework and ALPS Description requirements. Full Process Conformance may be assessed against Outcomes, Tasks, or both; the selected basis and evidence must be stated. Synchronizing a pair does not by itself establish Conformance of the represented ALPS asset.
 
 ## Interfaces & Traceability
 

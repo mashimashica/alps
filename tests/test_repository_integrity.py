@@ -37,7 +37,6 @@ REQUIRED_PATHS = (
     ROOT / "spec/locales/ja/process-framework.md",
     ROOT / "spec/ALPS-SPEC.md",
     ROOT / "spec/locales/ja/ALPS-SPEC.md",
-    ROOT / "skills/apply-alps/scripts/process_instance_record.py",
     ROOT / "skills/apply-alps/references/process-instance-record.md",
     ROOT / "skills/apply-alps/references/locales/ja/process-instance-record.md",
 )
