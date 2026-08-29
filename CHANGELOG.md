@@ -6,17 +6,23 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ### Added
 
-- Added the optional `alps-markdown/v2` Environment Binding and checker contract. Version 2 preserves the v1 lexical Skill-reference forms while binding each package ID to one exact version and root, and it carries `(package ID, exact version, Skill name)` as the resolved logical identity. The ratified v1 profile remains frozen at `spec/alps-markdown.md`, with its implemented checker and golden fixtures preserved by the 0.4.0 release.
+- Added pull-request and main-branch validation for the official Agent Skills form, the declared Agent Plugins schema, repository integrity, Process Instance Record behavior, relative Markdown links, and whitespace errors.
 
 ### Changed
 
 - Normalized the Process Framework and ALPS Specification so PF remains the sole source for general Process semantics, the ALPS Reference Model owns the reference relationship structure, and each reference Process Skill owns its complete Process Description.
 - Defined versioned logical Skill resolution through Logical Package Scope and Package Binding, including package ID, exact version, and Skill name as the complete logical identity, an `alps` same-version Release Package, and distinct resolution scopes for package-qualified and same-scope short references.
-- Declared same-scope resolution context explicitly instead of inferring it from repository paths; bounded exact-version syntax; made locale comparison require complete logical identities; and made required Japanese-locale validation cover the selected root asset and its transitive dependency closure.
+- Declared same-scope resolution context explicitly instead of inferring it from repository paths and retained package ID, exact version, and Skill name as the complete logical identity at the normative ALPS layer.
 - Renamed the three Reference Process display Names to the noun phrases ALPS Definition Process, ALPS Application Process, and ALPS Management Process while retaining the stable `define-alps`, `apply-alps`, and `manage-alps` Skill identifiers.
 - Integrated the Process Skill example, file-based Skill Package example, Agent ecosystem context, and PF/ALPS responsibility allocation into the paired ALPS Specification documents as informative subclauses, while placing related Process standards with the paired Process Framework documents.
 - Removed the former paired Appendix D guidance on Human Oversight, Accountability, and Evidence without relocation.
 - Clarified general Process semantics derived from the standards crosswalk, including Instance-specific responsibility, maturity and information-item meaning, Incremental application, structural levels, Name Tailoring, conditions of application, governance accountability, and measurement chains. Standard-specific organization, profile, and tailoring rules remain outside PF.
+
+### Removed
+
+- Removed the optional ALPS Markdown Profile v1 from the current specification and withdrew v2 without ratification or a compatibility layer.
+- Removed the bundled profile checker, typed intermediate representation, parser, resolver, locale comparator, fixtures, and checker-specific tests.
+- Replaced the profile-checking responsibility with separate official Agent Skills and Plugin validation, repository-integrity checks, and proposition-level cross-layer semantic review.
 
 ### Fixed
 

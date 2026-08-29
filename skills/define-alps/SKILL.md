@@ -153,15 +153,15 @@ This Skill represents the ALPS Definition Process. Its Skill Description may be 
 ## Bundled Resources
 
 - This root `SKILL.md` is the authoritative English Process Description. For Japanese-language work, use the [Japanese localization](references/locales/ja/SKILL.md); if the localization conflicts with this file, this English description governs.
-- [SKILL-template.md](references/SKILL-template.md) is an informative Process Description output-creation resource whose concrete form is compatible with `alps-markdown/v2`.
+- [SKILL-template.md](references/SKILL-template.md) is an informative Process Description output-creation resource; its concrete headings and order do not define ALPS requirements.
 - [record-templates.md](references/record-templates.md) is an informative output-creation resource for definition and verification records.
 - [skill-package-format.md](references/skill-package-format.md) is reference information for identifying logical Package resource roles.
-- These resources must not override ALPS or the Process Framework. Mechanical profile validation is supplied by the applicable Environment Binding or review Process, not by the ALPS Definition Process itself.
+- These resources must not override ALPS or the Process Framework. Official form validation and repository review remain separate from the ALPS Definition Process itself.
 
 ## Common Approach
 
 - Start from the need and select the Process Framework construct before choosing a file layout.
 - For a Process, work backward from Outcomes into Activities and Tasks and then trace back to the Outcomes.
-- For a Process Reference Model, compare each Process semantic center against its authoritative Process Description mechanically where possible.
+- For a Process Reference Model, compare each Process semantic center semantically against its authoritative Process Description.
 - For a Process View, review source provenance and Traceability for referenced source elements, application guidance, and the separation between View-local descriptions and changes to source Processes.
 - Use representative trials for Process Outcome achievability and structural/semantic review for non-Process representations.

@@ -1,0 +1,101 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12.11"
+
+      - name: Install fixed validation dependencies
+        run: |
+          python -m pip install --disable-pip-version-check \
+            "jsonschema==4.25.1" \
+            "skills-ref @ git+https://github.com/agentskills/agentskills.git@f130f348f502d9804278a617f86929846896d2e9#subdirectory=skills-ref"
+
+      - name: Validate distributed Agent Skills
+        run: |
+          skills-ref validate skills/alps-reference-model
+          skills-ref validate skills/define-alps
+          skills-ref validate skills/apply-alps
+          skills-ref validate skills/manage-alps
+
+      - name: Validate declared Plugin manifest schemas
+        run: |
+          python - <<'PY'
+          import json
+          import urllib.request
+          from pathlib import Path
+
+          from jsonschema import FormatChecker, validators
+
+          manifests = (Path("plugin.json"), Path(".claude-plugin/plugin.json"))
+          root_schema = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
+          failed = False
+          for manifest_path in manifests:
+              manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+              schema_url = manifest.get("$schema")
+              if manifest_path == Path("plugin.json") and schema_url != root_schema:
+                  raise SystemExit(f"plugin.json must declare {root_schema}")
+              if not isinstance(schema_url, str):
+                  raise SystemExit(f"{manifest_path} must declare its published schema")
+              with urllib.request.urlopen(schema_url, timeout=30) as response:
+                  schema = json.load(response)
+              validator_class = validators.validator_for(schema)
+              validator_class.check_schema(schema)
+              errors = sorted(
+                  validator_class(
+                      schema, format_checker=FormatChecker()
+                  ).iter_errors(manifest),
+                  key=lambda error: tuple(
+                      str(part) for part in error.absolute_path
+                  ),
+              )
+              for error in errors:
+                  location = (
+                      ".".join(str(part) for part in error.absolute_path)
+                      or "<root>"
+                  )
+                  print(f"{manifest_path}:{location}: {error.message}")
+                  failed = True
+          if failed:
+              raise SystemExit(1)
+          PY
+
+      - name: Run repository and Process Instance Record tests
+        run: python3 -m unittest discover -s tests -p 'test_*.py'
+
+      - name: Check relative Markdown links
+        run: |
+          find . -type f -name '*.md' -not -path './.git/*' -print0 \
+            | xargs -0 npx --yes markdown-link-check@3.13.7 \
+                --quiet --config .github/markdown-link-check.json
+
+      - name: Check changed-line whitespace
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          if [[ "$BASE_SHA" =~ ^0+$ ]]; then
+            git diff --check "$HEAD_SHA^..$HEAD_SHA"
+          elif [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            git diff --check "$BASE_SHA...$HEAD_SHA"
+          else
+            git diff --check "$BASE_SHA..$HEAD_SHA"
+          fi

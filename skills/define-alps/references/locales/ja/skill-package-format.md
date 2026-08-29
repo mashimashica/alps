@@ -24,8 +24,6 @@
 | `define-alps`パッケージ | 本`skill-package-format.md` | 参考情報 | 論理的な資源役割を説明するものであり、環境への対応付けではない。 |
 | `define-alps`パッケージ | [`agents/openai.yaml`](../../../agents/openai.yaml) | 環境への対応付け | 対象ホストの発見・提示メタデータへ対応付ける。 |
 | `define-alps`パッケージ | [`assets/alps.svg`](../../../assets/alps.svg) | 提示用資源 | 提示だけを支援する。 |
-| リポジトリレビュー | [`spec/alps-markdown-v2.md`](../../../../../spec/alps-markdown-v2.md) | 環境への対応付け | 任意の物理表現`alps-markdown/v2`を定義するものであり、ALPS自体ではない。 |
-| リポジトリレビュー | [`validate_alps_markdown.py`](../../../../../.agents/skills/review-alps/scripts/validate_alps_markdown.py) | 適用の実行支援要素 | `alps-markdown/v2`を検証してリポジトリ開発用`review-alps`プロセスを支援する。配布用`define-alps`パッケージには属さず、ALPSへの適合を成立させない。 |
 
 ## 環境への対応付けに含める代表項目
 

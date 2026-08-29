@@ -1,6 +1,6 @@
 # Representative Process Template for an ALPS-Conformant `SKILL.md`
 
-This material is an informative example for drafting a readable Process Description. After its placeholders are replaced with plain text, the concrete Markdown and frontmatter form is compatible with the [`alps-markdown/v2`](../../../spec/alps-markdown-v2.md) Environment Binding. That compatibility does not make this physical form, its headings, or its order an ALPS requirement. This template does not require a physical split between the discovery layer and execution layer. Give precedence to the Process Framework, ALPS, and the rules of the applicable execution environment.
+This material is an informative example for drafting a readable Process Description in an Agent Skills `SKILL.md`. Its Markdown form, headings, and order are not ALPS requirements. This template does not require a physical split between the discovery layer and execution layer. Give precedence to the Process Framework, ALPS, the Agent Skills specification, and the rules of the applicable execution environment.
 
 ## Template
 
