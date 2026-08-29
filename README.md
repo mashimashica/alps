@@ -163,6 +163,6 @@ This repository uses ALPS.
 
 ## Version and License
 
-ALPS versions the repository as one release unit. The current version is **0.4.0** and remains in initial development. Git tags and the commits they identify define exact release contents.
+ALPS versions the repository as one release unit. The current version is **0.5.0** and remains in initial development. Git tags and the commits they identify define exact release contents.
 
 Except for identified third-party material, this repository is licensed under the [Apache License 2.0](LICENSE). See also [NOTICE](NOTICE).
