@@ -8,7 +8,7 @@ ALPS uses version numbers in `MAJOR.MINOR.PATCH` form and releases the repositor
 
 ## Release Unit
 
-An ALPS release includes the Process Framework, the ALPS Specification, the reference Process Skills, their bundled resources, localizations, validation scripts, and repository-level documentation and assets.
+An ALPS release includes the Process Framework, the ALPS Specification, the distributed Process Skill and its bundled resources, localizations, validation scripts, and repository-level documentation and assets.
 
 English descriptions are authoritative. Japanese localizations are included in the same release and should remain aligned with their authoritative English sources.
 

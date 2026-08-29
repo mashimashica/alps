@@ -2,80 +2,114 @@
 
 [Japanese translation](docs/locales/ja/AGENTS.md)
 
-These instructions apply to the entire repository. `localization.yaml` defines English as authoritative and Japanese as supported. Keep each changed English/Japanese pair semantically equivalent without changing canonical identifiers, paths, metadata keys, code literals, or normative force.
+These instructions apply to the entire repository. `localization.yaml` defines
+English as authoritative and Japanese as supported. Keep every changed
+English/Japanese pair semantically equivalent without changing canonical
+identifiers, paths, metadata keys, code literals, or normative force.
 
-Read the complete `SKILL.md` for every ALPS representation or repository-development Skill selected for a task before applying it.
+Read the complete `SKILL.md` for every distributed or repository-development
+Skill selected for a task before applying it.
 
 ## Authoritative Sources
 
-Determine authority by subject rather than treating every repository asset as an equal source.
+Determine authority by subject rather than treating every repository asset as
+an equal source.
 
 | Subject | Authoritative source | Boundary |
 | --- | --- | --- |
-| Process constructs and semantics | [`spec/process-framework.md`](spec/process-framework.md) | Higher-order normative source. If it conflicts with the ALPS Specification, the Process Framework takes precedence. |
-| Agent Skill representation, lifecycle, and Conformance | [`spec/ALPS-SPEC.md`](spec/ALPS-SPEC.md) | Governs ALPS without requiring one physical file format. |
-| A distributed ALPS representation | Its root [`skills/*/SKILL.md`](skills/) | Authoritative Process Description or non-Process representation for that Skill. |
-| Repository layout, distribution boundaries, and agent workflow | This `AGENTS.md` | Governs work in this repository. |
-| A drafting example | [`skills/define-alps/references/SKILL-template.md`](skills/define-alps/references/SKILL-template.md) | Informative output-creation resource; it does not define a normative ALPS structure. |
+| General Process constructs and semantics | [`spec/process-framework.md`](spec/process-framework.md) | Higher-order normative source. It takes precedence over the ALPS Specification. |
+| Applying PF to Agent Skills | [`spec/ALPS-SPEC.md`](spec/ALPS-SPEC.md) | Thin profile for Process Skill representation, discovery projection, resources, handoffs, and validation boundaries. |
+| Distributed Process Skill | [`skills/reusable-work-design/SKILL.md`](skills/reusable-work-design/SKILL.md) | Authoritative Process Description for the Reusable Work Design Process. |
+| Repository layout, distribution boundaries, and change workflow | This `AGENTS.md` | Governs work in this repository. |
 
-Do not infer an ALPS requirement from a template, record, Environment Binding, repository test, Host adapter, or presentation resource.
+Do not infer Process semantics or ALPS requirements from a Host adapter,
+manifest, test, presentation asset, or validation result.
 
 ## Repository and Distribution Layout
 
 | Path | Role | Distribution status |
 | --- | --- | --- |
-| `skills/` | Single source of truth for the four Agent Skill representations exposed by the ALPS Plugin. | Distributed. |
-| `.agents/skills/alps-reference-model`, `.agents/skills/define-alps`, `.agents/skills/apply-alps`, `.agents/skills/manage-alps` | Relative symbolic links providing an integrated discovery view for repository-development Agents that inspect `.agents/skills/`. | The linked representations are distributed from `skills/`; do not duplicate them here. |
-| `.agents/skills/review-alps/` | Proposition-level and cross-layer review of ALPS repository changes. | Repository-development only; not registered or exposed as a Plugin Skill. |
-| `.agents/skills/sync-locales/` | English/Japanese semantic-equivalence and update-coverage review. | Repository-development only; not registered or exposed as a Plugin Skill. |
-| `spec/` | Authoritative Process Framework and ALPS Specification. | Repository specification assets. |
+| `skills/reusable-work-design/` | Single source of truth for the one Process Skill exposed by the `alps` Plugin. | Distributed. |
+| `.agents/skills/reusable-work-design` | Relative symbolic link providing a repository-development discovery view. | Points to the distributed source; do not duplicate it. |
+| `.agents/skills/review-alps/` | Cross-layer semantic and distribution review. | Repository-development only; never register it as a Plugin Skill. |
+| `.agents/skills/sync-locales/` | English/Japanese semantic-equivalence and coverage review. | Repository-development only; never register it as a Plugin Skill. |
+| `spec/` | Process Framework and ALPS Specification. | Repository specification assets. |
 | `spec/locales/ja/` and `docs/locales/ja/` | Supported Japanese counterparts. | Localized assets; English remains authoritative. |
-| `.claude-plugin/`, `.cursor-plugin/`, `.codex-plugin/` | Host-specific discovery or presentation metadata. | Adapters; they must not redefine ALPS semantics. |
+| `.claude-plugin/`, `.cursor-plugin/`, `.codex-plugin/` | Supported Host discovery or presentation metadata. | Adapters; they must not redefine ALPS semantics. |
 
-`.agents/skills/` is not assumed to be a universal Host convention. Plugin Hosts discover distributed Skills through `skills/` and their applicable Host adapters.
+`skills/` is the only distributed Skill source of truth. `.agents/skills/` is a
+repository-development view, not a universal Host convention. Agent Plugins
+provide distribution; the applicable Host performs Skill discovery, selection,
+activation, and execution.
 
-Repository-development Skills may remain as ordinary files in a repository checkout or package archive without being registered, exposed, or discovered as distributed Plugin Skills.
-
-Add another repository-development Skill only after a repeated task has emerged that does not fit clearly within `review-alps` or `sync-locales`.
+Repository or organizational policy, not the Reusable Work Design Process,
+governs adoption, versioning, controlled change, retirement, and governance.
 
 ## Change Routing
 
 | Change affects | Required Process or review perspective |
 | --- | --- |
-| Process Framework or ALPS Specification semantics | Use `review-alps`; use `sync-locales` for every affected English/Japanese pair. |
-| ALPS Reference Model, a reference Process, or another ALPS representation | Use `define-alps` to verify the representation and `review-alps` to assess the repository change; use `sync-locales` for paired assets. |
-| README, AGENTS, CONTRIBUTING, or other paired guidance | Use `sync-locales`; check terminology, links, canonical paths, and any affected semantic or distribution boundary with `review-alps`. |
-| Agent Skill form, Plugin manifests, Host adapters, symlinks, or repository layout | Apply the relevant official standard validation and use `review-alps` to assess source-of-truth and distributed/repository-only boundaries. |
+| Process Framework or ALPS Specification semantics | Apply `review-alps`; apply `sync-locales` to every affected English/Japanese pair. |
+| `skills/reusable-work-design/SKILL.md` or its localization | Perform the Process's self-consistency and semantic-fixed-point review, then apply `review-alps` and `sync-locales`. |
+| README, AGENTS, CONTRIBUTING, versioning, or other paired guidance | Apply `sync-locales` and the relevant `review-alps` semantic and distribution checks. |
+| Plugin manifest, Host adapter, OpenAI metadata, symlink, or layout | Apply applicable official form validation, repository-integrity checks, and a `review-alps` distribution-boundary review. |
 
-## Semantic Invariants
+## Semantic and Product Invariants
 
-- An Agent Skill represents a Process by default; a non-Process representation declares `metadata.alps.kind`.
-- A Process View preserves provenance and Traceability for referenced source elements. View-local or modified content does not change a source Process or establish source Process Conformance.
-- Change an applicable source Process through managed Tailoring, or change its authoritative Process Description through controlled redefinition with `define-alps`.
-- `skills/` remains the only source of truth for distributed Agent Skill representations.
-- Repository-development Skills remain real directories under `.agents/skills/` and are not distributed Plugin Skills.
-- Mechanical validation results do not determine ALPS Conformance, Outcome achievability, Outcome achievement, or Process execution Conformance.
+- `alps` is the Plugin and repository brand.
+- `reusable-work-design` is the Agent Skill discovery identifier.
+- `Reusable Work Design Process` is the English Process Name; `再利用可能な作業設計プロセス`
+  is its Japanese counterpart.
+- The distributed Skill represents one Process with one Purpose: establishing
+  recurring or shared agent work as a reusable and assessable Process Skill.
+- Creating, reviewing, and revising the Process Skill representation are inside
+  that Process boundary. Executing the represented Process and governing an
+  adopted Skill are outside it.
+- PF remains authoritative for Name, Purpose, Outcomes, optional Process
+  elements, handoffs, Tailoring, assessment, and other general semantics.
+- Optional detail is included only when needed for discovery, application,
+  composition, or assessment.
+- Mechanical validation does not determine semantic Conformance, Outcome
+  achievement, Process execution Conformance, or self-consistency.
 
 ## Repository Workflow
 
 ### Before editing
 
-- Inspect repository state, the requested scope, and the complete task-owned diff.
-- Identify the authoritative source, affected semantic layers, paired locale assets, canonical references, and distribution boundary before changing content.
+- Inspect repository state, the requested scope, and the complete task-owned
+  diff.
+- Identify authoritative sources, affected semantic layers, locale pairs,
+  relative references, Host projections, and the distribution boundary.
 - Preserve unrelated and user-authored changes.
-- Keep one source of truth for each information item and use relative links from consumers.
+- Keep one authoritative source for each information item and link to it from
+  consumers.
+- Keep historical release documents factual. Repair links broken by removals
+  with immutable tag or commit links rather than rewriting release history.
 
 ### Validation and review
 
-- Apply every Process or repository-development Skill selected through the routing table above.
-- Keep validation in three separate layers:
-  1. validate Agent Skill and Plugin form against the applicable official standards;
-  2. validate repository-controlled file, version, path, link, symlink, and distribution integrity without interpreting Process meaning; and
-  3. review propositions across the Process Framework, ALPS Specification, Reference Model, reference Processes, records, and English/Japanese counterparts.
-- At minimum, check whitespace, changed relative links, canonical references, English/Japanese counterpart coverage, repository distribution boundaries, and the complete task-owned diff.
-- Report standard-validation and repository-integrity results separately from cross-layer semantic review and from any Conformance judgment.
+Keep validation in three separate layers:
+
+1. apply official Agent Skills, Agent Plugins, and supported Host form
+   validation;
+2. validate repository-controlled files, versions, paths, links, symlinks,
+   locale coverage, and distribution boundaries without interpreting Process
+   meaning; and
+3. apply `review-alps`, including the `sync-locales` result, to review Process
+   semantics, discovery projection, Process boundary, English/Japanese meaning,
+   and cross-layer product promises.
+
+At minimum, run Python unit tests, JSON and YAML parsing, relative Markdown-link
+validation, symlink-target validation, `git diff --check`, active-reference
+search, locale counterpart coverage, and complete task-owned diff review.
+
+Report official form validation and repository-integrity results separately
+from semantic review. Do not report any of them as automated proof of ALPS
+Conformance, Outcome achievement, or self-consistency.
 
 ### Delivery
 
-- Inspect the final diff and record checks that were run, checks that failed, and checks that could not be performed.
-- Do not commit, push, publish, open or update a pull request, or make another external change unless the user requests it.
+Inspect the final diff and record checks that passed, checks that failed, checks
+that could not be performed, assumptions, and limitations. Do not commit,
+update a branch, publish, open or update a pull request, or make another
+external change unless the user requests it.

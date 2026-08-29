@@ -1,7 +1,7 @@
 {
   "name": "alps",
   "version": "0.5.0",
-  "description": "Turn recurring agent work into reusable, assessable Process Skills with explicit Outcomes, traceable handoffs, and controlled improvement.",
+  "description": "Design recurring or shared agent work as a reusable, assessable Process Skill with an explicit Purpose, observable Outcomes, and only necessary guidance.",
   "author": {
     "name": "mashimashica"
   },
@@ -12,8 +12,8 @@
     "agent-plugins",
     "agent-skills",
     "process",
-    "lifecycle",
-    "governance",
+    "process-design",
+    "reusable-work",
     "alps"
   ],
   "logo": "assets/icon.svg",

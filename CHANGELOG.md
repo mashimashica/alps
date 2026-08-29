@@ -4,6 +4,44 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+### Changed
+
+- Redesigned ALPS as one distributed `reusable-work-design` Skill representing
+  the `Reusable Work Design Process`, while retaining `alps` as the Plugin and
+  repository brand.
+- Reduced the ALPS Specification to a thin Agent Skill profile. The Process
+  Framework remains authoritative for general Process semantics, and the Host
+  remains responsible for Skill discovery, selection, activation, and execution.
+- Reworked English and Japanese guidance, Host metadata, validation, and
+  repository-development review around one Process, one Purpose, proportionate
+  detail, and separation of self-application from self-certification.
+
+### Removed
+
+- Removed the distributed `alps-reference-model`, `define-alps`, `apply-alps`,
+  and `manage-alps` Skills and their duplicate metadata and icon copies.
+- Removed active typed representation kinds, ALPS-specific logical Skill
+  references, Logical Package Scope, Package Binding, and resolver requirements.
+- Removed the discovery-description Conformance suffix requirement.
+- Removed the Process Instance Record references, generator, checker, and tests.
+- Removed the all-sections Skill template, record templates, management records,
+  and redundant Skill-package-format guidance.
+- Removed the ALPS Reference Model diagrams from the active documentation surface.
+
+### Compatibility
+
+- This is a breaking pre-1.0 redesign intended for the next MINOR release
+  (0.6.0). Release preparation remains separate, so `VERSION` and manifest
+  versions are unchanged in this change.
+- Consumers must replace the four removed Skill identifiers with
+  `reusable-work-design` for Process Skill creation, review, or revision.
+- Ordinary execution and general Skill selection are delegated to the Agent
+  Skills Host. Adoption, versioning, change, retirement, and governance remain
+  repository or organizational responsibilities.
+- Consumers of removed representation metadata, logical references, or Process
+  Instance Record bindings must migrate. No compatibility wrapper, redirect
+  Skill, legacy parser, or replacement resolver is provided.
+
 ## [0.5.0] - 2026-08-29
 
 Release notes: [ALPS 0.5.0](docs/releases/0.5.0.md).

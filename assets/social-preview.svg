@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title description">
-  <title id="title">ALPS — Agent Lifecycle Process Skills</title>
-  <desc id="description">A reusable Process Framework and specification for defining, applying, and managing Agent Skills.</desc>
+  <title id="title">ALPS — Reusable Work Design</title>
+  <desc id="description">A thin profile for designing recurring or shared agent work as a reusable, assessable Process Skill.</desc>
   <rect width="1280" height="640" fill="#ffffff"/>
   <image href="icon.svg" x="425" y="128" width="124" height="124" preserveAspectRatio="xMidYMid meet"/>
   <g fill="#1f2328" font-family="Inter, 'Segoe UI', Arial, sans-serif">
     <text x="579" y="222" font-size="104" font-weight="700" letter-spacing="-3">ALPS</text>
   </g>
   <g text-anchor="middle" font-family="Inter, 'Segoe UI', Arial, sans-serif">
-    <text x="640" y="378" fill="#000000" font-size="48" font-weight="500" letter-spacing="-0.6">Agent Lifecycle Process Skills</text>
-    <text x="640" y="447" fill="#111111" font-size="31" font-weight="400" letter-spacing="-0.15">A reusable Process Framework and specification for defining,</text>
-    <text x="640" y="491" fill="#111111" font-size="31" font-weight="400" letter-spacing="-0.15">applying, and managing Agent Skills.</text>
+    <text x="640" y="378" fill="#000000" font-size="48" font-weight="500" letter-spacing="-0.6">Reusable Work Design</text>
+    <text x="640" y="447" fill="#111111" font-size="31" font-weight="400" letter-spacing="-0.15">Design recurring or shared agent work as one reusable,</text>
+    <text x="640" y="491" fill="#111111" font-size="31" font-weight="400" letter-spacing="-0.15">assessable Process Skill.</text>
   </g>
 </svg>

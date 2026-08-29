@@ -1,4 +1,4 @@
-# ALPS — Agent Lifecycle Process Skills
+# ALPS — Reusable Work Design
 
 <p align="right">
   <strong>English</strong> | <a href="docs/locales/ja/README.md">Japanese</a>
@@ -8,161 +8,140 @@
   <img src="assets/icon.svg" alt="ALPS icon" width="160">
 </p>
 
-ALPS turns recurring agent work into reusable, assessable Process Skills. Instead of leaving a workflow as a one-off prompt or an undocumented convention, ALPS makes its Purpose, success conditions, boundary, Inputs, Outputs, and applicable conditions explicit.
+ALPS is a thin profile that applies the [Process Framework](spec/process-framework.md)
+to [Agent Skills](https://agentskills.io/specification). It helps establish
+recurring or shared agent work as a reusable and assessable Process Skill with
+an explicit Purpose, observable Outcomes, and only the guidance needed to apply
+it.
 
-ALPS is for teams and Agent builders who need work to be repeated, shared, composed, reviewed, or improved without tying it to one Agent, tool, or fixed execution sequence.
+The Plugin and repository brand is `alps`. The distributed Skill identifier is
+`reusable-work-design`. The Process Name is `Reusable Work Design Process`
+([`再利用可能な作業設計プロセス`](skills/reusable-work-design/references/locales/ja/SKILL.md)
+in Japanese).
 
-## What ALPS Changes
+## The Problem ALPS Addresses
 
-| Without ALPS | With ALPS |
+| Recurring-work failure | ALPS response |
 | --- | --- |
-| A recurring prompt works, but its intent and definition of done live in people's heads. | Purpose, Outcomes, boundary, and Entry/Exit Criteria establish a reusable definition of the work. |
-| Several Skills cooperate through hidden context or copied instructions. | Provider Outputs are mapped to recipient Inputs so handoffs can be traced and checked. |
-| A review says a Skill looks correct, but its claims and evidence are unclear. | References, assumptions, limitations, verification results, and Outcome evidence make the basis for a decision visible. |
-| A local edit quietly changes the reusable source. | Tailoring is kept distinct from controlled redefinition, reverification, and retirement. |
+| A recurring prompt works, but its intent and definition of done remain in people's heads. | State one Process Purpose and observable Outcomes. |
+| Producing a document is treated as proof that the work succeeded. | Separate Outputs from the successful states expressed as Outcomes. |
+| A Skill boundary combines unrelated reasons for doing work. | Establish one coherent Process boundary and separate independent Purposes. |
+| A general Skill fixes a performer, tool, method, metric, or sequence without need. | Leave implementation choices open unless a genuine Control or Constraint requires them. |
+| Skills exchange information through hidden context. | Make every described provider Output to recipient Input handoff explicit. |
+| Completing a template or passing a form check is treated as proof of quality. | Keep form validation, semantic review, and execution assessment distinct. |
 
-A generic Agent Skill can package instructions and resources. ALPS adds a Process contract around that Skill: why the work exists, what condition counts as success, how it composes with other Processes, and how changes are assessed over time.
+ALPS does not wrap the Host's Skill discovery, selection, activation, or
+execution. It also does not govern adoption, versioning, controlled change, or
+retirement for a repository or organization.
 
-Installing or activating a Skill does not by itself prove quality or Conformance. ALPS provides the structure and evidence points needed to assess those claims.
+## Distributed Skill
 
-## Quick Start
+ALPS distributes one Agent Skill:
 
-### 1. Install the plugin
+| Skill ID | Process Name | Purpose |
+| --- | --- | --- |
+| [`reusable-work-design`](skills/reusable-work-design/SKILL.md) | Reusable Work Design Process | Establish recurring or shared agent work as a reusable and assessable Process Skill. |
 
-ALPS is distributed as an [Agent Plugins](https://agent-plugins.org/) v1 package. With Node.js 18 or later available, install it through the [`plugins` CLI](https://www.npmjs.com/package/plugins):
+Use it for:
+
+- recurring work that needs a stable intent and definition of success;
+- shared work that must be understood by more than one user or Agent;
+- composed work whose Process handoffs need to be explicit; and
+- an existing Process Skill that needs review or revision.
+
+Do not use it merely for:
+
+- a one-off task with no concrete reuse, sharing, composition, review, or
+  assessment need;
+- ordinary execution of an already-defined Skill;
+- general Skill discovery or selection that the Host already provides; or
+- repository or organizational governance of an adopted Skill.
+
+## Start with the Semantic Core
+
+Every Process Description begins with three elements:
+
+| Element | Question answered |
+| --- | --- |
+| **Name** | What central concern identifies this Process? |
+| **Purpose** | Why is this Process performed? |
+| **Outcomes** | What observable result conditions constitute success? |
+
+Add optional detail only when its absence would materially reduce correct
+discovery, application, composition, or assessment. Optional detail can include
+Activities, Tasks, Inputs, Outputs, Entry Criteria, Exit Criteria, Controls,
+Constraints, Enablers, handoffs, and evidence needed for assessment.
+
+The [Reusable Work Design Process](skills/reusable-work-design/SKILL.md) is the
+primary example. ALPS intentionally provides no all-sections template: an empty
+or unnecessary section is not evidence of completeness.
+
+## Key Distinctions
+
+| Distinction | Meaning |
+| --- | --- |
+| **Outcome / Output** | An Outcome is a successful state; an Output is an item, result, or service produced or transferred. |
+| **Input / Enabler** | An Input is transformed; an Agent, person, model, tool, or execution environment enables performance. |
+| **Description order / execution order** | The order of Activities or Tasks in a document does not prescribe execution order. A genuine temporal relationship is a Constraint. |
+| **Brand / Process Name** | `alps` names the project and Plugin; a Process Name states the work's central concern. |
+| **Self-application / self-certification** | A Process Skill can be reviewed using its own design rules, but that review is not independent proof of Conformance. |
+
+## Responsibilities
+
+| Participant | Responsibility |
+| --- | --- |
+| Agent Plugins | Distribute the Plugin and provide a portable discovery surface. |
+| Agent Skills Host | Discover, select, activate, and execute Skills. |
+| Reusable Work Design Process | Create, review, and revise reusable Process Skills. |
+| Each resulting Process Skill | Provide the Process Description needed to perform its represented Process. |
+| Repository or organization | Decide adoption, versioning, controlled change, retirement, and governance. |
+
+## Install and Use
+
+ALPS is distributed as an [Agent Plugins](https://agent-plugins.org/) v1 package.
+With Node.js 18 or later available, install it through the `plugins` CLI:
 
 ```console
 npx plugins add mashimashica/alps
 ```
 
-Restart affected clients after installation so they reload the Agent Skills.
-
-### 2. Choose what you need
-
-| Agent Skill | Representation | Use it when |
-| --- | --- | --- |
-| [`alps-reference-model`](skills/alps-reference-model/SKILL.md) | Process Reference Model | The ALPS reference Processes and their relationships guide selection, assessment, or improvement. |
-| [`define-alps`](skills/define-alps/SKILL.md) | Process | An ALPS representation must be created, redefined, or verified. |
-| [`apply-alps`](skills/apply-alps/SKILL.md) | Process | Existing representations guide Process selection, Invocation, composition, or handoffs. |
-| [`manage-alps`](skills/manage-alps/SKILL.md) | Process | Representations must be adopted, tailored, assessed, changed, improved, or retired. |
-
-In most cases, start with `alps-reference-model` and use it to select the applicable reference Processes.
-
-A Process Model or Process View supplied by another plugin can guide selection in the same way. `apply-alps` resolves the Processes referenced by the selected Model or View.
-
-### 3. Ask the Agent
-
-After installation, ask in plain language. Name a packaged Skill when your Host requires explicit activation.
+Restart affected clients after installation so they reload the Agent Skill.
+Then ask the Agent in plain language, naming the Skill when the Host requires
+explicit activation:
 
 ```text
-Turn this recurring release checklist into a reusable Process Skill. Make its Purpose, Outcomes, boundary, Inputs, Outputs, and verification evidence explicit.
-
-Review this Skill Package for unclear boundaries, unresolved references, and unsupported Conformance claims. Record defects, assumptions, and limitations.
-
-Compose these Process Skills for the release workflow. Map every provider Output to its recipient Input and identify missing or inconsistent handoffs.
-
-Assess this adopted Process Skill using the attached execution records. Separate Outcome evidence, Conformance claims, and controlled improvement proposals.
+Use reusable-work-design to turn this recurring release-review work into a
+reusable Process Skill. Establish one boundary, an explicit Purpose, observable
+Outcomes, and only the detail needed to apply and assess it.
 ```
 
-## How ALPS Works
+## Specification Boundary
 
-### Process knowledge
+The [Process Framework](spec/process-framework.md) is the authoritative source
+for general Process semantics. The [ALPS Specification](spec/ALPS-SPEC.md) is a
+thin Agent Skill application profile. The Agent Skills specification governs
+the physical Skill form.
 
-The starting point is a Process Description:
+Form validation, parsing, loading, activation, template completion, or a textual
+self-claim does not by itself establish semantic Conformance, Outcome
+achievement, or Conformance of Process execution.
 
-- a **Process** is the work being performed;
-- a **Process Description** explains that work; and
-- by default, an **Agent Skill** represents a Process through an authoritative Process Description.
-
-A useful Process Description lets a reader answer the following questions.
-
-| Plain-language question | ALPS term |
-| --- | --- |
-| Why does the work exist? | **Purpose** |
-| What condition counts as success? | **Outcome** |
-| What is produced? | **Output** |
-| What is transformed? | **Input** |
-| What work belongs to the Process? | **Activities and Tasks** |
-| What directs, limits, or supports it? | **Controls, Constraints, and Enablers** |
-| When can the work begin or be considered complete? | **Entry Criteria and Exit Criteria** |
-| Where does the Process apply? | Its **boundary and application context** |
-| Who performs it? | A general Process leaves this open. |
-| How is it implemented? | A general Process Description does not prescribe this. |
-
-The [Process Framework](spec/process-framework.md) defines these concepts and their semantics. `Name`, `Purpose`, and `Outcomes` are required in a Process Description. Activities and Tasks describe work content rather than implementation steps. Inputs are transformed into Outputs. People, Agents, tools, and execution environments are resources or Enablers rather than Inputs.
-
-### Representation kinds
-
-An Agent Skill represents a Process by default. It can also represent another Process Framework construct.
-
-| Representation | Role |
-| --- | --- |
-| Process | Defines independent work through its Purpose and Outcomes. |
-| Process Model | Organizes related Processes and their relationships. |
-| Process Reference Model | Defines Processes by Name, Purpose, and Outcomes and relates them explicitly. |
-| Process View | Organizes Activities and Tasks across Processes around a Concern or Purpose and explains their application. |
-
-Only a Process representation may be selected for direct Process Invocation. Process Models, Process Reference Models, and Process Views provide selection or composition context.
-
-Non-Process representations declare their kind in `SKILL.md` metadata:
-
-```yaml
-metadata:
-  alps.kind: process-view
-```
-
-Supported explicit kinds are `process-model`, `process-reference-model`, and `process-view`. A Process View can reference source Activities and Tasks or describe View-local Activities and Tasks. Referenced source elements retain their provenance and Traceability, and View-local descriptions do not by themselves change a source Process.
-
-### ALPS Reference Model
-
-ALPS defines its own lifecycle through three reference Processes. They are not fixed phases and may be applied concurrently, iteratively, or recursively.
-
-<p align="center">
-  <img src="assets/alps-reference-model.svg" alt="ALPS Reference Model: the ALPS Definition Process sends a verified representation to the ALPS Management Process; the ALPS Management Process sends managed representations and conditions to the ALPS Application Process; the ALPS Application Process sends selection and execution evidence to the ALPS Management Process; the ALPS Management Process sends a redefinition or reverification request to the ALPS Definition Process; and the ALPS Application Process sends an unmet representation need to the ALPS Definition Process." width="100%">
-</p>
-
-The authoritative Process Reference Model is packaged as [`skills/alps-reference-model/SKILL.md`](skills/alps-reference-model/SKILL.md). It contains the Name, Purpose, and Outcomes of the three reference Processes.
-
-## Creating ALPS Representations
-
-Use the following resources according to the question being answered.
-
-| Need | Start with | Role |
-| --- | --- | --- |
-| Understand Process concepts and semantics | [Process Framework](spec/process-framework.md) | Higher-order normative source for Process constructs. |
-| Understand how Agent Skills represent and govern those constructs | [ALPS Specification](spec/ALPS-SPEC.md) | Normative requirements for ALPS representations, lifecycle, and Conformance. |
-| Define, redefine, or verify a representation | [`define-alps`](skills/define-alps/SKILL.md) | Reference Process for establishing an assessable and usable ALPS representation. |
-| Draft a Process Description | [`SKILL-template.md`](skills/define-alps/references/SKILL-template.md) | Informative drafting example; it does not define an ALPS requirement. |
-
-## Using ALPS in a Repository
-
-For a repository that uses ALPS regularly, add a short policy to [AGENTS.md](https://agents.md/). A minimal policy is:
-
-```md
-## ALPS
-
-This repository uses ALPS.
-
-- Activate `alps-reference-model` when the ALPS Reference Model is needed for Process selection or assessment.
-- Treat Agent Skills as Process representations by default. Use `metadata.alps.kind` to distinguish `process-model`, `process-reference-model`, and `process-view` representations.
-- Read the complete `SKILL.md` for every selected representation.
-- Use `define-alps` to define or verify ALPS representations, `apply-alps` to resolve and invoke Processes, and `manage-alps` for adoption, Tailoring, assessment, change, or retirement.
-- For a Process View, preserve provenance and Traceability for referenced source elements and keep View-local descriptions distinct from changes to source Processes.
-- When combining Processes, make every provider Output to recipient Input mapping explicit.
-```
-
-## Find the Right Resource
+## Resources
 
 | Goal | English | Japanese |
 | --- | --- | --- |
-| Understand Process semantics | [Process Framework](spec/process-framework.md) | [Process Framework](spec/locales/ja/process-framework.md) |
-| Read the normative ALPS requirements | [ALPS Specification](spec/ALPS-SPEC.md) | [ALPS Specification](spec/locales/ja/ALPS-SPEC.md) |
-| Draft a Process Description | [`SKILL-template.md`](skills/define-alps/references/SKILL-template.md) | [`SKILL-template.md`](skills/define-alps/references/locales/ja/SKILL-template.md) |
+| Understand general Process semantics | [Process Framework](spec/process-framework.md) | [プロセスフレームワーク](spec/locales/ja/process-framework.md) |
+| Read the Agent Skill profile | [ALPS Specification](spec/ALPS-SPEC.md) | [ALPS仕様](spec/locales/ja/ALPS-SPEC.md) |
+| Design or review a reusable Process Skill | [Reusable Work Design Process](skills/reusable-work-design/SKILL.md) | [再利用可能な作業設計プロセス](skills/reusable-work-design/references/locales/ja/SKILL.md) |
 | Contribute to the repository | [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) | [CONTRIBUTING.md](docs/locales/ja/CONTRIBUTING.md) and [AGENTS.md](docs/locales/ja/AGENTS.md) |
 | Review release history and version policy | [CHANGELOG.md](CHANGELOG.md) and [Versioning](docs/versioning.md) | [CHANGELOG.md](CHANGELOG.md) and [Versioning](docs/locales/ja/versioning.md) |
 
 ## Version and License
 
-ALPS versions the repository as one release unit. The current version is **0.5.0** and remains in initial development. Git tags and the commits they identify define exact release contents.
+ALPS versions the repository as one release unit. The current version is
+**0.5.0** and remains in initial development. Unreleased changes are recorded in
+[CHANGELOG.md](CHANGELOG.md); Git tags and the commits they identify define exact
+release contents.
 
-Except for identified third-party material, this repository is licensed under the [Apache License 2.0](LICENSE). See also [NOTICE](NOTICE).
+Except for identified third-party material, this repository is licensed under
+the [Apache License 2.0](LICENSE). See also [NOTICE](NOTICE).

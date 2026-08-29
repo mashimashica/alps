@@ -1,0 +1,7 @@
+interface:
+  display_name: "Reusable Work Design Process"
+  short_description: "Design a reusable, assessable Process Skill"
+  icon_small: "./assets/alps.svg"
+  icon_large: "./assets/alps.svg"
+  brand_color: "#4DB2FF"
+  default_prompt: "Use $reusable-work-design to turn this recurring or shared work into a reusable Process Skill with an explicit Purpose, observable Outcomes, and only the guidance needed to apply it."
