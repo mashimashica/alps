@@ -10,8 +10,8 @@ description: Use this skill to turn recurring or shared agent work into a reusab
 This Process establishes recurring or shared agent work as a reusable and
 assessable Process Skill.
 
-Creation and revision of the Process Skill representation are within this
-Process boundary. Execution of the represented Process and governance of an
+Creation, review, and revision of the Process Skill representation are within
+this Process boundary. Execution of the represented Process and governance of an
 adopted Skill are outside it.
 
 ## Outcomes
