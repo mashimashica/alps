@@ -6,7 +6,7 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ### Added
 
-- Added pull-request and main-branch validation for the official Agent Skills form, the declared Agent Plugins schema, repository integrity, Process Instance Record behavior, relative Markdown links, and whitespace errors.
+- Added pull-request and main-branch validation for the official Agent Skills form, the root Agent Plugins schema, the official Claude Plugin form, repository integrity, Process Instance Record behavior, relative Markdown links, and whitespace errors.
 
 ### Changed
 

@@ -36,7 +36,7 @@ jobs:
           skills-ref validate skills/apply-alps
           skills-ref validate skills/manage-alps
 
-      - name: Validate declared Plugin manifest schemas
+      - name: Validate root Agent Plugin manifest schema
         run: |
           python - <<'PY'
           import json
@@ -45,38 +45,37 @@ jobs:
 
           from jsonschema import FormatChecker, validators
 
-          manifests = (Path("plugin.json"), Path(".claude-plugin/plugin.json"))
+          manifest_path = Path("plugin.json")
           root_schema = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
-          failed = False
-          for manifest_path in manifests:
-              manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-              schema_url = manifest.get("$schema")
-              if manifest_path == Path("plugin.json") and schema_url != root_schema:
-                  raise SystemExit(f"plugin.json must declare {root_schema}")
-              if not isinstance(schema_url, str):
-                  raise SystemExit(f"{manifest_path} must declare its published schema")
-              with urllib.request.urlopen(schema_url, timeout=30) as response:
-                  schema = json.load(response)
-              validator_class = validators.validator_for(schema)
-              validator_class.check_schema(schema)
-              errors = sorted(
-                  validator_class(
-                      schema, format_checker=FormatChecker()
-                  ).iter_errors(manifest),
-                  key=lambda error: tuple(
-                      str(part) for part in error.absolute_path
-                  ),
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+          if manifest.get("$schema") != root_schema:
+              raise SystemExit(f"plugin.json must declare {root_schema}")
+          with urllib.request.urlopen(root_schema, timeout=30) as response:
+              schema = json.load(response)
+          validator_class = validators.validator_for(schema)
+          validator_class.check_schema(schema)
+          errors = sorted(
+              validator_class(
+                  schema, format_checker=FormatChecker()
+              ).iter_errors(manifest),
+              key=lambda error: tuple(
+                  str(part) for part in error.absolute_path
+              ),
+          )
+          for error in errors:
+              location = (
+                  ".".join(str(part) for part in error.absolute_path)
+                  or "<root>"
               )
-              for error in errors:
-                  location = (
-                      ".".join(str(part) for part in error.absolute_path)
-                      or "<root>"
-                  )
-                  print(f"{manifest_path}:{location}: {error.message}")
-                  failed = True
-          if failed:
+              print(f"{manifest_path}:{location}: {error.message}")
+          if errors:
               raise SystemExit(1)
           PY
+
+      - name: Validate Claude Plugin with Claude Code
+        run: |
+          npx --yes @anthropic-ai/claude-code@2.1.251 \
+            plugin validate . --strict
 
       - name: Run repository and Process Instance Record tests
         run: python3 -m unittest discover -s tests -p 'test_*.py'

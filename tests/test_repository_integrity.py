@@ -6,7 +6,7 @@ import json
 import os
 import re
 import unittest
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,6 +22,9 @@ PLUGIN_MANIFESTS = (
     ROOT / ".claude-plugin/plugin.json",
     ROOT / ".cursor-plugin/plugin.json",
     ROOT / ".codex-plugin/plugin.json",
+)
+CLAUDE_PLUGIN_SCHEMA = (
+    "https://json.schemastore.org/claude-code-plugin-manifest.json"
 )
 REPOSITORY_SKILLS = ("review-alps", "sync-locales")
 REQUIRED_PATHS = (
@@ -52,6 +55,31 @@ def load_json(path: Path) -> dict[str, object]:
     return value
 
 
+def nested_value(
+    mapping: dict[str, object], field_path: tuple[str, ...]
+) -> object:
+    value: object = mapping
+    for field in field_path:
+        if not isinstance(value, dict) or field not in value:
+            raise AssertionError(f"missing manifest field {'.'.join(field_path)}")
+        value = value[field]
+    return value
+
+
+def windows_path_escapes_root(path: PureWindowsPath) -> bool:
+    depth = 0
+    for part in path.parts:
+        if part in ("", "."):
+            continue
+        if part == "..":
+            if depth == 0:
+                return True
+            depth -= 1
+        else:
+            depth += 1
+    return False
+
+
 class RepositoryIntegrityTests(unittest.TestCase):
     def test_manifest_names_and_versions_match_release_files(self) -> None:
         version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
@@ -68,6 +96,118 @@ class RepositoryIntegrityTests(unittest.TestCase):
             root_manifest.get("$schema"),
             "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
         )
+        claude_manifest = load_json(ROOT / ".claude-plugin/plugin.json")
+        self.assertEqual(
+            claude_manifest.get("$schema"), CLAUDE_PLUGIN_SCHEMA
+        )
+
+    def assert_local_target(
+        self,
+        *,
+        owner_root: Path,
+        value: object,
+        target_type: str,
+        label: str,
+    ) -> None:
+        self.assertIsInstance(value, str, f"{label} must be a string")
+        assert isinstance(value, str)
+        self.assertTrue(value, f"{label} must not be empty")
+        self.assertFalse(
+            Path(value).is_absolute(), f"{label} must be relative"
+        )
+        windows_path = PureWindowsPath(value)
+        self.assertFalse(
+            windows_path.is_absolute() or bool(windows_path.drive),
+            f"{label} must not use an absolute Windows path",
+        )
+        self.assertFalse(
+            windows_path_escapes_root(windows_path),
+            f"{label} must not escape the Plugin root on Windows",
+        )
+
+        resolved_root = owner_root.resolve()
+        resolved_target = (owner_root / value).resolve()
+        try:
+            resolved_target.relative_to(resolved_root)
+        except ValueError:
+            self.fail(f"{label} escapes {owner_root.relative_to(ROOT)}")
+
+        if target_type == "directory":
+            self.assertTrue(
+                resolved_target.is_dir(), f"{label} must name a directory"
+            )
+        elif target_type == "file":
+            self.assertTrue(
+                resolved_target.is_file(), f"{label} must name a regular file"
+            )
+        else:
+            self.fail(f"unsupported target type for {label}: {target_type}")
+
+    def test_host_adapter_local_paths_exist_within_plugin_root(self) -> None:
+        path_fields = (
+            (
+                ROOT / ".cursor-plugin/plugin.json",
+                ("logo",),
+                "file",
+            ),
+            (
+                ROOT / ".cursor-plugin/plugin.json",
+                ("skills",),
+                "directory",
+            ),
+            (
+                ROOT / ".codex-plugin/plugin.json",
+                ("skills",),
+                "directory",
+            ),
+            (
+                ROOT / ".codex-plugin/plugin.json",
+                ("interface", "composerIcon"),
+                "file",
+            ),
+            (
+                ROOT / ".codex-plugin/plugin.json",
+                ("interface", "logo"),
+                "file",
+            ),
+            (
+                ROOT / ".codex-plugin/plugin.json",
+                ("interface", "logoDark"),
+                "file",
+            ),
+        )
+        for manifest_path, field_path, target_type in path_fields:
+            label = (
+                f"{manifest_path.relative_to(ROOT)}:"
+                f"{'.'.join(field_path)}"
+            )
+            with self.subTest(path=label):
+                manifest = load_json(manifest_path)
+                self.assert_local_target(
+                    owner_root=ROOT,
+                    value=nested_value(manifest, field_path),
+                    target_type=target_type,
+                    label=label,
+                )
+
+    def test_local_path_guard_rejects_invalid_targets(self) -> None:
+        invalid_targets = (
+            ("/tmp", "directory"),
+            ("../outside.svg", "file"),
+            (r"..\outside.svg", "file"),
+            ("./assets/missing.svg", "file"),
+            ("./assets/icon.svg", "directory"),
+            ("./skills", "file"),
+        )
+        for value, target_type in invalid_targets:
+            with self.subTest(value=value, target_type=target_type):
+                with self.assertRaises(AssertionError):
+                    self.assert_local_target(
+                        owner_root=ROOT,
+                        value=value,
+                        target_type=target_type,
+                        label="negative path test",
+                    )
 
     def test_distributed_skill_roots_and_locale_assets_exist(self) -> None:
         actual_roots = tuple(
@@ -135,7 +275,12 @@ class RepositoryIntegrityTests(unittest.TestCase):
             with self.subTest(skill=skill_name):
                 self.assertEqual(len(icons), 2)
                 for icon in icons:
-                    self.assertTrue((SKILLS_ROOT / skill_name / icon).is_file())
+                    self.assert_local_target(
+                        owner_root=SKILLS_ROOT / skill_name,
+                        value=icon,
+                        target_type="file",
+                        label=f"{metadata_path.relative_to(ROOT)}:{icon}",
+                    )
 
 
 if __name__ == "__main__":
