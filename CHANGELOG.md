@@ -4,6 +4,10 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-08-29
+
+Release notes: [ALPS 0.5.0](docs/releases/0.5.0.md).
+
 ### Added
 
 - Added pull-request and main-branch validation for the official Agent Skills form, the root Agent Plugins schema, the official Claude Plugin form, repository integrity, Process Instance Record behavior, relative Markdown links, and whitespace errors.
@@ -17,6 +21,7 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 - Integrated the Process Skill example, file-based Skill Package example, Agent ecosystem context, and PF/ALPS responsibility allocation into the paired ALPS Specification documents as informative subclauses, while placing related Process standards with the paired Process Framework documents.
 - Removed the former paired Appendix D guidance on Human Oversight, Accountability, and Evidence without relocation.
 - Clarified general Process semantics derived from the standards crosswalk, including Instance-specific responsibility, maturity and information-item meaning, Incremental application, structural levels, Name Tailoring, conditions of application, governance accountability, and measurement chains. Standard-specific organization, profile, and tailoring rules remain outside PF.
+- Reworked the paired README around user Outcomes, a concise installation path, plain-language usage examples, and paired English/Japanese ALPS Reference Model diagrams.
 
 ### Removed
 
@@ -32,6 +37,19 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 - Aligned informative record bindings with the normative sources by requiring Tailoring scope, recording candidate evaluation and Process Name Traceability, using typed representation-assessment subjects, and projecting unconditional handoff mappings.
 - Separated Description Conformance, Process Conformance, Reference Process Conformance, and Execution Conformance by subject, and aligned the reference Process Outcomes, atomic Tasks, and record bindings with those claim boundaries.
 - Aligned the OpenAI-facing name and icon for `alps-reference-model` with the other distributed Skills and replaced generic ALPS plugin listing metadata with concrete capabilities and starter prompts.
+
+### Compatibility
+
+- The package ID `alps`, the distributed Skill identifiers `alps-reference-model`, `define-alps`, `apply-alps`, and `manage-alps`, and their root `skills/` paths remain unchanged from 0.4.0.
+- The current specification no longer includes `alps-markdown/v1`, and the bundled profile checker is not retained. Consumers that require that physical binding must remain pinned to the immutable `v0.4.0` release or migrate to the applicable Agent Skill and Host forms.
+- The unratified `alps-markdown/v2` draft is withdrawn without becoming a released compatibility target. No wrapper, deprecation layer, legacy parser, or replacement ALPS-specific Markdown language is provided.
+- Logical Skill identity remains `(package ID, exact version, Skill name)`, while physical Package Binding remains the responsibility of the applicable Host. This repository does not add a multi-package or multi-version resolver.
+- These normative, Conformance, representation, and machine-consumed validation changes make this a pre-1.0 MINOR release.
+
+### Status
+
+- This release remains in initial development.
+- Compatibility is governed by the pre-1.0 rules in [Versioning](docs/versioning.md).
 
 ## [0.4.0] - 2026-08-25
 

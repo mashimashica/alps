@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "alps",
   "displayName": "ALPS",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Turn recurring agent work into reusable, assessable Process Skills with explicit Outcomes, traceable handoffs, and controlled improvement.",
   "author": {
     "name": "mashimashica",
