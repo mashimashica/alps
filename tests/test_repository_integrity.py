@@ -108,7 +108,7 @@ class RepositoryIntegrityTests(unittest.TestCase):
         value: object,
         target_type: str,
         label: str,
-    ) -> None:
+    ) -> Path:
         self.assertIsInstance(value, str, f"{label} must be a string")
         assert isinstance(value, str)
         self.assertTrue(value, f"{label} must not be empty")
@@ -142,6 +142,7 @@ class RepositoryIntegrityTests(unittest.TestCase):
             )
         else:
             self.fail(f"unsupported target type for {label}: {target_type}")
+        return resolved_target
 
     def test_host_adapter_local_paths_exist_within_plugin_root(self) -> None:
         path_fields = (
@@ -149,46 +150,54 @@ class RepositoryIntegrityTests(unittest.TestCase):
                 ROOT / ".cursor-plugin/plugin.json",
                 ("logo",),
                 "file",
+                None,
             ),
             (
                 ROOT / ".cursor-plugin/plugin.json",
                 ("skills",),
                 "directory",
+                SKILLS_ROOT,
             ),
             (
                 ROOT / ".codex-plugin/plugin.json",
                 ("skills",),
                 "directory",
+                SKILLS_ROOT,
             ),
             (
                 ROOT / ".codex-plugin/plugin.json",
                 ("interface", "composerIcon"),
                 "file",
+                None,
             ),
             (
                 ROOT / ".codex-plugin/plugin.json",
                 ("interface", "logo"),
                 "file",
+                None,
             ),
             (
                 ROOT / ".codex-plugin/plugin.json",
                 ("interface", "logoDark"),
                 "file",
+                None,
             ),
         )
-        for manifest_path, field_path, target_type in path_fields:
+        for manifest_path, field_path, target_type, expected_target in path_fields:
             label = (
                 f"{manifest_path.relative_to(ROOT)}:"
                 f"{'.'.join(field_path)}"
             )
             with self.subTest(path=label):
                 manifest = load_json(manifest_path)
-                self.assert_local_target(
+                resolved_target = self.assert_local_target(
                     owner_root=ROOT,
                     value=nested_value(manifest, field_path),
                     target_type=target_type,
                     label=label,
                 )
+                if expected_target is not None:
+                    self.assertEqual(resolved_target, expected_target.resolve())
 
     def test_local_path_guard_rejects_invalid_targets(self) -> None:
         invalid_targets = (
