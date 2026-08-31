@@ -29,12 +29,8 @@ jobs:
             "jsonschema==4.25.1" \
             "skills-ref @ git+https://github.com/agentskills/agentskills.git@f130f348f502d9804278a617f86929846896d2e9#subdirectory=skills-ref"
 
-      - name: Validate distributed Agent Skills
-        run: |
-          skills-ref validate skills/alps-reference-model
-          skills-ref validate skills/define-alps
-          skills-ref validate skills/apply-alps
-          skills-ref validate skills/manage-alps
+      - name: Validate distributed Agent Skill
+        run: skills-ref validate skills/design-process-description
 
       - name: Validate root Agent Plugin manifest schema
         run: |
@@ -77,7 +73,7 @@ jobs:
           npx --yes @anthropic-ai/claude-code@2.1.251 \
             plugin validate . --strict
 
-      - name: Run repository and Process Instance Record tests
+      - name: Run repository tests
         run: python3 -m unittest discover -s tests -p 'test_*.py'
 
       - name: Check relative Markdown links

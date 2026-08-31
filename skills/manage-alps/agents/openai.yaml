@@ -1,7 +1,0 @@
-interface:
-  display_name: "ALPS Management Process"
-  short_description: "Assess and improve managed ALPS Skills"
-  icon_small: "./assets/alps.svg"
-  icon_large: "./assets/alps.svg"
-  brand_color: "#4DB2FF"
-  default_prompt: "Use $manage-alps to assess this managed Process Skill from execution evidence and plan a controlled improvement."

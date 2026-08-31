@@ -4,54 +4,34 @@
   <strong>English</strong> | <a href="docs/locales/ja/CONTRIBUTING.md">Japanese</a>
 </p>
 
-Thank you for contributing to ALPS. Contributions are accepted under the repository license and the Developer Certificate of Origin 1.1 (DCO).
+Contributions are accepted under the repository license and the [Developer Certificate of Origin 1.1](DCO).
 
-## Before You Contribute
+## Before Contributing
 
-- Read [LICENSE](LICENSE), [NOTICE](NOTICE), and [DCO](DCO).
-- Keep English and Japanese counterparts aligned when a change affects both.
+- Read [LICENSE](LICENSE), [NOTICE](NOTICE), [DCO](DCO), and [AGENTS.md](AGENTS.md).
+- Keep changed English and Japanese counterparts semantically aligned.
 - Do not submit confidential information or material that you are not authorized to publish and license.
-- Open an issue before a change that would alter ALPS semantics, Conformance requirements, or the license boundary.
+- Discuss changes that would alter the single-Skill product boundary, public behavior, or license boundary before implementation.
 
-## Developer Certificate of Origin
+## Certificate and Rights
 
-Every commit in a contribution must contain a `Signed-off-by` trailer from its contributor. The trailer certifies the statements in [DCO](DCO); it is not the same as a cryptographic commit signature.
-
-Create the trailer with:
+Every contributed commit must contain the contributor's `Signed-off-by` trailer. Create it with:
 
 ```console
 git commit --signoff
 ```
 
-The name and email in the trailer must identify the contributor and must match the authorship being certified. If a contribution contains work from another person, preserve that person's authorship and ensure that the DCO chain and applicable license permit the submission.
+The trailer certifies the statements in [DCO](DCO); it is not a cryptographic signature. Preserve other authors' authorship and ensure the DCO chain and applicable license permit submission.
 
-ALPS uses the DCO instead of a Contributor License Agreement. Contributors retain copyright in their contributions and license them under the license that applies to the contributed files.
+Identify the source, author, license, and permission for third-party material. Do not copy text, figures, examples, translations, or assets unless the repository can document and distribute the proposed use. Keep quotations no longer than needed and provide a precise source. Citation alone does not grant permission.
 
-## Third-Party Material
-
-Contributors must identify the source, author, applicable license, and any permission for third-party material.
-
-- Do not copy third-party text, figures, tables, examples, or translations unless the repository can retain documented authorization for the proposed use.
-- A translation or close paraphrase can still depend on the source work. Do not label it an independent expression without checking the source and recording the basis for that classification.
-- Mark quotations as quotations, keep them no longer than needed, and provide a precise source. Citation alone does not grant permission.
-- For images, icons, and other assets, state who created them and confirm that the contribution can be distributed under the applicable repository license.
-- Referencing a standard, book, product, organization, or trademark does not place the referenced material under the ALPS license.
-
-Maintainers may request license evidence, written permission, or replacement of submitted material before accepting it.
-
-## Preparing a Change
+## Prepare and Validate a Change
 
 1. Work on a topic branch and keep unrelated changes separate.
-2. Update the paired English or Japanese asset when required.
-3. Preserve one authoritative source for each information item and use relative links from other documents.
-4. Run the validation supplied by the affected Skill Package.
-5. Run `git diff --check`, verify changed relative links, and inspect the final diff.
+2. Update affected English and Japanese counterparts.
+3. Keep one authoritative source for each information item and use relative links from other files.
+4. Run the official validation for `skills/design-process-description`, manifest and Host checks, repository tests, relative-link checks, and `git diff --check` as applicable.
+5. Inspect the complete final diff.
 6. Commit with `--signoff`.
 
-## Pull Request Checklist
-
-- [ ] Every commit contains the required `Signed-off-by` trailer.
-- [ ] I have the right to submit every part of the contribution under the applicable repository license.
-- [ ] Third-party sources, permissions, quotations, and asset authorship are documented.
-- [ ] English and Japanese counterparts have been assessed and updated where needed.
-- [ ] Relevant checks pass, or the pull request explains why a check was not run.
+When proposing a change, report checks that passed and any check that could not be run.

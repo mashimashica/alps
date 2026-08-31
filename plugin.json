@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "alps",
-  "version": "0.5.0",
-  "description": "Turn recurring agent work into reusable, assessable Process Skills with explicit Outcomes, traceable handoffs, and controlled improvement.",
+  "version": "0.6.0",
+  "description": "Design or simplify the Process Description that turns recurring agent work into a reusable Process Skill.",
   "author": {
     "name": "mashimashica",
     "url": "https://github.com/mashimashica"
@@ -14,8 +14,7 @@
     "agent-plugins",
     "agent-skills",
     "process",
-    "lifecycle",
-    "governance",
+    "design",
     "alps"
   ]
 }

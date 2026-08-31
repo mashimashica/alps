@@ -1,4 +1,4 @@
-"""Repository-only integrity checks that do not interpret ALPS meaning."""
+"""Repository integrity checks for the minimal ALPS distribution."""
 
 from __future__ import annotations
 
@@ -11,11 +11,12 @@ from pathlib import Path, PureWindowsPath
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILLS_ROOT = ROOT / "skills"
-DISTRIBUTED_SKILLS = (
-    "alps-reference-model",
-    "apply-alps",
-    "define-alps",
-    "manage-alps",
+SKILL_NAME = "design-process-description"
+SKILL_ROOT = SKILLS_ROOT / SKILL_NAME
+REFERENCES = (
+    "purpose-and-outcomes.md",
+    "boundary-and-detail.md",
+    "inputs-outputs-and-conditions.md",
 )
 PLUGIN_MANIFESTS = (
     ROOT / "plugin.json",
@@ -26,24 +27,33 @@ PLUGIN_MANIFESTS = (
 CLAUDE_PLUGIN_SCHEMA = (
     "https://json.schemastore.org/claude-code-plugin-manifest.json"
 )
-REPOSITORY_SKILLS = ("review-alps", "sync-locales")
-REQUIRED_PATHS = (
-    ROOT / "AGENTS.md",
-    ROOT / "docs/locales/ja/AGENTS.md",
-    ROOT / "README.md",
-    ROOT / "docs/locales/ja/README.md",
-    ROOT / "localization.yaml",
-    ROOT / "spec/process-framework.md",
-    ROOT / "spec/locales/ja/process-framework.md",
-    ROOT / "spec/ALPS-SPEC.md",
-    ROOT / "spec/locales/ja/ALPS-SPEC.md",
-    ROOT / "skills/apply-alps/scripts/process_instance_record.py",
-    ROOT / "skills/apply-alps/references/process-instance-record.md",
-    ROOT / "skills/apply-alps/references/locales/ja/process-instance-record.md",
-)
 ICON_PATTERN = re.compile(
     r'^\s*icon_(?:small|large):\s*["\']?([^"\'\s]+)["\']?\s*$',
     re.MULTILINE,
+)
+LEGACY_SKILL_IDS = (
+    "alps-reference" + "-model",
+    "define-" + "alps",
+    "apply-" + "alps",
+    "manage-" + "alps",
+    "review-" + "alps",
+    "sync-" + "locales",
+)
+FORBIDDEN_ACTIVE_TEXT = LEGACY_SKILL_IDS + (
+    "metadata." + "alps.kind",
+    "ALPS-" + "conformant.",
+    "ALPS" + "準拠。",
+    "skill:" + "#",
+    "Logical Package " + "Scope",
+    "Package " + "Binding",
+    "Process Instance " + "Record",
+    "Process Reference " + "Model representation",
+    "Process View " + "representation",
+    "ALPS Reference " + "Model",
+    "Description " + "Conformance",
+    "Reference Process " + "Conformance",
+    "Execution " + "Conformance",
+    "formal " + "Tailoring",
 )
 
 
@@ -81,26 +91,6 @@ def windows_path_escapes_root(path: PureWindowsPath) -> bool:
 
 
 class RepositoryIntegrityTests(unittest.TestCase):
-    def test_manifest_names_and_versions_match_release_files(self) -> None:
-        version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
-        self.assertTrue(version)
-
-        for manifest_path in PLUGIN_MANIFESTS:
-            with self.subTest(manifest=manifest_path.relative_to(ROOT)):
-                manifest = load_json(manifest_path)
-                self.assertEqual(manifest.get("name"), "alps")
-                self.assertEqual(manifest.get("version"), version)
-
-        root_manifest = load_json(ROOT / "plugin.json")
-        self.assertEqual(
-            root_manifest.get("$schema"),
-            "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-        )
-        claude_manifest = load_json(ROOT / ".claude-plugin/plugin.json")
-        self.assertEqual(
-            claude_manifest.get("$schema"), CLAUDE_PLUGIN_SCHEMA
-        )
-
     def assert_local_target(
         self,
         *,
@@ -112,9 +102,7 @@ class RepositoryIntegrityTests(unittest.TestCase):
         self.assertIsInstance(value, str, f"{label} must be a string")
         assert isinstance(value, str)
         self.assertTrue(value, f"{label} must not be empty")
-        self.assertFalse(
-            Path(value).is_absolute(), f"{label} must be relative"
-        )
+        self.assertFalse(Path(value).is_absolute(), f"{label} must be relative")
         windows_path = PureWindowsPath(value)
         self.assertFalse(
             windows_path.is_absolute() or bool(windows_path.drive),
@@ -133,163 +121,195 @@ class RepositoryIntegrityTests(unittest.TestCase):
             self.fail(f"{label} escapes {owner_root.relative_to(ROOT)}")
 
         if target_type == "directory":
-            self.assertTrue(
-                resolved_target.is_dir(), f"{label} must name a directory"
-            )
+            self.assertTrue(resolved_target.is_dir(), f"{label} must be a directory")
         elif target_type == "file":
-            self.assertTrue(
-                resolved_target.is_file(), f"{label} must name a regular file"
-            )
+            self.assertTrue(resolved_target.is_file(), f"{label} must be a file")
         else:
-            self.fail(f"unsupported target type for {label}: {target_type}")
+            self.fail(f"unsupported target type: {target_type}")
         return resolved_target
 
-    def test_host_adapter_local_paths_exist_within_plugin_root(self) -> None:
-        path_fields = (
-            (
-                ROOT / ".cursor-plugin/plugin.json",
-                ("logo",),
-                "file",
-                None,
-            ),
-            (
-                ROOT / ".cursor-plugin/plugin.json",
-                ("skills",),
-                "directory",
-                SKILLS_ROOT,
-            ),
-            (
-                ROOT / ".codex-plugin/plugin.json",
-                ("skills",),
-                "directory",
-                SKILLS_ROOT,
-            ),
-            (
-                ROOT / ".codex-plugin/plugin.json",
-                ("interface", "composerIcon"),
-                "file",
-                None,
-            ),
-            (
-                ROOT / ".codex-plugin/plugin.json",
-                ("interface", "logo"),
-                "file",
-                None,
-            ),
-            (
-                ROOT / ".codex-plugin/plugin.json",
-                ("interface", "logoDark"),
-                "file",
-                None,
-            ),
-        )
-        for manifest_path, field_path, target_type, expected_target in path_fields:
-            label = (
-                f"{manifest_path.relative_to(ROOT)}:"
-                f"{'.'.join(field_path)}"
-            )
-            with self.subTest(path=label):
-                manifest = load_json(manifest_path)
-                resolved_target = self.assert_local_target(
-                    owner_root=ROOT,
-                    value=nested_value(manifest, field_path),
-                    target_type=target_type,
-                    label=label,
-                )
-                if expected_target is not None:
-                    self.assertEqual(resolved_target, expected_target.resolve())
-
-    def test_local_path_guard_rejects_invalid_targets(self) -> None:
-        invalid_targets = (
-            ("/tmp", "directory"),
-            ("../outside.svg", "file"),
-            (r"..\outside.svg", "file"),
-            ("./assets/missing.svg", "file"),
-            ("./assets/icon.svg", "directory"),
-            ("./skills", "file"),
-        )
-        for value, target_type in invalid_targets:
-            with self.subTest(value=value, target_type=target_type):
-                with self.assertRaises(AssertionError):
-                    self.assert_local_target(
-                        owner_root=ROOT,
-                        value=value,
-                        target_type=target_type,
-                        label="negative path test",
-                    )
-
-    def test_distributed_skill_roots_and_locale_assets_exist(self) -> None:
-        actual_roots = tuple(
+    def test_single_distributed_skill_and_minimal_tree(self) -> None:
+        actual = tuple(
             sorted(path.name for path in SKILLS_ROOT.iterdir() if path.is_dir())
         )
-        self.assertEqual(actual_roots, DISTRIBUTED_SKILLS)
-
-        expected_manifest = "locale: ja\nsource_locale: en\nstatus: reviewed\n"
-        for skill_name in DISTRIBUTED_SKILLS:
-            with self.subTest(skill=skill_name):
-                skill_root = SKILLS_ROOT / skill_name
-                self.assertTrue((skill_root / "SKILL.md").is_file())
-                locale_root = skill_root / "references/locales/ja"
-                self.assertTrue((locale_root / "SKILL.md").is_file())
-                manifest_path = locale_root / "manifest.yaml"
-                self.assertTrue(manifest_path.is_file())
-                self.assertEqual(
-                    manifest_path.read_text(encoding="utf-8"), expected_manifest
-                )
-
-    def test_repository_skill_links_and_distribution_boundary(self) -> None:
-        development_root = ROOT / ".agents/skills"
-        for skill_name in DISTRIBUTED_SKILLS:
-            with self.subTest(skill=skill_name):
-                link = development_root / skill_name
-                self.assertTrue(link.is_symlink())
-                self.assertEqual(
-                    os.readlink(link), f"../../skills/{skill_name}"
-                )
-                self.assertEqual(link.resolve(), (SKILLS_ROOT / skill_name).resolve())
-
-        for skill_name in REPOSITORY_SKILLS:
-            with self.subTest(repository_skill=skill_name):
-                path = development_root / skill_name
-                self.assertTrue(path.is_dir())
-                self.assertFalse(path.is_symlink())
-                self.assertTrue((path / "SKILL.md").is_file())
-
-        serialized_manifests = "\n".join(
-            json.dumps(load_json(path), sort_keys=True) for path in PLUGIN_MANIFESTS
+        self.assertEqual(actual, (SKILL_NAME,))
+        self.assertEqual(
+            {path.name for path in SKILL_ROOT.iterdir()},
+            {"SKILL.md", "agents", "assets", "references"},
         )
-        for skill_name in REPOSITORY_SKILLS:
-            self.assertNotIn(skill_name, serialized_manifests)
-        self.assertNotIn(".agents/skills", serialized_manifests)
-
-    def test_reference_model_known_same_scope_targets_exist(self) -> None:
-        model = (SKILLS_ROOT / "alps-reference-model/SKILL.md").read_text(
-            encoding="utf-8"
+        self.assertEqual(
+            {path.name for path in (SKILL_ROOT / "agents").iterdir()},
+            {"openai.yaml"},
         )
-        for skill_name in ("define-alps", "apply-alps", "manage-alps"):
-            with self.subTest(skill=skill_name):
-                self.assertIn(f"skill:#{skill_name}", model)
-                self.assertTrue((SKILLS_ROOT / skill_name / "SKILL.md").is_file())
+        self.assertEqual(
+            {path.name for path in (SKILL_ROOT / "assets").iterdir()},
+            {"alps.svg"},
+        )
+        self.assertEqual(
+            {path.name for path in (SKILL_ROOT / "references").iterdir()},
+            {*REFERENCES, "locales"},
+        )
 
-    def test_required_repository_targets_exist(self) -> None:
-        for path in REQUIRED_PATHS:
-            with self.subTest(path=path.relative_to(ROOT)):
-                self.assertTrue(path.is_file())
+    def test_root_skill_frontmatter_purpose_and_outcomes(self) -> None:
+        skill = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+        frontmatter_match = re.match(r"\A---\n(.*?)\n---\n", skill, re.DOTALL)
+        self.assertIsNotNone(frontmatter_match)
+        assert frontmatter_match is not None
+        frontmatter_lines = frontmatter_match.group(1).splitlines()
+        keys = [line.split(":", 1)[0] for line in frontmatter_lines]
+        self.assertEqual(keys, ["name", "description"])
+        name_line = next(
+            line for line in frontmatter_lines if line.startswith("name:")
+        )
+        self.assertEqual(name_line.split(":", 1)[1].strip(), SKILL_NAME)
+        self.assertIn("## Purpose", skill)
+        self.assertIn("## Outcomes", skill)
+
+    def test_three_references_are_linked_with_specific_conditions(self) -> None:
+        skill = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+        conditions = {
+            "purpose-and-outcomes.md": (
+                "Purpose combines multiple independent intents",
+                "success cannot be assessed",
+            ),
+            "boundary-and-detail.md": (
+                "Skill is too case-specific",
+                "raises a split-or-merge decision",
+            ),
+            "inputs-outputs-and-conditions.md": (
+                "agent or tool is labeled as an Input",
+                "meaning is lost at a Handoff",
+            ),
+        }
+        for reference in REFERENCES:
+            with self.subTest(reference=reference):
+                self.assertTrue((SKILL_ROOT / "references" / reference).is_file())
+                self.assertIn(f"(references/{reference})", skill)
+                for phrase in conditions[reference]:
+                    self.assertIn(phrase, skill)
+
+    def test_japanese_counterparts_are_complete(self) -> None:
+        locale_root = SKILL_ROOT / "references/locales/ja"
+        self.assertEqual(
+            {path.name for path in locale_root.iterdir()},
+            {"SKILL.md", "manifest.yaml", *REFERENCES},
+        )
+        self.assertEqual(
+            (locale_root / "manifest.yaml").read_text(encoding="utf-8"),
+            "locale: ja\nsource_locale: en\nstatus: reviewed\n",
+        )
+
+    def test_repository_skill_symlink(self) -> None:
+        links_root = ROOT / ".agents/skills"
+        self.assertEqual({path.name for path in links_root.iterdir()}, {SKILL_NAME})
+        link = links_root / SKILL_NAME
+        self.assertTrue(link.is_symlink())
+        self.assertEqual(os.readlink(link), f"../../skills/{SKILL_NAME}")
+        self.assertEqual(link.resolve(), SKILL_ROOT.resolve())
+
+    def test_manifest_names_versions_and_paths(self) -> None:
+        version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+        self.assertEqual(version, "0.6.0")
+        for manifest_path in PLUGIN_MANIFESTS:
+            with self.subTest(manifest=manifest_path.relative_to(ROOT)):
+                manifest = load_json(manifest_path)
+                self.assertEqual(manifest.get("name"), "alps")
+                self.assertEqual(manifest.get("version"), version)
+
+        self.assertEqual(
+            load_json(ROOT / "plugin.json").get("$schema"),
+            "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+        )
+        self.assertEqual(
+            load_json(ROOT / ".claude-plugin/plugin.json").get("$schema"),
+            CLAUDE_PLUGIN_SCHEMA,
+        )
+        for manifest_path in (
+            ROOT / ".cursor-plugin/plugin.json",
+            ROOT / ".codex-plugin/plugin.json",
+        ):
+            manifest = load_json(manifest_path)
+            resolved = self.assert_local_target(
+                owner_root=ROOT,
+                value=manifest["skills"],
+                target_type="directory",
+                label=f"{manifest_path.relative_to(ROOT)}:skills",
+            )
+            self.assertEqual(resolved, SKILLS_ROOT.resolve())
+
+        codex = load_json(ROOT / ".codex-plugin/plugin.json")
+        self.assertEqual(
+            nested_value(codex, ("interface", "capabilities")),
+            [
+                "Design a Process Description from recurring work",
+                "Simplify an existing Process Skill",
+                "Revise a Process Description from evidence of use",
+            ],
+        )
+        prompts = nested_value(codex, ("interface", "defaultPrompt"))
+        self.assertIsInstance(prompts, list)
+        self.assertEqual(len(prompts), 3)
+
+    def test_host_adapter_icon_paths(self) -> None:
+        path_fields = (
+            (ROOT / ".cursor-plugin/plugin.json", ("logo",)),
+            (ROOT / ".codex-plugin/plugin.json", ("interface", "composerIcon")),
+            (ROOT / ".codex-plugin/plugin.json", ("interface", "logo")),
+            (ROOT / ".codex-plugin/plugin.json", ("interface", "logoDark")),
+        )
+        for manifest_path, field_path in path_fields:
+            with self.subTest(path=manifest_path, field=field_path):
+                manifest = load_json(manifest_path)
+                self.assert_local_target(
+                    owner_root=ROOT,
+                    value=nested_value(manifest, field_path),
+                    target_type="file",
+                    label=f"{manifest_path.relative_to(ROOT)}:{'.'.join(field_path)}",
+                )
 
     def test_openai_interface_icons_exist(self) -> None:
-        for skill_name in DISTRIBUTED_SKILLS:
-            metadata_path = SKILLS_ROOT / skill_name / "agents/openai.yaml"
-            metadata = metadata_path.read_text(encoding="utf-8")
-            icons = ICON_PATTERN.findall(metadata)
-            with self.subTest(skill=skill_name):
-                self.assertEqual(len(icons), 2)
-                for icon in icons:
-                    self.assert_local_target(
-                        owner_root=SKILLS_ROOT / skill_name,
-                        value=icon,
-                        target_type="file",
-                        label=f"{metadata_path.relative_to(ROOT)}:{icon}",
-                    )
+        metadata_path = SKILL_ROOT / "agents/openai.yaml"
+        metadata = metadata_path.read_text(encoding="utf-8")
+        icons = ICON_PATTERN.findall(metadata)
+        self.assertEqual(len(icons), 2)
+        for icon in icons:
+            self.assert_local_target(
+                owner_root=SKILL_ROOT,
+                value=icon,
+                target_type="file",
+                label=f"{metadata_path.relative_to(ROOT)}:{icon}",
+            )
+
+    def test_removed_paths_are_absent(self) -> None:
+        removed = [
+            ROOT / "spec",
+            ROOT / ("tests/test_" + "process_instance_record.py"),
+            ROOT / "assets" / ("alps-reference" + "-model.svg"),
+            ROOT / "assets" / ("alps-reference" + "-model-ja.svg"),
+        ]
+        removed.extend(SKILLS_ROOT / name for name in LEGACY_SKILL_IDS[:4])
+        removed.extend(ROOT / ".agents/skills" / name for name in LEGACY_SKILL_IDS)
+        for path in removed:
+            with self.subTest(path=path):
+                self.assertFalse(path.exists() or path.is_symlink())
+
+    def test_obsolete_terms_are_absent_from_active_product_files(self) -> None:
+        for path in ROOT.rglob("*"):
+            if not path.is_file() or ".git" in path.parts:
+                continue
+            relative = path.relative_to(ROOT)
+            if relative == Path("CHANGELOG.md") or relative.parts[:2] == (
+                "docs",
+                "releases",
+            ):
+                continue
+            try:
+                content = path.read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+                continue
+            for term in FORBIDDEN_ACTIVE_TEXT:
+                with self.subTest(path=relative, term=term):
+                    self.assertNotIn(term, content)
 
 
 if __name__ == "__main__":

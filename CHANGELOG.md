@@ -1,8 +1,38 @@
 # Changelog
 
-This file records notable changes to ALPS. ALPS is versioned as a single repository-wide release unit. See [Versioning](docs/versioning.md) for compatibility and release rules.
+This file records notable changes to ALPS. See [Versioning](docs/versioning.md).
 
 ## [Unreleased]
+
+## [0.6.0] - 2026-08-31
+
+Release notes: [ALPS 0.6.0](docs/releases/0.6.0.md).
+
+### Changed
+
+- Replaced the former distributed structure with the single `design-process-description` Skill for creating, revising, and simplifying an authoritative Process Description.
+- Reduced the root Skill to normal-use guidance and routed three independent conceptual references through concrete reading conditions.
+- Reduced Host adapters to Process Description design, simplification, and evidence-based revision.
+- Updated English and Japanese repository guidance, versioning, Plugin manifests, and validation for version 0.6.0.
+
+### Removed
+
+- Removed the former four Skills, two specifications, localized obsolete assets, records, templates, generator, meta Skills, reference-model diagrams, and specialized tests.
+- Removed lifecycle governance, representation kinds, formal conformance, logical resolution, package binding, and dedicated record responsibilities without aliases, wrappers, archives, or replacement infrastructure.
+
+### Migration
+
+- `define-alps` becomes `design-process-description`.
+- `apply-alps` becomes direct use of the target Process Skill.
+- `manage-alps` becomes ordinary Git, repository review, release, and organization policy.
+- `alps-reference-model` has no replacement.
+- `review-alps` and `sync-locales` become ordinary review and translation review.
+- Consumers needing the former identifiers or normative meanings must pin an earlier release or tag.
+
+### Status
+
+- This incompatible change is a pre-1.0 MINOR release.
+- No tag or release publication is performed by this source change.
 
 ## [0.5.0] - 2026-08-29
 
