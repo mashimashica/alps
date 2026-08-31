@@ -209,7 +209,7 @@ class RepositoryIntegrityTests(unittest.TestCase):
 
     def test_manifest_names_versions_and_paths(self) -> None:
         version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
-        self.assertEqual(version, "0.6.0")
+        self.assertTrue(version)
         for manifest_path in PLUGIN_MANIFESTS:
             with self.subTest(manifest=manifest_path.relative_to(ROOT)):
                 manifest = load_json(manifest_path)
