@@ -12,6 +12,7 @@
 ## Validation
 
 - [ ] I assessed the paired English or Japanese assets and updated them where needed.
-- [ ] I ran the affected Skill Package validation.
+- [ ] I ran the applicable Agent Skill and Plugin form checks and repository-integrity tests.
+- [ ] I reviewed semantics separately from mechanical validation and stated unverified matters.
 - [ ] I ran `git diff --check` and verified changed relative links.
 - [ ] I inspected the final task-owned diff.

@@ -8,7 +8,7 @@ ALPS uses version numbers in `MAJOR.MINOR.PATCH` form and releases the repositor
 
 ## Release Unit
 
-An ALPS release includes the Process Framework, the ALPS Specification, the reference Process Skills, their bundled resources, localizations, validation scripts, and repository-level documentation and assets.
+An ALPS release includes the Process Framework, the ALPS Specification, the single design Process Skill, its bundled resources, localizations, validation scripts, and repository-level documentation and assets.
 
 English descriptions are authoritative. Japanese localizations are included in the same release and should remain aligned with their authoritative English sources.
 
@@ -19,7 +19,7 @@ Individual documents and Skill Packages do not carry independent version numbers
 Versions before `1.0.0` are in initial development. During this period:
 
 - a PATCH release, such as `0.1.1`, contains changes that do not alter normative meaning, applicability, repository path contracts, or machine-consumed formats;
-- a MINOR release, such as `0.2.0`, contains any addition, removal, or change to normative meaning, conformance criteria, required structure, repository path contracts, or machine-consumed formats; and
+- a MINOR release, such as `0.2.0`, contains any addition, removal, or change to normative meaning, evaluation requirements, required structure, repository path contracts, or machine-consumed formats; and
 - a pre-release identifier, such as `0.2.0-rc.1`, identifies a candidate that is not yet the corresponding release.
 
 A change that appears editorial but changes normative force, scope, applicability, or interpretation is a MINOR change rather than a PATCH change. MINOR releases before `1.0.0` may be incompatible with earlier versions.
@@ -46,7 +46,7 @@ A consumer should record, as applicable:
 
 A tag is immutable once published. A published tag must not be moved or reused for different content. Consumers that synchronize ALPS assets into another repository should pin both the tag and the commit SHA.
 
-The `main` branch represents ongoing development. Changes not yet assigned to a release are recorded under `Unreleased` in [CHANGELOG.md](../CHANGELOG.md).
+The `main` branch represents ongoing development. The current [unreleased redesign](unreleased-redesign.md) is intended for the next MINOR after 0.5.0. It leaves `VERSION` and manifest versions unchanged. Released changes are documented in [CHANGELOG.md](../CHANGELOG.md).
 
 ## Release Procedure
 

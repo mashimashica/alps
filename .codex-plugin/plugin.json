@@ -1,7 +1,7 @@
 {
   "name": "alps",
   "version": "0.5.0",
-  "description": "Turn recurring agent work into reusable, assessable Process Skills with explicit Outcomes, traceable handoffs, and controlled improvement.",
+  "description": "Design and review the purpose, observable success conditions, and necessary boundaries of work as Process Descriptions, independently of execution means.",
   "author": {
     "name": "mashimashica",
     "url": "https://github.com/mashimashica"
@@ -13,29 +13,28 @@
     "agent-plugins",
     "agent-skills",
     "process",
-    "lifecycle",
-    "governance",
+    "process-description",
+    "design",
     "alps"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "ALPS",
-    "shortDescription": "Reusable, assessable Processes",
-    "longDescription": "ALPS turns recurring agent work into reusable, assessable Process Skills. It makes Purpose, success conditions, boundaries, Inputs, Outputs, and applicable conditions explicit; composes Processes through traceable handoffs; and uses verification and execution evidence to support controlled assessment and improvement.",
+    "shortDescription": "Purpose and success made clear",
+    "longDescription": "ALPS helps create, revise, and review Process Descriptions for general or context-specific work. Clarify why work is done, which observable results count as success, and which boundaries and details are necessary. Preserve source authority, required conditions, and uncertainty while leaving execution, storage, and approval to the environment.",
     "developerName": "mashimashica",
     "category": "Developer Tools",
     "capabilities": [
-      "Define reusable work with explicit Outcomes",
-      "Verify boundaries, references, and assumptions",
-      "Compose Process Skills with traceable handoffs",
-      "Assess execution using observable evidence",
-      "Control Tailoring, change, and retirement"
+      "Clarify purpose and observable success conditions",
+      "Design or revise a Process Description",
+      "Review boundaries, references, and uncertainty",
+      "Describe shared information and change effects"
     ],
     "websiteURL": "https://github.com/mashimashica/alps",
     "defaultPrompt": [
-      "Turn this recurring work into a reusable Process Skill with explicit Outcomes, Inputs, Outputs, and verification criteria.",
-      "Review this Skill Package for unclear boundaries, unresolved references, and unsupported Conformance claims.",
-      "Compose these Process Skills into one workflow and map every Output-to-Input handoff."
+      "Use design-process-description to describe this work with clear purpose, success conditions, and necessary boundaries.",
+      "Review this Process Description and report findings without rewriting it.",
+      "Revise this description to clarify shared information and preserve the conditions that apply in this context."
     ],
     "brandColor": "#4DB2FF",
     "composerIcon": "./assets/icon.svg",

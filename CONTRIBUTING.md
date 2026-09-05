@@ -11,7 +11,7 @@ Thank you for contributing to ALPS. Contributions are accepted under the reposit
 - Read [LICENSE](LICENSE), [NOTICE](NOTICE), and [DCO](DCO).
 - Keep English and Japanese counterparts aligned when a change affects both.
 - Do not submit confidential information or material that you are not authorized to publish and license.
-- Open an issue before a change that would alter ALPS semantics, Conformance requirements, or the license boundary.
+- Open an issue before a change that would alter ALPS semantics, required structure, or the license boundary.
 
 ## Developer Certificate of Origin
 
@@ -44,9 +44,9 @@ Maintainers may request license evidence, written permission, or replacement of 
 1. Work on a topic branch and keep unrelated changes separate.
 2. Update the paired English or Japanese asset when required.
 3. Preserve one authoritative source for each information item and use relative links from other documents.
-4. Run the validation supplied by the affected Skill Package.
+4. Run the applicable Agent Skill and Plugin form checks and repository-integrity tests. Use `review-alps` and `sync-locales` for separate semantic and locale review.
 5. Run `git diff --check`, verify changed relative links, and inspect the final diff.
-6. Commit with `--signoff`.
+6. When contribution submission is authorized, commit with `--signoff`. Local implementation and review do not themselves authorize commit or publication.
 
 ## Pull Request Checklist
 

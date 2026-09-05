@@ -31,10 +31,7 @@ jobs:
 
       - name: Validate distributed Agent Skills
         run: |
-          skills-ref validate skills/alps-reference-model
-          skills-ref validate skills/define-alps
-          skills-ref validate skills/apply-alps
-          skills-ref validate skills/manage-alps
+          skills-ref validate skills/design-process-description
 
       - name: Validate root Agent Plugin manifest schema
         run: |
@@ -77,12 +74,15 @@ jobs:
           npx --yes @anthropic-ai/claude-code@2.1.251 \
             plugin validate . --strict
 
-      - name: Run repository and Process Instance Record tests
+      - name: Run repository integrity tests
         run: python3 -m unittest discover -s tests -p 'test_*.py'
 
       - name: Check relative Markdown links
         run: |
-          find . -type f -name '*.md' -not -path './.git/*' -print0 \
+          find AGENTS.md README.md CONTRIBUTING.md spec skills .agents/skills \
+            docs/versioning.md docs/unreleased-redesign.md docs/locales/ja \
+            .github/pull_request_template.md \
+            -type f -name '*.md' -print0 \
             | xargs -0 npx --yes markdown-link-check@3.13.7 \
                 --quiet --config .github/markdown-link-check.json
 
