@@ -29,9 +29,11 @@ jobs:
             "jsonschema==4.25.1" \
             "skills-ref @ git+https://github.com/agentskills/agentskills.git@f130f348f502d9804278a617f86929846896d2e9#subdirectory=skills-ref"
 
-      - name: Validate distributed Agent Skills
+      - name: Validate Agent Skill format
         run: |
           skills-ref validate skills/design-process-description
+          skills-ref validate .agents/skills/review-alps
+          skills-ref validate .agents/skills/sync-locales
 
       - name: Validate root Agent Plugin manifest schema
         run: |

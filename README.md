@@ -8,7 +8,7 @@
 
 ALPS helps you design and review the meaning of work as a Process Description: why it is done, what observable conditions count as success, and which boundaries and details are necessary. The description remains understandable across different execution means.
 
-Use it to clarify a one-off assignment, improve an existing Skill, or describe work shared across people and Agents. Reuse is useful, but the work need not recur. Start with **Name, Purpose, and Outcomes**; add detail when it changes how the work is understood, applied, or evaluated.
+Use it to clarify a one-off assignment, improve an existing Skill, or describe work shared across people and Agents. Start with **Name, Purpose, and Outcomes**; add detail when it changes how the work is understood, applied, or evaluated.
 
 ## Install
 
@@ -20,9 +20,9 @@ npx plugins add mashimashica/alps
 
 Reload affected clients after installation. Keep the Plugin root layout, including `spec/`: the Skill's required specification links depend on it. Copying only the Skill folder omits those sources. Check that your installed client exposes `design-process-description` and that its links to both specifications open.
 
-## Use the single Skill
+## Use the Skill
 
-[design-process-description](skills/design-process-description/SKILL.md) creates, revises, and reviews the same kind of artifact: a Process Description. Ask in ordinary language or name the Skill explicitly as your Host requires.
+[design-process-description](skills/design-process-description/SKILL.md) helps you create, revise, and review Process Descriptions. Ask in ordinary language or name the Skill explicitly as your Host requires.
 
 ```text
 Use design-process-description to describe this one-off task through its purpose, observable success conditions, and necessary boundaries.
@@ -40,15 +40,16 @@ The [minimal template](skills/design-process-description/references/SKILL-templa
 | --- | --- |
 | Why undertake the work? | Purpose |
 | What observable condition counts as success? | Outcome |
+| What work contributes to success? | Activities group related Tasks; Tasks describe individual actions |
 | What is produced or updated? | Output; its existence alone is not success |
 | What is examined or transformed? | Input |
 | What directs, limits, or enables the work? | Control, Constraint, Enabler |
 | What is the source, and what changes locally? | Authority, reference, translation, and context-limited change |
 | What does a review establish? | A judgment about the description, separate from execution results and satisfaction of requirements |
 
-Activities, Tasks, Inputs, Outputs, Controls, Constraints, Enablers, and Entry/Exit Criteria are optional details. Necessary methods or order can be scoped to the relevant context. Multiple Processes can consult and update the same information; a Model or View can link to their descriptions without duplicating their Purposes and Outcomes.
+Add Activities, Tasks, boundary elements, and Entry/Exit Criteria when they help explain the work. The Framework defines their meanings and relationships so that additional detail remains consistent. Necessary methods or order can be scoped to the relevant context. Multiple Processes can consult and update the same information; a Model or View can link to their descriptions without duplicating their Purposes and Outcomes.
 
-ALPS supplies meaning and design support. Your environment supplies execution, storage, approval, and version management. No ALPS management procedure or certification scheme is needed.
+ALPS supplies meaning and design support. Your environment supplies execution, storage, approval, and version management.
 
 ## Resources
 
@@ -62,6 +63,6 @@ ALPS supplies meaning and design support. Your environment supplies execution, s
 
 ## Version and license
 
-The repository is versioned as one unit. `VERSION` and the manifests remain at **0.5.0**; the working descriptions include an unreleased breaking redesign intended for the next MINOR. They are not a claim that the redesign has been released or is present in an installed 0.5.0 package. See the compatibility note above.
+The repository is versioned as one unit. See the version policy and unreleased changes linked above for release scope and compatibility information.
 
 Except for identified third-party material, this repository is licensed under the [Apache License 2.0](LICENSE). See also [NOTICE](NOTICE).

@@ -33,13 +33,12 @@ Do not infer Process requirements from tests, templates, Host manifests, icons, 
 
 ## Change and review
 
-- Inspect current files, ownership, and the complete task-owned diff before editing. Use the current source and requested target to judge changes; inspect history only when authorized and relevant.
+- Inspect current files and the task-owned diff before editing. Preserve unrelated work.
 - Use `review-alps` for changes to specifications, Skill content, repository guidance, tests, distribution, or presentation that affect their meaning or boundaries.
 - Use `sync-locales` for each affected English/Japanese pair. Repository-development Skills have no Japanese Plugin counterparts.
-- Use `design-process-description` when authoring or reviewing a Process Description; it does not authorize executing the described work or publishing it.
-- Keep Purpose, Outcome, and Output distinct. Preserve necessary contextual constraints, source authority, shared-information relationships, and explicit uncertainty without recreating a management or certification system.
-- Preserve one source for each meaning. Models and views link to it; translations and summaries do not redefine it.
-- Follow the existing Host formats. Do not introduce a common replacement manifest schema or an execution/record subsystem.
+- Use `design-process-description` when authoring or reviewing a Process Description.
+- Keep each Host adapter aligned with its native format and the distribution layout above.
+- Apply [CONTRIBUTING](CONTRIBUTING.md) for contribution and licensing requirements and [Versioning](docs/versioning.md) for release policy.
 
 ## Verification and delivery
 
@@ -51,8 +50,4 @@ Keep three kinds of evidence separate:
 
 Run the checks in `.github/workflows/validate.yml` that the environment permits. At minimum run `python3 -m unittest discover -s tests -v`, `git diff --check`, changed-link checks, and review the complete task-owned diff, including new files. Passing mechanical checks does not prove semantic validity or successful Process execution.
 
-For locale review, compare subject, modality, action or state, object, condition, quantifier, polarity, exceptions, and scope. Preserve canonical paths, identifiers, and code literals. Report unverified pairs rather than assuming equivalence.
-
-Retirement checks apply to active specifications, distribution, guidance, configuration, and tests. Preserve release documents and changelog history; do not rewrite them to match the current specification. State intentional incompatibilities in current unreleased documentation.
-
-Report findings, completed checks, failed or unperformed checks, and limits. Do not commit, push, publish, create or update a pull request, merge, tag, release, or make another external change without the user's authorization.
+Report findings, completed checks, failed or unperformed checks, and limits.

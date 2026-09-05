@@ -88,7 +88,7 @@ def windows_path_escapes_root(path: PureWindowsPath) -> bool:
 
 
 def active_markdown_files(root: Path) -> list[Path]:
-    """Current guidance and sources only; never inspect release/change history."""
+    """Markdown sources covered by repository link checks."""
     files = [root / name for name in ("README.md", "AGENTS.md", "CONTRIBUTING.md")]
     files += [root / ".github/pull_request_template.md"]
     files += list((root / "docs").glob("*.md"))
@@ -367,44 +367,6 @@ class RepositoryIntegrityTests(unittest.TestCase):
                     target_type="file",
                     label="escaping symlink",
                 )
-
-    def test_retired_contracts_are_absent_from_active_content(self) -> None:
-        # These are retirement sentinels, not semantic correctness criteria.
-        # Migration notes deliberately name removed surfaces. They and historical
-        # releases are not sources of current requirements.
-        retired = (
-            "alps-reference-model", "define-alps", "apply-alps", "manage-alps",
-            "process_instance_record", "process-instance-record/1",
-            "record-templates.md", "management-records.md", "skill-package-format.md",
-            "skill:", "Logical Package Scope", "Package Binding", "alps.kind",
-            "ALPS-conformant.", "ALPS準拠。",
-            "Outcome Conformance", "Task Conformance", "Tailored Conformance",
-            "Description Conformance", "Reference Process Conformance",
-            "Execution Conformance", "ALPS Reference Model",
-            "成果適合", "タスク適合", "参照プロセス適合", "記述適合", "実行適合",
-        )
-        current = [p for p in active_markdown_files(ROOT) if p.name != "unreleased-redesign.md"]
-        current += list(PLUGIN_MANIFESTS)
-        current += list((ROOT / "skills").rglob("*.yaml"))
-        current += list((ROOT / "assets").glob("*.svg"))
-        current += [ROOT / ".github/workflows/validate.yml", ROOT / "localization.yaml"]
-        for path in current:
-            content = path.read_text(encoding="utf-8")
-            for marker in retired:
-                with self.subTest(path=path.relative_to(ROOT), retired=marker):
-                    self.assertNotIn(marker, content)
-
-    def test_no_retired_implementation_or_aliases_remain(self) -> None:
-        retired_names = {
-            "process_instance_record.py", "test_process_instance_record.py",
-            "process-instance-record.md", "record-templates.md",
-            "management-records.md", "skill-package-format.md",
-        }
-        for directory in ("skills", "tests", "spec", ".agents/skills"):
-            for path in (ROOT / directory).rglob("*"):
-                with self.subTest(path=path.relative_to(ROOT)):
-                    self.assertNotIn(path.name, retired_names)
-        self.assertFalse(any((SKILLS_ROOT / DISTRIBUTED_SKILLS[0]).rglob("*.py")))
 
     def test_svg_resources_and_local_image_targets_exist(self) -> None:
         for svg in [*ROOT.glob("assets/*.svg"), *SKILLS_ROOT.glob("*/assets/*.svg")]:

@@ -1,6 +1,6 @@
 ---
 name: design-process-description
-description: Create, revise, or review a Process Description that makes the purpose, observable success conditions, and necessary boundaries of work clear. Use for general or context-specific work, including one-off work, when its meaning or evaluation needs clarification.
+description: Create, revise, or review a Process Description that makes the purpose, observable success conditions, and necessary boundaries of work clear. Use for general or context-specific work when its meaning or evaluation needs clarification.
 ---
 
 # Process Description Design
@@ -11,36 +11,52 @@ Clarify the purpose and success conditions of the target work as an understandab
 
 ## Outcomes
 
-- The target work's purpose, applicable scope, and boundaries with adjacent work are identified.
-- Success conditions are described as observable result states relevant to the purpose.
-- Necessary detail is present, and unnecessary fixation of execution means is avoided.
-- Consistency, references, unconfirmed matters, and limits of application are clear.
+- The target work is identified by its purpose, applicable scope, and boundaries with adjacent work.
+- Success conditions are described as observable result states relevant to and collectively sufficient for the purpose.
+- The description contains the detail needed to understand, apply, and evaluate the work.
+- Execution means remain open except where applicable conditions require them.
+- The description's consistency with the Framework and required references is clear.
+- Unconfirmed matters and limits of application are explicit.
 
-## Tasks
+## Activities
 
-These actions concern the same description and can be revisited as understanding changes; their order is not an execution sequence.
+The Tasks below are required within the requested scope, except where stated as recommendations. Their relationships support revisiting the description as understanding develops.
 
-- The requested scope and available target description or work information must be identified. A review-only request must be answered with findings and any requested corrections, without unsolicited wholesale revision.
-- The intended purpose and result conditions must be clarified from the available information. Material uncertainty about scope or adjacent work must be exposed rather than filled by conjecture.
-- Each Outcome must be reviewed for observability and relevance, and the set for sufficiency to satisfy the Purpose. Distinguish creating an Output from establishing the condition it is meant to support.
-- Necessary detail must be assessed using the Framework. Add or retain it only where it changes understanding, application, or evaluation. Preserve contextually necessary methods, approvals, and order with their scope; remove unnecessary prescriptions when revision is requested.
-- Required references, relationships, and conditions must be checked. For shared information, identify its meaning, use, readers or updaters, and the effect of changes on related work where material.
-- For a revision, the authoritative source, affected scope, rationale, impact, and needed revalidation must be clear. Distinguish source changes, context-limited changes, and presentation changes.
-- The resulting description or review must be assessed against the requested scope. Report the judgment and its supporting evidence, remaining defects, assumptions, unconfirmed references, and applicability limits. For a review, evaluate these Outcomes in the supplied description; do not report a defect as repaired merely because it was identified.
-- Representative cases should be examined when they can expose an ambiguity or unsupported success condition. A trial that performs the target work requires the applicable authorization; an example alone does not establish execution success or universal applicability.
+### Work framing
+
+- Identify the requested scope and the available description or information about the target work.
+- Clarify the work's purpose and its boundary with adjacent work from that information.
+- Identify uncertainties that could change the intended scope or success conditions.
+
+### Success and work description
+
+- Formulate observable Outcomes that are relevant to and collectively sufficient for the Purpose. Keep independently assessable results distinguishable.
+- Determine the detail needed to understand, apply, or evaluate the work. Where work detail is needed, organize related actions into Activities and Tasks at a useful granularity and check their contribution to the Outcomes.
+- Describe necessary Inputs, Outputs, Controls, Constraints, Enablers, and Entry/Exit Criteria by their function. Preserve required methods and dependencies with their scope and leave other execution choices open.
+
+### Source and relationship alignment
+
+- Identify the authoritative description and confirm required references against their intended sources.
+- Clarify the meaning, use, and change effects of information shared with related work, including which work reads or updates it.
+- For changes, establish the affected source and elements, scope, rationale, consequences, and necessary revalidation. Distinguish a source change, a context-limited change, an application-specific choice, and a change in presentation.
+
+### Description evaluation
+
+- Evaluate the description against the Framework and applicable contextual requirements, including the coherence of its elements and the coverage of its Outcomes.
+- Representative cases should be examined when they can expose ambiguity, unsupported success conditions, or limits of application.
+- Report findings with their evidence and affected scope, including remaining defects and unconfirmed matters. In a review, assess these Outcomes in the supplied description; identifying a defect does not satisfy the condition that remains unmet.
 
 ## Controls
 
-Apply the [Process Framework](../../spec/process-framework.md) for meaning and the [ALPS Specification](../../spec/ALPS-SPEC.md) for Agent Skill representation. These sources are required; the Framework takes precedence. Apply the user's requested scope and the environment's applicable conditions for changes and external actions.
+Apply the [Process Framework](../../spec/process-framework.md) for meaning and the [ALPS Specification](../../spec/ALPS-SPEC.md) for Agent Skill representation. These sources are required; the Framework takes precedence. The user's request and applicable environment conditions govern the scope of changes.
 
 ## Constraints
 
-Designing or reviewing a description does not authorize executing the target work, approving its use, publishing it, or changing external state. If a required source or condition is unconfirmed, identify the affected judgment or action and its limitation. Independent review or drafting may continue within the authorized scope. Review completion must not be reported as execution success or as evidence that every design Outcome is satisfied.
+A review-only request must be answered with findings and any requested corrections, without unsolicited wholesale revision. Performing the described work or changing external state requires the applicable authorization. An unconfirmed reference or condition must limit the dependent judgment or action; independent work may continue within its applicable conditions.
 
 ## Resources
 
-This root `SKILL.md` is the authoritative English description. For Japanese-language work, use the [Japanese translation](references/locales/ja/SKILL.md) with the same meaning and normative force.
+This root `SKILL.md` is the authoritative English description. The [Japanese translation](references/locales/ja/SKILL.md) carries the same meaning and normative force.
 
-- [Minimal template](references/SKILL-template.md): use when drafting an Agent Skill; begin with only its required core.
-- [Examples and review cases](references/examples.md): consult relevant cases when deciding whether detail is necessary, describing shared information or views, or judging incomplete evidence.
-- `agents/openai.yaml` and `assets/alps.svg`: Host presentation resources; they add no Process requirements.
+- [Minimal template](references/SKILL-template.md): use when drafting an Agent Skill.
+- [Examples and review cases](references/examples.md): consult relevant cases when choosing work detail, describing shared information or views, or evaluating incomplete evidence.

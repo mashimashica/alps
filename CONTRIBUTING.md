@@ -46,7 +46,7 @@ Maintainers may request license evidence, written permission, or replacement of 
 3. Preserve one authoritative source for each information item and use relative links from other documents.
 4. Run the applicable Agent Skill and Plugin form checks and repository-integrity tests. Use `review-alps` and `sync-locales` for separate semantic and locale review.
 5. Run `git diff --check`, verify changed relative links, and inspect the final diff.
-6. When contribution submission is authorized, commit with `--signoff`. Local implementation and review do not themselves authorize commit or publication.
+6. Submit a pull request describing the change and its validation results, with the required sign-off on each commit.
 
 ## Pull Request Checklist
 
