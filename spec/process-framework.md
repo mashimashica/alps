@@ -12,7 +12,7 @@
 
 This Framework establishes a domain-independent basis for describing and understanding work: its intent, boundaries, work content, context, relationships, application, and evaluation. It supports general and context-specific work, including work performed once, while leaving execution means open where the context permits.
 
-The Framework governs Process meaning. The [ALPS Specification](ALPS-SPEC.md) applies it to Agent Skills and must preserve its semantics and normative force. If the two conflict, this Framework must take precedence.
+This Framework governs Process meaning.
 
 **Must** states a requirement; **must not** states a prohibition. **Should** and **should not** state recommendations. **May** states permission. **Typically** describes customary practice; **can** and **could** express possibility or capability. These last expressions carry no normative force. A description must make each statement's force and scope clear. Applicable requirements and prohibitions retain their force regardless of the assessment method or whether a claim is made.
 
