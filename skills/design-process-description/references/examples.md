@@ -164,3 +164,7 @@ The deployed revision and log are Outputs. Evaluate the result conditions separa
 The release Exit Criteria are not satisfied. The facts support reporting the failed purchase and requesting the missing approval evidence. They do not establish that approval occurred or never occurred, and the existing Outputs and successful health check do not establish overall success.
 
 The service owner pauses further rollout. The team's authorized investigation finds that qualification omitted a payment-provider error case and adds that case to the checks. A subsequent trial detects the reproduced fault. This evidence supports the change for that case. The purchase Outcome remains unmet and approval remains unconfirmed pending the required production and approval evidence.
+
+## 9. A description and its supporting system
+
+The [working service-assessment example](../../../examples/README.md) keeps the work's Purpose and Outcomes in one target Skill. Its supporting design refers to that description and assigns established calculations to a tool and contextual assessment to an agent. The example identifies how tool evidence contributes to the work without making tool completion its success condition.

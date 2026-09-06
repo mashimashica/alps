@@ -50,7 +50,7 @@ The Tasks below are required within the requested scope, except where stated as 
 
 ## Controls
 
-Apply the [Process Framework](../../spec/process-framework.md) for meaning and the [ALPS Specification](../../spec/ALPS-SPEC.md) for Agent Skill representation. These sources are required; the Framework takes precedence. The user's request and applicable environment conditions govern the scope of changes.
+Apply the [Process Framework](../../spec/process-framework.md) for meaning and the [ALPS Specification](../../spec/ALPS-SPEC.md) for Agent Skill correspondence. These sources are required; the Framework takes precedence for Process meaning. The user's request and applicable environment conditions govern the scope of changes.
 
 ## Constraints
 
@@ -62,3 +62,4 @@ This root `SKILL.md` is the English source for the [Japanese translation](refere
 
 - [Minimal template](references/SKILL-template.md): use when drafting an Agent Skill.
 - [Examples and review cases](references/examples.md): consult relevant cases when choosing work detail, describing shared information or views, or evaluating incomplete evidence.
+- [Agent Work System Design](../design-agent-work-system/SKILL.md): use when the requested work concerns the supporting configuration, its implementation, or its effectiveness. Refer to the shared work description; revisit it when configuration design reveals a problem with its assumptions.

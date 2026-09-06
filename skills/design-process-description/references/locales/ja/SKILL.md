@@ -50,7 +50,7 @@ description: 作業の目的、観察可能な成功条件、必要な境界を�
 
 ## 統制事項
 
-意味には[プロセスフレームワーク](../../../../../spec/locales/ja/process-framework.md)を、Agent Skillとしての表現には[ALPS Specification](../../../../../spec/locales/ja/ALPS-SPEC.md)を適用する。これらは必須参照であり、フレームワークが優先する。変更の範囲は、ユーザーの依頼と利用環境の適用条件が定める。
+意味には[プロセスフレームワーク](../../../../../spec/locales/ja/process-framework.md)を、Agent Skillとの対応付けには[ALPS Specification](../../../../../spec/locales/ja/ALPS-SPEC.md)を適用する。これらは必須参照であり、プロセスの意味にはフレームワークが優先する。変更の範囲は、ユーザーの依頼と利用環境の適用条件が定める。
 
 ## 制約
 
@@ -62,3 +62,4 @@ description: 作業の目的、観察可能な成功条件、必要な境界を�
 
 - [最小テンプレート](SKILL-template.md)：Agent Skillを作成する際に使用する。
 - [具体例とレビューケース](examples.md)：作業詳細の選択、共有情報やビューの記述、不完全な証拠の評価に関係する事例を参照する。
+- [エージェント作業システムの設計](../../../../design-agent-work-system/references/locales/ja/SKILL.md)：実現を支える構成、その実装、有効性が依頼対象の場合に用いる。共通の仕事の記述を参照し、構成の設計から前提の問題が見つかった場合は記述を再検討する。

@@ -16,7 +16,8 @@ from urllib.parse import unquote, urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 SKILLS_ROOT = ROOT / "skills"
-DISTRIBUTED_SKILLS = ("design-process-description",)
+DISTRIBUTED_SKILLS = ("design-agent-work-system", "design-process-description")
+PACKAGE_DIRECTORIES = ("skills", "spec", "assets", "examples")
 PLUGIN_MANIFESTS = (
     ROOT / "plugin.json",
     ROOT / ".claude-plugin/plugin.json",
@@ -37,6 +38,8 @@ REQUIRED_PATHS = (
     ROOT / "spec/locales/ja/process-framework.md",
     ROOT / "spec/ALPS-SPEC.md",
     ROOT / "spec/locales/ja/ALPS-SPEC.md",
+    ROOT / "spec/agent-work-system-design.md",
+    ROOT / "spec/locales/ja/agent-work-system-design.md",
     ROOT / "CONTRIBUTING.md",
     ROOT / "docs/locales/ja/CONTRIBUTING.md",
     ROOT / "docs/versioning.md",
@@ -48,6 +51,19 @@ REQUIRED_PATHS = (
     ROOT / "skills/design-process-description/references/examples.md",
     ROOT / "skills/design-process-description/references/locales/ja/SKILL-template.md",
     ROOT / "skills/design-process-description/references/locales/ja/examples.md",
+    ROOT / "skills/design-agent-work-system/references/examples.md",
+    ROOT / "skills/design-agent-work-system/references/locales/ja/examples.md",
+    ROOT / "examples/README.md",
+    ROOT / "examples/locales/ja/README.md",
+    ROOT / "examples/assess-service-change/SKILL.md",
+    ROOT / "examples/assess-service-change/references/pilot-context.md",
+    ROOT / "examples/assess-service-change/references/tool-use.md",
+    ROOT / "examples/assess-service-change/references/locales/ja/SKILL.md",
+    ROOT / "examples/assess-service-change/references/locales/ja/pilot-context.md",
+    ROOT / "examples/assess-service-change/references/locales/ja/tool-use.md",
+    ROOT / "examples/assess-service-change/scripts/compare_measurements.py",
+    ROOT / "examples/assess-service-change/assets/baseline.csv",
+    ROOT / "examples/assess-service-change/assets/candidate.csv",
 )
 ICON_PATTERN = re.compile(
     r'^\s*icon_(?:small|large):\s*["\']?([^"\'\s]+)["\']?\s*$',
@@ -94,7 +110,7 @@ def active_markdown_files(root: Path) -> list[Path]:
     files += [root / ".github/pull_request_template.md"]
     files += list((root / "docs").glob("*.md"))
     files += [root / "docs/releases" / f"{VERSION}.md"]
-    for directory in ("spec", "skills", "docs/locales/ja"):
+    for directory in ("spec", "skills", "examples", "docs/locales/ja"):
         files += list((root / directory).rglob("*.md"))
     files += [root / ".agents/skills" / name / "SKILL.md" for name in REPOSITORY_SKILLS]
     return sorted(set(files))
@@ -310,7 +326,7 @@ class RepositoryIntegrityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             package = Path(directory) / "alps"
             package.mkdir()
-            for name in ("skills", "spec", "assets"):
+            for name in PACKAGE_DIRECTORIES:
                 shutil.copytree(ROOT / name, package / name, symlinks=True)
             for manifest in PLUGIN_MANIFESTS:
                 target = package / manifest.relative_to(ROOT)
@@ -322,7 +338,9 @@ class RepositoryIntegrityTests(unittest.TestCase):
                 targets = {(skill.parent / link).resolve() for link in local_links(skill)}
                 for required in ("process-framework.md", "ALPS-SPEC.md"):
                     self.assertIn(package / "spec" / required, targets)
-            for path in [*package.glob("skills/**/*.md"), *package.glob("spec/**/*.md")]:
+                if name == "design-agent-work-system":
+                    self.assertIn(package / "spec/agent-work-system-design.md", targets)
+            for path in package.rglob("*.md"):
                 for link in local_links(path):
                     with self.subTest(source=path.relative_to(package), link=link):
                         self.assert_local_target(
@@ -345,13 +363,41 @@ class RepositoryIntegrityTests(unittest.TestCase):
 
     def test_distributed_files_stay_inside_plugin_root(self) -> None:
         paths = list(PLUGIN_MANIFESTS)
-        for directory in ("skills", "spec", "assets"):
+        for directory in PACKAGE_DIRECTORIES:
             paths += list((ROOT / directory).rglob("*"))
         for path in paths:
             with self.subTest(path=path.relative_to(ROOT)):
                 self.assertTrue(path.resolve().is_relative_to(ROOT.resolve()))
                 self.assertTrue(path.exists())
                 self.assertFalse(path.resolve().is_relative_to(ROOT / ".agents"))
+
+    def test_example_skill_is_reference_material_outside_discovery(self) -> None:
+        example = ROOT / "examples/assess-service-change"
+        self.assertTrue((example / "SKILL.md").is_file())
+        self.assertFalse(example.resolve().is_relative_to(SKILLS_ROOT.resolve()))
+        for manifest_path in PLUGIN_MANIFESTS:
+            manifest = load_json(manifest_path)
+            with self.subTest(manifest=manifest_path.relative_to(ROOT)):
+                discovery = manifest.get("skills", "skills")
+                self.assertIsInstance(discovery, str)
+                discovered = (ROOT / discovery).resolve()
+                self.assertEqual(discovered, SKILLS_ROOT.resolve())
+                self.assertEqual(
+                    {path.parent.name for path in discovered.glob("*/SKILL.md")},
+                    set(DISTRIBUTED_SKILLS),
+                )
+
+    def test_foundations_have_only_their_own_translation_as_local_reference(self) -> None:
+        # This checks the declared dependency graph, not the meaning of prose.
+        for name in ("process-framework.md", "agent-work-system-design.md"):
+            english = ROOT / "spec" / name
+            japanese = ROOT / "spec/locales/ja" / name
+            for source, counterpart in ((english, japanese), (japanese, english)):
+                with self.subTest(source=source.relative_to(ROOT)):
+                    self.assertEqual(
+                        {(source.parent / link).resolve() for link in local_links(source)},
+                        {counterpart.resolve()},
+                    )
 
     def test_path_guard_rejects_symlink_escape(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

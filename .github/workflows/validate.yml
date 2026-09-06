@@ -32,6 +32,8 @@ jobs:
       - name: Validate Agent Skill format
         run: |
           skills-ref validate skills/design-process-description
+          skills-ref validate skills/design-agent-work-system
+          skills-ref validate examples/assess-service-change
           skills-ref validate .agents/skills/review-alps
           skills-ref validate .agents/skills/sync-locales
 
@@ -76,13 +78,13 @@ jobs:
           npx --yes @anthropic-ai/claude-code@2.1.251 \
             plugin validate . --strict
 
-      - name: Run repository integrity tests
+      - name: Run repository integrity and example tool tests
         run: python3 -m unittest discover -s tests -p 'test_*.py'
 
       - name: Check relative Markdown links
         run: |
           release_version="$(cat VERSION)"
-          find AGENTS.md README.md CONTRIBUTING.md spec skills .agents/skills \
+          find AGENTS.md README.md CONTRIBUTING.md spec skills examples .agents/skills \
             docs/versioning.md "docs/releases/$release_version.md" docs/locales/ja \
             .github/pull_request_template.md \
             -type f -name '*.md' -print0 \

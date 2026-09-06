@@ -23,12 +23,14 @@ The following Tasks are required within the requested scope.
 
 - Read [localization.yaml](../../../localization.yaml) to identify source and supported locales.
 - Map specification files to `spec/locales/ja/`, repository guidance and documents to `docs/locales/ja/`, and distributed Skill content to its `references/locales/ja/` counterparts.
+- Map the working-example guide to `examples/locales/ja/` and the example Skill's documents to its `references/locales/ja/`. Shared code and fixture data keep their source identifiers.
 - Identify shared presentation resources and repository-development Skills using [AGENTS.md](../../../AGENTS.md); these do not require separate Plugin translations.
 
 ### Meaning alignment
 
 - Compare complete semantic units by subject, modality, action or state, object, condition, quantifier, polarity, exceptions, and scope. Assess relationships between elements as well as individual statements.
 - Check that work structure, Outcome judgments, contextual conditions, source identity, change effects, and uncertainty have the same meaning.
+- Check work-system responsibilities, judgment and processing allocation, interfaces, effects, and the distinctions between design review, component checks, and whole-system effectiveness. Preserve each source's independence and the Specification's integration relationships.
 - Preserve canonical paths, identifiers, and code literals. Localized links may target the corresponding translation when its English source remains identifiable.
 - Correct affected translations when synchronization is requested, preserving unrelated work. Keep changes to the English source within the requested scope.
 
@@ -39,7 +41,7 @@ The following Tasks are required within the requested scope.
 
 ## Controls
 
-The [Framework](../../../spec/process-framework.md) governs meaning and normative language. The localization configuration and AGENTS govern source roles and repository paths.
+The [Framework](../../../spec/process-framework.md) governs Process meaning. The [work-system principles](../../../spec/agent-work-system-design.md) govern the supporting configuration, and the [Specification](../../../spec/ALPS-SPEC.md) governs integration in Skills. Preserve the meaning and normative force of the applicable source. The localization configuration and AGENTS govern source roles and repository paths.
 
 ## Constraints
 

@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "alps",
-  "version": "0.6.0",
-  "description": "Design and review the purpose, observable success conditions, and necessary boundaries of work as Process Descriptions, independently of execution means.",
+  "version": "0.7.0",
+  "description": "Clarify work through Process Descriptions and design the agents, tools, information resources, and environments that realize it.",
   "author": {
     "name": "mashimashica",
     "url": "https://github.com/mashimashica"
@@ -15,6 +15,7 @@
     "agent-skills",
     "process",
     "process-description",
+    "agent-work-system",
     "design",
     "alps"
   ]
