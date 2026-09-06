@@ -40,7 +40,7 @@ The [minimal template](skills/design-process-description/references/SKILL-templa
 | --- | --- |
 | Why undertake the work? | Purpose |
 | What observable condition counts as success? | Outcome |
-| What work contributes to success? | Activities group related Tasks; Tasks describe individual actions |
+| What work contributes to success? | Activities & Tasks: an Activity groups related Tasks; a Task describes an individual action |
 | What is produced or updated? | Output; its existence alone is not success |
 | What is examined or transformed? | Input |
 | What directs, limits, or enables the work? | Control, Constraint, Enabler |
