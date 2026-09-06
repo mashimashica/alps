@@ -24,9 +24,10 @@ The following Tasks are required within the requested review scope.
 - Identify the affected sources and inspect the complete task-owned diff, including additions and removals.
 - Read the [Framework](../../../spec/process-framework.md), [Specification](../../../spec/ALPS-SPEC.md), and affected Process Descriptions in full.
 - Compare changed propositions by subject, modality, action or state, object, condition, quantifier, polarity, exception, and scope. Check that editorial changes preserve meaning and that intentional redefinitions have a basis in the requested design.
-- Assess each description's Purpose and independently assessable Outcomes for relevance and collective sufficiency. Check necessary detail, Activity/Task cohesion and coverage, boundary roles, and the distinction between work relationships and execution order.
+- Assess each description's Purpose and independently assessable Outcomes for relevance, individual necessity, and collective sufficiency. Check necessary detail, Activity/Task cohesion and coverage, boundary roles, and the distinction between work relationships and execution order.
 - Follow required references and information relationships. Assess source identity, shared conditions, context-limited changes, and effects on related work.
 - Check that description validity, execution results, satisfaction of requirements, and their supporting evidence remain distinguishable.
+- Assess the basis for Process selection and changes, including necessary information from affected parties and the applicability of criteria and evidence. Check the effects of changed conditions on dependent judgments and the treatment of unresolved findings.
 
 ### Distribution assessment
 

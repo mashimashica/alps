@@ -23,7 +23,7 @@ Determine the greatest value in the given non-empty finite set of integers.
 - The identified value belongs to the given set and is at least as large as every member.
 ```
 
-The result condition is observable and sufficient for this bounded Purpose. The Purpose identifies the input domain, and the Outcome identifies its maximum without prescribing an algorithm. An empty set falls outside the stated scope; it must not be silently reported as successfully handled.
+The result condition is observable, necessary, and sufficient for this bounded Purpose. The Purpose identifies the input domain, and the Outcome identifies its maximum without prescribing an algorithm. An empty set falls outside the stated scope; it must not be silently reported as successfully handled.
 
 ## 2. One-off, context-specific work
 
@@ -37,16 +37,16 @@ description: Arrange the replacement location for the 8 October 2026 design work
 
 ## Purpose
 
-Enable the 8 October 2026 design workshop to take place after Room A closes.
+Enable every intended participant to attend the 8 October 2026 design workshop at a replacement location after Room A closes.
 
 ## Outcomes
 
 - A replacement room is confirmed for the workshop time.
 - The replacement room accommodates every intended participant's attendance and access needs.
-- Every intended participant has acknowledged the replacement location before the workshop.
+- Every intended participant can identify the replacement location before the workshop.
 ```
 
-The date and occasion supply the necessary scope in the description. Room availability, suitability, and participant acknowledgment can be judged independently. Sending an invitation is an Output; an acknowledgment requires a response. An unidentified access need remains unconfirmed and limits the suitability judgment.
+The date and occasion supply the necessary scope in the description. Room availability, suitability, and participants' knowledge of the location can be judged independently. Participant acknowledgments can provide evidence that the replacement location is known. An unidentified access need remains unconfirmed and limits the suitability judgment.
 
 ## 3. Work without a fixed artifact
 
@@ -113,7 +113,7 @@ A policy directs the work; its approval condition limits deployment. The release
 
 **Purpose:** Determine whether candidate solutions can satisfy the clarified needs within the available capacity.
 
-**Outcomes:** Each considered candidate's feasibility is supported by evidence against the needs and available capacity. Unverified assumptions and their effect on the feasibility judgment are explicit.
+**Outcomes:** The feasibility judgment for each considered candidate is supported by evidence against the needs and available capacity. Unverified assumptions and their effect on the feasibility judgment are explicit.
 
 Both Processes consult and update the same ordinary **change brief**. It contains the needs, candidate assumptions, acceptance conditions, and supporting observations for this service change. Its needs and observations serve as Inputs when examined; its acceptance conditions act as Controls when judging a candidate. Updated information is an Output. These roles can be distinguished within the same document.
 
@@ -123,6 +123,8 @@ Both Processes consult and update the same ordinary **change brief**. It contain
 | Feasibility Assessment | Adds capacity evidence, candidate limits, and questions about the current needs. | A newly exposed limit requires reconsidering affected needs or solution choices. |
 
 For this collaboration, readers must identify the revision used. Updates must distinguish confirmed needs, proposals, and unverified assumptions, and must not silently overwrite conflicting findings. Changed information must be made available to affected work before it relies on superseded judgments. The team's existing document and version tools supply storage and coordination. The two Processes can revisit the brief repeatedly. Their repeated application at the same level is Iteration; applying them separately to the service and its components is Recursion. Integration checks completeness within each level and consistency between levels. Establishing usable portions of the service change is Incremental application. These relationships can be combined according to the change being considered.
+
+In one application, the service owner tightens the acceptable interruption from five minutes to one minute. The brief identifies the source and scope of the request. Reassessment against the revised condition finds that the candidate's measured interruption of ninety seconds makes it unsuitable. Recovery needs from the affected support team are still missing; their implications for candidate selection remain unconfirmed. Clarification and assessment continue with the revised condition and available evidence, while the support team's input is obtained.
 
 The approval conditions in Production Release govern deployment in that Process. Sharing the brief does not make those conditions Entry Criteria for all clarification and assessment work.
 
@@ -160,3 +162,5 @@ The deployed revision and log are Outputs. Evaluate the result conditions separa
 | The approval requirement is satisfied. | Approval evidence is missing; satisfaction remains unconfirmed. |
 
 The release Exit Criteria are not satisfied. The facts support reporting the failed purchase and requesting the missing approval evidence. They do not establish that approval occurred or never occurred, and the existing Outputs and successful health check do not establish overall success.
+
+The service owner pauses further rollout. The team's authorized investigation finds that qualification omitted a payment-provider error case and adds that case to the checks. A subsequent trial detects the reproduced fault. This evidence supports the change for that case. The purchase Outcome remains unmet and approval remains unconfirmed pending the required production and approval evidence.

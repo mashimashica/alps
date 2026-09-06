@@ -34,7 +34,7 @@ Every Process Description must contain **Name**, **Purpose**, and **one or more 
 
 The Name should be concise. The Purpose should clarify boundaries with neighboring work where they overlap; it should not combine independent objectives or merely summarize Activities. Benefits to stakeholders may explain the value of achieving the Purpose, but are distinct from the Outcomes used to judge success.
 
-Each Outcome must state one observable result condition. Independent results must not be joined in one Outcome; they must be distinguishable when judging achievement. Every Outcome must remain meaningful throughout the description's applicable scope, be relevant to its Purpose, and, together with the other Outcomes, be sufficient to satisfy it. Review must check these properties. Each statement should carry one meaning and enough context to remain meaningful when referenced separately; brevity must not obscure independent objectives, results, or actions.
+Each Outcome must state one observable result condition. Independent results must not be joined in one Outcome; they must be distinguishable when judging achievement. Every Outcome must remain meaningful throughout the description's applicable scope, be relevant to and necessary for achieving its Purpose, and, together with the other Outcomes, be sufficient to satisfy it. Review must check these properties. Each statement should carry one meaning and enough context to remain meaningful when referenced separately; brevity must not obscure independent objectives, results, or actions.
 
 A Task states an action; an Outcome states a result condition. An **Output** is a product, information item, or service produced or updated by the work. Merely creating an Output must not be stated as an Outcome. An Output can provide evidence of an Outcome, but its existence alone does not establish success. For example, an explanation is an Output; the recipient's demonstrated understanding is an Outcome.
 
@@ -94,6 +94,8 @@ These relationships are independent and can be combined. Incremental application
 
 Iteration can refine Outputs as decisions and understanding develop. In Recursion, an Output at one level can become an Input at another. When an Output changes, affected Inputs and judgments must be reconsidered. Actual flow follows the purpose and conditions of application; the relationship names alone prescribe no sequence. Process selection and timing must be reviewed when the subject or context changes in a way that affects them.
 
+When application exposes questions or inconsistencies that affect intended Outcomes or the basis for a judgment, the affected work should be revisited through Iteration, correction, and evaluation toward their resolution. A decision to continue, pause, or stop must follow applicable conditions. Any unresolved issues and their effects on Outcomes and dependent work must remain explicit.
+
 ## 6. Models, views, and references
 
 | Construct | Role |
@@ -118,13 +120,15 @@ Summaries, translations, examples, and views must preserve the meaning and norma
 
 Instantiation makes an application concrete; Tailoring changes what applies. A tailored Process can also be instantiated. A context-specific choice already permitted by the description does not itself change that description.
 
-Distinguish a change to the description used as the reference point for meaning, a context-limited change to what applies, and a change in presentation. A change must identify the affected source and elements, scope, rationale, consequences, and necessary revalidation. Consider affected requirements and stakeholder needs, risks, available capabilities and resources, and applicable Controls and Constraints. The level of detail and rigor should be proportionate to these conditions.
+Distinguish a change to the description used as the reference point for meaning, a context-limited change to what applies, and a change in presentation. A change must identify the affected source and elements, scope, rationale, consequences, and necessary revalidation.
 
-Authority and approval follow the applying environment's conditions. A context-limited change must not silently redefine the source, remove an externally imposed requirement, or imply authority to waive a prohibition. When conditions change, assumptions and adaptation decisions should be reviewed. Revalidation must address affected Outcomes, work, conditions, references, shared information, and translations where relevant. Its results and unresolved limits must be explicit. The environment determines how the source, applicable description, changes, and supporting rationale are retained and versioned.
+Process selection and changes to Process meaning must be evaluated for their ability to satisfy the Purpose under applicable conditions. The evaluation must take account of affected requirements and stakeholder needs, relevant risks and risk tolerance, available capabilities and resources, and applicable Controls and Constraints. Necessary information from affected parties must be obtained and considered, with its source and applicability clear. Existing information may be used while it remains applicable. Missing information must be reported with its effect on the judgment. The level of detail and rigor should be proportionate to the consequences, uncertainty, and complexity of the decision.
+
+Authority and approval follow the applying environment's conditions. A context-limited change must not silently redefine the source, remove an externally imposed requirement, or imply authority to waive a prohibition. During application, the description in use, its applicable conditions, and the basis for selection or adaptation must remain identifiable. Revalidation must address affected Outcomes, work, conditions, references, shared information, and translations where relevant. Its results and unresolved limits must be explicit. The environment determines how the source, applicable description, changes, and supporting rationale are retained and versioned.
 
 ## 8. Evaluation and improvement
 
-An evaluation must identify its subject, scope, applicable criteria, evidence, and resulting judgment. Evidence supports a judgment; it is not the judgment itself. Keep these questions distinct:
+An evaluation must identify its subject, scope, applicable criteria, evidence, and resulting judgment. The criteria and evidence must apply to the subject and conditions at the time of judgment. If changed conditions or information affect that basis, the affected criteria, evidence, and judgments must be re-evaluated before they are relied on. Evidence supports a judgment; it is not the judgment itself. Keep these questions distinct:
 
 | Subject | Question |
 | --- | --- |
@@ -138,6 +142,6 @@ A successful description review must not be reported as successful execution. Ex
 
 **Capability** concerns the ability to achieve intended results. **Maturity** concerns how far a Process or its implementation is established, managed, and capable of consistent performance. These characteristics require evidence relevant to the assessed context; one successful application or satisfaction of requirements does not by itself establish them. Capability does not itself establish satisfaction of requirements. Effectiveness can be evaluated through Purpose and Outcomes, while benefits and costs can inform improvement decisions.
 
-Measures used in an evaluation should connect the information needed to defined measures, collected data, analysis, indicators, and the decisions they support. Findings and lessons can inform changes whose effects are evaluated against the intended results. Execution, approval, measurement, and record-keeping arrangements are supplied by the applying environment.
+Measures used in an evaluation should connect the information needed to defined measures, collected data, analysis, indicators, and the decisions they support. Findings and lessons should inform improvement decisions, and the effects of resulting changes should be assessed against the intended results. Execution, approval, measurement, and record-keeping arrangements are supplied by the applying environment.
 
 Unconfirmed facts, assumptions, unmet conditions, and exclusions must remain distinguishable. An exclusion needs an applicability rationale; missing evidence is not a reason to mark a requirement inapplicable. None of these conditions may be silently converted into success. Findings must expose evidence gaps and their consequences.
