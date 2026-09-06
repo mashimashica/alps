@@ -14,6 +14,7 @@ from urllib.parse import unquote, urlsplit
 
 
 ROOT = Path(__file__).resolve().parents[1]
+VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 SKILLS_ROOT = ROOT / "skills"
 DISTRIBUTED_SKILLS = ("design-process-description",)
 PLUGIN_MANIFESTS = (
@@ -40,8 +41,8 @@ REQUIRED_PATHS = (
     ROOT / "docs/locales/ja/CONTRIBUTING.md",
     ROOT / "docs/versioning.md",
     ROOT / "docs/locales/ja/versioning.md",
-    ROOT / "docs/unreleased-redesign.md",
-    ROOT / "docs/locales/ja/unreleased-redesign.md",
+    ROOT / "docs/releases" / f"{VERSION}.md",
+    ROOT / "docs/locales/ja/releases" / f"{VERSION}.md",
     ROOT / ".github/workflows/validate.yml",
     ROOT / "skills/design-process-description/references/SKILL-template.md",
     ROOT / "skills/design-process-description/references/examples.md",
@@ -92,6 +93,7 @@ def active_markdown_files(root: Path) -> list[Path]:
     files = [root / name for name in ("README.md", "AGENTS.md", "CONTRIBUTING.md")]
     files += [root / ".github/pull_request_template.md"]
     files += list((root / "docs").glob("*.md"))
+    files += [root / "docs/releases" / f"{VERSION}.md"]
     for directory in ("spec", "skills", "docs/locales/ja"):
         files += list((root / directory).rglob("*.md"))
     files += [root / ".agents/skills" / name / "SKILL.md" for name in REPOSITORY_SKILLS]
@@ -117,14 +119,13 @@ def local_links(path: Path) -> list[str]:
 
 class RepositoryIntegrityTests(unittest.TestCase):
     def test_manifest_names_and_versions_match_release_files(self) -> None:
-        version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
-        self.assertTrue(version)
+        self.assertTrue(VERSION)
 
         for manifest_path in PLUGIN_MANIFESTS:
             with self.subTest(manifest=manifest_path.relative_to(ROOT)):
                 manifest = load_json(manifest_path)
                 self.assertEqual(manifest.get("name"), "alps")
-                self.assertEqual(manifest.get("version"), version)
+                self.assertEqual(manifest.get("version"), VERSION)
 
         root_manifest = load_json(ROOT / "plugin.json")
         self.assertEqual(

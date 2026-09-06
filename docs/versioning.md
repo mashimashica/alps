@@ -46,7 +46,7 @@ A consumer should record, as applicable:
 
 A tag is immutable once published. A published tag must not be moved or reused for different content. Consumers that synchronize ALPS assets into another repository should pin both the tag and the commit SHA.
 
-The `main` branch represents ongoing development. Pending changes are described in the [unreleased notes](unreleased-redesign.md); released changes are documented in [CHANGELOG.md](../CHANGELOG.md).
+The `main` branch represents ongoing development. [CHANGELOG.md](../CHANGELOG.md) records pending changes in its `Unreleased` section and versioned changes in dated sections with links to the corresponding release notes.
 
 ## Release Procedure
 
