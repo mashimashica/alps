@@ -59,10 +59,10 @@ ALPSは意味と設計の支援を提供します。実行、保存、承認、�
 | Agent Skillへの対応付け | [ALPS Specification](../../../spec/ALPS-SPEC.md) | [ALPS Specification](../../../spec/locales/ja/ALPS-SPEC.md) |
 | 設計Skill | [Skill](../../../skills/design-process-description/SKILL.md) | [Skill](../../../skills/design-process-description/references/locales/ja/SKILL.md) |
 | 貢献とリポジトリ作業 | [CONTRIBUTING](../../../CONTRIBUTING.md)、[AGENTS](../../../AGENTS.md) | [CONTRIBUTING](CONTRIBUTING.md)、[AGENTS](AGENTS.md) |
-| 版管理方針と予定する互換性の変更 | [Versioning](../../../docs/versioning.md)、[unreleased redesign](../../../docs/unreleased-redesign.md) | [版管理](versioning.md)、[未リリースの再設計](unreleased-redesign.md) |
+| 版管理方針とリリースノート | [Versioning](../../../docs/versioning.md)、[0.6.0](../../../docs/releases/0.6.0.md) | [版管理](versioning.md)、[0.6.0](releases/0.6.0.md) |
 
 ## 版とライセンス
 
-リポジトリ全体を一つの単位として版管理します。リリースの範囲と互換性については、上記の版管理方針と未リリースの変更を参照してください。
+リポジトリ全体を一つの単位として版管理します。リリースの範囲と互換性については、上記の版管理方針とリリースノートを参照してください。
 
 明示された第三者資料を除き、本リポジトリは[Apache License 2.0](../../../LICENSE)で提供します。[NOTICE](../../../NOTICE)も参照してください。

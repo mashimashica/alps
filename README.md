@@ -59,10 +59,10 @@ ALPS supplies meaning and design support. Your environment supplies execution, s
 | Agent Skill correspondence | [ALPS Specification](spec/ALPS-SPEC.md) | [ALPS Specification](spec/locales/ja/ALPS-SPEC.md) |
 | Design Skill | [Skill](skills/design-process-description/SKILL.md) | [Skill](skills/design-process-description/references/locales/ja/SKILL.md) |
 | Contribution and repository work | [CONTRIBUTING](CONTRIBUTING.md), [AGENTS](AGENTS.md) | [CONTRIBUTING](docs/locales/ja/CONTRIBUTING.md), [AGENTS](docs/locales/ja/AGENTS.md) |
-| Version policy and pending compatibility changes | [Versioning](docs/versioning.md), [unreleased redesign](docs/unreleased-redesign.md) | [版管理](docs/locales/ja/versioning.md), [未リリースの再設計](docs/locales/ja/unreleased-redesign.md) |
+| Version policy and release notes | [Versioning](docs/versioning.md), [0.6.0](docs/releases/0.6.0.md) | [版管理](docs/locales/ja/versioning.md), [0.6.0](docs/locales/ja/releases/0.6.0.md) |
 
 ## Version and license
 
-The repository is versioned as one unit. See the version policy and unreleased changes linked above for release scope and compatibility information.
+The repository is versioned as one unit. See the version policy and release notes linked above for release scope and compatibility information.
 
 Except for identified third-party material, this repository is licensed under the [Apache License 2.0](LICENSE). See also [NOTICE](NOTICE).

@@ -81,8 +81,9 @@ jobs:
 
       - name: Check relative Markdown links
         run: |
+          release_version="$(cat VERSION)"
           find AGENTS.md README.md CONTRIBUTING.md spec skills .agents/skills \
-            docs/versioning.md docs/unreleased-redesign.md docs/locales/ja \
+            docs/versioning.md "docs/releases/$release_version.md" docs/locales/ja \
             .github/pull_request_template.md \
             -type f -name '*.md' -print0 \
             | xargs -0 npx --yes markdown-link-check@3.13.7 \

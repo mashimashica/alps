@@ -4,6 +4,21 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-06
+
+### Changed
+
+- Focus ALPS on designing and reviewing Process Descriptions through `design-process-description`, with a minimal template and concrete examples.
+- Retain the Process Framework's defined vocabulary and relationships, with Name, Purpose, and Outcomes as the required description elements and detail added according to need.
+- Clarify Outcome necessity and sufficiency, the basis for Process selection and changes, and re-evaluation when conditions or evidence change.
+- Preserve English/Japanese correspondence, native Host manifests, presentation resources, and repository distribution checks.
+
+### Removed
+
+- The previous distributed Skills, fixed lifecycle, logical Skill references and bindings, ALPS-specific Conformance schemes, and execution-record CLI and format.
+
+See the [release notes](docs/releases/0.6.0.md) ([Japanese](docs/locales/ja/releases/0.6.0.md)) for compatibility changes and application guidance.
+
 ## [0.5.0] - 2026-08-29
 
 Release notes: [ALPS 0.5.0](docs/releases/0.5.0.md).
