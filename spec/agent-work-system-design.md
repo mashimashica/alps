@@ -67,18 +67,3 @@ The evaluation must identify assumptions, unresolved findings, unperformed check
 Changes in model, tool, or environment capabilities should trigger review of the affected allocation, instructions, information supply, and exposed operations. The review must distinguish guidance compensating for a capability limitation from knowledge, criteria, and constraints required by the work itself.
 
 Proposed changes must preserve the intended results and applicable conditions or explicitly establish and justify changes to them. Affected behavior must be re-evaluated through the relevant component checks and representative work before relying on the changed configuration. The scope and limits of the resulting evidence must remain explicit.
-
-## Informative sources
-
-The principles above are an independent design formulation. The definition of Agent Work System is specific to this document. ISO 6385 informs the attention to the whole work system and function allocation; its human ergonomics requirements are not transferred to agents, and this document makes no claim of applying or conforming to that standard as a whole.
-
-| Source and kind | Edition and passages used |
-| --- | --- |
-| [ISO 6385:2016](https://www.iso.org/standard/63785.html), ergonomics standard | Third edition, 2016-09-15; scope, definitions of work system, work equipment, and allocation of functions (§§1, 2.2, 2.6, 2.15), and general design principles (§3.1), checked in the [public preview](https://cdn.standards.iteh.ai/samples/63785/29a50db0a6d048208c063c308b21f500/ISO-6385-2016.pdf). |
-| Eric S. Raymond, [The Art of Unix Programming](https://www.catb.org/esr/writings/taoup/html/), book | Published 2003; [publisher sample](https://ptgmedia.pearsoncmg.com/images/9780131429017/samplepages/0131429019.pdf), sixth printing September 2008, Chapter 1 §§1.6.1, 1.6.3, 1.6.4 (pp. 14–17): modularity, composition, and separation. |
-| IEEE Computer Society, [SWEBOK Guide](https://www.computer.org/education/bodies-of-knowledge/software-engineering), body of knowledge guide | [Version 4.0a, released August 2026](https://ieeecs-media.computer.org/media/education/swebok/swebok-v4.pdf); Chapter 3, §1.4 design principles, §2.1 interactions, and §§6.1–6.3 design quality and evaluation. |
-| Karun Japhet, Sahaj, [The Unix Philosophy for Agentic Coding](https://www.sahaj.ai/the-unix-philosophy-for-agentic-coding/), practice article | Undated online text; “The Pattern,” examples, and “Skills, Hooks, and Tools”: existing capabilities, small purpose-built tools, and agent composition. |
-| Anthropic, [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents), practice article | Dated 2024-12-19, current online text; “What are agents?”, “When (and when not) to use agents,” and tool engineering in Appendix 2. |
-| Anthropic, [Writing effective tools for agents — with agents](https://www.anthropic.com/engineering/writing-tools-for-agents), practice article | Dated 2025-09-11; evaluation, choosing tools, meaningful context, and tool descriptions. |
-
-Online sources were consulted on 2026-09-06. The book, guide, and practice articles inform responsibility boundaries, interfaces, composition, and evaluation; they do not define the requirements of this document.

@@ -67,18 +67,3 @@
 モデル・ツール・環境の能力が変わった場合、影響する配分、指示、情報供給、公開操作を見直すことが望ましい。見直しでは、能力の限界を補う誘導と、仕事自体に必要な知識・基準・制約を区別しなければならない。
 
 変更案では、意図した結果と適用条件を維持するか、それらへの変更を明確に定めて正当化しなければならない。変更後の構成を信頼して用いる前に、関係する構成要素の検証と代表的な仕事を通じて、影響する動作を再評価しなければならない。得られた証拠の範囲と限界を明示し続けなければならない。
-
-## 参考文献
-
-上記の原則は、独立した設計原則としてまとめたものである。エージェント作業システムの定義は本書固有のものである。ISO 6385は、作業システム全体と機能配分への着目を参考にしている。人間工学上の要求をエージェントへ移し替えるものではなく、規格全体の適用や適合を主張しない。
-
-| 出典と種類 | 参照した版と箇所 |
-| --- | --- |
-| [ISO 6385:2016](https://www.iso.org/standard/63785.html)、人間工学の規格 | 第3版、2016-09-15。適用範囲、作業システム・作業設備・機能配分の定義（§§1、2.2、2.6、2.15）、一般的な設計原則（§3.1）を[公開プレビュー](https://cdn.standards.iteh.ai/samples/63785/29a50db0a6d048208c063c308b21f500/ISO-6385-2016.pdf)で確認。 |
-| Eric S. Raymond、[The Art of Unix Programming](https://www.catb.org/esr/writings/taoup/html/)、書籍 | 2003年刊行。[出版社のサンプル](https://ptgmedia.pearsoncmg.com/images/9780131429017/samplepages/0131429019.pdf)、第6刷（2008年9月）の第1章§§1.6.1、1.6.3、1.6.4（pp. 14–17）：モジュール化、合成、分離。 |
-| IEEE Computer Society、[SWEBOK Guide](https://www.computer.org/education/bodies-of-knowledge/software-engineering)、知識体系ガイド | [Version 4.0a、2026年8月公開](https://ieeecs-media.computer.org/media/education/swebok/swebok-v4.pdf)。第3章§1.4の設計原則、§2.1の相互作用、§§6.1–6.3の設計品質と評価。 |
-| Karun Japhet、Sahaj、[The Unix Philosophy for Agentic Coding](https://www.sahaj.ai/the-unix-philosophy-for-agentic-coding/)、実践記事 | 日付表示のないオンライン本文。“The Pattern”、具体例、“Skills, Hooks, and Tools”における既存能力、小さな専用ツール、エージェントによる組合せ。 |
-| Anthropic、[Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)、実践記事 | 記事日付2024-12-19の現行オンライン本文。“What are agents?”、“When (and when not) to use agents”、Appendix 2のツール設計。 |
-| Anthropic、[Writing effective tools for agents — with agents](https://www.anthropic.com/engineering/writing-tools-for-agents)、実践記事 | 記事日付2025-09-11。評価、ツールの選定、意味のある情報、ツールの説明。 |
-
-オンライン資料の参照日は2026-09-06である。書籍、ガイド、実践記事は、責務の境界、インターフェース、組合せ、評価の参考情報であり、本書の要求を定義するものではない。

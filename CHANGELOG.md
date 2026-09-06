@@ -9,7 +9,7 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 ### Added
 
 - `design-agent-work-system` for designing, implementing, and evaluating the configuration of agents, tools, information resources, and execution environments that realizes work.
-- Independent Design Principles for Agent Work Systems, with English/Japanese sources and an informative bibliography.
+- Independent Design Principles for Agent Work Systems, with an English text and Japanese translation.
 - A service-change assessment example with a working Python tool, synthetic measurement fixtures, and separate description, tool, and work-system evaluation cases.
 
 ### Changed
