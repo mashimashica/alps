@@ -8,7 +8,7 @@
 >
 > — John Dewey, “The Pragmatism of Peirce” (1916), p. 711.
 
-## 1. Purpose and authority
+## 1. Purpose and normative language
 
 This Framework establishes a domain-independent basis for describing and understanding work: its intent, boundaries, work content, context, relationships, application, and evaluation. It supports general and context-specific work, including work performed once, while leaving execution means open where the context permits.
 
@@ -40,7 +40,7 @@ A Task states an action; an Outcome states a result condition. An **Output** is 
 
 ## 3. Work content and necessary detail
 
-Activities, Tasks, Inputs, Outputs, Controls, Constraints, Enablers, and Entry/Exit Criteria are included according to the purpose of the description and the detail needed to understand, apply, or evaluate the work. Their inclusion is optional; their meanings and relationships follow this Framework when they are used. A description must include necessary detail and must not contain empty optional sections or completeness-driven fields. Clarify an otherwise ambiguous scope where it matters. The applicable context and source identity can be expressed in the description or associated information.
+Activities, Tasks, Inputs, Outputs, Controls, Constraints, Enablers, and Entry/Exit Criteria are included according to the purpose of the description and the detail needed to understand, apply, or evaluate the work. Their inclusion is optional; their meanings and relationships follow this Framework when they are used. A description must include necessary detail and must not contain empty optional sections or completeness-driven fields. Clarify an otherwise ambiguous scope where it matters. The applicable context and the identity of any source description can be expressed in the description or associated information.
 
 An **Activity** is a cohesive set of Tasks within a Process. It organizes related actions as a continuous or iterative function narrower than the Process as a whole, so that their contribution can be understood. Tasks within an Activity should relate more closely to one another than to Tasks outside it.
 
@@ -106,9 +106,9 @@ These constructs can be ordinary reference materials. They must refer to source 
 
 A View must retain source identity and necessary Traceability. It can select, explain, or propose changes to source elements, with proposals and local additions clearly distinguished from source requirements. A change in presentation alone must not change obligations or success conditions. Reference material that organizes work is distinct from a Process Description; independently defined work needs its own Name, Purpose, and Outcomes.
 
-The authoritative description must be uniquely identifiable using ordinary links or identifying information. When reproducibility is needed, identify the applicable version, commit, digest, or equivalent alongside the reference. Each necessary reference must identify its intended target. If the target cannot be confirmed, report the missing reference and affected scope as unconfirmed; do not substitute a same-named document or another version.
+The description that serves as the reference point for meaning must be uniquely identifiable using ordinary links or identifying information. When reproducibility is needed, identify the applicable version, commit, digest, or equivalent alongside the reference. Each necessary reference must identify its intended target. If the target cannot be confirmed, report the missing reference and affected scope as unconfirmed; do not substitute a same-named document or another version.
 
-Summaries, translations, examples, and views must preserve authoritative meaning and normative force. Their sources must be identifiable wherever necessary to distinguish source content from interpretation or local additions. A translation is not a second authority.
+Summaries, translations, examples, and views must preserve the meaning and normative force of their sources. Those sources must be identifiable wherever necessary to distinguish source content from interpretation or local additions. A translation does not replace its source.
 
 ## 7. Context, instantiation, and change
 
@@ -118,7 +118,7 @@ Summaries, translations, examples, and views must preserve authoritative meaning
 
 Instantiation makes an application concrete; Tailoring changes what applies. A tailored Process can also be instantiated. A context-specific choice already permitted by the description does not itself change that description.
 
-Distinguish a change to the authoritative description, a context-limited change to what applies, and a change in presentation. A change must identify the affected source and elements, scope, rationale, consequences, and necessary revalidation. Consider affected requirements and stakeholder needs, risks, available capabilities and resources, and applicable Controls and Constraints. The level of detail and rigor should be proportionate to these conditions.
+Distinguish a change to the description used as the reference point for meaning, a context-limited change to what applies, and a change in presentation. A change must identify the affected source and elements, scope, rationale, consequences, and necessary revalidation. Consider affected requirements and stakeholder needs, risks, available capabilities and resources, and applicable Controls and Constraints. The level of detail and rigor should be proportionate to these conditions.
 
 Authority and approval follow the applying environment's conditions. A context-limited change must not silently redefine the source, remove an externally imposed requirement, or imply authority to waive a prohibition. When conditions change, assumptions and adaptation decisions should be reviewed. Revalidation must address affected Outcomes, work, conditions, references, shared information, and translations where relevant. Its results and unresolved limits must be explicit. The environment determines how the source, applicable description, changes, and supporting rationale are retained and versioned.
 

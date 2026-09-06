@@ -33,6 +33,6 @@ The semantic changes are deliberate:
 
 ## Distribution and review
 
-The complete Plugin retains the root manifest, Claude/Cursor/Codex adapters, presentation assets, English authority, and Japanese counterparts. Keep `spec/` beside `skills/` so the Skill's mandatory references are available. Repository-development Skills remain separate.
+The complete Plugin retains the root manifest, Claude/Cursor/Codex adapters, presentation assets, English source files, and Japanese counterparts. Keep `spec/` beside `skills/` so the Skill's mandatory references are available. Repository-development Skills remain separate.
 
 Repository tests and format checks assess distributable form and integrity. Semantic review separately checks the purpose and sufficient Outcomes, necessary detail, references and uncertainty, shared-information relationships, contextual conditions, and locale equivalence. An installed package must be checked against its actual contents; a version string alone does not identify an uncommitted development snapshot.

@@ -1,6 +1,6 @@
 ---
 name: sync-locales
-description: Review and synchronize authoritative English ALPS specifications, Process Descriptions, templates, examples, and guidance with their Japanese counterparts. Report semantic mismatches and unverified pairs. Repository-development Skill.
+description: Review and synchronize English ALPS source documents—specifications, Process Descriptions, templates, examples, and guidance—with their Japanese counterparts. Report semantic mismatches and unverified pairs. Repository-development Skill.
 ---
 
 # Locale Synchronization
@@ -11,7 +11,7 @@ Preserve the meaning, normative force, and source identity of English ALPS asset
 
 ## Outcomes
 
-- The authoritative source and the supported counterpart for each affected asset are identified.
+- The English source and the supported counterpart for each affected asset are identified.
 - Differences in meaning, applicability, normative force, and reference identity are explicit.
 - Requested translation corrections preserve source meaning, with unverified correspondence identified.
 
@@ -21,7 +21,7 @@ The following Tasks are required within the requested scope.
 
 ### Source and counterpart identification
 
-- Read [localization.yaml](../../../localization.yaml) to identify authoritative and supported locales.
+- Read [localization.yaml](../../../localization.yaml) to identify source and supported locales.
 - Map specification files to `spec/locales/ja/`, repository guidance and documents to `docs/locales/ja/`, and distributed Skill content to its `references/locales/ja/` counterparts.
 - Identify shared presentation resources and repository-development Skills using [AGENTS.md](../../../AGENTS.md); these do not require separate Plugin translations.
 
@@ -29,8 +29,8 @@ The following Tasks are required within the requested scope.
 
 - Compare complete semantic units by subject, modality, action or state, object, condition, quantifier, polarity, exceptions, and scope. Assess relationships between elements as well as individual statements.
 - Check that work structure, Outcome judgments, contextual conditions, source identity, change effects, and uncertainty have the same meaning.
-- Preserve canonical paths, identifiers, and code literals. Localized links may target the corresponding translation when its authoritative source remains identifiable.
-- Correct affected translations when synchronization is requested, preserving unrelated work. Keep changes to the authoritative source within the requested scope.
+- Preserve canonical paths, identifiers, and code literals. Localized links may target the corresponding translation when its English source remains identifiable.
+- Correct affected translations when synchronization is requested, preserving unrelated work. Keep changes to the English source within the requested scope.
 
 ### Correspondence evaluation
 

@@ -2,9 +2,9 @@
 
 [Japanese translation](docs/locales/ja/AGENTS.md)
 
-These instructions apply to the repository. Follow the user's authorized scope and preserve unrelated work and user-authored data. `localization.yaml` defines English as authoritative and Japanese as supported.
+These instructions apply to the repository. Follow the user's authorized scope and preserve unrelated work and user-authored data. `localization.yaml` defines English as the source locale and Japanese as supported.
 
-## Authority
+## Sources
 
 | Subject | Source |
 | --- | --- |
@@ -20,12 +20,12 @@ Do not infer Process requirements from tests, templates, Host manifests, icons, 
 
 | Path | Role |
 | --- | --- |
-| `skills/design-process-description/` | The only distributed Skill; its root English `SKILL.md` is authoritative. |
+| `skills/design-process-description/` | The only distributed Skill; its root English `SKILL.md` is the source for that Process. |
 | `.agents/skills/design-process-description` | Relative symlink to `../../skills/design-process-description` for repository discovery. |
 | `.agents/skills/review-alps/` | Real directory for repository semantic and distribution review; not a Plugin Skill. |
 | `.agents/skills/sync-locales/` | Real directory for English/Japanese review; not a Plugin Skill. |
 | `spec/` | Shared normative sources included in the Plugin root. |
-| `spec/locales/ja/`, `docs/locales/ja/`, and the distributed Skill's `references/locales/ja/` | Supported translations; no second authority. |
+| `spec/locales/ja/`, `docs/locales/ja/`, and the distributed Skill's `references/locales/ja/` | Supported translations of the corresponding English source files. |
 | `plugin.json`, `.claude-plugin/`, `.cursor-plugin/`, `.codex-plugin/` | Root Plugin format and distinct Host adapters. |
 | `assets/` and the Skill's `agents/` and `assets/` | Presentation resources. |
 

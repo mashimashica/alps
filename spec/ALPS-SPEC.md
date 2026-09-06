@@ -2,7 +2,7 @@
 
 [Japanese translation](locales/ja/ALPS-SPEC.md)
 
-## 1. Scope and authority
+## 1. Scope and precedence
 
 This specification maps a Process Description to an Agent Skill. The [Process Framework](process-framework.md) defines Process meaning, relationships, normative language, and evaluation. It takes precedence over this specification.
 
@@ -22,9 +22,9 @@ The body must contain Name, Purpose, and one or more Outcomes. Additional elemen
 
 Frontmatter and Host displays must remain consistent with the description's meaning and scope. Discovery information summarizes the description; it does not replace it. Loading a Skill does not establish that its work has been performed. Reference material must remain distinguishable from a Process Description.
 
-## 3. Authority and resources
+## 3. Sources and resources
 
-Each Skill carrying a Process Description must have one identifiable authoritative description. Translations, summaries, and linked materials must preserve its meaning and normative force, with their relationship to the source clear.
+Each Skill carrying a Process Description must identify one description as the reference point for its meaning. Translations, summaries, and linked materials must make their relationship to that description clear and preserve its meaning and normative force.
 
 A Skill must identify the role and conditions of use of each supporting resource it requires. Necessary references must be accessible under the intended distribution arrangement. Packaged relative links must resolve within that arrangement; external references must identify the intended source and any access conditions. Apply the Framework's rules when a required reference cannot be confirmed.
 

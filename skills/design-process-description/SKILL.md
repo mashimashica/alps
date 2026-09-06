@@ -36,9 +36,9 @@ The Tasks below are required within the requested scope, except where stated as 
 
 ### Source and relationship alignment
 
-- Identify the authoritative description and confirm required references against their intended sources.
+- Identify the description used as the reference point for meaning and confirm required references against their intended sources.
 - Clarify the meaning, use, and change effects of information shared with related work, including which work reads or updates it.
-- For changes, establish the affected source and elements, scope, rationale, consequences, and necessary revalidation. Distinguish a source change, a context-limited change, an application-specific choice, and a change in presentation.
+- For changes, establish the affected description and elements, scope, rationale, consequences, and necessary revalidation. Distinguish a change to the description used as the reference point for meaning, a context-limited change, an application-specific choice, and a change in presentation.
 
 ### Description evaluation
 
@@ -56,7 +56,7 @@ A review-only request must be answered with findings and any requested correctio
 
 ## Resources
 
-This root `SKILL.md` is the authoritative English description. The [Japanese translation](references/locales/ja/SKILL.md) carries the same meaning and normative force.
+This root `SKILL.md` is the English source for the [Japanese translation](references/locales/ja/SKILL.md), which carries the same meaning and normative force.
 
 - [Minimal template](references/SKILL-template.md): use when drafting an Agent Skill.
 - [Examples and review cases](references/examples.md): consult relevant cases when choosing work detail, describing shared information or views, or evaluating incomplete evidence.

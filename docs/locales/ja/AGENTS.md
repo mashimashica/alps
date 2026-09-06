@@ -1,12 +1,12 @@
 # リポジトリ作業指示
 
-[英語正本](../../../AGENTS.md)
+[英語版](../../../AGENTS.md)
 
-本指示はリポジトリに適用する。ユーザーが許可した範囲に従い、無関係な作業とユーザー作成データを保全する。`localization.yaml`は英語を正本、日本語を対応言語と定める。
+本指示はリポジトリに適用する。ユーザーが許可した範囲に従い、無関係な作業とユーザー作成データを保全する。`localization.yaml`は英語を基準言語、日本語を対応言語と定める。
 
-## 正本の位置付け
+## 参照する文書
 
-| 対象 | 正本 |
+| 対象 | 参照する文書 |
 | --- | --- |
 | プロセスの意味、境界、参照、変更、評価 | [プロセスフレームワーク](../../../spec/locales/ja/process-framework.md) |
 | プロセス記述とAgent Skillの対応付け | フレームワークに従う[ALPS Specification](../../../spec/locales/ja/ALPS-SPEC.md) |
@@ -20,16 +20,16 @@
 
 | パス | 役割 |
 | --- | --- |
-| `skills/design-process-description/` | 唯一の配布Skill。ルートの英語`SKILL.md`が正本。 |
+| `skills/design-process-description/` | 唯一の配布Skill。ルートの英語`SKILL.md`を基準とする。 |
 | `.agents/skills/design-process-description` | リポジトリ内の発見用に`../../skills/design-process-description`を指す相対symlink。 |
 | `.agents/skills/review-alps/` | リポジトリの意味と配布をレビューする実ディレクトリ。Plugin Skillではない。 |
 | `.agents/skills/sync-locales/` | 日英レビューの実ディレクトリ。Plugin Skillではない。 |
-| `spec/` | Pluginルートに含める共有の規範正本。 |
-| `spec/locales/ja/`、`docs/locales/ja/`、配布Skillの`references/locales/ja/` | 対応する翻訳。第二の正本ではない。 |
+| `spec/` | Pluginルートに含める共有の規範文書。 |
+| `spec/locales/ja/`、`docs/locales/ja/`、配布Skillの`references/locales/ja/` | 対応する英語版の翻訳。 |
 | `plugin.json`、`.claude-plugin/`、`.cursor-plugin/`、`.codex-plugin/` | ルートPlugin形式と、それぞれのHostアダプター。 |
 | `assets/`およびSkillの`agents/`と`assets/` | 表示資源。 |
 
-`skills/`を配布の唯一の正本とする。Hostは各規約とmanifestにより発見する。`.agents/skills/`はリポジトリ内の統合ビューであり、普遍的なHost規約ではない。checkoutに開発用Skillを含めても、それをPlugin Skillとして公開することにはならない。`spec/`への必須リンクが利用できるようPluginルートの配置を保つ。開発用Skillを`skills/`へコピーしない。
+`skills/`を唯一の配布元とする。Hostは各規約とmanifestにより発見する。`.agents/skills/`はリポジトリ内の統合ビューであり、普遍的なHost規約ではない。checkoutに開発用Skillを含めても、それをPlugin Skillとして公開することにはならない。`spec/`への必須リンクが利用できるようPluginルートの配置を保つ。開発用Skillを`skills/`へコピーしない。
 
 ## 変更とレビュー
 

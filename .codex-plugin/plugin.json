@@ -21,7 +21,7 @@
   "interface": {
     "displayName": "ALPS",
     "shortDescription": "Purpose and success made clear",
-    "longDescription": "ALPS helps create, revise, and review Process Descriptions for general or context-specific work. Clarify why work is done, which observable results count as success, and which boundaries and details are necessary. Preserve source authority, required conditions, and uncertainty while leaving execution, storage, and approval to the environment.",
+    "longDescription": "ALPS helps create, revise, and review Process Descriptions for general or context-specific work. Clarify why work is done, which observable results count as success, and which boundaries and details are necessary. Keep the source of each description, required conditions, and uncertainty clear while leaving execution, storage, and approval to the environment.",
     "developerName": "mashimashica",
     "category": "Developer Tools",
     "capabilities": [

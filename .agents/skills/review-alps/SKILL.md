@@ -1,6 +1,6 @@
 ---
 name: review-alps
-description: Review ALPS repository changes for semantic consistency, source authority, evaluation limits, and distribution integrity across specifications, the design Skill, resources, tests, and guidance. Repository-development Skill.
+description: Review ALPS repository changes for semantic consistency, source relationships, evaluation limits, and distribution integrity across specifications, the design Skill, resources, tests, and guidance. Repository-development Skill.
 ---
 
 # ALPS Repository Review

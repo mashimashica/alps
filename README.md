@@ -44,7 +44,7 @@ The [minimal template](skills/design-process-description/references/SKILL-templa
 | What is produced or updated? | Output; its existence alone is not success |
 | What is examined or transformed? | Input |
 | What directs, limits, or enables the work? | Control, Constraint, Enabler |
-| What is the source, and what changes locally? | Authority, reference, translation, and context-limited change |
+| Which description is the source, and what changes locally? | Source description, reference, translation, and context-limited change |
 | What does a review establish? | A judgment about the description, separate from execution results and satisfaction of requirements |
 
 Add Activities, Tasks, boundary elements, and Entry/Exit Criteria when they help explain the work. The Framework defines their meanings and relationships so that additional detail remains consistent. Necessary methods or order can be scoped to the relevant context. Multiple Processes can consult and update the same information; a Model or View can link to their descriptions without duplicating their Purposes and Outcomes.
