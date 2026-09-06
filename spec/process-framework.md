@@ -12,9 +12,7 @@
 
 This Framework establishes a domain-independent basis for describing and understanding work: its intent, boundaries, work content, context, relationships, application, and evaluation. It supports general and context-specific work, including work performed once, while leaving execution means open where the context permits.
 
-This Framework governs Process meaning.
-
-**Must** states a requirement; **must not** states a prohibition. **Should** and **should not** state recommendations. **May** states permission. **Typically** describes customary practice; **can** and **could** express possibility or capability. These last expressions carry no normative force. A description must make each statement's force and scope clear. Applicable requirements and prohibitions retain their force regardless of the assessment method or whether a claim is made.
+Within this Framework, **must** states a requirement; **must not** states a prohibition. **Should** and **should not** state recommendations. **May** states permission. **Typically** describes customary practice; **can** and **could** express possibility or capability. These last expressions carry no normative force. A description must make each statement's force and scope clear. Applicable requirements and prohibitions retain their force regardless of the assessment method or whether a claim is made.
 
 Examples, notes, conventions, and other reference information are informative. They must not alter the meaning or normative force of the Process elements they explain.
 
