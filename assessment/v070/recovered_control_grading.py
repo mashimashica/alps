@@ -1,4 +1,4 @@
-"""Package the reviewed S06 C-U084–093 recovery evidence without inventing finals.
+"""Package reviewed C-U084–093 evidence and label four new creator recovery freezes.
 
 Assessment infrastructure only. This module neither grades nor executes a task.
 The fixed recovery inputs are deliberately closed to unreviewed additions.
@@ -45,6 +45,11 @@ ORIGINAL_RELAYS = {
 }
 CAPTURE_SHA256 = "112e2dc9ab5110e0ef0dd99eb0be53c21a42e5d57978c4626832424fb296c9c4"
 WORKFLOW_SHA256 = "0abbc92774a836c30973c9737b3c758d441380122565f54f4e3f401711722006"
+REQUEST_PROVENANCE_PATH = "recovery/C-U092-request-hash-match-provenance.json"
+REQUEST_PROVENANCE_SHA256 = "1d97138dabefb9389245c0804044cb8733668e75fccd3197328b14917729ee86"
+CREATOR_COMPANION_PATH = "recovery/creator-recovery-freezes-001.json"
+CREATOR_COMPANION_SHA256 = "03cd21ec820654b6978ea75c903bde1863b1cc625614fe5bbf1859d693f1d402"
+RECOVERED_CREATORS = {f"control-{number:03}" for number in range(69, 73)}
 BOUNDARY_ADDENDUM = """
 Some S06 applications include evidence-availability.md and recovery-provenance.json.
 Read these before assessing the application. Prepared inputs/Skills are the
@@ -202,11 +207,23 @@ def plan_application(root, consumer_id, assignment):
         else:
             raise ValueError("Unknown supplemental evidence role")
         add(item["path"], destination, item["sha256"], item["scope"])
+    if consumer_id == "C-U092":
+        request_provenance = json.loads(checked_bytes(root, REQUEST_PROVENANCE_PATH, REQUEST_PROVENANCE_SHA256))
+        rendering = checked_bytes(root, request_provenance["source"]["path"], request_provenance["source"]["sha256"])
+        exact = checked_bytes(root, request_provenance["recovered"]["path"], request_provenance["recovered"]["sha256"])
+        review = request_provenance["independent_review"]
+        checked_bytes(root, review["path"], review["sha256"])
+        if not rendering.endswith(b"\n") or rendering[:-1] != exact or len(exact) != request_provenance["byte_length"]:
+            raise ValueError("C-U092 request bytes do not match the reviewed one-LF removal")
+        add(request_provenance["recovered"]["path"], "recovered-work-evidence/request-hash-matched.json",
+            request_provenance["recovered"]["sha256"], request_provenance["scope"])
+        add(REQUEST_PROVENANCE_PATH, "recovery-provenance/request-hash-match.json", REQUEST_PROVENANCE_SHA256,
+            "reviewed request-checkpoint byte recovery; not final API state")
     missing = ["Original per-application final API metadata, original SQLite byte identity and complete call history.",
                "A complete post-execution resource inventory; prepared-resource hashes do not establish it.",
                "Uncaptured locks, journals and other absent filesystem observations."]
     if consumer_id == "C-U092":
-        missing.append("Final API SQL and its historical captured digest are unavailable. The request/checkpoint rendering is a different artifact.")
+        missing.append("Final API SQL and its historical captured digest are unavailable. The request/checkpoint rendering and hash-matched request bytes are a different artifact.")
     if consumer_id == "C-U093":
         missing.append("The consumer-produced workflow SQLite checkpoint and its native SQL remain unavailable despite retained historical hashes. The API-state supplement is a different database.")
     if consumer_id == "C-U091":
@@ -230,7 +247,8 @@ def plan_application(root, consumer_id, assignment):
                     "committed-initial-state/ and setup-observations.json are original initial evidence. "
                     "Any logical-state-supplement/ contains committed SQL matching a historically recorded digest; "
                     "it is not original per-trial final metadata or a new final capture. "
-                    "Recovered checkpoint files, where present, remain explicitly labelled renderings. "
+                    "Recovered checkpoint renderings remain labelled renderings; any separately named hash-matched request bytes "
+                    "retain their exact-byte transformation and historical digest proof. "
                     "Their source/provenance and the selected historical observations are included.\n\n"
                     "Unavailable observations:\n\n" + "".join(f"- {item}\n" for item in missing)
                     + "\nThe original business criteria, denominator and missing-observation rules remain unchanged. "
@@ -239,12 +257,8 @@ def plan_application(root, consumer_id, assignment):
             "availability": availability, "historical_excerpt": historical_excerpt(root, consumer_id)}
 
 
-def write_application(root, plan, destination, copy_file):
-    checked_path(destination)
-    if destination.exists() or not destination.is_relative_to(root):
-        raise ValueError("Preserve existing/partial recovered application packet")
-    destination.mkdir(parents=True, exist_ok=False)
-    for item in plan["files"]:
+def copy_planned_files(root, files, destination, copy_file):
+    for item in files:
         original = source(root, item["source"])
         checked_bytes(root, item["source"], item["sha256"])
         if stat.S_IMODE(original.stat().st_mode) != item["observed_copy_source_mode"]:
@@ -253,9 +267,78 @@ def write_application(root, plan, destination, copy_file):
         copy_file(original, target)
         if sha_bytes(target.read_bytes()) != item["sha256"] or stat.S_IMODE(target.stat().st_mode) != item["observed_copy_source_mode"]:
             raise ValueError("Recovery evidence copy differs")
+
+
+def write_application(root, plan, destination, copy_file):
+    checked_path(destination)
+    if destination.exists() or destination.resolve() != destination or not destination.is_relative_to(root):
+        raise ValueError("Preserve existing/partial recovered application packet")
+    destination.mkdir(parents=True, exist_ok=False)
+    copy_planned_files(root, plan["files"], destination, copy_file)
     generated = {"evidence-availability.md": plan["availability"],
                  "recovery-provenance.json": json.dumps(plan["provenance"], indent=2) + "\n",
                  "recovery-provenance/historical-state-observations.md": plan["historical_excerpt"]}
     for relative, text in generated.items():
         with (destination / relative).open("x", encoding="utf-8") as stream:
             stream.write(text)
+
+
+def plan_creator(root, creator_id, package):
+    """Attach a filtered new-freeze observation; never rewrite the evaluated Skill."""
+    if creator_id not in RECOVERED_CREATORS:
+        return None
+    companion = json.loads(checked_bytes(root, CREATOR_COMPANION_PATH, CREATOR_COMPANION_SHA256))
+    if set(companion["creators"]) != RECOVERED_CREATORS:
+        raise ValueError("Exactly the four reviewed creator recovery freezes are required")
+    for reference in (*companion["evidence_reviews"], companion["rematerialization"], companion["common_display_recovery"]):
+        checked_bytes(root, reference["path"], reference["sha256"])
+    entry = companion["creators"][creator_id]
+    for reference in (entry["relay"], entry["format_observation"], entry["freeze_manifest"], *entry["consumer_assignments"]):
+        checked_bytes(root, reference["path"], reference["sha256"])
+    freeze = json.loads(source(root, entry["freeze_manifest"]["path"]).read_text())
+    if (freeze["creator_id"] != creator_id or package.parent != root / "frozen/control-artifacts" / creator_id
+            or package.name != Path(freeze["frozen_path"]).name
+            or freeze["file_sha256"] != entry["frozen_resource_sha256"]
+            or freeze["source_file_modes"] != entry["newly_observed_source_file_modes"]
+            or file_hashes(checked_path(package)) != entry["frozen_resource_sha256"]
+            or {name: stat.S_IMODE((package / name).stat().st_mode) for name in file_hashes(package)}
+            != entry["newly_observed_source_file_modes"]):
+        raise ValueError("New recovery freeze/resource identity differs")
+    for reference in entry["consumer_assignments"]:
+        assignment = json.loads(source(root, reference["path"]).read_text())
+        if assignment["creator_id"] != creator_id or assignment["artifact_freeze_sha256"] != entry["freeze_manifest"]["sha256"]:
+            raise ValueError("Reconstructed preparation does not bind the reviewed recovery freeze")
+    rematerialization = json.loads(source(root, companion["rematerialization"]["path"]).read_text())
+    selected_placement = [item for item in rematerialization["files"]
+                          if item["destination_path"].startswith(f"trials/{creator_id}/")]
+    # No whole review, other creator entry, schedule or consumer assignment body
+    # enters the blind packet. The preserved relay and format observation contain
+    # this candidate's public evidence, without model/effort mappings or grades.
+    files = []
+    for field, destination in (("relay", "source-relay.md"), ("format_observation", "format-observation.json")):
+        reference = entry[field]
+        files.append({"source": reference["path"], "destination": destination, "sha256": reference["sha256"],
+                      "observed_copy_source_mode": stat.S_IMODE(source(root, reference["path"]).stat().st_mode)})
+    provenance = {"source_companion": CREATOR_COMPANION_PATH, "source_companion_sha256": CREATOR_COMPANION_SHA256,
+                  "observation_utc": companion["observation_utc"], "scope": companion["scope"],
+                  "creator": entry, "evidence_reviews": companion["evidence_reviews"],
+                  "rematerialization_source": companion["rematerialization"],
+                  "this_creator_rematerialized_files": selected_placement}
+    return {"files": files, "provenance": provenance}
+
+
+def write_creator(root, plan, destination, copy_file):
+    checked_path(destination)
+    if destination.exists() or destination.resolve() != destination or not destination.is_relative_to(root):
+        raise ValueError("Preserve existing/partial creator recovery provenance")
+    destination.mkdir(parents=True, exist_ok=False)
+    copy_planned_files(root, plan["files"], destination, copy_file)
+    with (destination / "creator-recovery-provenance.json").open("x", encoding="utf-8") as stream:
+        json.dump(plan["provenance"], stream, indent=2)
+        stream.write("\n")
+    with (destination / "README.md").open("x", encoding="utf-8") as stream:
+        stream.write("# Recovery provenance\n\n" + plan["provenance"]["creator"]["content_provenance"] + ".\n\n"
+                     + plan["provenance"]["creator"]["historical_limits"] + "\n\n"
+                     "This candidate's current canonical freeze and consumer preparation are new recovery observations. "
+                     "The attached format observation is mechanical validation at recovery time, not semantic or business grading. "
+                     "Original task criteria and evaluation rules are unchanged.\n")

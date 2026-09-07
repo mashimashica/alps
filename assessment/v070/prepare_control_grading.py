@@ -156,6 +156,7 @@ def main():
         if sha(ROOT / "frozen/main-cases" / family / relative) != digest:
             raise ValueError("Original creator business input changed")
     plans = []
+    creator_recoveries = {}
     for code, creator_id in zip(("R17", "R63", "R28", "R44"), packet["creators"]):
         if creators[creator_id]["execution"] != "completed":
             raise ValueError(f"Creator is not explicitly complete: {creator_id}")
@@ -170,6 +171,7 @@ def main():
                 inventory(package) != freeze["file_sha256"] or
                 file_modes(package) != freeze["source_file_modes"]):
             raise ValueError(f"Frozen package changed: {creator_id}")
+        creator_recoveries[creator_id] = recovered_control_grading.plan_creator(ROOT, creator_id, package)
         applications = []
         number = int(creator_id.rsplit("-", 1)[1])
         for index, variant in enumerate(("ordinary", "challenging")):
@@ -241,6 +243,9 @@ def main():
         copy_tree(package, candidate / "package" / package.name, excluded_caches)
         creator = ROOT / "trials" / creator_id
         copy_file(creator / "execution-note.md", candidate / "creator-reported-checks.md")
+        if creator_recoveries[creator_id] is not None:
+            recovered_control_grading.write_creator(ROOT, creator_recoveries[creator_id],
+                                                    candidate / "recovery-provenance", copy_file)
         creator_caches = artifact_inventory(creator / "deliverables")[1]
         if creator_caches:
             excluded_caches[(creator / "deliverables").relative_to(ROOT).as_posix()] = creator_caches

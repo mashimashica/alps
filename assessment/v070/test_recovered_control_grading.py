@@ -1,5 +1,6 @@
 """Disposable packaging checks, never a consumer run or a real grading packet."""
 
+import ast
 import csv
 import hashlib
 import json
@@ -21,7 +22,9 @@ class RecoveredGradingTests(unittest.TestCase):
         self.root = Path(self.temporary.name) / "assessment"
         self.root.mkdir()
         for relative in ("control-consumer-list.tsv", "RECOVERY-ENVIRONMENT-OFFLINE.md",
-                         "state-snapshots/C-U073/final.sql", "state-snapshots/C-U074/final.sql"):
+                         "state-snapshots/C-U073/final.sql", "state-snapshots/C-U074/final.sql",
+                         "recovery/C-U092-request-hash-matched.json", recovery.REQUEST_PROVENANCE_PATH,
+                         "audits/recovered-evidence-sufficiency-review.md"):
             self.copy(relative)
         shutil.copytree(SOURCE / "recovery/consumer-evidence", self.root / "recovery/consumer-evidence")
         for consumer_id in recovery.ASSIGNMENT_SHA256:
@@ -90,6 +93,18 @@ class RecoveredGradingTests(unittest.TestCase):
         (self.root / "recovery/consumer-evidence/C-U091/checkpoint-rendering.json").unlink()
         with self.assertRaisesRegex(ValueError, "Missing, changed or unknown"):
             self.plan("C-U091")
+
+    def test_hash_matched_request_bytes_stay_distinct_from_missing_api_state(self):
+        destination = self.write("C-U092")
+        request = destination / "recovered-work-evidence/request-hash-matched.json"
+        self.assertEqual(len(request.read_bytes()), 1454)
+        self.assertEqual(recovery.sha_bytes(request.read_bytes()), "cf3b8effece5f3c1c9be5e405b5240a66d68d83c984a9795304481974fc486ee")
+        self.assertEqual((destination / "recovered-work-evidence/checkpoint-rendering.json").read_bytes(), request.read_bytes() + b"\n")
+        self.assertFalse((destination / "logical-state-supplement").exists())
+        self.assertIn("Final API SQL and its historical captured digest are unavailable", (destination / "evidence-availability.md").read_text())
+        (self.root / "recovery/C-U092-request-hash-matched.json").write_text("{}")
+        with self.assertRaisesRegex(ValueError, "Preserved recovery evidence changed"):
+            self.plan("C-U092")
 
     def test_changed_or_added_supplement_is_rejected(self):
         path = self.root / "recovery/consumer-evidence/C-U086/answer.md"
@@ -188,6 +203,101 @@ class RecoveredGradingTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "symlink"):
             self.plan()
         self.assertFalse((self.root / "disposable-packets").exists())
+
+    def test_actual_application_loop_packages_supplement_without_original_final_claims(self):
+        node = next(node for node in ast.walk(ast.parse(Path(grading.__file__).read_text()))
+                    if isinstance(node, ast.For) and isinstance(node.target, ast.Tuple)
+                    and [item.id for item in node.target.elts] == ["variant", "use_id", "folder", "assignment", "recovered"])
+        use_id = "C-U086"
+        assignment = self.assignment(use_id)
+        candidate = self.root / "disposable-packets/integrated/R17"
+        mapping = {"R17": {"creator": assignment["creator_id"], "consumers": []}}
+        environment = {**vars(grading), "ROOT": self.root, "candidate": candidate, "code": "R17", "mapping": mapping,
+                       "excluded_caches": {}, "family": "S06", "applications": [
+                           (assignment["variant"], use_id, self.root / "consumers" / use_id, assignment, self.plan(use_id))]}
+        exec(compile(ast.Module(body=[node], type_ignores=[]), "actual-grading-application-loop", "exec"), environment)
+        destination = candidate / assignment["variant"]
+        self.assertEqual(mapping["R17"]["consumers"], [use_id])
+        self.assertTrue((destination / "recovered-public-text/answer.md").is_file())
+        self.assertFalse((destination / "observed-final-skill").exists())
+
+    def test_noncanonical_destination_is_refused(self):
+        destination = self.root / "unused" / ".." / "outside"
+        with self.assertRaisesRegex(ValueError, "existing/partial"):
+            recovery.write_application(self.root, self.plan(), destination, grading.copy_file)
+        self.assertFalse((self.root / "outside").exists())
+
+
+class CreatorRecoveryGradingTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="alps-creator-recovery-grading-test-")
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name) / "assessment"
+        self.root.mkdir()
+        companion = json.loads((SOURCE / recovery.CREATOR_COMPANION_PATH).read_text())
+        paths = {recovery.CREATOR_COMPANION_PATH}
+        paths.update(item["path"] for item in (*companion["evidence_reviews"], companion["rematerialization"], companion["common_display_recovery"]))
+        self.packages = {}
+        for creator_id, entry in companion["creators"].items():
+            paths.update(item["path"] for item in (entry["relay"], entry["format_observation"], entry["freeze_manifest"], *entry["consumer_assignments"]))
+            freeze = json.loads((SOURCE / entry["freeze_manifest"]["path"]).read_text())
+            relative = Path("frozen/control-artifacts") / creator_id / Path(freeze["frozen_path"]).name
+            paths.update(str(relative / name) for name in freeze["file_sha256"])
+            self.packages[creator_id] = self.root / relative
+        for relative in paths:
+            target = self.root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(SOURCE / relative, target)
+
+    def plan(self, creator_id="control-071"):
+        return recovery.plan_creator(self.root, creator_id, self.packages[creator_id])
+
+    def test_all_four_attach_only_the_candidates_recovery_evidence(self):
+        for creator_id in recovery.RECOVERED_CREATORS:
+            with self.subTest(creator=creator_id):
+                plan = self.plan(creator_id)
+                destination = self.root / "disposable-packets" / creator_id
+                recovery.write_creator(self.root, plan, destination, grading.copy_file)
+                names = {path.name for path in destination.iterdir()}
+                self.assertEqual(names, {"source-relay.md", "format-observation.json", "creator-recovery-provenance.json", "README.md"})
+                provenance = json.loads((destination / "creator-recovery-provenance.json").read_text())
+                self.assertNotIn("creators", provenance)
+                self.assertEqual(provenance["creator"]["frozen_resource_sha256"], recovery.file_hashes(self.packages[creator_id]))
+                self.assertTrue(all(item["destination_path"].startswith(f"trials/{creator_id}/") for item in provenance["this_creator_rematerialized_files"]))
+                self.assertIn("lost original coordinator format report", (destination / "README.md").read_text())
+                self.assertEqual(json.loads((destination / "format-observation.json").read_text())["trial"], creator_id)
+                for outside in recovery.RECOVERED_CREATORS - {creator_id}:
+                    self.assertNotIn(outside, json.dumps(provenance))
+                self.assertNotIn("requested_model", json.dumps(provenance))
+                self.assertNotIn("requested_effort", json.dumps(provenance))
+
+    def test_non_recovered_creator_does_not_require_a_companion(self):
+        (self.root / recovery.CREATOR_COMPANION_PATH).unlink()
+        self.assertIsNone(recovery.plan_creator(self.root, "control-068", self.root / "unused"))
+        with self.assertRaises(FileNotFoundError):
+            self.plan()
+
+    def test_missing_review_or_changed_consumer_assignment_blocks_new_freeze_attachment(self):
+        review = self.root / "audits/recovered-evidence-sufficiency-review.md"
+        original = review.read_bytes()
+        review.unlink()
+        with self.assertRaises(FileNotFoundError):
+            self.plan()
+        review.write_bytes(original)
+        (self.root / "consumer-assignments/C-U141.json").write_text("{}\n")
+        with self.assertRaisesRegex(ValueError, "Preserved recovery evidence changed"):
+            self.plan()
+
+    def test_changed_frozen_resource_or_mode_is_rejected(self):
+        resource = self.packages["control-071"] / "SKILL.md"
+        original = resource.read_bytes()
+        resource.write_bytes(original + b"changed\n")
+        with self.assertRaisesRegex(ValueError, "freeze/resource identity differs"):
+            self.plan()
+        resource.write_bytes(original)
+        resource.chmod(0o600)
+        with self.assertRaisesRegex(ValueError, "freeze/resource identity differs"):
+            self.plan()
 
 
 if __name__ == "__main__":

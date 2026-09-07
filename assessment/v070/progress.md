@@ -9,7 +9,7 @@ Frozen current main A is dee3866d35e43db5db480fc9f85166a8dcb1ec3b, VERSION 0.7.0
 | Stage | Completed design | Completed consumer | Other completed | Planned task trials |
 | --- | ---: | ---: | ---: | ---: |
 | Calibration | 12 | 24 | 0 | 36 |
-| C control | 72 | 97 | 0 | 216 |
+| C control | 72 | 102 | 0 | 216 |
 | Remaining base plan | 0 | 0 | 0 | up to 1,776 |
 
 Additional diagnostic reserve: at most 72 starts across at most three rounds. H01–H03 used 68 starts: 66 complete and two retained interrupted originals. Four slots remain, but do not authorize a fourth ordinary round. Across calibration/development, 34 creators and 68 valid consumers are complete. Completed tasks, observation validity, business adequacy and achieved Outcomes are different counts.
@@ -41,3 +41,5 @@ The environment reconnected with an older local snapshot. Exact remote commit 75
 scope-decision-required.md preserves the exact blocked stages and later decision. Continue all independently authorized C work and reviews; do not start an unqualified B comparison, reopen ordinary tuning, waive complete-package stages or finalize the example pool. No ALPS added-value estimate, convergence, final exemplar, or release readiness is established.
 
 Baseline nine repository tests passed. The twelve public main-case families (36 files) are frozen. Experiment-only compare_main.py has 13 meaningful numerical/denominator tests with independent initial/follow-up review; these are calculation checks, not main task observations. prepare_main.py remains unused. Native Host execution, complete-package holdout, locale and transfer checks are not claimed performed. No new product PR, merge, tag or Release has occurred.
+
+Current continuation observation: C-U101–105 also completed; totals276 trials andC174/216. All144 fixed consumer packets are now ready, including eight explicitly reconstructed recovery preparations. Three original S06 states were restored at new paths under independently reviewed bindings and await verified saving before resumption. Supplementary grading integration is independently under review. These recovery steps add no business trial and do not resolve the candidate-dependent stage decision.
