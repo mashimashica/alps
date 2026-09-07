@@ -1,0 +1,95 @@
+{
+  "input_issues": [],
+  "line_count": 5,
+  "lines": [
+    {
+      "coverage_complete": true,
+      "event_ids": [
+        "R-51",
+        "R-52"
+      ],
+      "follow_up": {
+        "action": "Confirm remaining receipt of 5 units for PO-C51/WIRE.",
+        "recipient": "Ivy at CoilCo",
+        "recipient_role": "supplier_contact"
+      },
+      "observed_subtotal": 3,
+      "order_id": "PO-C51",
+      "ordered": 8,
+      "sku": "WIRE",
+      "status": "shortfall"
+    },
+    {
+      "coverage_complete": false,
+      "event_ids": [
+        "R-54"
+      ],
+      "follow_up": {
+        "action": "Provide or confirm the full 2026-09 receipt export for PO-C52/BOLT before final comparison.",
+        "recipient": "Paz (receiving data)",
+        "recipient_role": "data_steward"
+      },
+      "observed_subtotal": 12,
+      "order_id": "PO-C52",
+      "ordered": 10,
+      "sku": "BOLT",
+      "status": "incomplete_export"
+    },
+    {
+      "coverage_complete": true,
+      "event_ids": [],
+      "follow_up": {
+        "action": "Reconcile the identified source records for PO-C53/LAMP before final line comparison.",
+        "recipient_roles": [
+          "purchasing_coordinator",
+          "data_steward"
+        ],
+        "recipients": [
+          "Nila (purchasing)",
+          "Paz (receiving data)"
+        ]
+      },
+      "observed_subtotal": 0,
+      "order_id": "PO-C53",
+      "ordered": 4,
+      "sku": "LAMP",
+      "status": "conflicting_event"
+    },
+    {
+      "coverage_complete": true,
+      "event_ids": [],
+      "follow_up": {
+        "action": "Reconcile the identified source records for PO-C54/CORD before final line comparison.",
+        "recipient_roles": [
+          "purchasing_coordinator",
+          "data_steward"
+        ],
+        "recipients": [
+          "Nila (purchasing)",
+          "Paz (receiving data)"
+        ]
+      },
+      "observed_subtotal": 0,
+      "order_id": "PO-C54",
+      "ordered": 7,
+      "sku": "CORD",
+      "status": "conflicting_event"
+    },
+    {
+      "coverage_complete": true,
+      "event_ids": [],
+      "follow_up": {
+        "action": "Confirm remaining receipt of 5 units for PO-C55/SEAL.",
+        "recipient": "Miro at SealCo",
+        "recipient_role": "supplier_contact"
+      },
+      "observed_subtotal": 0,
+      "order_id": "PO-C55",
+      "ordered": 5,
+      "sku": "SEAL",
+      "status": "shortfall"
+    }
+  ],
+  "month": "2026-09",
+  "status": "ok"
+}

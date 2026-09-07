@@ -1,0 +1,18 @@
+{
+  "consumer_id": "U015",
+  "creator_id": "cal-008",
+  "case": "S05",
+  "variant": "ordinary",
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "high",
+  "context": "fresh",
+  "copied_sha256": {
+    "skill/monthly-receiving-review/SKILL.md": "c3f2f542596c3a70164cd26fdbecdefeebb1e24de953c83d4ac1b6904b185673",
+    "skill/monthly-receiving-review/scripts/review_receipts.py": "b27464d057cd2db4acb1ca0569a3991cba060fbeac86751c7bc06921a486f006",
+    "skill/monthly-receiving-review/tests/test_review_receipts.py": "842f4d475d3195289b152950b3bfb692669d96cfdb3358d846c1923f06370c97",
+    "skill/monthly-receiving-review/references/contract.md": "1f05b77a8258d5fe635832753aca110fcc69985d5bcab41d09f534b11608697d",
+    "input/request.md": "cc890af83f2a7151c9319d6495903d9fcf50696e6c8dd9b9e66480f8ea149c59",
+    "input/receiving.json": "e0c5c976692661d10f559f4bba52ef3003ef23a036c35571c33fe4300ff9ceea"
+  },
+  "prompt_sha256": "516c8ab76bb318aa2d8f35fb505263cda69a9891d0b09edd474af27b562e4a5a"
+}

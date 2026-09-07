@@ -1,0 +1,4 @@
+interface:
+  display_name: "Release Checkout Service"
+  short_description: "Safely qualify, release, and verify checkout"
+  default_prompt: "Use $release-checkout-service to assess and release the exact checkout candidate in the supplied local simulation, then verify health and checkout."

@@ -1,0 +1,14 @@
+{
+  "consumer_id": "U003",
+  "creator_id": "cal-002",
+  "case": "S01",
+  "variant": "ordinary",
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "high",
+  "context": "fresh",
+  "copied_sha256": {
+    "skill/select-min-response-time/SKILL.md": "8ed4152d12e3a255f262472f169b4183ef5f53f22c5d7894afcf13fce9dfd759",
+    "input/request.md": "3b625b82ed922bde8764e67315f2ff3e745af44eb67f167be323c5082d6ab085"
+  },
+  "prompt_sha256": "9322cdda0318bbc530415144299aae335ff7fa2191e19837524411ecf4d0ab78"
+}

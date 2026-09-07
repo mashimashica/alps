@@ -51,13 +51,30 @@ def verify():
             raise SystemExit(f"Frozen input changed: {relative}")
 
 
-def export(offset=0, limit=None):
-    verify()
-    entries = []
+def evidence_files():
     for path, relative in files():
         if relative.parts[:2] == ("frozen", "alps"):
             continue
         if relative.parts[:3] == ("frozen", "skill-creator", "assets"):
+            continue
+        yield path, relative
+
+
+def mark():
+    hashes = {relative.as_posix(): hashlib.sha256(content(path)).hexdigest() for path, relative in evidence_files()}
+    state = ROOT / ".local" / "published-hashes.json"
+    state.parent.mkdir(exist_ok=True)
+    state.write_text(json.dumps(hashes, indent=2) + "\n", encoding="utf-8")
+    print(f"Recorded hashes for {len(hashes)} verified published files")
+
+
+def export(offset=0, limit=None):
+    verify()
+    previous_path = ROOT / ".local" / "published-hashes.json"
+    previous = json.loads(previous_path.read_text()) if previous_path.exists() else {}
+    entries = []
+    for path, relative in evidence_files():
+        if previous.get(relative.as_posix()) == hashlib.sha256(content(path)).hexdigest():
             continue
         try:
             value = content(path).decode("utf-8")
@@ -70,13 +87,18 @@ def export(offset=0, limit=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("operation", choices=("freeze", "verify", "export"))
+    parser.add_argument("operation", choices=("freeze", "verify", "export", "mark"))
     parser.add_argument("--offset", type=int, default=0)
     parser.add_argument("--limit", type=int)
+    parser.add_argument("--root", type=Path)
     args = parser.parse_args()
+    if args.root is not None:
+        ROOT = args.root.resolve()
     operation = args.operation
     if operation == "freeze":
         freeze()
+    elif operation == "mark":
+        mark()
     elif operation == "verify":
         verify()
         print("Frozen input hashes verified")

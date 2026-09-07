@@ -1,0 +1,16 @@
+{
+  "consumer_id": "U009",
+  "creator_id": "cal-005",
+  "case": "S05",
+  "variant": "ordinary",
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "high",
+  "context": "fresh",
+  "copied_sha256": {
+    "skill/receiving-review/SKILL.md": "95027dbafaad3152eb8fe8474b0d0c6b50d798f3b803592e753d6f74da48b38d",
+    "skill/receiving-review/scripts/monthly_review.py": "198b540ff724ad4d8bcd1862d5221eddf5c96e62950250fd4a874dfb1072ebaf",
+    "input/request.md": "cc890af83f2a7151c9319d6495903d9fcf50696e6c8dd9b9e66480f8ea149c59",
+    "input/receiving.json": "e0c5c976692661d10f559f4bba52ef3003ef23a036c35571c33fe4300ff9ceea"
+  },
+  "prompt_sha256": "4c39f704a36bd4d91d8379b8e436e52679af7de74e21e648f6e5b00bbcc95e71"
+}

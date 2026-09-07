@@ -1,0 +1,30 @@
+{
+  "K23": {
+    "creator": "cal-004",
+    "consumers": [
+      "U007",
+      "U008"
+    ]
+  },
+  "K51": {
+    "creator": "cal-001",
+    "consumers": [
+      "U001",
+      "U002"
+    ]
+  },
+  "K14": {
+    "creator": "cal-003",
+    "consumers": [
+      "U005",
+      "U006"
+    ]
+  },
+  "K66": {
+    "creator": "cal-002",
+    "consumers": [
+      "U003",
+      "U004"
+    ]
+  }
+}

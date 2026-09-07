@@ -1,0 +1,18 @@
+{
+  "consumer_id": "U013",
+  "creator_id": "cal-007",
+  "case": "S05",
+  "variant": "ordinary",
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "high",
+  "context": "fresh",
+  "copied_sha256": {
+    "skill/monthly-receiving-review/SKILL.md": "9ca8c144118a2559653acb0a9df0f54de970a17c4cbbb656ef29a0cb4af8b113",
+    "skill/monthly-receiving-review/scripts/review_receipts.py": "863d02869a757b5cf00078a3c19d5d017e20af09857de7856bd663abc17c4bc6",
+    "skill/monthly-receiving-review/tests/test_review_receipts.py": "484d30a4a5609b0cc34e832d400dd59fa9de34b2619a64d87f7f290ceac0fa05",
+    "skill/monthly-receiving-review/references/tool-use.md": "4bcc7a3f148048d2e6da2000ef7165c20d98c1ce1da037320e5d2dcc55d8c9ee",
+    "input/request.md": "cc890af83f2a7151c9319d6495903d9fcf50696e6c8dd9b9e66480f8ea149c59",
+    "input/receiving.json": "e0c5c976692661d10f559f4bba52ef3003ef23a036c35571c33fe4300ff9ceea"
+  },
+  "prompt_sha256": "795c0fa14bb13050c0f4ddfb6ed206eb9e7f2638f4f1d164b6e7c05ec3165e65"
+}
