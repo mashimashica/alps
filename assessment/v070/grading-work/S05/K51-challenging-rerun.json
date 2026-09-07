@@ -1,0 +1,237 @@
+{
+  "review_month": "2026-09",
+  "summary": {
+    "supplied_order_rows": 5,
+    "usable_order_rows": 5,
+    "in_scope_lines": 5,
+    "received_as_ordered": 0,
+    "shortfall": 2,
+    "excess": 0,
+    "undetermined": 3,
+    "lines_requiring_follow_up": 5,
+    "lines_with_evidence_gaps": 3
+  },
+  "lines": [
+    {
+      "order_id": "PO-C51",
+      "sku": "WIRE",
+      "ordered_quantity": 8,
+      "observed_net_received_quantity": 3,
+      "position": "shortfall",
+      "difference_quantity": 5,
+      "coverage_state": "complete",
+      "evidence": {
+        "counted_event_ids": [
+          "R-51",
+          "R-52"
+        ],
+        "exact_duplicate_event_rows_ignored": 1,
+        "blockers": [],
+        "diagnostic_codes": [
+          "duplicate_event_row"
+        ]
+      },
+      "follow_up": {
+        "reason": "a confirmed shortfall of 5",
+        "owners": [
+          {
+            "role": "purchasing_coordinator",
+            "recipient": "Nila (purchasing)"
+          }
+        ],
+        "external_recipient": "Ivy at CoilCo",
+        "recipient_gaps": [],
+        "next_action": "ask the supplier contact to confirm the plan and timing for the remaining 5 units",
+        "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); supplier_contact: Ivy at CoilCo. Order PO-C51, SKU WIRE: a confirmed shortfall of 5. Next action: ask the supplier contact to confirm the plan and timing for the remaining 5 units.",
+        "sent": false
+      }
+    },
+    {
+      "order_id": "PO-C52",
+      "sku": "BOLT",
+      "ordered_quantity": 10,
+      "observed_net_received_quantity": 12,
+      "position": "undetermined",
+      "difference_quantity": null,
+      "coverage_state": "incomplete",
+      "evidence": {
+        "counted_event_ids": [
+          "R-54"
+        ],
+        "exact_duplicate_event_rows_ignored": 0,
+        "blockers": [
+          "incomplete_coverage"
+        ],
+        "diagnostic_codes": []
+      },
+      "follow_up": {
+        "reason": "the requested-month receipt export is not confirmed complete",
+        "owners": [
+          {
+            "role": "data_steward",
+            "recipient": "Paz (receiving data)"
+          }
+        ],
+        "external_recipient": null,
+        "recipient_gaps": [],
+        "next_action": "provide or confirm the full requested-month export, then rerun the comparison",
+        "draft": "Draft — not sent. To/owner: data_steward: Paz (receiving data). Order PO-C52, SKU BOLT: the requested-month receipt export is not confirmed complete. Next action: provide or confirm the full requested-month export, then rerun the comparison.",
+        "sent": false
+      }
+    },
+    {
+      "order_id": "PO-C53",
+      "sku": "LAMP",
+      "ordered_quantity": 4,
+      "observed_net_received_quantity": 0,
+      "position": "undetermined",
+      "difference_quantity": null,
+      "coverage_state": "complete",
+      "evidence": {
+        "counted_event_ids": [],
+        "exact_duplicate_event_rows_ignored": 0,
+        "blockers": [
+          "conflicting_event_id"
+        ],
+        "diagnostic_codes": [
+          "conflicting_event_id"
+        ]
+      },
+      "follow_up": {
+        "reason": "conflicting or invalid order/event identity evidence",
+        "owners": [
+          {
+            "role": "purchasing_coordinator",
+            "recipient": "Nila (purchasing)"
+          },
+          {
+            "role": "data_steward",
+            "recipient": "Paz (receiving data)"
+          }
+        ],
+        "external_recipient": null,
+        "recipient_gaps": [],
+        "next_action": "reconcile the identified source records, then rerun the line comparison",
+        "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); data_steward: Paz (receiving data). Order PO-C53, SKU LAMP: conflicting or invalid order/event identity evidence. Next action: reconcile the identified source records, then rerun the line comparison.",
+        "sent": false
+      }
+    },
+    {
+      "order_id": "PO-C54",
+      "sku": "CORD",
+      "ordered_quantity": 7,
+      "observed_net_received_quantity": 0,
+      "position": "undetermined",
+      "difference_quantity": null,
+      "coverage_state": "complete",
+      "evidence": {
+        "counted_event_ids": [],
+        "exact_duplicate_event_rows_ignored": 0,
+        "blockers": [
+          "conflicting_event_id"
+        ],
+        "diagnostic_codes": [
+          "conflicting_event_id"
+        ]
+      },
+      "follow_up": {
+        "reason": "conflicting or invalid order/event identity evidence",
+        "owners": [
+          {
+            "role": "purchasing_coordinator",
+            "recipient": "Nila (purchasing)"
+          },
+          {
+            "role": "data_steward",
+            "recipient": "Paz (receiving data)"
+          }
+        ],
+        "external_recipient": null,
+        "recipient_gaps": [],
+        "next_action": "reconcile the identified source records, then rerun the line comparison",
+        "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); data_steward: Paz (receiving data). Order PO-C54, SKU CORD: conflicting or invalid order/event identity evidence. Next action: reconcile the identified source records, then rerun the line comparison.",
+        "sent": false
+      }
+    },
+    {
+      "order_id": "PO-C55",
+      "sku": "SEAL",
+      "ordered_quantity": 5,
+      "observed_net_received_quantity": 0,
+      "position": "shortfall",
+      "difference_quantity": 5,
+      "coverage_state": "complete",
+      "evidence": {
+        "counted_event_ids": [],
+        "exact_duplicate_event_rows_ignored": 0,
+        "blockers": [],
+        "diagnostic_codes": []
+      },
+      "follow_up": {
+        "reason": "a confirmed shortfall of 5",
+        "owners": [
+          {
+            "role": "purchasing_coordinator",
+            "recipient": "Nila (purchasing)"
+          }
+        ],
+        "external_recipient": "Miro at SealCo",
+        "recipient_gaps": [],
+        "next_action": "ask the supplier contact to confirm the plan and timing for the remaining 5 units",
+        "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); supplier_contact: Miro at SealCo. Order PO-C55, SKU SEAL: a confirmed shortfall of 5. Next action: ask the supplier contact to confirm the plan and timing for the remaining 5 units.",
+        "sent": false
+      }
+    }
+  ],
+  "excluded_events": {
+    "outside_requested_month": {
+      "count": 1,
+      "event_ids": [
+        "R-53"
+      ]
+    },
+    "outside_supplied_order_set": {
+      "count": 0,
+      "event_ids": []
+    },
+    "conflicting_event_ids": {
+      "count": 1,
+      "event_ids": [
+        "R-55"
+      ]
+    },
+    "invalid_rows_without_usable_event_id": 0
+  },
+  "diagnostics": [
+    {
+      "code": "duplicate_event_row",
+      "severity": "warning",
+      "message": "Exact repeated event copies count once.",
+      "event_id": "R-51",
+      "order_id": "PO-C51",
+      "sku": "WIRE",
+      "ignored_rows": 1
+    },
+    {
+      "code": "conflicting_event_id",
+      "severity": "error",
+      "message": "The same event_id has different content; all variants were excluded and affected lines require source reconciliation.",
+      "event_id": "R-55",
+      "rows": [
+        5,
+        6
+      ],
+      "affected_lines": [
+        {
+          "order_id": "PO-C53",
+          "sku": "LAMP"
+        },
+        {
+          "order_id": "PO-C54",
+          "sku": "CORD"
+        }
+      ]
+    }
+  ],
+  "drafts_sent": false
+}

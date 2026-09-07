@@ -34,6 +34,12 @@ def content(path):
     return str(path.readlink()).encode() if path.is_symlink() else path.read_bytes()
 
 
+def file_mode(path):
+    if path.is_symlink():
+        return "120000"
+    return "100755" if path.stat().st_mode & 0o111 else "100644"
+
+
 def freeze():
     manifest = ROOT / "frozen-hashes.sha256"
     if manifest.exists():
@@ -61,7 +67,7 @@ def evidence_files():
 
 
 def mark():
-    hashes = {relative.as_posix(): hashlib.sha256(content(path)).hexdigest() for path, relative in evidence_files()}
+    hashes = {relative.as_posix(): {"sha256": hashlib.sha256(content(path)).hexdigest(), "mode": file_mode(path)} for path, relative in evidence_files()}
     state = ROOT / ".local" / "published-hashes.json"
     state.parent.mkdir(exist_ok=True)
     state.write_text(json.dumps(hashes, indent=2) + "\n", encoding="utf-8")
@@ -74,13 +80,14 @@ def export(offset=0, limit=None):
     previous = json.loads(previous_path.read_text()) if previous_path.exists() else {}
     entries = []
     for path, relative in evidence_files():
-        if previous.get(relative.as_posix()) == hashlib.sha256(content(path)).hexdigest():
+        fingerprint = {"sha256": hashlib.sha256(content(path)).hexdigest(), "mode": file_mode(path)}
+        if previous.get(relative.as_posix()) == fingerprint:
             continue
         try:
             value = content(path).decode("utf-8")
         except UnicodeDecodeError:
             raise SystemExit(f"Non-text evidence needs an explicit direct storage route: {relative}")
-        entries.append({"path": "assessment/v070/" + relative.as_posix(), "mode": "120000" if path.is_symlink() else "100644", "type": "blob", "content": value})
+        entries.append({"path": "assessment/v070/" + relative.as_posix(), "mode": file_mode(path), "type": "blob", "content": value})
     selected = entries[offset:] if limit is None else entries[offset:offset+limit]
     print(json.dumps(selected, ensure_ascii=False))
 

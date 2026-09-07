@@ -1,0 +1,151 @@
+{
+  "review_month": "2026-08",
+  "summary": {
+    "supplied_order_rows": 3,
+    "usable_order_rows": 3,
+    "in_scope_lines": 3,
+    "received_as_ordered": 0,
+    "shortfall": 1,
+    "excess": 1,
+    "undetermined": 1,
+    "lines_requiring_follow_up": 3,
+    "lines_with_evidence_gaps": 1
+  },
+  "lines": [
+    {
+      "order_id": "PO-N31",
+      "sku": "PEN",
+      "ordered_quantity": 10,
+      "observed_net_received_quantity": 10,
+      "position": "undetermined",
+      "difference_quantity": null,
+      "coverage_state": "complete",
+      "evidence": {
+        "counted_event_ids": [
+          "N-1"
+        ],
+        "exact_duplicate_event_rows_ignored": 0,
+        "blockers": [
+          "unknown_sku_for_in_scope_order"
+        ],
+        "diagnostic_codes": [
+          "unknown_sku_for_in_scope_order"
+        ]
+      },
+      "follow_up": {
+        "reason": "conflicting or invalid order/event identity evidence",
+        "owners": [
+          {
+            "role": "purchasing_coordinator",
+            "recipient": "Nila (purchasing)"
+          },
+          {
+            "role": "data_steward",
+            "recipient": "Paz (receiving data)"
+          }
+        ],
+        "external_recipient": null,
+        "recipient_gaps": [],
+        "next_action": "reconcile the identified source records, then rerun the line comparison",
+        "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); data_steward: Paz (receiving data). Order PO-N31, SKU PEN: conflicting or invalid order/event identity evidence. Next action: reconcile the identified source records, then rerun the line comparison.",
+        "sent": false
+      }
+    },
+    {
+      "order_id": "PO-N32",
+      "sku": "TAPE",
+      "ordered_quantity": 8,
+      "observed_net_received_quantity": 5,
+      "position": "shortfall",
+      "difference_quantity": 3,
+      "coverage_state": "complete",
+      "evidence": {
+        "counted_event_ids": [
+          "N-2"
+        ],
+        "exact_duplicate_event_rows_ignored": 0,
+        "blockers": [],
+        "diagnostic_codes": []
+      },
+      "follow_up": {
+        "reason": "a confirmed shortfall of 3",
+        "owners": [
+          {
+            "role": "purchasing_coordinator",
+            "recipient": "Nila (purchasing)"
+          }
+        ],
+        "external_recipient": "Sol at WrapCo",
+        "recipient_gaps": [],
+        "next_action": "ask the supplier contact to confirm the plan and timing for the remaining 3 units",
+        "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); supplier_contact: Sol at WrapCo. Order PO-N32, SKU TAPE: a confirmed shortfall of 3. Next action: ask the supplier contact to confirm the plan and timing for the remaining 3 units.",
+        "sent": false
+      }
+    },
+    {
+      "order_id": "PO-N33",
+      "sku": "PAD",
+      "ordered_quantity": 6,
+      "observed_net_received_quantity": 9,
+      "position": "excess",
+      "difference_quantity": 3,
+      "coverage_state": "complete",
+      "evidence": {
+        "counted_event_ids": [
+          "N-3"
+        ],
+        "exact_duplicate_event_rows_ignored": 0,
+        "blockers": [],
+        "diagnostic_codes": []
+      },
+      "follow_up": {
+        "reason": "a confirmed excess of 3",
+        "owners": [
+          {
+            "role": "warehouse_lead",
+            "recipient": "Oren (warehouse)"
+          }
+        ],
+        "external_recipient": null,
+        "recipient_gaps": [],
+        "next_action": "reconcile the 3 surplus units against the order and receiving evidence",
+        "draft": "Draft — not sent. To/owner: warehouse_lead: Oren (warehouse). Order PO-N33, SKU PAD: a confirmed excess of 3. Next action: reconcile the 3 surplus units against the order and receiving evidence.",
+        "sent": false
+      }
+    }
+  ],
+  "excluded_events": {
+    "outside_requested_month": {
+      "count": 1,
+      "event_ids": [
+        "N-4"
+      ]
+    },
+    "outside_supplied_order_set": {
+      "count": 0,
+      "event_ids": []
+    },
+    "conflicting_event_ids": {
+      "count": 0,
+      "event_ids": []
+    },
+    "invalid_rows_without_usable_event_id": 0
+  },
+  "diagnostics": [
+    {
+      "code": "unknown_sku_for_in_scope_order",
+      "severity": "error",
+      "message": "Requested-month event names an in-scope order but a SKU absent from that order; all lines on the order require identity reconciliation.",
+      "event_id": "PROBE-UNKNOWN",
+      "order_id": "PO-N31",
+      "sku": "UNKNOWN",
+      "affected_lines": [
+        {
+          "order_id": "PO-N31",
+          "sku": "PEN"
+        }
+      ]
+    }
+  ],
+  "drafts_sent": false
+}

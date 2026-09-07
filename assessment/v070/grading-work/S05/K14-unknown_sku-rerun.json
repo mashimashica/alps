@@ -1,0 +1,62 @@
+{
+  "input_issues": [],
+  "line_count": 3,
+  "lines": [
+    {
+      "coverage_complete": true,
+      "event_ids": [
+        "N-1"
+      ],
+      "follow_up": {
+        "action": "Reconcile the identified source records for PO-N31/PEN before final line comparison.",
+        "recipient_roles": [
+          "purchasing_coordinator",
+          "data_steward"
+        ],
+        "recipients": [
+          "Nila (purchasing)",
+          "Paz (receiving data)"
+        ]
+      },
+      "observed_subtotal": 10,
+      "order_id": "PO-N31",
+      "ordered": 10,
+      "sku": "PEN",
+      "status": "identity_reconciliation"
+    },
+    {
+      "coverage_complete": true,
+      "event_ids": [
+        "N-2"
+      ],
+      "follow_up": {
+        "action": "Confirm remaining receipt of 3 units for PO-N32/TAPE.",
+        "recipient": "Sol at WrapCo",
+        "recipient_role": "supplier_contact"
+      },
+      "observed_subtotal": 5,
+      "order_id": "PO-N32",
+      "ordered": 8,
+      "sku": "TAPE",
+      "status": "shortfall"
+    },
+    {
+      "coverage_complete": true,
+      "event_ids": [
+        "N-3"
+      ],
+      "follow_up": {
+        "action": "Reconcile surplus of 3 units for PO-N33/PAD against order and receiving evidence.",
+        "recipient": "Oren (warehouse)",
+        "recipient_role": "warehouse_lead"
+      },
+      "observed_subtotal": 9,
+      "order_id": "PO-N33",
+      "ordered": 6,
+      "sku": "PAD",
+      "status": "excess"
+    }
+  ],
+  "month": "2026-08",
+  "status": "ok"
+}

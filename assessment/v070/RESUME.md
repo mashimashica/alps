@@ -24,7 +24,7 @@ The user authorized execution of the finalized assessment/improvement plan on 20
 
 ## Current phase
 
-Baseline/protocol setup. No new assessment trial has run yet. Calibration is next: 3 cases × 2 creator settings × A/C = 12 generated Skills, followed by 2 independent consumer cases per Skill = 24 consumer trials. The reference consumer is gpt-5.6-sol/high.
+All 12 calibration creators and 24 fresh consumers are complete. All 12 generated packages pass pinned Agent Skills format validation. Blind S01/S05/S10 grades and an independent second S10 grade are complete; a second S05 assessment is in progress. Read calibration-synthesis.md for findings and adjudications, not just the ledger's completed flags. Main case authors are preparing the remaining public briefs. No product improvement is implemented and no new PR is opened yet. Before any main comparison, freeze gates.md and candidate B after bounded development diagnostics. The reference consumer remains gpt-5.6-sol/high.
 
 ## Important limits
 

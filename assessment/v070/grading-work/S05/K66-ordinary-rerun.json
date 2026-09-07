@@ -1,0 +1,136 @@
+{
+  "evidence_issues": [],
+  "exact_event_duplicates": [],
+  "exact_order_duplicates": [],
+  "exclusions": [
+    {
+      "event_id": "N-4",
+      "event_month": "2026-07",
+      "type": "event_outside_requested_month"
+    }
+  ],
+  "input": {
+    "bytes": 1164,
+    "sha256": "e0c5c976692661d10f559f4bba52ef3003ef23a036c35571c33fe4300ff9ceea",
+    "source": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05/inputs/ordinary/receiving.json"
+  },
+  "lines": [
+    {
+      "coverage_record_indexes": [
+        0
+      ],
+      "coverage_status": "complete",
+      "evidence_findings": [],
+      "excess_quantity": null,
+      "follow_ups": [],
+      "included_event_ids": [
+        "N-1"
+      ],
+      "observed_uncontested_net_received": 10,
+      "order_id": "PO-N31",
+      "order_record_indexes": [
+        0
+      ],
+      "ordered": 10,
+      "position": "received_as_ordered",
+      "position_is_final": true,
+      "recipient_gaps": [],
+      "remaining_quantity": null,
+      "sku": "PEN",
+      "supplier_contact": "Rue at PaperCo"
+    },
+    {
+      "coverage_record_indexes": [
+        1
+      ],
+      "coverage_status": "complete",
+      "evidence_findings": [],
+      "excess_quantity": null,
+      "follow_ups": [
+        {
+          "next_action": "Ask the supplied supplier contact to confirm and resolve the remaining receipt quantity.",
+          "recipient": "Sol at WrapCo",
+          "remaining_quantity": 3,
+          "sender": {
+            "recipient": "Nila (purchasing)",
+            "role": "purchasing_coordinator"
+          },
+          "type": "remaining_receipt_follow_up"
+        }
+      ],
+      "included_event_ids": [
+        "N-2"
+      ],
+      "observed_uncontested_net_received": 5,
+      "order_id": "PO-N32",
+      "order_record_indexes": [
+        1
+      ],
+      "ordered": 8,
+      "position": "shortfall",
+      "position_is_final": true,
+      "recipient_gaps": [],
+      "remaining_quantity": 3,
+      "sku": "TAPE",
+      "supplier_contact": "Sol at WrapCo"
+    },
+    {
+      "coverage_record_indexes": [
+        2
+      ],
+      "coverage_status": "complete",
+      "evidence_findings": [],
+      "excess_quantity": 3,
+      "follow_ups": [
+        {
+          "excess_quantity": 3,
+          "next_action": "Reconcile the surplus against the purchase order and receiving evidence.",
+          "parties": [
+            {
+              "recipient": "Oren (warehouse)",
+              "role": "warehouse_lead"
+            }
+          ],
+          "type": "surplus_reconciliation"
+        }
+      ],
+      "included_event_ids": [
+        "N-3"
+      ],
+      "observed_uncontested_net_received": 9,
+      "order_id": "PO-N33",
+      "order_record_indexes": [
+        2
+      ],
+      "ordered": 6,
+      "position": "excess",
+      "position_is_final": true,
+      "recipient_gaps": [],
+      "remaining_quantity": null,
+      "sku": "PAD",
+      "supplier_contact": "Teo at PadCo"
+    }
+  ],
+  "requested_month": "2026-08",
+  "responsibilities": {
+    "data_steward": "Paz (receiving data)",
+    "purchasing_coordinator": "Nila (purchasing)",
+    "warehouse_lead": "Oren (warehouse)"
+  },
+  "schema_version": "1.0",
+  "scope_issues": [],
+  "summary": {
+    "all_line_positions_final": true,
+    "all_supplied_scope_represented": true,
+    "lines_requiring_follow_up": 2,
+    "position_counts": {
+      "excess": 1,
+      "received_as_ordered": 1,
+      "shortfall": 1,
+      "unconfirmed": 0
+    },
+    "recipient_gaps": [],
+    "represented_order_lines": 3,
+    "supplied_order_records": 3
+  }
+}

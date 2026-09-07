@@ -1,0 +1,141 @@
+{
+  "scope": "Recorded original resources only; authorized state changes need separate behavioral review. Does not establish task completion.",
+  "results": [
+    {
+      "consumer": "U001",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": []
+    },
+    {
+      "consumer": "U002",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": []
+    },
+    {
+      "consumer": "U003",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": []
+    },
+    {
+      "consumer": "U004",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": []
+    },
+    {
+      "consumer": "U005",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": []
+    },
+    {
+      "consumer": "U006",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": []
+    },
+    {
+      "consumer": "U007",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": []
+    },
+    {
+      "consumer": "U008",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": []
+    },
+    {
+      "consumer": "U009",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": []
+    },
+    {
+      "consumer": "U010",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": []
+    },
+    {
+      "consumer": "U011",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": []
+    },
+    {
+      "consumer": "U012",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": []
+    },
+    {
+      "consumer": "U013",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": []
+    },
+    {
+      "consumer": "U014",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": []
+    },
+    {
+      "consumer": "U015",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": []
+    },
+    {
+      "consumer": "U016",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": []
+    },
+    {
+      "consumer": "U017",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": [
+        "input/state.json"
+      ]
+    },
+    {
+      "consumer": "U018",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": [
+        "input/state.json"
+      ]
+    },
+    {
+      "consumer": "U019",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": [
+        "input/state.json"
+      ]
+    },
+    {
+      "consumer": "U020",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": [
+        "input/state.json"
+      ]
+    },
+    {
+      "consumer": "U021",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": [
+        "input/state.json"
+      ]
+    },
+    {
+      "consumer": "U022",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": [
+        "input/state.json"
+      ]
+    },
+    {
+      "consumer": "U023",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": [
+        "input/state.json"
+      ]
+    },
+    {
+      "consumer": "U024",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": [
+        "input/state.json"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "excluded_events": [
+    {
+      "event_id": "R-53",
+      "reason": "outside requested month or order scope"
+    }
+  ],
+  "issues": {
+    "conflicting_event_ids": [
+      {
+        "event_id": "R-55",
+        "lines": [
+          [
+            "PO-C53",
+            "LAMP"
+          ],
+          [
+            "PO-C54",
+            "CORD"
+          ]
+        ]
+      }
+    ],
+    "identity_conflict_orders": []
+  },
+  "lines": [
+    {
+      "coverage_complete": true,
+      "evidence_status": "complete_valid",
+      "follow_up": {
+        "draft_action": "Confirm the remaining receipt of 2 unit(s) for PO-PROBE/LAMP.",
+        "recipient": "Probe supplier"
+      },
+      "net_received": 0,
+      "observed_subtotal": 0,
+      "order_id": "PO-PROBE",
+      "ordered": 2,
+      "position": "complete_shortfall",
+      "sku": "LAMP"
+    },
+    {
+      "coverage_complete": true,
+      "evidence_status": "complete_valid",
+      "follow_up": {
+        "draft_action": "Confirm the remaining receipt of 5 unit(s) for PO-C51/WIRE.",
+        "recipient": "Ivy at CoilCo"
+      },
+      "net_received": 3,
+      "observed_subtotal": 3,
+      "order_id": "PO-C51",
+      "ordered": 8,
+      "position": "complete_shortfall",
+      "sku": "WIRE"
+    },
+    {
+      "coverage_complete": false,
+      "evidence_status": "incomplete_export",
+      "follow_up": {
+        "draft_action": "Provide or confirm the full receiving export for this order line and month.",
+        "recipient": "Paz (receiving data)"
+      },
+      "observed_subtotal": 12,
+      "order_id": "PO-C52",
+      "ordered": 10,
+      "position": "undetermined",
+      "sku": "BOLT"
+    },
+    {
+      "coverage_complete": true,
+      "evidence_status": "identity_conflict",
+      "follow_up": {
+        "draft_action": "Reconcile the identified order/event source records before final line comparison.",
+        "recipient": [
+          "Nila (purchasing)",
+          "Paz (receiving data)"
+        ]
+      },
+      "observed_subtotal": 0,
+      "order_id": "PO-C53",
+      "ordered": 4,
+      "position": "undetermined",
+      "sku": "LAMP"
+    },
+    {
+      "coverage_complete": true,
+      "evidence_status": "identity_conflict",
+      "follow_up": {
+        "draft_action": "Reconcile the identified order/event source records before final line comparison.",
+        "recipient": [
+          "Nila (purchasing)",
+          "Paz (receiving data)"
+        ]
+      },
+      "observed_subtotal": 0,
+      "order_id": "PO-C54",
+      "ordered": 7,
+      "position": "undetermined",
+      "sku": "CORD"
+    },
+    {
+      "coverage_complete": true,
+      "evidence_status": "complete_valid",
+      "follow_up": {
+        "draft_action": "Confirm the remaining receipt of 5 unit(s) for PO-C55/SEAL.",
+        "recipient": "Miro at SealCo"
+      },
+      "net_received": 0,
+      "observed_subtotal": 0,
+      "order_id": "PO-C55",
+      "ordered": 5,
+      "position": "complete_shortfall",
+      "sku": "SEAL"
+    }
+  ],
+  "scope": {
+    "line_count": 6,
+    "month": "2026-09"
+  }
+}

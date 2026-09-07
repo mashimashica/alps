@@ -1,0 +1,11 @@
+{
+  "environment": "SIM-ALPHA",
+  "candidate": {"id": "rel-maple-18", "digest": "maple-content-18", "qualification_ok": true, "healthy": true, "checkout_ok": true},
+  "production": {"id": "rel-maple-17", "digest": "maple-content-17", "healthy": true, "checkout_ok": true},
+  "service_owner": "Rae Chen",
+  "sequence": 22,
+  "qualification": {"candidate": "rel-maple-18", "digest": "maple-content-18", "passed": true, "sequence": 21},
+  "approval": {"candidate": "rel-maple-18", "digest": "maple-content-18", "owner": "Rae Chen", "qualification_sequence": 21, "sequence": 22},
+  "requests": {},
+  "promotion_count": 0
+}

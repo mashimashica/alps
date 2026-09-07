@@ -1,0 +1,29 @@
+{
+  "month": "2026-09",
+  "orders": [
+    {"order_id": "PO-PROBE", "sku": "LAMP", "ordered": 2, "supplier_contact": "Probe supplier"},
+    {"order_id": "PO-C51", "sku": "WIRE", "ordered": 8, "supplier_contact": "Ivy at CoilCo"},
+    {"order_id": "PO-C52", "sku": "BOLT", "ordered": 10, "supplier_contact": "Jules at FastenCo"},
+    {"order_id": "PO-C53", "sku": "LAMP", "ordered": 4, "supplier_contact": "Kiran at LumenCo"},
+    {"order_id": "PO-C54", "sku": "CORD", "ordered": 7, "supplier_contact": "Lin at CableCo"},
+    {"order_id": "PO-C55", "sku": "SEAL", "ordered": 5, "supplier_contact": "Miro at SealCo"}
+  ],
+  "events": [
+    {"event_id": "R-51", "order_id": "PO-C51", "sku": "WIRE", "event_month": "2026-09", "quantity": 5},
+    {"event_id": "R-51", "order_id": "PO-C51", "sku": "WIRE", "event_month": "2026-09", "quantity": 5},
+    {"event_id": "R-52", "order_id": "PO-C51", "sku": "WIRE", "event_month": "2026-09", "quantity": -2},
+    {"event_id": "R-53", "order_id": "PO-C51", "sku": "WIRE", "event_month": "2026-08", "quantity": 100},
+    {"event_id": "R-54", "order_id": "PO-C52", "sku": "BOLT", "event_month": "2026-09", "quantity": 12},
+    {"event_id": "R-55", "order_id": "PO-C53", "sku": "LAMP", "event_month": "2026-09", "quantity": 4},
+    {"event_id": "R-55", "order_id": "PO-C54", "sku": "CORD", "event_month": "2026-09", "quantity": 7}
+  ],
+  "coverage": [
+    {"order_id": "PO-PROBE", "sku": "LAMP", "month": "2026-09", "complete": true},
+    {"order_id": "PO-C51", "sku": "WIRE", "month": "2026-09", "complete": true},
+    {"order_id": "PO-C52", "sku": "BOLT", "month": "2026-09", "complete": false},
+    {"order_id": "PO-C53", "sku": "LAMP", "month": "2026-09", "complete": true},
+    {"order_id": "PO-C54", "sku": "CORD", "month": "2026-09", "complete": true},
+    {"order_id": "PO-C55", "sku": "SEAL", "month": "2026-09", "complete": true}
+  ],
+  "responsibilities": {"purchasing_coordinator": "Nila (purchasing)", "warehouse_lead": "Oren (warehouse)", "data_steward": "Paz (receiving data)"}
+}

@@ -19,6 +19,7 @@ def main():
     shutil.copy2(ROOT / "cases" / args.case / "brief.md", target / "business-brief.md")
     shutil.copy2(ROOT / "oracles" / f"{args.case}.md", target / "business-oracle.md")
     shutil.copy2(ROOT / "grading-guidance.md", target / "grading-guidance.md")
+    shutil.copytree(ROOT / "consumer-source" / args.case, target / "original-consumer-inputs")
     mapping = {}
     for code, number in zip(CODES, ORDER[args.case]):
         creator_id = f"cal-{number:03}"
