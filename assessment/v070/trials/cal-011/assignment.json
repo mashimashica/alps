@@ -1,0 +1,13 @@
+{
+  "trial_id": "cal-011",
+  "case": "S10",
+  "arm": "A",
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "high",
+  "context": "fresh",
+  "input_sha256": {
+    "input/release_tool.py": "939931810a40d9f813280ea46c95fec2c4a1ed72368937353bf5c899b8217577",
+    "input/brief.md": "284eab48172c8b996d5eb3218590fb453c1e24f5b532f9d4457bda99fb38485e"
+  },
+  "prompt_sha256": "e7f359847e21352cfda2a91a288d67195d4c95cdcc05d20ec84f13e5cc4682de"
+}

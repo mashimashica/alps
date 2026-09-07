@@ -1,0 +1,13 @@
+{
+  "trial_id": "cal-009",
+  "case": "S10",
+  "arm": "A",
+  "requested_model": "gpt-5.6-luna",
+  "requested_effort": "low",
+  "context": "fresh",
+  "input_sha256": {
+    "input/release_tool.py": "939931810a40d9f813280ea46c95fec2c4a1ed72368937353bf5c899b8217577",
+    "input/brief.md": "284eab48172c8b996d5eb3218590fb453c1e24f5b532f9d4457bda99fb38485e"
+  },
+  "prompt_sha256": "d93e8f2d74fbe545909f81693b8b04954f3399b99b08b1cda90bf550c3031a7d"
+}

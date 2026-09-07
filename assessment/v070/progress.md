@@ -11,14 +11,16 @@ Updated: 2026-09-07 UTC.
 
 ## In progress
 
-- Freeze input copies and hashes; run baseline validation; save the initial checkpoint.
-- Prepare and independently inspect calibration business cases and assessment criteria.
+- Frozen inputs and the first direct-API checkpoint are saved; baseline tests passed. Independent semantic and case audits are complete.
+- Six creator trials are complete but not graded. Five are running; cal-012 is queued until an agent slot is free. An attempted spawn returning thread-limit reached did not start a trial and is not counted as one.
+- S05 scope and identity-conflict wording was clarified before its creators started. Other underspecified edge cases and malformed simulator fixtures are not assigned hidden gold answers in calibration.
+- No consumer inputs or oracle answers have been materialized yet.
 
 ## Trial counts
 
 | Stage | Completed design | Completed consumer | Other completed | Planned task trials |
 | --- | ---: | ---: | ---: | ---: |
-| Calibration | 0 | 0 | 0 | 36 |
+| Calibration | 6 | 0 | 0 | 36 |
 | Remaining base plan | 0 | 0 | 0 | up to 1,992 |
 
-No new generated Skill has been evaluated. No improvement finding, causal benefit, convergence or release readiness is asserted. No new PR, tag or Release has been created.
+Generated Skills have not yet been independently used or graded. The independent baseline semantic audit found no material defect in its examined scope; it does not establish behavioral effectiveness. No causal benefit, convergence or release readiness is asserted. No new PR, tag or Release has been created. Evidence commits are saved on assessment/v070-evidence, separate from the unchanged product worktree.

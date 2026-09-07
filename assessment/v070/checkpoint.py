@@ -51,7 +51,7 @@ def verify():
             raise SystemExit(f"Frozen input changed: {relative}")
 
 
-def export():
+def export(offset=0, limit=None):
     verify()
     entries = []
     for path, relative in files():
@@ -64,17 +64,21 @@ def export():
         except UnicodeDecodeError:
             raise SystemExit(f"Non-text evidence needs an explicit direct storage route: {relative}")
         entries.append({"path": "assessment/v070/" + relative.as_posix(), "mode": "120000" if path.is_symlink() else "100644", "type": "blob", "content": value})
-    print(json.dumps(entries, ensure_ascii=False))
+    selected = entries[offset:] if limit is None else entries[offset:offset+limit]
+    print(json.dumps(selected, ensure_ascii=False))
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("operation", choices=("freeze", "verify", "export"))
-    operation = parser.parse_args().operation
+    parser.add_argument("--offset", type=int, default=0)
+    parser.add_argument("--limit", type=int)
+    args = parser.parse_args()
+    operation = args.operation
     if operation == "freeze":
         freeze()
     elif operation == "verify":
         verify()
         print("Frozen input hashes verified")
     else:
-        export()
+        export(args.offset, args.limit)

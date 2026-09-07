@@ -1,0 +1,12 @@
+{
+  "trial_id": "cal-003",
+  "case": "S01",
+  "arm": "A",
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "high",
+  "context": "fresh",
+  "input_sha256": {
+    "input/brief.md": "1c0232b978fdb4b809b64c4b41bf748852488af295a4b05c31da2f84dcbb30e1"
+  },
+  "prompt_sha256": "c3fc73d469a26eb7e5f7fcde05235dd674a0334eefccfbf5603d7ef913ccefaf"
+}
