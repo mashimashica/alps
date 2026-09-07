@@ -91,3 +91,7 @@ Verified commit `8932123773d89fe4ae2a66c87ff34330a7469f2c`, tree `c6b3d0b548005d
 ## Restored initial states before continuation
 
 Verified commit `362a24219384e4285e05bca6b7c90540289e9f00`, tree `b14126d545075fa2d9fbf07d8235269f4b57e5ea`, parent `8932123773d89fe4ae2a66c87ff34330a7469f2c`. Snapshot `../assessment-checkpoint-p6NnU9`;17 changed entries,5,590 published files. Exact commit/ref/DCO and full read-back of all17 changed UTF-8 files matched. The three restored initial bindings/SQL observations were saved before C094–096 received minimal original-to-restored state-path substitutions. They subsequently completed in their original contexts; current original final-state captures remain separate observations. Their historical initial spawn times and exact continuation-start times were not reconstructed; completion observations are recorded now.
+
+## Completed original restored contexts
+
+Verified commit `9c55a050a8fbe9e8fee98ba6a3e4a87932020bb7`, tree `645db8dab20dcd58d7d7604e57e5783847f44563`, parent `362a24219384e4285e05bca6b7c90540289e9f00`. Snapshot `../assessment-checkpoint-prd6vN`;33 changed entries and5,620 published files. Exact commit/ref/DCO and all33 changed UTF-8 files were fetched back and matched. Saves original-context C094–096 completions, actual final native captures with both paths, C094 workflow SQL, C106–107 completions and scoped supplemental grading review. S06-P01/P03 were prepared afterward using only the approved consumer path; creator069–072 grading remains blocked pending the narrow F1/F2 follow-up.

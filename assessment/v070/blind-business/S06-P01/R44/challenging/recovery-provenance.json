@@ -1,0 +1,126 @@
+{
+  "scope": "Evidence packaging for the same completed original application; no replay or new final capture",
+  "source_commit": "75c0ea9bddf379c5e1803e4c0114ba5b47c871d8",
+  "source_manifest": "recovery/consumer-evidence/provenance.json",
+  "source_manifest_sha256": "4a24e1cb17327ea2b05e11b9c8cabcd2324e6b0ec6f9a8f66bbadadd322bf35b",
+  "source_entries": [
+    {
+      "consumer_id": "C-U084",
+      "role": "matched-final-logical-state-supplement",
+      "path": "recovery/consumer-evidence/C-U084/matched-final-state.sql",
+      "sha256": "071ead7c2855dc57b35546ff0515c79039899eae12b921f60584232f858cb496",
+      "source_commit": "75c0ea9bddf379c5e1803e4c0114ba5b47c871d8",
+      "source_path": "state-snapshots/C-U074/final.sql",
+      "source_blob_sha": "19f0c73867febe10a8e69e4a7818f1ddd0ebd7c0",
+      "historical_digest_observation": "RECOVERY-ENVIRONMENT-OFFLINE.md at the same commit, Uncommitted state evidence to recover",
+      "scope": "Content-addressed bytes matching the recorded final SQL digest. This is not recovered original per-trial final metadata, original binary identity, call history, or a new final-state capture."
+    }
+  ],
+  "source_relay_blob": "baaa3fabfe615fac7abebbfe165bf67e2681d517",
+  "files": [
+    {
+      "source": "consumers/C-U084/prompt.md",
+      "destination": "prompt.md",
+      "sha256": "5059fb5fc56d3da250f985ab0a55d03ea942f434948fd6cc2d562c6f093ea7ff",
+      "observed_copy_source_mode": 420,
+      "role": "original prepared prompt"
+    },
+    {
+      "source": "consumers/C-U084/skill/reimbursement-ledger-rollup/SKILL.md",
+      "destination": "prepared-skill/reimbursement-ledger-rollup/SKILL.md",
+      "sha256": "6e80c91cf9ac3cc64c230c65ddc2c02434e42fb3aee833084b0fc50053344fea",
+      "observed_copy_source_mode": 420,
+      "role": "assignment-backed prepared resource; final inventory unavailable"
+    },
+    {
+      "source": "consumers/C-U084/skill/reimbursement-ledger-rollup/scripts/rollup.py",
+      "destination": "prepared-skill/reimbursement-ledger-rollup/scripts/rollup.py",
+      "sha256": "3c2866e81abdcbab376ddcdd39629755d2aeb8cff620a3accf32236d267b627a",
+      "observed_copy_source_mode": 420,
+      "role": "assignment-backed prepared resource; final inventory unavailable"
+    },
+    {
+      "source": "consumers/C-U084/input/ledger_api.py",
+      "destination": "prepared-input/ledger_api.py",
+      "sha256": "4622ec041dcfe8057aed319bc0ad168f24aebf4520a68c2961cdf046483315f3",
+      "observed_copy_source_mode": 420,
+      "role": "assignment-backed prepared resource; final inventory unavailable"
+    },
+    {
+      "source": "consumers/C-U084/input/request.md",
+      "destination": "prepared-input/request.md",
+      "sha256": "5ca0da91a2d464dd4e828e7f679305230f218b4b373e9f767803bbbb627be1ff",
+      "observed_copy_source_mode": 420,
+      "role": "assignment-backed prepared resource; final inventory unavailable"
+    },
+    {
+      "source": "consumers/C-U084/answer.md",
+      "destination": "original-public-observations/answer.md",
+      "sha256": "bd965630931d2b407cc6e2471d00321172d11aaa87a6bd61cc150bcd2f82a4ce",
+      "observed_copy_source_mode": 420,
+      "role": "surviving original observation"
+    },
+    {
+      "source": "consumers/C-U084/execution-note.md",
+      "destination": "original-public-observations/execution-note.md",
+      "sha256": "df1d6f6fdeff1411f1d3e3365b72bbacb7dbe8d9571ee8c12e21946fc1decb87",
+      "observed_copy_source_mode": 420,
+      "role": "surviving original observation"
+    },
+    {
+      "source": "consumers/C-U084/work/reimbursement-rollup-2026-06-10_2026-06-18.checkpoint.json",
+      "destination": "original-work-evidence/reimbursement-rollup-2026-06-10_2026-06-18.checkpoint.json",
+      "sha256": "1a72249018b991ee0f1dd70c036d126d8a1f70fa70e6c4b229e2dc3439e5e150",
+      "observed_copy_source_mode": 420,
+      "role": "surviving original observation"
+    },
+    {
+      "source": "consumer-setup/C-U084.json",
+      "destination": "setup-observations.json",
+      "sha256": "0cfb58eae23abc1d2455f142b414f15948724ae9d26d12d661f72c78cbd6cca6",
+      "observed_copy_source_mode": 420,
+      "role": "original assignment-anchored initial observation"
+    },
+    {
+      "source": "state-snapshots/C-U084/initial.sql",
+      "destination": "committed-initial-state/initial.sql",
+      "sha256": "cff24d0d1e625ef2c10c6cb417f2322f1f11fd4f3693ae295d5d5641990b47b7",
+      "observed_copy_source_mode": 420,
+      "role": "original assignment-anchored initial observation"
+    },
+    {
+      "source": "state-snapshots/C-U084/initial.json",
+      "destination": "committed-initial-state/initial.json",
+      "sha256": "042b4db8651df66760dbe829080280e86ca44bff47e3db2c3966f92c3cfa6983",
+      "observed_copy_source_mode": 420,
+      "role": "original assignment-anchored initial observation"
+    },
+    {
+      "source": "recovery/control-use-084-relay.md",
+      "destination": "recovery-provenance/source-relay.md",
+      "sha256": "ae45716269fd9a7fb84945ca8a735c40182d9e1431ad13273eb52d9c35b791e9",
+      "observed_copy_source_mode": 420,
+      "role": "unchanged original recovery relay"
+    },
+    {
+      "source": "state-snapshots/C-U074/final.sql",
+      "destination": "recovery-provenance/matched-sql-source.sql",
+      "sha256": "071ead7c2855dc57b35546ff0515c79039899eae12b921f60584232f858cb496",
+      "observed_copy_source_mode": 420,
+      "role": "committed byte source of the matching SQL; not this consumer's final capture"
+    },
+    {
+      "source": "recovery/consumer-evidence/C-U084/matched-final-state.sql",
+      "destination": "logical-state-supplement/matched-final-state.sql",
+      "sha256": "071ead7c2855dc57b35546ff0515c79039899eae12b921f60584232f858cb496",
+      "observed_copy_source_mode": 420,
+      "role": "Content-addressed bytes matching the recorded final SQL digest. This is not recovered original per-trial final metadata, original binary identity, call history, or a new final-state capture."
+    }
+  ],
+  "unavailable": [
+    "Original per-application final API metadata, original SQLite byte identity and complete call history.",
+    "A complete post-execution resource inventory; prepared-resource hashes do not establish it.",
+    "Uncaptured locks, journals and other absent filesystem observations."
+  ],
+  "historical_capture_paragraph_sha256": "112e2dc9ab5110e0ef0dd99eb0be53c21a42e5d57978c4626832424fb296c9c4"
+}

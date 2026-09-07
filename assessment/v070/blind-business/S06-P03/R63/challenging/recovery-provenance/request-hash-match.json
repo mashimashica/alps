@@ -1,0 +1,19 @@
+{
+  "observation_utc": "2026-09-07T23:22:01.009365+00:00",
+  "source": {
+    "path": "recovery/consumer-evidence/C-U092/checkpoint-rendering.json",
+    "sha256": "b0423a23f9d12352c45e90dc2609f2125224c0cde340d5ac3f58174209d03a4e"
+  },
+  "recovered": {
+    "path": "recovery/C-U092-request-hash-matched.json",
+    "sha256": "cf3b8effece5f3c1c9be5e405b5240a66d68d83c984a9795304481974fc486ee"
+  },
+  "transformation": "Remove exactly one terminal display LF, preserving the existing rendering and relay unchanged",
+  "byte_length": 1454,
+  "historical_observation": "recovery/control-use-092-relay.md lines124\u2013126, exact observed request.json hash and size",
+  "independent_review": {
+    "path": "audits/recovered-evidence-sufficiency-review.md",
+    "sha256": "b396d405b574b5dbed485a1773c97bc6cf01e5ab738ed697ff06075b7ef8f38b"
+  },
+  "scope": "Hash-matched original workflow request checkpoint bytes only. No API final-state, lock, journal, operation replay or new business result recovered."
+}

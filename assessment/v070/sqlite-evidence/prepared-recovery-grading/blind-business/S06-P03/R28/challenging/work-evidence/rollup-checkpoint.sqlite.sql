@@ -1,0 +1,18 @@
+BEGIN TRANSACTION;
+CREATE TABLE entries (entry_id TEXT PRIMARY KEY);
+INSERT INTO "entries" VALUES('chg-001');
+INSERT INTO "entries" VALUES('chg-002');
+INSERT INTO "entries" VALUES('chg-003');
+INSERT INTO "entries" VALUES('chg-004');
+INSERT INTO "entries" VALUES('chg-005');
+INSERT INTO "entries" VALUES('chg-006');
+CREATE TABLE pages (cursor TEXT PRIMARY KEY);
+INSERT INTO "pages" VALUES('null');
+INSERT INTO "pages" VALUES('"p_824dd208571a05a7d57ff5bd0e4889c0"');
+CREATE TABLE state (id INTEGER PRIMARY KEY CHECK(id=1), payload TEXT NOT NULL);
+INSERT INTO "state" VALUES(1,'{"version": 1, "api": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U094/input/ledger_api.py", "source": "/workspace/scratch/a75c3a6d9076/C-U094-ledger-recovery-initial-001/ledger.sqlite", "checkpoint": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U094/work/rollup-checkpoint.sqlite", "start": "2026-06-10", "end": "2026-06-18", "snapshot": "snap_fb322d1120ca406ad668bc26", "total": 15, "next_cursor": "p_b62d3333e930f1830dd2d61eb80d3bbc", "complete": false}');
+CREATE TABLE vendors (vendor_id TEXT PRIMARY KEY, charges TEXT, credits TEXT, count INTEGER);
+INSERT INTO "vendors" VALUES('azure','5000','0',1);
+INSERT INTO "vendors" VALUES('saffron','0','900',1);
+INSERT INTO "vendors" VALUES('glacier','700','700',2);
+COMMIT;

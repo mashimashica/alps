@@ -1,0 +1,11 @@
+{
+  "consumer_id": "C-U094",
+  "state_path": "/workspace/scratch/a75c3a6d9076/C-U094-ledger-recovery-initial-001/ledger.sqlite",
+  "original_state_path": "/workspace/scratch/a75c3a6d9076/C-U094-ledger-state-ucpf2ya_/ledger.sqlite",
+  "recovery_binding_path": "recovery-bindings/C-U094.json",
+  "recovery_binding_sha256": "96fc2afec6c2698ec7ede98333145a3d14e97fc73aa7b97ccda4c388dcf4f924",
+  "snapshot": "restored-initial",
+  "representation": "Native SQL from a consistent committed read transaction; not byte-identical SQLite",
+  "sqlite_version": "3.53.1",
+  "sql_sha256": "cff24d0d1e625ef2c10c6cb417f2322f1f11fd4f3693ae295d5d5641990b47b7"
+}
