@@ -1,0 +1,6 @@
+Theo's bench note, 13:46, same local working day:
+
+Lyra: Functional check passed earlier. Charger is beside the open case, not yet packed. Packing still to do.
+Orion: Spare HDMI adapter tested twice with the demo display. Picture dropped after approximately twenty seconds both times. Test failed. No replacement has been found or tested. Orion is not ready for dispatch.
+
+The note records physical work and observed results only. No dispatch exception has been issued.

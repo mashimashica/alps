@@ -27,6 +27,8 @@
 
 | C creators and predeclared consumer/grading allocation | cdbb51b991c9d6efe44dd61a602f8e41fcfbb4ce | 2,446 evidence files; tree ffcca382b8b477a5e1b304cbde481f880176de4e. 26 creators explicitly complete, later creator evidence in progress; fixed 144-cell consumer schedule and prespecified secondary-review sample; concrete blocked-stage decision record. Consumer packaging drafts are preserved but not yet approved or used. |
 
+| Reviewed consumer helper and native verification states | db412ba5d8f208727263fd2489eaada57bd3fbad | 2,512 evidence files; tree fc058f49f49aa7bd32d6cc646ec621f254acde65. 36 C creator completions recorded; control-036's final notification was not yet entered. Reviewed consumer helper, native SQL representations of control-037's three verification databases, first blind-helper review/probe evidence and corrected helper awaiting follow-up. No live consumer prepared at snapshot time. |
+
 Branch: assessment/v070-evidence. Prefix: assessment/v070/. Initial tree: c40d6345d778cb1c44be80f20382ccc9d8b059f2. Commit tree, parent, author-matching DCO, and branch ref were verified through the direct API. The local frozen/alps convenience export is reconstructed from the baseline commit and is not duplicated in the checkpoint.
 
 This log is included in the next checkpoint; the latest branch ref is authoritative when recovering after a save whose local log update was interrupted.
