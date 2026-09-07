@@ -1,0 +1,78 @@
+{
+  "scope": "Physical Agent Skill format only; not semantics or work effectiveness",
+  "validator_source": "agentskills/agentskills@f130f348f502d9804278a617f86929846896d2e9 skills-ref",
+  "results": [
+    {
+      "trial": "dev3-001",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+        "validate",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev3-001/output/checkout-service-release"
+      ],
+      "exit_code": 0,
+      "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev3-001/output/checkout-service-release\n",
+      "stderr": ""
+    },
+    {
+      "trial": "dev3-002",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+        "validate",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev3-002/output/checkout-service-release"
+      ],
+      "exit_code": 0,
+      "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev3-002/output/checkout-service-release\n",
+      "stderr": ""
+    },
+    {
+      "trial": "dev3-003",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+        "validate",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev3-003/output/monthly-receiving-review"
+      ],
+      "exit_code": 0,
+      "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev3-003/output/monthly-receiving-review\n",
+      "stderr": ""
+    },
+    {
+      "trial": "dev3-004",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+        "validate",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev3-004/output/receiving-review"
+      ],
+      "exit_code": 0,
+      "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev3-004/output/receiving-review\n",
+      "stderr": ""
+    },
+    {
+      "trial": "dev3-005",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+        "validate",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev3-005/output/checkout-service-release"
+      ],
+      "exit_code": 0,
+      "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev3-005/output/checkout-service-release\n",
+      "stderr": ""
+    },
+    {
+      "trial": "dev3-006",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+        "validate",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev3-006/output/checkout-service-release"
+      ],
+      "exit_code": 0,
+      "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev3-006/output/checkout-service-release\n",
+      "stderr": ""
+    }
+  ]
+}
