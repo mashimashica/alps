@@ -75,3 +75,9 @@ Calibration and all three permitted ordinary development rounds are complete. B1
 The independently reviewed dependency plan permits finishing C and version-independent preparation. Main A/B and 1,776 dependent task slots remain pending under scope-decision-required.md. C outcomes cannot substitute for paired acceptance, claim ALPS benefit, close the final example pool or establish release readiness. The three-round cap was intended to bound improvement; any later change needs a concrete scope decision after independent work is exhausted.
 
 No new product PR, merge, tag or Release has occurred in this assessment program. The evidence branch must not be merged into the product. User authorization covers the assessment and supported example/release-preparation PRs, with English PR bodies and direct UTF-8 GitHub API updates. It does not authorize merging those new PRs, tagging or publishing a Release.
+
+## Additional conversation recovery
+
+After the first emergency checkpoint, the original completed C070, C071 and C072 agents also relayed their retained successful apply_patch contents without filesystem access or new authoring. The corresponding recovery/control-070-authored-text.md, control-071-authored-text.md and control-072-authored-text.md preserve each Skill, supporting resources and public execution note separately from the inaccessible originals. Together with C069, all four later creators now have supplemental conversation recovery text. Original package/freeze byte reconciliation and the later consumer artifacts remain pending.
+
+The first emergency commit is 6a0a6dc737ba93df750c449c3ca752d492300053, tree 6b1d4db53f66af3ec70c9c84efe159736a4bd63f, parent bb0b730b49dae994a4869e8002f246e338e9da1f. Its four changed files were fetched back as UTF-8 and compared in full to the submitted text; all four matched. See recovery/checkpoint-receipts.md. Always fetch the latest exact evidence ref before another update.
