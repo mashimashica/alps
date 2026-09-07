@@ -29,6 +29,8 @@
 
 | Reviewed consumer helper and native verification states | db412ba5d8f208727263fd2489eaada57bd3fbad | 2,512 evidence files; tree fc058f49f49aa7bd32d6cc646ec621f254acde65. 36 C creator completions recorded; control-036's final notification was not yet entered. Reviewed consumer helper, native SQL representations of control-037's three verification databases, first blind-helper review/probe evidence and corrected helper awaiting follow-up. No live consumer prepared at snapshot time. |
 
+| First 24 frozen C packages and 48 prepared applications | 42d5eff534ad363ee622733b2fa2d3acaa3995e8 | 2,812 evidence files; tree 7670c5418dd747da3d39d3e8648cf0bd052f33d2. All first 37 C creators complete; first 24 packages pass pinned form checks. Their exact frozen resources, external manifests and all C-U001–048 materialized prompts/inputs/assignments are saved before first consumer execution. Blind follow-up remains pending. |
+
 Branch: assessment/v070-evidence. Prefix: assessment/v070/. Initial tree: c40d6345d778cb1c44be80f20382ccc9d8b059f2. Commit tree, parent, author-matching DCO, and branch ref were verified through the direct API. The local frozen/alps convenience export is reconstructed from the baseline commit and is not duplicated in the checkpoint.
 
 This log is included in the next checkpoint; the latest branch ref is authoritative when recovering after a save whose local log update was interrupted.

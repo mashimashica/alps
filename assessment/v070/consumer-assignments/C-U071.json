@@ -1,0 +1,55 @@
+{
+  "consumer_id": "C-U071",
+  "creator_id": "control-036",
+  "case": "S05",
+  "variant": "ordinary",
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "high",
+  "context": "fresh",
+  "copied_sha256": {
+    "skill/monthly-receiving-review/SKILL.md": "534aac52d3a8d5a4d5a0e04155831b05b51a5ce481b90d00e5813e6e726b676e",
+    "skill/monthly-receiving-review/references/contract.md": "ebc837c2bd3da08306be0f81f63d61b1560761706f640cfba1cb49f49f2dcf47",
+    "skill/monthly-receiving-review/scripts/review.py": "40601ab683035d41717b04ba5ce136407246228aff20fd6bd29cdaddbfdc5b6c",
+    "skill/monthly-receiving-review/tests/test_review.py": "941779bbafe9a3a75abfd18faab931294589dc770f4badb18ee00d996b60a2b0",
+    "input/receiving.json": "534322f85790ec61a78f6dcf10441729d1fc78e8d4ad5aabc614558992f3868c",
+    "input/request.md": "7c1239e7e1e61908edb1dcf828a90ac48de7e23f11c449c840eabde97777c615"
+  },
+  "prompt_sha256": "22f5482f2e4f61d70c61f9ea3bd89ab0c72ab6a800198757638b41c5e039185b",
+  "copied_file_modes": {
+    "skill/monthly-receiving-review/SKILL.md": 420,
+    "skill/monthly-receiving-review/references/contract.md": 420,
+    "skill/monthly-receiving-review/scripts/review.py": 420,
+    "skill/monthly-receiving-review/tests/test_review.py": 420,
+    "input/receiving.json": 420,
+    "input/request.md": 420
+  },
+  "initial_state_evidence_sha256": {},
+  "artifact_freeze_manifest": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-artifact-freezes/control-036.json",
+  "artifact_freeze_sha256": "9a3ae864b1c83e6fac39716335ea1689657ad7e0ba035ec70955c357c6d80be7",
+  "case_bank_manifest_sha256": "f26be07f6cfba54aedc3068a67ae32292877f6ee005f0c190156f5786d1cbdc2",
+  "request_source": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S05/ordinary/input/request.md",
+  "request_source_sha256": "0f75d91510a604485e41821babe05f4118db0ab0c76153ee250e77b6062f5dd7",
+  "request_substitutions": [
+    {
+      "token": "{{INPUT_DIR}}",
+      "value": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U071/input",
+      "occurrences": 1
+    }
+  ],
+  "common_authoring_aid_sha256": {
+    "SKILL.md": "6656e54755638e8efcf275a472b9672eaa8a9a1b9e59dc210e275b03b59e1e66",
+    "agents/openai.yaml": "d07d21b93fcf3d4dc8d9a3399c05fc226a49a333a96d3e1c68b451b8dd9eade6",
+    "assets/skill-creator-small.svg": "6591bf8ea9bb9435890dbdea299e0d2bd05f3aa893a335d26e4c535e93c8e7fb",
+    "assets/skill-creator.png": "a4024b0306ddb05847e1012879d37aaf1e658205199da596f5145ed7a88d9162",
+    "license.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "references/openai_yaml.md": "ffac39318e408108141d40f820968e59f70434a891694f9bf1d25be8237b150c",
+    "scripts/generate_openai_yaml.py": "ddaf9abdfb3e762ed3c82571e9c607ce964188f49f2146281beb2cb8a553a93d",
+    "scripts/init_skill.py": "bc04fae1e671aa1e5104212674e7f22c9665a791fafa2fc2b3897187a89801b2",
+    "scripts/quick_validate.py": "1fd66498c219616fd9249eacdf16c458412ea9065a9d887fd716aeef03907762"
+  },
+  "common_aid_unrecorded_original_display_assets": [
+    "assets/skill-creator-small.svg",
+    "assets/skill-creator.png"
+  ],
+  "schedule_sha256": "739210b57f1b000dcb3cf6f4e2ee912ca6e911d8e829eacde225bb03ffe91569"
+}

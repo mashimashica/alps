@@ -1,0 +1,45 @@
+{
+  "scope": "Completed C-U001\u2013010 original resource bytes/modes only; not additions/access or task quality",
+  "results": [
+    {
+      "consumer": "C-U001",
+      "recorded_resource_changes": []
+    },
+    {
+      "consumer": "C-U002",
+      "recorded_resource_changes": []
+    },
+    {
+      "consumer": "C-U003",
+      "recorded_resource_changes": []
+    },
+    {
+      "consumer": "C-U004",
+      "recorded_resource_changes": []
+    },
+    {
+      "consumer": "C-U005",
+      "recorded_resource_changes": []
+    },
+    {
+      "consumer": "C-U006",
+      "recorded_resource_changes": []
+    },
+    {
+      "consumer": "C-U007",
+      "recorded_resource_changes": []
+    },
+    {
+      "consumer": "C-U008",
+      "recorded_resource_changes": []
+    },
+    {
+      "consumer": "C-U009",
+      "recorded_resource_changes": []
+    },
+    {
+      "consumer": "C-U010",
+      "recorded_resource_changes": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "creator_id": "control-037",
+  "source_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/control-037/deliverables/skills/reimbursement-ledger-rollup",
+  "frozen_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/control-artifacts/control-037/reimbursement-ledger-rollup",
+  "file_sha256": {
+    "SKILL.md": "33775b043f9f6ec32808bcf66058f13b1396ae385f2b55846c19f95ab4816370",
+    "scripts/rollup.py": "af33ec728bb9749f362eb5d61628cf12b8a684f478ea82ed81e498b8fc5168e9"
+  },
+  "source_file_modes": {
+    "SKILL.md": 420,
+    "scripts/rollup.py": 420
+  },
+  "excluded_runtime_cache_sha256": {},
+  "cache_handling": "Regular *.pyc directly inside __pycache__ are retained in the original creator folder but omitted from the frozen/copy resources and durable checkpoint; their bytes are not claimed preserved",
+  "schedule_sha256": "739210b57f1b000dcb3cf6f4e2ee912ca6e911d8e829eacde225bb03ffe91569",
+  "case_bank_manifest_sha256": "f26be07f6cfba54aedc3068a67ae32292877f6ee005f0c190156f5786d1cbdc2",
+  "scope": "Supplied Skill resources and bytes, with explicitly recorded Python runtime-cache exclusions; no quality judgment"
+}

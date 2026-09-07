@@ -1,0 +1,31 @@
+{
+  "helper_sha256": "70638868bb15f9ef58114f7f502189b8f0f2d65c6971126f646a766bef8f6fb1",
+  "exit_code": 0,
+  "stdout": "Prepared S06-P01: four frozen packages and eight completed observations; no quality judgment\n",
+  "stderr": "",
+  "packet_created": true,
+  "added_skill_resource_preserved": false,
+  "observed_final_skill_preserved": false,
+  "root_consumer_result_preserved": false,
+  "creator_public_note_preserved": false,
+  "creator_demo_preserved": false,
+  "original_resource_observations": {
+    "scope": "Recorded original bytes only; additions and behavior need separate review",
+    "changed_originals": []
+  },
+  "misbound_snapshot_metadata_copied": {
+    "consumer_id": "C-U999",
+    "snapshot": "wrong-label",
+    "state_path": "/wrong-state/ledger.sqlite",
+    "sql_sha256": "1713c49c104819a7df7cee6a37a4417723e339a8fd20952b8ba8483eb7730079"
+  },
+  "changed_prompt_accepted": "Changed synthetic prompt, deliberately unlike its assignment hash.\n",
+  "noncache_hidden_resource": {
+    "consumer_inventory_accepted": true,
+    "checkpoint_inventory_preserved": false,
+    "consumer_helper_sha256": "f6bba138b7c1920c73a70eca7065a435eb9ca2e074648dd52ddbf14177ebc642",
+    "checkpoint_helper_sha256": "8153f3cf02db0f3877e988114d99c94b24133418533c08c2dd70ad3d882b9b42"
+  },
+  "fixture_root": "/tmp/control-packaging-review-7ljtp9ti"
+}
+

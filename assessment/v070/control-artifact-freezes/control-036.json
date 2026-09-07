@@ -1,0 +1,22 @@
+{
+  "creator_id": "control-036",
+  "source_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/control-036/deliverables/skills/monthly-receiving-review",
+  "frozen_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/control-artifacts/control-036/monthly-receiving-review",
+  "file_sha256": {
+    "SKILL.md": "534aac52d3a8d5a4d5a0e04155831b05b51a5ce481b90d00e5813e6e726b676e",
+    "references/contract.md": "ebc837c2bd3da08306be0f81f63d61b1560761706f640cfba1cb49f49f2dcf47",
+    "scripts/review.py": "40601ab683035d41717b04ba5ce136407246228aff20fd6bd29cdaddbfdc5b6c",
+    "tests/test_review.py": "941779bbafe9a3a75abfd18faab931294589dc770f4badb18ee00d996b60a2b0"
+  },
+  "source_file_modes": {
+    "SKILL.md": 420,
+    "references/contract.md": 420,
+    "scripts/review.py": 420,
+    "tests/test_review.py": 420
+  },
+  "excluded_runtime_cache_sha256": {},
+  "cache_handling": "Regular *.pyc directly inside __pycache__ are retained in the original creator folder but omitted from the frozen/copy resources and durable checkpoint; their bytes are not claimed preserved",
+  "schedule_sha256": "739210b57f1b000dcb3cf6f4e2ee912ca6e911d8e829eacde225bb03ffe91569",
+  "case_bank_manifest_sha256": "f26be07f6cfba54aedc3068a67ae32292877f6ee005f0c190156f5786d1cbdc2",
+  "scope": "Supplied Skill resources and bytes, with explicitly recorded Python runtime-cache exclusions; no quality judgment"
+}

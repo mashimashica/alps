@@ -1,0 +1,25 @@
+{
+  "scope": "Exact three-entry index and six representation-file identities only; no source SQLite body or generated Skill read; no business work repeated",
+  "index_sha256": "3614aa1659cef948bc6552ffc92011d68de91790cadc3f3814c17bac9e91533b",
+  "checks": [
+    {
+      "source_path": "trials/control-037/verify1/source.sqlite",
+      "metadata_matches_index": true,
+      "SQL_metadata_files_are_regular_and_export_eligible": true,
+      "SQL_metadata_hashes_match_index": true
+    },
+    {
+      "source_path": "trials/control-037/verify2/source.sqlite",
+      "metadata_matches_index": true,
+      "SQL_metadata_files_are_regular_and_export_eligible": true,
+      "SQL_metadata_hashes_match_index": true
+    },
+    {
+      "source_path": "trials/control-037/verify3/source.sqlite",
+      "metadata_matches_index": true,
+      "SQL_metadata_files_are_regular_and_export_eligible": true,
+      "SQL_metadata_hashes_match_index": true
+    }
+  ]
+}
+
