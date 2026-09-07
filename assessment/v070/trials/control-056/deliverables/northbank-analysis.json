@@ -258,34 +258,34 @@
     "planned_shifts": 20,
     "quality_effect_scenarios": {
       "contemporaneous": {
-        "avoided_cost_point_estimate": 7048.88888889,
-        "avoided_outcomes_point_estimate": 108.44444444
+        "avoided_cost_point_estimate": 7048.89,
+        "avoided_outcomes_point_estimate": 108.44
       },
       "difference_in_differences": {
-        "avoided_cost_point_estimate": 10168.88888889,
-        "avoided_outcomes_point_estimate": 156.44444444
+        "avoided_cost_point_estimate": 10168.89,
+        "avoided_outcomes_point_estimate": 156.44
       }
     },
     "quality_effect_scenarios_by_band": {
       "complex": {
         "contemporaneous_benefit": {
-          "avoided_cost_point_estimate": 1039.99896,
-          "avoided_outcomes_point_estimate": 15.999984
+          "avoided_cost_point_estimate": 1040.0,
+          "avoided_outcomes_point_estimate": 16.0
         },
         "difference_in_differences_benefit": {
-          "avoided_cost_point_estimate": 4159.99896,
-          "avoided_outcomes_point_estimate": 63.999984
+          "avoided_cost_point_estimate": 4160.0,
+          "avoided_outcomes_point_estimate": 64.0
         },
         "planned_orders": 4800.0
       },
       "standard": {
         "contemporaneous_benefit": {
-          "avoided_cost_point_estimate": 6008.88288,
-          "avoided_outcomes_point_estimate": 92.444352
+          "avoided_cost_point_estimate": 6008.88,
+          "avoided_outcomes_point_estimate": 92.44
         },
         "difference_in_differences_benefit": {
-          "avoided_cost_point_estimate": 6008.88288,
-          "avoided_outcomes_point_estimate": 92.444352
+          "avoided_cost_point_estimate": 6008.88,
+          "avoided_outcomes_point_estimate": 92.44
         },
         "planned_orders": 19200.0
       }

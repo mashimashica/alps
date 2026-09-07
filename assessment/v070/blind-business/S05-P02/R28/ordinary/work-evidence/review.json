@@ -1,0 +1,177 @@
+{
+  "review_month": "2026-06",
+  "review_summary": {
+    "supplied_order_records": 6,
+    "identifiable_supplied_lines": 6,
+    "unidentifiable_order_records": 0,
+    "resolved_positions": 5,
+    "undetermined_positions": 1,
+    "lines_requiring_follow_up": 4
+  },
+  "lines": [
+    {
+      "order_id": "PO-R2606-410",
+      "sku": "CARTON-M",
+      "ordered": 80,
+      "counted_event_ids": [
+        "RCV-H1804",
+        "RCV-H1805"
+      ],
+      "observed_subtotal": 42,
+      "observed_subtotal_is_final": true,
+      "final_net_received": 42,
+      "variance_received_minus_ordered": -38,
+      "evidence_status": "complete",
+      "position": "shortfall",
+      "evidence_gaps": [],
+      "follow_up": {
+        "type": "supplier_remaining_receipt",
+        "owners": [
+          {
+            "role": "purchasing_coordinator",
+            "role_label": "purchasing coordinator",
+            "recipient": "Dana Ivers <dana.ivers@juniperworks.example>"
+          }
+        ],
+        "external_recipient": "Mara Quinn <mara.quinn@harborpack.example>",
+        "next_action": "Confirm the receipt plan and timing for the remaining 38 units.",
+        "draft_basis": "Order PO-R2606-410, SKU CARTON-M, is short by 38 units for 2026-06; ask the supplied supplier contact to confirm receipt plan and timing."
+      }
+    },
+    {
+      "order_id": "PO-R2606-410",
+      "sku": "LABEL-60",
+      "ordered": 120,
+      "counted_event_ids": [
+        "RCV-H1801",
+        "RCV-H1802",
+        "RCV-H1803"
+      ],
+      "observed_subtotal": 120,
+      "observed_subtotal_is_final": true,
+      "final_net_received": 120,
+      "variance_received_minus_ordered": 0,
+      "evidence_status": "complete",
+      "position": "received_as_ordered",
+      "evidence_gaps": [],
+      "follow_up": null
+    },
+    {
+      "order_id": "PO-R2606-411",
+      "sku": "GLOVE-N",
+      "ordered": 60,
+      "counted_event_ids": [
+        "RCV-H1806",
+        "RCV-H1807"
+      ],
+      "observed_subtotal": 64,
+      "observed_subtotal_is_final": true,
+      "final_net_received": 64,
+      "variance_received_minus_ordered": 4,
+      "evidence_status": "complete",
+      "position": "excess",
+      "evidence_gaps": [],
+      "follow_up": {
+        "type": "surplus_reconciliation",
+        "owners": [
+          {
+            "role": "warehouse_lead",
+            "role_label": "warehouse lead",
+            "recipient": "Noel Price <noel.price@juniperworks.example>"
+          }
+        ],
+        "external_recipient": null,
+        "next_action": "Reconcile the 4-unit surplus against the order and receiving evidence.",
+        "draft_basis": "Order PO-R2606-411, SKU GLOVE-N, has a 4-unit excess for 2026-06; reconcile the surplus against the order and receiving records."
+      }
+    },
+    {
+      "order_id": "PO-R2606-412",
+      "sku": "FILM-300",
+      "ordered": 24,
+      "counted_event_ids": [
+        "RCV-H1808"
+      ],
+      "observed_subtotal": 24,
+      "observed_subtotal_is_final": true,
+      "final_net_received": 24,
+      "variance_received_minus_ordered": 0,
+      "evidence_status": "complete",
+      "position": "received_as_ordered",
+      "evidence_gaps": [],
+      "follow_up": null
+    },
+    {
+      "order_id": "PO-R2606-413",
+      "sku": "SEAL-BLUE",
+      "ordered": 40,
+      "counted_event_ids": [
+        "RCV-H1809",
+        "RCV-H1810"
+      ],
+      "observed_subtotal": 30,
+      "observed_subtotal_is_final": false,
+      "final_net_received": null,
+      "variance_received_minus_ordered": null,
+      "evidence_status": "incomplete_export",
+      "position": "undetermined",
+      "evidence_gaps": [
+        "requested-month event export is declared incomplete"
+      ],
+      "follow_up": {
+        "type": "complete_or_correct_export",
+        "owners": [
+          {
+            "role": "data_steward",
+            "role_label": "data steward",
+            "recipient": "Simone Bell <simone.bell@juniperworks.example>"
+          }
+        ],
+        "external_recipient": null,
+        "next_action": "Provide, correct, or confirm the full requested-month event export, then rerun the final comparison.",
+        "draft_basis": "Order PO-R2606-413, SKU SEAL-BLUE, cannot be finalized for 2026-06; provide, correct, or confirm the full event export described by the evidence gaps."
+      }
+    },
+    {
+      "order_id": "PO-R2606-414",
+      "sku": "TAPE-48",
+      "ordered": 30,
+      "counted_event_ids": [],
+      "observed_subtotal": 0,
+      "observed_subtotal_is_final": true,
+      "final_net_received": 0,
+      "variance_received_minus_ordered": -30,
+      "evidence_status": "complete",
+      "position": "shortfall",
+      "evidence_gaps": [],
+      "follow_up": {
+        "type": "supplier_remaining_receipt",
+        "owners": [
+          {
+            "role": "purchasing_coordinator",
+            "role_label": "purchasing coordinator",
+            "recipient": "Dana Ivers <dana.ivers@juniperworks.example>"
+          }
+        ],
+        "external_recipient": "Owen Malik <owen.malik@bindwell.example>",
+        "next_action": "Confirm the receipt plan and timing for the remaining 30 units.",
+        "draft_basis": "Order PO-R2606-414, SKU TAPE-48, is short by 30 units for 2026-06; ask the supplied supplier contact to confirm receipt plan and timing."
+      }
+    }
+  ],
+  "outside_scope_events": [
+    "RCV-H1811"
+  ],
+  "ignored_other_month_event_ids": [
+    "RCV-H1720",
+    "RCV-H1901"
+  ],
+  "unassigned_issues": [],
+  "processing_notes": {
+    "exact_duplicate_order_records_ignored": 0,
+    "exact_duplicate_event_records_ignored": 1,
+    "exact_duplicate_coverage_records_ignored": 0,
+    "observed_subtotal_rule": "sum of valid, unique, matching requested-month events; may be non-final",
+    "no_external_actions": "No messages were sent and no order or receiving records were changed."
+  }
+}

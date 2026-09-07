@@ -1,0 +1,163 @@
+{
+  "review_month": "2026-06",
+  "scope": {
+    "supplied_order_rows": 6,
+    "identifiable_order_lines": 6
+  },
+  "input_issues": [],
+  "ignored": {
+    "out_of_month_event_ids": [
+      "RCV-H1720",
+      "RCV-H1901"
+    ],
+    "out_of_scope_event_ids": [
+      "RCV-H1811"
+    ],
+    "non_applicable_coverage_rows": 0
+  },
+  "lines": [
+    {
+      "order_id": "PO-R2606-410",
+      "sku": "CARTON-M",
+      "ordered": 80,
+      "supplier_contact": "Mara Quinn <mara.quinn@harborpack.example>",
+      "observed_net_received": 42,
+      "accepted_event_ids": [
+        "RCV-H1804",
+        "RCV-H1805"
+      ],
+      "excluded_conflicting_event_ids": [],
+      "coverage_status": "complete",
+      "final_net_received": 42,
+      "difference_from_order": -38,
+      "receipt_position": "shortfall",
+      "evidence_gaps": [],
+      "follow_up": [
+        {
+          "reason": "complete_shortfall",
+          "responsible_role": "purchasing_coordinator",
+          "responsible": "Dana Ivers <dana.ivers@juniperworks.example>",
+          "recipient": "Mara Quinn <mara.quinn@harborpack.example>",
+          "next_action": "Ask the supplier contact to confirm the plan for the remaining 38 units.",
+          "draft": "To: Mara Quinn <mara.quinn@harborpack.example>\nFrom/owner: Dana Ivers <dana.ivers@juniperworks.example>\n\nFor order PO-R2606-410, SKU CARTON-M, the complete 2026-06 evidence shows 42 received against 80 ordered. Please confirm the receipt plan for the remaining 38 units."
+        }
+      ]
+    },
+    {
+      "order_id": "PO-R2606-410",
+      "sku": "LABEL-60",
+      "ordered": 120,
+      "supplier_contact": "Mara Quinn <mara.quinn@harborpack.example>",
+      "observed_net_received": 120,
+      "accepted_event_ids": [
+        "RCV-H1801",
+        "RCV-H1802",
+        "RCV-H1803"
+      ],
+      "excluded_conflicting_event_ids": [],
+      "coverage_status": "complete",
+      "final_net_received": 120,
+      "difference_from_order": 0,
+      "receipt_position": "received_as_ordered",
+      "evidence_gaps": [],
+      "follow_up": []
+    },
+    {
+      "order_id": "PO-R2606-411",
+      "sku": "GLOVE-N",
+      "ordered": 60,
+      "supplier_contact": "Ellis Chen <ellis.chen@elmprotect.example>",
+      "observed_net_received": 64,
+      "accepted_event_ids": [
+        "RCV-H1806",
+        "RCV-H1807"
+      ],
+      "excluded_conflicting_event_ids": [],
+      "coverage_status": "complete",
+      "final_net_received": 64,
+      "difference_from_order": 4,
+      "receipt_position": "excess",
+      "evidence_gaps": [],
+      "follow_up": [
+        {
+          "reason": "complete_excess",
+          "responsible_role": "warehouse_lead",
+          "responsible": "Noel Price <noel.price@juniperworks.example>",
+          "recipient": "Noel Price <noel.price@juniperworks.example>",
+          "next_action": "Reconcile the excess 4 units against the order and receiving evidence.",
+          "draft": "To: Noel Price <noel.price@juniperworks.example>\nFrom/owner: Noel Price <noel.price@juniperworks.example>\n\nPlease reconcile order PO-R2606-411, SKU GLOVE-N: complete 2026-06 evidence shows 64 received against 60 ordered, an excess of 4. Confirm the source and corrective disposition."
+        }
+      ]
+    },
+    {
+      "order_id": "PO-R2606-412",
+      "sku": "FILM-300",
+      "ordered": 24,
+      "supplier_contact": "Priya Stone <priya.stone@clearspan.example>",
+      "observed_net_received": 24,
+      "accepted_event_ids": [
+        "RCV-H1808"
+      ],
+      "excluded_conflicting_event_ids": [],
+      "coverage_status": "complete",
+      "final_net_received": 24,
+      "difference_from_order": 0,
+      "receipt_position": "received_as_ordered",
+      "evidence_gaps": [],
+      "follow_up": []
+    },
+    {
+      "order_id": "PO-R2606-413",
+      "sku": "SEAL-BLUE",
+      "ordered": 40,
+      "supplier_contact": "Leni Perez <leni.perez@blueridgepack.example>",
+      "observed_net_received": 30,
+      "accepted_event_ids": [
+        "RCV-H1809",
+        "RCV-H1810"
+      ],
+      "excluded_conflicting_event_ids": [],
+      "coverage_status": "incomplete",
+      "final_net_received": null,
+      "difference_from_order": null,
+      "receipt_position": "undetermined",
+      "evidence_gaps": [
+        "The event export is incomplete; the observed subtotal is not a final receipt position."
+      ],
+      "follow_up": [
+        {
+          "reason": "export_completeness",
+          "responsible_role": "data_steward",
+          "responsible": "Simone Bell <simone.bell@juniperworks.example>",
+          "recipient": "Simone Bell <simone.bell@juniperworks.example>",
+          "next_action": "Provide or confirm the full 2026-06 event export for order PO-R2606-413, SKU SEAL-BLUE, and resolve the coverage declaration.",
+          "draft": "To: Simone Bell <simone.bell@juniperworks.example>\nFrom/owner: Simone Bell <simone.bell@juniperworks.example>\n\nPlease provide or confirm the complete 2026-06 receiving-event export for order PO-R2606-413, SKU SEAL-BLUE, and confirm its coverage status. The current observed subtotal is 30 and is not being treated as final."
+        }
+      ]
+    },
+    {
+      "order_id": "PO-R2606-414",
+      "sku": "TAPE-48",
+      "ordered": 30,
+      "supplier_contact": "Owen Malik <owen.malik@bindwell.example>",
+      "observed_net_received": 0,
+      "accepted_event_ids": [],
+      "excluded_conflicting_event_ids": [],
+      "coverage_status": "complete",
+      "final_net_received": 0,
+      "difference_from_order": -30,
+      "receipt_position": "shortfall",
+      "evidence_gaps": [],
+      "follow_up": [
+        {
+          "reason": "complete_shortfall",
+          "responsible_role": "purchasing_coordinator",
+          "responsible": "Dana Ivers <dana.ivers@juniperworks.example>",
+          "recipient": "Owen Malik <owen.malik@bindwell.example>",
+          "next_action": "Ask the supplier contact to confirm the plan for the remaining 30 units.",
+          "draft": "To: Owen Malik <owen.malik@bindwell.example>\nFrom/owner: Dana Ivers <dana.ivers@juniperworks.example>\n\nFor order PO-R2606-414, SKU TAPE-48, the complete 2026-06 evidence shows 0 received against 30 ordered. Please confirm the receipt plan for the remaining 30 units."
+        }
+      ]
+    }
+  ]
+}

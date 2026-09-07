@@ -1,0 +1,58 @@
+{
+  "month": "2026-08",
+  "orders": [
+    {
+      "order_id": "P-A",
+      "sku": "X",
+      "ordered": 10,
+      "supplier_contact": "Supplier A"
+    },
+    {
+      "order_id": "P-B",
+      "sku": "Y",
+      "ordered": 5,
+      "supplier_contact": "Supplier B"
+    }
+  ],
+  "events": [
+    {
+      "event_id": "e-a",
+      "order_id": "P-A",
+      "sku": "X",
+      "event_month": "2026-08",
+      "quantity": 6
+    },
+    {
+      "event_id": "e-b",
+      "order_id": "P-B",
+      "sku": "Y",
+      "event_month": "2026-08",
+      "quantity": 5
+    }
+  ],
+  "coverage": [
+    {
+      "order_id": "P-A",
+      "sku": "X",
+      "month": "2026-08",
+      "complete": false
+    },
+    {
+      "order_id": "P-B",
+      "sku": "Y",
+      "month": "2026-08",
+      "complete": true
+    },
+    {
+      "order_id": "P-A",
+      "sku": "X",
+      "month": "2026-08",
+      "complete": true
+    }
+  ],
+  "responsibilities": {
+    "purchasing_coordinator": "Buyer",
+    "warehouse_lead": "Warehouse",
+    "data_steward": "Data"
+  }
+}

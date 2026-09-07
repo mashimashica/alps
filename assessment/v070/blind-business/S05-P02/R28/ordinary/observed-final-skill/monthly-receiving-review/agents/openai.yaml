@@ -1,0 +1,4 @@
+interface:
+  display_name: "Monthly Receiving Review"
+  short_description: "Review monthly PO receipts and draft follow-up"
+  default_prompt: "Use $monthly-receiving-review to review this month's supplied purchase-order receipt evidence and draft the required follow-up."
