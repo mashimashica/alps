@@ -33,6 +33,8 @@
 
 | First control applications and completed packaging reviews | 6573d38e853e924cc74da8f9e068847ed15e7132 | 3,167 evidence files; tree 36f9e3ca126d09e94a7b50088d5cb5016b08092e. 37 creators complete/pass pinned form checks, 74 consumers prepared and first 14 complete. All source packages, prompts, initial S06 SQL/setup observations and metadata saved before remaining execution. F1–F4 and SQLite follow-up complete/read; first S01-P02 business packet saved before grading. |
 
+| Complete numerical controls and first independent grade | a8927b6d975dd8c4d888a982cbeff5df03b812ac | 3,321 evidence files; tree 37811ee56219b758c045ecbfa296d225d95c473b. C-U001–025 complete and C-U026 running at snapshot time; full S01 evidence and all three blind packets preserved. S01-P02 primary grade complete/read; remaining three prescribed S01 reviews were prepared and unstarted. |
+
 Branch: assessment/v070-evidence. Prefix: assessment/v070/. Initial tree: c40d6345d778cb1c44be80f20382ccc9d8b059f2. Commit tree, parent, author-matching DCO, and branch ref were verified through the direct API. The local frozen/alps convenience export is reconstructed from the baseline commit and is not duplicated in the checkpoint.
 
 This log is included in the next checkpoint; the latest branch ref is authoritative when recovering after a save whose local log update was interrupted.

@@ -26,7 +26,7 @@ Updated: 2026-09-07 UTC.
 | Stage | Completed design | Completed consumer | Other completed | Planned task trials |
 | --- | ---: | ---: | ---: | ---: |
 | Calibration | 12 | 24 | 0 | 36 |
-| C control | 37 | 14 | 0 | 216 |
+| C control | 40 | 31 | 0 | 216 |
 | Remaining base plan | 0 | 0 | 0 | up to 1,776 |
 
 Additional diagnostic reserve (separate from base): at most 72 executions across at most three rounds. H01–H03 have 66 completed and two retained incomplete executions, for 68 started; four reserve slots remain unallocated. Across calibration and development, 34 creators and 68 valid consumers are complete. Completion, observation validity, business adequacy and Outcome achievement are distinct.
@@ -34,3 +34,5 @@ Additional diagnostic reserve (separate from base): at most 72 executions across
 All numerical selection tasks were correct. Receiving reviews computed the supplied quantities correctly, but four applications omitted a required follow-up owner; independent component probes found two different latent implementation defects. Four ordinary simulated releases succeeded; two challenging rehearsals completed and established checkout failure, while two needlessly requalified and blocked the requested rehearsal. Reporting failure honestly is not release success. See calibration-synthesis.md and grades for distinctions and limits.
 
 No ALPS causal benefit, convergence, or release readiness is asserted. No new product PR, tag or Release has been created. Do not count format success, grader checks or prepared cases as completed fresh task trials.
+
+Latest execution reconciliation: C creators 001–040 are complete and pass pinned format checks; 041–042 are running. C-U001–080 are prepared; 001–031 are complete and 032–035 are running. The truncated C-U031 spawn reply was reconciled with its existing completed task, without rerunning it. S01's three primary grades and prespecified P01 second grade are complete and read; control-S01-closeout.md records 24 adequate, correct answers and six unconfirmed writing-method observations separately. C038–039's three completed verification databases are preserved as native SQL plus hashes, alongside the earlier C037 states. Main A/B dependencies remain blocked and the three-round cap unchanged. Consult the mutable ledgers/live agents for later notifications.

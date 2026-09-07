@@ -43,6 +43,8 @@ S08 consumer SQLite states are in dedicated temporary directories outside this e
 
 ## Important limits
 
+Newest reconciliation superseding earlier progress counts: C creators 001–040 complete/form-pass; 041–042 running. Consumers 001–080 prepared; 001–031 complete, 032–035 running. All S01 primary grades and the prespecified P01 second grade are complete and read; control-S01-closeout.md records the final descriptive judgment. C-U031's truncated spawn reply was recovered from the existing completed agent, not retried. Three completed C038–039 verification databases are indexed native-SQL evidence; C040 produced no SQLite-header file. All consumer/blind/SQLite helper reviews mentioned as pending above are now complete/read. Last confirmed remote checkpoint before this reconciliation is a8927b6d975dd8c4d888a982cbeff5df03b812ac, tree 37811ee56219b758c045ecbfa296d225d95c473b, 3,321 files. Fetch the exact evidence ref before mutation and use the later receipt in checkpoints.md when one exists.
+
 Fresh subagents do not inherit conversation context. They receive only their task-local prompt and permitted files. The host filesystem is shared: path restrictions are procedural, not a security sandbox. Do not disclose held-out cases or independent oracles to creators. Consumer cases are materialized only after the associated creators finish. Keep public prompts/tool observations/artifacts, never private chain-of-thought.
 
 The approved base plan is up to 2,028 task trials, excluding grading, host sessions and bounded development diagnostics. Completed counts must be reported independently of planned counts. Read protocol.md for exact arithmetic and convergence rules.
