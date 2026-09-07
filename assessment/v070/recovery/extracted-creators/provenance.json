@@ -1,0 +1,94 @@
+{
+  "observation_utc": "2026-09-07T23:03:25.071927+00:00",
+  "scope": "Recovery of completed creator text only; no authoring, execution, validation or historical freeze reconstructed",
+  "files": [
+    {
+      "original_path": "trials/control-071/deliverables/skills/checkout-release/SKILL.md",
+      "extracted_path": "recovery/extracted-creators/control-071/deliverables/skills/checkout-release/SKILL.md",
+      "relay_path": "recovery/control-071-authored-text.md",
+      "relay_sha256": "94131018b4cade42cb16786ba875166073b793493bb6ccacd2735fa3f422ca01",
+      "relay_body_start_line": 8,
+      "extracted_sha256": "bebf2179ccd570a8a720195374974641943bd6cfa00bf1e3017812a7ad6781f2",
+      "extracted_bytes": 10964,
+      "observed_mode": 420,
+      "identity_scope": "Exact retained successful authored-text relay; original file byte hash and mode unavailable. This is a recovery observation, not original final filesystem attestation."
+    },
+    {
+      "original_path": "trials/control-071/deliverables/skills/checkout-release/references/release-interface.md",
+      "extracted_path": "recovery/extracted-creators/control-071/deliverables/skills/checkout-release/references/release-interface.md",
+      "relay_path": "recovery/control-071-authored-text.md",
+      "relay_sha256": "94131018b4cade42cb16786ba875166073b793493bb6ccacd2735fa3f422ca01",
+      "relay_body_start_line": 109,
+      "extracted_sha256": "6a07585c88b0d830a18c6efb37779a65e8f8c1af909fb6c3f189b3a9d9620529",
+      "extracted_bytes": 4024,
+      "observed_mode": 420,
+      "identity_scope": "Exact retained successful authored-text relay; original file byte hash and mode unavailable. This is a recovery observation, not original final filesystem attestation."
+    },
+    {
+      "original_path": "trials/control-071/deliverables/skills/checkout-release/assets/release-request.json",
+      "extracted_path": "recovery/extracted-creators/control-071/deliverables/skills/checkout-release/assets/release-request.json",
+      "relay_path": "recovery/control-071-authored-text.md",
+      "relay_sha256": "94131018b4cade42cb16786ba875166073b793493bb6ccacd2735fa3f422ca01",
+      "relay_body_start_line": 157,
+      "extracted_sha256": "9d06ff9ca3875eeb20acf7d15d6a4c65e22c1a65a6ff4df94b0e11e7b7fb0f26",
+      "extracted_bytes": 160,
+      "observed_mode": 420,
+      "identity_scope": "Exact retained successful authored-text relay; original file byte hash and mode unavailable. This is a recovery observation, not original final filesystem attestation."
+    },
+    {
+      "original_path": "trials/control-071/execution-note.md",
+      "extracted_path": "recovery/extracted-creators/control-071/execution-note.md",
+      "relay_path": "recovery/control-071-authored-text.md",
+      "relay_sha256": "94131018b4cade42cb16786ba875166073b793493bb6ccacd2735fa3f422ca01",
+      "relay_body_start_line": 170,
+      "extracted_sha256": "a0afe632487602bad243bd24e071b88ad803812615a8606de7f72eb4d3569626",
+      "extracted_bytes": 6524,
+      "observed_mode": 420,
+      "identity_scope": "Exact retained successful authored-text relay; original file byte hash and mode unavailable. This is a recovery observation, not original final filesystem attestation."
+    },
+    {
+      "original_path": "trials/control-072/deliverables/skills/checkout-service-release/SKILL.md",
+      "extracted_path": "recovery/extracted-creators/control-072/deliverables/skills/checkout-service-release/SKILL.md",
+      "relay_path": "recovery/control-072-authored-text.md",
+      "relay_sha256": "359294217d7731bce81b23bfe92424fbc4cd4361f19b0957c7b86b1d0dc86901",
+      "relay_body_start_line": 8,
+      "extracted_sha256": "91bc6db2f85646194abd9d4892fbdeebf21dba5159bdf0f2e205646502396fbc",
+      "extracted_bytes": 11050,
+      "observed_mode": 420,
+      "identity_scope": "Exact retained successful authored-text relay; original file byte hash and mode unavailable. This is a recovery observation, not original final filesystem attestation."
+    },
+    {
+      "original_path": "trials/control-072/deliverables/skills/checkout-service-release/assets/release-context.template.json",
+      "extracted_path": "recovery/extracted-creators/control-072/deliverables/skills/checkout-service-release/assets/release-context.template.json",
+      "relay_path": "recovery/control-072-authored-text.md",
+      "relay_sha256": "359294217d7731bce81b23bfe92424fbc4cd4361f19b0957c7b86b1d0dc86901",
+      "relay_body_start_line": 96,
+      "extracted_sha256": "f5393ac11cbf94218ecc6f64f24a3b40431751148deb5f22086fd27bf2b3b962",
+      "extracted_bytes": 317,
+      "observed_mode": 420,
+      "identity_scope": "Exact retained successful authored-text relay; original file byte hash and mode unavailable. This is a recovery observation, not original final filesystem attestation."
+    },
+    {
+      "original_path": "trials/control-072/deliverables/skills/checkout-service-release/references/interface.md",
+      "extracted_path": "recovery/extracted-creators/control-072/deliverables/skills/checkout-service-release/references/interface.md",
+      "relay_path": "recovery/control-072-authored-text.md",
+      "relay_sha256": "359294217d7731bce81b23bfe92424fbc4cd4361f19b0957c7b86b1d0dc86901",
+      "relay_body_start_line": 114,
+      "extracted_sha256": "b2a8bd70dd2a568a635f38e6e03985f5401977abb6f8d30ca508b4d80643c61b",
+      "extracted_bytes": 5104,
+      "observed_mode": 420,
+      "identity_scope": "Exact retained successful authored-text relay; original file byte hash and mode unavailable. This is a recovery observation, not original final filesystem attestation."
+    },
+    {
+      "original_path": "trials/control-072/execution-note.md",
+      "extracted_path": "recovery/extracted-creators/control-072/execution-note.md",
+      "relay_path": "recovery/control-072-authored-text.md",
+      "relay_sha256": "359294217d7731bce81b23bfe92424fbc4cd4361f19b0957c7b86b1d0dc86901",
+      "relay_body_start_line": 154,
+      "extracted_sha256": "eb833ccecc88626b8f52a2ece1b1393d9add0c6e0247dd24d02d58215c397313",
+      "extracted_bytes": 6262,
+      "observed_mode": 420,
+      "identity_scope": "Exact retained successful authored-text relay; original file byte hash and mode unavailable. This is a recovery observation, not original final filesystem attestation."
+    }
+  ]
+}
