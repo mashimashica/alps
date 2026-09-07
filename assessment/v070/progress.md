@@ -9,7 +9,7 @@ Frozen current main A is dee3866d35e43db5db480fc9f85166a8dcb1ec3b, VERSION 0.7.0
 | Stage | Completed design | Completed consumer | Other completed | Planned task trials |
 | --- | ---: | ---: | ---: | ---: |
 | Calibration | 12 | 24 | 0 | 36 |
-| C control | 50 | 53 | 0 | 216 |
+| C control | 52 | 58 | 0 | 216 |
 | Remaining base plan | 0 | 0 | 0 | up to 1,776 |
 
 Additional diagnostic reserve: at most 72 starts across at most three rounds. H01–H03 used 68 starts: 66 complete and two retained interrupted originals. Four slots remain, but do not authorize a fourth ordinary round. Across calibration/development, 34 creators and 68 valid consumers are complete. Completed tasks, observation validity, business adequacy and achieved Outcomes are different counts.
@@ -24,7 +24,7 @@ Additional diagnostic reserve: at most 72 starts across at most three rounds. H0
 
 ## Work in progress
 
-C creators 001–050 are complete/form-pass; 051–052 running. C-U001–100 are prepared; 001–053 complete and 054–056 running. S03's five completed primary/second reports are read, including the P03 second clarification; root adjudication of its one category disagreement is adequate with a retained optional clarity improvement. P02's primary reviewer disclosed broad filename enumeration; a fresh P02 second review is running on the unchanged packet before family closeout. See audits/control-S03-adjudication.md. All schedules, case/oracle identities and preselected review allocation remain fixed; additional reviews do not replace business trials. S01/S05/S10 use original independent stimuli, not newly held-out cases. Creator-029's reported scope deviation remains preserved without an ungrounded exclusion or retry.
+C creators 001–052 are complete/form-pass; 053–054 running. C-U001–104 are prepared; 001–058 complete and 059–062 running. S03 is closed out after all six reports and the clarification were read: 24 adequate applications following one preserved adjudication, prior full agreement in 12 ordinary inputs and only partial agreement in 12 challenging inputs. P02's additional fresh second independently agrees on all eight judgments; the first review's filename-enumeration deviation remains recorded. See control-S03-closeout.md and audits/control-S03-adjudication.md. All schedules, case/oracle identities and preselected review allocation remain fixed; extra grading does not replace business trials. S01/S05/S10 use original independent stimuli, not new holdout. Creator-029's reported scope deviation also remains preserved.
 
 Consumer/blind packaging reviews and SQLite preservation integration are complete/read. Helpers verify frozen bytes/modes and maintain original final-state evidence without interpreting semantic success. Actual creator verification databases are preserved at their original paths and, for direct UTF-8 saving, as indexed native SQL with hashes. S06 consumer states are independently initialized outside the evidence tree; preserve their actual final committed state with control_ledger_state.py after completion, without resetting quota or granting another tranche.
 
