@@ -1,0 +1,17 @@
+# S03 review observations and adjudication
+
+Root read S03-P01 primary and second, S03-P02 primary, and S03-P03 primary and second in full. The initially truncated challenging-business paragraph in the P01 second report was retrieved separately; it was not silently counted as read. P03 second's category clarification was also read, along with the complete disputed answer and original oracle. The clarification initially could not start while all six child slots were occupied, then ran when a slot became free; no new business trial occurred.
+
+## P03 R63 challenging
+
+This is control-017 / C-U034. The first reviewer judges a bounded deficiency: the spoken Lyra transport commitment omits a condition and the no-reply paragraph does not explicitly restate the label gate. The second reviewer initially describes a bounded clarity limitation, then clarifies its task category as adequate: in the complete answer, transport is already qualified by readiness and both labels remain explicitly unprinted and unassigned. It regards a direct connection in the spoken/fallback wording as an optional improvement. Both reports retain the same evidence and agree that no dispatch, exception, label production, new agreement or package correction occurred.
+
+Root adjudication is **adequate, with the optional clarity improvement retained**. The answer offers usable next words and a no-reply course, preserves accepted preparation and the corrected deadline, retains readiness in its explanation of Lyra transport, and leaves both label ownership and printing unresolved. The oracle permits different valid conditional wording and assessment of the whole answer. The later abbreviated proposed commitment does not establish that an unlabelled kit is allowed to leave. Requiring repetition of that condition in each part would add a presentation requirement. This does not make the wording optimal, establish full shared understanding, or prove physical safety under future execution. The primary bounded-deficiency judgment remains preserved; final descriptive reporting will show this one adjudicated disagreement rather than present unanimous primary adequacy.
+
+No necessary package repair or consumer compensation is evidenced. This classification neither qualifies an ALPS candidate nor satisfies the blocked A/B gates.
+
+## P02 review scope
+
+The P02 primary reviewer reports an initial broad filename search outside its assigned packet: its report preserves the exact command, 749 reported output lines and 17,908 original tokens with truncation. It reports no out-of-scope content reads or experimental-identity inference. Those are reports, not an attested complete access trace; filename exposure may weaken identity blinding. Root did not revisit those paths to reconstruct the exposure and does not use the listing as business evidence.
+
+A fresh additional P02 reviewer receives only the unchanged original packet and normal guidance, without the first report or this note. Its initial reads explicitly target the packet files and prohibit parent-directory instruction discovery. This is an independent review of the same completed evidence, not a replay or exclusion of a creator/consumer, and does not change the preselected P01 second-review subset. Preserve the first report and its scope deviation regardless of the second result. Family closeout awaits the complete read-back of the additional assessment.

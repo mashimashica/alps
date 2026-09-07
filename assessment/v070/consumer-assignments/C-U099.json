@@ -1,0 +1,49 @@
+{
+  "consumer_id": "C-U099",
+  "creator_id": "control-050",
+  "case": "S09",
+  "variant": "ordinary",
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "high",
+  "context": "fresh",
+  "copied_sha256": {
+    "skill/operational-intervention-decision/SKILL.md": "2b811c1824d556de3f8317dff44f0167e7141e93018dcfbc0115a8128f710a6f",
+    "input/request.md": "6ac1cdd60955412b8e5f1208862c9574b60e1f70514ae6f63a85359647c3c392",
+    "input/sources/decision_context.md": "db617bd327c581d41163649f373944101be1394c760359d77760b395ba42d267",
+    "input/sources/measurement_notes.md": "4f89f6c363b70e69e5acdabde1ba46f3ca96c4a65530ac524a47786830f4a91e",
+    "input/sources/shift_operations.csv": "821cefcd24d45b7acebc6a30d1b9f3ab6f2f2cbb300a66aee359ef7cd2779c85",
+    "input/sources/shipment_cohorts.csv": "280644532300832a9b74e2b3bc8daf7318f42124bf74f50f630dd22c15ea25b0"
+  },
+  "prompt_sha256": "aa05b36a697f688aac33898a9839230a3479af7c9c8dea53ddcd8fb52e9c6bca",
+  "copied_file_modes": {
+    "skill/operational-intervention-decision/SKILL.md": 420,
+    "input/request.md": 420,
+    "input/sources/decision_context.md": 420,
+    "input/sources/measurement_notes.md": 420,
+    "input/sources/shift_operations.csv": 420,
+    "input/sources/shipment_cohorts.csv": 420
+  },
+  "initial_state_evidence_sha256": {},
+  "artifact_freeze_manifest": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-artifact-freezes/control-050.json",
+  "artifact_freeze_sha256": "7e9ef55c40cd799c897035b19ccf7ed240fc3d4a830593d9bbb17993bf200c4b",
+  "case_bank_manifest_sha256": "f26be07f6cfba54aedc3068a67ae32292877f6ee005f0c190156f5786d1cbdc2",
+  "request_source": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S09/ordinary/input/request.md",
+  "request_source_sha256": "6ac1cdd60955412b8e5f1208862c9574b60e1f70514ae6f63a85359647c3c392",
+  "request_substitutions": [],
+  "common_authoring_aid_sha256": {
+    "SKILL.md": "6656e54755638e8efcf275a472b9672eaa8a9a1b9e59dc210e275b03b59e1e66",
+    "agents/openai.yaml": "d07d21b93fcf3d4dc8d9a3399c05fc226a49a333a96d3e1c68b451b8dd9eade6",
+    "assets/skill-creator-small.svg": "6591bf8ea9bb9435890dbdea299e0d2bd05f3aa893a335d26e4c535e93c8e7fb",
+    "assets/skill-creator.png": "a4024b0306ddb05847e1012879d37aaf1e658205199da596f5145ed7a88d9162",
+    "license.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "references/openai_yaml.md": "ffac39318e408108141d40f820968e59f70434a891694f9bf1d25be8237b150c",
+    "scripts/generate_openai_yaml.py": "ddaf9abdfb3e762ed3c82571e9c607ce964188f49f2146281beb2cb8a553a93d",
+    "scripts/init_skill.py": "bc04fae1e671aa1e5104212674e7f22c9665a791fafa2fc2b3897187a89801b2",
+    "scripts/quick_validate.py": "1fd66498c219616fd9249eacdf16c458412ea9065a9d887fd716aeef03907762"
+  },
+  "common_aid_unrecorded_original_display_assets": [
+    "assets/skill-creator-small.svg",
+    "assets/skill-creator.png"
+  ],
+  "schedule_sha256": "739210b57f1b000dcb3cf6f4e2ee912ca6e911d8e829eacde225bb03ffe91569"
+}

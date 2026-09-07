@@ -1,0 +1,14 @@
+{
+  "scope": "Physical Agent Skill format only; not semantics or work effectiveness",
+  "validator_source": "agentskills/agentskills@f130f348f502d9804278a617f86929846896d2e9 skills-ref",
+  "trial": "control-050",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+    "validate",
+    "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/control-050/deliverables/skills/operational-intervention-decision"
+  ],
+  "exit_code": 0,
+  "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/control-050/deliverables/skills/operational-intervention-decision\n",
+  "stderr": ""
+}

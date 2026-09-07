@@ -228,5 +228,15 @@
     "sql_path": "sqlite-evidence/creator-complete/trials/control-046/verification/no-match.sqlite.sql",
     "sql_sha256": "f542f4c33b773332629af01b7a405e26c558d7663c385a592bee9273a0d324f7",
     "sqlite_version": "3.53.1"
+  },
+  "trials/control-048/verification/tmpu5ashm8k/source.sqlite": {
+    "metadata_path": "sqlite-evidence/creator-complete/trials/control-048/verification/tmpu5ashm8k/source.sqlite.json",
+    "metadata_sha256": "7c6ac1b746a6904b376dbea9ba2b79e0a7e4b7004eeb30aaf21508e5988e4cc4",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/control-048/verification/tmpu5ashm8k/source.sqlite",
+    "source_sha256": "63e846552d6998aab75c14a958b2e6229fde67b9bd1a00c8bdecdc7a3fb6c298",
+    "sql_path": "sqlite-evidence/creator-complete/trials/control-048/verification/tmpu5ashm8k/source.sqlite.sql",
+    "sql_sha256": "75b4edb32643fee1db6fb2df24a5b8cdd8ef461194c0a44b8cc30c538eabd874",
+    "sqlite_version": "3.53.1"
   }
 }
