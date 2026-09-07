@@ -43,22 +43,23 @@ The [minimal template](skills/design-process-description/references/SKILL-templa
 
 The [working example](examples/README.md) shows both design responsibilities on one service-assessment Skill. Its script validates measurements and calculates comparisons; the agent assesses the context and interprets the evidence. [System design examples](skills/design-agent-work-system/references/examples.md) also cover existing tools, state-changing operations, and adaptation to changed capabilities.
 
-## What a description makes clear
+## Design philosophy
 
-| Question | Element or distinction |
-| --- | --- |
-| Why undertake the work? | Purpose |
-| What observable condition counts as success? | Outcome |
-| What work contributes to success? | Activities & Tasks: an Activity groups related Tasks; a Task describes an individual action |
-| What is produced or updated? | Output; its existence alone is not success |
-| What is examined or transformed? | Input |
-| What directs, limits, or enables the work? | Control, Constraint, Enabler |
-| Which description is the source, and what changes locally? | Source description, reference, translation, and context-limited change |
-| What does a review establish? | A judgment about the description, separate from execution results and satisfaction of requirements |
+When an AI agent is given a job, not everything should be left to the model. Some parts of the work are established processing; others depend on context and require interpretation, selection, or composition.
 
-Add Activities, Tasks, boundary elements, and Entry/Exit Criteria when they help explain the work. The Framework defines their meanings and relationships so that additional detail remains consistent. Necessary methods or order can be scoped to the relevant context. Multiple Processes can consult and update the same information; a Model or View can link to their descriptions without duplicating their Purposes and Outcomes.
+ALPS connects two lineages. The [Process Framework](skills/design-process-description/references/process-framework.md) follows process-description practice from systems and software engineering: the meaning of work—its purpose, observable outcomes, necessary work, and applicable conditions—can be described independently of a particular implementation. A Unix-inspired view of agentic systems addresses the other side: expose established processing through clear tools and compose those capabilities as needed. Karun Japhet describes this as [“the agent is the shell”](https://www.sahaj.ai/the-unix-philosophy-for-agentic-coding/). Anthropic similarly distinguishes [code-driven workflows from model-directed agents](https://www.anthropic.com/engineering/building-effective-agents) and recommends [tools that encapsulate stable operations](https://www.anthropic.com/engineering/writing-tools-for-agents).
 
-For an agent work system, provide processing capabilities through tools with clear responsibilities and interfaces. Implement established processing and combinations, and retain agent judgment where interpretation, selection, or composition depends on the situation. Evaluate the configuration through actual work as well as component checks.
+<p align="center">
+  <img src="assets/alps-agent-onion.svg" alt="Why and What are the meaning of work, How is the available means, and the Agent provides the judgment between them" width="900">
+</p>
+
+In this picture, **Why / What** is the meaning of the work, **How** is the available means, and the **Agent** is responsible for the judgment between them. It interprets the situation, selects and composes capabilities, adapts the method, and can devise new means when existing ones are insufficient. Established calculations, transformations, checks, and stable sequences belong in tools when suitable implementations can perform them reliably.
+
+The diagram is intentionally schematic. A Process Description can include Activities, Tasks, methods, or ordering where they are necessary. The separation is not “What only” versus “How only”; it is between the work being described and the configuration used to realize it.
+
+> **Describe the meaning of work independently of its implementation, make the available means explicit, and leave the judgment between them to the agent.**
+
+ALPS supports this through two complementary Skills: `design-process-description` clarifies the work, while `design-agent-work-system` designs the configuration that realizes it. They are not mandatory sequential phases; either can be used when its design basis is sufficient, and discoveries in one can lead to reconsideration of the other.
 
 ALPS supplies descriptions, design principles, and design support. Your environment supplies execution, storage, approval, and version management.
 
