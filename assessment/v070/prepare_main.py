@@ -30,6 +30,8 @@ def main():
     ledger = ROOT / "main-list.tsv"
     if ledger.exists():
         raise SystemExit("Main assignments already exist; preserve their identities")
+    if (ROOT / "control-list.tsv").exists():
+        raise SystemExit("Independent C assignments already exist; future A/B preparation must preserve those C cells")
     candidate = ROOT / "frozen" / args.candidate
     for skill in ("design-process-description", "design-agent-work-system"):
         if not (candidate / "skills" / skill / "SKILL.md").is_file():

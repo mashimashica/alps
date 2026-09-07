@@ -1,0 +1,10 @@
+{
+  "records": [
+    {"entry_id":"ord-001","vendor_id":"willow","posted_on":"2026-04-09","kind":"credit","status":"settled","amount_cents":407,"currency":"USD"},
+    {"entry_id":"ord-002","vendor_id":"mirage","posted_on":"2026-04-06","kind":"charge","status":"pending","amount_cents":99991,"currency":"USD"},
+    {"entry_id":"ord-003","vendor_id":"apricot","posted_on":"2026-04-03","kind":"charge","status":"settled","amount_cents":1234,"currency":"USD"},
+    {"entry_id":"ord-004","vendor_id":"apricot","posted_on":"2026-04-08","kind":"credit","status":"settled","amount_cents":1234,"currency":"USD"},
+    {"entry_id":"ord-005","vendor_id":"outside","posted_on":"2026-04-10","kind":"charge","status":"settled","amount_cents":54321,"currency":"USD"},
+    {"entry_id":"ord-006","vendor_id":"juniper","posted_on":"2026-04-04","kind":"charge","status":"settled","amount_cents":2501,"currency":"USD"}
+  ]
+}
