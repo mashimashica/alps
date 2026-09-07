@@ -1,3 +1,9 @@
+# Emergency recovery notice — 2026-09-07
+
+The workspace is disconnected (409 environment_offline). Read [RECOVERY-ENVIRONMENT-OFFLINE.md](RECOVERY-ENVIRONMENT-OFFLINE.md) first: it supersedes the older progress counts below, identifies the last full filesystem checkpoint, and records the difference between completed work and durably preserved artifacts. Do not run a whole-folder export from stale local metadata before reconciling this emergency update. The original RESUME snapshot follows unchanged.
+
+---
+
 # ALPS v0.7.0 assessment — resume here
 
 ## Authorization and frozen basis
