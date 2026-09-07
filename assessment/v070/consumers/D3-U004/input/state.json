@@ -14,12 +14,12 @@
     "checkout_ok": true
   },
   "service_owner": "Rowan (checkout service owner)",
-  "sequence": 208,
+  "sequence": 209,
   "qualification": {
     "candidate": "rel-onyx-27",
     "digest": "onyx27-content-c82d6e",
     "passed": true,
-    "sequence": 207
+    "sequence": 209
   },
   "approval": {
     "candidate": "rel-onyx-27",

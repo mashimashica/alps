@@ -14,12 +14,12 @@
     "checkout_ok": true
   },
   "service_owner": "Marlow (checkout service owner)",
-  "sequence": 104,
+  "sequence": 105,
   "qualification": {
     "candidate": "rel-linden-42",
     "digest": "linden42-content-7f3a91",
     "passed": true,
-    "sequence": 103
+    "sequence": 105
   },
   "approval": {
     "candidate": "rel-linden-42",
