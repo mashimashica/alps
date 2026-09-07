@@ -1,0 +1,125 @@
+{
+  "month": "2026-06",
+  "summary": {
+    "line_count": 6,
+    "dispositions": {
+      "excess": 1,
+      "indeterminate": 1,
+      "received_as_ordered": 2,
+      "shortfall": 2
+    },
+    "unresolved_line_count": 4
+  },
+  "scope_issues": [],
+  "outside_scope_events": [
+    "RCV-H1811"
+  ],
+  "lines": [
+    {
+      "order_id": "PO-R2606-410",
+      "sku": "LABEL-60",
+      "ordered": 120,
+      "observed_net_received": 120,
+      "coverage_complete": true,
+      "final_comparison_allowed": true,
+      "disposition": "received_as_ordered",
+      "variance_received_minus_ordered": 0,
+      "evidence_issues": [],
+      "follow_ups": []
+    },
+    {
+      "order_id": "PO-R2606-410",
+      "sku": "CARTON-M",
+      "ordered": 80,
+      "observed_net_received": 42,
+      "coverage_complete": true,
+      "final_comparison_allowed": true,
+      "disposition": "shortfall",
+      "variance_received_minus_ordered": -38,
+      "evidence_issues": [],
+      "follow_ups": [
+        {
+          "type": "remaining_receipt",
+          "owner": "Dana Ivers <dana.ivers@juniperworks.example>",
+          "recipient": "Mara Quinn <mara.quinn@harborpack.example>",
+          "action": "Ask Mara Quinn <mara.quinn@harborpack.example> to follow up the remaining 38 units for PO-R2606-410/CARTON-M.",
+          "draft": "Please confirm the plan for the remaining 38 units of PO-R2606-410/CARTON-M for 2026-06. The order quantity is 80 and confirmed net received is 42."
+        }
+      ]
+    },
+    {
+      "order_id": "PO-R2606-411",
+      "sku": "GLOVE-N",
+      "ordered": 60,
+      "observed_net_received": 64,
+      "coverage_complete": true,
+      "final_comparison_allowed": true,
+      "disposition": "excess",
+      "variance_received_minus_ordered": 4,
+      "evidence_issues": [],
+      "follow_ups": [
+        {
+          "type": "surplus_reconciliation",
+          "owner": "Noel Price <noel.price@juniperworks.example>",
+          "recipient": "Noel Price <noel.price@juniperworks.example>",
+          "action": "Reconcile the surplus 4 units for PO-R2606-411/GLOVE-N against the order and receiving evidence.",
+          "draft": "Please reconcile the 4-unit surplus for PO-R2606-411/GLOVE-N for 2026-06 against the purchase order and receiving evidence. Ordered: 60; confirmed net received: 64."
+        }
+      ]
+    },
+    {
+      "order_id": "PO-R2606-412",
+      "sku": "FILM-300",
+      "ordered": 24,
+      "observed_net_received": 24,
+      "coverage_complete": true,
+      "final_comparison_allowed": true,
+      "disposition": "received_as_ordered",
+      "variance_received_minus_ordered": 0,
+      "evidence_issues": [],
+      "follow_ups": []
+    },
+    {
+      "order_id": "PO-R2606-413",
+      "sku": "SEAL-BLUE",
+      "ordered": 40,
+      "observed_net_received": 30,
+      "coverage_complete": false,
+      "final_comparison_allowed": false,
+      "disposition": "indeterminate",
+      "variance_received_minus_ordered": null,
+      "evidence_issues": [
+        "The event export is declared incomplete for this line and requested month."
+      ],
+      "follow_ups": [
+        {
+          "type": "complete_export",
+          "owner": "Simone Bell <simone.bell@juniperworks.example>",
+          "recipient": "Simone Bell <simone.bell@juniperworks.example>",
+          "action": "Provide or confirm the complete 2026-06 event export for PO-R2606-413/SEAL-BLUE, then rerun the comparison.",
+          "draft": "Please provide or confirm the complete receiving-event export for PO-R2606-413/SEAL-BLUE for 2026-06. The observed subtotal is 30, but the final receipt position cannot yet be determined."
+        }
+      ]
+    },
+    {
+      "order_id": "PO-R2606-414",
+      "sku": "TAPE-48",
+      "ordered": 30,
+      "observed_net_received": 0,
+      "coverage_complete": true,
+      "final_comparison_allowed": true,
+      "disposition": "shortfall",
+      "variance_received_minus_ordered": -30,
+      "evidence_issues": [],
+      "follow_ups": [
+        {
+          "type": "remaining_receipt",
+          "owner": "Dana Ivers <dana.ivers@juniperworks.example>",
+          "recipient": "Owen Malik <owen.malik@bindwell.example>",
+          "action": "Ask Owen Malik <owen.malik@bindwell.example> to follow up the remaining 30 units for PO-R2606-414/TAPE-48.",
+          "draft": "Please confirm the plan for the remaining 30 units of PO-R2606-414/TAPE-48 for 2026-06. The order quantity is 30 and confirmed net received is 0."
+        }
+      ]
+    }
+  ]
+}

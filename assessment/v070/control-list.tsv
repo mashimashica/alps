@@ -56,14 +56,14 @@ control-054	control	S09	C	2	gpt-5.6-sol	low	completed	/root/control_make_054	202
 control-055	control	S09	C	1	gpt-5.6-sol	high	completed	/root/control_make_055	2026-09-07T20:20:02.057474+00:00	2026-09-07T20:31:39.159292+00:00
 control-056	control	S09	C	2	gpt-5.6-sol	high	completed	/root/control_make_056	2026-09-07T20:20:57.172456+00:00	2026-09-07T20:37:08.088881+00:00
 control-057	control	S09	C	1	gpt-6-astra	low	completed	/root/control_make_057	2026-09-07T20:31:39.586612+00:00	2026-09-07T20:37:08.088881+00:00
-control-058	control	S09	C	2	gpt-6-astra	low	running	/root/control_make_058	2026-09-07T20:37:08.518365+00:00	
-control-059	control	S09	C	1	gpt-6-astra	high	running	/root/control_make_059	2026-09-07T20:37:08.929514+00:00	
-control-060	control	S09	C	2	gpt-6-astra	high	not started			
-control-061	control	S10	C	1	gpt-5.6-luna	low	not started			
-control-062	control	S10	C	2	gpt-5.6-luna	low	not started			
-control-063	control	S10	C	1	gpt-5.6-luna	high	not started			
-control-064	control	S10	C	2	gpt-5.6-luna	high	not started			
-control-065	control	S10	C	1	gpt-5.6-sol	low	not started			
+control-058	control	S09	C	2	gpt-6-astra	low	completed	/root/control_make_058	2026-09-07T20:37:08.518365+00:00	2026-09-07T21:02:20.243319+00:00
+control-059	control	S09	C	1	gpt-6-astra	high	completed	/root/control_make_059	2026-09-07T20:37:08.929514+00:00	2026-09-07T21:02:20.243319+00:00
+control-060	control	S09	C	2	gpt-6-astra	high	completed	/root/control_make_060	2026-09-07T21:02:19.806690+00:00	2026-09-07T21:02:20.243319+00:00
+control-061	control	S10	C	1	gpt-5.6-luna	low	completed	/root/control_make_061	2026-09-07T21:03:23.167154+00:00	2026-09-07T21:05:26.205632+00:00
+control-062	control	S10	C	2	gpt-5.6-luna	low	completed	/root/control_make_062	2026-09-07T21:03:23.571895+00:00	2026-09-07T21:04:50.110730+00:00
+control-063	control	S10	C	1	gpt-5.6-luna	high	completed	/root/control_make_063	2026-09-07T21:05:25.366469+00:00	2026-09-07T21:08:38.953460+00:00
+control-064	control	S10	C	2	gpt-5.6-luna	high	completed	/root/control_make_064	2026-09-07T21:05:25.796963+00:00	2026-09-07T21:10:18.709857+00:00
+control-065	control	S10	C	1	gpt-5.6-sol	low	running	/root/control_make_065	2026-09-07T21:10:18.304554+00:00	
 control-066	control	S10	C	2	gpt-5.6-sol	low	not started			
 control-067	control	S10	C	1	gpt-5.6-sol	high	not started			
 control-068	control	S10	C	2	gpt-5.6-sol	high	not started			

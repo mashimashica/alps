@@ -1,0 +1,65 @@
+{
+  "candidate": "R44",
+  "probe": "same-line-conflict-and-partial",
+  "command": [
+    "python3",
+    "-B",
+    "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/copies/R44/monthly-receiving-review/scripts/review.py",
+    "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/runs/R44/same-line-conflict-and-partial/input.json",
+    "--output",
+    "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/runs/R44/same-line-conflict-and-partial/report.json"
+  ],
+  "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second",
+  "exit_code": 0,
+  "stderr": "",
+  "stdout_bytes": 0,
+  "input_unchanged": true,
+  "line": {
+    "source_order_row": 0,
+    "order_id": "P1",
+    "sku": "A",
+    "ordered": 10,
+    "coverage": "incomplete or conflicting",
+    "coverage_records": [
+      {
+        "order_id": "P1",
+        "sku": "A",
+        "month": "2026-07",
+        "complete": false
+      }
+    ],
+    "blockers": [
+      "conflicting event_id CONFLICT; source rows [0, 1]"
+    ],
+    "event_ids": [
+      "CLEAN"
+    ],
+    "observed_subtotal": null,
+    "net_received": null,
+    "difference": null,
+    "status": "undetermined",
+    "actions": [
+      {
+        "responsible_role": "purchasing_coordinator",
+        "recipient": "Coordinator",
+        "next_action": "Reconcile the identified order/event source records before a final comparison: conflicting event_id CONFLICT; source rows [0, 1]",
+        "routing": "ready",
+        "draft": "To: Coordinator\nSubject: 2026-07 receiving review P1 / A\nReconcile the identified order/event source records before a final comparison: conflicting event_id CONFLICT; source rows [0, 1]\nDraft only; not sent."
+      },
+      {
+        "responsible_role": "data_steward",
+        "recipient": "Steward",
+        "next_action": "Reconcile the identified order/event source records before a final comparison: conflicting event_id CONFLICT; source rows [0, 1]",
+        "routing": "ready",
+        "draft": "To: Steward\nSubject: 2026-07 receiving review P1 / A\nReconcile the identified order/event source records before a final comparison: conflicting event_id CONFLICT; source rows [0, 1]\nDraft only; not sent."
+      },
+      {
+        "responsible_role": "data_steward",
+        "recipient": "Steward",
+        "next_action": "Provide or confirm the full 2026-07 export and a consistent completeness declaration for P1 / A before final comparison.",
+        "routing": "ready",
+        "draft": "To: Steward\nSubject: 2026-07 receiving review P1 / A\nProvide or confirm the full 2026-07 export and a consistent completeness declaration for P1 / A before final comparison.\nDraft only; not sent."
+      }
+    ]
+  }
+}

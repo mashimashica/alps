@@ -127,6 +127,18 @@ def ignore_runtime_caches(directory, names):
     return [name for name in names if Path(name).suffix == ".pyc" and (Path(directory) / name).is_file()]
 
 
+def creator_input_caches(folder, expected):
+    """Verify every supplied input; record only added regular Python caches."""
+    actual = file_hashes(folder)
+    if any(actual.get(key) != value for key, value in expected.items()):
+        raise ValueError(f"Original creator input bytes or file set changed: {folder}")
+    added = {key: value for key, value in actual.items() if key not in expected}
+    if any(Path(key).parent.name != "__pycache__" or Path(key).suffix != ".pyc"
+           for key in added):
+        raise ValueError(f"Unexpected added creator input resource; preserve it: {folder}")
+    return added
+
+
 def refuse_existing(path):
     checked_path(path)
     if path.exists():
@@ -184,8 +196,7 @@ def main():
                            if relative.startswith(row["case"] + "/")}
         if assignment["input_sha256"] != {"input/" + key: value for key, value in original_inputs.items()}:
             raise ValueError(f"Creator input identity differs from the frozen public bank: {creator_id}")
-        if file_hashes(creator / "input") != original_inputs:
-            raise ValueError(f"Original creator inputs changed: {creator_id}")
+        input_caches = creator_input_caches(creator / "input", original_inputs)
         checked_path(creator / "prompt.md")
         if digest(creator / "prompt.md") != assignment["prompt_sha256"]:
             raise ValueError(f"Original creator prompt changed: {creator_id}")
@@ -223,11 +234,11 @@ def main():
             if row["case"] == "S10" and "release_tool.py" in source_hashes:
                 raise ValueError("S10 interface must be supplied from the unchanged frozen public source")
             consumers.append((use_id, variant, folder, source, source_hashes))
-        plans.append((creator_id, row, skill, hashes, caches, freeze, manifest, consumers))
+        plans.append((creator_id, row, skill, hashes, caches, input_caches, freeze, manifest, consumers))
 
     # All selected creators and owned destinations pass preflight before writes.
     # Any later failure retains its files; no automated overwrite or retry occurs.
-    for creator_id, row, skill, hashes, caches, freeze, manifest, consumers in plans:
+    for creator_id, row, skill, hashes, caches, input_caches, freeze, manifest, consumers in plans:
         freeze.mkdir(parents=True, exist_ok=False)
         frozen_skill = freeze / skill.name
         shutil.copytree(skill, frozen_skill, ignore=ignore_runtime_caches)
@@ -238,6 +249,7 @@ def main():
                              "source_file_modes": {key: stat.S_IMODE((skill / key).stat().st_mode)
                                                    for key in hashes},
                              "excluded_runtime_cache_sha256": caches,
+                             "creator_input_added_runtime_cache_sha256": input_caches,
                              "cache_handling": "Regular *.pyc directly inside __pycache__ are retained in the original creator folder but omitted from the frozen/copy resources and durable checkpoint; their bytes are not claimed preserved",
                              "schedule_sha256": SCHEDULE_SHA256,
                              "case_bank_manifest_sha256": digest(case_manifest),

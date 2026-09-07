@@ -1,0 +1,218 @@
+{
+  "review_month": "2026-06",
+  "review_summary": {
+    "supplied_order_records": 6,
+    "identifiable_supplied_lines": 6,
+    "unidentifiable_order_records": 0,
+    "resolved_positions": 0,
+    "undetermined_positions": 6,
+    "lines_requiring_follow_up": 6
+  },
+  "lines": [
+    {
+      "order_id": "PO-R2606-410",
+      "sku": "CARTON-M",
+      "ordered": 80,
+      "counted_event_ids": [
+        "RCV-H1804",
+        "RCV-H1805"
+      ],
+      "observed_subtotal": 42,
+      "observed_subtotal_is_final": false,
+      "final_net_received": null,
+      "variance_received_minus_ordered": null,
+      "evidence_status": "invalid_evidence",
+      "position": "undetermined",
+      "evidence_gaps": [
+        "event PROBE-UNATTRIBUTED has no assignable order_id and could affect an in-scope line"
+      ],
+      "follow_up": {
+        "type": "complete_or_correct_export",
+        "owners": [
+          {
+            "role": "data_steward",
+            "role_label": "data steward",
+            "recipient": "Simone Bell <simone.bell@juniperworks.example>"
+          }
+        ],
+        "external_recipient": null,
+        "next_action": "Provide, correct, or confirm the full requested-month event export, then rerun the final comparison.",
+        "draft_basis": "Order PO-R2606-410, SKU CARTON-M, cannot be finalized for 2026-06; provide, correct, or confirm the full event export described by the evidence gaps."
+      }
+    },
+    {
+      "order_id": "PO-R2606-410",
+      "sku": "LABEL-60",
+      "ordered": 120,
+      "counted_event_ids": [
+        "RCV-H1801",
+        "RCV-H1802",
+        "RCV-H1803"
+      ],
+      "observed_subtotal": 120,
+      "observed_subtotal_is_final": false,
+      "final_net_received": null,
+      "variance_received_minus_ordered": null,
+      "evidence_status": "invalid_evidence",
+      "position": "undetermined",
+      "evidence_gaps": [
+        "event PROBE-UNATTRIBUTED has no assignable order_id and could affect an in-scope line"
+      ],
+      "follow_up": {
+        "type": "complete_or_correct_export",
+        "owners": [
+          {
+            "role": "data_steward",
+            "role_label": "data steward",
+            "recipient": "Simone Bell <simone.bell@juniperworks.example>"
+          }
+        ],
+        "external_recipient": null,
+        "next_action": "Provide, correct, or confirm the full requested-month event export, then rerun the final comparison.",
+        "draft_basis": "Order PO-R2606-410, SKU LABEL-60, cannot be finalized for 2026-06; provide, correct, or confirm the full event export described by the evidence gaps."
+      }
+    },
+    {
+      "order_id": "PO-R2606-411",
+      "sku": "GLOVE-N",
+      "ordered": 60,
+      "counted_event_ids": [
+        "RCV-H1806",
+        "RCV-H1807"
+      ],
+      "observed_subtotal": 64,
+      "observed_subtotal_is_final": false,
+      "final_net_received": null,
+      "variance_received_minus_ordered": null,
+      "evidence_status": "invalid_evidence",
+      "position": "undetermined",
+      "evidence_gaps": [
+        "event PROBE-UNATTRIBUTED has no assignable order_id and could affect an in-scope line"
+      ],
+      "follow_up": {
+        "type": "complete_or_correct_export",
+        "owners": [
+          {
+            "role": "data_steward",
+            "role_label": "data steward",
+            "recipient": "Simone Bell <simone.bell@juniperworks.example>"
+          }
+        ],
+        "external_recipient": null,
+        "next_action": "Provide, correct, or confirm the full requested-month event export, then rerun the final comparison.",
+        "draft_basis": "Order PO-R2606-411, SKU GLOVE-N, cannot be finalized for 2026-06; provide, correct, or confirm the full event export described by the evidence gaps."
+      }
+    },
+    {
+      "order_id": "PO-R2606-412",
+      "sku": "FILM-300",
+      "ordered": 24,
+      "counted_event_ids": [
+        "RCV-H1808"
+      ],
+      "observed_subtotal": 24,
+      "observed_subtotal_is_final": false,
+      "final_net_received": null,
+      "variance_received_minus_ordered": null,
+      "evidence_status": "invalid_evidence",
+      "position": "undetermined",
+      "evidence_gaps": [
+        "event PROBE-UNATTRIBUTED has no assignable order_id and could affect an in-scope line"
+      ],
+      "follow_up": {
+        "type": "complete_or_correct_export",
+        "owners": [
+          {
+            "role": "data_steward",
+            "role_label": "data steward",
+            "recipient": "Simone Bell <simone.bell@juniperworks.example>"
+          }
+        ],
+        "external_recipient": null,
+        "next_action": "Provide, correct, or confirm the full requested-month event export, then rerun the final comparison.",
+        "draft_basis": "Order PO-R2606-412, SKU FILM-300, cannot be finalized for 2026-06; provide, correct, or confirm the full event export described by the evidence gaps."
+      }
+    },
+    {
+      "order_id": "PO-R2606-413",
+      "sku": "SEAL-BLUE",
+      "ordered": 40,
+      "counted_event_ids": [
+        "RCV-H1809",
+        "RCV-H1810"
+      ],
+      "observed_subtotal": 30,
+      "observed_subtotal_is_final": false,
+      "final_net_received": null,
+      "variance_received_minus_ordered": null,
+      "evidence_status": "invalid_evidence",
+      "position": "undetermined",
+      "evidence_gaps": [
+        "requested-month event export is declared incomplete",
+        "event PROBE-UNATTRIBUTED has no assignable order_id and could affect an in-scope line"
+      ],
+      "follow_up": {
+        "type": "complete_or_correct_export",
+        "owners": [
+          {
+            "role": "data_steward",
+            "role_label": "data steward",
+            "recipient": "Simone Bell <simone.bell@juniperworks.example>"
+          }
+        ],
+        "external_recipient": null,
+        "next_action": "Provide, correct, or confirm the full requested-month event export, then rerun the final comparison.",
+        "draft_basis": "Order PO-R2606-413, SKU SEAL-BLUE, cannot be finalized for 2026-06; provide, correct, or confirm the full event export described by the evidence gaps."
+      }
+    },
+    {
+      "order_id": "PO-R2606-414",
+      "sku": "TAPE-48",
+      "ordered": 30,
+      "counted_event_ids": [],
+      "observed_subtotal": 0,
+      "observed_subtotal_is_final": false,
+      "final_net_received": null,
+      "variance_received_minus_ordered": null,
+      "evidence_status": "invalid_evidence",
+      "position": "undetermined",
+      "evidence_gaps": [
+        "event PROBE-UNATTRIBUTED has no assignable order_id and could affect an in-scope line"
+      ],
+      "follow_up": {
+        "type": "complete_or_correct_export",
+        "owners": [
+          {
+            "role": "data_steward",
+            "role_label": "data steward",
+            "recipient": "Simone Bell <simone.bell@juniperworks.example>"
+          }
+        ],
+        "external_recipient": null,
+        "next_action": "Provide, correct, or confirm the full requested-month event export, then rerun the final comparison.",
+        "draft_basis": "Order PO-R2606-414, SKU TAPE-48, cannot be finalized for 2026-06; provide, correct, or confirm the full event export described by the evidence gaps."
+      }
+    }
+  ],
+  "outside_scope_events": [
+    "RCV-H1811"
+  ],
+  "ignored_other_month_event_ids": [
+    "RCV-H1720",
+    "RCV-H1901"
+  ],
+  "unassigned_issues": [
+    {
+      "source": "events",
+      "event_id": "PROBE-UNATTRIBUTED",
+      "issue": "order_id is missing or invalid"
+    }
+  ],
+  "processing_notes": {
+    "exact_duplicate_order_records_ignored": 0,
+    "exact_duplicate_event_records_ignored": 1,
+    "exact_duplicate_coverage_records_ignored": 0,
+    "observed_subtotal_rule": "sum of valid, unique, matching requested-month events; may be non-final",
+    "no_external_actions": "No messages were sent and no order or receiving records were changed."
+  }
+}

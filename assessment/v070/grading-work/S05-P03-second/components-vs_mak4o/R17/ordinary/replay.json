@@ -1,0 +1,168 @@
+{
+  "month": "2026-06",
+  "scope": {
+    "order_line_count": 6,
+    "reviewed_line_count": 6
+  },
+  "source_checks": {
+    "input_event_rows": 14,
+    "exact_duplicate_rows_ignored": 1,
+    "conflicting_event_ids": [],
+    "outside_order_event_ids_excluded": [
+      "RCV-H1811"
+    ],
+    "identity_reconciliation_order_ids": []
+  },
+  "issues": [],
+  "lines": [
+    {
+      "order_id": "PO-R2606-410",
+      "sku": "LABEL-60",
+      "ordered_quantity": 120,
+      "observed_net_received": 120,
+      "observed_quantity_label": "final_net",
+      "counted_event_ids": [
+        "RCV-H1801",
+        "RCV-H1802",
+        "RCV-H1803"
+      ],
+      "evidence_condition": "complete_valid",
+      "receipt_position": "received_as_ordered",
+      "judgment_notes": [],
+      "follow_ups": []
+    },
+    {
+      "order_id": "PO-R2606-410",
+      "sku": "CARTON-M",
+      "ordered_quantity": 80,
+      "observed_net_received": 42,
+      "observed_quantity_label": "final_net",
+      "counted_event_ids": [
+        "RCV-H1804",
+        "RCV-H1805"
+      ],
+      "evidence_condition": "complete_valid",
+      "receipt_position": "shortfall",
+      "judgment_notes": [],
+      "follow_ups": [
+        {
+          "kind": "remaining_receipt",
+          "recipient_roles": [
+            "purchasing_coordinator",
+            "supplier_contact"
+          ],
+          "recipients": [
+            "Dana Ivers <dana.ivers@juniperworks.example>",
+            "Mara Quinn <mara.quinn@harborpack.example>"
+          ],
+          "recipient_information_complete": true,
+          "next_action": "Follow up on the remaining 38 units for PO-R2606-410/CARTON-M with the supplied supplier contact and confirm the expected receipt disposition.",
+          "draft": "To: Dana Ivers <dana.ivers@juniperworks.example>; Mara Quinn <mara.quinn@harborpack.example>\nSubject: 2026-06 receiving review — PO-R2606-410/CARTON-M\nAction requested: Follow up on the remaining 38 units for PO-R2606-410/CARTON-M with the supplied supplier contact and confirm the expected receipt disposition.",
+          "send_status": "draft_not_sent"
+        }
+      ]
+    },
+    {
+      "order_id": "PO-R2606-411",
+      "sku": "GLOVE-N",
+      "ordered_quantity": 60,
+      "observed_net_received": 64,
+      "observed_quantity_label": "final_net",
+      "counted_event_ids": [
+        "RCV-H1806",
+        "RCV-H1807"
+      ],
+      "evidence_condition": "complete_valid",
+      "receipt_position": "excess",
+      "judgment_notes": [],
+      "follow_ups": [
+        {
+          "kind": "surplus_reconciliation",
+          "recipient_roles": [
+            "warehouse_lead"
+          ],
+          "recipients": [
+            "Noel Price <noel.price@juniperworks.example>"
+          ],
+          "recipient_information_complete": true,
+          "next_action": "Reconcile the 4-unit surplus for PO-R2606-411/GLOVE-N against the order and receiving evidence.",
+          "draft": "To: Noel Price <noel.price@juniperworks.example>\nSubject: 2026-06 receiving review — PO-R2606-411/GLOVE-N\nAction requested: Reconcile the 4-unit surplus for PO-R2606-411/GLOVE-N against the order and receiving evidence.",
+          "send_status": "draft_not_sent"
+        }
+      ]
+    },
+    {
+      "order_id": "PO-R2606-412",
+      "sku": "FILM-300",
+      "ordered_quantity": 24,
+      "observed_net_received": 24,
+      "observed_quantity_label": "final_net",
+      "counted_event_ids": [
+        "RCV-H1808"
+      ],
+      "evidence_condition": "complete_valid",
+      "receipt_position": "received_as_ordered",
+      "judgment_notes": [],
+      "follow_ups": []
+    },
+    {
+      "order_id": "PO-R2606-413",
+      "sku": "SEAL-BLUE",
+      "ordered_quantity": 40,
+      "observed_net_received": 30,
+      "observed_quantity_label": "provisional_subtotal",
+      "counted_event_ids": [
+        "RCV-H1809",
+        "RCV-H1810"
+      ],
+      "evidence_condition": "export_incomplete",
+      "receipt_position": "undetermined",
+      "judgment_notes": [
+        "Export is declared incomplete; observed quantity is a subtotal, not a final position."
+      ],
+      "follow_ups": [
+        {
+          "kind": "complete_export",
+          "recipient_roles": [
+            "data_steward"
+          ],
+          "recipients": [
+            "Simone Bell <simone.bell@juniperworks.example>"
+          ],
+          "recipient_information_complete": true,
+          "next_action": "Provide or confirm the complete 2026-06 event export for PO-R2606-413/SEAL-BLUE, then rerun the final comparison.",
+          "draft": "To: Simone Bell <simone.bell@juniperworks.example>\nSubject: 2026-06 receiving review — PO-R2606-413/SEAL-BLUE\nAction requested: Provide or confirm the complete 2026-06 event export for PO-R2606-413/SEAL-BLUE, then rerun the final comparison.",
+          "send_status": "draft_not_sent"
+        }
+      ]
+    },
+    {
+      "order_id": "PO-R2606-414",
+      "sku": "TAPE-48",
+      "ordered_quantity": 30,
+      "observed_net_received": 0,
+      "observed_quantity_label": "final_net",
+      "counted_event_ids": [],
+      "evidence_condition": "complete_valid",
+      "receipt_position": "shortfall",
+      "judgment_notes": [],
+      "follow_ups": [
+        {
+          "kind": "remaining_receipt",
+          "recipient_roles": [
+            "purchasing_coordinator",
+            "supplier_contact"
+          ],
+          "recipients": [
+            "Dana Ivers <dana.ivers@juniperworks.example>",
+            "Owen Malik <owen.malik@bindwell.example>"
+          ],
+          "recipient_information_complete": true,
+          "next_action": "Follow up on the remaining 30 units for PO-R2606-414/TAPE-48 with the supplied supplier contact and confirm the expected receipt disposition.",
+          "draft": "To: Dana Ivers <dana.ivers@juniperworks.example>; Owen Malik <owen.malik@bindwell.example>\nSubject: 2026-06 receiving review — PO-R2606-414/TAPE-48\nAction requested: Follow up on the remaining 30 units for PO-R2606-414/TAPE-48 with the supplied supplier contact and confirm the expected receipt disposition.",
+          "send_status": "draft_not_sent"
+        }
+      ]
+    }
+  ]
+}

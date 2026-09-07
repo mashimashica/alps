@@ -1,0 +1,979 @@
+{
+  "work": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o",
+  "runtime": "Python 3.12.13",
+  "comparisons": [
+    {
+      "candidate": "R17",
+      "variant": "ordinary",
+      "final_inputs_equal": {
+        "request.md": false,
+        "receiving.json": true
+      },
+      "observed_skill_bytes_equal": true,
+      "python_files_parsed": 1
+    },
+    {
+      "candidate": "R17",
+      "variant": "challenging",
+      "final_inputs_equal": {
+        "request.md": false,
+        "receiving.json": true
+      },
+      "observed_skill_bytes_equal": true,
+      "python_files_parsed": 1
+    },
+    {
+      "candidate": "R28",
+      "variant": "ordinary",
+      "final_inputs_equal": {
+        "request.md": false,
+        "receiving.json": true
+      },
+      "observed_skill_bytes_equal": true,
+      "python_files_parsed": 1
+    },
+    {
+      "candidate": "R28",
+      "variant": "challenging",
+      "final_inputs_equal": {
+        "request.md": false,
+        "receiving.json": true
+      },
+      "observed_skill_bytes_equal": true,
+      "python_files_parsed": 1
+    },
+    {
+      "candidate": "R44",
+      "variant": "ordinary",
+      "final_inputs_equal": {
+        "request.md": false,
+        "receiving.json": true
+      },
+      "observed_skill_bytes_equal": true,
+      "python_files_parsed": 2
+    },
+    {
+      "candidate": "R44",
+      "variant": "challenging",
+      "final_inputs_equal": {
+        "request.md": false,
+        "receiving.json": true
+      },
+      "observed_skill_bytes_equal": true,
+      "python_files_parsed": 2
+    },
+    {
+      "candidate": "R63",
+      "variant": "ordinary",
+      "final_inputs_equal": {
+        "request.md": false,
+        "receiving.json": true
+      },
+      "observed_skill_bytes_equal": true,
+      "python_files_parsed": 1
+    },
+    {
+      "candidate": "R63",
+      "variant": "challenging",
+      "final_inputs_equal": {
+        "request.md": false,
+        "receiving.json": true
+      },
+      "observed_skill_bytes_equal": true,
+      "python_files_parsed": 1
+    }
+  ],
+  "replays": [
+    {
+      "candidate": "R17",
+      "variant": "ordinary",
+      "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o/R17/ordinary",
+      "command": [
+        "python3",
+        "-B",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o/R17/skill/scripts/receiving_review.py",
+        "input.json"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "recorded_json_equal": true,
+      "line_count": 6,
+      "line_summary": [
+        {
+          "sku": "LABEL-60",
+          "status": "received_as_ordered",
+          "observed": 120
+        },
+        {
+          "sku": "CARTON-M",
+          "status": "shortfall",
+          "observed": 42
+        },
+        {
+          "sku": "GLOVE-N",
+          "status": "excess",
+          "observed": 64
+        },
+        {
+          "sku": "FILM-300",
+          "status": "received_as_ordered",
+          "observed": 24
+        },
+        {
+          "sku": "SEAL-BLUE",
+          "status": "undetermined",
+          "observed": 30
+        },
+        {
+          "sku": "TAPE-48",
+          "status": "shortfall",
+          "observed": 0
+        }
+      ],
+      "selected_followups": [
+        {
+          "sku": "CARTON-M",
+          "status": "shortfall",
+          "observed": 42,
+          "follow_up": [
+            {
+              "kind": "remaining_receipt",
+              "recipient_roles": [
+                "purchasing_coordinator",
+                "supplier_contact"
+              ],
+              "recipients": [
+                "Dana Ivers <dana.ivers@juniperworks.example>",
+                "Mara Quinn <mara.quinn@harborpack.example>"
+              ],
+              "recipient_information_complete": true,
+              "next_action": "Follow up on the remaining 38 units for PO-R2606-410/CARTON-M with the supplied supplier contact and confirm the expected receipt disposition.",
+              "draft": "To: Dana Ivers <dana.ivers@juniperworks.example>; Mara Quinn <mara.quinn@harborpack.example>\nSubject: 2026-06 receiving review \u2014 PO-R2606-410/CARTON-M\nAction requested: Follow up on the remaining 38 units for PO-R2606-410/CARTON-M with the supplied supplier contact and confirm the expected receipt disposition.",
+              "send_status": "draft_not_sent"
+            }
+          ]
+        },
+        {
+          "sku": "TAPE-48",
+          "status": "shortfall",
+          "observed": 0,
+          "follow_up": [
+            {
+              "kind": "remaining_receipt",
+              "recipient_roles": [
+                "purchasing_coordinator",
+                "supplier_contact"
+              ],
+              "recipients": [
+                "Dana Ivers <dana.ivers@juniperworks.example>",
+                "Owen Malik <owen.malik@bindwell.example>"
+              ],
+              "recipient_information_complete": true,
+              "next_action": "Follow up on the remaining 30 units for PO-R2606-414/TAPE-48 with the supplied supplier contact and confirm the expected receipt disposition.",
+              "draft": "To: Dana Ivers <dana.ivers@juniperworks.example>; Owen Malik <owen.malik@bindwell.example>\nSubject: 2026-06 receiving review \u2014 PO-R2606-414/TAPE-48\nAction requested: Follow up on the remaining 30 units for PO-R2606-414/TAPE-48 with the supplied supplier contact and confirm the expected receipt disposition.",
+              "send_status": "draft_not_sent"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "candidate": "R17",
+      "variant": "challenging",
+      "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o/R17/challenging",
+      "command": [
+        "python3",
+        "-B",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o/R17/skill/scripts/receiving_review.py",
+        "input.json"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "recorded_json_equal": true,
+      "line_count": 13,
+      "line_summary": [
+        {
+          "sku": "BOLT-M8",
+          "status": "undetermined",
+          "observed": 90
+        },
+        {
+          "sku": "WASHER-M8",
+          "status": "undetermined",
+          "observed": 200
+        },
+        {
+          "sku": "PACK-RACK",
+          "status": "undetermined",
+          "observed": 20
+        },
+        {
+          "sku": "STRAP-20",
+          "status": "received_as_ordered",
+          "observed": 60
+        },
+        {
+          "sku": "SHIELD-CLR",
+          "status": "undetermined",
+          "observed": 28
+        },
+        {
+          "sku": "POUCH-12",
+          "status": "undetermined",
+          "observed": 34
+        },
+        {
+          "sku": "TRAY-L",
+          "status": "undetermined",
+          "observed": 9
+        },
+        {
+          "sku": "BINDER-B",
+          "status": "undetermined",
+          "observed": 0
+        },
+        {
+          "sku": "INSERT-G",
+          "status": "excess",
+          "observed": 75
+        },
+        {
+          "sku": "WRAP-500",
+          "status": "shortfall",
+          "observed": 18
+        },
+        {
+          "sku": "CLIP-R",
+          "status": "received_as_ordered",
+          "observed": 10
+        },
+        {
+          "sku": "PAD-FOAM",
+          "status": "shortfall",
+          "observed": -4
+        },
+        {
+          "sku": "CRATE-S",
+          "status": "shortfall",
+          "observed": 0
+        }
+      ],
+      "selected_followups": [
+        {
+          "sku": "BOLT-M8",
+          "status": "undetermined",
+          "observed": 90,
+          "follow_up": [
+            {
+              "kind": "identity_reconciliation",
+              "recipient_roles": [
+                "purchasing_coordinator",
+                "data_steward"
+              ],
+              "recipients": [
+                "Rowan Ames <rowan.ames@northquayassembly.example>",
+                "Beck Lin <beck.lin@northquayassembly.example>"
+              ],
+              "recipient_information_complete": true,
+              "next_action": "Reconcile order and event identity for PO-S2607-820/BOLT-M8, correct or confirm the source records, then rerun the 2026-07 comparison.",
+              "draft": "To: Rowan Ames <rowan.ames@northquayassembly.example>; Beck Lin <beck.lin@northquayassembly.example>\nSubject: 2026-07 receiving review \u2014 PO-S2607-820/BOLT-M8\nAction requested: Reconcile order and event identity for PO-S2607-820/BOLT-M8, correct or confirm the source records, then rerun the 2026-07 comparison.",
+              "send_status": "draft_not_sent"
+            }
+          ]
+        },
+        {
+          "sku": "WASHER-M8",
+          "status": "undetermined",
+          "observed": 200,
+          "follow_up": [
+            {
+              "kind": "identity_reconciliation",
+              "recipient_roles": [
+                "purchasing_coordinator",
+                "data_steward"
+              ],
+              "recipients": [
+                "Rowan Ames <rowan.ames@northquayassembly.example>",
+                "Beck Lin <beck.lin@northquayassembly.example>"
+              ],
+              "recipient_information_complete": true,
+              "next_action": "Reconcile order and event identity for PO-S2607-820/WASHER-M8, correct or confirm the source records, then rerun the 2026-07 comparison.",
+              "draft": "To: Rowan Ames <rowan.ames@northquayassembly.example>; Beck Lin <beck.lin@northquayassembly.example>\nSubject: 2026-07 receiving review \u2014 PO-S2607-820/WASHER-M8\nAction requested: Reconcile order and event identity for PO-S2607-820/WASHER-M8, correct or confirm the source records, then rerun the 2026-07 comparison.",
+              "send_status": "draft_not_sent"
+            }
+          ]
+        },
+        {
+          "sku": "PACK-RACK",
+          "status": "undetermined",
+          "observed": 20,
+          "follow_up": [
+            {
+              "kind": "identity_reconciliation",
+              "recipient_roles": [
+                "purchasing_coordinator",
+                "data_steward"
+              ],
+              "recipients": [
+                "Rowan Ames <rowan.ames@northquayassembly.example>",
+                "Beck Lin <beck.lin@northquayassembly.example>"
+              ],
+              "recipient_information_complete": true,
+              "next_action": "Reconcile order and event identity for PO-S2607-821/PACK-RACK, correct or confirm the source records, then rerun the 2026-07 comparison.",
+              "draft": "To: Rowan Ames <rowan.ames@northquayassembly.example>; Beck Lin <beck.lin@northquayassembly.example>\nSubject: 2026-07 receiving review \u2014 PO-S2607-821/PACK-RACK\nAction requested: Reconcile order and event identity for PO-S2607-821/PACK-RACK, correct or confirm the source records, then rerun the 2026-07 comparison.",
+              "send_status": "draft_not_sent"
+            }
+          ]
+        },
+        {
+          "sku": "CRATE-S",
+          "status": "shortfall",
+          "observed": 0,
+          "follow_up": [
+            {
+              "kind": "remaining_receipt",
+              "recipient_roles": [
+                "purchasing_coordinator",
+                "supplier_contact"
+              ],
+              "recipients": [
+                "Rowan Ames <rowan.ames@northquayassembly.example>",
+                "Elena Duarte <elena.duarte@crateforge.example>"
+              ],
+              "recipient_information_complete": true,
+              "next_action": "Follow up on the remaining 16 units for PO-S2607-830/CRATE-S with the supplied supplier contact and confirm the expected receipt disposition.",
+              "draft": "To: Rowan Ames <rowan.ames@northquayassembly.example>; Elena Duarte <elena.duarte@crateforge.example>\nSubject: 2026-07 receiving review \u2014 PO-S2607-830/CRATE-S\nAction requested: Follow up on the remaining 16 units for PO-S2607-830/CRATE-S with the supplied supplier contact and confirm the expected receipt disposition.",
+              "send_status": "draft_not_sent"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "candidate": "R28",
+      "variant": "ordinary",
+      "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o/R28/ordinary",
+      "command": [
+        "python3",
+        "-B",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o/R28/skill/scripts/review.py",
+        "input.json"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "recorded_json_equal": true,
+      "line_count": 6,
+      "line_summary": [
+        {
+          "sku": "LABEL-60",
+          "status": "received_as_ordered",
+          "observed": 120
+        },
+        {
+          "sku": "CARTON-M",
+          "status": "complete_shortfall",
+          "observed": 42
+        },
+        {
+          "sku": "GLOVE-N",
+          "status": "complete_excess",
+          "observed": 64
+        },
+        {
+          "sku": "FILM-300",
+          "status": "received_as_ordered",
+          "observed": 24
+        },
+        {
+          "sku": "SEAL-BLUE",
+          "status": "incomplete_export",
+          "observed": 30
+        },
+        {
+          "sku": "TAPE-48",
+          "status": "missing_received_value",
+          "observed": null
+        }
+      ],
+      "selected_followups": [
+        {
+          "sku": "CARTON-M",
+          "status": "complete_shortfall",
+          "observed": 42,
+          "follow_up": {
+            "draft": "Ask Dana Ivers <dana.ivers@juniperworks.example> about the remaining receipt for PO-R2606-410/CARTON-M.",
+            "recipient": "Dana Ivers <dana.ivers@juniperworks.example>"
+          }
+        },
+        {
+          "sku": "TAPE-48",
+          "status": "missing_received_value",
+          "observed": null,
+          "follow_up": null
+        }
+      ]
+    },
+    {
+      "candidate": "R28",
+      "variant": "challenging",
+      "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o/R28/challenging",
+      "command": [
+        "python3",
+        "-B",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o/R28/skill/scripts/review.py",
+        "input.json"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "recorded_json_equal": true,
+      "line_count": 13,
+      "line_summary": [
+        {
+          "sku": "BOLT-M8",
+          "status": "complete_shortfall",
+          "observed": 90
+        },
+        {
+          "sku": "WASHER-M8",
+          "status": "received_as_ordered",
+          "observed": 200
+        },
+        {
+          "sku": "PACK-RACK",
+          "status": "conflicting_event_evidence",
+          "observed": 38
+        },
+        {
+          "sku": "STRAP-20",
+          "status": "received_as_ordered",
+          "observed": 60
+        },
+        {
+          "sku": "SHIELD-CLR",
+          "status": "conflicting_event_evidence",
+          "observed": 40
+        },
+        {
+          "sku": "POUCH-12",
+          "status": "incomplete_export",
+          "observed": 34
+        },
+        {
+          "sku": "TRAY-L",
+          "status": "incomplete_export",
+          "observed": 9
+        },
+        {
+          "sku": "BINDER-B",
+          "status": "incomplete_export",
+          "observed": null
+        },
+        {
+          "sku": "INSERT-G",
+          "status": "complete_excess",
+          "observed": 75
+        },
+        {
+          "sku": "WRAP-500",
+          "status": "complete_shortfall",
+          "observed": 18
+        },
+        {
+          "sku": "CLIP-R",
+          "status": "received_as_ordered",
+          "observed": 10
+        },
+        {
+          "sku": "PAD-FOAM",
+          "status": "complete_shortfall",
+          "observed": -4
+        },
+        {
+          "sku": "CRATE-S",
+          "status": "missing_received_value",
+          "observed": null
+        }
+      ],
+      "selected_followups": [
+        {
+          "sku": "BOLT-M8",
+          "status": "complete_shortfall",
+          "observed": 90,
+          "follow_up": {
+            "draft": "Ask Rowan Ames <rowan.ames@northquayassembly.example> about the remaining receipt for PO-S2607-820/BOLT-M8.",
+            "recipient": "Rowan Ames <rowan.ames@northquayassembly.example>"
+          }
+        },
+        {
+          "sku": "WASHER-M8",
+          "status": "received_as_ordered",
+          "observed": 200,
+          "follow_up": null
+        },
+        {
+          "sku": "PACK-RACK",
+          "status": "conflicting_event_evidence",
+          "observed": 38,
+          "follow_up": {
+            "draft": "Ask Rowan Ames <rowan.ames@northquayassembly.example> and Beck Lin <beck.lin@northquayassembly.example> to reconcile the identified source records for PO-S2607-821/PACK-RACK.",
+            "recipient": "Rowan Ames <rowan.ames@northquayassembly.example>"
+          }
+        },
+        {
+          "sku": "CRATE-S",
+          "status": "missing_received_value",
+          "observed": null,
+          "follow_up": null
+        }
+      ]
+    },
+    {
+      "candidate": "R44",
+      "variant": "ordinary",
+      "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o/R44/ordinary",
+      "command": [
+        "python3",
+        "-B",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o/R44/skill/scripts/review.py",
+        "input.json"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "recorded_json_equal": true,
+      "line_count": 6,
+      "line_summary": [
+        {
+          "sku": "LABEL-60",
+          "status": "received_as_ordered",
+          "observed": 120
+        },
+        {
+          "sku": "CARTON-M",
+          "status": "shortfall",
+          "observed": 42
+        },
+        {
+          "sku": "GLOVE-N",
+          "status": "excess",
+          "observed": 64
+        },
+        {
+          "sku": "FILM-300",
+          "status": "received_as_ordered",
+          "observed": 24
+        },
+        {
+          "sku": "SEAL-BLUE",
+          "status": "unresolved_evidence",
+          "observed": 30
+        },
+        {
+          "sku": "TAPE-48",
+          "status": "shortfall",
+          "observed": 0
+        }
+      ],
+      "selected_followups": [
+        {
+          "sku": "CARTON-M",
+          "status": "shortfall",
+          "observed": 42,
+          "follow_up": [
+            {
+              "kind": "supplier_follow_up",
+              "owner": "Dana Ivers <dana.ivers@juniperworks.example>",
+              "recipients": [
+                "Dana Ivers <dana.ivers@juniperworks.example>",
+                "Mara Quinn <mara.quinn@harborpack.example>"
+              ],
+              "missing_recipients": [],
+              "draft": "2026-06 / PO-R2606-410 / CARTON-M: Confirm the remaining receipt of 38 units and provide the next receiving date/action."
+            }
+          ]
+        },
+        {
+          "sku": "TAPE-48",
+          "status": "shortfall",
+          "observed": 0,
+          "follow_up": [
+            {
+              "kind": "supplier_follow_up",
+              "owner": "Dana Ivers <dana.ivers@juniperworks.example>",
+              "recipients": [
+                "Dana Ivers <dana.ivers@juniperworks.example>",
+                "Owen Malik <owen.malik@bindwell.example>"
+              ],
+              "missing_recipients": [],
+              "draft": "2026-06 / PO-R2606-414 / TAPE-48: Confirm the remaining receipt of 30 units and provide the next receiving date/action."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "candidate": "R44",
+      "variant": "challenging",
+      "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o/R44/challenging",
+      "command": [
+        "python3",
+        "-B",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o/R44/skill/scripts/review.py",
+        "input.json"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "recorded_json_equal": true,
+      "line_count": 13,
+      "line_summary": [
+        {
+          "sku": "BOLT-M8",
+          "status": "unresolved_evidence",
+          "observed": 90
+        },
+        {
+          "sku": "WASHER-M8",
+          "status": "unresolved_evidence",
+          "observed": 200
+        },
+        {
+          "sku": "PACK-RACK",
+          "status": "unresolved_evidence",
+          "observed": 20
+        },
+        {
+          "sku": "STRAP-20",
+          "status": "received_as_ordered",
+          "observed": 60
+        },
+        {
+          "sku": "SHIELD-CLR",
+          "status": "unresolved_evidence",
+          "observed": 28
+        },
+        {
+          "sku": "POUCH-12",
+          "status": "unresolved_evidence",
+          "observed": 34
+        },
+        {
+          "sku": "TRAY-L",
+          "status": "unresolved_evidence",
+          "observed": 9
+        },
+        {
+          "sku": "BINDER-B",
+          "status": "unresolved_evidence",
+          "observed": 0
+        },
+        {
+          "sku": "INSERT-G",
+          "status": "excess",
+          "observed": 75
+        },
+        {
+          "sku": "WRAP-500",
+          "status": "shortfall",
+          "observed": 18
+        },
+        {
+          "sku": "CLIP-R",
+          "status": "received_as_ordered",
+          "observed": 10
+        },
+        {
+          "sku": "PAD-FOAM",
+          "status": "shortfall",
+          "observed": -4
+        },
+        {
+          "sku": "CRATE-S",
+          "status": "shortfall",
+          "observed": 0
+        }
+      ],
+      "selected_followups": [
+        {
+          "sku": "BOLT-M8",
+          "status": "unresolved_evidence",
+          "observed": 90,
+          "follow_up": [
+            {
+              "kind": "reconcile_sources",
+              "owner": "Rowan Ames <rowan.ames@northquayassembly.example>",
+              "recipients": [
+                "Rowan Ames <rowan.ames@northquayassembly.example>",
+                "Beck Lin <beck.lin@northquayassembly.example>"
+              ],
+              "missing_recipients": [],
+              "draft": "2026-07 / PO-S2607-820 / BOLT-M8: Reconcile source records before final comparison: events[4]: unknown SKU for in-scope order"
+            }
+          ]
+        },
+        {
+          "sku": "WASHER-M8",
+          "status": "unresolved_evidence",
+          "observed": 200,
+          "follow_up": [
+            {
+              "kind": "reconcile_sources",
+              "owner": "Rowan Ames <rowan.ames@northquayassembly.example>",
+              "recipients": [
+                "Rowan Ames <rowan.ames@northquayassembly.example>",
+                "Beck Lin <beck.lin@northquayassembly.example>"
+              ],
+              "missing_recipients": [],
+              "draft": "2026-07 / PO-S2607-820 / WASHER-M8: Reconcile source records before final comparison: events[4]: unknown SKU for in-scope order"
+            }
+          ]
+        },
+        {
+          "sku": "PACK-RACK",
+          "status": "unresolved_evidence",
+          "observed": 20,
+          "follow_up": [
+            {
+              "kind": "reconcile_sources",
+              "owner": "Rowan Ames <rowan.ames@northquayassembly.example>",
+              "recipients": [
+                "Rowan Ames <rowan.ames@northquayassembly.example>",
+                "Beck Lin <beck.lin@northquayassembly.example>"
+              ],
+              "missing_recipients": [],
+              "draft": "2026-07 / PO-S2607-821 / PACK-RACK: Reconcile source records before final comparison: Conflicting event_id RCV-K7107: rows [6, 8]"
+            }
+          ]
+        },
+        {
+          "sku": "CRATE-S",
+          "status": "shortfall",
+          "observed": 0,
+          "follow_up": [
+            {
+              "kind": "supplier_follow_up",
+              "owner": "Rowan Ames <rowan.ames@northquayassembly.example>",
+              "recipients": [
+                "Rowan Ames <rowan.ames@northquayassembly.example>",
+                "Elena Duarte <elena.duarte@crateforge.example>"
+              ],
+              "missing_recipients": [],
+              "draft": "2026-07 / PO-S2607-830 / CRATE-S: Confirm the remaining receipt of 16 units and provide the next receiving date/action."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "candidate": "R63",
+      "variant": "ordinary",
+      "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o/R63/ordinary",
+      "command": [
+        "python3",
+        "-B",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o/R63/skill/scripts/review_receipts.py",
+        "input.json"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "recorded_json_equal": true,
+      "line_count": 6,
+      "line_summary": [
+        {
+          "sku": "LABEL-60",
+          "status": "received_as_ordered",
+          "observed": 120
+        },
+        {
+          "sku": "CARTON-M",
+          "status": "shortfall",
+          "observed": 42
+        },
+        {
+          "sku": "GLOVE-N",
+          "status": "excess",
+          "observed": 64
+        },
+        {
+          "sku": "FILM-300",
+          "status": "received_as_ordered",
+          "observed": 24
+        },
+        {
+          "sku": "SEAL-BLUE",
+          "status": "unavailable",
+          "observed": 30
+        },
+        {
+          "sku": "TAPE-48",
+          "status": "shortfall",
+          "observed": 0
+        }
+      ],
+      "selected_followups": [
+        {
+          "sku": "CARTON-M",
+          "status": "shortfall",
+          "observed": 42,
+          "follow_up": {
+            "action": "Confirm and arrange receipt of the remaining quantity.",
+            "recipients": [
+              "Mara Quinn <mara.quinn@harborpack.example>"
+            ]
+          }
+        },
+        {
+          "sku": "TAPE-48",
+          "status": "shortfall",
+          "observed": 0,
+          "follow_up": {
+            "action": "Confirm and arrange receipt of the remaining quantity.",
+            "recipients": [
+              "Owen Malik <owen.malik@bindwell.example>"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "candidate": "R63",
+      "variant": "challenging",
+      "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o/R63/challenging",
+      "command": [
+        "python3",
+        "-B",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o/R63/skill/scripts/review_receipts.py",
+        "input.json"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "recorded_json_equal": true,
+      "line_count": 13,
+      "line_summary": [
+        {
+          "sku": "BOLT-M8",
+          "status": "unavailable",
+          "observed": 90
+        },
+        {
+          "sku": "WASHER-M8",
+          "status": "unavailable",
+          "observed": 200
+        },
+        {
+          "sku": "PACK-RACK",
+          "status": "unavailable",
+          "observed": 38
+        },
+        {
+          "sku": "STRAP-20",
+          "status": "received_as_ordered",
+          "observed": 60
+        },
+        {
+          "sku": "SHIELD-CLR",
+          "status": "unavailable",
+          "observed": 28
+        },
+        {
+          "sku": "POUCH-12",
+          "status": "unavailable",
+          "observed": 34
+        },
+        {
+          "sku": "TRAY-L",
+          "status": "unavailable",
+          "observed": 9
+        },
+        {
+          "sku": "BINDER-B",
+          "status": "unavailable",
+          "observed": 0
+        },
+        {
+          "sku": "INSERT-G",
+          "status": "excess",
+          "observed": 75
+        },
+        {
+          "sku": "WRAP-500",
+          "status": "shortfall",
+          "observed": 18
+        },
+        {
+          "sku": "CLIP-R",
+          "status": "received_as_ordered",
+          "observed": 10
+        },
+        {
+          "sku": "PAD-FOAM",
+          "status": "shortfall",
+          "observed": -4
+        },
+        {
+          "sku": "CRATE-S",
+          "status": "shortfall",
+          "observed": 0
+        }
+      ],
+      "selected_followups": [
+        {
+          "sku": "BOLT-M8",
+          "status": "unavailable",
+          "observed": 90,
+          "follow_up": {
+            "action": "Reconcile the identified order/SKU source records before final comparison.",
+            "recipients": [
+              "Rowan Ames <rowan.ames@northquayassembly.example>",
+              "Beck Lin <beck.lin@northquayassembly.example>"
+            ]
+          }
+        },
+        {
+          "sku": "WASHER-M8",
+          "status": "unavailable",
+          "observed": 200,
+          "follow_up": {
+            "action": "Reconcile the identified order/SKU source records before final comparison.",
+            "recipients": [
+              "Rowan Ames <rowan.ames@northquayassembly.example>",
+              "Beck Lin <beck.lin@northquayassembly.example>"
+            ]
+          }
+        },
+        {
+          "sku": "PACK-RACK",
+          "status": "unavailable",
+          "observed": 38,
+          "follow_up": {
+            "action": "Reconcile conflicting event source records before final comparison.",
+            "recipients": [
+              "Rowan Ames <rowan.ames@northquayassembly.example>",
+              "Beck Lin <beck.lin@northquayassembly.example>"
+            ]
+          }
+        },
+        {
+          "sku": "CRATE-S",
+          "status": "shortfall",
+          "observed": 0,
+          "follow_up": {
+            "action": "Confirm and arrange receipt of the remaining quantity.",
+            "recipients": [
+              "Elena Duarte <elena.duarte@crateforge.example>"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "bundled_tests": {
+    "command": [
+      "python3",
+      "-B",
+      "scripts/test_review.py"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P03-second/components-vs_mak4o/R44/skill",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "..........\n----------------------------------------------------------------------\nRan 10 tests in 0.001s\n\nOK\n"
+  }
+}

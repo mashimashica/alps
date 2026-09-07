@@ -1,5 +1,7 @@
 # Confirmed checkpoints
 
+Latest receipt reconciled after continuation: commit `259e969f1897445a846cb1a7c529d5658ef38a6e`, tree `8519c6e5fd6f3e4abec7f4ef36ceb4272cbb5e3c`, parent `7bcb55a9886778f2026c550377aefad8876e7108`; snapshot `../assessment-checkpoint-6ubtX4`, 4,641 files and 186 changed entries. The preceding completed direct-API response verified commit/tree/ref. This saves 57 completed/form-validated creators, 114 prepared consumers, all first 73 completed consumers with C-U073 final native SQL, and all three original S05 packets. P02's primary start and creator 058's completion were later ledger reconciliations. Later work is not implied saved by this receipt.
+
 | Checkpoint | Commit | Contents |
 | --- | --- | --- |
 | Initial setup | e76b8fcae6b22de1c94eecf108a3382894e05406 | Scope, full protocol, common skill-creator text/scripts/license, 77 frozen-input hashes, three draft calibration briefs and mock, baseline 9-test result. No trial results yet. |

@@ -1,0 +1,110 @@
+{
+  "conflicts": [],
+  "lines": [
+    {
+      "evidence": {
+        "conflicting_event_ids": [],
+        "coverage_complete": true,
+        "event_count": 3
+      },
+      "evidence_status": "complete",
+      "follow_up": null,
+      "observed_net_received": 120,
+      "order_id": "PO-R2606-410",
+      "ordered": 120,
+      "position": "received_as_ordered",
+      "sku": "LABEL-60"
+    },
+    {
+      "evidence": {
+        "conflicting_event_ids": [],
+        "coverage_complete": true,
+        "event_count": 2
+      },
+      "evidence_status": "complete",
+      "follow_up": {
+        "action": "Confirm and arrange receipt of the remaining quantity.",
+        "recipients": [
+          "Mara Quinn <mara.quinn@harborpack.example>"
+        ]
+      },
+      "observed_net_received": 42,
+      "order_id": "PO-R2606-410",
+      "ordered": 80,
+      "position": "shortfall",
+      "sku": "CARTON-M"
+    },
+    {
+      "evidence": {
+        "conflicting_event_ids": [],
+        "coverage_complete": true,
+        "event_count": 2
+      },
+      "evidence_status": "complete",
+      "follow_up": {
+        "action": "Reconcile the surplus against the order and receiving evidence.",
+        "recipients": [
+          "Noel Price <noel.price@juniperworks.example>"
+        ]
+      },
+      "observed_net_received": 64,
+      "order_id": "PO-R2606-411",
+      "ordered": 60,
+      "position": "excess",
+      "sku": "GLOVE-N"
+    },
+    {
+      "evidence": {
+        "conflicting_event_ids": [],
+        "coverage_complete": true,
+        "event_count": 1
+      },
+      "evidence_status": "complete",
+      "follow_up": null,
+      "observed_net_received": 24,
+      "order_id": "PO-R2606-412",
+      "ordered": 24,
+      "position": "received_as_ordered",
+      "sku": "FILM-300"
+    },
+    {
+      "evidence": {
+        "conflicting_event_ids": [],
+        "coverage_complete": false,
+        "event_count": 2
+      },
+      "evidence_status": "incomplete_export",
+      "follow_up": {
+        "action": "Provide or confirm the full receiving export for this order line and month.",
+        "recipients": [
+          "Simone Bell <simone.bell@juniperworks.example>"
+        ]
+      },
+      "observed_net_received": 30,
+      "order_id": "PO-R2606-413",
+      "ordered": 40,
+      "position": "unavailable",
+      "sku": "SEAL-BLUE"
+    },
+    {
+      "evidence": {
+        "conflicting_event_ids": [],
+        "coverage_complete": true,
+        "event_count": 0
+      },
+      "evidence_status": "complete",
+      "follow_up": {
+        "action": "Confirm and arrange receipt of the remaining quantity.",
+        "recipients": [
+          "Owen Malik <owen.malik@bindwell.example>"
+        ]
+      },
+      "observed_net_received": 0,
+      "order_id": "PO-R2606-414",
+      "ordered": 30,
+      "position": "shortfall",
+      "sku": "TAPE-48"
+    }
+  ],
+  "month": "2026-06"
+}

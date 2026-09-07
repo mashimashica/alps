@@ -1,0 +1,320 @@
+[
+  {
+    "candidate": "R17",
+    "probe": "same-line-conflict-and-partial",
+    "command": [
+      "python3",
+      "-B",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/copies/R17/receiving-review/scripts/receiving_review.py",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/runs/R17/same-line-conflict-and-partial/input.json",
+      "--output",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/runs/R17/same-line-conflict-and-partial/report.json"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second",
+    "exit_code": 0,
+    "stderr": "",
+    "stdout_bytes": 0,
+    "input_unchanged": true,
+    "line": {
+      "order_id": "P1",
+      "sku": "A",
+      "ordered": 10,
+      "supplier_contact": "Supplier",
+      "status": "conflicting_evidence",
+      "coverage": "incomplete",
+      "supporting_event_ids": [
+        "CLEAN",
+        "CONFLICT"
+      ],
+      "observed_subtotal": 15,
+      "conflicting_event_ids": [
+        "CONFLICT"
+      ],
+      "blocking_conditions": [
+        "event_id has conflicting content",
+        "coverage declares an incomplete export"
+      ],
+      "follow_up": {
+        "recipient": "Coordinator and Steward",
+        "role": "purchasing_coordinator_and_data_steward",
+        "subject": "Reconcile receiving evidence for P1 / A",
+        "action": "Reconcile the identified source records before final line comparison (event_id has conflicting content and coverage declares an incomplete export).",
+        "draft": "To: Coordinator and Steward\nSubject: Reconcile receiving evidence for P1 / A\n\nPlease reconcile the order and receiving source records for P1 / A (event_id has conflicting content and coverage declares an incomplete export) and confirm the evidence to use for the final review."
+      }
+    }
+  },
+  {
+    "candidate": "R28",
+    "probe": "same-line-conflict-and-partial",
+    "command": [
+      "python3",
+      "-B",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/copies/R28/monthly-receiving-review/scripts/review.py",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/runs/R28/same-line-conflict-and-partial/input.json"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second",
+    "exit_code": 0,
+    "stderr": "",
+    "stdout_bytes": 2312,
+    "input_unchanged": true,
+    "line": {
+      "order_id": "P1",
+      "sku": "A",
+      "order_record_indexes": [
+        0
+      ],
+      "ordered": 10,
+      "coverage": "partial",
+      "observed_net": 1,
+      "accepted_event_ids": [
+        "CLEAN"
+      ],
+      "issues": [
+        {
+          "kind": "identity",
+          "message": "Conflicting event_id 'CONFLICT' in events records [0, 1]; excluded from subtotal."
+        }
+      ],
+      "receipt_position": "blocked",
+      "final_net": null,
+      "remaining": null,
+      "excess": null,
+      "follow_ups": [
+        {
+          "kind": "identity_reconciliation",
+          "owners": [
+            "Coordinator",
+            "Steward"
+          ],
+          "recipients": [
+            "Coordinator",
+            "Steward"
+          ],
+          "missing_roles": [],
+          "action": "Reconcile source records for 2026-07 order P1, SKU A before final comparison. Conflicting event_id 'CONFLICT' in events records [0, 1]; excluded from subtotal. Confirm the order quantity and event-to-line identities, then rerun the review.",
+          "draft": "To: Coordinator; Steward\nSubject: Receiving review 2026-07\n\nReconcile source records for 2026-07 order P1, SKU A before final comparison. Conflicting event_id 'CONFLICT' in events records [0, 1]; excluded from subtotal. Confirm the order quantity and event-to-line identities, then rerun the review.",
+          "ready_to_address": true
+        },
+        {
+          "kind": "full_export",
+          "owners": [
+            "Steward"
+          ],
+          "recipients": [
+            "Steward"
+          ],
+          "missing_roles": [],
+          "action": "Provide or confirm the full event export and an explicit complete coverage declaration for 2026-07 order P1, SKU A before final comparison. Coverage is partial; accepted-event observed subtotal is 1.",
+          "draft": "To: Steward\nSubject: Receiving review 2026-07\n\nProvide or confirm the full event export and an explicit complete coverage declaration for 2026-07 order P1, SKU A before final comparison. Coverage is partial; accepted-event observed subtotal is 1.",
+          "ready_to_address": true
+        }
+      ]
+    }
+  },
+  {
+    "candidate": "R44",
+    "probe": "same-line-conflict-and-partial",
+    "command": [
+      "python3",
+      "-B",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/copies/R44/monthly-receiving-review/scripts/review.py",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/runs/R44/same-line-conflict-and-partial/input.json",
+      "--output",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/runs/R44/same-line-conflict-and-partial/report.json"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second",
+    "exit_code": 0,
+    "stderr": "",
+    "stdout_bytes": 0,
+    "input_unchanged": true,
+    "line": {
+      "source_order_row": 0,
+      "order_id": "P1",
+      "sku": "A",
+      "ordered": 10,
+      "coverage": "incomplete or conflicting",
+      "coverage_records": [
+        {
+          "order_id": "P1",
+          "sku": "A",
+          "month": "2026-07",
+          "complete": false
+        }
+      ],
+      "blockers": [
+        "conflicting event_id CONFLICT; source rows [0, 1]"
+      ],
+      "event_ids": [
+        "CLEAN"
+      ],
+      "observed_subtotal": null,
+      "net_received": null,
+      "difference": null,
+      "status": "undetermined",
+      "actions": [
+        {
+          "responsible_role": "purchasing_coordinator",
+          "recipient": "Coordinator",
+          "next_action": "Reconcile the identified order/event source records before a final comparison: conflicting event_id CONFLICT; source rows [0, 1]",
+          "routing": "ready",
+          "draft": "To: Coordinator\nSubject: 2026-07 receiving review P1 / A\nReconcile the identified order/event source records before a final comparison: conflicting event_id CONFLICT; source rows [0, 1]\nDraft only; not sent."
+        },
+        {
+          "responsible_role": "data_steward",
+          "recipient": "Steward",
+          "next_action": "Reconcile the identified order/event source records before a final comparison: conflicting event_id CONFLICT; source rows [0, 1]",
+          "routing": "ready",
+          "draft": "To: Steward\nSubject: 2026-07 receiving review P1 / A\nReconcile the identified order/event source records before a final comparison: conflicting event_id CONFLICT; source rows [0, 1]\nDraft only; not sent."
+        },
+        {
+          "responsible_role": "data_steward",
+          "recipient": "Steward",
+          "next_action": "Provide or confirm the full 2026-07 export and a consistent completeness declaration for P1 / A before final comparison.",
+          "routing": "ready",
+          "draft": "To: Steward\nSubject: 2026-07 receiving review P1 / A\nProvide or confirm the full 2026-07 export and a consistent completeness declaration for P1 / A before final comparison.\nDraft only; not sent."
+        }
+      ]
+    }
+  },
+  {
+    "candidate": "R63",
+    "probe": "same-line-conflict-and-partial",
+    "command": [
+      "python3",
+      "-B",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/copies/R63/receiving-review/scripts/review_receipts.py",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/runs/R63/same-line-conflict-and-partial/input.json",
+      "--output",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/runs/R63/same-line-conflict-and-partial/report.json"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second",
+    "exit_code": 0,
+    "stderr": "",
+    "stdout_bytes": 0,
+    "input_unchanged": true,
+    "line": {
+      "coverage": {
+        "complete": false,
+        "month": "2026-07"
+      },
+      "event_ids": [
+        "CLEAN"
+      ],
+      "follow_up": {
+        "action": "draft_only",
+        "draft": "Please reconcile the identified order/event source records for order P1, SKU A, before finalizing the 2026-07 receipt position.",
+        "recipient_roles": [
+          "purchasing_coordinator",
+          "data_steward"
+        ],
+        "recipients": [
+          "Coordinator",
+          "Steward"
+        ]
+      },
+      "issues": [
+        {
+          "event_ids": [
+            "CONFLICT"
+          ],
+          "type": "conflicting_event_id"
+        },
+        {
+          "type": "receiving_export_incomplete"
+        }
+      ],
+      "observed_received": 1,
+      "order_id": "P1",
+      "ordered": 10,
+      "sku": "A",
+      "status": "conflicting_evidence",
+      "supplier_contact": "Supplier"
+    }
+  },
+  {
+    "candidate": "R63",
+    "probe": "prior-month-only-conflict",
+    "command": [
+      "python3",
+      "-B",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/copies/R63/receiving-review/scripts/review_receipts.py",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/runs/R63/prior-month-only-conflict/input.json",
+      "--output",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/runs/R63/prior-month-only-conflict/report.json"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second",
+    "exit_code": 0,
+    "stderr": "",
+    "stdout_bytes": 0,
+    "input_unchanged": true,
+    "line": {
+      "coverage": {
+        "complete": true,
+        "month": "2026-07"
+      },
+      "event_ids": [
+        "CURRENT"
+      ],
+      "follow_up": {
+        "action": "draft_only",
+        "draft": "Please reconcile the identified order/event source records for order P1, SKU A, before finalizing the 2026-07 receipt position.",
+        "recipient_roles": [
+          "purchasing_coordinator",
+          "data_steward"
+        ],
+        "recipients": [
+          "Coordinator",
+          "Steward"
+        ]
+      },
+      "issues": [
+        {
+          "event_ids": [
+            "OLD"
+          ],
+          "type": "conflicting_event_id"
+        }
+      ],
+      "observed_received": 10,
+      "order_id": "P1",
+      "ordered": 10,
+      "sku": "A",
+      "status": "conflicting_evidence",
+      "supplier_contact": "Supplier"
+    }
+  },
+  {
+    "candidate": "R63",
+    "probe": "output-is-input",
+    "command": [
+      "python3",
+      "-B",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/copies/R63/receiving-review/scripts/review_receipts.py",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/runs/R63/output-is-input/input.json",
+      "--output",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second/runs/R63/output-is-input/input.json"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P01-second",
+    "exit_code": 0,
+    "stderr": "",
+    "stdout_bytes": 0,
+    "input_unchanged": false,
+    "line": {
+      "coverage": {
+        "complete": true,
+        "month": "2026-07"
+      },
+      "event_ids": [
+        "CURRENT"
+      ],
+      "final_received": 10,
+      "issues": [],
+      "observed_received": 10,
+      "order_id": "P1",
+      "ordered": 10,
+      "sku": "A",
+      "status": "received_as_ordered",
+      "supplier_contact": "Supplier"
+    }
+  }
+]

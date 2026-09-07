@@ -1,0 +1,414 @@
+{
+  "month": "2026-06",
+  "source": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-P02-primary/component-probes/current_event_missing_order_id.json",
+  "scope": {
+    "supplied_order_records": 6,
+    "unique_identifiable_lines": 6,
+    "unresolved_order_records": 0,
+    "reported_entries": 6
+  },
+  "lines": [
+    {
+      "order_id": "PO-R2606-410",
+      "sku": "LABEL-60",
+      "order_record_indexes": [
+        0
+      ],
+      "ordered": 120,
+      "coverage": "complete",
+      "coverage_refs": [
+        "coverage[0]"
+      ],
+      "accepted_events": [
+        {
+          "source_ref": "events[0]",
+          "event_id": "RCV-H1801",
+          "quantity": 75
+        },
+        {
+          "source_ref": "events[1]",
+          "event_id": "RCV-H1802",
+          "quantity": 50
+        },
+        {
+          "source_ref": "events[2]",
+          "event_id": "RCV-H1803",
+          "quantity": -5
+        }
+      ],
+      "issue_ids": [
+        "I-1"
+      ],
+      "valid_event_subtotal": 120,
+      "observed_net": null,
+      "final_net": null,
+      "status": "blocked_evidence",
+      "remaining": null,
+      "excess": null,
+      "actions": [
+        {
+          "kind": "reconcile_sources",
+          "responsible": [
+            {
+              "role": "purchasing_coordinator",
+              "name": "Dana Ivers <dana.ivers@juniperworks.example>"
+            },
+            {
+              "role": "data_steward",
+              "name": "Simone Bell <simone.bell@juniperworks.example>"
+            }
+          ],
+          "recipients": [
+            {
+              "role": "purchasing_coordinator",
+              "name": "Dana Ivers <dana.ivers@juniperworks.example>"
+            },
+            {
+              "role": "data_steward",
+              "name": "Simone Bell <simone.bell@juniperworks.example>"
+            }
+          ],
+          "missing_routing": [],
+          "next_action": "Reconcile the order/event source records events[14]; supply corrected identities, quantities, or export records before final comparison.",
+          "draft_seed": "Draft — not sent\nTo: Dana Ivers <dana.ivers@juniperworks.example>; Simone Bell <simone.bell@juniperworks.example>\nSubject: 2026-06 receiving review — PO-R2606-410 / LABEL-60\nFor 2026-06, PO-R2606-410 / LABEL-60: Reconcile the order/event source records events[14]; supply corrected identities, quantities, or export records before final comparison."
+        }
+      ]
+    },
+    {
+      "order_id": "PO-R2606-410",
+      "sku": "CARTON-M",
+      "order_record_indexes": [
+        1
+      ],
+      "ordered": 80,
+      "coverage": "complete",
+      "coverage_refs": [
+        "coverage[1]"
+      ],
+      "accepted_events": [
+        {
+          "source_ref": "events[4]",
+          "event_id": "RCV-H1804",
+          "quantity": 50
+        },
+        {
+          "source_ref": "events[5]",
+          "event_id": "RCV-H1805",
+          "quantity": -8
+        }
+      ],
+      "issue_ids": [
+        "I-1"
+      ],
+      "valid_event_subtotal": 42,
+      "observed_net": null,
+      "final_net": null,
+      "status": "blocked_evidence",
+      "remaining": null,
+      "excess": null,
+      "actions": [
+        {
+          "kind": "reconcile_sources",
+          "responsible": [
+            {
+              "role": "purchasing_coordinator",
+              "name": "Dana Ivers <dana.ivers@juniperworks.example>"
+            },
+            {
+              "role": "data_steward",
+              "name": "Simone Bell <simone.bell@juniperworks.example>"
+            }
+          ],
+          "recipients": [
+            {
+              "role": "purchasing_coordinator",
+              "name": "Dana Ivers <dana.ivers@juniperworks.example>"
+            },
+            {
+              "role": "data_steward",
+              "name": "Simone Bell <simone.bell@juniperworks.example>"
+            }
+          ],
+          "missing_routing": [],
+          "next_action": "Reconcile the order/event source records events[14]; supply corrected identities, quantities, or export records before final comparison.",
+          "draft_seed": "Draft — not sent\nTo: Dana Ivers <dana.ivers@juniperworks.example>; Simone Bell <simone.bell@juniperworks.example>\nSubject: 2026-06 receiving review — PO-R2606-410 / CARTON-M\nFor 2026-06, PO-R2606-410 / CARTON-M: Reconcile the order/event source records events[14]; supply corrected identities, quantities, or export records before final comparison."
+        }
+      ]
+    },
+    {
+      "order_id": "PO-R2606-411",
+      "sku": "GLOVE-N",
+      "order_record_indexes": [
+        2
+      ],
+      "ordered": 60,
+      "coverage": "complete",
+      "coverage_refs": [
+        "coverage[2]"
+      ],
+      "accepted_events": [
+        {
+          "source_ref": "events[7]",
+          "event_id": "RCV-H1806",
+          "quantity": 66
+        },
+        {
+          "source_ref": "events[8]",
+          "event_id": "RCV-H1807",
+          "quantity": -2
+        }
+      ],
+      "issue_ids": [
+        "I-1"
+      ],
+      "valid_event_subtotal": 64,
+      "observed_net": null,
+      "final_net": null,
+      "status": "blocked_evidence",
+      "remaining": null,
+      "excess": null,
+      "actions": [
+        {
+          "kind": "reconcile_sources",
+          "responsible": [
+            {
+              "role": "purchasing_coordinator",
+              "name": "Dana Ivers <dana.ivers@juniperworks.example>"
+            },
+            {
+              "role": "data_steward",
+              "name": "Simone Bell <simone.bell@juniperworks.example>"
+            }
+          ],
+          "recipients": [
+            {
+              "role": "purchasing_coordinator",
+              "name": "Dana Ivers <dana.ivers@juniperworks.example>"
+            },
+            {
+              "role": "data_steward",
+              "name": "Simone Bell <simone.bell@juniperworks.example>"
+            }
+          ],
+          "missing_routing": [],
+          "next_action": "Reconcile the order/event source records events[14]; supply corrected identities, quantities, or export records before final comparison.",
+          "draft_seed": "Draft — not sent\nTo: Dana Ivers <dana.ivers@juniperworks.example>; Simone Bell <simone.bell@juniperworks.example>\nSubject: 2026-06 receiving review — PO-R2606-411 / GLOVE-N\nFor 2026-06, PO-R2606-411 / GLOVE-N: Reconcile the order/event source records events[14]; supply corrected identities, quantities, or export records before final comparison."
+        }
+      ]
+    },
+    {
+      "order_id": "PO-R2606-412",
+      "sku": "FILM-300",
+      "order_record_indexes": [
+        3
+      ],
+      "ordered": 24,
+      "coverage": "complete",
+      "coverage_refs": [
+        "coverage[3]"
+      ],
+      "accepted_events": [
+        {
+          "source_ref": "events[9]",
+          "event_id": "RCV-H1808",
+          "quantity": 24
+        }
+      ],
+      "issue_ids": [
+        "I-1"
+      ],
+      "valid_event_subtotal": 24,
+      "observed_net": null,
+      "final_net": null,
+      "status": "blocked_evidence",
+      "remaining": null,
+      "excess": null,
+      "actions": [
+        {
+          "kind": "reconcile_sources",
+          "responsible": [
+            {
+              "role": "purchasing_coordinator",
+              "name": "Dana Ivers <dana.ivers@juniperworks.example>"
+            },
+            {
+              "role": "data_steward",
+              "name": "Simone Bell <simone.bell@juniperworks.example>"
+            }
+          ],
+          "recipients": [
+            {
+              "role": "purchasing_coordinator",
+              "name": "Dana Ivers <dana.ivers@juniperworks.example>"
+            },
+            {
+              "role": "data_steward",
+              "name": "Simone Bell <simone.bell@juniperworks.example>"
+            }
+          ],
+          "missing_routing": [],
+          "next_action": "Reconcile the order/event source records events[14]; supply corrected identities, quantities, or export records before final comparison.",
+          "draft_seed": "Draft — not sent\nTo: Dana Ivers <dana.ivers@juniperworks.example>; Simone Bell <simone.bell@juniperworks.example>\nSubject: 2026-06 receiving review — PO-R2606-412 / FILM-300\nFor 2026-06, PO-R2606-412 / FILM-300: Reconcile the order/event source records events[14]; supply corrected identities, quantities, or export records before final comparison."
+        }
+      ]
+    },
+    {
+      "order_id": "PO-R2606-413",
+      "sku": "SEAL-BLUE",
+      "order_record_indexes": [
+        4
+      ],
+      "ordered": 40,
+      "coverage": "partial",
+      "coverage_refs": [
+        "coverage[4]"
+      ],
+      "accepted_events": [
+        {
+          "source_ref": "events[11]",
+          "event_id": "RCV-H1809",
+          "quantity": 35
+        },
+        {
+          "source_ref": "events[12]",
+          "event_id": "RCV-H1810",
+          "quantity": -5
+        }
+      ],
+      "issue_ids": [
+        "I-1"
+      ],
+      "valid_event_subtotal": 30,
+      "observed_net": null,
+      "final_net": null,
+      "status": "blocked_evidence",
+      "remaining": null,
+      "excess": null,
+      "actions": [
+        {
+          "kind": "reconcile_sources",
+          "responsible": [
+            {
+              "role": "purchasing_coordinator",
+              "name": "Dana Ivers <dana.ivers@juniperworks.example>"
+            },
+            {
+              "role": "data_steward",
+              "name": "Simone Bell <simone.bell@juniperworks.example>"
+            }
+          ],
+          "recipients": [
+            {
+              "role": "purchasing_coordinator",
+              "name": "Dana Ivers <dana.ivers@juniperworks.example>"
+            },
+            {
+              "role": "data_steward",
+              "name": "Simone Bell <simone.bell@juniperworks.example>"
+            }
+          ],
+          "missing_routing": [],
+          "next_action": "Reconcile the order/event source records events[14]; supply corrected identities, quantities, or export records before final comparison.",
+          "draft_seed": "Draft — not sent\nTo: Dana Ivers <dana.ivers@juniperworks.example>; Simone Bell <simone.bell@juniperworks.example>\nSubject: 2026-06 receiving review — PO-R2606-413 / SEAL-BLUE\nFor 2026-06, PO-R2606-413 / SEAL-BLUE: Reconcile the order/event source records events[14]; supply corrected identities, quantities, or export records before final comparison."
+        },
+        {
+          "kind": "confirm_export",
+          "responsible": [
+            {
+              "role": "data_steward",
+              "name": "Simone Bell <simone.bell@juniperworks.example>"
+            }
+          ],
+          "recipients": [
+            {
+              "role": "data_steward",
+              "name": "Simone Bell <simone.bell@juniperworks.example>"
+            }
+          ],
+          "missing_routing": [],
+          "next_action": "Coverage is partial; provide or confirm the full receiving export and an explicit coverage declaration for this line and month before final comparison.",
+          "draft_seed": "Draft — not sent\nTo: Simone Bell <simone.bell@juniperworks.example>\nSubject: 2026-06 receiving review — PO-R2606-413 / SEAL-BLUE\nFor 2026-06, PO-R2606-413 / SEAL-BLUE: Coverage is partial; provide or confirm the full receiving export and an explicit coverage declaration for this line and month before final comparison."
+        }
+      ]
+    },
+    {
+      "order_id": "PO-R2606-414",
+      "sku": "TAPE-48",
+      "order_record_indexes": [
+        5
+      ],
+      "ordered": 30,
+      "coverage": "complete",
+      "coverage_refs": [
+        "coverage[5]"
+      ],
+      "accepted_events": [],
+      "issue_ids": [
+        "I-1"
+      ],
+      "valid_event_subtotal": 0,
+      "observed_net": null,
+      "final_net": null,
+      "status": "blocked_evidence",
+      "remaining": null,
+      "excess": null,
+      "actions": [
+        {
+          "kind": "reconcile_sources",
+          "responsible": [
+            {
+              "role": "purchasing_coordinator",
+              "name": "Dana Ivers <dana.ivers@juniperworks.example>"
+            },
+            {
+              "role": "data_steward",
+              "name": "Simone Bell <simone.bell@juniperworks.example>"
+            }
+          ],
+          "recipients": [
+            {
+              "role": "purchasing_coordinator",
+              "name": "Dana Ivers <dana.ivers@juniperworks.example>"
+            },
+            {
+              "role": "data_steward",
+              "name": "Simone Bell <simone.bell@juniperworks.example>"
+            }
+          ],
+          "missing_routing": [],
+          "next_action": "Reconcile the order/event source records events[14]; supply corrected identities, quantities, or export records before final comparison.",
+          "draft_seed": "Draft — not sent\nTo: Dana Ivers <dana.ivers@juniperworks.example>; Simone Bell <simone.bell@juniperworks.example>\nSubject: 2026-06 receiving review — PO-R2606-414 / TAPE-48\nFor 2026-06, PO-R2606-414 / TAPE-48: Reconcile the order/event source records events[14]; supply corrected identities, quantities, or export records before final comparison."
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "id": "I-1",
+      "code": "event_identity",
+      "source_refs": [
+        "events[14]"
+      ],
+      "message": "Missing usable order_id; attribution is unknown."
+    }
+  ],
+  "excluded_events": [
+    {
+      "source_ref": "events[3]",
+      "reason": "exact_duplicate"
+    },
+    {
+      "source_ref": "events[6]",
+      "reason": "outside_requested_month"
+    },
+    {
+      "source_ref": "events[10]",
+      "reason": "outside_requested_month"
+    },
+    {
+      "source_ref": "events[13]",
+      "reason": "outside_supplied_order_set"
+    }
+  ],
+  "excluded_coverage": []
+}

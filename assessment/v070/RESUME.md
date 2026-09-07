@@ -30,10 +30,10 @@ No qualifying B exists. Main A/B and its dependent stages remain blocked, not wa
 All 72 creator assignments and the 144-consumer schedule were frozen before execution. Creator families: 001–012 S01, 013–024 S03, 025–036 S05, 037–048 S06, 049–060 S09, 061–072 S10. Within each family, pairs are luna/low, luna/high, sol/low, sol/high, astra/low, astra/high. Consumers are fresh sol/high. Each creator has ordinary then challenging consumers.
 
 At this reconciliation:
-- Creators 001–054 complete/form-pass; 055–056 running; 057–072 unstarted.
-- Consumers 001–108 prepared. C-U001–063 and 065 complete; 064 and 066–068 running; later prepared consumers unstarted.
+- Creators 001–064 complete/form-pass; 065 running; 066–072 unstarted. Creator 061 preparation stopped on an added Python cache with unchanged original source. The narrow helper correction is under independent review. Consumer preparation for 061/063/064 waits for that review; no creator is replayed.
+- Consumers 001–120 and 123–124 prepared (122 total). C-U001–075 complete with S06 final native SQL for 073–075; 076–077 running. C-U121/122 and 125–128 are not prepared yet.
 - S01 all three primary grades and prespecified P01 second grade complete/read. control-S01-closeout.md: 24 correct adequate answers, no evidenced package compensation, six separately unconfirmed writing-method observations.
-- S03 is closed out with all six reports and the clarification read. P03 R63 challenging is control-017/C-U034: primary bounded deficiency, second clarified adequate, root adequate with optional clarity improvement; disagreement retained. P02's fresh additional second agrees on all eight applications without erasing the primary's filename-scope deviation. See control-S03-closeout.md and audits/control-S03-adjudication.md. No S05 packet is prepared yet; use the fixed allocation and explicit completed consumers to determine readiness.
+- S03 is closed out with all six reports and the clarification read. P03 R63 challenging is control-017/C-U034: primary bounded deficiency, second clarified adequate, root adequate with optional clarity improvement; disagreement retained. P02's fresh additional second agrees on all eight applications without erasing the primary's filename-scope deviation. All S05 packets are prepared/saved; three primary reports and P01 second are complete/read. Additional fresh P02/P03 second reviews are running for material/disputed findings. See audits/control-S05-second-review-triggers.md; no S05 closeout yet.
 - Consult control-list.tsv, control-consumer-list.tsv, control-grading-list.tsv and live agents for later notifications. Counts above are an observation, not a claim that later work has not completed.
 - Preserve creator-029's reported workspace-enumeration deviation in audits/control-creator-observation-limits.md. It neither authorized a rerun nor established complete absence of leakage.
 
@@ -42,7 +42,7 @@ The consumer case bank/oracles are frozen and independently reviewed. S01/S05/S1
 ## Approved experiment helpers
 
 Consumer/blind packaging and native-SQL integration reviews are complete and read. Use only approved helpers:
-- prepare_control_consumers.py: 4a3cfe4e641d91c90348b19f128b6e281b898414d0ff157538d550f5f51ca32c
+- prepare_control_consumers.py: prior approved version 4a3cfe4e641d91c90348b19f128b6e281b898414d0ff157538d550f5f51ca32c; current added-input-cache correction awaits audits/control-input-cache-review.md. Do not use the edited helper until that review is complete/read and findings resolved.
 - prepare_control_grading.py: d0af475ae5f6809273232c5b49800772845e2bfbff1b71d33880892f485c0c1f
 - preserve_sqlite_evidence.py: 3c024f1cf763da4701fa198892b6dd6c0fb9a59fc445c8ef5e6d7768f8707f6c
 - checkpoint.py: f98c1d24cc219e87de9467bb94289853ae32885ee40fce36f2aa743dc8ac6e30
@@ -57,7 +57,7 @@ Creator verification SQLite remains at original paths. preserve_sqlite_evidence.
 
 S06 consumer SQLite is outside the evidence folder in unique directories recorded in consumer-setup/C-Uxxx.json. Initial SQL is saved under state-snapshots/C-Uxxx. Do not initialize again, grant another tranche, inspect source data in the consumer context, or reset quota. After consumer completion, run control_ledger_state.py C-Uxxx --label final before grading/checkpointing. Existing S08 states use booking_state.py analogously. Recover lost SQLite only to a new path from trusted saved native SQL, recording the restoration and preserving attempts; recovery is not a completed business execution.
 
-Latest confirmed remote checkpoint at this update: 90f0af20d8568fcf91e31e82e17ade9ca2ff1208, tree 09c9c3a66c76db5c7e000df384ed84a8621a0d24, 4,193 published files, snapshot ../assessment-checkpoint-wk936d. It saved 54 creator artifacts, 108 prepared consumers, 64 completed applications and S03 closeout evidence. Use a later receipt in checkpoints.md when present; later notifications are not inferred saved. checkpoint-direct-api.js reads the exact current ref, builds a delta on its verified tree, creates an author-matching DCO commit and verifies the update. Execute it with the expected newest checkpoint; if the ref differs, reconcile before mutation. Never merge assessment/v070-evidence into the product.
+Latest confirmed remote checkpoint at this update: 259e969f1897445a846cb1a7c529d5658ef38a6e, tree 8519c6e5fd6f3e4abec7f4ef36ceb4272cbb5e3c, 4,641 published files, snapshot ../assessment-checkpoint-6ubtX4. It saves 57 creators, 114 prepared consumers, first 73 completed applications with final SQL, and all S05 packets. Later work listed above awaits the next save. Use a later receipt in checkpoints.md when present; later notifications are not inferred saved. checkpoint-direct-api.js verifies the exact ref, tree, parent, DCO and update. Execute with the newest verified receipt; reconcile an unexpected ref before mutation. Never merge assessment/v070-evidence into the product.
 
 ## Remaining limits
 
