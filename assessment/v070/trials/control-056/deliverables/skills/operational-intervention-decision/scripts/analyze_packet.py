@@ -251,8 +251,8 @@ def main() -> int:
         for label, effect in (("contemporaneous", contemp), ("difference_in_differences", did)):
             avoided = total_volume * effect
             planning["quality_effect_scenarios"][label] = {
-                "avoided_outcomes_point_estimate": rounded(avoided),
-                "avoided_cost_point_estimate": rounded(avoided * args.error_cost),
+                "avoided_outcomes_point_estimate": rounded(avoided, 2),
+                "avoided_cost_point_estimate": rounded(avoided * args.error_cost, 2),
             }
         planning["error_cost_per_outcome"] = args.error_cost
         planning["quality_effect_scenarios_by_band"] = {}
@@ -263,8 +263,8 @@ def main() -> int:
                 estimate = effects_by_band[band][label]["estimate"]
                 avoided = band_volume * estimate
                 planning["quality_effect_scenarios_by_band"][band][label] = {
-                    "avoided_outcomes_point_estimate": rounded(avoided),
-                    "avoided_cost_point_estimate": rounded(avoided * args.error_cost),
+                    "avoided_outcomes_point_estimate": rounded(avoided, 2),
+                    "avoided_cost_point_estimate": rounded(avoided * args.error_cost, 2),
                 }
     if args.hour_cost is not None:
         planning["labor_cost_scenarios"] = {}
@@ -274,8 +274,8 @@ def main() -> int:
         ):
             hours = per_shift * args.planned_shifts
             planning["labor_cost_scenarios"][label] = {
-                "incremental_hours": rounded(hours),
-                "incremental_cost": rounded(hours * args.hour_cost),
+                "incremental_hours": rounded(hours, 2),
+                "incremental_cost": rounded(hours * args.hour_cost, 2),
             }
         planning["hour_cost"] = args.hour_cost
         comparison_projected = labor_rates[(args.intervention_period, args.comparison_line)] * args.orders_per_shift

@@ -1,0 +1,469 @@
+{
+  "month": "2026-07",
+  "issues": [
+    "events[4]: invalid event or order/SKU identity; reconcile source record",
+    "conflicting event_id RCV-K7107; source rows [6, 8]",
+    "events[19] excluded: other month or outside order scope",
+    "events[20] excluded: other month or outside order scope",
+    "events[26] excluded: other month or outside order scope",
+    "events[29] excluded: other month or outside order scope"
+  ],
+  "lines": [
+    {
+      "source_order_row": 0,
+      "order_id": "PO-S2607-820",
+      "sku": "BOLT-M8",
+      "ordered": 100,
+      "coverage": "complete",
+      "coverage_records": [
+        {
+          "order_id": "PO-S2607-820",
+          "sku": "BOLT-M8",
+          "month": "2026-07",
+          "complete": true
+        }
+      ],
+      "blockers": [
+        "events[4]: invalid event or order/SKU identity; reconcile source record"
+      ],
+      "event_ids": [
+        "RCV-K7101",
+        "RCV-K7102",
+        "RCV-K7103"
+      ],
+      "observed_subtotal": null,
+      "net_received": null,
+      "difference": null,
+      "status": "undetermined",
+      "actions": [
+        {
+          "responsible_role": "purchasing_coordinator",
+          "recipient": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "next_action": "Reconcile the identified order/event source records before a final comparison: events[4]: invalid event or order/SKU identity; reconcile source record",
+          "routing": "ready",
+          "draft": "To: Rowan Ames <rowan.ames@northquayassembly.example>\nSubject: 2026-07 receiving review PO-S2607-820 / BOLT-M8\nReconcile the identified order/event source records before a final comparison: events[4]: invalid event or order/SKU identity; reconcile source record\nDraft only; not sent."
+        },
+        {
+          "responsible_role": "data_steward",
+          "recipient": "Beck Lin <beck.lin@northquayassembly.example>",
+          "next_action": "Reconcile the identified order/event source records before a final comparison: events[4]: invalid event or order/SKU identity; reconcile source record",
+          "routing": "ready",
+          "draft": "To: Beck Lin <beck.lin@northquayassembly.example>\nSubject: 2026-07 receiving review PO-S2607-820 / BOLT-M8\nReconcile the identified order/event source records before a final comparison: events[4]: invalid event or order/SKU identity; reconcile source record\nDraft only; not sent."
+        }
+      ]
+    },
+    {
+      "source_order_row": 1,
+      "order_id": "PO-S2607-820",
+      "sku": "WASHER-M8",
+      "ordered": 200,
+      "coverage": "complete",
+      "coverage_records": [
+        {
+          "order_id": "PO-S2607-820",
+          "sku": "WASHER-M8",
+          "month": "2026-07",
+          "complete": true
+        }
+      ],
+      "blockers": [
+        "events[4]: invalid event or order/SKU identity; reconcile source record"
+      ],
+      "event_ids": [
+        "RCV-K7104"
+      ],
+      "observed_subtotal": null,
+      "net_received": null,
+      "difference": null,
+      "status": "undetermined",
+      "actions": [
+        {
+          "responsible_role": "purchasing_coordinator",
+          "recipient": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "next_action": "Reconcile the identified order/event source records before a final comparison: events[4]: invalid event or order/SKU identity; reconcile source record",
+          "routing": "ready",
+          "draft": "To: Rowan Ames <rowan.ames@northquayassembly.example>\nSubject: 2026-07 receiving review PO-S2607-820 / WASHER-M8\nReconcile the identified order/event source records before a final comparison: events[4]: invalid event or order/SKU identity; reconcile source record\nDraft only; not sent."
+        },
+        {
+          "responsible_role": "data_steward",
+          "recipient": "Beck Lin <beck.lin@northquayassembly.example>",
+          "next_action": "Reconcile the identified order/event source records before a final comparison: events[4]: invalid event or order/SKU identity; reconcile source record",
+          "routing": "ready",
+          "draft": "To: Beck Lin <beck.lin@northquayassembly.example>\nSubject: 2026-07 receiving review PO-S2607-820 / WASHER-M8\nReconcile the identified order/event source records before a final comparison: events[4]: invalid event or order/SKU identity; reconcile source record\nDraft only; not sent."
+        }
+      ]
+    },
+    {
+      "source_order_row": 2,
+      "order_id": "PO-S2607-821",
+      "sku": "PACK-RACK",
+      "ordered": 48,
+      "coverage": "complete",
+      "coverage_records": [
+        {
+          "order_id": "PO-S2607-821",
+          "sku": "PACK-RACK",
+          "month": "2026-07",
+          "complete": true
+        }
+      ],
+      "blockers": [
+        "conflicting event_id RCV-K7107; source rows [6, 8]"
+      ],
+      "event_ids": [
+        "RCV-K7106"
+      ],
+      "observed_subtotal": null,
+      "net_received": null,
+      "difference": null,
+      "status": "undetermined",
+      "actions": [
+        {
+          "responsible_role": "purchasing_coordinator",
+          "recipient": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "next_action": "Reconcile the identified order/event source records before a final comparison: conflicting event_id RCV-K7107; source rows [6, 8]",
+          "routing": "ready",
+          "draft": "To: Rowan Ames <rowan.ames@northquayassembly.example>\nSubject: 2026-07 receiving review PO-S2607-821 / PACK-RACK\nReconcile the identified order/event source records before a final comparison: conflicting event_id RCV-K7107; source rows [6, 8]\nDraft only; not sent."
+        },
+        {
+          "responsible_role": "data_steward",
+          "recipient": "Beck Lin <beck.lin@northquayassembly.example>",
+          "next_action": "Reconcile the identified order/event source records before a final comparison: conflicting event_id RCV-K7107; source rows [6, 8]",
+          "routing": "ready",
+          "draft": "To: Beck Lin <beck.lin@northquayassembly.example>\nSubject: 2026-07 receiving review PO-S2607-821 / PACK-RACK\nReconcile the identified order/event source records before a final comparison: conflicting event_id RCV-K7107; source rows [6, 8]\nDraft only; not sent."
+        }
+      ]
+    },
+    {
+      "source_order_row": 3,
+      "order_id": "PO-S2607-821",
+      "sku": "STRAP-20",
+      "ordered": 60,
+      "coverage": "complete",
+      "coverage_records": [
+        {
+          "order_id": "PO-S2607-821",
+          "sku": "STRAP-20",
+          "month": "2026-07",
+          "complete": true
+        }
+      ],
+      "blockers": [],
+      "event_ids": [
+        "RCV-K7109"
+      ],
+      "observed_subtotal": 60,
+      "net_received": 60,
+      "difference": 0,
+      "status": "received as ordered",
+      "actions": []
+    },
+    {
+      "source_order_row": 4,
+      "order_id": "PO-S2607-822",
+      "sku": "SHIELD-CLR",
+      "ordered": 40,
+      "coverage": "complete",
+      "coverage_records": [
+        {
+          "order_id": "PO-S2607-822",
+          "sku": "SHIELD-CLR",
+          "month": "2026-07",
+          "complete": true
+        }
+      ],
+      "blockers": [
+        "conflicting event_id RCV-K7107; source rows [6, 8]"
+      ],
+      "event_ids": [
+        "RCV-K7108"
+      ],
+      "observed_subtotal": null,
+      "net_received": null,
+      "difference": null,
+      "status": "undetermined",
+      "actions": [
+        {
+          "responsible_role": "purchasing_coordinator",
+          "recipient": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "next_action": "Reconcile the identified order/event source records before a final comparison: conflicting event_id RCV-K7107; source rows [6, 8]",
+          "routing": "ready",
+          "draft": "To: Rowan Ames <rowan.ames@northquayassembly.example>\nSubject: 2026-07 receiving review PO-S2607-822 / SHIELD-CLR\nReconcile the identified order/event source records before a final comparison: conflicting event_id RCV-K7107; source rows [6, 8]\nDraft only; not sent."
+        },
+        {
+          "responsible_role": "data_steward",
+          "recipient": "Beck Lin <beck.lin@northquayassembly.example>",
+          "next_action": "Reconcile the identified order/event source records before a final comparison: conflicting event_id RCV-K7107; source rows [6, 8]",
+          "routing": "ready",
+          "draft": "To: Beck Lin <beck.lin@northquayassembly.example>\nSubject: 2026-07 receiving review PO-S2607-822 / SHIELD-CLR\nReconcile the identified order/event source records before a final comparison: conflicting event_id RCV-K7107; source rows [6, 8]\nDraft only; not sent."
+        }
+      ]
+    },
+    {
+      "source_order_row": 5,
+      "order_id": "PO-S2607-823",
+      "sku": "POUCH-12",
+      "ordered": 30,
+      "coverage": "incomplete or conflicting",
+      "coverage_records": [
+        {
+          "order_id": "PO-S2607-823",
+          "sku": "POUCH-12",
+          "month": "2026-07",
+          "complete": false
+        }
+      ],
+      "blockers": [],
+      "event_ids": [
+        "RCV-K7110",
+        "RCV-K7111"
+      ],
+      "observed_subtotal": 34,
+      "net_received": null,
+      "difference": null,
+      "status": "undetermined",
+      "actions": [
+        {
+          "responsible_role": "data_steward",
+          "recipient": "Beck Lin <beck.lin@northquayassembly.example>",
+          "next_action": "Provide or confirm the full 2026-07 export and a consistent completeness declaration for PO-S2607-823 / POUCH-12 before final comparison.",
+          "routing": "ready",
+          "draft": "To: Beck Lin <beck.lin@northquayassembly.example>\nSubject: 2026-07 receiving review PO-S2607-823 / POUCH-12\nProvide or confirm the full 2026-07 export and a consistent completeness declaration for PO-S2607-823 / POUCH-12 before final comparison.\nDraft only; not sent."
+        }
+      ]
+    },
+    {
+      "source_order_row": 6,
+      "order_id": "PO-S2607-824",
+      "sku": "TRAY-L",
+      "ordered": 18,
+      "coverage": "missing",
+      "coverage_records": [],
+      "blockers": [],
+      "event_ids": [
+        "RCV-K7112",
+        "RCV-K7113"
+      ],
+      "observed_subtotal": 9,
+      "net_received": null,
+      "difference": null,
+      "status": "undetermined",
+      "actions": [
+        {
+          "responsible_role": "data_steward",
+          "recipient": "Beck Lin <beck.lin@northquayassembly.example>",
+          "next_action": "Provide or confirm the full 2026-07 export and a consistent completeness declaration for PO-S2607-824 / TRAY-L before final comparison.",
+          "routing": "ready",
+          "draft": "To: Beck Lin <beck.lin@northquayassembly.example>\nSubject: 2026-07 receiving review PO-S2607-824 / TRAY-L\nProvide or confirm the full 2026-07 export and a consistent completeness declaration for PO-S2607-824 / TRAY-L before final comparison.\nDraft only; not sent."
+        }
+      ]
+    },
+    {
+      "source_order_row": 7,
+      "order_id": "PO-S2607-825",
+      "sku": "BINDER-B",
+      "ordered": 25,
+      "coverage": "incomplete or conflicting",
+      "coverage_records": [
+        {
+          "order_id": "PO-S2607-825",
+          "sku": "BINDER-B",
+          "month": "2026-07",
+          "complete": false
+        }
+      ],
+      "blockers": [],
+      "event_ids": [],
+      "observed_subtotal": 0,
+      "net_received": null,
+      "difference": null,
+      "status": "undetermined",
+      "actions": [
+        {
+          "responsible_role": "data_steward",
+          "recipient": "Beck Lin <beck.lin@northquayassembly.example>",
+          "next_action": "Provide or confirm the full 2026-07 export and a consistent completeness declaration for PO-S2607-825 / BINDER-B before final comparison.",
+          "routing": "ready",
+          "draft": "To: Beck Lin <beck.lin@northquayassembly.example>\nSubject: 2026-07 receiving review PO-S2607-825 / BINDER-B\nProvide or confirm the full 2026-07 export and a consistent completeness declaration for PO-S2607-825 / BINDER-B before final comparison.\nDraft only; not sent."
+        }
+      ]
+    },
+    {
+      "source_order_row": 8,
+      "order_id": "PO-S2607-826",
+      "sku": "INSERT-G",
+      "ordered": 70,
+      "coverage": "complete",
+      "coverage_records": [
+        {
+          "order_id": "PO-S2607-826",
+          "sku": "INSERT-G",
+          "month": "2026-07",
+          "complete": true
+        }
+      ],
+      "blockers": [],
+      "event_ids": [
+        "RCV-K7114",
+        "RCV-K7115",
+        "RCV-K7116"
+      ],
+      "observed_subtotal": 75,
+      "net_received": 75,
+      "difference": 5,
+      "status": "excess",
+      "actions": [
+        {
+          "responsible_role": "warehouse_lead",
+          "recipient": "Inez Cole <inez.cole@northquayassembly.example>",
+          "next_action": "Reconcile the surplus of 5 units against the order and receiving evidence; ordered 70, net received 75.",
+          "routing": "ready",
+          "draft": "To: Inez Cole <inez.cole@northquayassembly.example>\nSubject: 2026-07 receiving review PO-S2607-826 / INSERT-G\nReconcile the surplus of 5 units against the order and receiving evidence; ordered 70, net received 75.\nDraft only; not sent."
+        }
+      ]
+    },
+    {
+      "source_order_row": 9,
+      "order_id": "PO-S2607-827",
+      "sku": "WRAP-500",
+      "ordered": 40,
+      "coverage": "complete",
+      "coverage_records": [
+        {
+          "order_id": "PO-S2607-827",
+          "sku": "WRAP-500",
+          "month": "2026-07",
+          "complete": true
+        }
+      ],
+      "blockers": [],
+      "event_ids": [
+        "RCV-K7117",
+        "RCV-K7118",
+        "RCV-K7119"
+      ],
+      "observed_subtotal": 18,
+      "net_received": 18,
+      "difference": -22,
+      "status": "short",
+      "actions": [
+        {
+          "responsible_role": "purchasing_coordinator",
+          "recipient": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "next_action": "Follow up with the supplied supplier contact about the remaining 22 units; ordered 40, net received 18.",
+          "routing": "ready",
+          "draft": "To: Rowan Ames <rowan.ames@northquayassembly.example>\nSubject: 2026-07 receiving review PO-S2607-827 / WRAP-500\nFollow up with the supplied supplier contact about the remaining 22 units; ordered 40, net received 18.\nDraft only; not sent."
+        },
+        {
+          "responsible_role": "supplier_contact",
+          "recipient": "Felix Arun <felix.arun@wrapline.example>",
+          "next_action": "Please confirm the remaining receipt of 22 units for PO-S2607-827 / WRAP-500 and the expected receipt date. Ordered 40; net received in 2026-07: 18.",
+          "routing": "ready",
+          "draft": "To: Felix Arun <felix.arun@wrapline.example>\nSubject: 2026-07 receiving review PO-S2607-827 / WRAP-500\nPlease confirm the remaining receipt of 22 units for PO-S2607-827 / WRAP-500 and the expected receipt date. Ordered 40; net received in 2026-07: 18.\nDraft only; not sent."
+        }
+      ]
+    },
+    {
+      "source_order_row": 10,
+      "order_id": "PO-S2607-828",
+      "sku": "CLIP-R",
+      "ordered": 10,
+      "coverage": "complete",
+      "coverage_records": [
+        {
+          "order_id": "PO-S2607-828",
+          "sku": "CLIP-R",
+          "month": "2026-07",
+          "complete": true
+        }
+      ],
+      "blockers": [],
+      "event_ids": [
+        "RCV-K7120",
+        "RCV-K7121"
+      ],
+      "observed_subtotal": 10,
+      "net_received": 10,
+      "difference": 0,
+      "status": "received as ordered",
+      "actions": []
+    },
+    {
+      "source_order_row": 11,
+      "order_id": "PO-S2607-829",
+      "sku": "PAD-FOAM",
+      "ordered": 12,
+      "coverage": "complete",
+      "coverage_records": [
+        {
+          "order_id": "PO-S2607-829",
+          "sku": "PAD-FOAM",
+          "month": "2026-07",
+          "complete": true
+        }
+      ],
+      "blockers": [],
+      "event_ids": [
+        "RCV-K7122",
+        "RCV-K7123"
+      ],
+      "observed_subtotal": -4,
+      "net_received": -4,
+      "difference": -16,
+      "status": "short",
+      "actions": [
+        {
+          "responsible_role": "purchasing_coordinator",
+          "recipient": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "next_action": "Follow up with the supplied supplier contact about the remaining 16 units; ordered 12, net received -4.",
+          "routing": "ready",
+          "draft": "To: Rowan Ames <rowan.ames@northquayassembly.example>\nSubject: 2026-07 receiving review PO-S2607-829 / PAD-FOAM\nFollow up with the supplied supplier contact about the remaining 16 units; ordered 12, net received -4.\nDraft only; not sent."
+        },
+        {
+          "responsible_role": "supplier_contact",
+          "recipient": "Rafael Brooks <rafael.brooks@cushionstock.example>",
+          "next_action": "Please confirm the remaining receipt of 16 units for PO-S2607-829 / PAD-FOAM and the expected receipt date. Ordered 12; net received in 2026-07: -4.",
+          "routing": "ready",
+          "draft": "To: Rafael Brooks <rafael.brooks@cushionstock.example>\nSubject: 2026-07 receiving review PO-S2607-829 / PAD-FOAM\nPlease confirm the remaining receipt of 16 units for PO-S2607-829 / PAD-FOAM and the expected receipt date. Ordered 12; net received in 2026-07: -4.\nDraft only; not sent."
+        }
+      ]
+    },
+    {
+      "source_order_row": 12,
+      "order_id": "PO-S2607-830",
+      "sku": "CRATE-S",
+      "ordered": 16,
+      "coverage": "complete",
+      "coverage_records": [
+        {
+          "order_id": "PO-S2607-830",
+          "sku": "CRATE-S",
+          "month": "2026-07",
+          "complete": true
+        }
+      ],
+      "blockers": [],
+      "event_ids": [],
+      "observed_subtotal": 0,
+      "net_received": 0,
+      "difference": -16,
+      "status": "short",
+      "actions": [
+        {
+          "responsible_role": "purchasing_coordinator",
+          "recipient": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "next_action": "Follow up with the supplied supplier contact about the remaining 16 units; ordered 16, net received 0.",
+          "routing": "ready",
+          "draft": "To: Rowan Ames <rowan.ames@northquayassembly.example>\nSubject: 2026-07 receiving review PO-S2607-830 / CRATE-S\nFollow up with the supplied supplier contact about the remaining 16 units; ordered 16, net received 0.\nDraft only; not sent."
+        },
+        {
+          "responsible_role": "supplier_contact",
+          "recipient": "Elena Duarte <elena.duarte@crateforge.example>",
+          "next_action": "Please confirm the remaining receipt of 16 units for PO-S2607-830 / CRATE-S and the expected receipt date. Ordered 16; net received in 2026-07: 0.",
+          "routing": "ready",
+          "draft": "To: Elena Duarte <elena.duarte@crateforge.example>\nSubject: 2026-07 receiving review PO-S2607-830 / CRATE-S\nPlease confirm the remaining receipt of 16 units for PO-S2607-830 / CRATE-S and the expected receipt date. Ordered 16; net received in 2026-07: 0.\nDraft only; not sent."
+        }
+      ]
+    }
+  ]
+}
