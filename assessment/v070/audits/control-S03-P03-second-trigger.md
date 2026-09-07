@@ -1,0 +1,5 @@
+# Additional independent S03-P03 review
+
+The primary report, read in full by root, judges all four packages adequate and seven of eight application answers adequate. It classifies R63 challenging as a bounded dependency-communication deficiency while acknowledging qualifying language elsewhere in the same answer. It asks for independent review of whether that whole-answer qualification suffices, and of application-versus-package attribution. No actual unauthorized dispatch is alleged.
+
+Because this judgment changes task adequacy and admits consequential interpretive uncertainty, an additional fresh second reviewer receives the complete unchanged S03-P03 packet and common instructions, without the primary report, its proposed result, experimental mapping or this trigger note. This is permitted additional grading, not a new business trial or a change to the preselected random second-review subset. Preserve both reports and adjudicate against the whole answer and original business evidence.

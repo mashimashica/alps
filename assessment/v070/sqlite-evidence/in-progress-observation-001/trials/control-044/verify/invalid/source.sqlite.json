@@ -1,0 +1,8 @@
+{
+  "source_path": "trials/control-044/verify/invalid/source.sqlite",
+  "source_sha256": "48384daa5b4ef3a0576e5950c025fe623be38d2cf90c65ec6e6d9104ea0637b6",
+  "sql_path": "sqlite-evidence/in-progress-observation-001/trials/control-044/verify/invalid/source.sqlite.sql",
+  "sql_sha256": "6f349b0986fd242c4479a8b1497f8eda60ed553091b8f2aa2f2d8e433cad0f56",
+  "sqlite_version": "3.53.1",
+  "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history"
+}

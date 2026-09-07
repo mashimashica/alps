@@ -1,0 +1,8 @@
+{
+  "source_path": "trials/control-045/verification-67gg939x/lost.sqlite",
+  "source_sha256": "50105f0c613a4ffdda7a08c5a5ea0d8c5483a5b4d7fdea013e6bf9374af7659a",
+  "sql_path": "sqlite-evidence/in-progress-observation-001/trials/control-045/verification-67gg939x/lost.sqlite.sql",
+  "sql_sha256": "b0c1fd57a30ccfa2b62ec1c4f713d9b06631d7aae067714236457d2273134376",
+  "sqlite_version": "3.53.1",
+  "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history"
+}

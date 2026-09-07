@@ -1,0 +1,60 @@
+{
+  "consumer_id": "C-U085",
+  "creator_id": "control-043",
+  "case": "S06",
+  "variant": "ordinary",
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "high",
+  "context": "fresh",
+  "copied_sha256": {
+    "skill/complete-reimbursement-rollup/SKILL.md": "8394b1de09f04d74ac7b6edfbcf987207d446e64834377ac26b3402876e06ecd",
+    "skill/complete-reimbursement-rollup/scripts/reimbursement_rollup.py": "1f14d5ee7b1a33bc49480ce4d4e44cc08d204e4de4ae6e6fedf6bd82ee9e52d0",
+    "input/ledger_api.py": "4622ec041dcfe8057aed319bc0ad168f24aebf4520a68c2961cdf046483315f3",
+    "input/request.md": "585c36b1e5a0767892345cb3768578181b2d4a5c0bcb973523ff52e149375edf"
+  },
+  "prompt_sha256": "0e795a5fdf7128e07cfea5ba8d72825baadf465e99cdadfa29c4aa28bc4e2d7c",
+  "copied_file_modes": {
+    "skill/complete-reimbursement-rollup/SKILL.md": 420,
+    "skill/complete-reimbursement-rollup/scripts/reimbursement_rollup.py": 493,
+    "input/ledger_api.py": 420,
+    "input/request.md": 420
+  },
+  "initial_state_evidence_sha256": {
+    "consumer-setup/C-U085.json": "80a6889afa0f786c8cc55d01263f85bd4b96a391cb6637c52fdaa914ac20d564",
+    "state-snapshots/C-U085/initial.sql": "1206581aaa26d95a4831a91f82dd1b59f06cfc56195294559db2af8192f63204",
+    "state-snapshots/C-U085/initial.json": "947851d848c31de16e1c150d600d4f3b377b65f4a2bdbb8b60728c8896481d82"
+  },
+  "artifact_freeze_manifest": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-artifact-freezes/control-043.json",
+  "artifact_freeze_sha256": "ad24d9f98e690a4fba87a845b6091d75229ad964c4ddb4d3234b26deb5812f49",
+  "case_bank_manifest_sha256": "f26be07f6cfba54aedc3068a67ae32292877f6ee005f0c190156f5786d1cbdc2",
+  "request_source": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S06/ordinary/input/request.md",
+  "request_source_sha256": "724929c06b67118a4f9468d1351c627b7396a03f1ed983c7cf23e2ab90988b09",
+  "request_substitutions": [
+    {
+      "token": "{{INPUT_DIR}}",
+      "value": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U085/input",
+      "occurrences": 1
+    },
+    {
+      "token": "{{STATE_PATH}}",
+      "value": "/workspace/scratch/a75c3a6d9076/C-U085-ledger-state-ub66sp7k/ledger.sqlite",
+      "occurrences": 1
+    }
+  ],
+  "common_authoring_aid_sha256": {
+    "SKILL.md": "6656e54755638e8efcf275a472b9672eaa8a9a1b9e59dc210e275b03b59e1e66",
+    "agents/openai.yaml": "d07d21b93fcf3d4dc8d9a3399c05fc226a49a333a96d3e1c68b451b8dd9eade6",
+    "assets/skill-creator-small.svg": "6591bf8ea9bb9435890dbdea299e0d2bd05f3aa893a335d26e4c535e93c8e7fb",
+    "assets/skill-creator.png": "a4024b0306ddb05847e1012879d37aaf1e658205199da596f5145ed7a88d9162",
+    "license.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "references/openai_yaml.md": "ffac39318e408108141d40f820968e59f70434a891694f9bf1d25be8237b150c",
+    "scripts/generate_openai_yaml.py": "ddaf9abdfb3e762ed3c82571e9c607ce964188f49f2146281beb2cb8a553a93d",
+    "scripts/init_skill.py": "bc04fae1e671aa1e5104212674e7f22c9665a791fafa2fc2b3897187a89801b2",
+    "scripts/quick_validate.py": "1fd66498c219616fd9249eacdf16c458412ea9065a9d887fd716aeef03907762"
+  },
+  "common_aid_unrecorded_original_display_assets": [
+    "assets/skill-creator-small.svg",
+    "assets/skill-creator.png"
+  ],
+  "schedule_sha256": "739210b57f1b000dcb3cf6f4e2ee912ca6e911d8e829eacde225bb03ffe91569"
+}

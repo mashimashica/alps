@@ -1,38 +1,37 @@
 # Progress
 
-Updated: 2026-09-07 UTC.
+Updated: 2026-09-07 UTC. Execution counts are coordinator observations; consult the mutable ledgers and live agents for later completions.
 
-## Completed
+## Status
 
-- Frozen main: dee3866d35e43db5db480fc9f85166a8dcb1ec3b (v0.7.0). The improvement worktree is restored to A with clean status; all three rejected candidate versions remain immutable evidence.
-- Repository instructions, both design Skills and foundations, review-alps, sync-locales, contribution and versioning guidance read. Baseline nine unit tests passed.
-- Protocol, raw tasks, frozen authoring assistance, original generated Skills and evaluation evidence saved on the separate assessment/v070-evidence branch through direct APIs; see checkpoints.md for exact receipts.
-- All 12 calibration creators and 24 fresh consumers completed. Pinned Agent Skills validation: 12/12 pass. Final consumer-resource check: 24 assignments, zero unexpected file changes. Allowed S10 state changes are judged separately.
-- Independent baseline semantic and case audits, blind S01/S05/S10 grades and independent second S05/S10 grades completed. All nine additional public main-case packets are authored; root read/review and provider checks are complete for the necessary current resources.
-
-## In progress
-
-- Prospective numerical acceptance criteria and operational adjudications are fixed in gates.md after independent review.
-- B1's informative note pair passed semantic/locale review but is rejected for progression: both paired S10 repetitions show the same qualification-refresh pattern in A and B1. Primary and second blind S10 reviews agree; no mechanism benefit is established. See development-1-decision.md. Neither foundation changed and no product PR is opened.
-- Development round 1 is closed out: eight creators and sixteen consumers completed, all six primary/second blind reports and source-fidelity audit read. B1 is rejected. Ten applications are adequate, one has a bounded deficiency and five materially fail; no aggregate business Outcome claim is substituted. See development-1-closeout.md. All eight packages pass pinned form checks. Seven packages omit a separate Outcome core despite meaningful operational criteria; the remaining explicit-core package has substantive condition/evidence defects. S08 actual and independent probe states are preserved as native SQL; these do not reproduce race schedules.
-- H02 is closed out after source-fidelity, both primary/second blind grades and independent progression review. All eight creators and sixteen valid applications are complete; nine applications are adequate and seven inadequate. A has six adequate applications and B2 three; these are descriptive development results. Both B2 release cores show contrary semantic uptake, so B2 is rejected for progression. Two interrupted originals and their independently adjudicated first valid retries remain retained. Component evidence includes the disclosed conflict-probe transcriptions and post hoc source copies. See development-2-closeout.md.
-- H03 is closed out after all four recovered business grades and independent progression review were read. Two applications are adequate and ten materially fail; A and B3 each have one adequate out of six. Only receiving core uptake is supported, with condition defects retained; both B3 release cores fail sufficiency. B3 is rejected and the product worktree is clean at A. The ordinary round cap is exhausted; no qualifying B or acceptance claim exists.
-- The originally allocated C control remains independently authorized. Creators 001–037 are complete; 038–072 unstarted. All 37 packages pass pinned form checks. C-U001–074 are prepared; C-U001–014 are complete at this update. The first ten completed consumers have no changes to recorded original resource bytes/modes; that check does not establish their task adequacy. All six consumer banks/oracles and both schedules are frozen. Consumer and blind helper reviews, including F1–F4 follow-up and narrow native-SQL preservation integration, are complete/read. S01-P02's first four-package business-review packet is prepared; grading has not started. Main A/B and complete-package dependencies remain blocked, not waived.
-- Experiment-only paired calculation helper and 13 meaningful numeric/denominator tests pass. Independent initial and follow-up reviews are complete/read. The exact-20-percent roundoff boundary, case-type grouping, frozen-schedule verification and subgroup planned/unconfirmed counts are addressed. Immutable schedule and whole-application case types must be saved before their respective execution/evaluation, with verified digests used for final analysis. No actual main observations exist and no numerical gate has been evaluated on task results.
-- All twelve reviewed public main-case families are frozen under frozen/main-cases (36 files, main-case-hashes.json). prepare_main.py is written and compiles, but has not been used: the B identity must be selected after bounded development, and no main assignment or consumer oracle exists yet.
-
-## Trial counts
+Frozen current main A is dee3866d35e43db5db480fc9f85166a8dcb1ec3b, VERSION 0.7.0. The product worktree remains clean at A. Calibration and all three ordinary development rounds are complete, independently reviewed and closed out. B1, B2 and B3 are rejected for progression. No qualified B exists; main A/B and dependent final/example stages remain blocked, not waived. The original C control is independently proceeding.
 
 | Stage | Completed design | Completed consumer | Other completed | Planned task trials |
 | --- | ---: | ---: | ---: | ---: |
 | Calibration | 12 | 24 | 0 | 36 |
-| C control | 40 | 31 | 0 | 216 |
+| C control | 42 | 43 | 0 | 216 |
 | Remaining base plan | 0 | 0 | 0 | up to 1,776 |
 
-Additional diagnostic reserve (separate from base): at most 72 executions across at most three rounds. H01–H03 have 66 completed and two retained incomplete executions, for 68 started; four reserve slots remain unallocated. Across calibration and development, 34 creators and 68 valid consumers are complete. Completion, observation validity, business adequacy and Outcome achievement are distinct.
+Additional diagnostic reserve: at most 72 starts across at most three rounds. H01–H03 used 68 starts: 66 complete and two retained interrupted originals. Four slots remain, but do not authorize a fourth ordinary round. Across calibration/development, 34 creators and 68 valid consumers are complete. Completed tasks, observation validity, business adequacy and achieved Outcomes are different counts.
 
-All numerical selection tasks were correct. Receiving reviews computed the supplied quantities correctly, but four applications omitted a required follow-up owner; independent component probes found two different latent implementation defects. Four ordinary simulated releases succeeded; two challenging rehearsals completed and established checkout failure, while two needlessly requalified and blocked the requested rehearsal. Reporting failure honestly is not release success. See calibration-synthesis.md and grades for distinctions and limits.
+## Findings already adjudicated
 
-No ALPS causal benefit, convergence, or release readiness is asserted. No new product PR, tag or Release has been created. Do not count format success, grader checks or prepared cases as completed fresh task trials.
+- Calibration: 12 package format checks passed. All numeric selections were correct. Receiving quantities were correct but four applications omitted follow-up owners; independent component probes exposed unknown-SKU and conflict-scope defects. Four ordinary releases succeeded; two challenging rehearsals properly established checkout failure and two self-blocked by refreshing qualification. See calibration-synthesis.md.
+- H01: ten adequate, one bounded deficiency and five material failures. Both release pairs reproduce the same avoidable approval invalidation across A/B1; no mechanism benefit. See development-1-closeout.md.
+- H02: nine adequate and seven inadequate applications, A six of eight and B2 three of eight. Both B2 release cores substitute assessment or allowed stopping for sufficient achieved-work conditions. Two lost originals and separately adjudicated first-valid retries remain preserved. See development-2-closeout.md.
+- H03: two adequate and ten material failures, one adequate of six in each arm. Both release cores fail sufficient-result uptake; all eight release applications invalidate an already satisfied approval. B3 is rejected after independent progression review. Source attribution is not inferred solely from a generated defect. See development-3-closeout.md and audits/dev3-progression-review.md.
+- C S01: all 12 packages adequate in the examined scope, all 24 answers correct, no evidenced package compensation. Three primary reports and the prespecified second report are complete/read. Six writing-method observations remain unconfirmed separately from numeric success. No executable is needed for this business, but the packages therefore do not meet the exemplar's bundled-processing criterion. See control-S01-closeout.md.
 
-Latest execution reconciliation: C creators 001–040 are complete and pass pinned format checks; 041–042 are running. C-U001–080 are prepared; 001–031 are complete and 032–035 are running. The truncated C-U031 spawn reply was reconciled with its existing completed task, without rerunning it. S01's three primary grades and prespecified P01 second grade are complete and read; control-S01-closeout.md records 24 adequate, correct answers and six unconfirmed writing-method observations separately. C038–039's three completed verification databases are preserved as native SQL plus hashes, alongside the earlier C037 states. Main A/B dependencies remain blocked and the three-round cap unchanged. Consult the mutable ledgers/live agents for later notifications.
+## Work in progress
+
+C creators 001–042 are complete/form-pass; 043–044 running. C-U001–084 are prepared; 001–043 complete and 044–046 running. S03-P03's saved blind packet is under independent primary review. All C schedules, consumer cases/oracles and review allocation are fixed. S01/S05/S10 use original independent stimuli, not newly held-out cases. The recorded creator-029 workspace-enumeration deviation is retained without an ungrounded exclusion or retry.
+
+Consumer/blind packaging reviews and SQLite preservation integration are complete/read. Helpers verify frozen bytes/modes and maintain original final-state evidence without interpreting semantic success. Actual creator verification databases are preserved at their original paths and, for direct UTF-8 saving, as indexed native SQL with hashes. S06 consumer states are independently initialized outside the evidence tree; preserve their actual final committed state with control_ledger_state.py after completion, without resetting quota or granting another tranche.
+
+Latest verified checkpoint is cda73fd475601693c10071e50a7294a6f29ebb00 (3,573 published files). It saves 42 creators, 84 prepared consumers and S03-P03 before review. Later statuses and resume/progress updates await the next checkpoint. Exact tree/ref receipts and failed-export reconciliations are in checkpoints.md. The separate assessment/v070-evidence branch is not merged into product distribution.
+
+## Remaining decisions and verification limits
+
+scope-decision-required.md preserves the exact blocked stages and later decision. Continue all independently authorized C work and reviews; do not start an unqualified B comparison, reopen ordinary tuning, waive complete-package stages or finalize the example pool. No ALPS added-value estimate, convergence, final exemplar, or release readiness is established.
+
+Baseline nine repository tests passed. The twelve public main-case families (36 files) are frozen. Experiment-only compare_main.py has 13 meaningful numerical/denominator tests with independent initial/follow-up review; these are calculation checks, not main task observations. prepare_main.py remains unused. Native Host execution, complete-package holdout, locale and transfer checks are not claimed performed. No new product PR, merge, tag or Release has occurred.

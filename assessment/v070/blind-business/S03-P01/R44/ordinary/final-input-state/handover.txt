@@ -1,0 +1,19 @@
+Setting: Nacre Demo Room, a fictional studio. All times are on the same local working day. It is now 14:43. Rosa leaves the room at 14:45 but can take a call until 15:25. Finn, Rosa, and Jules were all present throughout this complete, accurately attributed exchange.
+
+Supplied operating fact: An incomplete kit may leave only with Rosa's explicit approval. Cove requires its charger; Heron requires a working spare USB-C hub. A kit also needs its dispatch label before it goes to reception.
+
+14:34 Rosa: Cove's checks passed. Its charger is beside the case; put it in before closing. Heron still needs its spare USB-C hub tested. Both go to south reception for the usual 16:30 courier. Jules might do the labels.
+
+14:35 Finn: I'll put the charger in Cove and pack it. I'll test Heron's hub and pack Heron if it passes. Which reception deadline are we using?
+
+14:36 Rosa: Correction, the courier has moved collection to 16:10. Both kits need to be at south reception by 15:50. Get the hub test done by 15:00 so there's time to deal with a failure. If it fails, hold Heron and call me; don't send it missing the hub.
+
+14:38 Jules: I can print both labels. I'll hand them to Finn by 15:05.
+
+14:40 Finn: My jobs are Cove's charger and packing, Heron's hub test by 15:00 and packing if it passes, then attaching Jules's labels and taking both complete kits to south reception by 15:50. Jules gives me both labels by 15:05. Collection is 16:10. If the hub fails, I hold Heron and call Rosa before 15:25 for a decision. Have I got that right?
+
+14:41 Rosa: Yes, all of that is right. I'm the person who would have to approve any exception for Heron. Cove can still go on time if it is complete.
+
+14:42 Jules: Yes, both labels are mine, to Finn by 15:05.
+
+Current physical state supplied with the exchange: Neither kit has been packed, Heron's hub has not yet been tested, and neither label has been printed. There have been no later corrections or replies.
