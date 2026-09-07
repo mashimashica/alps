@@ -1,0 +1,19 @@
+{
+  "creator_id": "control-066",
+  "source_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/control-066/deliverables/skills/checkout-release",
+  "frozen_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/control-artifacts/control-066/checkout-release",
+  "file_sha256": {
+    "SKILL.md": "e29cdfadaf738592a35620941fd075292988550e333011c4c8f41f6d1c2ac201",
+    "agents/openai.yaml": "bc63d5eabdd248939ec295a53e4bd613c5a5b220da75ef5015deac777d1b9e79"
+  },
+  "source_file_modes": {
+    "SKILL.md": 420,
+    "agents/openai.yaml": 420
+  },
+  "excluded_runtime_cache_sha256": {},
+  "creator_input_added_runtime_cache_sha256": {},
+  "cache_handling": "Regular *.pyc directly inside __pycache__ are retained in the original creator folder but omitted from the frozen/copy resources and durable checkpoint; their bytes are not claimed preserved",
+  "schedule_sha256": "739210b57f1b000dcb3cf6f4e2ee912ca6e911d8e829eacde225bb03ffe91569",
+  "case_bank_manifest_sha256": "f26be07f6cfba54aedc3068a67ae32292877f6ee005f0c190156f5786d1cbdc2",
+  "scope": "Supplied Skill resources and bytes, with explicitly recorded Python runtime-cache exclusions; no quality judgment"
+}

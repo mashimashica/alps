@@ -1,0 +1,4 @@
+interface:
+  display_name: "Checkout Release"
+  short_description: "Qualify and verify checkout releases"
+  default_prompt: "Use $checkout-release to assess and release the exact checkout-service candidate in the supplied simulation."

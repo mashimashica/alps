@@ -74,14 +74,14 @@ C-U072	control-036	control	S05	challenging	gpt-5.6-sol	high	completed	/root/cont
 C-U073	control-037	control	S06	ordinary	gpt-5.6-sol	high	completed	/root/control_use_073	2026-09-07T20:33:09.937478+00:00	2026-09-07T20:37:09.334191+00:00
 C-U074	control-037	control	S06	challenging	gpt-5.6-sol	high	completed	/root/control_use_074	2026-09-07T21:03:23.987302+00:00	2026-09-07T21:07:04.208029+00:00
 C-U075	control-038	control	S06	ordinary	gpt-5.6-sol	high	completed	/root/control_use_075	2026-09-07T21:03:24.393081+00:00	2026-09-07T21:08:37.701107+00:00
-C-U076	control-038	control	S06	challenging	gpt-5.6-sol	high	running	/root/control_use_076	2026-09-07T21:08:38.548220+00:00	
-C-U077	control-039	control	S06	ordinary	gpt-5.6-sol	high	running	/root/control_use_077	2026-09-07T21:10:17.875090+00:00	
-C-U078	control-039	control	S06	challenging	gpt-5.6-sol	high	prepared			
-C-U079	control-040	control	S06	ordinary	gpt-5.6-sol	high	prepared			
-C-U080	control-040	control	S06	challenging	gpt-5.6-sol	high	prepared			
-C-U081	control-041	control	S06	ordinary	gpt-5.6-sol	high	prepared			
-C-U082	control-041	control	S06	challenging	gpt-5.6-sol	high	prepared			
-C-U083	control-042	control	S06	ordinary	gpt-5.6-sol	high	prepared			
+C-U076	control-038	control	S06	challenging	gpt-5.6-sol	high	completed	/root/control_use_076	2026-09-07T21:08:38.548220+00:00	2026-09-07T21:12:56.428909+00:00
+C-U077	control-039	control	S06	ordinary	gpt-5.6-sol	high	completed	/root/control_use_077	2026-09-07T21:10:17.875090+00:00	2026-09-07T21:11:55.781394+00:00
+C-U078	control-039	control	S06	challenging	gpt-5.6-sol	high	completed	/root/control_use_078	2026-09-07T21:11:56.609575+00:00	2026-09-07T21:16:03.046467+00:00
+C-U079	control-040	control	S06	ordinary	gpt-5.6-sol	high	completed	/root/control_use_079	2026-09-07T21:12:57.678415+00:00	2026-09-07T21:17:03.871342+00:00
+C-U080	control-040	control	S06	challenging	gpt-5.6-sol	high	running	/root/control_use_080	2026-09-07T21:16:05.259946+00:00	
+C-U081	control-041	control	S06	ordinary	gpt-5.6-sol	high	running	/root/control_use_081	2026-09-07T21:16:05.691247+00:00	
+C-U082	control-041	control	S06	challenging	gpt-5.6-sol	high	running	/root/control_use_082	2026-09-07T21:17:05.110982+00:00	
+C-U083	control-042	control	S06	ordinary	gpt-5.6-sol	high	running	/root/control_use_083	2026-09-07T21:17:05.521563+00:00	
 C-U084	control-042	control	S06	challenging	gpt-5.6-sol	high	prepared			
 C-U085	control-043	control	S06	ordinary	gpt-5.6-sol	high	prepared			
 C-U086	control-043	control	S06	challenging	gpt-5.6-sol	high	prepared			
@@ -119,18 +119,18 @@ C-U117	control-059	control	S09	ordinary	gpt-5.6-sol	high	prepared
 C-U118	control-059	control	S09	challenging	gpt-5.6-sol	high	prepared			
 C-U119	control-060	control	S09	ordinary	gpt-5.6-sol	high	prepared			
 C-U120	control-060	control	S09	challenging	gpt-5.6-sol	high	prepared			
-C-U121	control-061	control	S10	ordinary	gpt-5.6-sol	high	not prepared			
-C-U122	control-061	control	S10	challenging	gpt-5.6-sol	high	not prepared			
+C-U121	control-061	control	S10	ordinary	gpt-5.6-sol	high	prepared			
+C-U122	control-061	control	S10	challenging	gpt-5.6-sol	high	prepared			
 C-U123	control-062	control	S10	ordinary	gpt-5.6-sol	high	prepared			
 C-U124	control-062	control	S10	challenging	gpt-5.6-sol	high	prepared			
-C-U125	control-063	control	S10	ordinary	gpt-5.6-sol	high	not prepared			
-C-U126	control-063	control	S10	challenging	gpt-5.6-sol	high	not prepared			
-C-U127	control-064	control	S10	ordinary	gpt-5.6-sol	high	not prepared			
-C-U128	control-064	control	S10	challenging	gpt-5.6-sol	high	not prepared			
-C-U129	control-065	control	S10	ordinary	gpt-5.6-sol	high	not prepared			
-C-U130	control-065	control	S10	challenging	gpt-5.6-sol	high	not prepared			
-C-U131	control-066	control	S10	ordinary	gpt-5.6-sol	high	not prepared			
-C-U132	control-066	control	S10	challenging	gpt-5.6-sol	high	not prepared			
+C-U125	control-063	control	S10	ordinary	gpt-5.6-sol	high	prepared			
+C-U126	control-063	control	S10	challenging	gpt-5.6-sol	high	prepared			
+C-U127	control-064	control	S10	ordinary	gpt-5.6-sol	high	prepared			
+C-U128	control-064	control	S10	challenging	gpt-5.6-sol	high	prepared			
+C-U129	control-065	control	S10	ordinary	gpt-5.6-sol	high	prepared			
+C-U130	control-065	control	S10	challenging	gpt-5.6-sol	high	prepared			
+C-U131	control-066	control	S10	ordinary	gpt-5.6-sol	high	prepared			
+C-U132	control-066	control	S10	challenging	gpt-5.6-sol	high	prepared			
 C-U133	control-067	control	S10	ordinary	gpt-5.6-sol	high	not prepared			
 C-U134	control-067	control	S10	challenging	gpt-5.6-sol	high	not prepared			
 C-U135	control-068	control	S10	ordinary	gpt-5.6-sol	high	not prepared			

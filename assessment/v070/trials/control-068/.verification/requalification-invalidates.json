@@ -1,0 +1,24 @@
+{
+  "candidate": {
+    "id": "checkout-43",
+    "digest": "sha256:bbb",
+    "qualification_ok": true,
+    "healthy": true,
+    "checkout_ok": true
+  },
+  "service_owner": "owner@example.test",
+  "qualification": {
+    "candidate": "checkout-43",
+    "digest": "sha256:bbb",
+    "passed": true,
+    "sequence": 7
+  },
+  "approval": {
+    "candidate": "checkout-43",
+    "digest": "sha256:bbb",
+    "owner": "owner@example.test",
+    "qualification_sequence": 7,
+    "sequence": 8
+  },
+  "sequence": 8
+}

@@ -1,0 +1,56 @@
+{
+  "status": "incomplete",
+  "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+  "interval": {
+    "start": "2026-06-10",
+    "end": "2026-06-18",
+    "inclusive": true
+  },
+  "checkpoint": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U076/work/rollup.json",
+  "pages_incorporated": 2,
+  "successful_page_calls_in_tranche": 2,
+  "records_incorporated": 6,
+  "incorporated_entry_ids": [
+    "chg-001",
+    "chg-002",
+    "chg-003",
+    "chg-004",
+    "chg-005",
+    "chg-006"
+  ],
+  "next_cursor": "p_b62d3333e930f1830dd2d61eb80d3bbc",
+  "observed_quota": {
+    "tranche": 1,
+    "calls_per_tranche": 2,
+    "remaining_calls": 0
+  },
+  "source_metadata": {
+    "total_records": 15,
+    "page_size": 3
+  },
+  "partial_vendors": [
+    {
+      "vendor_id": "azure",
+      "settled_charge_cents": 5000,
+      "settled_credit_cents": 0,
+      "net_cents": 5000,
+      "qualifying_entry_count": 1
+    },
+    {
+      "vendor_id": "glacier",
+      "settled_charge_cents": 700,
+      "settled_credit_cents": 700,
+      "net_cents": 0,
+      "qualifying_entry_count": 2
+    },
+    {
+      "vendor_id": "saffron",
+      "settled_charge_cents": 0,
+      "settled_credit_cents": 900,
+      "net_cents": -900,
+      "qualifying_entry_count": 1
+    }
+  ],
+  "incorporation_uncertainty": null,
+  "continuation": "After a later operator grants another tranche, rerun the supplied rollup helper with the same API, source state, interval, and checkpoint path. The helper will resume with next_cursor; do not delete, edit, or replace the checkpoint."
+}

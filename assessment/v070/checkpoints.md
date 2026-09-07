@@ -1,5 +1,7 @@
 # Confirmed checkpoints
 
+Verified later save: commit `0271df7427236afef1bed5da8881859e54918cc3`, tree `485be7464ed68cea0cacf0c9ffc8cea33735e960`, parent `259e969f1897445a846cb1a7c529d5658ef38a6e`; snapshot `../assessment-checkpoint-rXNmb9`, 4,926 published files, 292 changed entries. Saves 64 completed/form-validated creators, 122 prepared consumers (001–120 and 123–124), first 75 completed applications with S06 final native SQL, all four completed/read S05 reports, two additional second-review starts, and the proposed cache correction awaiting independent review. The ref, commit, parent, tree and author-matching DCO were verified directly. C-U077's completion notification arrived later and is not inferred finalized in this snapshot.
+
 Latest receipt reconciled after continuation: commit `259e969f1897445a846cb1a7c529d5658ef38a6e`, tree `8519c6e5fd6f3e4abec7f4ef36ceb4272cbb5e3c`, parent `7bcb55a9886778f2026c550377aefad8876e7108`; snapshot `../assessment-checkpoint-6ubtX4`, 4,641 files and 186 changed entries. The preceding completed direct-API response verified commit/tree/ref. This saves 57 completed/form-validated creators, 114 prepared consumers, all first 73 completed consumers with C-U073 final native SQL, and all three original S05 packets. P02's primary start and creator 058's completion were later ledger reconciliations. Later work is not implied saved by this receipt.
 
 | Checkpoint | Commit | Contents |

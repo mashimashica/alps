@@ -42,7 +42,7 @@ The consumer case bank/oracles are frozen and independently reviewed. S01/S05/S1
 ## Approved experiment helpers
 
 Consumer/blind packaging and native-SQL integration reviews are complete and read. Use only approved helpers:
-- prepare_control_consumers.py: prior approved version 4a3cfe4e641d91c90348b19f128b6e281b898414d0ff157538d550f5f51ca32c; current added-input-cache correction awaits audits/control-input-cache-review.md. Do not use the edited helper until that review is complete/read and findings resolved.
+- prepare_control_consumers.py: 3eb8b617b9bd7264a25d871d675ff02c5c9e55b8df3d659c22c815cdf18af581. The added-input-cache correction has a complete/read independent review with 25 passing disposable checks and no blocker. Preserve original inputs and record added regular Python caches separately; this does not authorize other additions or original changes. See audits/control-input-cache-review.md and audits/control-061-input-cache-observation.md.
 - prepare_control_grading.py: d0af475ae5f6809273232c5b49800772845e2bfbff1b71d33880892f485c0c1f
 - preserve_sqlite_evidence.py: 3c024f1cf763da4701fa198892b6dd6c0fb9a59fc445c8ef5e6d7768f8707f6c
 - checkpoint.py: f98c1d24cc219e87de9467bb94289853ae32885ee40fce36f2aa743dc8ac6e30

@@ -1,0 +1,144 @@
+{
+  "python": "3.12.13",
+  "tests_passed": 25,
+  "disposable_root": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/control-input-cache-review/.local/run-3jvqxoxs",
+  "results": [
+    {
+      "test": "C061 supplied byte identities, prompt identity and sole cache hash",
+      "result": "PASS",
+      "detail": {
+        "original_input_sha256": {
+          "brief.md": "284eab48172c8b996d5eb3218590fb453c1e24f5b532f9d4457bda99fb38485e",
+          "release_tool.py": "939931810a40d9f813280ea46c95fec2c4a1ed72368937353bf5c899b8217577"
+        },
+        "added_cache_sha256": {
+          "__pycache__/release_tool.cpython-312.pyc": "817e07c25329c62c67ad09f7db52c4dde4222c6d3f42733d40a7d0228682b44b"
+        },
+        "prompt_sha256": "ab875c9f2790fcbcd789d368e605ff792c1fbd528d5353b5cad4939e4633725b"
+      }
+    },
+    {
+      "test": "Unchanged input without a cache remains accepted",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "test": "Changed supplied source",
+      "result": "PASS",
+      "detail": "Original creator input bytes or file set changed: <disposable>/matrix/changed-supplied-source/input"
+    },
+    {
+      "test": "Missing supplied source",
+      "result": "PASS",
+      "detail": "Original creator input bytes or file set changed: <disposable>/matrix/missing-supplied-source/input"
+    },
+    {
+      "test": "Renamed supplied source",
+      "result": "PASS",
+      "detail": "Original creator input bytes or file set changed: <disposable>/matrix/renamed-supplied-source/input"
+    },
+    {
+      "test": "Added ordinary file",
+      "result": "PASS",
+      "detail": "Unexpected added creator input resource; preserve it: <disposable>/matrix/added-ordinary-file/input"
+    },
+    {
+      "test": "Added pyc outside __pycache__",
+      "result": "PASS",
+      "detail": "Unexpected added creator input resource; preserve it: <disposable>/matrix/added-pyc-outside-__pycache__/input"
+    },
+    {
+      "test": "Added non-pyc inside __pycache__",
+      "result": "PASS",
+      "detail": "Unexpected added creator input resource; preserve it: <disposable>/matrix/added-non-pyc-inside-__pycache__/input"
+    },
+    {
+      "test": "Added uppercase PYC",
+      "result": "PASS",
+      "detail": "Unexpected added creator input resource; preserve it: <disposable>/matrix/added-uppercase-pyc/input"
+    },
+    {
+      "test": "Pyc not directly inside __pycache__",
+      "result": "PASS",
+      "detail": "Unexpected added creator input resource; preserve it: <disposable>/matrix/nested-pyc/input"
+    },
+    {
+      "test": "Previously supplied cache bytes are still pinned",
+      "result": "PASS",
+      "detail": "Original creator input bytes or file set changed: <disposable>/matrix/original-cache-mutated/input"
+    },
+    {
+      "test": "Original source symlink",
+      "result": "PASS",
+      "detail": "Unexpected symlink; preserve it: <disposable>/matrix/original-source-symlink/input/release_tool.py"
+    },
+    {
+      "test": "Cache file symlink",
+      "result": "PASS",
+      "detail": "Unexpected symlink; preserve it: <disposable>/matrix/cache-file-symlink/input/__pycache__/release_tool.cpython-312.pyc"
+    },
+    {
+      "test": "Dangling cache symlink",
+      "result": "PASS",
+      "detail": "Unexpected symlink; preserve it: <disposable>/matrix/dangling-cache-symlink/input/__pycache__/release_tool.cpython-312.pyc"
+    },
+    {
+      "test": "Cache directory symlink",
+      "result": "PASS",
+      "detail": "Unexpected symlink; preserve it: <disposable>/matrix/cache-directory-symlink/input/__pycache__"
+    },
+    {
+      "test": "Input directory symlink",
+      "result": "PASS",
+      "detail": "Unexpected symlink; preserve it: <disposable>/matrix/ancestor-symlink/alias"
+    },
+    {
+      "test": "Cache-named FIFO",
+      "result": "PASS",
+      "detail": "Unsupported filesystem entry: <disposable>/matrix/fifo/input/__pycache__/extra.pyc"
+    },
+    {
+      "test": "Classification limits observed",
+      "result": "PASS",
+      "detail": "Regular files are classified by location/suffix, not bytecode content; empty directories are not inventoried"
+    },
+    {
+      "test": "Consumer preflight rejects non-cache input before writes",
+      "result": "PASS",
+      "detail": "Unexpected added creator input resource; preserve it: <disposable>/integration/assessment/trials/control-061/input"
+    },
+    {
+      "test": "Synthetic consumer preparation preserves sources and modes, records cache hashes, binds manifest and excludes caches",
+      "result": "PASS",
+      "detail": "C-U121: prepared from control-061, ordinary; not started\nC-U122: prepared from control-061, challenging; not started"
+    },
+    {
+      "test": "Existing consumer preparation is preserved",
+      "result": "PASS",
+      "detail": "Complete or partial preparation already exists; preserve it: <disposable>/integration/assessment/frozen/control-artifacts/control-061"
+    },
+    {
+      "test": "Blind preparation rejects tampering with cache evidence bound by assignment",
+      "result": "PASS",
+      "detail": "Application identity differs: C-U121"
+    },
+    {
+      "test": "Synthetic blind preparation accepts unchanged manifest and preserves package/source bytes and modes without cache payloads",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "test": "Checkpoint export keeps external cache hashes and original source while omitting raw caches",
+      "result": "PASS",
+      "detail": {
+        "exported_entries": 80
+      }
+    },
+    {
+      "test": "Read original evidence and helper bytes/modes remain unchanged",
+      "result": "PASS",
+      "detail": null
+    }
+  ],
+  "limits": "Synthetic S10 packaging fixture with substituted in-memory identity constants and one creator/two consumers. No real schedule/allocation/bank, live preparation, business task, Skill quality, prior validator/refusal, or remote save was exercised. Cache format/origin, modes of original creator inputs, empty directories, and concurrent changes are not attested."
+}
