@@ -1,0 +1,30 @@
+{
+  "R17": {
+    "creator": "control-011",
+    "consumers": [
+      "C-U021",
+      "C-U022"
+    ]
+  },
+  "R63": {
+    "creator": "control-008",
+    "consumers": [
+      "C-U015",
+      "C-U016"
+    ]
+  },
+  "R28": {
+    "creator": "control-004",
+    "consumers": [
+      "C-U007",
+      "C-U008"
+    ]
+  },
+  "R44": {
+    "creator": "control-003",
+    "consumers": [
+      "C-U005",
+      "C-U006"
+    ]
+  }
+}

@@ -31,6 +31,8 @@
 
 | First 24 frozen C packages and 48 prepared applications | 42d5eff534ad363ee622733b2fa2d3acaa3995e8 | 2,812 evidence files; tree 7670c5418dd747da3d39d3e8648cf0bd052f33d2. All first 37 C creators complete; first 24 packages pass pinned form checks. Their exact frozen resources, external manifests and all C-U001–048 materialized prompts/inputs/assignments are saved before first consumer execution. Blind follow-up remains pending. |
 
+| First control applications and completed packaging reviews | 6573d38e853e924cc74da8f9e068847ed15e7132 | 3,167 evidence files; tree 36f9e3ca126d09e94a7b50088d5cb5016b08092e. 37 creators complete/pass pinned form checks, 74 consumers prepared and first 14 complete. All source packages, prompts, initial S06 SQL/setup observations and metadata saved before remaining execution. F1–F4 and SQLite follow-up complete/read; first S01-P02 business packet saved before grading. |
+
 Branch: assessment/v070-evidence. Prefix: assessment/v070/. Initial tree: c40d6345d778cb1c44be80f20382ccc9d8b059f2. Commit tree, parent, author-matching DCO, and branch ref were verified through the direct API. The local frozen/alps convenience export is reconstructed from the baseline commit and is not duplicated in the checkpoint.
 
 This log is included in the next checkpoint; the latest branch ref is authoritative when recovering after a save whose local log update was interrupted.
