@@ -14,7 +14,8 @@ Updated: 2026-09-07 UTC.
 
 - Prospective numerical acceptance criteria and operational adjudications are fixed in gates.md after independent review.
 - B1 is a two-file NOTE/注記-only candidate. Independent semantic/locale review finds no blocking issue; nine product tests and changed whitespace pass. Frozen copy/hashes/patch preserve this exact version. No product PR is opened and neither foundation changed.
-- Development round 1: all eight fresh luna/low creators completed; all eight pass pinned Agent Skills form validation. New S10/S05/S08 consumer cases/oracles were independently authored after associated creators ended. Ten fresh sol/high consumers have completed, six are running; none is independently graded yet. S08 setup was checked against the author's recorded CLI observations, and initial committed state is preserved as native SQL. Latest resource check: 40 prepared assignments, zero unexpected file changes. Calibration source-fidelity review remains separate from business grading.
+- Development round 1: all eight fresh luna/low creators and sixteen fresh sol/high consumers completed. All eight packages pass pinned Agent Skills form validation. New S10/S05/S08 consumer cases/oracles were independently authored after associated creators ended. Blind S10 and S05 primary/second reviews, S08 review, and a separate source-fidelity review are running. S08 setup was checked against the author's recorded CLI observations; initial and final committed states are preserved as native SQL. Latest resource check: 40 prepared assignments, zero unexpected file changes. Calibration source-fidelity review remains separate from business grading.
+- All twelve reviewed public main-case families are frozen under frozen/main-cases (36 files, main-case-hashes.json). prepare_main.py is written and compiles, but has not been used: the B identity must be selected after bounded development, and no main assignment or consumer oracle exists yet.
 
 ## Trial counts
 
@@ -23,7 +24,7 @@ Updated: 2026-09-07 UTC.
 | Calibration | 12 | 24 | 0 | 36 |
 | Remaining base plan | 0 | 0 | 0 | up to 1,992 |
 
-Additional diagnostic reserve (separate from base): at most 72 executions across at most three rounds. H01 reserves 8 creators + 16 consumers; 8 creators and 10 consumers completed, 6 consumers running. See dev1-list.tsv and dev1-consumer-list.tsv; successful starts and completed trials are distinct.
+Additional diagnostic reserve (separate from base): at most 72 executions across at most three rounds. H01's 8 creators + 16 consumers are completed (24 of 72 reserve executions used). See dev1-list.tsv and dev1-consumer-list.tsv; completion and success are distinct.
 
 All numerical selection tasks were correct. Receiving reviews computed the supplied quantities correctly, but four applications omitted a required follow-up owner; independent component probes found two different latent implementation defects. Four ordinary simulated releases succeeded; two challenging rehearsals completed and established checkout failure, while two needlessly requalified and blocked the requested rehearsal. Reporting failure honestly is not release success. See calibration-synthesis.md and grades for distinctions and limits.
 

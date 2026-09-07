@@ -1,0 +1,4 @@
+manifest_line_id,site_id,shipment_id,sku,lot_id,expected_qty
+M-101,NORTH,DEMO-201,00017,LOT-A,6
+M-102,NORTH,DEMO-201,00017,LOT-A,4
+M-103,NORTH,DEMO-202,00024,LOT-B,8

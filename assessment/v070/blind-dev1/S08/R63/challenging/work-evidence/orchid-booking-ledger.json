@@ -1,0 +1,16 @@
+{
+  "orchid-linocut-20261122-01": {
+    "last_receipt": {
+      "party_id": "crew-orchid",
+      "reason": "insufficient_capacity",
+      "request_key": "orchid-linocut-20261122-01",
+      "seats": 3,
+      "slot_id": "linocut-sun-am",
+      "state": "rejected"
+    },
+    "party_id": "crew-orchid",
+    "request_key": "orchid-linocut-20261122-01",
+    "seats": 3,
+    "slot_id": "linocut-sun-am"
+  }
+}

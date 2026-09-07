@@ -1,0 +1,7 @@
+{
+  "slots": [
+    {"slot_id": "screenprint-mon-am", "starts_at": "2026-11-16T09:30:00Z", "capacity": 8},
+    {"slot_id": "risograph-mon-pm", "starts_at": "2026-11-16T14:00:00Z", "capacity": 6},
+    {"slot_id": "paper-marbling-tue", "starts_at": "2026-11-17T10:00:00Z", "capacity": 3}
+  ]
+}

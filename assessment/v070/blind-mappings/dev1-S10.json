@@ -1,0 +1,30 @@
+{
+  "R17": {
+    "creator": "dev1-003",
+    "consumers": [
+      "D1-U005",
+      "D1-U006"
+    ]
+  },
+  "R63": {
+    "creator": "dev1-001",
+    "consumers": [
+      "D1-U001",
+      "D1-U002"
+    ]
+  },
+  "R28": {
+    "creator": "dev1-004",
+    "consumers": [
+      "D1-U007",
+      "D1-U008"
+    ]
+  },
+  "R44": {
+    "creator": "dev1-002",
+    "consumers": [
+      "D1-U003",
+      "D1-U004"
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "state_path": "/workspace/scratch/a75c3a6d9076/D1-U010-booking-state-3zc_fceb/bookings.sqlite",
+  "snapshot": "final",
+  "representation": "Native SQL of a consistent committed read transaction; not a byte-identical SQLite file",
+  "sql_sha256": "11e7e6146fdb180295ac79ad4cdf352026e22c4b374c7a7abd846ae37124fa9b"
+}
