@@ -41,7 +41,7 @@ The following Tasks are required within the requested scope, except where stated
 
 1. Within the requested scope, implement and connect the necessary capabilities using the applicable environment. Existing CLIs or APIs may be used directly. Make tool use, dependencies, result interpretation, failure handling, and state-changing effects available where they are needed.
 2. For a target Skill, reflect the work, judgment criteria, required tool use, and conditions in `SKILL.md` and necessary resources. Apply the Framework's Markdown rules and the [Process Description Design guidance](../design-process-description/SKILL.md) for Agent Skill correspondence. Put bundled business processing in that target Skill's `scripts/` and document it using the script guidance; scripts in a design Skill must support its design or evaluation work.
-3. Verify that required resources and their conditions of use are available under the intended distribution. Packaged links must resolve within it; external references must identify their intended sources and access conditions.
+3. Verify that required resources and their conditions of use are available under the intended distribution. Packaged links must resolve within it; external references must identify their intended sources and any access conditions.
 4. Confirm required conditions before dependent operations. Address uncertain or partial effects before retrying an operation that changes state.
 
 ### Evaluating and adjusting the system

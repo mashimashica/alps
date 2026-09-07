@@ -40,7 +40,7 @@ The Tasks below are required within the requested scope, except where stated as 
 
 ### Source and relationship alignment
 
-1. Identify the description used as the reference point for meaning and confirm required references against their intended sources. Make the roles and conditions of required resources clear, and distinguish reference material from descriptions of work. For a Skill, verify that packaged links resolve in the intended distribution and that external references identify their sources and access conditions.
+1. Identify the description used as the reference point for meaning and confirm required references against their intended sources. Make the roles and conditions of required resources clear, and distinguish reference material from descriptions of work. For a Skill, verify that packaged links resolve in the intended distribution and that external references identify their sources and any access conditions.
 2. Clarify the meaning, use, and change effects of information shared with related work, including which work reads or updates it.
 3. For changes, establish the affected description and elements, scope, rationale, consequences, and necessary revalidation. Distinguish a change to the description used as the reference point for meaning, a context-limited change, an application-specific choice, and a change in presentation.
 4. For Process selection or changes to Process meaning, evaluate proposed choices against the Purpose and applicable conditions using the evidence needed to justify the decision.
