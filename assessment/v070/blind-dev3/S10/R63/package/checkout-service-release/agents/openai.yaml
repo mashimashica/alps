@@ -1,0 +1,4 @@
+interface:
+  display_name: Checkout service release
+  short_description: Release and verify a qualified checkout candidate
+  default_prompt: Assess or release the requested checkout-service candidate using the local state-file release tool, then report qualification, approval, promotion, health, and checkout evidence separately.

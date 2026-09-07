@@ -9,5 +9,5 @@ D3-U007	dev3-004	S05	ordinary	gpt-5.6-sol	high	completed	/root/dev3_use_007	2026
 D3-U008	dev3-004	S05	challenging	gpt-5.6-sol	high	completed	/root/dev3_use_008	2026-09-07T17:45:14.112919+00:00	2026-09-07T17:49:31.966640+00:00
 D3-U009	dev3-005	S10	ordinary	gpt-5.6-sol	high	completed	/root/dev3_use_009	2026-09-07T17:45:14.535875+00:00	2026-09-07T17:49:03.359498+00:00
 D3-U010	dev3-005	S10	challenging	gpt-5.6-sol	high	completed	/root/dev3_use_010	2026-09-07T17:45:54.365393+00:00	2026-09-07T17:49:03.782519+00:00
-D3-U011	dev3-006	S10	ordinary	gpt-5.6-sol	high	running	/root/dev3_use_011	2026-09-07T17:49:04.209438+00:00	
-D3-U012	dev3-006	S10	challenging	gpt-5.6-sol	high	running	/root/dev3_use_012	2026-09-07T17:49:04.632118+00:00	
+D3-U011	dev3-006	S10	ordinary	gpt-5.6-sol	high	completed	/root/dev3_use_011	2026-09-07T17:49:04.209438+00:00	2026-09-07T17:52:04.371993+00:00
+D3-U012	dev3-006	S10	challenging	gpt-5.6-sol	high	completed	/root/dev3_use_012	2026-09-07T17:49:04.632118+00:00	2026-09-07T17:52:04.802160+00:00
