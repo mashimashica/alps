@@ -95,3 +95,7 @@ Verified commit `362a24219384e4285e05bca6b7c90540289e9f00`, tree `b14126d545075f
 ## Completed original restored contexts
 
 Verified commit `9c55a050a8fbe9e8fee98ba6a3e4a87932020bb7`, tree `645db8dab20dcd58d7d7604e57e5783847f44563`, parent `362a24219384e4285e05bca6b7c90540289e9f00`. Snapshot `../assessment-checkpoint-prd6vN`;33 changed entries and5,620 published files. Exact commit/ref/DCO and all33 changed UTF-8 files were fetched back and matched. Saves original-context C094–096 completions, actual final native captures with both paths, C094 workflow SQL, C106–107 completions and scoped supplemental grading review. S06-P01/P03 were prepared afterward using only the approved consumer path; creator069–072 grading remains blocked pending the narrow F1/F2 follow-up.
+
+## Remaining S06 packets and grading start
+
+Verified commit `6bdc492d05be47af91a563afc85161dee9c0f40a`, tree `78960b4bf3cf025419611ee597b74ee398000d78`, parent `9c55a050a8fbe9e8fee98ba6a3e4a87932020bb7`. Snapshot `../assessment-checkpoint-H0yqzK`; 332 changed entries and 5,949 published files. Exact commit/ref/author-matching DCO and all 332 changed Git blob identities/modes matched the submitted UTF-8 payload. Saves S06-P01/P03 blind packets and the copied C094 workflow native-SQL representation, S06-P02 adjudication and C108–109 start observations. Later completion reports and the corrected recovery-helper follow-up review require the next save.

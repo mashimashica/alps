@@ -1,0 +1,59 @@
+{
+  "scope": "Stateless component probe, not a replay of a recorded application.\n\nUse an unchanged disposable helper copy. Model a successful metered page whose\nstdout was lost; no real API command or source database is opened or changed.\n",
+  "helper_copy_unchanged": true,
+  "helper_argv": [
+    "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P03-primary/DISPOSABLE-COMPONENT-COPY-R17-rollup.py",
+    "--api",
+    "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P03-primary/SIMULATED-API-NOT-CREATED.py",
+    "--state",
+    "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P03-primary/SIMULATED-SOURCE-NOT-CREATED.sqlite",
+    "--start",
+    "2026-04-03",
+    "--end",
+    "2026-04-09",
+    "--checkpoint",
+    "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P03-primary/DISPOSABLE-R17-response-loss-checkpoint.json"
+  ],
+  "mocked_subprocess_calls": [
+    {
+      "argv": [
+        "python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P03-primary/SIMULATED-API-NOT-CREATED.py",
+        "--state",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P03-primary/SIMULATED-SOURCE-NOT-CREATED.sqlite",
+        "describe"
+      ],
+      "returncode": 0,
+      "stdout": "{\"snapshot_id\": \"probe-six-entry-immutable-snapshot\", \"total_records\": 6, \"page_size\": 3, \"calls_per_tranche\": 2, \"tranche\": 1, \"remaining_calls\": 2}",
+      "stderr": "",
+      "label": "synthetic describe; no database access"
+    },
+    {
+      "argv": [
+        "python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P03-primary/SIMULATED-API-NOT-CREATED.py",
+        "--state",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P03-primary/SIMULATED-SOURCE-NOT-CREATED.sqlite",
+        "page",
+        "--snapshot",
+        "probe-six-entry-immutable-snapshot"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "",
+      "label": "simulated successful page with lost stdout; one successful call modelled"
+    }
+  ],
+  "helper_main_return": null,
+  "helper_stdout": "{\"calls_used\": 1, \"complete\": true, \"interval\": {\"end\": \"2026-04-09\", \"start\": \"2026-04-03\"}, \"snapshot_id\": \"probe-six-entry-immutable-snapshot\", \"vendors\": []}\n",
+  "checkpoint": {
+    "complete": true,
+    "cursor": null,
+    "end": "2026-04-09",
+    "entries": {},
+    "snapshot_id": "probe-six-entry-immutable-snapshot",
+    "start": "2026-04-03"
+  },
+  "simulated_source_database_exists": false,
+  "actual_api_or_source_operations": 0
+}

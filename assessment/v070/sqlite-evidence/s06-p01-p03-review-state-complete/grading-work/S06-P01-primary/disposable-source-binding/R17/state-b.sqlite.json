@@ -1,0 +1,8 @@
+{
+  "source_path": "grading-work/S06-P01-primary/disposable-source-binding/R17/state-b.sqlite",
+  "source_sha256": "148fd691696662b57439add02236102ed9d93d0a7e51edf1e8139919c0fb229c",
+  "sql_path": "sqlite-evidence/s06-p01-p03-review-state-complete/grading-work/S06-P01-primary/disposable-source-binding/R17/state-b.sqlite.sql",
+  "sql_sha256": "cff24d0d1e625ef2c10c6cb417f2322f1f11fd4f3693ae295d5d5641990b47b7",
+  "sqlite_version": "3.53.1",
+  "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history"
+}

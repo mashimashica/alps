@@ -1,0 +1,1213 @@
+{
+  "scope": "Read-only packet inspection; no operational source access or component replay.\n\nThe sole SQLite file opened is an explicitly labelled disposable byte copy of\nthe captured workflow checkpoint. It is opened mode=ro with immutable=1.\n",
+  "packages": {
+    "R17": {
+      "frontmatter_basic_check": true,
+      "syntax_ast_parse": "pass",
+      "file_hashes": {
+        "SKILL.md": "cbe689a3d0237d4976e08e26d65e4587943f87eaa03efdba5990ff2b70384dd1",
+        "scripts/rollup.py": "9a0df82845ebc4f7570648479aa077af49b33ba73ced9e247899b89d345951fb"
+      }
+    },
+    "R28": {
+      "frontmatter_basic_check": true,
+      "syntax_ast_parse": "pass",
+      "file_hashes": {
+        "SKILL.md": "d54169aaefc2125800a9c23f284149a114336a2533ee921395803e6b9aaa8598",
+        "references/verification.md": "144adee7702ce2aa23bbd756763d5a1eab903db6b1b219ffc7cd47923d5b90b1",
+        "scripts/rollup.py": "c5191384d7c6b3e78174189b4b870cdd40e6dad29507fe3d3a709e85ad1dc5e6"
+      }
+    },
+    "R44": {
+      "frontmatter_basic_check": true,
+      "syntax_ast_parse": "pass",
+      "file_hashes": {
+        "SKILL.md": "4a41f0c5798a55732c1eaaec19da9aa6f1ea2e4353ac242041433daf9ca1ed67",
+        "scripts/reimbursement_rollup.py": "e9854e3779aa7e2072e72b5c4e58e29425df212ff637e2518d526a8ec5b74bc7"
+      }
+    },
+    "R63": {
+      "frontmatter_basic_check": true,
+      "syntax_ast_parse": "pass",
+      "file_hashes": {
+        "SKILL.md": "d193b32fa0b6f4ed73ee957e3262d4c00d2caa0db84a43c9c34cad425a328740",
+        "scripts/rollup.py": "40a139c6798db6d09e375cff8e32f0a0ffd8e935416df8ac51847856a3c00e1d"
+      }
+    }
+  },
+  "applications": {
+    "R17/ordinary": {
+      "resource_class": "observed-final-skill",
+      "resource_comparison_to_package": {
+        "SKILL.md": {
+          "bytes_equal": true,
+          "modes_equal": true
+        },
+        "scripts/rollup.py": {
+          "bytes_equal": true,
+          "modes_equal": true
+        }
+      },
+      "api_matches_original": true,
+      "request_matches_fixed_case_after_literal_substitution": true,
+      "prompt_read_bytes": 2157,
+      "source_binding_from_original_setup": "/workspace/scratch/a75c3a6d9076/C-U075-ledger-state-w3vcedad/ledger.sqlite",
+      "setup_calls": [
+        {
+          "argv": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U075/input/ledger_api.py",
+            "--state",
+            "/workspace/scratch/a75c3a6d9076/C-U075-ledger-state-w3vcedad/ledger.sqlite",
+            "init",
+            "--fixture",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S06/ordinary/fixture.json"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"state\":\"ready\",\"total_records\":6}\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U075/input/ledger_api.py",
+            "--state",
+            "/workspace/scratch/a75c3a6d9076/C-U075-ledger-state-w3vcedad/ledger.sqlite",
+            "describe"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":2,\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"total_records\":6,\"tranche\":1}\n",
+          "stderr": ""
+        }
+      ],
+      "initial_sql_sha256_matches_metadata": true,
+      "initial_state_sql": [
+        "INSERT INTO \"source_state\" VALUES(1,'snap_c22e71aa06b43ab25395e0ce',1,0);"
+      ],
+      "final_sql_class": "actual final capture",
+      "final_sql_sha256": "0c59cdc1f01c69cb8dc8899d6565287e22fc0469988613be1a04c379594ca580",
+      "final_state_sql": [
+        "INSERT INTO \"source_state\" VALUES(1,'snap_c22e71aa06b43ab25395e0ce',1,2);"
+      ],
+      "record_sql_unchanged": true,
+      "final_resource_observation": {
+        "scope": "Initial and final file bytes/modes; not a complete operation/access trace",
+        "changed_originals": [],
+        "added_resources_sha256": {}
+      },
+      "checkpoint_content": {
+        "complete": true,
+        "cursor": null,
+        "end": "2026-04-09",
+        "entries": {
+          "ord-001": {
+            "amount_cents": 407,
+            "currency": "USD",
+            "entry_id": "ord-001",
+            "kind": "credit",
+            "posted_on": "2026-04-09",
+            "status": "settled",
+            "vendor_id": "willow"
+          },
+          "ord-002": {
+            "amount_cents": 99991,
+            "currency": "USD",
+            "entry_id": "ord-002",
+            "kind": "charge",
+            "posted_on": "2026-04-06",
+            "status": "pending",
+            "vendor_id": "mirage"
+          },
+          "ord-003": {
+            "amount_cents": 1234,
+            "currency": "USD",
+            "entry_id": "ord-003",
+            "kind": "charge",
+            "posted_on": "2026-04-03",
+            "status": "settled",
+            "vendor_id": "apricot"
+          },
+          "ord-004": {
+            "amount_cents": 1234,
+            "currency": "USD",
+            "entry_id": "ord-004",
+            "kind": "credit",
+            "posted_on": "2026-04-08",
+            "status": "settled",
+            "vendor_id": "apricot"
+          },
+          "ord-005": {
+            "amount_cents": 54321,
+            "currency": "USD",
+            "entry_id": "ord-005",
+            "kind": "charge",
+            "posted_on": "2026-04-10",
+            "status": "settled",
+            "vendor_id": "outside"
+          },
+          "ord-006": {
+            "amount_cents": 2501,
+            "currency": "USD",
+            "entry_id": "ord-006",
+            "kind": "charge",
+            "posted_on": "2026-04-04",
+            "status": "settled",
+            "vendor_id": "juniper"
+          }
+        },
+        "snapshot_id": "snap_c22e71aa06b43ab25395e0ce",
+        "start": "2026-04-03"
+      },
+      "checkpoint_recomputed_vendors": [
+        {
+          "vendor_id": "apricot",
+          "charges": 1234,
+          "credits": 1234,
+          "count": 2,
+          "net": 0
+        },
+        {
+          "vendor_id": "juniper",
+          "charges": 2501,
+          "credits": 0,
+          "count": 1,
+          "net": 2501
+        },
+        {
+          "vendor_id": "willow",
+          "charges": 0,
+          "credits": 407,
+          "count": 1,
+          "net": -407
+        }
+      ]
+    },
+    "R17/challenging": {
+      "resource_class": "observed-final-skill",
+      "resource_comparison_to_package": {
+        "SKILL.md": {
+          "bytes_equal": true,
+          "modes_equal": true
+        },
+        "scripts/rollup.py": {
+          "bytes_equal": true,
+          "modes_equal": true
+        }
+      },
+      "api_matches_original": true,
+      "request_matches_fixed_case_after_literal_substitution": true,
+      "prompt_read_bytes": 2157,
+      "source_binding_from_original_setup": "/workspace/scratch/a75c3a6d9076/C-U076-ledger-state-f58ax81d/ledger.sqlite",
+      "setup_calls": [
+        {
+          "argv": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U076/input/ledger_api.py",
+            "--state",
+            "/workspace/scratch/a75c3a6d9076/C-U076-ledger-state-f58ax81d/ledger.sqlite",
+            "init",
+            "--fixture",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S06/challenging/fixture.json"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"state\":\"ready\",\"total_records\":15}\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U076/input/ledger_api.py",
+            "--state",
+            "/workspace/scratch/a75c3a6d9076/C-U076-ledger-state-f58ax81d/ledger.sqlite",
+            "describe"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":2,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n",
+          "stderr": ""
+        }
+      ],
+      "initial_sql_sha256_matches_metadata": true,
+      "initial_state_sql": [
+        "INSERT INTO \"source_state\" VALUES(1,'snap_fb322d1120ca406ad668bc26',1,0);"
+      ],
+      "final_sql_class": "actual final capture",
+      "final_sql_sha256": "071ead7c2855dc57b35546ff0515c79039899eae12b921f60584232f858cb496",
+      "final_state_sql": [
+        "INSERT INTO \"source_state\" VALUES(1,'snap_fb322d1120ca406ad668bc26',1,2);"
+      ],
+      "record_sql_unchanged": true,
+      "final_resource_observation": {
+        "scope": "Initial and final file bytes/modes; not a complete operation/access trace",
+        "changed_originals": [],
+        "added_resources_sha256": {}
+      },
+      "checkpoint_content": {
+        "complete": false,
+        "cursor": "p_b62d3333e930f1830dd2d61eb80d3bbc",
+        "end": "2026-06-18",
+        "entries": {
+          "chg-001": {
+            "amount_cents": 5000,
+            "currency": "USD",
+            "entry_id": "chg-001",
+            "kind": "charge",
+            "posted_on": "2026-06-18",
+            "status": "settled",
+            "vendor_id": "azure"
+          },
+          "chg-002": {
+            "amount_cents": 900,
+            "currency": "USD",
+            "entry_id": "chg-002",
+            "kind": "credit",
+            "posted_on": "2026-06-10",
+            "status": "settled",
+            "vendor_id": "saffron"
+          },
+          "chg-003": {
+            "amount_cents": 123456,
+            "currency": "USD",
+            "entry_id": "chg-003",
+            "kind": "charge",
+            "posted_on": "2026-06-13",
+            "status": "pending",
+            "vendor_id": "mirage"
+          },
+          "chg-004": {
+            "amount_cents": 700,
+            "currency": "USD",
+            "entry_id": "chg-004",
+            "kind": "credit",
+            "posted_on": "2026-06-17",
+            "status": "settled",
+            "vendor_id": "glacier"
+          },
+          "chg-005": {
+            "amount_cents": 700,
+            "currency": "USD",
+            "entry_id": "chg-005",
+            "kind": "charge",
+            "posted_on": "2026-06-11",
+            "status": "settled",
+            "vendor_id": "glacier"
+          },
+          "chg-006": {
+            "amount_cents": 88000,
+            "currency": "USD",
+            "entry_id": "chg-006",
+            "kind": "charge",
+            "posted_on": "2026-06-19",
+            "status": "settled",
+            "vendor_id": "azure"
+          }
+        },
+        "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+        "start": "2026-06-10"
+      },
+      "checkpoint_recomputed_vendors": [
+        {
+          "vendor_id": "azure",
+          "charges": 5000,
+          "credits": 0,
+          "count": 1,
+          "net": 5000
+        },
+        {
+          "vendor_id": "glacier",
+          "charges": 700,
+          "credits": 700,
+          "count": 2,
+          "net": 0
+        },
+        {
+          "vendor_id": "saffron",
+          "charges": 0,
+          "credits": 900,
+          "count": 1,
+          "net": -900
+        }
+      ]
+    },
+    "R28/ordinary": {
+      "resource_class": "prepared-skill",
+      "resource_comparison_to_package": {
+        "SKILL.md": {
+          "bytes_equal": true,
+          "modes_equal": true
+        },
+        "references/verification.md": {
+          "bytes_equal": true,
+          "modes_equal": true
+        },
+        "scripts/rollup.py": {
+          "bytes_equal": true,
+          "modes_equal": true
+        }
+      },
+      "api_matches_original": true,
+      "request_matches_fixed_case_after_literal_substitution": true,
+      "prompt_read_bytes": 2157,
+      "source_binding_from_original_setup": "/workspace/scratch/a75c3a6d9076/C-U093-ledger-state-7b_kk2bk/ledger.sqlite",
+      "setup_calls": [
+        {
+          "argv": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U093/input/ledger_api.py",
+            "--state",
+            "/workspace/scratch/a75c3a6d9076/C-U093-ledger-state-7b_kk2bk/ledger.sqlite",
+            "init",
+            "--fixture",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S06/ordinary/fixture.json"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"state\":\"ready\",\"total_records\":6}\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U093/input/ledger_api.py",
+            "--state",
+            "/workspace/scratch/a75c3a6d9076/C-U093-ledger-state-7b_kk2bk/ledger.sqlite",
+            "describe"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":2,\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"total_records\":6,\"tranche\":1}\n",
+          "stderr": ""
+        }
+      ],
+      "initial_sql_sha256_matches_metadata": true,
+      "initial_state_sql": [
+        "INSERT INTO \"source_state\" VALUES(1,'snap_c22e71aa06b43ab25395e0ce',1,0);"
+      ],
+      "final_sql_class": "historical digest matched supplement",
+      "final_sql_sha256": "0c59cdc1f01c69cb8dc8899d6565287e22fc0469988613be1a04c379594ca580",
+      "final_state_sql": [
+        "INSERT INTO \"source_state\" VALUES(1,'snap_c22e71aa06b43ab25395e0ce',1,2);"
+      ],
+      "record_sql_unchanged": true
+    },
+    "R28/challenging": {
+      "resource_class": "observed-final-skill",
+      "resource_comparison_to_package": {
+        "SKILL.md": {
+          "bytes_equal": true,
+          "modes_equal": true
+        },
+        "references/verification.md": {
+          "bytes_equal": true,
+          "modes_equal": true
+        },
+        "scripts/rollup.py": {
+          "bytes_equal": true,
+          "modes_equal": true
+        }
+      },
+      "api_matches_original": true,
+      "request_matches_fixed_case_after_literal_substitution": true,
+      "prompt_read_bytes": 2157,
+      "source_binding_from_original_setup": "/workspace/scratch/a75c3a6d9076/C-U094-ledger-state-ucpf2ya_/ledger.sqlite",
+      "setup_calls": [
+        {
+          "argv": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U094/input/ledger_api.py",
+            "--state",
+            "/workspace/scratch/a75c3a6d9076/C-U094-ledger-state-ucpf2ya_/ledger.sqlite",
+            "init",
+            "--fixture",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S06/challenging/fixture.json"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"state\":\"ready\",\"total_records\":15}\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U094/input/ledger_api.py",
+            "--state",
+            "/workspace/scratch/a75c3a6d9076/C-U094-ledger-state-ucpf2ya_/ledger.sqlite",
+            "describe"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":2,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n",
+          "stderr": ""
+        }
+      ],
+      "initial_sql_sha256_matches_metadata": true,
+      "initial_state_sql": [
+        "INSERT INTO \"source_state\" VALUES(1,'snap_fb322d1120ca406ad668bc26',1,0);"
+      ],
+      "final_sql_class": "actual final capture",
+      "final_sql_sha256": "071ead7c2855dc57b35546ff0515c79039899eae12b921f60584232f858cb496",
+      "final_state_sql": [
+        "INSERT INTO \"source_state\" VALUES(1,'snap_fb322d1120ca406ad668bc26',1,2);"
+      ],
+      "record_sql_unchanged": true,
+      "restored_path_binding": {
+        "consumer_id": "C-U094",
+        "original_state_path": "/workspace/scratch/a75c3a6d9076/C-U094-ledger-state-ucpf2ya_/ledger.sqlite",
+        "restored_state_path": "/workspace/scratch/a75c3a6d9076/C-U094-ledger-recovery-initial-001/ledger.sqlite",
+        "assignment_sha256": "b2f7ff3927349317b1530a8bf60ce8104a598f8126232fef8b722d8476e680da",
+        "source_evidence_sha256": {
+          "consumer-setup/C-U094.json": "599fc130eab77ddaabb2660901fcada6bdfa79a8dbd9d56f04ca3a4a246440c2",
+          "state-snapshots/C-U094/initial.sql": "cff24d0d1e625ef2c10c6cb417f2322f1f11fd4f3693ae295d5d5641990b47b7",
+          "state-snapshots/C-U094/initial.json": "ce00cc941e98f5366cd129a928f00488a4f6bef08d66a05c591b30ad69e992e0"
+        },
+        "restored_sql_sha256": "cff24d0d1e625ef2c10c6cb417f2322f1f11fd4f3693ae295d5d5641990b47b7",
+        "restored_binary_sha256": "125f49dc46f799fc3772e5ec79a5634c692d47126273aea9bbd60a21b722a11c",
+        "initial_state_observation": {
+          "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+          "total_records": 15,
+          "page_size": 3,
+          "calls_per_tranche": 2,
+          "tranche": 1,
+          "calls_used": 0,
+          "remaining_calls": 2,
+          "records_sha256": "fb322d1120ca406ad668bc26486cdc8a010a3cdbe1e942d62348ea9f3e6b1aa7"
+        },
+        "sqlite_version": "3.53.1",
+        "observed_utc": "2026-09-07T23:26:38.919100+00:00",
+        "scope": "New native file restored from preserved initial SQL for the same pending attempt; no business API operation"
+      },
+      "restored_initial_sql_matches_original": true,
+      "final_resource_observation": {
+        "scope": "Initial and final file bytes/modes; not a complete operation/access trace",
+        "changed_originals": [],
+        "added_resources_sha256": {}
+      }
+    },
+    "R44/ordinary": {
+      "resource_class": "prepared-skill",
+      "resource_comparison_to_package": {
+        "SKILL.md": {
+          "bytes_equal": true,
+          "modes_equal": true
+        },
+        "scripts/reimbursement_rollup.py": {
+          "bytes_equal": true,
+          "modes_equal": true
+        }
+      },
+      "api_matches_original": true,
+      "request_matches_fixed_case_after_literal_substitution": true,
+      "prompt_read_bytes": 2157,
+      "source_binding_from_original_setup": "/workspace/scratch/a75c3a6d9076/C-U087-ledger-state-o5ol6shu/ledger.sqlite",
+      "setup_calls": [
+        {
+          "argv": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U087/input/ledger_api.py",
+            "--state",
+            "/workspace/scratch/a75c3a6d9076/C-U087-ledger-state-o5ol6shu/ledger.sqlite",
+            "init",
+            "--fixture",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S06/ordinary/fixture.json"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"state\":\"ready\",\"total_records\":6}\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U087/input/ledger_api.py",
+            "--state",
+            "/workspace/scratch/a75c3a6d9076/C-U087-ledger-state-o5ol6shu/ledger.sqlite",
+            "describe"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":2,\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"total_records\":6,\"tranche\":1}\n",
+          "stderr": ""
+        }
+      ],
+      "initial_sql_sha256_matches_metadata": true,
+      "initial_state_sql": [
+        "INSERT INTO \"source_state\" VALUES(1,'snap_c22e71aa06b43ab25395e0ce',1,0);"
+      ],
+      "final_sql_class": "historical digest matched supplement",
+      "final_sql_sha256": "0c59cdc1f01c69cb8dc8899d6565287e22fc0469988613be1a04c379594ca580",
+      "final_state_sql": [
+        "INSERT INTO \"source_state\" VALUES(1,'snap_c22e71aa06b43ab25395e0ce',1,2);"
+      ],
+      "record_sql_unchanged": true,
+      "checkpoint_content": {
+        "aggregates": {
+          "apricot": {
+            "charges": 1234,
+            "count": 2,
+            "credits": 1234
+          },
+          "juniper": {
+            "charges": 2501,
+            "count": 1,
+            "credits": 0
+          },
+          "willow": {
+            "charges": 0,
+            "count": 1,
+            "credits": 407
+          }
+        },
+        "complete": true,
+        "next_cursor": null,
+        "pages_incorporated": 2,
+        "request": {
+          "api": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U087/input/ledger_api.py",
+          "end": "2026-04-09",
+          "page_size": 3,
+          "snapshot_id": "snap_c22e71aa06b43ab25395e0ce",
+          "source_state": "/workspace/scratch/a75c3a6d9076/C-U087-ledger-state-o5ol6shu/ledger.sqlite",
+          "start": "2026-04-03",
+          "total_records": 6
+        },
+        "seen_entry_ids": [
+          "ord-001",
+          "ord-002",
+          "ord-003",
+          "ord-004",
+          "ord-005",
+          "ord-006"
+        ],
+        "version": 1
+      }
+    },
+    "R44/challenging": {
+      "resource_class": "prepared-skill",
+      "resource_comparison_to_package": {
+        "SKILL.md": {
+          "bytes_equal": true,
+          "modes_equal": true
+        },
+        "scripts/reimbursement_rollup.py": {
+          "bytes_equal": true,
+          "modes_equal": true
+        }
+      },
+      "api_matches_original": true,
+      "request_matches_fixed_case_after_literal_substitution": true,
+      "prompt_read_bytes": 2157,
+      "source_binding_from_original_setup": "/workspace/scratch/a75c3a6d9076/C-U088-ledger-state-yi5gom8w/ledger.sqlite",
+      "setup_calls": [
+        {
+          "argv": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U088/input/ledger_api.py",
+            "--state",
+            "/workspace/scratch/a75c3a6d9076/C-U088-ledger-state-yi5gom8w/ledger.sqlite",
+            "init",
+            "--fixture",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S06/challenging/fixture.json"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"state\":\"ready\",\"total_records\":15}\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U088/input/ledger_api.py",
+            "--state",
+            "/workspace/scratch/a75c3a6d9076/C-U088-ledger-state-yi5gom8w/ledger.sqlite",
+            "describe"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":2,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n",
+          "stderr": ""
+        }
+      ],
+      "initial_sql_sha256_matches_metadata": true,
+      "initial_state_sql": [
+        "INSERT INTO \"source_state\" VALUES(1,'snap_fb322d1120ca406ad668bc26',1,0);"
+      ],
+      "final_sql_class": "historical digest matched supplement",
+      "final_sql_sha256": "071ead7c2855dc57b35546ff0515c79039899eae12b921f60584232f858cb496",
+      "final_state_sql": [
+        "INSERT INTO \"source_state\" VALUES(1,'snap_fb322d1120ca406ad668bc26',1,2);"
+      ],
+      "record_sql_unchanged": true,
+      "checkpoint_content": {
+        "aggregates": {
+          "azure": {
+            "charges": 5000,
+            "count": 1,
+            "credits": 0
+          },
+          "glacier": {
+            "charges": 700,
+            "count": 2,
+            "credits": 700
+          },
+          "saffron": {
+            "charges": 0,
+            "count": 1,
+            "credits": 900
+          }
+        },
+        "complete": false,
+        "next_cursor": "p_b62d3333e930f1830dd2d61eb80d3bbc",
+        "pages_incorporated": 2,
+        "request": {
+          "api": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U088/input/ledger_api.py",
+          "end": "2026-06-18",
+          "page_size": 3,
+          "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+          "source_state": "/workspace/scratch/a75c3a6d9076/C-U088-ledger-state-yi5gom8w/ledger.sqlite",
+          "start": "2026-06-10",
+          "total_records": 15
+        },
+        "seen_entry_ids": [
+          "chg-001",
+          "chg-002",
+          "chg-003",
+          "chg-004",
+          "chg-005",
+          "chg-006"
+        ],
+        "version": 1
+      }
+    },
+    "R63/ordinary": {
+      "resource_class": "prepared-skill",
+      "resource_comparison_to_package": {
+        "SKILL.md": {
+          "bytes_equal": true,
+          "modes_equal": true
+        },
+        "scripts/rollup.py": {
+          "bytes_equal": true,
+          "modes_equal": true
+        }
+      },
+      "api_matches_original": true,
+      "request_matches_fixed_case_after_literal_substitution": true,
+      "prompt_read_bytes": 2150,
+      "source_binding_from_original_setup": "/workspace/scratch/a75c3a6d9076/C-U091-ledger-state-lchkup6h/ledger.sqlite",
+      "setup_calls": [
+        {
+          "argv": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U091/input/ledger_api.py",
+            "--state",
+            "/workspace/scratch/a75c3a6d9076/C-U091-ledger-state-lchkup6h/ledger.sqlite",
+            "init",
+            "--fixture",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S06/ordinary/fixture.json"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"state\":\"ready\",\"total_records\":6}\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U091/input/ledger_api.py",
+            "--state",
+            "/workspace/scratch/a75c3a6d9076/C-U091-ledger-state-lchkup6h/ledger.sqlite",
+            "describe"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":2,\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"total_records\":6,\"tranche\":1}\n",
+          "stderr": ""
+        }
+      ],
+      "initial_sql_sha256_matches_metadata": true,
+      "initial_state_sql": [
+        "INSERT INTO \"source_state\" VALUES(1,'snap_c22e71aa06b43ab25395e0ce',1,0);"
+      ],
+      "final_sql_class": "historical digest matched supplement",
+      "final_sql_sha256": "0c59cdc1f01c69cb8dc8899d6565287e22fc0469988613be1a04c379594ca580",
+      "final_state_sql": [
+        "INSERT INTO \"source_state\" VALUES(1,'snap_c22e71aa06b43ab25395e0ce',1,2);"
+      ],
+      "record_sql_unchanged": true,
+      "checkpoint_content": {
+        "api": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U091/input/ledger_api.py",
+        "cursor": null,
+        "done": true,
+        "end": "2026-04-09",
+        "entries": {
+          "ord-001": {
+            "amount_cents": 407,
+            "currency": "USD",
+            "entry_id": "ord-001",
+            "kind": "credit",
+            "posted_on": "2026-04-09",
+            "status": "settled",
+            "vendor_id": "willow"
+          },
+          "ord-002": {
+            "amount_cents": 99991,
+            "currency": "USD",
+            "entry_id": "ord-002",
+            "kind": "charge",
+            "posted_on": "2026-04-06",
+            "status": "pending",
+            "vendor_id": "mirage"
+          },
+          "ord-003": {
+            "amount_cents": 1234,
+            "currency": "USD",
+            "entry_id": "ord-003",
+            "kind": "charge",
+            "posted_on": "2026-04-03",
+            "status": "settled",
+            "vendor_id": "apricot"
+          },
+          "ord-004": {
+            "amount_cents": 1234,
+            "currency": "USD",
+            "entry_id": "ord-004",
+            "kind": "credit",
+            "posted_on": "2026-04-08",
+            "status": "settled",
+            "vendor_id": "apricot"
+          },
+          "ord-005": {
+            "amount_cents": 54321,
+            "currency": "USD",
+            "entry_id": "ord-005",
+            "kind": "charge",
+            "posted_on": "2026-04-10",
+            "status": "settled",
+            "vendor_id": "outside"
+          },
+          "ord-006": {
+            "amount_cents": 2501,
+            "currency": "USD",
+            "entry_id": "ord-006",
+            "kind": "charge",
+            "posted_on": "2026-04-04",
+            "status": "settled",
+            "vendor_id": "juniper"
+          }
+        },
+        "processed_cursors": [
+          null,
+          "p_de1636bae17d3ae33cda4377d6e42ee3"
+        ],
+        "snapshot_id": "snap_c22e71aa06b43ab25395e0ce",
+        "start": "2026-04-03",
+        "state": "/workspace/scratch/a75c3a6d9076/C-U091-ledger-state-lchkup6h/ledger.sqlite",
+        "total_records": 6,
+        "version": 1
+      },
+      "checkpoint_recomputed_vendors": [
+        {
+          "vendor_id": "apricot",
+          "charges": 1234,
+          "credits": 1234,
+          "count": 2,
+          "net": 0
+        },
+        {
+          "vendor_id": "juniper",
+          "charges": 2501,
+          "credits": 0,
+          "count": 1,
+          "net": 2501
+        },
+        {
+          "vendor_id": "willow",
+          "charges": 0,
+          "credits": 407,
+          "count": 1,
+          "net": -407
+        }
+      ]
+    },
+    "R63/challenging": {
+      "resource_class": "prepared-skill",
+      "resource_comparison_to_package": {
+        "SKILL.md": {
+          "bytes_equal": true,
+          "modes_equal": true
+        },
+        "scripts/rollup.py": {
+          "bytes_equal": true,
+          "modes_equal": true
+        }
+      },
+      "api_matches_original": true,
+      "request_matches_fixed_case_after_literal_substitution": true,
+      "prompt_read_bytes": 2150,
+      "source_binding_from_original_setup": "/workspace/scratch/a75c3a6d9076/C-U092-ledger-state-hor12u9m/ledger.sqlite",
+      "setup_calls": [
+        {
+          "argv": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U092/input/ledger_api.py",
+            "--state",
+            "/workspace/scratch/a75c3a6d9076/C-U092-ledger-state-hor12u9m/ledger.sqlite",
+            "init",
+            "--fixture",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S06/challenging/fixture.json"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"state\":\"ready\",\"total_records\":15}\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U092/input/ledger_api.py",
+            "--state",
+            "/workspace/scratch/a75c3a6d9076/C-U092-ledger-state-hor12u9m/ledger.sqlite",
+            "describe"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":2,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n",
+          "stderr": ""
+        }
+      ],
+      "initial_sql_sha256_matches_metadata": true,
+      "initial_state_sql": [
+        "INSERT INTO \"source_state\" VALUES(1,'snap_fb322d1120ca406ad668bc26',1,0);"
+      ],
+      "final_sql_class": "unavailable; no inference from absence",
+      "checkpoint_content": {
+        "api": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U092/input/ledger_api.py",
+        "cursor": "p_b62d3333e930f1830dd2d61eb80d3bbc",
+        "done": false,
+        "end": "2026-06-18",
+        "entries": {
+          "chg-001": {
+            "amount_cents": 5000,
+            "currency": "USD",
+            "entry_id": "chg-001",
+            "kind": "charge",
+            "posted_on": "2026-06-18",
+            "status": "settled",
+            "vendor_id": "azure"
+          },
+          "chg-002": {
+            "amount_cents": 900,
+            "currency": "USD",
+            "entry_id": "chg-002",
+            "kind": "credit",
+            "posted_on": "2026-06-10",
+            "status": "settled",
+            "vendor_id": "saffron"
+          },
+          "chg-003": {
+            "amount_cents": 123456,
+            "currency": "USD",
+            "entry_id": "chg-003",
+            "kind": "charge",
+            "posted_on": "2026-06-13",
+            "status": "pending",
+            "vendor_id": "mirage"
+          },
+          "chg-004": {
+            "amount_cents": 700,
+            "currency": "USD",
+            "entry_id": "chg-004",
+            "kind": "credit",
+            "posted_on": "2026-06-17",
+            "status": "settled",
+            "vendor_id": "glacier"
+          },
+          "chg-005": {
+            "amount_cents": 700,
+            "currency": "USD",
+            "entry_id": "chg-005",
+            "kind": "charge",
+            "posted_on": "2026-06-11",
+            "status": "settled",
+            "vendor_id": "glacier"
+          },
+          "chg-006": {
+            "amount_cents": 88000,
+            "currency": "USD",
+            "entry_id": "chg-006",
+            "kind": "charge",
+            "posted_on": "2026-06-19",
+            "status": "settled",
+            "vendor_id": "azure"
+          }
+        },
+        "processed_cursors": [
+          null,
+          "p_824dd208571a05a7d57ff5bd0e4889c0"
+        ],
+        "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+        "start": "2026-06-10",
+        "state": "/workspace/scratch/a75c3a6d9076/C-U092-ledger-state-hor12u9m/ledger.sqlite",
+        "total_records": 15,
+        "version": 1
+      },
+      "checkpoint_recomputed_vendors": [
+        {
+          "vendor_id": "azure",
+          "charges": 5000,
+          "credits": 0,
+          "count": 1,
+          "net": 5000
+        },
+        {
+          "vendor_id": "glacier",
+          "charges": 700,
+          "credits": 700,
+          "count": 2,
+          "net": 0
+        },
+        {
+          "vendor_id": "saffron",
+          "charges": 0,
+          "credits": 900,
+          "count": 1,
+          "net": -900
+        }
+      ]
+    }
+  },
+  "recovery_hashes": {
+    "R28/ordinary": {
+      "prompt.md": true,
+      "prepared-skill/reimbursement-ledger-rollup/SKILL.md": true,
+      "prepared-skill/reimbursement-ledger-rollup/references/verification.md": true,
+      "prepared-skill/reimbursement-ledger-rollup/scripts/rollup.py": true,
+      "prepared-input/ledger_api.py": true,
+      "prepared-input/request.md": true,
+      "setup-observations.json": true,
+      "committed-initial-state/initial.sql": true,
+      "committed-initial-state/initial.json": true,
+      "recovery-provenance/source-relay.md": true,
+      "recovered-public-text/answer.md": true,
+      "recovered-public-text/execution-note.md": true,
+      "recovery-provenance/matched-sql-source.sql": true,
+      "logical-state-supplement/matched-final-state.sql": true
+    },
+    "R44/ordinary": {
+      "prompt.md": true,
+      "prepared-skill/reimbursement-ledger-rollup/SKILL.md": true,
+      "prepared-skill/reimbursement-ledger-rollup/scripts/reimbursement_rollup.py": true,
+      "prepared-input/ledger_api.py": true,
+      "prepared-input/request.md": true,
+      "setup-observations.json": true,
+      "committed-initial-state/initial.sql": true,
+      "committed-initial-state/initial.json": true,
+      "recovery-provenance/source-relay.md": true,
+      "recovered-public-text/answer.md": true,
+      "recovered-public-text/execution-note.md": true,
+      "recovered-work-evidence/checkpoint-rendering.json": true,
+      "recovery-provenance/matched-sql-source.sql": true,
+      "logical-state-supplement/matched-final-state.sql": true
+    },
+    "R44/challenging": {
+      "prompt.md": true,
+      "prepared-skill/reimbursement-ledger-rollup/SKILL.md": true,
+      "prepared-skill/reimbursement-ledger-rollup/scripts/reimbursement_rollup.py": true,
+      "prepared-input/ledger_api.py": true,
+      "prepared-input/request.md": true,
+      "setup-observations.json": true,
+      "committed-initial-state/initial.sql": true,
+      "committed-initial-state/initial.json": true,
+      "recovery-provenance/source-relay.md": true,
+      "recovered-public-text/answer.md": true,
+      "recovered-public-text/execution-note.md": true,
+      "recovered-work-evidence/checkpoint-rendering.json": true,
+      "recovery-provenance/matched-sql-source.sql": true,
+      "logical-state-supplement/matched-final-state.sql": true
+    },
+    "R63/ordinary": {
+      "prompt.md": true,
+      "prepared-skill/reimbursement-rollup/SKILL.md": true,
+      "prepared-skill/reimbursement-rollup/scripts/rollup.py": true,
+      "prepared-input/ledger_api.py": true,
+      "prepared-input/request.md": true,
+      "setup-observations.json": true,
+      "committed-initial-state/initial.sql": true,
+      "committed-initial-state/initial.json": true,
+      "recovery-provenance/source-relay.md": true,
+      "recovered-public-text/answer.md": true,
+      "recovered-public-text/execution-note.md": true,
+      "recovered-work-evidence/checkpoint-rendering.json": true,
+      "recovery-provenance/matched-sql-source.sql": true,
+      "logical-state-supplement/matched-final-state.sql": true
+    },
+    "R63/challenging": {
+      "prompt.md": true,
+      "prepared-skill/reimbursement-rollup/SKILL.md": true,
+      "prepared-skill/reimbursement-rollup/scripts/rollup.py": true,
+      "prepared-input/ledger_api.py": true,
+      "prepared-input/request.md": true,
+      "setup-observations.json": true,
+      "committed-initial-state/initial.sql": true,
+      "committed-initial-state/initial.json": true,
+      "recovery-provenance/source-relay.md": true,
+      "recovered-public-text/answer.md": true,
+      "recovered-public-text/execution-note.md": true,
+      "recovered-work-evidence/checkpoint-rendering.json": true,
+      "recovered-work-evidence/request-hash-matched.json": true,
+      "recovery-provenance/request-hash-match.json": true
+    }
+  },
+  "oracle_arithmetic": {
+    "ordinary": {
+      "full": [
+        {
+          "vendor_id": "apricot",
+          "charges": 1234,
+          "credits": 1234,
+          "count": 2,
+          "net": 0
+        },
+        {
+          "vendor_id": "juniper",
+          "charges": 2501,
+          "credits": 0,
+          "count": 1,
+          "net": 2501
+        },
+        {
+          "vendor_id": "willow",
+          "charges": 0,
+          "credits": 407,
+          "count": 1,
+          "net": -407
+        }
+      ],
+      "first_six": [
+        {
+          "vendor_id": "apricot",
+          "charges": 1234,
+          "credits": 1234,
+          "count": 2,
+          "net": 0
+        },
+        {
+          "vendor_id": "juniper",
+          "charges": 2501,
+          "credits": 0,
+          "count": 1,
+          "net": 2501
+        },
+        {
+          "vendor_id": "willow",
+          "charges": 0,
+          "credits": 407,
+          "count": 1,
+          "net": -407
+        }
+      ]
+    },
+    "challenging": {
+      "full": [
+        {
+          "vendor_id": "azure",
+          "charges": 5125,
+          "credits": 6200,
+          "count": 3,
+          "net": -1075
+        },
+        {
+          "vendor_id": "glacier",
+          "charges": 700,
+          "credits": 700,
+          "count": 2,
+          "net": 0
+        },
+        {
+          "vendor_id": "harbor",
+          "charges": 2222,
+          "credits": 222,
+          "count": 2,
+          "net": 2000
+        },
+        {
+          "vendor_id": "quartz",
+          "charges": 0,
+          "credits": 0,
+          "count": 1,
+          "net": 0
+        },
+        {
+          "vendor_id": "saffron",
+          "charges": 900,
+          "credits": 900,
+          "count": 2,
+          "net": 0
+        }
+      ],
+      "first_six": [
+        {
+          "vendor_id": "azure",
+          "charges": 5000,
+          "credits": 0,
+          "count": 1,
+          "net": 5000
+        },
+        {
+          "vendor_id": "glacier",
+          "charges": 700,
+          "credits": 700,
+          "count": 2,
+          "net": 0
+        },
+        {
+          "vendor_id": "saffron",
+          "charges": 0,
+          "credits": 900,
+          "count": 1,
+          "net": -900
+        }
+      ]
+    }
+  },
+  "R28_challenging_checkpoint_copy": {
+    "scope": "Captured workflow checkpoint copy, not source ledger; read-only inspection, no replay",
+    "copy_sha256_matches": true,
+    "state": {
+      "version": 1,
+      "api": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U094/input/ledger_api.py",
+      "source": "/workspace/scratch/a75c3a6d9076/C-U094-ledger-recovery-initial-001/ledger.sqlite",
+      "checkpoint": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U094/work/rollup-checkpoint.sqlite",
+      "start": "2026-06-10",
+      "end": "2026-06-18",
+      "snapshot": "snap_fb322d1120ca406ad668bc26",
+      "total": 15,
+      "next_cursor": "p_b62d3333e930f1830dd2d61eb80d3bbc",
+      "complete": false
+    },
+    "page_input_cursors": [
+      null,
+      "p_824dd208571a05a7d57ff5bd0e4889c0"
+    ],
+    "entry_ids": [
+      "chg-001",
+      "chg-002",
+      "chg-003",
+      "chg-004",
+      "chg-005",
+      "chg-006"
+    ],
+    "vendors": [
+      [
+        "azure",
+        "5000",
+        "0",
+        1
+      ],
+      [
+        "glacier",
+        "700",
+        "700",
+        2
+      ],
+      [
+        "saffron",
+        "0",
+        "900",
+        1
+      ]
+    ]
+  },
+  "R63_challenging_checkpoint_hash_match": {
+    "sha256": "cf3b8effece5f3c1c9be5e405b5240a66d68d83c984a9795304481974fc486ee",
+    "bytes": 1454,
+    "rendering_minus_one_lf": true,
+    "same_logical_json": true
+  }
+}

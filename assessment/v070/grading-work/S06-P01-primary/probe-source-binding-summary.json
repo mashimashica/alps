@@ -1,0 +1,250 @@
+[
+  {
+    "candidate": "R17",
+    "initial_run_exit": 75,
+    "initial_run": {
+      "complete": false,
+      "currency": "USD",
+      "end": "2026-06-18",
+      "examined_records": 6,
+      "reason": "execution_tranche_limit",
+      "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+      "start": "2026-06-10",
+      "total_records": 15
+    },
+    "substituted_run_exit": 2,
+    "substituted_run": {
+      "complete": false,
+      "error": "checkpoint belongs to another request",
+      "recovery": "Preserve checkpoint; resolve error and rerun with remaining approved quota."
+    },
+    "source_a": {
+      "calls_per_tranche": 2,
+      "page_size": 3,
+      "remaining_calls": 0,
+      "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+      "total_records": 15,
+      "tranche": 1
+    },
+    "source_b": {
+      "calls_per_tranche": 2,
+      "page_size": 3,
+      "remaining_calls": 2,
+      "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+      "total_records": 15,
+      "tranche": 1
+    },
+    "checkpoint_unchanged": true,
+    "runner_sha256": "dac1a0d3f3bb00017d2659a9a49711fae55a471841921e8f606f4c5128c86018"
+  },
+  {
+    "candidate": "R28",
+    "initial_run_exit": 75,
+    "initial_run": {
+      "checkpoint": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/checkpoint.json",
+      "coverage": {
+        "pages_processed": 2,
+        "records_examined": 6,
+        "source_exhausted": false,
+        "total_records": 15
+      },
+      "interval": {
+        "end": "2026-06-18",
+        "start": "2026-06-10"
+      },
+      "partial_aggregation_withheld": true,
+      "reason": "tranche_boundary",
+      "remaining_calls": 0,
+      "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+      "source_tranche": 1,
+      "status": "incomplete"
+    },
+    "substituted_run_exit": 2,
+    "substituted_run": {
+      "detail": "checkpoint belongs to different inputs",
+      "error": "checkpoint_request_mismatch",
+      "status": "invalid_request"
+    },
+    "source_a": {
+      "calls_per_tranche": 2,
+      "page_size": 3,
+      "remaining_calls": 0,
+      "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+      "total_records": 15,
+      "tranche": 1
+    },
+    "source_b": {
+      "calls_per_tranche": 2,
+      "page_size": 3,
+      "remaining_calls": 2,
+      "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+      "total_records": 15,
+      "tranche": 1
+    },
+    "checkpoint_unchanged": true,
+    "runner_sha256": "1f14d5ee7b1a33bc49480ce4d4e44cc08d204e4de4ae6e6fedf6bd82ee9e52d0"
+  },
+  {
+    "candidate": "R44",
+    "initial_run_exit": 0,
+    "initial_run": {
+      "interval": {
+        "end": "2026-06-18",
+        "start": "2026-06-10"
+      },
+      "next_cursor": "p_b62d3333e930f1830dd2d61eb80d3bbc",
+      "partial_vendors": [
+        {
+          "net_amount_cents": 5000,
+          "qualifying_entry_count": 1,
+          "settled_charge_amount_cents": 5000,
+          "settled_credit_amount_cents": 0,
+          "vendor_id": "azure"
+        },
+        {
+          "net_amount_cents": 0,
+          "qualifying_entry_count": 2,
+          "settled_charge_amount_cents": 700,
+          "settled_credit_amount_cents": 700,
+          "vendor_id": "glacier"
+        },
+        {
+          "net_amount_cents": -900,
+          "qualifying_entry_count": 1,
+          "settled_charge_amount_cents": 0,
+          "settled_credit_amount_cents": 900,
+          "vendor_id": "saffron"
+        }
+      ],
+      "reason": "tranche_capacity_required",
+      "remaining_calls": 0,
+      "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+      "source_records_examined": 6,
+      "source_total_records": 15,
+      "status": "incomplete",
+      "tranche": 1
+    },
+    "substituted_run_exit": 0,
+    "substituted_run": {
+      "interval": {
+        "end": "2026-06-18",
+        "start": "2026-06-10"
+      },
+      "next_cursor": "p_a504be71ee377d98a86997c7f1436598",
+      "partial_vendors": [
+        {
+          "net_amount_cents": -1200,
+          "qualifying_entry_count": 2,
+          "settled_charge_amount_cents": 5000,
+          "settled_credit_amount_cents": 6200,
+          "vendor_id": "azure"
+        },
+        {
+          "net_amount_cents": 0,
+          "qualifying_entry_count": 2,
+          "settled_charge_amount_cents": 700,
+          "settled_credit_amount_cents": 700,
+          "vendor_id": "glacier"
+        },
+        {
+          "net_amount_cents": 2000,
+          "qualifying_entry_count": 2,
+          "settled_charge_amount_cents": 2222,
+          "settled_credit_amount_cents": 222,
+          "vendor_id": "harbor"
+        },
+        {
+          "net_amount_cents": 0,
+          "qualifying_entry_count": 2,
+          "settled_charge_amount_cents": 900,
+          "settled_credit_amount_cents": 900,
+          "vendor_id": "saffron"
+        }
+      ],
+      "reason": "tranche_capacity_required",
+      "remaining_calls": 0,
+      "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+      "source_records_examined": 12,
+      "source_total_records": 15,
+      "status": "incomplete",
+      "tranche": 1
+    },
+    "source_a": {
+      "calls_per_tranche": 2,
+      "page_size": 3,
+      "remaining_calls": 0,
+      "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+      "total_records": 15,
+      "tranche": 1
+    },
+    "source_b": {
+      "calls_per_tranche": 2,
+      "page_size": 3,
+      "remaining_calls": 0,
+      "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+      "total_records": 15,
+      "tranche": 1
+    },
+    "checkpoint_unchanged": false,
+    "runner_sha256": "3c2866e81abdcbab376ddcdd39629755d2aeb8cff620a3accf32236d267b627a"
+  },
+  {
+    "candidate": "R63",
+    "initial_run_exit": 75,
+    "initial_run": {
+      "currency": "USD",
+      "end": "2026-06-18",
+      "examined_records": 6,
+      "partial_vendors": [
+        {
+          "net_cents": 5000,
+          "qualifying_entry_count": 1,
+          "settled_charge_cents": 5000,
+          "settled_credit_cents": 0,
+          "vendor_id": "azure"
+        },
+        {
+          "net_cents": 0,
+          "qualifying_entry_count": 2,
+          "settled_charge_cents": 700,
+          "settled_credit_cents": 700,
+          "vendor_id": "glacier"
+        },
+        {
+          "net_cents": -900,
+          "qualifying_entry_count": 1,
+          "settled_charge_cents": 0,
+          "settled_credit_cents": 900,
+          "vendor_id": "saffron"
+        }
+      ],
+      "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+      "start": "2026-06-10",
+      "status": "incomplete",
+      "total_records": 15
+    },
+    "substituted_run_exit": 2,
+    "substituted_run": {
+      "status": "error",
+      "detail": "checkpoint request mismatch"
+    },
+    "source_a": {
+      "calls_per_tranche": 2,
+      "page_size": 3,
+      "remaining_calls": 0,
+      "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+      "total_records": 15,
+      "tranche": 1
+    },
+    "source_b": {
+      "calls_per_tranche": 2,
+      "page_size": 3,
+      "remaining_calls": 2,
+      "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+      "total_records": 15,
+      "tranche": 1
+    },
+    "checkpoint_unchanged": true,
+    "runner_sha256": "2e4fabb74b9cc63a469a763b7c9e49e7a952bf4845187700cc322175ba1e7593"
+  }
+]

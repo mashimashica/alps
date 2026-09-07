@@ -240,23 +240,27 @@ def main():
     mapping = {}
     for code, creator_id, package, applications in plans:
         candidate = target / code
-        copy_tree(package, candidate / "package" / package.name, excluded_caches)
         creator = ROOT / "trials" / creator_id
-        copy_file(creator / "execution-note.md", candidate / "creator-reported-checks.md")
         if creator_recoveries[creator_id] is not None:
-            recovered_control_grading.write_creator(ROOT, creator_recoveries[creator_id],
-                                                    candidate / "recovery-provenance", copy_file)
-        creator_caches = artifact_inventory(creator / "deliverables")[1]
-        if creator_caches:
-            excluded_caches[(creator / "deliverables").relative_to(ROOT).as_posix()] = creator_caches
-        for path in (creator / "deliverables").iterdir():
-            if path.name in {"skills", "__pycache__"}:
-                continue
-            destination = candidate / "other-creator-deliverables" / path.name
-            if path.is_dir():
-                copy_tree(path, destination, excluded_caches)
-            else:
-                copy_file(path, destination)
+            recovered_control_grading.write_creator_candidate(ROOT, creator_recoveries[creator_id], candidate, copy_file)
+            creator_caches = creator_recoveries[creator_id]["provenance"]["excluded_canonical_runtime_caches"]
+            if creator_caches:
+                excluded_caches[(creator / "deliverables").relative_to(ROOT).as_posix()] = {
+                    name: item["sha256"] for name, item in creator_caches.items()}
+        else:
+            copy_tree(package, candidate / "package" / package.name, excluded_caches)
+            copy_file(creator / "execution-note.md", candidate / "creator-reported-checks.md")
+            creator_caches = artifact_inventory(creator / "deliverables")[1]
+            if creator_caches:
+                excluded_caches[(creator / "deliverables").relative_to(ROOT).as_posix()] = creator_caches
+            for path in (creator / "deliverables").iterdir():
+                if path.name in {"skills", "__pycache__"}:
+                    continue
+                destination = candidate / "other-creator-deliverables" / path.name
+                if path.is_dir():
+                    copy_tree(path, destination, excluded_caches)
+                else:
+                    copy_file(path, destination)
         mapping[code] = {"creator": creator_id, "consumers": []}
         for variant, use_id, folder, assignment, recovered in applications:
             dest = candidate / variant

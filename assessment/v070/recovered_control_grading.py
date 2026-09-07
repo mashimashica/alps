@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 import stat
 
-from prepare_control_consumers import checked_path, file_hashes
+from prepare_control_consumers import artifact_inventory, checked_path, file_hashes
 
 SOURCE_COMMIT = "75c0ea9bddf379c5e1803e4c0114ba5b47c871d8"
 MANIFEST_PATH = "recovery/consumer-evidence/provenance.json"
@@ -50,6 +50,10 @@ REQUEST_PROVENANCE_SHA256 = "1d97138dabefb9389245c0804044cb8733668e75fccd3197328
 CREATOR_COMPANION_PATH = "recovery/creator-recovery-freezes-001.json"
 CREATOR_COMPANION_SHA256 = "03cd21ec820654b6978ea75c903bde1863b1cc625614fe5bbf1859d693f1d402"
 RECOVERED_CREATORS = {f"control-{number:03}" for number in range(69, 73)}
+COMMITTED_CREATOR_NOTES = {
+    "control-069": "358a9face475b70dae4d513206b215fa3495432344b129968a47646d880a4fb6",
+    "control-070": "780adc079178f47a0e8945c1c76a48e338122a5fea62962a6948638458202fe9",
+}
 BOUNDARY_ADDENDUM = """
 Some S06 applications include evidence-availability.md and recovery-provenance.json.
 Read these before assessing the application. Prepared inputs/Skills are the
@@ -260,6 +264,8 @@ def plan_application(root, consumer_id, assignment):
 def copy_planned_files(root, files, destination, copy_file):
     for item in files:
         original = source(root, item["source"])
+        if not original.is_file():
+            raise ValueError("Planned recovery source must remain a regular file")
         checked_bytes(root, item["source"], item["sha256"])
         if stat.S_IMODE(original.stat().st_mode) != item["observed_copy_source_mode"]:
             raise ValueError("Recovery source mode changed after preflight")
@@ -281,6 +287,23 @@ def write_application(root, plan, destination, copy_file):
     for relative, text in generated.items():
         with (destination / relative).open("x", encoding="utf-8") as stream:
             stream.write(text)
+
+
+def closed_creator_inventory(folder, expected, expected_modes, allow_runtime_caches=False):
+    """Verify reviewed files and all directory entries; record only permitted caches."""
+    resources, caches = artifact_inventory(checked_path(folder))
+    if resources != expected or (caches and not allow_runtime_caches):
+        raise ValueError("Closed recovered creator resource inventory differs")
+    if {name: stat.S_IMODE((folder / name).stat().st_mode) for name in resources} != expected_modes:
+        raise ValueError("Closed recovered creator resource modes differ")
+    allowed_directories = set()
+    for relative in (*expected, *caches):
+        allowed_directories.update(parent.as_posix() for parent in Path(relative).parents if parent != Path("."))
+    actual_directories = {path.relative_to(folder).as_posix() for path in folder.rglob("*") if path.is_dir()}
+    if actual_directories != allowed_directories:
+        raise ValueError("Unknown or missing recovered creator deliverable directory")
+    return {name: {"sha256": value, "mode": stat.S_IMODE((folder / name).stat().st_mode)}
+            for name, value in caches.items()}
 
 
 def plan_creator(root, creator_id, package):
@@ -311,6 +334,42 @@ def plan_creator(root, creator_id, package):
     rematerialization = json.loads(source(root, companion["rematerialization"]["path"]).read_text())
     selected_placement = [item for item in rematerialization["files"]
                           if item["destination_path"].startswith(f"trials/{creator_id}/")]
+    canonical_relative = f"trials/{creator_id}/deliverables"
+    canonical_files = {f"skills/{package.name}/{name}": value for name, value in entry["frozen_resource_sha256"].items()}
+    canonical_modes = {f"skills/{package.name}/{name}": mode for name, mode in entry["newly_observed_source_file_modes"].items()}
+    caches = closed_creator_inventory(source(root, canonical_relative), canonical_files, canonical_modes, True)
+    closed_creator_inventory(package, entry["frozen_resource_sha256"], entry["newly_observed_source_file_modes"])
+    note_relative = f"trials/{creator_id}/execution-note.md"
+    if creator_id in COMMITTED_CREATOR_NOTES:
+        if selected_placement:
+            raise ValueError("Committed creator note must retain its reviewed original provenance")
+        note_sha256, note_mode = COMMITTED_CREATOR_NOTES[creator_id], 0o644
+        note_origin = {"source_commit": SOURCE_COMMIT, "corroborating_relay": entry["relay"]}
+    else:
+        placements = {item["destination_path"]: item for item in selected_placement}
+        if len(placements) != len(selected_placement) or set(placements) != {
+                note_relative, *(f"{canonical_relative}/{name}" for name in canonical_files)}:
+            raise ValueError("The reviewed rematerialization must cover exactly the note and package")
+        for name, value in canonical_files.items():
+            placement = placements[f"{canonical_relative}/{name}"]
+            if placement["sha256"] != value or int(placement["new_placement_mode"], 8) != canonical_modes[name]:
+                raise ValueError("Canonical resource disagrees with reviewed rematerialization")
+        note_placement = placements[note_relative]
+        note_sha256, note_mode = note_placement["sha256"], int(note_placement["new_placement_mode"], 8)
+        note_origin = {"rematerialization": companion["rematerialization"], "placement": note_placement}
+    note = source(root, note_relative)
+    if not note.is_file():
+        raise ValueError("Recovered creator public note must be a regular file")
+    checked_bytes(root, note_relative, note_sha256)
+    if stat.S_IMODE(note.stat().st_mode) != note_mode:
+        raise ValueError("Recovered creator public-note mode differs")
+    selected_note = {"source": note_relative, "sha256": note_sha256,
+                     "observed_copy_source_mode": note_mode, "identity_source": note_origin}
+    candidate_files = [{**selected_note, "destination": "creator-reported-checks.md"}]
+    for name, value in entry["frozen_resource_sha256"].items():
+        candidate_files.append({"source": (package / name).relative_to(root).as_posix(),
+                                "destination": f"package/{package.name}/{name}", "sha256": value,
+                                "observed_copy_source_mode": entry["newly_observed_source_file_modes"][name]})
     # No whole review, other creator entry, schedule or consumer assignment body
     # enters the blind packet. The preserved relay and format observation contain
     # this candidate's public evidence, without model/effort mappings or grades.
@@ -323,14 +382,26 @@ def plan_creator(root, creator_id, package):
                   "observation_utc": companion["observation_utc"], "scope": companion["scope"],
                   "creator": entry, "evidence_reviews": companion["evidence_reviews"],
                   "rematerialization_source": companion["rematerialization"],
-                  "this_creator_rematerialized_files": selected_placement}
-    return {"files": files, "provenance": provenance}
+                  "this_creator_rematerialized_files": selected_placement,
+                  "canonical_public_note": selected_note,
+                  "canonical_deliverable_resource_sha256": canonical_files,
+                  "canonical_deliverable_resource_modes": canonical_modes,
+                  "excluded_canonical_runtime_caches": caches}
+    return {"creator_id": creator_id, "frozen_relative": package.relative_to(root).as_posix(),
+            "files": files, "candidate_files": candidate_files, "provenance": provenance}
+
+
+def verify_creator_plan(root, plan):
+    current = plan_creator(root, plan["creator_id"], source(root, plan["frozen_relative"]))
+    if current != plan:
+        raise ValueError("Recovered creator evidence changed after planning")
 
 
 def write_creator(root, plan, destination, copy_file):
     checked_path(destination)
     if destination.exists() or destination.resolve() != destination or not destination.is_relative_to(root):
         raise ValueError("Preserve existing/partial creator recovery provenance")
+    verify_creator_plan(root, plan)
     destination.mkdir(parents=True, exist_ok=False)
     copy_planned_files(root, plan["files"], destination, copy_file)
     with (destination / "creator-recovery-provenance.json").open("x", encoding="utf-8") as stream:
@@ -342,3 +413,17 @@ def write_creator(root, plan, destination, copy_file):
                      "This candidate's current canonical freeze and consumer preparation are new recovery observations. "
                      "The attached format observation is mechanical validation at recovery time, not semantic or business grading. "
                      "Original task criteria and evaluation rules are unchanged.\n")
+    verify_creator_plan(root, plan)
+
+
+def write_creator_candidate(root, plan, destination, copy_file):
+    """Copy only the closed, reviewed candidate version and its public note."""
+    checked_path(destination)
+    if destination.exists() or destination.resolve() != destination or not destination.is_relative_to(root):
+        raise ValueError("Preserve existing/partial recovered creator candidate")
+    verify_creator_plan(root, plan)
+    destination.mkdir(parents=True, exist_ok=False)
+    copy_planned_files(root, plan["candidate_files"], destination, copy_file)
+    # This performs a second complete source check before and after attachment,
+    # preserving partial output if a canonical or selected file changed mid-copy.
+    write_creator(root, plan, destination / "recovery-provenance", copy_file)

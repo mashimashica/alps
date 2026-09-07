@@ -4,6 +4,7 @@ import ast
 import csv
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
 import tempfile
@@ -243,6 +244,8 @@ class CreatorRecoveryGradingTests(unittest.TestCase):
             freeze = json.loads((SOURCE / entry["freeze_manifest"]["path"]).read_text())
             relative = Path("frozen/control-artifacts") / creator_id / Path(freeze["frozen_path"]).name
             paths.update(str(relative / name) for name in freeze["file_sha256"])
+            paths.add(f"trials/{creator_id}/execution-note.md")
+            paths.update(f"trials/{creator_id}/deliverables/skills/{relative.name}/{name}" for name in freeze["file_sha256"])
             self.packages[creator_id] = self.root / relative
         for relative in paths:
             target = self.root / relative
@@ -298,6 +301,197 @@ class CreatorRecoveryGradingTests(unittest.TestCase):
         resource.chmod(0o600)
         with self.assertRaisesRegex(ValueError, "freeze/resource identity differs"):
             self.plan()
+
+    def canonical(self, creator_id):
+        return self.root / "trials" / creator_id / "deliverables"
+
+    def test_both_note_provenance_paths_reject_changed_missing_or_wrong_mode_notes(self):
+        for creator_id in ("control-069", "control-071"):
+            with self.subTest(creator=creator_id):
+                note = self.root / "trials" / creator_id / "execution-note.md"
+                original = note.read_bytes()
+                note.write_text("UNREVIEWED REPLACEMENT CREATOR NOTE\n")
+                with self.assertRaisesRegex(ValueError, "Preserved recovery evidence changed"):
+                    self.plan(creator_id)
+                note.unlink()
+                with self.assertRaisesRegex(ValueError, "public note must be a regular file"):
+                    self.plan(creator_id)
+                note.write_bytes(original)
+                note.chmod(0o600)
+                with self.assertRaisesRegex(ValueError, "public-note mode differs"):
+                    self.plan(creator_id)
+                note.chmod(0o644)
+
+    def test_both_provenance_paths_reject_unknown_files_directories_and_nonregular_entries(self):
+        for creator_id in ("control-069", "control-071"):
+            with self.subTest(creator=creator_id):
+                folder = self.canonical(creator_id)
+                extra = folder / "unreviewed-summary.md"
+                extra.write_text("SYNTHETIC OTHER-GRADE/MODEL-MAPPING SENTINEL\n")
+                with self.assertRaisesRegex(ValueError, "Closed recovered creator resource inventory"):
+                    self.plan(creator_id)
+                extra.unlink()
+                extra.mkdir()
+                with self.assertRaisesRegex(ValueError, "Unknown or missing recovered creator deliverable directory"):
+                    self.plan(creator_id)
+                extra.rmdir()
+                os.mkfifo(extra)
+                with self.assertRaisesRegex(ValueError, "Unsupported filesystem entry"):
+                    self.plan(creator_id)
+                extra.unlink()
+                extra.symlink_to(folder / "skills")
+                with self.assertRaisesRegex(ValueError, "symlink"):
+                    self.plan(creator_id)
+                extra.unlink()
+
+    def test_both_provenance_paths_reject_missing_changed_and_wrong_mode_canonical_resources(self):
+        for creator_id in ("control-069", "control-071"):
+            with self.subTest(creator=creator_id):
+                resource = self.canonical(creator_id) / "skills" / self.packages[creator_id].name / "SKILL.md"
+                original = resource.read_bytes()
+                resource.unlink()
+                with self.assertRaisesRegex(ValueError, "Closed recovered creator resource inventory"):
+                    self.plan(creator_id)
+                resource.write_bytes(original + b"changed\n")
+                with self.assertRaisesRegex(ValueError, "Closed recovered creator resource inventory"):
+                    self.plan(creator_id)
+                resource.write_bytes(original)
+                resource.chmod(0o600)
+                with self.assertRaisesRegex(ValueError, "Closed recovered creator resource modes"):
+                    self.plan(creator_id)
+                resource.chmod(0o644)
+
+    def test_complete_candidate_copy_keeps_reviewed_note_package_and_provenance_together(self):
+        for creator_id in recovery.RECOVERED_CREATORS:
+            with self.subTest(creator=creator_id):
+                plan = self.plan(creator_id)
+                destination = self.root / "disposable-candidates" / creator_id
+                recovery.write_creator_candidate(self.root, plan, destination, grading.copy_file)
+                for item in plan["candidate_files"]:
+                    copied = destination / item["destination"]
+                    self.assertEqual(recovery.sha_bytes(copied.read_bytes()), item["sha256"])
+                    self.assertEqual(copied.stat().st_mode & 0o777, item["observed_copy_source_mode"])
+                self.assertTrue((destination / "recovery-provenance/creator-recovery-provenance.json").is_file())
+                self.assertFalse((destination / "other-creator-deliverables").exists())
+
+    def test_post_plan_note_resource_mode_and_extra_file_changes_block_copy(self):
+        for creator_id in ("control-069", "control-071"):
+            folder = self.canonical(creator_id)
+            note = folder.parent / "execution-note.md"
+            resource = folder / "skills" / self.packages[creator_id].name / "SKILL.md"
+            for changed in (note, resource):
+                with self.subTest(creator=creator_id, path=changed.name):
+                    plan = self.plan(creator_id)
+                    original = changed.read_bytes()
+                    changed.write_bytes(original + b"changed after plan\n")
+                    destination = self.root / "disposable-candidates" / creator_id
+                    with self.assertRaises(ValueError):
+                        recovery.write_creator_candidate(self.root, plan, destination, grading.copy_file)
+                    self.assertFalse(destination.exists())
+                    changed.write_bytes(original)
+                    changed.chmod(0o600)
+                    with self.assertRaises(ValueError):
+                        recovery.write_creator_candidate(self.root, plan, destination, grading.copy_file)
+                    self.assertFalse(destination.exists())
+                    changed.chmod(0o644)
+            plan = self.plan(creator_id)
+            extra = folder / "after-plan.md"
+            extra.write_text("new unreviewed evidence\n")
+            with self.assertRaisesRegex(ValueError, "Closed recovered creator resource inventory"):
+                recovery.write_creator_candidate(self.root, plan, self.root / "disposable-candidates" / creator_id, grading.copy_file)
+            extra.unlink()
+
+    def test_mutation_during_copy_retains_partial_candidate_and_refuses_replacement(self):
+        for creator_id in ("control-069", "control-071"):
+            with self.subTest(creator=creator_id):
+                plan = self.plan(creator_id)
+                extra = self.canonical(creator_id) / "injected-after-note.md"
+                destination = self.root / "disposable-candidates" / creator_id
+
+                def inject_extra(original, target):
+                    grading.copy_file(original, target)
+                    if target.name == "creator-reported-checks.md":
+                        extra.write_text("unreviewed mid-copy evidence\n")
+
+                with self.assertRaisesRegex(ValueError, "Closed recovered creator resource inventory"):
+                    recovery.write_creator_candidate(self.root, plan, destination, inject_extra)
+                self.assertTrue((destination / "creator-reported-checks.md").is_file())
+                self.assertFalse((destination / "recovery-provenance").exists())
+                extra.unlink()
+                with self.assertRaisesRegex(ValueError, "existing/partial recovered creator candidate"):
+                    recovery.write_creator_candidate(self.root, plan, destination, grading.copy_file)
+
+    def test_permitted_runtime_cache_is_recorded_excluded_and_bound_after_planning(self):
+        folder = self.canonical("control-071") / "__pycache__"
+        folder.mkdir()
+        cache = folder / "fixture.cpython-312.pyc"
+        cache.write_bytes(b"disposable runtime cache bytes")
+        plan = self.plan()
+        observation = plan["provenance"]["excluded_canonical_runtime_caches"]
+        self.assertEqual(observation["__pycache__/fixture.cpython-312.pyc"]["sha256"], recovery.sha_bytes(cache.read_bytes()))
+        destination = self.root / "disposable-candidates/with-cache"
+        recovery.write_creator_candidate(self.root, plan, destination, grading.copy_file)
+        self.assertEqual(list(destination.rglob("*.pyc")), [])
+        cache.write_bytes(b"changed after plan")
+        with self.assertRaisesRegex(ValueError, "changed after planning"):
+            recovery.write_creator_candidate(self.root, plan, self.root / "disposable-candidates/changed-cache", grading.copy_file)
+        (folder / "not-cache.md").write_text("unreviewed\n")
+        with self.assertRaisesRegex(ValueError, "non-cache resource"):
+            self.plan()
+
+    def test_selected_note_and_frozen_file_bytes_or_modes_are_rechecked_during_copy(self):
+        for creator_id in ("control-069", "control-071"):
+            for mutation in ("note-bytes", "frozen-bytes", "frozen-mode"):
+                with self.subTest(creator=creator_id, mutation=mutation):
+                    plan = self.plan(creator_id)
+                    changed = (self.canonical(creator_id).parent / "execution-note.md" if mutation == "note-bytes"
+                               else self.packages[creator_id] / "SKILL.md")
+                    original = changed.read_bytes()
+                    original_mode = changed.stat().st_mode & 0o777
+                    destination = self.root / "disposable-candidates" / f"{creator_id}-{mutation}"
+
+                    def inject_change(source, target):
+                        grading.copy_file(source, target)
+                        if target.name == "creator-reported-checks.md":
+                            if mutation == "frozen-mode":
+                                changed.chmod(0o600)
+                            else:
+                                changed.write_bytes(original + b"mid-copy change\n")
+
+                    try:
+                        with self.assertRaises(ValueError):
+                            recovery.write_creator_candidate(self.root, plan, destination, inject_change)
+                        self.assertTrue((destination / "creator-reported-checks.md").is_file())
+                        self.assertFalse((destination / "recovery-provenance").exists())
+                    finally:
+                        changed.write_bytes(original)
+                        changed.chmod(original_mode)
+
+    def test_actual_creator_copy_loop_cannot_admit_changed_note_or_extra_deliverable(self):
+        loop = next(node for node in ast.walk(ast.parse(Path(grading.__file__).read_text()))
+                    if isinstance(node, ast.For) and isinstance(node.target, ast.Tuple)
+                    and [getattr(item, "id", None) for item in node.target.elts] == ["code", "creator_id", "package", "applications"])
+        for creator_id in ("control-069", "control-071"):
+            plan = self.plan(creator_id)
+            note = self.canonical(creator_id).parent / "execution-note.md"
+            original = note.read_bytes()
+            for mutation in ("note", "extra"):
+                with self.subTest(creator=creator_id, mutation=mutation):
+                    extra = self.canonical(creator_id) / "unreviewed-summary.md"
+                    if mutation == "note":
+                        note.write_text("UNREVIEWED REPLACEMENT CREATOR NOTE\n")
+                    else:
+                        extra.write_text("SYNTHETIC OTHER-GRADE/MODEL-MAPPING SENTINEL\n")
+                    target = self.root / "disposable-copy-loop" / f"{creator_id}-{mutation}"
+                    environment = {**vars(grading), "ROOT": self.root, "target": target,
+                                   "creator_recoveries": {creator_id: plan}, "mapping": {}, "excluded_caches": {},
+                                   "plans": [("R17", creator_id, self.packages[creator_id], [])]}
+                    with self.assertRaises(ValueError):
+                        exec(compile(ast.Module(body=[loop], type_ignores=[]), "actual-creator-copy-loop", "exec"), environment)
+                    self.assertFalse(target.exists())
+                    note.write_bytes(original)
+                    if extra.exists():
+                        extra.unlink()
 
 
 if __name__ == "__main__":

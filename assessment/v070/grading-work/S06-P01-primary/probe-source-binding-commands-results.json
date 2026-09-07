@@ -1,0 +1,410 @@
+[
+  {
+    "label": "R17 initialize disposable A",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/state-a.sqlite",
+      "init",
+      "--fixture",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/fixture.json"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"state\":\"ready\",\"total_records\":15}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R17 initialize disposable B",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/state-b.sqlite",
+      "init",
+      "--fixture",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/fixture.json"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"state\":\"ready\",\"total_records\":15}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R17 incorporate first tranche from A",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/runner.py",
+      "--api",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/state-a.sqlite",
+      "--checkpoint",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/checkpoint.json",
+      "--start",
+      "2026-06-10",
+      "--end",
+      "2026-06-18"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 75,
+    "stdout": "{\"complete\": false, \"currency\": \"USD\", \"end\": \"2026-06-18\", \"examined_records\": 6, \"reason\": \"execution_tranche_limit\", \"snapshot_id\": \"snap_fb322d1120ca406ad668bc26\", \"start\": \"2026-06-10\", \"total_records\": 15}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R17 describe A after first run",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/state-a.sqlite",
+      "describe"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":0,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R17 deliberately substitute B using same checkpoint",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/runner.py",
+      "--api",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/state-b.sqlite",
+      "--checkpoint",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/checkpoint.json",
+      "--start",
+      "2026-06-10",
+      "--end",
+      "2026-06-18"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 2,
+    "stdout": "{\"complete\": false, \"error\": \"checkpoint belongs to another request\", \"recovery\": \"Preserve checkpoint; resolve error and rerun with remaining approved quota.\"}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R17 describe B after substitution",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R17/state-b.sqlite",
+      "describe"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":2,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R28 initialize disposable A",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/state-a.sqlite",
+      "init",
+      "--fixture",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/fixture.json"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"state\":\"ready\",\"total_records\":15}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R28 initialize disposable B",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/state-b.sqlite",
+      "init",
+      "--fixture",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/fixture.json"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"state\":\"ready\",\"total_records\":15}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R28 incorporate first tranche from A",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/runner.py",
+      "--api",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/ledger_api.py",
+      "--source-state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/state-a.sqlite",
+      "--checkpoint",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/checkpoint.json",
+      "--start",
+      "2026-06-10",
+      "--end",
+      "2026-06-18"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 75,
+    "stdout": "{\"checkpoint\":\"/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/checkpoint.json\",\"coverage\":{\"pages_processed\":2,\"records_examined\":6,\"source_exhausted\":false,\"total_records\":15},\"interval\":{\"end\":\"2026-06-18\",\"start\":\"2026-06-10\"},\"partial_aggregation_withheld\":true,\"reason\":\"tranche_boundary\",\"remaining_calls\":0,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"source_tranche\":1,\"status\":\"incomplete\"}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R28 describe A after first run",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/state-a.sqlite",
+      "describe"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":0,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R28 deliberately substitute B using same checkpoint",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/runner.py",
+      "--api",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/ledger_api.py",
+      "--source-state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/state-b.sqlite",
+      "--checkpoint",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/checkpoint.json",
+      "--start",
+      "2026-06-10",
+      "--end",
+      "2026-06-18"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 2,
+    "stdout": "{\"detail\":\"checkpoint belongs to different inputs\",\"error\":\"checkpoint_request_mismatch\",\"status\":\"invalid_request\"}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R28 describe B after substitution",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R28/state-b.sqlite",
+      "describe"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":2,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R44 initialize disposable A",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/state-a.sqlite",
+      "init",
+      "--fixture",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/fixture.json"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"state\":\"ready\",\"total_records\":15}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R44 initialize disposable B",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/state-b.sqlite",
+      "init",
+      "--fixture",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/fixture.json"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"state\":\"ready\",\"total_records\":15}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R44 incorporate first tranche from A",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/runner.py",
+      "--api",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/ledger_api.py",
+      "--source-state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/state-a.sqlite",
+      "--checkpoint",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/checkpoint.json",
+      "--start",
+      "2026-06-10",
+      "--end",
+      "2026-06-18"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"interval\":{\"end\":\"2026-06-18\",\"start\":\"2026-06-10\"},\"next_cursor\":\"p_b62d3333e930f1830dd2d61eb80d3bbc\",\"partial_vendors\":[{\"net_amount_cents\":5000,\"qualifying_entry_count\":1,\"settled_charge_amount_cents\":5000,\"settled_credit_amount_cents\":0,\"vendor_id\":\"azure\"},{\"net_amount_cents\":0,\"qualifying_entry_count\":2,\"settled_charge_amount_cents\":700,\"settled_credit_amount_cents\":700,\"vendor_id\":\"glacier\"},{\"net_amount_cents\":-900,\"qualifying_entry_count\":1,\"settled_charge_amount_cents\":0,\"settled_credit_amount_cents\":900,\"vendor_id\":\"saffron\"}],\"reason\":\"tranche_capacity_required\",\"remaining_calls\":0,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"source_records_examined\":6,\"source_total_records\":15,\"status\":\"incomplete\",\"tranche\":1}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R44 describe A after first run",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/state-a.sqlite",
+      "describe"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":0,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R44 deliberately substitute B using same checkpoint",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/runner.py",
+      "--api",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/ledger_api.py",
+      "--source-state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/state-b.sqlite",
+      "--checkpoint",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/checkpoint.json",
+      "--start",
+      "2026-06-10",
+      "--end",
+      "2026-06-18"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"interval\":{\"end\":\"2026-06-18\",\"start\":\"2026-06-10\"},\"next_cursor\":\"p_a504be71ee377d98a86997c7f1436598\",\"partial_vendors\":[{\"net_amount_cents\":-1200,\"qualifying_entry_count\":2,\"settled_charge_amount_cents\":5000,\"settled_credit_amount_cents\":6200,\"vendor_id\":\"azure\"},{\"net_amount_cents\":0,\"qualifying_entry_count\":2,\"settled_charge_amount_cents\":700,\"settled_credit_amount_cents\":700,\"vendor_id\":\"glacier\"},{\"net_amount_cents\":2000,\"qualifying_entry_count\":2,\"settled_charge_amount_cents\":2222,\"settled_credit_amount_cents\":222,\"vendor_id\":\"harbor\"},{\"net_amount_cents\":0,\"qualifying_entry_count\":2,\"settled_charge_amount_cents\":900,\"settled_credit_amount_cents\":900,\"vendor_id\":\"saffron\"}],\"reason\":\"tranche_capacity_required\",\"remaining_calls\":0,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"source_records_examined\":12,\"source_total_records\":15,\"status\":\"incomplete\",\"tranche\":1}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R44 describe B after substitution",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R44/state-b.sqlite",
+      "describe"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":0,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R63 initialize disposable A",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/state-a.sqlite",
+      "init",
+      "--fixture",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/fixture.json"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"state\":\"ready\",\"total_records\":15}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R63 initialize disposable B",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/state-b.sqlite",
+      "init",
+      "--fixture",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/fixture.json"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"state\":\"ready\",\"total_records\":15}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R63 incorporate first tranche from A",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/runner.py",
+      "--api",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/state-a.sqlite",
+      "--checkpoint",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/checkpoint.json",
+      "--start",
+      "2026-06-10",
+      "--end",
+      "2026-06-18"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 75,
+    "stdout": "{\"currency\": \"USD\", \"end\": \"2026-06-18\", \"examined_records\": 6, \"partial_vendors\": [{\"net_cents\": 5000, \"qualifying_entry_count\": 1, \"settled_charge_cents\": 5000, \"settled_credit_cents\": 0, \"vendor_id\": \"azure\"}, {\"net_cents\": 0, \"qualifying_entry_count\": 2, \"settled_charge_cents\": 700, \"settled_credit_cents\": 700, \"vendor_id\": \"glacier\"}, {\"net_cents\": -900, \"qualifying_entry_count\": 1, \"settled_charge_cents\": 0, \"settled_credit_cents\": 900, \"vendor_id\": \"saffron\"}], \"snapshot_id\": \"snap_fb322d1120ca406ad668bc26\", \"start\": \"2026-06-10\", \"status\": \"incomplete\", \"total_records\": 15}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R63 describe A after first run",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/state-a.sqlite",
+      "describe"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":0,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R63 deliberately substitute B using same checkpoint",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/runner.py",
+      "--api",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/state-b.sqlite",
+      "--checkpoint",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/checkpoint.json",
+      "--start",
+      "2026-06-10",
+      "--end",
+      "2026-06-18"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 2,
+    "stdout": "{\"status\": \"error\", \"detail\": \"checkpoint request mismatch\"}\n",
+    "stderr": ""
+  },
+  {
+    "label": "R63 describe B after substitution",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/ledger_api.py",
+      "--state",
+      "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding/R63/state-b.sqlite",
+      "describe"
+    ],
+    "cwd": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P01-primary/disposable-source-binding",
+    "exit_code": 0,
+    "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":2,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n",
+    "stderr": ""
+  }
+]
