@@ -1,0 +1,14 @@
+{
+  "trial_id": "control-030",
+  "stage": "control",
+  "case": "S05",
+  "arm": "C",
+  "repetition": 2,
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "low",
+  "context": "fresh",
+  "input_sha256": {
+    "input/brief.md": "05a2f9ff59c6054b7e81f9fe4de499b34d548798907d950077b2c4d11e67c7e9"
+  },
+  "prompt_sha256": "37b322e00de310084a4879d1939f938078bde2337b2836e4b0464d64dab72660"
+}

@@ -1,0 +1,11 @@
+# C-control business case provenance
+
+The control stage retains the original six family allocation and frozen creator briefs. S01 consumer stimuli and oracle are reused unchanged from calibration; S05 and S10 are reused unchanged from the independently authored development cases. They are fresh applications of new generated C Skills, not new holdout scenarios or independent re-estimation of the earlier case bank's representativeness. All source originals remain preserved. Their business criteria are not tuned to any C artifact.
+
+prepare_control_fixed_cases.py copies the raw request/evidence and oracle bytes before C application preparation. The S01 source is consumer-source/S01 with oracles/S01.md. S05/S10 sources are development-consumer-cases with development-oracles. S10 consumers receive the unchanged frozen release simulator and a distinct execution-copy state; the source state is never reset to obtain a better result. The oracle's original provenance paths deliberately identify its actual derivation.
+
+S03, S06 and S09 packets are independently authored from only the corresponding frozen public business sources before their C outputs. Creators never receive the consumer banks or oracles. Root reviews and freezes the original case-bank bytes and records actual author checks before staging any associated application. Case author checks are fixture verification, not generated-component or system-effectiveness evidence. The source of shared-understanding evidence in S03 must remain the supplied replies, separate from the adequacy of proposed assistant communication.
+
+S06 uses an immutable source snapshot through its paginated API. Consumers receive a separate initialized SQLite state and API, without the setup fixture in their input. Native SQL snapshots preserve committed logical state for recovery; runtime/byte identity is not claimed. Only the first approved tranche is used in the incomplete case. Describing a resumable pause is assessed against actual source/cursor/progress evidence without imposing a particular persistence format; later approved continuation is not claimed executed by that case alone.
+
+No C trial has yet begun at this update. Main A/B and complete-package gates remain separate dependencies. Exact frozen case hashes and final review status will be recorded before consumer execution.

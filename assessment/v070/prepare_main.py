@@ -28,10 +28,24 @@ def main():
     if not (ROOT / "main-candidate-selection.md").is_file():
         raise SystemExit("Document the bounded development decision before preparing main")
     ledger = ROOT / "main-list.tsv"
-    if ledger.exists():
+    if ledger.exists() or ledger.is_symlink():
         raise SystemExit("Main assignments already exist; preserve their identities")
-    if (ROOT / "control-list.tsv").exists():
+    control_ledger = ROOT / "control-list.tsv"
+    if control_ledger.exists() or control_ledger.is_symlink():
         raise SystemExit("Independent C assignments already exist; future A/B preparation must preserve those C cells")
+    # Either preparation can stop before its ledger is written. Preserve partial
+    # owned output too, before creating any new main or duplicate C assignments.
+    destinations = [ROOT / name for name in (
+        "main-schedule.tsv", "main-schedule-sha256.txt", "main-candidate-hashes.json",
+        "control-schedule.tsv", "control-schedule-sha256.txt", "control-assignments")]
+    trials = ROOT / "trials"
+    if trials.is_symlink() or (trials.exists() and not trials.is_dir()):
+        raise SystemExit(f"Unexpected trial directory; preserve it: {trials}")
+    for pattern in ("control-[0-9][0-9][0-9]", "main-[0-9][0-9][0-9]"):
+        destinations.extend(trials.glob(pattern))
+    for path in destinations:
+        if path.exists() or path.is_symlink():
+            raise SystemExit(f"Assignments or partial preparation already exist; preserve their cells: {path}")
     candidate = ROOT / "frozen" / args.candidate
     for skill in ("design-process-description", "design-agent-work-system"):
         if not (candidate / "skills" / skill / "SKILL.md").is_file():

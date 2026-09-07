@@ -1,0 +1,16 @@
+{
+  "trial_id": "control-042",
+  "stage": "control",
+  "case": "S06",
+  "arm": "C",
+  "repetition": 2,
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "low",
+  "context": "fresh",
+  "input_sha256": {
+    "input/brief.md": "62f310f50ff7280749ada5871746d154005f82fc11aae85dff8bb31c5f7b1b1b",
+    "input/fixture.json": "d2ad6670cd561401486548b5702d1734ef280822a5651431461647a8710a675a",
+    "input/ledger_api.py": "4622ec041dcfe8057aed319bc0ad168f24aebf4520a68c2961cdf046483315f3"
+  },
+  "prompt_sha256": "bcea55a27ebe8a4e3a7b0aead3278f3a55866cf9f21c14bce2230982e12cd552"
+}

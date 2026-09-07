@@ -1,0 +1,15 @@
+{
+  "trial_id": "control-072",
+  "stage": "control",
+  "case": "S10",
+  "arm": "C",
+  "repetition": 2,
+  "requested_model": "gpt-6-astra",
+  "requested_effort": "high",
+  "context": "fresh",
+  "input_sha256": {
+    "input/brief.md": "284eab48172c8b996d5eb3218590fb453c1e24f5b532f9d4457bda99fb38485e",
+    "input/release_tool.py": "939931810a40d9f813280ea46c95fec2c4a1ed72368937353bf5c899b8217577"
+  },
+  "prompt_sha256": "ccd0966aa9b433b945a395cc1f2569267a54934b8aa031a846ef63c1eda55ce4"
+}

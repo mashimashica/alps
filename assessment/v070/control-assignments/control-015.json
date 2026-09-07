@@ -1,0 +1,14 @@
+{
+  "trial_id": "control-015",
+  "stage": "control",
+  "case": "S03",
+  "arm": "C",
+  "repetition": 1,
+  "requested_model": "gpt-5.6-luna",
+  "requested_effort": "high",
+  "context": "fresh",
+  "input_sha256": {
+    "input/brief.md": "6a72d7685f44d8c4567685b3f5eb91f30102c28f2369bc36a41394cd84122b83"
+  },
+  "prompt_sha256": "11b68def5557c6385b383d2385af37650da738cee3770179fef3d48bf6e5b9f1"
+}

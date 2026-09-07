@@ -37,8 +37,13 @@ def main():
     # The original main helper also assigns C cells. Preserve either preparation
     # and any partial output; reconciliation must not silently assign them twice.
     destinations = [ledger, schedule, digest, assignments,
-                    ROOT / "main-list.tsv", ROOT / "main-schedule.tsv"]
-    destinations.extend(ROOT / "trials" / row[0] for row in rows)
+                    ROOT / "main-list.tsv", ROOT / "main-schedule.tsv",
+                    ROOT / "main-schedule-sha256.txt", ROOT / "main-candidate-hashes.json"]
+    trials = ROOT / "trials"
+    if trials.is_symlink() or (trials.exists() and not trials.is_dir()):
+        raise SystemExit(f"Unexpected trial directory; preserve it: {trials}")
+    for pattern in ("control-[0-9][0-9][0-9]", "main-[0-9][0-9][0-9]"):
+        destinations.extend(trials.glob(pattern))
     for path in destinations:
         if path.exists() or path.is_symlink():
             raise SystemExit(f"Assignments or preparation already exist; preserve them: {path}")

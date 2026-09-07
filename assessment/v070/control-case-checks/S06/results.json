@@ -1,0 +1,572 @@
+{
+  "all_checks_passed": true,
+  "checks": {
+    "challenging_hypothetical_complete": {
+      "final_describe": {
+        "calls_per_tranche": 2,
+        "page_size": 3,
+        "remaining_calls": 1,
+        "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+        "total_records": 15,
+        "tranche": 3
+      },
+      "observed_records": 15,
+      "operator_grants_in_disposable_validation_only": 2,
+      "page_next_cursors": [
+        "p_824dd208571a05a7d57ff5bd0e4889c0",
+        "p_b62d3333e930f1830dd2d61eb80d3bbc",
+        "p_86855d8734c18b66c4303f4cee84e1e3",
+        "p_a504be71ee377d98a86997c7f1436598",
+        null
+      ],
+      "rollup": [
+        {
+          "charges_cents": 5125,
+          "credits_cents": 6200,
+          "net_cents": -1075,
+          "qualifying_count": 3,
+          "vendor_id": "azure"
+        },
+        {
+          "charges_cents": 700,
+          "credits_cents": 700,
+          "net_cents": 0,
+          "qualifying_count": 2,
+          "vendor_id": "glacier"
+        },
+        {
+          "charges_cents": 2222,
+          "credits_cents": 222,
+          "net_cents": 2000,
+          "qualifying_count": 2,
+          "vendor_id": "harbor"
+        },
+        {
+          "charges_cents": 0,
+          "credits_cents": 0,
+          "net_cents": 0,
+          "qualifying_count": 1,
+          "vendor_id": "quartz"
+        },
+        {
+          "charges_cents": 900,
+          "credits_cents": 900,
+          "net_cents": 0,
+          "qualifying_count": 2,
+          "vendor_id": "saffron"
+        }
+      ],
+      "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+      "successful_page_calls": 5
+    },
+    "challenging_pause": {
+      "budget_error_returns_no_entries": true,
+      "final_describe": {
+        "calls_per_tranche": 2,
+        "page_size": 3,
+        "remaining_calls": 0,
+        "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+        "total_records": 15,
+        "tranche": 1
+      },
+      "invalid_cursor_and_snapshot_calls_unmetered": true,
+      "observed_entry_ids": [
+        "chg-001",
+        "chg-002",
+        "chg-003",
+        "chg-004",
+        "chg-005",
+        "chg-006"
+      ],
+      "page_next_cursors": [
+        "p_824dd208571a05a7d57ff5bd0e4889c0",
+        "p_b62d3333e930f1830dd2d61eb80d3bbc"
+      ],
+      "rollup": [
+        {
+          "charges_cents": 5000,
+          "credits_cents": 0,
+          "net_cents": 5000,
+          "qualifying_count": 1,
+          "vendor_id": "azure"
+        },
+        {
+          "charges_cents": 700,
+          "credits_cents": 700,
+          "net_cents": 0,
+          "qualifying_count": 2,
+          "vendor_id": "glacier"
+        },
+        {
+          "charges_cents": 0,
+          "credits_cents": 900,
+          "net_cents": -900,
+          "qualifying_count": 1,
+          "vendor_id": "saffron"
+        }
+      ],
+      "snapshot_id": "snap_fb322d1120ca406ad668bc26",
+      "successful_page_calls": 2
+    },
+    "ordinary_complete": {
+      "final_describe": {
+        "calls_per_tranche": 2,
+        "page_size": 3,
+        "remaining_calls": 0,
+        "snapshot_id": "snap_c22e71aa06b43ab25395e0ce",
+        "total_records": 6,
+        "tranche": 1
+      },
+      "observed_records": 6,
+      "page_next_cursors": [
+        "p_de1636bae17d3ae33cda4377d6e42ee3",
+        null
+      ],
+      "rollup": [
+        {
+          "charges_cents": 1234,
+          "credits_cents": 1234,
+          "net_cents": 0,
+          "qualifying_count": 2,
+          "vendor_id": "apricot"
+        },
+        {
+          "charges_cents": 2501,
+          "credits_cents": 0,
+          "net_cents": 2501,
+          "qualifying_count": 1,
+          "vendor_id": "juniper"
+        },
+        {
+          "charges_cents": 0,
+          "credits_cents": 407,
+          "net_cents": -407,
+          "qualifying_count": 1,
+          "vendor_id": "willow"
+        }
+      ],
+      "snapshot_id": "snap_c22e71aa06b43ab25395e0ce",
+      "successful_page_calls": 2
+    },
+    "repeat_consumes_call_and_replays_same_page": true
+  },
+  "commands": [
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/ordinary.sqlite",
+        "init",
+        "--fixture",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S06/ordinary/fixture.json"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"state\":\"ready\",\"total_records\":6}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/ordinary.sqlite",
+        "describe"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":2,\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"total_records\":6,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/ordinary.sqlite",
+        "page",
+        "--snapshot",
+        "snap_c22e71aa06b43ab25395e0ce"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"items\":[{\"amount_cents\":407,\"currency\":\"USD\",\"entry_id\":\"ord-001\",\"kind\":\"credit\",\"posted_on\":\"2026-04-09\",\"status\":\"settled\",\"vendor_id\":\"willow\"},{\"amount_cents\":99991,\"currency\":\"USD\",\"entry_id\":\"ord-002\",\"kind\":\"charge\",\"posted_on\":\"2026-04-06\",\"status\":\"pending\",\"vendor_id\":\"mirage\"},{\"amount_cents\":1234,\"currency\":\"USD\",\"entry_id\":\"ord-003\",\"kind\":\"charge\",\"posted_on\":\"2026-04-03\",\"status\":\"settled\",\"vendor_id\":\"apricot\"}],\"next_cursor\":\"p_de1636bae17d3ae33cda4377d6e42ee3\",\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"total_records\":6,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/ordinary.sqlite",
+        "page",
+        "--snapshot",
+        "snap_c22e71aa06b43ab25395e0ce",
+        "--cursor",
+        "p_de1636bae17d3ae33cda4377d6e42ee3"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"items\":[{\"amount_cents\":1234,\"currency\":\"USD\",\"entry_id\":\"ord-004\",\"kind\":\"credit\",\"posted_on\":\"2026-04-08\",\"status\":\"settled\",\"vendor_id\":\"apricot\"},{\"amount_cents\":54321,\"currency\":\"USD\",\"entry_id\":\"ord-005\",\"kind\":\"charge\",\"posted_on\":\"2026-04-10\",\"status\":\"settled\",\"vendor_id\":\"outside\"},{\"amount_cents\":2501,\"currency\":\"USD\",\"entry_id\":\"ord-006\",\"kind\":\"charge\",\"posted_on\":\"2026-04-04\",\"status\":\"settled\",\"vendor_id\":\"juniper\"}],\"next_cursor\":null,\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"total_records\":6,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/ordinary.sqlite",
+        "describe"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":0,\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"total_records\":6,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-pause.sqlite",
+        "init",
+        "--fixture",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S06/challenging/fixture.json"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"state\":\"ready\",\"total_records\":15}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-pause.sqlite",
+        "describe"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":2,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-pause.sqlite",
+        "page",
+        "--snapshot",
+        "snap_c22e71aa06b43ab25395e0ce"
+      ],
+      "exit_code": 4,
+      "stderr": "",
+      "stdout": "{\"error\":\"snapshot_mismatch\"}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-pause.sqlite",
+        "page",
+        "--snapshot",
+        "snap_fb322d1120ca406ad668bc26",
+        "--cursor",
+        "p_de1636bae17d3ae33cda4377d6e42ee3"
+      ],
+      "exit_code": 2,
+      "stderr": "",
+      "stdout": "{\"error\":\"invalid_cursor\"}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-pause.sqlite",
+        "describe"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":2,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-pause.sqlite",
+        "page",
+        "--snapshot",
+        "snap_fb322d1120ca406ad668bc26"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"items\":[{\"amount_cents\":5000,\"currency\":\"USD\",\"entry_id\":\"chg-001\",\"kind\":\"charge\",\"posted_on\":\"2026-06-18\",\"status\":\"settled\",\"vendor_id\":\"azure\"},{\"amount_cents\":900,\"currency\":\"USD\",\"entry_id\":\"chg-002\",\"kind\":\"credit\",\"posted_on\":\"2026-06-10\",\"status\":\"settled\",\"vendor_id\":\"saffron\"},{\"amount_cents\":123456,\"currency\":\"USD\",\"entry_id\":\"chg-003\",\"kind\":\"charge\",\"posted_on\":\"2026-06-13\",\"status\":\"pending\",\"vendor_id\":\"mirage\"}],\"next_cursor\":\"p_824dd208571a05a7d57ff5bd0e4889c0\",\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-pause.sqlite",
+        "page",
+        "--snapshot",
+        "snap_fb322d1120ca406ad668bc26",
+        "--cursor",
+        "p_824dd208571a05a7d57ff5bd0e4889c0"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"items\":[{\"amount_cents\":700,\"currency\":\"USD\",\"entry_id\":\"chg-004\",\"kind\":\"credit\",\"posted_on\":\"2026-06-17\",\"status\":\"settled\",\"vendor_id\":\"glacier\"},{\"amount_cents\":700,\"currency\":\"USD\",\"entry_id\":\"chg-005\",\"kind\":\"charge\",\"posted_on\":\"2026-06-11\",\"status\":\"settled\",\"vendor_id\":\"glacier\"},{\"amount_cents\":88000,\"currency\":\"USD\",\"entry_id\":\"chg-006\",\"kind\":\"charge\",\"posted_on\":\"2026-06-19\",\"status\":\"settled\",\"vendor_id\":\"azure\"}],\"next_cursor\":\"p_b62d3333e930f1830dd2d61eb80d3bbc\",\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-pause.sqlite",
+        "page",
+        "--snapshot",
+        "snap_fb322d1120ca406ad668bc26",
+        "--cursor",
+        "p_b62d3333e930f1830dd2d61eb80d3bbc"
+      ],
+      "exit_code": 75,
+      "stderr": "",
+      "stdout": "{\"error\":\"call_budget_exhausted\",\"remaining_calls\":0,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-pause.sqlite",
+        "describe"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":0,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/repeat-budget.sqlite",
+        "init",
+        "--fixture",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S06/ordinary/fixture.json"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"state\":\"ready\",\"total_records\":6}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/repeat-budget.sqlite",
+        "describe"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":2,\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"total_records\":6,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/repeat-budget.sqlite",
+        "page",
+        "--snapshot",
+        "snap_c22e71aa06b43ab25395e0ce"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"items\":[{\"amount_cents\":407,\"currency\":\"USD\",\"entry_id\":\"ord-001\",\"kind\":\"credit\",\"posted_on\":\"2026-04-09\",\"status\":\"settled\",\"vendor_id\":\"willow\"},{\"amount_cents\":99991,\"currency\":\"USD\",\"entry_id\":\"ord-002\",\"kind\":\"charge\",\"posted_on\":\"2026-04-06\",\"status\":\"pending\",\"vendor_id\":\"mirage\"},{\"amount_cents\":1234,\"currency\":\"USD\",\"entry_id\":\"ord-003\",\"kind\":\"charge\",\"posted_on\":\"2026-04-03\",\"status\":\"settled\",\"vendor_id\":\"apricot\"}],\"next_cursor\":\"p_de1636bae17d3ae33cda4377d6e42ee3\",\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"total_records\":6,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/repeat-budget.sqlite",
+        "page",
+        "--snapshot",
+        "snap_c22e71aa06b43ab25395e0ce"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"items\":[{\"amount_cents\":407,\"currency\":\"USD\",\"entry_id\":\"ord-001\",\"kind\":\"credit\",\"posted_on\":\"2026-04-09\",\"status\":\"settled\",\"vendor_id\":\"willow\"},{\"amount_cents\":99991,\"currency\":\"USD\",\"entry_id\":\"ord-002\",\"kind\":\"charge\",\"posted_on\":\"2026-04-06\",\"status\":\"pending\",\"vendor_id\":\"mirage\"},{\"amount_cents\":1234,\"currency\":\"USD\",\"entry_id\":\"ord-003\",\"kind\":\"charge\",\"posted_on\":\"2026-04-03\",\"status\":\"settled\",\"vendor_id\":\"apricot\"}],\"next_cursor\":\"p_de1636bae17d3ae33cda4377d6e42ee3\",\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"total_records\":6,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/repeat-budget.sqlite",
+        "describe"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":0,\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"total_records\":6,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/repeat-budget.sqlite",
+        "page",
+        "--snapshot",
+        "snap_c22e71aa06b43ab25395e0ce",
+        "--cursor",
+        "p_de1636bae17d3ae33cda4377d6e42ee3"
+      ],
+      "exit_code": 75,
+      "stderr": "",
+      "stdout": "{\"error\":\"call_budget_exhausted\",\"remaining_calls\":0,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-complete-validation.sqlite",
+        "init",
+        "--fixture",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S06/challenging/fixture.json"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"state\":\"ready\",\"total_records\":15}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-complete-validation.sqlite",
+        "describe"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":2,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-complete-validation.sqlite",
+        "page",
+        "--snapshot",
+        "snap_fb322d1120ca406ad668bc26"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"items\":[{\"amount_cents\":5000,\"currency\":\"USD\",\"entry_id\":\"chg-001\",\"kind\":\"charge\",\"posted_on\":\"2026-06-18\",\"status\":\"settled\",\"vendor_id\":\"azure\"},{\"amount_cents\":900,\"currency\":\"USD\",\"entry_id\":\"chg-002\",\"kind\":\"credit\",\"posted_on\":\"2026-06-10\",\"status\":\"settled\",\"vendor_id\":\"saffron\"},{\"amount_cents\":123456,\"currency\":\"USD\",\"entry_id\":\"chg-003\",\"kind\":\"charge\",\"posted_on\":\"2026-06-13\",\"status\":\"pending\",\"vendor_id\":\"mirage\"}],\"next_cursor\":\"p_824dd208571a05a7d57ff5bd0e4889c0\",\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-complete-validation.sqlite",
+        "page",
+        "--snapshot",
+        "snap_fb322d1120ca406ad668bc26",
+        "--cursor",
+        "p_824dd208571a05a7d57ff5bd0e4889c0"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"items\":[{\"amount_cents\":700,\"currency\":\"USD\",\"entry_id\":\"chg-004\",\"kind\":\"credit\",\"posted_on\":\"2026-06-17\",\"status\":\"settled\",\"vendor_id\":\"glacier\"},{\"amount_cents\":700,\"currency\":\"USD\",\"entry_id\":\"chg-005\",\"kind\":\"charge\",\"posted_on\":\"2026-06-11\",\"status\":\"settled\",\"vendor_id\":\"glacier\"},{\"amount_cents\":88000,\"currency\":\"USD\",\"entry_id\":\"chg-006\",\"kind\":\"charge\",\"posted_on\":\"2026-06-19\",\"status\":\"settled\",\"vendor_id\":\"azure\"}],\"next_cursor\":\"p_b62d3333e930f1830dd2d61eb80d3bbc\",\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":1}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-complete-validation.sqlite",
+        "grant-tranche"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"remaining_calls\":2,\"state\":\"tranche_granted\",\"tranche\":2}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-complete-validation.sqlite",
+        "page",
+        "--snapshot",
+        "snap_fb322d1120ca406ad668bc26",
+        "--cursor",
+        "p_b62d3333e930f1830dd2d61eb80d3bbc"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"items\":[{\"amount_cents\":6200,\"currency\":\"USD\",\"entry_id\":\"chg-007\",\"kind\":\"credit\",\"posted_on\":\"2026-06-12\",\"status\":\"settled\",\"vendor_id\":\"azure\"},{\"amount_cents\":900,\"currency\":\"USD\",\"entry_id\":\"chg-008\",\"kind\":\"charge\",\"posted_on\":\"2026-06-16\",\"status\":\"settled\",\"vendor_id\":\"saffron\"},{\"amount_cents\":2222,\"currency\":\"USD\",\"entry_id\":\"chg-009\",\"kind\":\"charge\",\"posted_on\":\"2026-06-10\",\"status\":\"settled\",\"vendor_id\":\"harbor\"}],\"next_cursor\":\"p_86855d8734c18b66c4303f4cee84e1e3\",\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":2}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-complete-validation.sqlite",
+        "page",
+        "--snapshot",
+        "snap_fb322d1120ca406ad668bc26",
+        "--cursor",
+        "p_86855d8734c18b66c4303f4cee84e1e3"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"items\":[{\"amount_cents\":33333,\"currency\":\"USD\",\"entry_id\":\"chg-010\",\"kind\":\"credit\",\"posted_on\":\"2026-06-14\",\"status\":\"void\",\"vendor_id\":\"mirage\"},{\"amount_cents\":222,\"currency\":\"USD\",\"entry_id\":\"chg-011\",\"kind\":\"credit\",\"posted_on\":\"2026-06-18\",\"status\":\"settled\",\"vendor_id\":\"harbor\"},{\"amount_cents\":99,\"currency\":\"USD\",\"entry_id\":\"chg-012\",\"kind\":\"charge\",\"posted_on\":\"2026-06-09\",\"status\":\"settled\",\"vendor_id\":\"glacier\"}],\"next_cursor\":\"p_a504be71ee377d98a86997c7f1436598\",\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":2}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-complete-validation.sqlite",
+        "grant-tranche"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"remaining_calls\":2,\"state\":\"tranche_granted\",\"tranche\":3}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-complete-validation.sqlite",
+        "page",
+        "--snapshot",
+        "snap_fb322d1120ca406ad668bc26",
+        "--cursor",
+        "p_a504be71ee377d98a86997c7f1436598"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"items\":[{\"amount_cents\":0,\"currency\":\"USD\",\"entry_id\":\"chg-013\",\"kind\":\"charge\",\"posted_on\":\"2026-06-15\",\"status\":\"settled\",\"vendor_id\":\"quartz\"},{\"amount_cents\":125,\"currency\":\"USD\",\"entry_id\":\"chg-014\",\"kind\":\"charge\",\"posted_on\":\"2026-06-14\",\"status\":\"settled\",\"vendor_id\":\"azure\"},{\"amount_cents\":9900,\"currency\":\"USD\",\"entry_id\":\"chg-015\",\"kind\":\"charge\",\"posted_on\":\"2026-06-10\",\"status\":\"void\",\"vendor_id\":\"saffron\"}],\"next_cursor\":null,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":3}\n"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/main-cases/S06/ledger_api.py",
+        "--state",
+        "/tmp/s06-control-check-1p_7oc02/challenging-complete-validation.sqlite",
+        "describe"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":1,\"snapshot_id\":\"snap_fb322d1120ca406ad668bc26\",\"total_records\":15,\"tranche\":3}\n"
+    }
+  ],
+  "scope": "Synthetic fixture arithmetic and unchanged API behavior; no target Skill/model run or effectiveness result."
+}
