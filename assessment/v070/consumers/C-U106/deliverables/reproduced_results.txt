@@ -1,0 +1,24 @@
+VALIDATION: PASS
+rows: 28 cohort, 14 operations; unique keys and coverage pass
+raw baseline Alder: 132/3600 = 3.667%
+70/30 adjusted baseline Alder: 3.200%
+raw baseline Birch: 102/3600 = 2.833%
+70/30 adjusted baseline Birch: 2.600%
+raw pilot Alder: 63/3600 = 1.750%
+70/30 adjusted pilot Alder: 3.700%
+raw pilot Birch: 51/3600 = 1.417%
+70/30 adjusted pilot Birch: 2.500%
+quality change-in-changes: 0.600%
+labor change-in-changes per 1,200-order shift: 6.00 h
+Alder continue projection: 108.0 h/shift vs 102 h cap
+Alder stop projection (control-trend): 100.8 h/shift
+Alder stop projection (baseline-only): 98.4 h/shift
+Birch no-check projection: 98.4 h/shift
+Alder continue late projection: 336/28800 = 1.167%
+Alder stop late projection: 168/28800 = 0.583%
+Birch no-check late projection: 144/28800 = 0.500%
+continue expected mispacks: 1065.6; cost $58,608
+stop expected mispacks (control-trend): 892.8; cost $49,104
+continue-minus-stop expected mispack cost: $9,504
+continue-minus-stop incremental labor: 144.0 h; cost $4,896
+continue-minus-stop combined modeled cost: $14,400
