@@ -4,7 +4,7 @@ Updated: 2026-09-07 UTC.
 
 ## Completed
 
-- Frozen main: dee3866d35e43db5db480fc9f85166a8dcb1ec3b (v0.7.0). The separate improvement worktree contains only the unaccepted B1 note pair.
+- Frozen main: dee3866d35e43db5db480fc9f85166a8dcb1ec3b (v0.7.0). The separate improvement worktree now contains only the unaccepted B2 sentence pair; rejected B1 is preserved as immutable evidence.
 - Repository instructions, both design Skills and foundations, review-alps, sync-locales, contribution and versioning guidance read. Baseline nine unit tests passed.
 - Protocol, raw tasks, frozen authoring assistance, original generated Skills and evaluation evidence saved on the separate assessment/v070-evidence branch through direct APIs; see checkpoints.md for exact receipts.
 - All 12 calibration creators and 24 fresh consumers completed. Pinned Agent Skills validation: 12/12 pass. Final consumer-resource check: 24 assignments, zero unexpected file changes. Allowed S10 state changes are judged separately.
@@ -13,8 +13,9 @@ Updated: 2026-09-07 UTC.
 ## In progress
 
 - Prospective numerical acceptance criteria and operational adjudications are fixed in gates.md after independent review.
-- B1 is a two-file NOTE/注記-only candidate. Independent semantic/locale review finds no blocking issue; nine product tests and changed whitespace pass. Frozen copy/hashes/patch preserve this exact version. No product PR is opened and neither foundation changed.
-- Development round 1: all eight fresh luna/low creators and sixteen fresh sol/high consumers completed. All eight packages pass pinned Agent Skills form validation. New S10/S05/S08 consumer cases/oracles were independently authored after associated creators ended. Blind S10 and S05 primary/second reviews, S08 review, and a separate source-fidelity review are running. S08 setup was checked against the author's recorded CLI observations; initial and final committed states are preserved as native SQL. Latest resource check: 40 prepared assignments, zero unexpected file changes. Calibration source-fidelity review remains separate from business grading.
+- B1's informative note pair passed semantic/locale review but is rejected for progression: both paired S10 repetitions show the same qualification-refresh pattern in A and B1. Primary and second blind S10 reviews agree; no mechanism benefit is established. See development-1-decision.md. Neither foundation changed and no product PR is opened.
+- Development round 1: all eight fresh luna/low creators and sixteen fresh sol/high consumers completed. All eight packages pass pinned form validation. S10/S05 primary and second grades and source-fidelity review are complete and read; S08 primary review is read and its second report is pending. The latter independently reports matching outcome and recovery-defect observations. Seven packages omit a separate Outcome core despite meaningful operational criteria; the remaining explicit-core package has substantive condition/evidence defects. Those are distinct from actual consumer adequacy and do not establish a source defect. S08 initial/final states are preserved as native SQL. Latest resource check: 40 assignments, zero unexpected file changes.
+- H02 is preregistered in development-round-2.md. B2 is frozen with hashes/patch; its sole change is to name the target Process core at the existing Skill-authoring Task in English/Japanese. The root's nine product tests, whitespace and complete-diff checks pass. Independent semantic/locale review is running; no B2 creator/consumer has started. The remaining H01 review/closeout and B2 semantic decision precede its eight planned creators and sixteen consumers.
 - All twelve reviewed public main-case families are frozen under frozen/main-cases (36 files, main-case-hashes.json). prepare_main.py is written and compiles, but has not been used: the B identity must be selected after bounded development, and no main assignment or consumer oracle exists yet.
 
 ## Trial counts

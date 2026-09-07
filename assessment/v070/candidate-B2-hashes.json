@@ -1,0 +1,282 @@
+{
+  ".agents/skills/design-agent-work-system": {
+    "sha256": "16402c87c8dbda8362fcf26cf585803b04cff6dd6d0967a89c5f3f5a7418349d",
+    "mode": "120000"
+  },
+  ".agents/skills/design-process-description": {
+    "sha256": "eabd24cf3ab558b79fa59db3a8f67062bef4dd595b443c4db1d9a2a13cb819a9",
+    "mode": "120000"
+  },
+  ".agents/skills/review-alps/SKILL.md": {
+    "sha256": "14b03815adf40fa68fbb7c5b4daa99be54df1743439ba746b728daac15a8c6be",
+    "mode": "100644"
+  },
+  ".agents/skills/sync-locales/SKILL.md": {
+    "sha256": "c122ac62ee5b083978191492c5a3896600db7c16899127b9a52110c08ccb9283",
+    "mode": "100644"
+  },
+  ".claude-plugin/plugin.json": {
+    "sha256": "578fef6e45bc7456f235aebe83ec81551327bf2c7aaa19adde05568185fb3d08",
+    "mode": "100644"
+  },
+  ".codex-plugin/plugin.json": {
+    "sha256": "4f84202ee595ace057ebd265b33830a08f499a02fbb0a50587dd7623dab2586f",
+    "mode": "100644"
+  },
+  ".cursor-plugin/plugin.json": {
+    "sha256": "9a0df66ba762b885acb305ffbf41e811be4b3d9dcbfa36791c1071b43c8768fc",
+    "mode": "100644"
+  },
+  ".github/markdown-link-check.json": {
+    "sha256": "7d4b5ff58791388bd7ceb6ae80f5b3ab2cde8c7bac86e5e1482462ccddb47dc5",
+    "mode": "100644"
+  },
+  ".github/pull_request_template.md": {
+    "sha256": "a1976d4c2e7b9ef1ed9e2b64c70a66f8b1dbd000010f957799b9471b0364cdc8",
+    "mode": "100644"
+  },
+  ".github/workflows/validate.yml": {
+    "sha256": "e58b01c252c1b4fbbb2a1a38851a38a1c3b0d74a1009d7da1e66973c82f6d542",
+    "mode": "100644"
+  },
+  ".gitignore": {
+    "sha256": "43689f98eb204d20c009a53d8fc83723be25faa8f3c9b49cc2479009b1719947",
+    "mode": "100644"
+  },
+  "AGENTS.md": {
+    "sha256": "e05afd95d08cf7ecb6b71e77a991d2d3287cf08f290c74ffbd3cecc5899eb4bc",
+    "mode": "100644"
+  },
+  "CHANGELOG.md": {
+    "sha256": "e5c11510c488fce86cea530b89469c0cd71b1fd65f472bd6b9ae537d56357d69",
+    "mode": "100644"
+  },
+  "CONTRIBUTING.md": {
+    "sha256": "7ee4e7c2142ea0b966a206da7895a83a05659f75cbf9c026036d0a64fea254ed",
+    "mode": "100644"
+  },
+  "DCO": {
+    "sha256": "f7ac75b443f4ca16b503241344b41aeff9503b0c30bedc2b119551d83cb0fa90",
+    "mode": "100644"
+  },
+  "LICENSE": {
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "mode": "100644"
+  },
+  "NOTICE": {
+    "sha256": "da9e43b19dee6755c93238c3e64c5ae3106d3c62de0f2d0fa8de3842ae4588fd",
+    "mode": "100644"
+  },
+  "README.md": {
+    "sha256": "d54c2774b0a3ab4ce474b3d1d25cc8a20743b5f0168d9bf1c48d22e336162b9c",
+    "mode": "100644"
+  },
+  "VERSION": {
+    "sha256": "967d9afb101346667166f2e76e81910bc190488d7d41d50ca0072e9d92f00e32",
+    "mode": "100644"
+  },
+  "assets/icon.svg": {
+    "sha256": "1e647ebcac91eecb94c02be540219b20b652e0208151f2e2fd8a15f64dad363e",
+    "mode": "100644"
+  },
+  "assets/social-preview.svg": {
+    "sha256": "82a8eee068666b111dfdf475fa6578c0bee7ff4913b5e6005c95c42d79e64f51",
+    "mode": "100644"
+  },
+  "docs/locales/ja/AGENTS.md": {
+    "sha256": "1b208bdd6e70669221e5583becac25476f62850ad15bccb8dc19c94c0b6fea04",
+    "mode": "100644"
+  },
+  "docs/locales/ja/CONTRIBUTING.md": {
+    "sha256": "9ad9d248c2539e32e82295ec7866364f00e31949a92faeb53f3d931bcd47160d",
+    "mode": "100644"
+  },
+  "docs/locales/ja/README.md": {
+    "sha256": "3ea046faa43af1fe53f22a1c923282ab7725a8905b8340ccc27b0c0d7a649a6e",
+    "mode": "100644"
+  },
+  "docs/locales/ja/releases/0.6.0.md": {
+    "sha256": "7261c1145c3a2513e18c7ab90ea02406dfed6dbcd1877517d37bb36afbadc8da",
+    "mode": "100644"
+  },
+  "docs/locales/ja/releases/0.7.0.md": {
+    "sha256": "4ff58047c94b5dd3343ce2dc8f10b1b0469a9eb5783f1511d7ac1659981f9adb",
+    "mode": "100644"
+  },
+  "docs/locales/ja/versioning.md": {
+    "sha256": "6c34626bcb4df9314d3857ef39deb369d5d7c2cd0185e4ef5f800ec67895f2c0",
+    "mode": "100644"
+  },
+  "docs/releases/0.1.0.md": {
+    "sha256": "78683f6103a76e9cd67d11d905335c9f189047612441fe936c226c245fd3d931",
+    "mode": "100644"
+  },
+  "docs/releases/0.2.0.md": {
+    "sha256": "ec8881a015b3456ddac551453f25bf965cb47161322faa5c0ff7b2f2dce42d3c",
+    "mode": "100644"
+  },
+  "docs/releases/0.3.0.md": {
+    "sha256": "3ed03903db7aff069a5e84b8ca5c803da18b554d7accc05d5a778c41e153d99e",
+    "mode": "100644"
+  },
+  "docs/releases/0.4.0.md": {
+    "sha256": "edf5428caf36ce55624b85ff2bd1827dd7eaed174bef08dd192cc4203e85f1b0",
+    "mode": "100644"
+  },
+  "docs/releases/0.5.0.md": {
+    "sha256": "1e630c8bcb020cc0c8e2f5683bfb36dcacb23b2c418fa62f11243851a5167241",
+    "mode": "100644"
+  },
+  "docs/releases/0.6.0.md": {
+    "sha256": "aa19d96b56b9f43a426ef3bc5df6feced5d910082be4edbee014d01aeea09385",
+    "mode": "100644"
+  },
+  "docs/releases/0.7.0.md": {
+    "sha256": "12b4705c36c096227274986cb8aeca6d4d8e21f6a7066a5652d782c54305014b",
+    "mode": "100644"
+  },
+  "docs/versioning.md": {
+    "sha256": "dc6cf41158d84026297bf624eb0de5c9010547d64cedb377c1a2228631b21870",
+    "mode": "100644"
+  },
+  "examples/README.md": {
+    "sha256": "d4432f9833ff5b9533ec6907e8b6b4333004a79e01018b6c914109a74dc4f6c5",
+    "mode": "100644"
+  },
+  "examples/assess-service-change/SKILL.md": {
+    "sha256": "a916d89afc0247e292eca168ad5bc1a5884580c73f26cc2c4b6bfcc58df77c89",
+    "mode": "100644"
+  },
+  "examples/assess-service-change/assets/baseline.csv": {
+    "sha256": "bb951a263827e4f19fdbe051dbde2d49238da3cce9192a5148cc35bcf211bb08",
+    "mode": "100644"
+  },
+  "examples/assess-service-change/assets/candidate.csv": {
+    "sha256": "1a29aaac149322bfa283f2f0c89126cd922883f4853494932c88753f5dd618c4",
+    "mode": "100644"
+  },
+  "examples/assess-service-change/references/locales/ja/SKILL.md": {
+    "sha256": "42b4141843a94406c25ecbad04565b1a485875410c75b1270bd250736785f791",
+    "mode": "100644"
+  },
+  "examples/assess-service-change/references/locales/ja/pilot-context.md": {
+    "sha256": "15172e0c4d246c71af7300b46c912d5f71c311308746d87e47ee25c2ad60f60f",
+    "mode": "100644"
+  },
+  "examples/assess-service-change/references/locales/ja/tool-use.md": {
+    "sha256": "f5877a9495cbc0e678c4f71f32a53d0ac64d8b3a693d1734bace56dc690a9c4f",
+    "mode": "100644"
+  },
+  "examples/assess-service-change/references/pilot-context.md": {
+    "sha256": "9f8b6aa3f619b738e3654f000aa6aaf36dd588bef286b43d95595da38cd8de84",
+    "mode": "100644"
+  },
+  "examples/assess-service-change/references/tool-use.md": {
+    "sha256": "ee7335e4cb33f5f13067ac91befa34d32cf34dfc3651515c886337dc4e886f10",
+    "mode": "100644"
+  },
+  "examples/assess-service-change/scripts/compare_measurements.py": {
+    "sha256": "c5ebc3c28304e542c091dd12d6e637a01f5b6da035946cbba21e762c93230ef2",
+    "mode": "100644"
+  },
+  "examples/locales/ja/README.md": {
+    "sha256": "25df1d837cf86921717148526487498d0309e28d9c2723871a421cda228eea48",
+    "mode": "100644"
+  },
+  "localization.yaml": {
+    "sha256": "ae67e55c43afea38560476f0ef500c42a0f9b4edd6266fc0a09663a68652b9ab",
+    "mode": "100644"
+  },
+  "plugin.json": {
+    "sha256": "f70530f76f4f33d15774e0c121dddda228295a722a689dd79a5228a3dbbd2b1a",
+    "mode": "100644"
+  },
+  "skills/design-agent-work-system/SKILL.md": {
+    "sha256": "19cf0602a3d2681433eb017ab1b43e2ff266c6f9d2e3c434504a4ced9d70dddf",
+    "mode": "100644"
+  },
+  "skills/design-agent-work-system/agents/openai.yaml": {
+    "sha256": "912066d82e35382b62407e024876e529036fc63fc1963cee943cd426b2cf8dee",
+    "mode": "100644"
+  },
+  "skills/design-agent-work-system/assets/alps.svg": {
+    "sha256": "1e647ebcac91eecb94c02be540219b20b652e0208151f2e2fd8a15f64dad363e",
+    "mode": "100644"
+  },
+  "skills/design-agent-work-system/references/agent-work-system-design.md": {
+    "sha256": "4fa9bb7ed8db69b3357b99b51485ca95ef1900635d77091255fb122df311ffbd",
+    "mode": "100644"
+  },
+  "skills/design-agent-work-system/references/examples.md": {
+    "sha256": "4a1a6900deaf0a9b69d2491a77d5483163123d16035a8e26054b760e3cfee00f",
+    "mode": "100644"
+  },
+  "skills/design-agent-work-system/references/locales/ja/SKILL.md": {
+    "sha256": "2e94ab5ae0c7730e512c1b054c9823a58ee38edc2650ab3fae163148fb28218b",
+    "mode": "100644"
+  },
+  "skills/design-agent-work-system/references/locales/ja/agent-work-system-design.md": {
+    "sha256": "9d5118b37b73d8e9a8f79030953bf97169a17b58f2b35b93586653e8e29641ef",
+    "mode": "100644"
+  },
+  "skills/design-agent-work-system/references/locales/ja/examples.md": {
+    "sha256": "927206ba2f39b7c6d10337be8b3ce37fd9dd61f9455375113ddeb70c15d58388",
+    "mode": "100644"
+  },
+  "skills/design-agent-work-system/references/locales/ja/manifest.yaml": {
+    "sha256": "29e2b90115b5493ec61a64b689257e4d32e60b135c17f12cecb61ea11b451936",
+    "mode": "100644"
+  },
+  "skills/design-process-description/SKILL.md": {
+    "sha256": "d22954b30076229cddb698cfde4fc058f01a172e82292df4cca53211031575e0",
+    "mode": "100644"
+  },
+  "skills/design-process-description/agents/openai.yaml": {
+    "sha256": "93f50cff221cafa7a57b85ea9121e8e5a66ba95f4eee18b9a3b963b5eb525bd5",
+    "mode": "100644"
+  },
+  "skills/design-process-description/assets/alps.svg": {
+    "sha256": "1e647ebcac91eecb94c02be540219b20b652e0208151f2e2fd8a15f64dad363e",
+    "mode": "100644"
+  },
+  "skills/design-process-description/references/SKILL-template.md": {
+    "sha256": "4fdf83af1b01067c32ba617b08530d5f21babc62a06cd04c95f9ffc281ebb344",
+    "mode": "100644"
+  },
+  "skills/design-process-description/references/examples.md": {
+    "sha256": "6cd583f03527c9366149020c534cab77703e9c7e7f2440b265f22d7d31249643",
+    "mode": "100644"
+  },
+  "skills/design-process-description/references/locales/ja/SKILL-template.md": {
+    "sha256": "7c373106907018f66ee83f3d6bc05922a33ff3c46794823f331890d9090c0f4f",
+    "mode": "100644"
+  },
+  "skills/design-process-description/references/locales/ja/SKILL.md": {
+    "sha256": "1d8124436a8e4bdeb1c5913ea85b588e4eda101813a6d091e0ebe64fb2ce2f9a",
+    "mode": "100644"
+  },
+  "skills/design-process-description/references/locales/ja/examples.md": {
+    "sha256": "5f7b34906b48eca98b1ad2b007f8021f04f99b6fe1a3b09554bebf93727234ae",
+    "mode": "100644"
+  },
+  "skills/design-process-description/references/locales/ja/manifest.yaml": {
+    "sha256": "29e2b90115b5493ec61a64b689257e4d32e60b135c17f12cecb61ea11b451936",
+    "mode": "100644"
+  },
+  "skills/design-process-description/references/locales/ja/process-framework.md": {
+    "sha256": "f57fc05e3ccb7af98720b094c1935e3c4fc645f3c9f583011a64ee7784aaa765",
+    "mode": "100644"
+  },
+  "skills/design-process-description/references/process-framework.md": {
+    "sha256": "4f3dfb412467ec860ece1689107d4aea7cf7771993a654ec639c3e0b46037bf2",
+    "mode": "100644"
+  },
+  "tests/test_manifest_versions.py": {
+    "sha256": "f83e35b61a29e2f91094a22d32a702d81e55d2dfa71460dcb562eb3ab0b2383a",
+    "mode": "100644"
+  },
+  "tests/test_service_comparison.py": {
+    "sha256": "c0dd2a04efa5ce4aeb47b0ab53aebcc793ef01340eae3ea7f0ae4e56e278349f",
+    "mode": "100644"
+  }
+}

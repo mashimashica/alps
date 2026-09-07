@@ -1,0 +1,22 @@
+{
+  "name": "alps",
+  "version": "0.7.0",
+  "description": "Clarify work through Process Descriptions and design the agents, tools, information resources, and environments that realize it.",
+  "author": {
+    "name": "mashimashica"
+  },
+  "homepage": "https://github.com/mashimashica/alps",
+  "repository": "https://github.com/mashimashica/alps",
+  "license": "Apache-2.0",
+  "keywords": [
+    "agent-plugins",
+    "agent-skills",
+    "process",
+    "process-description",
+    "agent-work-system",
+    "design",
+    "alps"
+  ],
+  "logo": "assets/icon.svg",
+  "skills": "skills/"
+}

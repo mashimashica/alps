@@ -74,7 +74,7 @@ def mark():
     print(f"Recorded hashes for {len(hashes)} verified published files")
 
 
-def export(offset=0, limit=None, char_offset=None, char_limit=8000):
+def export(offset=0, limit=None, char_offset=None, char_limit=8000, cache=False):
     verify()
     previous_path = ROOT / ".local" / "published-hashes.json"
     previous = json.loads(previous_path.read_text()) if previous_path.exists() else {}
@@ -90,7 +90,13 @@ def export(offset=0, limit=None, char_offset=None, char_limit=8000):
         entries.append({"path": "assessment/v070/" + relative.as_posix(), "mode": file_mode(path), "type": "blob", "content": value})
     selected = entries[offset:] if limit is None else entries[offset:offset+limit]
     encoded = json.dumps(selected, ensure_ascii=False)
-    if char_offset is None:
+    if cache:
+        destination = ROOT / ".local" / "export.json"
+        destination.parent.mkdir(exist_ok=True)
+        with destination.open("x", encoding="utf-8") as stream:
+            stream.write(encoded)
+        print(json.dumps({"entries": len(selected), "characters": len(encoded), "cache": str(destination)}))
+    elif char_offset is None:
         print(encoded)
     else:
         print(encoded[char_offset:char_offset + char_limit], end="")
@@ -98,12 +104,13 @@ def export(offset=0, limit=None, char_offset=None, char_limit=8000):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("operation", choices=("freeze", "verify", "export", "mark"))
+    parser.add_argument("operation", choices=("freeze", "verify", "export", "mark", "slice"))
     parser.add_argument("--offset", type=int, default=0)
     parser.add_argument("--limit", type=int)
     parser.add_argument("--char-offset", type=int)
     parser.add_argument("--char-limit", type=int, default=8000)
     parser.add_argument("--root", type=Path)
+    parser.add_argument("--cache", action="store_true", help="Preserve an export once in the immutable snapshot's .local folder")
     args = parser.parse_args()
     if args.root is not None:
         ROOT = args.root.resolve()
@@ -115,5 +122,10 @@ if __name__ == "__main__":
     elif operation == "verify":
         verify()
         print("Frozen input hashes verified")
+    elif operation == "slice":
+        if args.char_offset is None or args.char_offset < 0 or args.char_limit < 1:
+            raise SystemExit("A nonnegative character offset and positive limit are required")
+        encoded = (ROOT / ".local/export.json").read_text(encoding="utf-8")
+        print(encoded[args.char_offset:args.char_offset + args.char_limit], end="")
     else:
-        export(args.offset, args.limit, args.char_offset, args.char_limit)
+        export(args.offset, args.limit, args.char_offset, args.char_limit, args.cache)

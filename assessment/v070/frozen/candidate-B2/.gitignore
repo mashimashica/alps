@@ -1,0 +1,20 @@
+# macOS
+.DS_Store
+
+# Local worktrees and environments
+.worktrees/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local logs and temporary files
+.codex-log/
+*.tmp
+*.swp
+*.swo
+*~

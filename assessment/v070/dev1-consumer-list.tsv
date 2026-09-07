@@ -1,17 +1,17 @@
 consumer_id	creator_id	case	variant	model	effort	execution	agent
-D1-U001	dev1-001	S10	ordinary	gpt-5.6-sol	high	completed; not graded	/root/dev1_use_001
-D1-U002	dev1-001	S10	challenging	gpt-5.6-sol	high	completed; not graded	/root/dev1_use_002
-D1-U003	dev1-002	S10	ordinary	gpt-5.6-sol	high	completed; not graded	/root/dev1_use_003
-D1-U004	dev1-002	S10	challenging	gpt-5.6-sol	high	completed; not graded	/root/dev1_use_004
-D1-U005	dev1-003	S10	ordinary	gpt-5.6-sol	high	completed; not graded	/root/dev1_use_005
-D1-U006	dev1-003	S10	challenging	gpt-5.6-sol	high	completed; not graded	/root/dev1_use_006
-D1-U007	dev1-004	S10	ordinary	gpt-5.6-sol	high	completed; not graded	/root/dev1_use_007
-D1-U008	dev1-004	S10	challenging	gpt-5.6-sol	high	completed; not graded	/root/dev1_use_008
+D1-U001	dev1-001	S10	ordinary	gpt-5.6-sol	high	completed; independent primary and second grades read	/root/dev1_use_001
+D1-U002	dev1-001	S10	challenging	gpt-5.6-sol	high	completed; independent primary and second grades read	/root/dev1_use_002
+D1-U003	dev1-002	S10	ordinary	gpt-5.6-sol	high	completed; independent primary and second grades read	/root/dev1_use_003
+D1-U004	dev1-002	S10	challenging	gpt-5.6-sol	high	completed; independent primary and second grades read	/root/dev1_use_004
+D1-U005	dev1-003	S10	ordinary	gpt-5.6-sol	high	completed; independent primary and second grades read	/root/dev1_use_005
+D1-U006	dev1-003	S10	challenging	gpt-5.6-sol	high	completed; independent primary and second grades read	/root/dev1_use_006
+D1-U007	dev1-004	S10	ordinary	gpt-5.6-sol	high	completed; independent primary and second grades read	/root/dev1_use_007
+D1-U008	dev1-004	S10	challenging	gpt-5.6-sol	high	completed; independent primary and second grades read	/root/dev1_use_008
 D1-U009	dev1-005	S08	ordinary	gpt-5.6-sol	high	completed; not graded	/root/dev1_use_009
 D1-U010	dev1-005	S08	challenging	gpt-5.6-sol	high	completed; not graded	/root/dev1_use_010
 D1-U011	dev1-006	S08	ordinary	gpt-5.6-sol	high	completed; not graded	/root/dev1_use_011
 D1-U012	dev1-006	S08	challenging	gpt-5.6-sol	high	completed; not graded	/root/dev1_use_012
-D1-U013	dev1-007	S05	ordinary	gpt-5.6-sol	high	completed; not graded	/root/dev1_use_013
-D1-U014	dev1-007	S05	challenging	gpt-5.6-sol	high	completed; not graded	/root/dev1_use_014
-D1-U015	dev1-008	S05	ordinary	gpt-5.6-sol	high	completed; not graded	/root/dev1_use_015
-D1-U016	dev1-008	S05	challenging	gpt-5.6-sol	high	completed; not graded	/root/dev1_use_016
+D1-U013	dev1-007	S05	ordinary	gpt-5.6-sol	high	completed; independent primary and second grades read	/root/dev1_use_013
+D1-U014	dev1-007	S05	challenging	gpt-5.6-sol	high	completed; independent primary and second grades read	/root/dev1_use_014
+D1-U015	dev1-008	S05	ordinary	gpt-5.6-sol	high	completed; independent primary and second grades read	/root/dev1_use_015
+D1-U016	dev1-008	S05	challenging	gpt-5.6-sol	high	completed; independent primary and second grades read	/root/dev1_use_016

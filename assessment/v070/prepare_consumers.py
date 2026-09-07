@@ -22,7 +22,7 @@ def main():
     for creator_id in args.creator_ids:
         creator = ROOT / "trials" / creator_id
         assignment = json.loads((creator / "assignment.json").read_text())
-        development = creator_id.startswith("dev1-")
+        development = creator_id.startswith(("dev1-", "dev2-"))
         if development and assignment["case"] not in {"S05", "S08", "S10"}:
             raise SystemExit("No reviewed development consumer case for this family")
         skills = [p for p in (creator / "output").iterdir() if p.is_dir() and (p / "SKILL.md").is_file()]
@@ -30,7 +30,7 @@ def main():
             raise SystemExit(f"Expected one completed target Skill: {creator_id}")
         number = int(creator_id.rsplit("-", 1)[1])
         for index, variant in enumerate(("ordinary", "challenging")):
-            prefix = "D1-U" if development else "U"
+            prefix = "D" + creator_id.split("-")[0][-1] + "-U" if development else "U"
             use_id = f"{prefix}{2 * (number - 1) + index + 1:03}"
             folder = ROOT / "consumers" / use_id
             folder.mkdir(parents=True, exist_ok=False)
