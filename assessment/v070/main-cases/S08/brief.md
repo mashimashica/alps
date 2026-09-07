@@ -25,7 +25,7 @@ python3.12 booking.py --state /absolute/disposable/bookings.sqlite lookup --requ
 
 | Command | Information and effect contract |
 | --- | --- |
-| `availability` | Read-only JSON list of `slot_id`, `starts_at`, `capacity`, and `remaining`. This is a point-in-time observation, not a hold or a promise. |
+| `availability` | Read-only JSON object with a `slots` array; each entry has `slot_id`, `starts_at`, `capacity`, and `remaining`. This is a point-in-time observation, not a hold or a promise. |
 | `reserve` | Takes `request_key`, `party_id`, `slot_id`, and integer `seats`. Atomically records a terminal receipt and, only if accepted, decrements that one session's remaining places. |
 | `lookup` | Read-only lookup of a terminal receipt by request key. Returns the saved receipt or `{"state":"not_seen","request_key":"..."}`. |
 

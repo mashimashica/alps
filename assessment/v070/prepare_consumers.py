@@ -10,6 +10,8 @@ import json
 import shutil
 from pathlib import Path
 
+from booking_state import prepare as prepare_booking
+
 ROOT = Path(__file__).resolve().parent
 
 
@@ -20,17 +22,40 @@ def main():
     for creator_id in args.creator_ids:
         creator = ROOT / "trials" / creator_id
         assignment = json.loads((creator / "assignment.json").read_text())
+        development = creator_id.startswith("dev1-")
+        if development and assignment["case"] not in {"S05", "S08", "S10"}:
+            raise SystemExit("No reviewed development consumer case for this family")
         skills = [p for p in (creator / "output").iterdir() if p.is_dir() and (p / "SKILL.md").is_file()]
         if len(skills) != 1:
             raise SystemExit(f"Expected one completed target Skill: {creator_id}")
         number = int(creator_id.rsplit("-", 1)[1])
         for index, variant in enumerate(("ordinary", "challenging")):
-            use_id = f"U{2 * (number - 1) + index + 1:03}"
+            prefix = "D1-U" if development else "U"
+            use_id = f"{prefix}{2 * (number - 1) + index + 1:03}"
             folder = ROOT / "consumers" / use_id
             folder.mkdir(parents=True, exist_ok=False)
-            shutil.copytree(skills[0], folder / "skill" / skills[0].name, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
-            shutil.copytree(ROOT / "consumer-source" / assignment["case"] / variant, folder / "input")
             (folder / "work").mkdir()
+            shutil.copytree(skills[0], folder / "skill" / skills[0].name, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+            source = ROOT / ("development-consumer-cases" if development else "consumer-source") / assignment["case"] / variant
+            if development and (source / "input").is_dir():
+                source = source / "input"
+            if development and assignment["case"] == "S08":
+                prepare_booking(folder, source)
+            else:
+                shutil.copytree(source, folder / "input")
+            if development and assignment["case"] != "S08":
+                if assignment["case"] == "S10":
+                    shutil.copy2(ROOT / "cases/S10/release_tool.py", folder / "input/release_tool.py")
+                request = folder / "input/request.md"
+                body = request.read_text(encoding="utf-8")
+                replacements = {"{{INPUT_DIR}}": str(folder / "input"),
+                                "{{ENVIRONMENT_PATH}}": str(folder / "input"),
+                                "{{STATE_PATH}}": str(folder / "input/state.json")}
+                for token, value in replacements.items():
+                    body = body.replace(token, value)
+                if "{{" in body:
+                    raise SystemExit(f"Unresolved request path token: {use_id}")
+                request.write_text(body, encoding="utf-8")
             target = folder / "skill" / skills[0].name
             prompt = f"""Use the Skill at {target}/SKILL.md to complete the user's task in {folder}/input/request.md with any accompanying files in that input folder. Write the user-facing answer to {folder}/answer.md using apply_patch. Use {folder}/work for temporary processing and permitted local outputs.
 

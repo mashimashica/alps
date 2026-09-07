@@ -1,0 +1,48 @@
+{
+  "case_id": "S08-challenging",
+  "audience": "evaluator_only",
+  "encoding": "UTF-8",
+  "bindings": {
+    "PYTHON": "An available Python 3.12 executable; verification used python3.12.",
+    "BOOKING_PY": "Absolute path to the unchanged main-cases/S08/booking.py interface.",
+    "FIXTURE_JSON": "Absolute path to this packet's fixture.json.",
+    "STATE_DB": "Absolute, nonexistent bookings.sqlite filename in a new disposable directory dedicated to one consumer.",
+    "WORK_DIR": "Absolute existing directory dedicated to that consumer's supporting recovery records."
+  },
+  "steps": [
+    {
+      "id": "initialize",
+      "argv": ["{{PYTHON}}", "{{BOOKING_PY}}", "--state", "{{STATE_DB}}", "init", "--fixture", "{{FIXTURE_JSON}}"]
+    },
+    {
+      "id": "capture_earlier_availability",
+      "argv": ["{{PYTHON}}", "{{BOOKING_PY}}", "--state", "{{STATE_DB}}", "availability"]
+    },
+    {
+      "id": "original_uncertain_attempt",
+      "argv": ["{{PYTHON}}", "{{BOOKING_PY}}", "--state", "{{STATE_DB}}", "reserve", "--request-key", "orchid-linocut-20261122-01", "--party-id", "crew-orchid", "--slot-id", "linocut-sun-am", "--seats", "3", "--fault", "before-commit"]
+    },
+    {
+      "id": "seed_later_other_coordinator_booking",
+      "argv": ["{{PYTHON}}", "{{BOOKING_PY}}", "--state", "{{STATE_DB}}", "reserve", "--request-key", "cobalt-linocut-20261122-01", "--party-id", "team-cobalt", "--slot-id", "linocut-sun-am", "--seats", "4"]
+    },
+    {
+      "id": "capture_later_availability",
+      "argv": ["{{PYTHON}}", "{{BOOKING_PY}}", "--state", "{{STATE_DB}}", "availability"]
+    },
+    {
+      "id": "verify_original_unseen_at_handoff",
+      "argv": ["{{PYTHON}}", "{{BOOKING_PY}}", "--state", "{{STATE_DB}}", "lookup", "--request-key", "orchid-linocut-20261122-01"]
+    },
+    {
+      "id": "verify_other_coordinator_receipt",
+      "argv": ["{{PYTHON}}", "{{BOOKING_PY}}", "--state", "{{STATE_DB}}", "lookup", "--request-key", "cobalt-linocut-20261122-01"]
+    }
+  ],
+  "handoff": {
+    "consumer_visible": ["request.md after substituting BOOKING_PY, STATE_DB, and WORK_DIR", "the dedicated initialized state through the authorized booking interface"],
+    "withhold": ["setup.json", "setup.md", "setup-observations.json", "the fault flag and selected fault mode", "the evaluator's handoff lookup observation", "development-oracles/S08.md", "other consumers' files and state"],
+    "consumer_start_after_step": "verify_other_coordinator_receipt",
+    "background_setup_processes_at_handoff": 0
+  }
+}

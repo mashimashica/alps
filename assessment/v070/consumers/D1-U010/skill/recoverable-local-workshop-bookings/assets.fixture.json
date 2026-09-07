@@ -1,0 +1,7 @@
+{
+  "slots": [
+    {"slot_id":"paper-lab-am","starts_at":"2026-10-12T09:00:00Z","capacity":6},
+    {"slot_id":"paper-lab-pm","starts_at":"2026-10-12T14:00:00Z","capacity":4},
+    {"slot_id":"press-demo","starts_at":"2026-10-13T11:00:00Z","capacity":1}
+  ]
+}

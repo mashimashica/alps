@@ -1,0 +1,18 @@
+{
+  "consumer_id": "D1-U009",
+  "creator_id": "dev1-005",
+  "case": "S08",
+  "variant": "ordinary",
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "high",
+  "context": "fresh",
+  "copied_sha256": {
+    "skill/recoverable-local-workshop-bookings/SKILL.md": "77fd5fb637d02cce1049f59b6f7b020cd856f1bf8a024ebc7aaf6e55e67bf4de",
+    "skill/recoverable-local-workshop-bookings/assets.fixture.json": "3466a8bdf63ce18505567e6fdc778d21b6bfe9005cde390e611c97eab3fdc98d",
+    "skill/recoverable-local-workshop-bookings/scripts/book.py": "ab0db745371f94c5efe00dcb237681ec0812a268f35355db57279f2054a698df",
+    "skill/recoverable-local-workshop-bookings/scripts/booking.py": "49ac48ca1648f172c043a11fecf7fe0c049338755a6a26e4410a5c708cc39bc8",
+    "input/request.md": "bc5c8b8af5079a37c539984d011a417101f9de94daa923bdf47468b4da82f093",
+    "input/booking.py": "49ac48ca1648f172c043a11fecf7fe0c049338755a6a26e4410a5c708cc39bc8"
+  },
+  "prompt_sha256": "8f3d4e7b60193d149657d918a649984228aaa117524f5f1acee1e2eb2b807fa7"
+}
