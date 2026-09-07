@@ -18,7 +18,7 @@ ALPSはClaude、Cursor、Codexのアダプターを持つ[Agent Plugins](https:/
 npx plugins add mashimashica/alps
 ```
 
-導入後は対象クライアントを再読込みしてください。必要な仕様と同梱する参照資料を利用できるよう、`spec/`と`examples/`を含むPluginルートの配置を保ちます。導入先で`design-process-description`と`design-agent-work-system`が表示され、それぞれの仕様リンクを開けることを確認してください。
+導入後は対象クライアントを再読込みしてください。Skill内とSkill間の必要なリンクを利用できるよう、両Skillとその参照資源、同梱する`examples/`を、Plugin全体の配置で保持します。導入先で`design-process-description`と`design-agent-work-system`が表示され、それぞれの参照リンクを開けることを確認してください。
 
 ## Skillの使い方
 
@@ -66,9 +66,8 @@ ALPSは記述、設計原則、設計の支援を提供します。実行、保�
 
 | 資源 | 英語 | 日本語 |
 | --- | --- | --- |
-| プロセス記述の意味 | [Process Framework](../../../spec/process-framework.md) | [プロセスフレームワーク](../../../spec/locales/ja/process-framework.md) |
-| 作業システムの設計 | [Design principles](../../../spec/agent-work-system-design.md) | [エージェント作業システムの設計原則](../../../spec/locales/ja/agent-work-system-design.md) |
-| Agent Skillでの統合 | [ALPS Specification](../../../spec/ALPS-SPEC.md) | [ALPS Specification](../../../spec/locales/ja/ALPS-SPEC.md) |
+| プロセス記述の意味 | [Process Framework](../../../skills/design-process-description/references/process-framework.md) | [プロセスフレームワーク](../../../skills/design-process-description/references/locales/ja/process-framework.md) |
+| 作業システムの設計 | [Design principles](../../../skills/design-agent-work-system/references/agent-work-system-design.md) | [エージェント作業システムの設計原則](../../../skills/design-agent-work-system/references/locales/ja/agent-work-system-design.md) |
 | プロセス記述の設計 | [Skill](../../../skills/design-process-description/SKILL.md) | [Skill](../../../skills/design-process-description/references/locales/ja/SKILL.md) |
 | エージェント作業システムの設計 | [Skill](../../../skills/design-agent-work-system/SKILL.md) | [Skill](../../../skills/design-agent-work-system/references/locales/ja/SKILL.md) |
 | 貢献とリポジトリ作業 | [CONTRIBUTING](../../../CONTRIBUTING.md)、[AGENTS](../../../AGENTS.md) | [CONTRIBUTING](CONTRIBUTING.md)、[AGENTS](AGENTS.md) |

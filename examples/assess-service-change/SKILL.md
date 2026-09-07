@@ -34,7 +34,7 @@ Baseline and candidate request measurements and their measurement context.
 
 ## Controls
 
-The applicable pilot criteria in [pilot conditions](references/pilot-context.md) govern the assessment. For this Process Description, apply the [Process Framework](../../spec/process-framework.md) and [ALPS Specification](../../spec/ALPS-SPEC.md).
+The applicable pilot criteria in [pilot conditions](references/pilot-context.md) govern the assessment. For this Process Description, apply the [Process Framework](../../skills/design-process-description/references/process-framework.md).
 
 ## Constraints
 

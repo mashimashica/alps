@@ -2,7 +2,7 @@
 
 [Japanese translation](locales/ja/examples.md)
 
-These fictional cases illustrate the [Framework](../../../spec/process-framework.md); they introduce no additional requirements. Start with the [minimal template](SKILL-template.md), and add only details whose absence would change understanding, application, or evaluation.
+These fictional cases illustrate the [Framework](process-framework.md); they introduce no additional requirements. Start with the [minimal template](SKILL-template.md), and add only details whose absence would change understanding, application, or evaluation.
 
 ## 1. Only the required core
 
@@ -140,15 +140,27 @@ The Activity headings group related work and the numbered Tasks state actions. B
 
 ### Requirements Clarification
 
-**Purpose:** Make the needs for the service change precise enough to guide solution choices.
+#### Purpose
 
-**Outcomes:** The needs have observable acceptance conditions. Material ambiguities and conflicts are resolved or identified with their consequences for solution choice.
+Make the needs for the service change precise enough to guide solution choices.
+
+#### Outcomes
+
+- The needs have observable acceptance conditions.
+- Material ambiguities and conflicts are resolved or identified with their consequences for solution choice.
 
 ### Feasibility Assessment
 
-**Purpose:** Determine whether candidate solutions can satisfy the clarified needs within the available capacity.
+#### Purpose
 
-**Outcomes:** The feasibility judgment for each considered candidate is supported by evidence against the needs and available capacity. Unverified assumptions and their effect on the feasibility judgment are explicit.
+Determine whether candidate solutions can satisfy the clarified needs within the available capacity.
+
+#### Outcomes
+
+- The feasibility judgment for each considered candidate is supported by evidence against the needs and available capacity.
+- Unverified assumptions and their effect on the feasibility judgment are explicit.
+
+### Shared information and application
 
 Both Processes consult and update the same ordinary **change brief**. It contains the needs, candidate assumptions, acceptance conditions, and supporting observations for this service change. Its needs and observations serve as Inputs when examined; its acceptance conditions act as Controls when judging a candidate. Updated information is an Output. These roles can be distinguished within the same document.
 

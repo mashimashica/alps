@@ -34,7 +34,7 @@ description: 基準と候補のリクエスト測定値を用いて、サービ�
 
 ## 統制事項
 
-[試行条件](pilot-context.md)にある適用可能な試行基準に従って評価する。このプロセス記述には、[プロセスフレームワーク](../../../../../spec/locales/ja/process-framework.md)と[ALPS Specification](../../../../../spec/locales/ja/ALPS-SPEC.md)を適用する。
+[試行条件](pilot-context.md)にある適用可能な試行基準に従って評価する。このプロセス記述には、[プロセスフレームワーク](../../../../../skills/design-process-description/references/locales/ja/process-framework.md)を適用する。
 
 ## 制約
 

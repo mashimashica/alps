@@ -8,10 +8,9 @@
 
 | 対象 | 参照する文書 |
 | --- | --- |
-| プロセスの意味、境界、参照、変更、評価 | [プロセスフレームワーク](../../../spec/locales/ja/process-framework.md) |
-| エージェント・ツール・情報・環境の設計 | [エージェント作業システムの設計原則](../../../spec/locales/ja/agent-work-system-design.md) |
-| 二つの基盤のAgent Skillでの統合 | それぞれの対象について各参照元に従う[ALPS Specification](../../../spec/locales/ja/ALPS-SPEC.md) |
-| 配布する設計プロセス | [design-process-description](../../../skills/design-process-description/references/locales/ja/SKILL.md)と[design-agent-work-system](../../../skills/design-agent-work-system/references/locales/ja/SKILL.md) |
+| プロセスの意味、境界、参照、変更、評価 | [プロセスフレームワーク](../../../skills/design-process-description/references/locales/ja/process-framework.md) |
+| エージェント・ツール・情報・環境の設計 | [エージェント作業システムの設計原則](../../../skills/design-agent-work-system/references/locales/ja/agent-work-system-design.md) |
+| 設計の仕事とAgent Skillへの適用 | [design-process-description](../../../skills/design-process-description/references/locales/ja/SKILL.md)と[design-agent-work-system](../../../skills/design-agent-work-system/references/locales/ja/SKILL.md) |
 | リポジトリ作業と配布 | 本ファイル |
 | 草案作成の補助 | [テンプレート](../../../skills/design-process-description/references/locales/ja/SKILL-template.md)と[具体例](../../../skills/design-process-description/references/locales/ja/examples.md)。いずれも参考情報。 |
 
@@ -25,13 +24,13 @@
 | `.agents/skills/<distributed-skill>` | リポジトリ内の発見用に`../../skills/<distributed-skill>`を指す相対symlink。 |
 | `.agents/skills/review-alps/` | リポジトリの意味と配布をレビューする実ディレクトリ。Plugin Skillではない。 |
 | `.agents/skills/sync-locales/` | 日英レビューの実ディレクトリ。Plugin Skillではない。 |
-| `spec/` | Pluginルートに含める共有の規範文書。 |
-| `spec/locales/ja/`、`docs/locales/ja/`、各Skillの`references/locales/ja/` | 対応する英語版の翻訳。 |
+| 各Skillの`references/` | そのSkillが用いる原則と付属資料。各文書の役割によって規範強度が決まる。 |
+| `docs/locales/ja/`、各Skillの`references/locales/ja/` | 対応する英語版の翻訳。 |
 | `examples/` | 実働する対象Skillを含む、同梱する参照資料。Plugin Skillの発見対象外。ガイドの翻訳は`examples/locales/ja/`、対象Skillの翻訳はその`references/locales/ja/`に置く。 |
 | `plugin.json`、`.claude-plugin/`、`.cursor-plugin/`、`.codex-plugin/` | ルートPlugin形式と、それぞれのHostアダプター。 |
 | `assets/`およびSkillの`agents/`と`assets/` | 表示資源。 |
 
-`skills/`をPlugin Skillの配布元とする。Hostは各規約とmanifestにより発見する。`.agents/skills/`はリポジトリ内の統合ビューであり、普遍的なHost規約ではない。checkoutに開発用Skillを含めても、それをPlugin Skillとして公開することにはならない。`spec/`と`examples/`へのリンクが利用できるようPluginルートの配置を保つ。開発用Skillと例のSkillは`skills/`の外に置く。
+`skills/`をPlugin Skillの配布元とする。Hostは各規約とmanifestにより発見する。`.agents/skills/`はリポジトリ内の統合ビューであり、普遍的なHost規約ではない。checkoutに開発用Skillを含めても、それをPlugin Skillとして公開することにはならない。Skill内、Skill間、`examples/`への参照が利用できるようPlugin全体の配置を保つ。開発用Skillと例のSkillは`skills/`の外に置く。
 
 ## 変更とレビュー
 
@@ -39,7 +38,7 @@
 - 仕様、Skill内容、リポジトリ案内、テスト、配布、表示が意味や境界に影響する変更では`review-alps`を使用する。
 - 影響する日英の各ペアに`sync-locales`を使用する。開発用Skillには日本語のPlugin対応ファイルはない。
 - プロセス記述の作成・レビューには`design-process-description`を用いる。
-- 実現を支える構成、実装、有効性の設計・レビューには`design-agent-work-system`を用いる。共有する仕事の意味を維持し、統合規則はALPS-SPECに置く。二つの基盤仕様は、それぞれ独立して利用できる。
+- 実現を支える構成、実装、有効性の設計・レビューには`design-agent-work-system`を用いる。共有する仕事の意味を維持し、それぞれの対象に各基盤を適用する。
 - 各Hostアダプターを、そのHost固有の形式と上記の配布配置に整合させる。
 - 貢献とライセンスの要件には[CONTRIBUTING](CONTRIBUTING.md)を、リリース方針には[版管理](versioning.md)を適用する。
 
