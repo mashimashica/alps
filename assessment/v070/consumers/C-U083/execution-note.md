@@ -40,9 +40,20 @@ All commands ran with working directory `/workspace/scratch/a75c3a6d9076/alps-v0
      ```
    - Captured stderr: none observed.
 
-7. `apply_patch` created `answer.md` and `execution-note.md`.
-   - Exit code: successful tool completion.
-   - Captured output: `Done!`
+7. `cat answer.md`
+   - Exit code: `0`
+   - Captured stdout summary: displayed the complete snapshot, interval, 6-of-6 coverage, and the three vendor rows written to the user-facing answer.
+   - Captured stderr: none observed.
+
+8. `cat execution-note.md`
+   - Exit code: `0`
+   - Captured stdout summary: displayed the execution note for verification before its final correction.
+   - Captured stderr: none observed.
+
+9. `cat work/reimbursement-rollup-checkpoint.json`
+   - Exit code: `0`
+   - Exact relevant observations from captured stdout: `"complete":true`, `"next_cursor":null`, `"snapshot_id":"snap_c22e71aa06b43ab25395e0ce"`, `"start":"2026-04-03"`, `"end":"2026-04-09"`, and `"total_records":6`. The checkpoint contained six distinct entry IDs, `ord-001` through `ord-006`.
+   - Captured stderr: none observed.
 
 ## Files used
 

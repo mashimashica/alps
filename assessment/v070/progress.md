@@ -9,7 +9,7 @@ Frozen current main A is dee3866d35e43db5db480fc9f85166a8dcb1ec3b, VERSION 0.7.0
 | Stage | Completed design | Completed consumer | Other completed | Planned task trials |
 | --- | ---: | ---: | ---: | ---: |
 | Calibration | 12 | 24 | 0 | 36 |
-| C control | 64 | 75 | 0 | 216 |
+| C control | 68 | 83 | 0 | 216 |
 | Remaining base plan | 0 | 0 | 0 | up to 1,776 |
 
 Additional diagnostic reserve: at most 72 starts across at most three rounds. H01–H03 used 68 starts: 66 complete and two retained interrupted originals. Four slots remain, but do not authorize a fourth ordinary round. Across calibration/development, 34 creators and 68 valid consumers are complete. Completed tasks, observation validity, business adequacy and achieved Outcomes are different counts.
@@ -24,9 +24,9 @@ Additional diagnostic reserve: at most 72 starts across at most three rounds. H0
 
 ## Work in progress
 
-C creators 001–064 are complete/form-pass; 065 running. C-U001–120 and 123–124 are prepared; first 75 complete with final native SQL for 073–075; 076–077 running. Creator 061 added a Python bytecode cache without changing either supplied original file. Preparation refused before mutation; a narrow helper correction awaits independent review. Preparation for 061/063/064 waits for it. No creator is replayed or source restored to erase the observation.
+C creators 001–068 are complete/form-pass/frozen; 069–070 running. C-U001–136 are prepared; first 83 complete with actual final native SQL for 073–083; 084–085 running. Creator 061's bytecode-only addition was independently reconciled, the reviewed helper now records it separately, and preparation succeeded without replay or source restoration. The original cache and observation remain preserved. S06-P02 is prepared and awaits its first save before grading.
 
-S03 is closed out after all six reports and the clarification were read: 24 adequate applications following one preserved adjudication, prior full agreement in 12 ordinary inputs and only partial agreement in 12 challenging inputs. All S05 packets are saved; three primary reports and P01 second are complete/read, with additional P02/P03 second reviews underway. Material complete-empty errors, ownership and evidenced corrections, latent component defects and source-identification sufficiency are under adjudication. Original oracle detail, actionable review quality and additional probes remain separate. No S05 synthesis is final. All schedules and case identities remain fixed; extra grading is not a business trial. S01/S05/S10 reuse independent stimuli, not new holdout. Recorded creator/reviewer scope deviations remain preserved.
+S03 is closed out after all reports/clarification: 24 adequate, with prior full agreement only in the 12 ordinary inputs. S05 is closed out after six reports and three post-blind supplementary addenda: 14 adequate, 8 bounded source-detail deficiencies, 2 material failures and 3 evidenced corrections in C026. The broader actionable-review interpretation would classify those eight bounded cases adequate; the distinction and original omissions remain explicit. Component failures and provisional example eligibility are in control-S05-closeout.md. Extra grading/read-back is not a new business trial. All schedules and case identities remain fixed; S01/S05/S10 reuse independent stimuli, not new holdout. Recorded scope deviations remain preserved.
 
 Consumer/blind packaging reviews and SQLite preservation integration are complete/read. Helpers verify frozen bytes/modes and maintain original final-state evidence without interpreting semantic success. Actual creator verification databases are preserved at their original paths and, for direct UTF-8 saving, as indexed native SQL with hashes. S06 consumer states are independently initialized outside the evidence tree; preserve their actual final committed state with control_ledger_state.py after completion, without resetting quota or granting another tranche.
 
