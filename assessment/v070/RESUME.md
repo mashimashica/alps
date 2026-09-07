@@ -1,3 +1,17 @@
+# Current restoration status — 2026-09-07
+
+The environment is connected again. The evidence root was restored from exact commit `75c0ea9bddf379c5e1803e4c0114ba5b47c871d8`, tree `ecb6cc6d6ba4ebf2c009be8b51b6602749f0939d`. All 5,290 tracked files were individually matched by Git blob identity and mode before rebuilding the publication cache. The older H02 filesystem remains separately preserved. Read `audits/environment-restoration-review.md` and `audits/environment-restoration-coordinator.md` before continuation; their recovery instructions supersede the obsolete offline instructions and counts below.
+
+Completion ledgers now record 72 C creators, 93 C consumers and 17 C grading reports from explicit original notifications, without inventing historical timestamps. Total completed trial count remains 267; recovery adds no trial. C-U094–097 retain their original paused attempt identities; C-U098–144 have not started. Of those, 098–136 have durable prepared packets; 137–144 require package recovery and independently reviewed new recovery freezes. Missing original files and observations are identified in the restoration review and must not be replaced with fabricated final-state metadata.
+
+After saving this restoration checkpoint, verify availability of the retained C-U097 context and resume it if available, then start the fixed S09 consumers 098–120 in fresh sol/high contexts. C-U094–096 remain paused until separate new-path database binding support is independently reviewed and saved. A genuinely unavailable original context requires the existing independent infrastructure adjudication before any distinct retry. No new candidate round, acceptance waiver or final example selection is authorized. See `scope-decision-required.md` for the 1,776 blocked dependent slots.
+
+The product worktree is verified clean at frozen A. The preserved older worktree diff contained only the exact rejected B2 English/Japanese Skill files; those two task-owned edits were removed by targeted restoration to A after preserving their diff. No unrelated work was changed.
+
+The older recovery notices below are retained as historical observations and are no longer current connection or progress status. Use the newest verified checkpoint receipt for subsequent remote updates.
+
+---
+
 # Emergency recovery notice — 2026-09-07
 
 The workspace is disconnected (409 environment_offline). Read [RECOVERY-ENVIRONMENT-OFFLINE.md](RECOVERY-ENVIRONMENT-OFFLINE.md) first: it supersedes the older progress counts below, identifies the last full filesystem checkpoint, and records the difference between completed work and durably preserved artifacts. Do not run a whole-folder export from stale local metadata before reconciling this emergency update. The original RESUME snapshot follows unchanged.

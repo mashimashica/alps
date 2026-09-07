@@ -1,5 +1,7 @@
 # Emergency checkpoint receipts
 
+Latest verified emergency head: `75c0ea9bddf379c5e1803e4c0114ba5b47c871d8`, tree `ecb6cc6d6ba4ebf2c009be8b51b6602749f0939d`, parent `c9c04b94d6b2ae12dd0b9bf8767d89049fe8368f`. All twelve changed files were fetched back as UTF-8 and matched their submitted content and blob identities. After reconnection, all 5,290 committed evidence files were individually verified by Git blob SHA and mode at the restored working root. Later normal checkpoint receipts belong in `checkpoints.md`.
+
 The last full filesystem export remains bb0b730b49dae994a4869e8002f246e338e9da1f (tree ebdeb7355d14bf5383b531f3b3a89137b01ebd92, 5,268 files). The entries below preserve additional text through the direct API while the execution environment is disconnected; they do not attest an additional filesystem export.
 
 | Verified commit | Tree | Parent | Preserved changes | Verification |

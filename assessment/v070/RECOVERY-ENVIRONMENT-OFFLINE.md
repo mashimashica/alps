@@ -1,5 +1,7 @@
 # Environment-offline recovery checkpoint — 2026-09-07
 
+Current status: the environment has reconnected and the exact latest emergency checkpoint has been restored and verified. Read the current prefix in `RESUME.md`, `audits/environment-restoration-review.md` and `audits/environment-restoration-coordinator.md`. The remainder of this document preserves outage-time observations, including then-unconfirmed availability; it does not override the later restoration findings.
+
 This document supersedes the execution counts and latest-checkpoint paragraph in the older RESUME.md snapshot until reconciliation is complete. It records observed progress; it does not declare unavailable files lost or durably saved.
 
 The execution server disconnected with: "failed to query exec-server capabilities: exec-server connection attempt failed: environment registry request failed (409 Conflict, environment_offline): Environment is not connected." Both the ordinary execution tool and a read-only Node filesystem attempt failed before process/file access. The parent repeated a bounded pwd check and received the same error. This is an environment connection failure, not a reported model rate-limit error. Direct GitHub API reads still work. No exposed environment reconnection capability was found.

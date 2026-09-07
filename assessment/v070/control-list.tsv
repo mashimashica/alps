@@ -67,7 +67,7 @@ control-065	control	S10	C	1	gpt-5.6-sol	low	completed	/root/control_make_065	202
 control-066	control	S10	C	2	gpt-5.6-sol	low	completed	/root/control_make_066	2026-09-07T21:12:57.266326+00:00	2026-09-07T21:16:03.943554+00:00
 control-067	control	S10	C	1	gpt-5.6-sol	high	completed	/root/control_make_067	2026-09-07T21:16:06.105871+00:00	2026-09-07T21:21:06.925588+00:00
 control-068	control	S10	C	2	gpt-5.6-sol	high	completed	/root/control_make_068	2026-09-07T21:16:06.525503+00:00	2026-09-07T21:21:34.855072+00:00
-control-069	control	S10	C	1	gpt-6-astra	low	running	/root/control_make_069	2026-09-07T21:21:36.616621+00:00	
-control-070	control	S10	C	2	gpt-6-astra	low	running	/root/control_make_070	2026-09-07T21:23:19.257054+00:00	
-control-071	control	S10	C	1	gpt-6-astra	high	not started			
-control-072	control	S10	C	2	gpt-6-astra	high	not started			
+control-069	control	S10	C	1	gpt-6-astra	low	completed	/root/control_make_069	2026-09-07T21:21:36.616621+00:00	
+control-070	control	S10	C	2	gpt-6-astra	low	completed	/root/control_make_070	2026-09-07T21:23:19.257054+00:00	
+control-071	control	S10	C	1	gpt-6-astra	high	completed	/root/control_make_071		
+control-072	control	S10	C	2	gpt-6-astra	high	completed	/root/control_make_072		
