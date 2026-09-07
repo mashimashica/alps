@@ -78,7 +78,7 @@ jobs:
           npx --yes @anthropic-ai/claude-code@2.1.251 \
             plugin validate . --strict
 
-      - name: Run repository integrity and example tool tests
+      - name: Run manifest version and example tool tests
         run: python3 -m unittest discover -s tests -p 'test_*.py'
 
       - name: Check relative Markdown links

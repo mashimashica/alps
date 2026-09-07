@@ -12,7 +12,7 @@
 ## Validation
 
 - [ ] I assessed the paired English or Japanese assets and updated them where needed.
-- [ ] I ran the applicable Agent Skill and Plugin form checks and repository-integrity tests.
+- [ ] I ran the applicable checks in the [validation Workflow](workflows/validate.yml).
 - [ ] I reviewed semantics separately from mechanical validation and stated unverified matters.
 - [ ] For tools or work-system changes, I distinguished component and connection checks from effectiveness on representative work and reported the evidence and limits.
 - [ ] I ran `git diff --check` and verified changed relative links.

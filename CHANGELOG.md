@@ -4,6 +4,10 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+### Changed
+
+- Focus repository tests on manifest version consistency and example tool behavior; review affected distribution layout and resources alongside existing format and link checks.
+
 ## [0.7.0] - 2026-09-06
 
 ### Added
