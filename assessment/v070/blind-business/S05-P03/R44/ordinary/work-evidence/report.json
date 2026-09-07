@@ -1,0 +1,213 @@
+{
+  "month": "2026-06",
+  "scope": "All supplied order rows for requested month",
+  "lines": [
+    {
+      "order_row": 0,
+      "source": {
+        "order_id": "PO-R2606-410",
+        "sku": "LABEL-60",
+        "ordered": 120,
+        "supplier_contact": "Mara Quinn <mara.quinn@harborpack.example>"
+      },
+      "order_id": "PO-R2606-410",
+      "sku": "LABEL-60",
+      "ordered": 120,
+      "observed_subtotal": 120,
+      "event_ids": [
+        "RCV-H1801",
+        "RCV-H1802",
+        "RCV-H1803"
+      ],
+      "coverage_rows": [
+        0
+      ],
+      "blockers": [],
+      "actions": [],
+      "coverage_complete": true,
+      "final_net_received": 120,
+      "remaining_quantity": null,
+      "excess_quantity": null,
+      "status": "received_as_ordered"
+    },
+    {
+      "order_row": 1,
+      "source": {
+        "order_id": "PO-R2606-410",
+        "sku": "CARTON-M",
+        "ordered": 80,
+        "supplier_contact": "Mara Quinn <mara.quinn@harborpack.example>"
+      },
+      "order_id": "PO-R2606-410",
+      "sku": "CARTON-M",
+      "ordered": 80,
+      "observed_subtotal": 42,
+      "event_ids": [
+        "RCV-H1804",
+        "RCV-H1805"
+      ],
+      "coverage_rows": [
+        1
+      ],
+      "blockers": [],
+      "actions": [
+        {
+          "kind": "supplier_follow_up",
+          "owner": "Dana Ivers <dana.ivers@juniperworks.example>",
+          "recipients": [
+            "Dana Ivers <dana.ivers@juniperworks.example>",
+            "Mara Quinn <mara.quinn@harborpack.example>"
+          ],
+          "missing_recipients": [],
+          "draft": "2026-06 / PO-R2606-410 / CARTON-M: Confirm the remaining receipt of 38 units and provide the next receiving date/action."
+        }
+      ],
+      "coverage_complete": true,
+      "final_net_received": 42,
+      "remaining_quantity": 38,
+      "excess_quantity": null,
+      "status": "shortfall"
+    },
+    {
+      "order_row": 2,
+      "source": {
+        "order_id": "PO-R2606-411",
+        "sku": "GLOVE-N",
+        "ordered": 60,
+        "supplier_contact": "Ellis Chen <ellis.chen@elmprotect.example>"
+      },
+      "order_id": "PO-R2606-411",
+      "sku": "GLOVE-N",
+      "ordered": 60,
+      "observed_subtotal": 64,
+      "event_ids": [
+        "RCV-H1806",
+        "RCV-H1807"
+      ],
+      "coverage_rows": [
+        2
+      ],
+      "blockers": [],
+      "actions": [
+        {
+          "kind": "surplus_reconciliation",
+          "owner": "Dana Ivers <dana.ivers@juniperworks.example>",
+          "recipients": [
+            "Noel Price <noel.price@juniperworks.example>"
+          ],
+          "missing_recipients": [],
+          "draft": "2026-06 / PO-R2606-411 / GLOVE-N: Reconcile the surplus of 4 units against the order and receiving evidence and report the required correction."
+        }
+      ],
+      "coverage_complete": true,
+      "final_net_received": 64,
+      "remaining_quantity": null,
+      "excess_quantity": 4,
+      "status": "excess"
+    },
+    {
+      "order_row": 3,
+      "source": {
+        "order_id": "PO-R2606-412",
+        "sku": "FILM-300",
+        "ordered": 24,
+        "supplier_contact": "Priya Stone <priya.stone@clearspan.example>"
+      },
+      "order_id": "PO-R2606-412",
+      "sku": "FILM-300",
+      "ordered": 24,
+      "observed_subtotal": 24,
+      "event_ids": [
+        "RCV-H1808"
+      ],
+      "coverage_rows": [
+        3
+      ],
+      "blockers": [],
+      "actions": [],
+      "coverage_complete": true,
+      "final_net_received": 24,
+      "remaining_quantity": null,
+      "excess_quantity": null,
+      "status": "received_as_ordered"
+    },
+    {
+      "order_row": 4,
+      "source": {
+        "order_id": "PO-R2606-413",
+        "sku": "SEAL-BLUE",
+        "ordered": 40,
+        "supplier_contact": "Leni Perez <leni.perez@blueridgepack.example>"
+      },
+      "order_id": "PO-R2606-413",
+      "sku": "SEAL-BLUE",
+      "ordered": 40,
+      "observed_subtotal": 30,
+      "event_ids": [
+        "RCV-H1809",
+        "RCV-H1810"
+      ],
+      "coverage_rows": [
+        4
+      ],
+      "blockers": [],
+      "actions": [
+        {
+          "kind": "complete_export",
+          "owner": "Dana Ivers <dana.ivers@juniperworks.example>",
+          "recipients": [
+            "Simone Bell <simone.bell@juniperworks.example>"
+          ],
+          "missing_recipients": [],
+          "draft": "2026-06 / PO-R2606-413 / SEAL-BLUE: Provide or confirm the full event export and completeness declaration for this line and month before final comparison."
+        }
+      ],
+      "coverage_complete": false,
+      "final_net_received": null,
+      "remaining_quantity": null,
+      "excess_quantity": null,
+      "status": "unresolved_evidence"
+    },
+    {
+      "order_row": 5,
+      "source": {
+        "order_id": "PO-R2606-414",
+        "sku": "TAPE-48",
+        "ordered": 30,
+        "supplier_contact": "Owen Malik <owen.malik@bindwell.example>"
+      },
+      "order_id": "PO-R2606-414",
+      "sku": "TAPE-48",
+      "ordered": 30,
+      "observed_subtotal": 0,
+      "event_ids": [],
+      "coverage_rows": [
+        5
+      ],
+      "blockers": [],
+      "actions": [
+        {
+          "kind": "supplier_follow_up",
+          "owner": "Dana Ivers <dana.ivers@juniperworks.example>",
+          "recipients": [
+            "Dana Ivers <dana.ivers@juniperworks.example>",
+            "Owen Malik <owen.malik@bindwell.example>"
+          ],
+          "missing_recipients": [],
+          "draft": "2026-06 / PO-R2606-414 / TAPE-48: Confirm the remaining receipt of 30 units and provide the next receiving date/action."
+        }
+      ],
+      "coverage_complete": true,
+      "final_net_received": 0,
+      "remaining_quantity": 30,
+      "excess_quantity": null,
+      "status": "shortfall"
+    }
+  ],
+  "diagnostics": [
+    "events[6]: outside requested month",
+    "events[10]: outside requested month",
+    "events[13]: outside supplied order set"
+  ],
+  "drafts_only": true
+}

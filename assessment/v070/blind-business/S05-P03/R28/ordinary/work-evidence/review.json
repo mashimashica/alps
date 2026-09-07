@@ -1,0 +1,104 @@
+{
+  "lines": [
+    {
+      "evidence_issues": [],
+      "follow_up": null,
+      "observed_received": 120,
+      "order_id": "PO-R2606-410",
+      "ordered": 120,
+      "sku": "LABEL-60",
+      "status": "received_as_ordered"
+    },
+    {
+      "evidence_issues": [],
+      "follow_up": {
+        "draft": "Ask Dana Ivers <dana.ivers@juniperworks.example> about the remaining receipt for PO-R2606-410/CARTON-M.",
+        "recipient": "Dana Ivers <dana.ivers@juniperworks.example>"
+      },
+      "observed_received": 42,
+      "order_id": "PO-R2606-410",
+      "ordered": 80,
+      "sku": "CARTON-M",
+      "status": "complete_shortfall"
+    },
+    {
+      "evidence_issues": [],
+      "follow_up": {
+        "draft": "Ask Noel Price <noel.price@juniperworks.example> to reconcile the surplus for PO-R2606-411/GLOVE-N against order and receiving evidence.",
+        "recipient": "Noel Price <noel.price@juniperworks.example>"
+      },
+      "observed_received": 64,
+      "order_id": "PO-R2606-411",
+      "ordered": 60,
+      "sku": "GLOVE-N",
+      "status": "complete_excess"
+    },
+    {
+      "evidence_issues": [],
+      "follow_up": null,
+      "observed_received": 24,
+      "order_id": "PO-R2606-412",
+      "ordered": 24,
+      "sku": "FILM-300",
+      "status": "received_as_ordered"
+    },
+    {
+      "evidence_issues": [],
+      "follow_up": {
+        "draft": "Ask Simone Bell <simone.bell@juniperworks.example> to provide or confirm the full export for PO-R2606-413/SEAL-BLUE for 2026-06.",
+        "recipient": "Simone Bell <simone.bell@juniperworks.example>"
+      },
+      "observed_received": 30,
+      "order_id": "PO-R2606-413",
+      "ordered": 40,
+      "sku": "SEAL-BLUE",
+      "status": "incomplete_export"
+    },
+    {
+      "evidence_issues": [],
+      "follow_up": null,
+      "observed_received": null,
+      "order_id": "PO-R2606-414",
+      "ordered": 30,
+      "sku": "TAPE-48",
+      "status": "missing_received_value"
+    }
+  ],
+  "month": "2026-06",
+  "out_of_scope_events": [
+    {
+      "event_id": "RCV-H1811",
+      "event_month": "2026-06",
+      "order_id": "PO-R2606-499",
+      "quantity": 90,
+      "sku": "PALLET-STD"
+    }
+  ],
+  "scope": [
+    {
+      "order_id": "PO-R2606-410",
+      "sku": "LABEL-60"
+    },
+    {
+      "order_id": "PO-R2606-410",
+      "sku": "CARTON-M"
+    },
+    {
+      "order_id": "PO-R2606-411",
+      "sku": "GLOVE-N"
+    },
+    {
+      "order_id": "PO-R2606-412",
+      "sku": "FILM-300"
+    },
+    {
+      "order_id": "PO-R2606-413",
+      "sku": "SEAL-BLUE"
+    },
+    {
+      "order_id": "PO-R2606-414",
+      "sku": "TAPE-48"
+    }
+  ],
+  "warnings": []
+}

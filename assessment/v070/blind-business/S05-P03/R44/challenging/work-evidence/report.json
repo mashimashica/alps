@@ -1,0 +1,480 @@
+{
+  "month": "2026-07",
+  "scope": "All supplied order rows for requested month",
+  "lines": [
+    {
+      "order_row": 0,
+      "source": {
+        "order_id": "PO-S2607-820",
+        "sku": "BOLT-M8",
+        "ordered": 100,
+        "supplier_contact": "Tessa Holt <tessa.holt@ridgefast.example>"
+      },
+      "order_id": "PO-S2607-820",
+      "sku": "BOLT-M8",
+      "ordered": 100,
+      "observed_subtotal": 90,
+      "event_ids": [
+        "RCV-K7101",
+        "RCV-K7102",
+        "RCV-K7103"
+      ],
+      "coverage_rows": [
+        0
+      ],
+      "blockers": [
+        "events[4]: unknown SKU for in-scope order"
+      ],
+      "actions": [
+        {
+          "kind": "reconcile_sources",
+          "owner": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "recipients": [
+            "Rowan Ames <rowan.ames@northquayassembly.example>",
+            "Beck Lin <beck.lin@northquayassembly.example>"
+          ],
+          "missing_recipients": [],
+          "draft": "2026-07 / PO-S2607-820 / BOLT-M8: Reconcile source records before final comparison: events[4]: unknown SKU for in-scope order"
+        }
+      ],
+      "coverage_complete": true,
+      "final_net_received": null,
+      "remaining_quantity": null,
+      "excess_quantity": null,
+      "status": "unresolved_evidence"
+    },
+    {
+      "order_row": 1,
+      "source": {
+        "order_id": "PO-S2607-820",
+        "sku": "WASHER-M8",
+        "ordered": 200,
+        "supplier_contact": "Tessa Holt <tessa.holt@ridgefast.example>"
+      },
+      "order_id": "PO-S2607-820",
+      "sku": "WASHER-M8",
+      "ordered": 200,
+      "observed_subtotal": 200,
+      "event_ids": [
+        "RCV-K7104"
+      ],
+      "coverage_rows": [
+        1
+      ],
+      "blockers": [
+        "events[4]: unknown SKU for in-scope order"
+      ],
+      "actions": [
+        {
+          "kind": "reconcile_sources",
+          "owner": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "recipients": [
+            "Rowan Ames <rowan.ames@northquayassembly.example>",
+            "Beck Lin <beck.lin@northquayassembly.example>"
+          ],
+          "missing_recipients": [],
+          "draft": "2026-07 / PO-S2607-820 / WASHER-M8: Reconcile source records before final comparison: events[4]: unknown SKU for in-scope order"
+        }
+      ],
+      "coverage_complete": true,
+      "final_net_received": null,
+      "remaining_quantity": null,
+      "excess_quantity": null,
+      "status": "unresolved_evidence"
+    },
+    {
+      "order_row": 2,
+      "source": {
+        "order_id": "PO-S2607-821",
+        "sku": "PACK-RACK",
+        "ordered": 48,
+        "supplier_contact": "Leif Moreno <leif.moreno@silverrack.example>"
+      },
+      "order_id": "PO-S2607-821",
+      "sku": "PACK-RACK",
+      "ordered": 48,
+      "observed_subtotal": 20,
+      "event_ids": [
+        "RCV-K7106"
+      ],
+      "coverage_rows": [
+        2
+      ],
+      "blockers": [
+        "Conflicting event_id RCV-K7107: rows [6, 8]"
+      ],
+      "actions": [
+        {
+          "kind": "reconcile_sources",
+          "owner": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "recipients": [
+            "Rowan Ames <rowan.ames@northquayassembly.example>",
+            "Beck Lin <beck.lin@northquayassembly.example>"
+          ],
+          "missing_recipients": [],
+          "draft": "2026-07 / PO-S2607-821 / PACK-RACK: Reconcile source records before final comparison: Conflicting event_id RCV-K7107: rows [6, 8]"
+        }
+      ],
+      "coverage_complete": true,
+      "final_net_received": null,
+      "remaining_quantity": null,
+      "excess_quantity": null,
+      "status": "unresolved_evidence"
+    },
+    {
+      "order_row": 3,
+      "source": {
+        "order_id": "PO-S2607-821",
+        "sku": "STRAP-20",
+        "ordered": 60,
+        "supplier_contact": "Leif Moreno <leif.moreno@silverrack.example>"
+      },
+      "order_id": "PO-S2607-821",
+      "sku": "STRAP-20",
+      "ordered": 60,
+      "observed_subtotal": 60,
+      "event_ids": [
+        "RCV-K7109"
+      ],
+      "coverage_rows": [
+        3
+      ],
+      "blockers": [],
+      "actions": [],
+      "coverage_complete": true,
+      "final_net_received": 60,
+      "remaining_quantity": null,
+      "excess_quantity": null,
+      "status": "received_as_ordered"
+    },
+    {
+      "order_row": 4,
+      "source": {
+        "order_id": "PO-S2607-822",
+        "sku": "SHIELD-CLR",
+        "ordered": 40,
+        "supplier_contact": "Anika Roy <anika.roy@lucidguard.example>"
+      },
+      "order_id": "PO-S2607-822",
+      "sku": "SHIELD-CLR",
+      "ordered": 40,
+      "observed_subtotal": 28,
+      "event_ids": [
+        "RCV-K7108"
+      ],
+      "coverage_rows": [
+        4
+      ],
+      "blockers": [
+        "Conflicting event_id RCV-K7107: rows [6, 8]"
+      ],
+      "actions": [
+        {
+          "kind": "reconcile_sources",
+          "owner": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "recipients": [
+            "Rowan Ames <rowan.ames@northquayassembly.example>",
+            "Beck Lin <beck.lin@northquayassembly.example>"
+          ],
+          "missing_recipients": [],
+          "draft": "2026-07 / PO-S2607-822 / SHIELD-CLR: Reconcile source records before final comparison: Conflicting event_id RCV-K7107: rows [6, 8]"
+        }
+      ],
+      "coverage_complete": true,
+      "final_net_received": null,
+      "remaining_quantity": null,
+      "excess_quantity": null,
+      "status": "unresolved_evidence"
+    },
+    {
+      "order_row": 5,
+      "source": {
+        "order_id": "PO-S2607-823",
+        "sku": "POUCH-12",
+        "ordered": 30,
+        "supplier_contact": "Hugo Silva <hugo.silva@softpack.example>"
+      },
+      "order_id": "PO-S2607-823",
+      "sku": "POUCH-12",
+      "ordered": 30,
+      "observed_subtotal": 34,
+      "event_ids": [
+        "RCV-K7110",
+        "RCV-K7111"
+      ],
+      "coverage_rows": [
+        5
+      ],
+      "blockers": [],
+      "actions": [
+        {
+          "kind": "complete_export",
+          "owner": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "recipients": [
+            "Beck Lin <beck.lin@northquayassembly.example>"
+          ],
+          "missing_recipients": [],
+          "draft": "2026-07 / PO-S2607-823 / POUCH-12: Provide or confirm the full event export and completeness declaration for this line and month before final comparison."
+        }
+      ],
+      "coverage_complete": false,
+      "final_net_received": null,
+      "remaining_quantity": null,
+      "excess_quantity": null,
+      "status": "unresolved_evidence"
+    },
+    {
+      "order_row": 6,
+      "source": {
+        "order_id": "PO-S2607-824",
+        "sku": "TRAY-L",
+        "ordered": 18,
+        "supplier_contact": "Celia Grant <celia.grant@traycraft.example>"
+      },
+      "order_id": "PO-S2607-824",
+      "sku": "TRAY-L",
+      "ordered": 18,
+      "observed_subtotal": 9,
+      "event_ids": [
+        "RCV-K7112",
+        "RCV-K7113"
+      ],
+      "coverage_rows": [],
+      "blockers": [],
+      "actions": [
+        {
+          "kind": "complete_export",
+          "owner": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "recipients": [
+            "Beck Lin <beck.lin@northquayassembly.example>"
+          ],
+          "missing_recipients": [],
+          "draft": "2026-07 / PO-S2607-824 / TRAY-L: Provide or confirm the full event export and completeness declaration for this line and month before final comparison."
+        }
+      ],
+      "coverage_complete": false,
+      "final_net_received": null,
+      "remaining_quantity": null,
+      "excess_quantity": null,
+      "status": "unresolved_evidence"
+    },
+    {
+      "order_row": 7,
+      "source": {
+        "order_id": "PO-S2607-825",
+        "sku": "BINDER-B",
+        "ordered": 25,
+        "supplier_contact": "Idris Fox <idris.fox@bindersupply.example>"
+      },
+      "order_id": "PO-S2607-825",
+      "sku": "BINDER-B",
+      "ordered": 25,
+      "observed_subtotal": 0,
+      "event_ids": [],
+      "coverage_rows": [
+        7
+      ],
+      "blockers": [],
+      "actions": [
+        {
+          "kind": "complete_export",
+          "owner": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "recipients": [
+            "Beck Lin <beck.lin@northquayassembly.example>"
+          ],
+          "missing_recipients": [],
+          "draft": "2026-07 / PO-S2607-825 / BINDER-B: Provide or confirm the full event export and completeness declaration for this line and month before final comparison."
+        }
+      ],
+      "coverage_complete": false,
+      "final_net_received": null,
+      "remaining_quantity": null,
+      "excess_quantity": null,
+      "status": "unresolved_evidence"
+    },
+    {
+      "order_row": 8,
+      "source": {
+        "order_id": "PO-S2607-826",
+        "sku": "INSERT-G",
+        "ordered": 70,
+        "supplier_contact": "Nora Vega <nora.vega@greeninsert.example>"
+      },
+      "order_id": "PO-S2607-826",
+      "sku": "INSERT-G",
+      "ordered": 70,
+      "observed_subtotal": 75,
+      "event_ids": [
+        "RCV-K7114",
+        "RCV-K7115",
+        "RCV-K7116"
+      ],
+      "coverage_rows": [
+        8
+      ],
+      "blockers": [],
+      "actions": [
+        {
+          "kind": "surplus_reconciliation",
+          "owner": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "recipients": [
+            "Inez Cole <inez.cole@northquayassembly.example>"
+          ],
+          "missing_recipients": [],
+          "draft": "2026-07 / PO-S2607-826 / INSERT-G: Reconcile the surplus of 5 units against the order and receiving evidence and report the required correction."
+        }
+      ],
+      "coverage_complete": true,
+      "final_net_received": 75,
+      "remaining_quantity": null,
+      "excess_quantity": 5,
+      "status": "excess"
+    },
+    {
+      "order_row": 9,
+      "source": {
+        "order_id": "PO-S2607-827",
+        "sku": "WRAP-500",
+        "ordered": 40,
+        "supplier_contact": "Felix Arun <felix.arun@wrapline.example>"
+      },
+      "order_id": "PO-S2607-827",
+      "sku": "WRAP-500",
+      "ordered": 40,
+      "observed_subtotal": 18,
+      "event_ids": [
+        "RCV-K7117",
+        "RCV-K7118",
+        "RCV-K7119"
+      ],
+      "coverage_rows": [
+        9
+      ],
+      "blockers": [],
+      "actions": [
+        {
+          "kind": "supplier_follow_up",
+          "owner": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "recipients": [
+            "Rowan Ames <rowan.ames@northquayassembly.example>",
+            "Felix Arun <felix.arun@wrapline.example>"
+          ],
+          "missing_recipients": [],
+          "draft": "2026-07 / PO-S2607-827 / WRAP-500: Confirm the remaining receipt of 22 units and provide the next receiving date/action."
+        }
+      ],
+      "coverage_complete": true,
+      "final_net_received": 18,
+      "remaining_quantity": 22,
+      "excess_quantity": null,
+      "status": "shortfall"
+    },
+    {
+      "order_row": 10,
+      "source": {
+        "order_id": "PO-S2607-828",
+        "sku": "CLIP-R",
+        "ordered": 10,
+        "supplier_contact": "Asha Wren <asha.wren@clipworks.example>"
+      },
+      "order_id": "PO-S2607-828",
+      "sku": "CLIP-R",
+      "ordered": 10,
+      "observed_subtotal": 10,
+      "event_ids": [
+        "RCV-K7120",
+        "RCV-K7121"
+      ],
+      "coverage_rows": [
+        10
+      ],
+      "blockers": [],
+      "actions": [],
+      "coverage_complete": true,
+      "final_net_received": 10,
+      "remaining_quantity": null,
+      "excess_quantity": null,
+      "status": "received_as_ordered"
+    },
+    {
+      "order_row": 11,
+      "source": {
+        "order_id": "PO-S2607-829",
+        "sku": "PAD-FOAM",
+        "ordered": 12,
+        "supplier_contact": "Rafael Brooks <rafael.brooks@cushionstock.example>"
+      },
+      "order_id": "PO-S2607-829",
+      "sku": "PAD-FOAM",
+      "ordered": 12,
+      "observed_subtotal": -4,
+      "event_ids": [
+        "RCV-K7122",
+        "RCV-K7123"
+      ],
+      "coverage_rows": [
+        11
+      ],
+      "blockers": [],
+      "actions": [
+        {
+          "kind": "supplier_follow_up",
+          "owner": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "recipients": [
+            "Rowan Ames <rowan.ames@northquayassembly.example>",
+            "Rafael Brooks <rafael.brooks@cushionstock.example>"
+          ],
+          "missing_recipients": [],
+          "draft": "2026-07 / PO-S2607-829 / PAD-FOAM: Confirm the remaining receipt of 16 units and provide the next receiving date/action."
+        }
+      ],
+      "coverage_complete": true,
+      "final_net_received": -4,
+      "remaining_quantity": 16,
+      "excess_quantity": null,
+      "status": "shortfall"
+    },
+    {
+      "order_row": 12,
+      "source": {
+        "order_id": "PO-S2607-830",
+        "sku": "CRATE-S",
+        "ordered": 16,
+        "supplier_contact": "Elena Duarte <elena.duarte@crateforge.example>"
+      },
+      "order_id": "PO-S2607-830",
+      "sku": "CRATE-S",
+      "ordered": 16,
+      "observed_subtotal": 0,
+      "event_ids": [],
+      "coverage_rows": [
+        12
+      ],
+      "blockers": [],
+      "actions": [
+        {
+          "kind": "supplier_follow_up",
+          "owner": "Rowan Ames <rowan.ames@northquayassembly.example>",
+          "recipients": [
+            "Rowan Ames <rowan.ames@northquayassembly.example>",
+            "Elena Duarte <elena.duarte@crateforge.example>"
+          ],
+          "missing_recipients": [],
+          "draft": "2026-07 / PO-S2607-830 / CRATE-S: Confirm the remaining receipt of 16 units and provide the next receiving date/action."
+        }
+      ],
+      "coverage_complete": true,
+      "final_net_received": 0,
+      "remaining_quantity": 16,
+      "excess_quantity": null,
+      "status": "shortfall"
+    }
+  ],
+  "diagnostics": [
+    "events[19]: outside requested month",
+    "events[20]: outside requested month",
+    "events[26]: outside requested month",
+    "events[29]: outside supplied order set"
+  ],
+  "drafts_only": true
+}
