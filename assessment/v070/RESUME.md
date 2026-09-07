@@ -24,7 +24,7 @@ The user authorized execution of the finalized assessment/improvement plan on 20
 
 ## Current phase
 
-All 12 calibration creators and 24 fresh consumers are complete. All 12 generated packages pass pinned Agent Skills format validation. Blind S01/S05/S10 grades and an independent second S10 grade are complete; a second S05 assessment is in progress. Read calibration-synthesis.md for findings and adjudications, not just the ledger's completed flags. Main case authors are preparing the remaining public briefs. No product improvement is implemented and no new PR is opened yet. Before any main comparison, freeze gates.md and candidate B after bounded development diagnostics. The reference consumer remains gpt-5.6-sol/high.
+All 12 calibration creators and 24 fresh consumers are complete, with blind grades, independent second S05/S10 grades, source-fidelity review and root adjudications. All 12 generated packages pass pinned format validation. Main public cases are authored. Gates are fixed after independent operational review. B1 is a NOTE/注記-only candidate in the improvement worktree and frozen/candidate-B1; its exact hashes and patch are preserved and independent semantic/locale review found no blocker. H01's eight fresh creators are complete (8/8 pinned format pass); its sixteen consumers have not started. Independent new consumer-case authors are working on S10, S05 and S08. Read development-round-1.md, dev1-list.tsv, progress.md and calibration-synthesis.md. No improvement is accepted, no new product PR is open, no main trial has begun. The reference consumer remains gpt-5.6-sol/high.
 
 ## Important limits
 

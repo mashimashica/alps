@@ -1,0 +1,2499 @@
+{
+  "python": "3.12.13",
+  "runs": [
+    {
+      "candidate": "K14",
+      "probe": "ordinary",
+      "cmd": "python3 /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K14/receiving-review/scripts/monthly_review.py /workspace/scratch/a75c3a6d9076/alps-v070-assessment/blind/S05/original-consumer-inputs/ordinary/receiving.json",
+      "chunk_id": "7ceb4d",
+      "exit_code": 0,
+      "original_token_count": 291,
+      "output": "{\n  \"input_issues\": [],\n  \"line_count\": 3,\n  \"lines\": [\n    {\n      \"coverage_complete\": true,\n      \"event_ids\": [\n        \"N-1\"\n      ],\n      \"observed_subtotal\": 10,\n      \"order_id\": \"PO-N31\",\n      \"ordered\": 10,\n      \"sku\": \"PEN\",\n      \"status\": \"received_as_ordered\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"event_ids\": [\n        \"N-2\"\n      ],\n      \"follow_up\": {\n        \"action\": \"Confirm remaining receipt of 3 units for PO-N32/TAPE.\",\n        \"recipient\": \"Sol at WrapCo\",\n        \"recipient_role\": \"supplier_contact\"\n      },\n      \"observed_subtotal\": 5,\n      \"order_id\": \"PO-N32\",\n      \"ordered\": 8,\n      \"sku\": \"TAPE\",\n      \"status\": \"shortfall\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"event_ids\": [\n        \"N-3\"\n      ],\n      \"follow_up\": {\n        \"action\": \"Reconcile surplus of 3 units for PO-N33/PAD against order and receiving evidence.\",\n        \"recipient\": \"Oren (warehouse)\",\n        \"recipient_role\": \"warehouse_lead\"\n      },\n      \"observed_subtotal\": 9,\n      \"order_id\": \"PO-N33\",\n      \"ordered\": 6,\n      \"sku\": \"PAD\",\n      \"status\": \"excess\"\n    }\n  ],\n  \"month\": \"2026-08\",\n  \"status\": \"ok\"\n}\n",
+      "wall_time_seconds": 0.000002157,
+      "data": {
+        "input_issues": [],
+        "line_count": 3,
+        "lines": [
+          {
+            "coverage_complete": true,
+            "event_ids": [
+              "N-1"
+            ],
+            "observed_subtotal": 10,
+            "order_id": "PO-N31",
+            "ordered": 10,
+            "sku": "PEN",
+            "status": "received_as_ordered"
+          },
+          {
+            "coverage_complete": true,
+            "event_ids": [
+              "N-2"
+            ],
+            "follow_up": {
+              "action": "Confirm remaining receipt of 3 units for PO-N32/TAPE.",
+              "recipient": "Sol at WrapCo",
+              "recipient_role": "supplier_contact"
+            },
+            "observed_subtotal": 5,
+            "order_id": "PO-N32",
+            "ordered": 8,
+            "sku": "TAPE",
+            "status": "shortfall"
+          },
+          {
+            "coverage_complete": true,
+            "event_ids": [
+              "N-3"
+            ],
+            "follow_up": {
+              "action": "Reconcile surplus of 3 units for PO-N33/PAD against order and receiving evidence.",
+              "recipient": "Oren (warehouse)",
+              "recipient_role": "warehouse_lead"
+            },
+            "observed_subtotal": 9,
+            "order_id": "PO-N33",
+            "ordered": 6,
+            "sku": "PAD",
+            "status": "excess"
+          }
+        ],
+        "month": "2026-08",
+        "status": "ok"
+      }
+    },
+    {
+      "candidate": "K14",
+      "probe": "challenging",
+      "cmd": "python3 /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K14/receiving-review/scripts/monthly_review.py /workspace/scratch/a75c3a6d9076/alps-v070-assessment/blind/S05/original-consumer-inputs/challenging/receiving.json",
+      "chunk_id": "e0518f",
+      "exit_code": 0,
+      "original_token_count": 612,
+      "output": "{\n  \"input_issues\": [],\n  \"line_count\": 5,\n  \"lines\": [\n    {\n      \"coverage_complete\": true,\n      \"event_ids\": [\n        \"R-51\",\n        \"R-52\"\n      ],\n      \"follow_up\": {\n        \"action\": \"Confirm remaining receipt of 5 units for PO-C51/WIRE.\",\n        \"recipient\": \"Ivy at CoilCo\",\n        \"recipient_role\": \"supplier_contact\"\n      },\n      \"observed_subtotal\": 3,\n      \"order_id\": \"PO-C51\",\n      \"ordered\": 8,\n      \"sku\": \"WIRE\",\n      \"status\": \"shortfall\"\n    },\n    {\n      \"coverage_complete\": false,\n      \"event_ids\": [\n        \"R-54\"\n      ],\n      \"follow_up\": {\n        \"action\": \"Provide or confirm the full 2026-09 receipt export for PO-C52/BOLT before final comparison.\",\n        \"recipient\": \"Paz (receiving data)\",\n        \"recipient_role\": \"data_steward\"\n      },\n      \"observed_subtotal\": 12,\n      \"order_id\": \"PO-C52\",\n      \"ordered\": 10,\n      \"sku\": \"BOLT\",\n      \"status\": \"incomplete_export\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"event_ids\": [],\n      \"follow_up\": {\n        \"action\": \"Reconcile the identified source records for PO-C53/LAMP before final line comparison.\",\n        \"recipient_roles\": [\n          \"purchasing_coordinator\",\n          \"data_steward\"\n        ],\n        \"recipients\": [\n          \"Nila (purchasing)\",\n          \"Paz (receiving data)\"\n        ]\n      },\n      \"observed_subtotal\": 0,\n      \"order_id\": \"PO-C53\",\n      \"ordered\": 4,\n      \"sku\": \"LAMP\",\n      \"status\": \"conflicting_event\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"event_ids\": [],\n      \"follow_up\": {\n        \"action\": \"Reconcile the identified source records for PO-C54/CORD before final line comparison.\",\n        \"recipient_roles\": [\n          \"purchasing_coordinator\",\n          \"data_steward\"\n        ],\n        \"recipients\": [\n          \"Nila (purchasing)\",\n          \"Paz (receiving data)\"\n        ]\n      },\n      \"observed_subtotal\": 0,\n      \"order_id\": \"PO-C54\",\n      \"ordered\": 7,\n      \"sku\": \"CORD\",\n      \"status\": \"conflicting_event\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"event_ids\": [],\n      \"follow_up\": {\n        \"action\": \"Confirm remaining receipt of 5 units for PO-C55/SEAL.\",\n        \"recipient\": \"Miro at SealCo\",\n        \"recipient_role\": \"supplier_contact\"\n      },\n      \"observed_subtotal\": 0,\n      \"order_id\": \"PO-C55\",\n      \"ordered\": 5,\n      \"sku\": \"SEAL\",\n      \"status\": \"shortfall\"\n    }\n  ],\n  \"month\": \"2026-09\",\n  \"status\": \"ok\"\n}\n",
+      "wall_time_seconds": 0.056262713,
+      "data": {
+        "input_issues": [],
+        "line_count": 5,
+        "lines": [
+          {
+            "coverage_complete": true,
+            "event_ids": [
+              "R-51",
+              "R-52"
+            ],
+            "follow_up": {
+              "action": "Confirm remaining receipt of 5 units for PO-C51/WIRE.",
+              "recipient": "Ivy at CoilCo",
+              "recipient_role": "supplier_contact"
+            },
+            "observed_subtotal": 3,
+            "order_id": "PO-C51",
+            "ordered": 8,
+            "sku": "WIRE",
+            "status": "shortfall"
+          },
+          {
+            "coverage_complete": false,
+            "event_ids": [
+              "R-54"
+            ],
+            "follow_up": {
+              "action": "Provide or confirm the full 2026-09 receipt export for PO-C52/BOLT before final comparison.",
+              "recipient": "Paz (receiving data)",
+              "recipient_role": "data_steward"
+            },
+            "observed_subtotal": 12,
+            "order_id": "PO-C52",
+            "ordered": 10,
+            "sku": "BOLT",
+            "status": "incomplete_export"
+          },
+          {
+            "coverage_complete": true,
+            "event_ids": [],
+            "follow_up": {
+              "action": "Reconcile the identified source records for PO-C53/LAMP before final line comparison.",
+              "recipient_roles": [
+                "purchasing_coordinator",
+                "data_steward"
+              ],
+              "recipients": [
+                "Nila (purchasing)",
+                "Paz (receiving data)"
+              ]
+            },
+            "observed_subtotal": 0,
+            "order_id": "PO-C53",
+            "ordered": 4,
+            "sku": "LAMP",
+            "status": "conflicting_event"
+          },
+          {
+            "coverage_complete": true,
+            "event_ids": [],
+            "follow_up": {
+              "action": "Reconcile the identified source records for PO-C54/CORD before final line comparison.",
+              "recipient_roles": [
+                "purchasing_coordinator",
+                "data_steward"
+              ],
+              "recipients": [
+                "Nila (purchasing)",
+                "Paz (receiving data)"
+              ]
+            },
+            "observed_subtotal": 0,
+            "order_id": "PO-C54",
+            "ordered": 7,
+            "sku": "CORD",
+            "status": "conflicting_event"
+          },
+          {
+            "coverage_complete": true,
+            "event_ids": [],
+            "follow_up": {
+              "action": "Confirm remaining receipt of 5 units for PO-C55/SEAL.",
+              "recipient": "Miro at SealCo",
+              "recipient_role": "supplier_contact"
+            },
+            "observed_subtotal": 0,
+            "order_id": "PO-C55",
+            "ordered": 5,
+            "sku": "SEAL",
+            "status": "shortfall"
+          }
+        ],
+        "month": "2026-09",
+        "status": "ok"
+      }
+    },
+    {
+      "candidate": "K14",
+      "probe": "unknown_sku",
+      "cmd": "python3 /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K14/receiving-review/scripts/monthly_review.py /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05/unknown_sku.json",
+      "chunk_id": "4c2b26",
+      "exit_code": 0,
+      "original_token_count": 376,
+      "output": "{\n  \"input_issues\": [],\n  \"line_count\": 3,\n  \"lines\": [\n    {\n      \"coverage_complete\": true,\n      \"event_ids\": [\n        \"N-1\"\n      ],\n      \"follow_up\": {\n        \"action\": \"Reconcile the identified source records for PO-N31/PEN before final line comparison.\",\n        \"recipient_roles\": [\n          \"purchasing_coordinator\",\n          \"data_steward\"\n        ],\n        \"recipients\": [\n          \"Nila (purchasing)\",\n          \"Paz (receiving data)\"\n        ]\n      },\n      \"observed_subtotal\": 10,\n      \"order_id\": \"PO-N31\",\n      \"ordered\": 10,\n      \"sku\": \"PEN\",\n      \"status\": \"identity_reconciliation\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"event_ids\": [\n        \"N-2\"\n      ],\n      \"follow_up\": {\n        \"action\": \"Confirm remaining receipt of 3 units for PO-N32/TAPE.\",\n        \"recipient\": \"Sol at WrapCo\",\n        \"recipient_role\": \"supplier_contact\"\n      },\n      \"observed_subtotal\": 5,\n      \"order_id\": \"PO-N32\",\n      \"ordered\": 8,\n      \"sku\": \"TAPE\",\n      \"status\": \"shortfall\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"event_ids\": [\n        \"N-3\"\n      ],\n      \"follow_up\": {\n        \"action\": \"Reconcile surplus of 3 units for PO-N33/PAD against order and receiving evidence.\",\n        \"recipient\": \"Oren (warehouse)\",\n        \"recipient_role\": \"warehouse_lead\"\n      },\n      \"observed_subtotal\": 9,\n      \"order_id\": \"PO-N33\",\n      \"ordered\": 6,\n      \"sku\": \"PAD\",\n      \"status\": \"excess\"\n    }\n  ],\n  \"month\": \"2026-08\",\n  \"status\": \"ok\"\n}\n",
+      "wall_time_seconds": 0.000003445,
+      "data": {
+        "input_issues": [],
+        "line_count": 3,
+        "lines": [
+          {
+            "coverage_complete": true,
+            "event_ids": [
+              "N-1"
+            ],
+            "follow_up": {
+              "action": "Reconcile the identified source records for PO-N31/PEN before final line comparison.",
+              "recipient_roles": [
+                "purchasing_coordinator",
+                "data_steward"
+              ],
+              "recipients": [
+                "Nila (purchasing)",
+                "Paz (receiving data)"
+              ]
+            },
+            "observed_subtotal": 10,
+            "order_id": "PO-N31",
+            "ordered": 10,
+            "sku": "PEN",
+            "status": "identity_reconciliation"
+          },
+          {
+            "coverage_complete": true,
+            "event_ids": [
+              "N-2"
+            ],
+            "follow_up": {
+              "action": "Confirm remaining receipt of 3 units for PO-N32/TAPE.",
+              "recipient": "Sol at WrapCo",
+              "recipient_role": "supplier_contact"
+            },
+            "observed_subtotal": 5,
+            "order_id": "PO-N32",
+            "ordered": 8,
+            "sku": "TAPE",
+            "status": "shortfall"
+          },
+          {
+            "coverage_complete": true,
+            "event_ids": [
+              "N-3"
+            ],
+            "follow_up": {
+              "action": "Reconcile surplus of 3 units for PO-N33/PAD against order and receiving evidence.",
+              "recipient": "Oren (warehouse)",
+              "recipient_role": "warehouse_lead"
+            },
+            "observed_subtotal": 9,
+            "order_id": "PO-N33",
+            "ordered": 6,
+            "sku": "PAD",
+            "status": "excess"
+          }
+        ],
+        "month": "2026-08",
+        "status": "ok"
+      }
+    },
+    {
+      "candidate": "K14",
+      "probe": "conflict_scope",
+      "cmd": "python3 /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K14/receiving-review/scripts/monthly_review.py /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05/conflict_scope.json",
+      "chunk_id": "d775d2",
+      "exit_code": 0,
+      "original_token_count": 748,
+      "output": "{\n  \"input_issues\": [],\n  \"line_count\": 6,\n  \"lines\": [\n    {\n      \"coverage_complete\": true,\n      \"event_ids\": [],\n      \"follow_up\": {\n        \"action\": \"Reconcile the identified source records for PO-PROBE/LAMP before final line comparison.\",\n        \"recipient_roles\": [\n          \"purchasing_coordinator\",\n          \"data_steward\"\n        ],\n        \"recipients\": [\n          \"Nila (purchasing)\",\n          \"Paz (receiving data)\"\n        ]\n      },\n      \"observed_subtotal\": 0,\n      \"order_id\": \"PO-PROBE\",\n      \"ordered\": 2,\n      \"sku\": \"LAMP\",\n      \"status\": \"conflicting_event\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"event_ids\": [\n        \"R-51\",\n        \"R-52\"\n      ],\n      \"follow_up\": {\n        \"action\": \"Confirm remaining receipt of 5 units for PO-C51/WIRE.\",\n        \"recipient\": \"Ivy at CoilCo\",\n        \"recipient_role\": \"supplier_contact\"\n      },\n      \"observed_subtotal\": 3,\n      \"order_id\": \"PO-C51\",\n      \"ordered\": 8,\n      \"sku\": \"WIRE\",\n      \"status\": \"shortfall\"\n    },\n    {\n      \"coverage_complete\": false,\n      \"event_ids\": [\n        \"R-54\"\n      ],\n      \"follow_up\": {\n        \"action\": \"Provide or confirm the full 2026-09 receipt export for PO-C52/BOLT before final comparison.\",\n        \"recipient\": \"Paz (receiving data)\",\n        \"recipient_role\": \"data_steward\"\n      },\n      \"observed_subtotal\": 12,\n      \"order_id\": \"PO-C52\",\n      \"ordered\": 10,\n      \"sku\": \"BOLT\",\n      \"status\": \"incomplete_export\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"event_ids\": [],\n      \"follow_up\": {\n        \"action\": \"Reconcile the identified source records for PO-C53/LAMP before final line comparison.\",\n        \"recipient_roles\": [\n          \"purchasing_coordinator\",\n          \"data_steward\"\n        ],\n        \"recipients\": [\n          \"Nila (purchasing)\",\n          \"Paz (receiving data)\"\n        ]\n      },\n      \"observed_subtotal\": 0,\n      \"order_id\": \"PO-C53\",\n      \"ordered\": 4,\n      \"sku\": \"LAMP\",\n      \"status\": \"conflicting_event\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"event_ids\": [],\n      \"follow_up\": {\n        \"action\": \"Reconcile the identified source records for PO-C54/CORD before final line comparison.\",\n        \"recipient_roles\": [\n          \"purchasing_coordinator\",\n          \"data_steward\"\n        ],\n        \"recipients\": [\n          \"Nila (purchasing)\",\n          \"Paz (receiving data)\"\n        ]\n      },\n      \"observed_subtotal\": 0,\n      \"order_id\": \"PO-C54\",\n      \"ordered\": 7,\n      \"sku\": \"CORD\",\n      \"status\": \"conflicting_event\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"event_ids\": [],\n      \"follow_up\": {\n        \"action\": \"Confirm remaining receipt of 5 units for PO-C55/SEAL.\",\n        \"recipient\": \"Miro at SealCo\",\n        \"recipient_role\": \"supplier_contact\"\n      },\n      \"observed_subtotal\": 0,\n      \"order_id\": \"PO-C55\",\n      \"ordered\": 5,\n      \"sku\": \"SEAL\",\n      \"status\": \"shortfall\"\n    }\n  ],\n  \"month\": \"2026-09\",\n  \"status\": \"ok\"\n}\n",
+      "wall_time_seconds": 0.000003037,
+      "data": {
+        "input_issues": [],
+        "line_count": 6,
+        "lines": [
+          {
+            "coverage_complete": true,
+            "event_ids": [],
+            "follow_up": {
+              "action": "Reconcile the identified source records for PO-PROBE/LAMP before final line comparison.",
+              "recipient_roles": [
+                "purchasing_coordinator",
+                "data_steward"
+              ],
+              "recipients": [
+                "Nila (purchasing)",
+                "Paz (receiving data)"
+              ]
+            },
+            "observed_subtotal": 0,
+            "order_id": "PO-PROBE",
+            "ordered": 2,
+            "sku": "LAMP",
+            "status": "conflicting_event"
+          },
+          {
+            "coverage_complete": true,
+            "event_ids": [
+              "R-51",
+              "R-52"
+            ],
+            "follow_up": {
+              "action": "Confirm remaining receipt of 5 units for PO-C51/WIRE.",
+              "recipient": "Ivy at CoilCo",
+              "recipient_role": "supplier_contact"
+            },
+            "observed_subtotal": 3,
+            "order_id": "PO-C51",
+            "ordered": 8,
+            "sku": "WIRE",
+            "status": "shortfall"
+          },
+          {
+            "coverage_complete": false,
+            "event_ids": [
+              "R-54"
+            ],
+            "follow_up": {
+              "action": "Provide or confirm the full 2026-09 receipt export for PO-C52/BOLT before final comparison.",
+              "recipient": "Paz (receiving data)",
+              "recipient_role": "data_steward"
+            },
+            "observed_subtotal": 12,
+            "order_id": "PO-C52",
+            "ordered": 10,
+            "sku": "BOLT",
+            "status": "incomplete_export"
+          },
+          {
+            "coverage_complete": true,
+            "event_ids": [],
+            "follow_up": {
+              "action": "Reconcile the identified source records for PO-C53/LAMP before final line comparison.",
+              "recipient_roles": [
+                "purchasing_coordinator",
+                "data_steward"
+              ],
+              "recipients": [
+                "Nila (purchasing)",
+                "Paz (receiving data)"
+              ]
+            },
+            "observed_subtotal": 0,
+            "order_id": "PO-C53",
+            "ordered": 4,
+            "sku": "LAMP",
+            "status": "conflicting_event"
+          },
+          {
+            "coverage_complete": true,
+            "event_ids": [],
+            "follow_up": {
+              "action": "Reconcile the identified source records for PO-C54/CORD before final line comparison.",
+              "recipient_roles": [
+                "purchasing_coordinator",
+                "data_steward"
+              ],
+              "recipients": [
+                "Nila (purchasing)",
+                "Paz (receiving data)"
+              ]
+            },
+            "observed_subtotal": 0,
+            "order_id": "PO-C54",
+            "ordered": 7,
+            "sku": "CORD",
+            "status": "conflicting_event"
+          },
+          {
+            "coverage_complete": true,
+            "event_ids": [],
+            "follow_up": {
+              "action": "Confirm remaining receipt of 5 units for PO-C55/SEAL.",
+              "recipient": "Miro at SealCo",
+              "recipient_role": "supplier_contact"
+            },
+            "observed_subtotal": 0,
+            "order_id": "PO-C55",
+            "ordered": 5,
+            "sku": "SEAL",
+            "status": "shortfall"
+          }
+        ],
+        "month": "2026-09",
+        "status": "ok"
+      }
+    },
+    {
+      "candidate": "K23",
+      "probe": "ordinary",
+      "cmd": "python3 /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K23/receiving-review/scripts/review_receiving.py /workspace/scratch/a75c3a6d9076/alps-v070-assessment/blind/S05/original-consumer-inputs/ordinary/receiving.json",
+      "chunk_id": "3c9e6a",
+      "exit_code": 0,
+      "original_token_count": 353,
+      "output": "{\n  \"excluded_events\": [\n    {\n      \"event_id\": \"N-4\",\n      \"reason\": \"outside requested month or order scope\"\n    }\n  ],\n  \"issues\": {\n    \"conflicting_event_ids\": [],\n    \"identity_conflict_orders\": []\n  },\n  \"lines\": [\n    {\n      \"coverage_complete\": true,\n      \"evidence_status\": \"complete_valid\",\n      \"follow_up\": null,\n      \"net_received\": 10,\n      \"observed_subtotal\": 10,\n      \"order_id\": \"PO-N31\",\n      \"ordered\": 10,\n      \"position\": \"received_as_ordered\",\n      \"sku\": \"PEN\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"evidence_status\": \"complete_valid\",\n      \"follow_up\": {\n        \"draft_action\": \"Confirm the remaining receipt of 3 unit(s) for PO-N32/TAPE.\",\n        \"recipient\": \"Sol at WrapCo\"\n      },\n      \"net_received\": 5,\n      \"observed_subtotal\": 5,\n      \"order_id\": \"PO-N32\",\n      \"ordered\": 8,\n      \"position\": \"complete_shortfall\",\n      \"sku\": \"TAPE\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"evidence_status\": \"complete_valid\",\n      \"follow_up\": {\n        \"draft_action\": \"Reconcile the surplus of 3 unit(s) for PO-N33/PAD against order and receiving evidence.\",\n        \"recipient\": \"Oren (warehouse)\"\n      },\n      \"net_received\": 9,\n      \"observed_subtotal\": 9,\n      \"order_id\": \"PO-N33\",\n      \"ordered\": 6,\n      \"position\": \"complete_excess\",\n      \"sku\": \"PAD\"\n    }\n  ],\n  \"scope\": {\n    \"line_count\": 3,\n    \"month\": \"2026-08\"\n  }\n}\n",
+      "wall_time_seconds": 0.000004378,
+      "data": {
+        "excluded_events": [
+          {
+            "event_id": "N-4",
+            "reason": "outside requested month or order scope"
+          }
+        ],
+        "issues": {
+          "conflicting_event_ids": [],
+          "identity_conflict_orders": []
+        },
+        "lines": [
+          {
+            "coverage_complete": true,
+            "evidence_status": "complete_valid",
+            "follow_up": null,
+            "net_received": 10,
+            "observed_subtotal": 10,
+            "order_id": "PO-N31",
+            "ordered": 10,
+            "position": "received_as_ordered",
+            "sku": "PEN"
+          },
+          {
+            "coverage_complete": true,
+            "evidence_status": "complete_valid",
+            "follow_up": {
+              "draft_action": "Confirm the remaining receipt of 3 unit(s) for PO-N32/TAPE.",
+              "recipient": "Sol at WrapCo"
+            },
+            "net_received": 5,
+            "observed_subtotal": 5,
+            "order_id": "PO-N32",
+            "ordered": 8,
+            "position": "complete_shortfall",
+            "sku": "TAPE"
+          },
+          {
+            "coverage_complete": true,
+            "evidence_status": "complete_valid",
+            "follow_up": {
+              "draft_action": "Reconcile the surplus of 3 unit(s) for PO-N33/PAD against order and receiving evidence.",
+              "recipient": "Oren (warehouse)"
+            },
+            "net_received": 9,
+            "observed_subtotal": 9,
+            "order_id": "PO-N33",
+            "ordered": 6,
+            "position": "complete_excess",
+            "sku": "PAD"
+          }
+        ],
+        "scope": {
+          "line_count": 3,
+          "month": "2026-08"
+        }
+      }
+    },
+    {
+      "candidate": "K23",
+      "probe": "challenging",
+      "cmd": "python3 /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K23/receiving-review/scripts/review_receiving.py /workspace/scratch/a75c3a6d9076/alps-v070-assessment/blind/S05/original-consumer-inputs/challenging/receiving.json",
+      "chunk_id": "345dbc",
+      "exit_code": 0,
+      "original_token_count": 660,
+      "output": "{\n  \"excluded_events\": [\n    {\n      \"event_id\": \"R-53\",\n      \"reason\": \"outside requested month or order scope\"\n    }\n  ],\n  \"issues\": {\n    \"conflicting_event_ids\": [\n      {\n        \"event_id\": \"R-55\",\n        \"lines\": [\n          [\n            \"PO-C53\",\n            \"LAMP\"\n          ],\n          [\n            \"PO-C54\",\n            \"CORD\"\n          ]\n        ]\n      }\n    ],\n    \"identity_conflict_orders\": []\n  },\n  \"lines\": [\n    {\n      \"coverage_complete\": true,\n      \"evidence_status\": \"complete_valid\",\n      \"follow_up\": {\n        \"draft_action\": \"Confirm the remaining receipt of 5 unit(s) for PO-C51/WIRE.\",\n        \"recipient\": \"Ivy at CoilCo\"\n      },\n      \"net_received\": 3,\n      \"observed_subtotal\": 3,\n      \"order_id\": \"PO-C51\",\n      \"ordered\": 8,\n      \"position\": \"complete_shortfall\",\n      \"sku\": \"WIRE\"\n    },\n    {\n      \"coverage_complete\": false,\n      \"evidence_status\": \"incomplete_export\",\n      \"follow_up\": {\n        \"draft_action\": \"Provide or confirm the full receiving export for this order line and month.\",\n        \"recipient\": \"Paz (receiving data)\"\n      },\n      \"observed_subtotal\": 12,\n      \"order_id\": \"PO-C52\",\n      \"ordered\": 10,\n      \"position\": \"undetermined\",\n      \"sku\": \"BOLT\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"evidence_status\": \"identity_conflict\",\n      \"follow_up\": {\n        \"draft_action\": \"Reconcile the identified order/event source records before final line comparison.\",\n        \"recipient\": [\n          \"Nila (purchasing)\",\n          \"Paz (receiving data)\"\n        ]\n      },\n      \"observed_subtotal\": 0,\n      \"order_id\": \"PO-C53\",\n      \"ordered\": 4,\n      \"position\": \"undetermined\",\n      \"sku\": \"LAMP\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"evidence_status\": \"identity_conflict\",\n      \"follow_up\": {\n        \"draft_action\": \"Reconcile the identified order/event source records before final line comparison.\",\n        \"recipient\": [\n          \"Nila (purchasing)\",\n          \"Paz (receiving data)\"\n        ]\n      },\n      \"observed_subtotal\": 0,\n      \"order_id\": \"PO-C54\",\n      \"ordered\": 7,\n      \"position\": \"undetermined\",\n      \"sku\": \"CORD\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"evidence_status\": \"complete_valid\",\n      \"follow_up\": {\n        \"draft_action\": \"Confirm the remaining receipt of 5 unit(s) for PO-C55/SEAL.\",\n        \"recipient\": \"Miro at SealCo\"\n      },\n      \"net_received\": 0,\n      \"observed_subtotal\": 0,\n      \"order_id\": \"PO-C55\",\n      \"ordered\": 5,\n      \"position\": \"complete_shortfall\",\n      \"sku\": \"SEAL\"\n    }\n  ],\n  \"scope\": {\n    \"line_count\": 5,\n    \"month\": \"2026-09\"\n  }\n}\n",
+      "wall_time_seconds": 0.000002859,
+      "data": {
+        "excluded_events": [
+          {
+            "event_id": "R-53",
+            "reason": "outside requested month or order scope"
+          }
+        ],
+        "issues": {
+          "conflicting_event_ids": [
+            {
+              "event_id": "R-55",
+              "lines": [
+                [
+                  "PO-C53",
+                  "LAMP"
+                ],
+                [
+                  "PO-C54",
+                  "CORD"
+                ]
+              ]
+            }
+          ],
+          "identity_conflict_orders": []
+        },
+        "lines": [
+          {
+            "coverage_complete": true,
+            "evidence_status": "complete_valid",
+            "follow_up": {
+              "draft_action": "Confirm the remaining receipt of 5 unit(s) for PO-C51/WIRE.",
+              "recipient": "Ivy at CoilCo"
+            },
+            "net_received": 3,
+            "observed_subtotal": 3,
+            "order_id": "PO-C51",
+            "ordered": 8,
+            "position": "complete_shortfall",
+            "sku": "WIRE"
+          },
+          {
+            "coverage_complete": false,
+            "evidence_status": "incomplete_export",
+            "follow_up": {
+              "draft_action": "Provide or confirm the full receiving export for this order line and month.",
+              "recipient": "Paz (receiving data)"
+            },
+            "observed_subtotal": 12,
+            "order_id": "PO-C52",
+            "ordered": 10,
+            "position": "undetermined",
+            "sku": "BOLT"
+          },
+          {
+            "coverage_complete": true,
+            "evidence_status": "identity_conflict",
+            "follow_up": {
+              "draft_action": "Reconcile the identified order/event source records before final line comparison.",
+              "recipient": [
+                "Nila (purchasing)",
+                "Paz (receiving data)"
+              ]
+            },
+            "observed_subtotal": 0,
+            "order_id": "PO-C53",
+            "ordered": 4,
+            "position": "undetermined",
+            "sku": "LAMP"
+          },
+          {
+            "coverage_complete": true,
+            "evidence_status": "identity_conflict",
+            "follow_up": {
+              "draft_action": "Reconcile the identified order/event source records before final line comparison.",
+              "recipient": [
+                "Nila (purchasing)",
+                "Paz (receiving data)"
+              ]
+            },
+            "observed_subtotal": 0,
+            "order_id": "PO-C54",
+            "ordered": 7,
+            "position": "undetermined",
+            "sku": "CORD"
+          },
+          {
+            "coverage_complete": true,
+            "evidence_status": "complete_valid",
+            "follow_up": {
+              "draft_action": "Confirm the remaining receipt of 5 unit(s) for PO-C55/SEAL.",
+              "recipient": "Miro at SealCo"
+            },
+            "net_received": 0,
+            "observed_subtotal": 0,
+            "order_id": "PO-C55",
+            "ordered": 5,
+            "position": "complete_shortfall",
+            "sku": "SEAL"
+          }
+        ],
+        "scope": {
+          "line_count": 5,
+          "month": "2026-09"
+        }
+      }
+    },
+    {
+      "candidate": "K23",
+      "probe": "unknown_sku",
+      "cmd": "python3 /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K23/receiving-review/scripts/review_receiving.py /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05/unknown_sku.json",
+      "chunk_id": "45ece2",
+      "exit_code": 0,
+      "original_token_count": 391,
+      "output": "{\n  \"excluded_events\": [\n    {\n      \"event_id\": \"N-4\",\n      \"reason\": \"outside requested month or order scope\"\n    },\n    {\n      \"event_id\": \"PROBE-UNKNOWN\",\n      \"order_id\": \"PO-N31\",\n      \"reason\": \"SKU absent from supplied order line\",\n      \"sku\": \"UNKNOWN\"\n    }\n  ],\n  \"issues\": {\n    \"conflicting_event_ids\": [],\n    \"identity_conflict_orders\": []\n  },\n  \"lines\": [\n    {\n      \"coverage_complete\": true,\n      \"evidence_status\": \"complete_valid\",\n      \"follow_up\": null,\n      \"net_received\": 10,\n      \"observed_subtotal\": 10,\n      \"order_id\": \"PO-N31\",\n      \"ordered\": 10,\n      \"position\": \"received_as_ordered\",\n      \"sku\": \"PEN\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"evidence_status\": \"complete_valid\",\n      \"follow_up\": {\n        \"draft_action\": \"Confirm the remaining receipt of 3 unit(s) for PO-N32/TAPE.\",\n        \"recipient\": \"Sol at WrapCo\"\n      },\n      \"net_received\": 5,\n      \"observed_subtotal\": 5,\n      \"order_id\": \"PO-N32\",\n      \"ordered\": 8,\n      \"position\": \"complete_shortfall\",\n      \"sku\": \"TAPE\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"evidence_status\": \"complete_valid\",\n      \"follow_up\": {\n        \"draft_action\": \"Reconcile the surplus of 3 unit(s) for PO-N33/PAD against order and receiving evidence.\",\n        \"recipient\": \"Oren (warehouse)\"\n      },\n      \"net_received\": 9,\n      \"observed_subtotal\": 9,\n      \"order_id\": \"PO-N33\",\n      \"ordered\": 6,\n      \"position\": \"complete_excess\",\n      \"sku\": \"PAD\"\n    }\n  ],\n  \"scope\": {\n    \"line_count\": 3,\n    \"month\": \"2026-08\"\n  }\n}\n",
+      "wall_time_seconds": 0.110488522,
+      "data": {
+        "excluded_events": [
+          {
+            "event_id": "N-4",
+            "reason": "outside requested month or order scope"
+          },
+          {
+            "event_id": "PROBE-UNKNOWN",
+            "order_id": "PO-N31",
+            "reason": "SKU absent from supplied order line",
+            "sku": "UNKNOWN"
+          }
+        ],
+        "issues": {
+          "conflicting_event_ids": [],
+          "identity_conflict_orders": []
+        },
+        "lines": [
+          {
+            "coverage_complete": true,
+            "evidence_status": "complete_valid",
+            "follow_up": null,
+            "net_received": 10,
+            "observed_subtotal": 10,
+            "order_id": "PO-N31",
+            "ordered": 10,
+            "position": "received_as_ordered",
+            "sku": "PEN"
+          },
+          {
+            "coverage_complete": true,
+            "evidence_status": "complete_valid",
+            "follow_up": {
+              "draft_action": "Confirm the remaining receipt of 3 unit(s) for PO-N32/TAPE.",
+              "recipient": "Sol at WrapCo"
+            },
+            "net_received": 5,
+            "observed_subtotal": 5,
+            "order_id": "PO-N32",
+            "ordered": 8,
+            "position": "complete_shortfall",
+            "sku": "TAPE"
+          },
+          {
+            "coverage_complete": true,
+            "evidence_status": "complete_valid",
+            "follow_up": {
+              "draft_action": "Reconcile the surplus of 3 unit(s) for PO-N33/PAD against order and receiving evidence.",
+              "recipient": "Oren (warehouse)"
+            },
+            "net_received": 9,
+            "observed_subtotal": 9,
+            "order_id": "PO-N33",
+            "ordered": 6,
+            "position": "complete_excess",
+            "sku": "PAD"
+          }
+        ],
+        "scope": {
+          "line_count": 3,
+          "month": "2026-08"
+        }
+      }
+    },
+    {
+      "candidate": "K23",
+      "probe": "conflict_scope",
+      "cmd": "python3 /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K23/receiving-review/scripts/review_receiving.py /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05/conflict_scope.json",
+      "chunk_id": "22b2df",
+      "exit_code": 0,
+      "original_token_count": 763,
+      "output": "{\n  \"excluded_events\": [\n    {\n      \"event_id\": \"R-53\",\n      \"reason\": \"outside requested month or order scope\"\n    }\n  ],\n  \"issues\": {\n    \"conflicting_event_ids\": [\n      {\n        \"event_id\": \"R-55\",\n        \"lines\": [\n          [\n            \"PO-C53\",\n            \"LAMP\"\n          ],\n          [\n            \"PO-C54\",\n            \"CORD\"\n          ]\n        ]\n      }\n    ],\n    \"identity_conflict_orders\": []\n  },\n  \"lines\": [\n    {\n      \"coverage_complete\": true,\n      \"evidence_status\": \"complete_valid\",\n      \"follow_up\": {\n        \"draft_action\": \"Confirm the remaining receipt of 2 unit(s) for PO-PROBE/LAMP.\",\n        \"recipient\": \"Probe supplier\"\n      },\n      \"net_received\": 0,\n      \"observed_subtotal\": 0,\n      \"order_id\": \"PO-PROBE\",\n      \"ordered\": 2,\n      \"position\": \"complete_shortfall\",\n      \"sku\": \"LAMP\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"evidence_status\": \"complete_valid\",\n      \"follow_up\": {\n        \"draft_action\": \"Confirm the remaining receipt of 5 unit(s) for PO-C51/WIRE.\",\n        \"recipient\": \"Ivy at CoilCo\"\n      },\n      \"net_received\": 3,\n      \"observed_subtotal\": 3,\n      \"order_id\": \"PO-C51\",\n      \"ordered\": 8,\n      \"position\": \"complete_shortfall\",\n      \"sku\": \"WIRE\"\n    },\n    {\n      \"coverage_complete\": false,\n      \"evidence_status\": \"incomplete_export\",\n      \"follow_up\": {\n        \"draft_action\": \"Provide or confirm the full receiving export for this order line and month.\",\n        \"recipient\": \"Paz (receiving data)\"\n      },\n      \"observed_subtotal\": 12,\n      \"order_id\": \"PO-C52\",\n      \"ordered\": 10,\n      \"position\": \"undetermined\",\n      \"sku\": \"BOLT\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"evidence_status\": \"identity_conflict\",\n      \"follow_up\": {\n        \"draft_action\": \"Reconcile the identified order/event source records before final line comparison.\",\n        \"recipient\": [\n          \"Nila (purchasing)\",\n          \"Paz (receiving data)\"\n        ]\n      },\n      \"observed_subtotal\": 0,\n      \"order_id\": \"PO-C53\",\n      \"ordered\": 4,\n      \"position\": \"undetermined\",\n      \"sku\": \"LAMP\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"evidence_status\": \"identity_conflict\",\n      \"follow_up\": {\n        \"draft_action\": \"Reconcile the identified order/event source records before final line comparison.\",\n        \"recipient\": [\n          \"Nila (purchasing)\",\n          \"Paz (receiving data)\"\n        ]\n      },\n      \"observed_subtotal\": 0,\n      \"order_id\": \"PO-C54\",\n      \"ordered\": 7,\n      \"position\": \"undetermined\",\n      \"sku\": \"CORD\"\n    },\n    {\n      \"coverage_complete\": true,\n      \"evidence_status\": \"complete_valid\",\n      \"follow_up\": {\n        \"draft_action\": \"Confirm the remaining receipt of 5 unit(s) for PO-C55/SEAL.\",\n        \"recipient\": \"Miro at SealCo\"\n      },\n      \"net_received\": 0,\n      \"observed_subtotal\": 0,\n      \"order_id\": \"PO-C55\",\n      \"ordered\": 5,\n      \"position\": \"complete_shortfall\",\n      \"sku\": \"SEAL\"\n    }\n  ],\n  \"scope\": {\n    \"line_count\": 6,\n    \"month\": \"2026-09\"\n  }\n}\n",
+      "wall_time_seconds": 0.000002442,
+      "data": {
+        "excluded_events": [
+          {
+            "event_id": "R-53",
+            "reason": "outside requested month or order scope"
+          }
+        ],
+        "issues": {
+          "conflicting_event_ids": [
+            {
+              "event_id": "R-55",
+              "lines": [
+                [
+                  "PO-C53",
+                  "LAMP"
+                ],
+                [
+                  "PO-C54",
+                  "CORD"
+                ]
+              ]
+            }
+          ],
+          "identity_conflict_orders": []
+        },
+        "lines": [
+          {
+            "coverage_complete": true,
+            "evidence_status": "complete_valid",
+            "follow_up": {
+              "draft_action": "Confirm the remaining receipt of 2 unit(s) for PO-PROBE/LAMP.",
+              "recipient": "Probe supplier"
+            },
+            "net_received": 0,
+            "observed_subtotal": 0,
+            "order_id": "PO-PROBE",
+            "ordered": 2,
+            "position": "complete_shortfall",
+            "sku": "LAMP"
+          },
+          {
+            "coverage_complete": true,
+            "evidence_status": "complete_valid",
+            "follow_up": {
+              "draft_action": "Confirm the remaining receipt of 5 unit(s) for PO-C51/WIRE.",
+              "recipient": "Ivy at CoilCo"
+            },
+            "net_received": 3,
+            "observed_subtotal": 3,
+            "order_id": "PO-C51",
+            "ordered": 8,
+            "position": "complete_shortfall",
+            "sku": "WIRE"
+          },
+          {
+            "coverage_complete": false,
+            "evidence_status": "incomplete_export",
+            "follow_up": {
+              "draft_action": "Provide or confirm the full receiving export for this order line and month.",
+              "recipient": "Paz (receiving data)"
+            },
+            "observed_subtotal": 12,
+            "order_id": "PO-C52",
+            "ordered": 10,
+            "position": "undetermined",
+            "sku": "BOLT"
+          },
+          {
+            "coverage_complete": true,
+            "evidence_status": "identity_conflict",
+            "follow_up": {
+              "draft_action": "Reconcile the identified order/event source records before final line comparison.",
+              "recipient": [
+                "Nila (purchasing)",
+                "Paz (receiving data)"
+              ]
+            },
+            "observed_subtotal": 0,
+            "order_id": "PO-C53",
+            "ordered": 4,
+            "position": "undetermined",
+            "sku": "LAMP"
+          },
+          {
+            "coverage_complete": true,
+            "evidence_status": "identity_conflict",
+            "follow_up": {
+              "draft_action": "Reconcile the identified order/event source records before final line comparison.",
+              "recipient": [
+                "Nila (purchasing)",
+                "Paz (receiving data)"
+              ]
+            },
+            "observed_subtotal": 0,
+            "order_id": "PO-C54",
+            "ordered": 7,
+            "position": "undetermined",
+            "sku": "CORD"
+          },
+          {
+            "coverage_complete": true,
+            "evidence_status": "complete_valid",
+            "follow_up": {
+              "draft_action": "Confirm the remaining receipt of 5 unit(s) for PO-C55/SEAL.",
+              "recipient": "Miro at SealCo"
+            },
+            "net_received": 0,
+            "observed_subtotal": 0,
+            "order_id": "PO-C55",
+            "ordered": 5,
+            "position": "complete_shortfall",
+            "sku": "SEAL"
+          }
+        ],
+        "scope": {
+          "line_count": 6,
+          "month": "2026-09"
+        }
+      }
+    },
+    {
+      "candidate": "K51",
+      "probe": "ordinary",
+      "cmd": "python3 /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K51/monthly-receiving-review/scripts/review_receipts.py /workspace/scratch/a75c3a6d9076/alps-v070-assessment/blind/S05/original-consumer-inputs/ordinary/receiving.json",
+      "chunk_id": "16f15b",
+      "exit_code": 0,
+      "original_token_count": 829,
+      "output": "{\n  \"review_month\": \"2026-08\",\n  \"summary\": {\n    \"supplied_order_rows\": 3,\n    \"usable_order_rows\": 3,\n    \"in_scope_lines\": 3,\n    \"received_as_ordered\": 1,\n    \"shortfall\": 1,\n    \"excess\": 1,\n    \"undetermined\": 0,\n    \"lines_requiring_follow_up\": 2,\n    \"lines_with_evidence_gaps\": 0\n  },\n  \"lines\": [\n    {\n      \"order_id\": \"PO-N31\",\n      \"sku\": \"PEN\",\n      \"ordered_quantity\": 10,\n      \"observed_net_received_quantity\": 10,\n      \"position\": \"received_as_ordered\",\n      \"difference_quantity\": 0,\n      \"coverage_state\": \"complete\",\n      \"evidence\": {\n        \"counted_event_ids\": [\n          \"N-1\"\n        ],\n        \"exact_duplicate_event_rows_ignored\": 0,\n        \"blockers\": [],\n        \"diagnostic_codes\": []\n      },\n      \"follow_up\": null\n    },\n    {\n      \"order_id\": \"PO-N32\",\n      \"sku\": \"TAPE\",\n      \"ordered_quantity\": 8,\n      \"observed_net_received_quantity\": 5,\n      \"position\": \"shortfall\",\n      \"difference_quantity\": 3,\n      \"coverage_state\": \"complete\",\n      \"evidence\": {\n        \"counted_event_ids\": [\n          \"N-2\"\n        ],\n        \"exact_duplicate_event_rows_ignored\": 0,\n        \"blockers\": [],\n        \"diagnostic_codes\": []\n      },\n      \"follow_up\": {\n        \"reason\": \"a confirmed shortfall of 3\",\n        \"owners\": [\n          {\n            \"role\": \"purchasing_coordinator\",\n            \"recipient\": \"Nila (purchasing)\"\n          }\n        ],\n        \"external_recipient\": \"Sol at WrapCo\",\n        \"recipient_gaps\": [],\n        \"next_action\": \"ask the supplier contact to confirm the plan and timing for the remaining 3 units\",\n        \"draft\": \"Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); supplier_contact: Sol at WrapCo. Order PO-N32, SKU TAPE: a confirmed shortfall of 3. Next action: ask the supplier contact to confirm the plan and timing for the remaining 3 units.\",\n        \"sent\": false\n      }\n    },\n    {\n      \"order_id\": \"PO-N33\",\n      \"sku\": \"PAD\",\n      \"ordered_quantity\": 6,\n      \"observed_net_received_quantity\": 9,\n      \"position\": \"excess\",\n      \"difference_quantity\": 3,\n      \"coverage_state\": \"complete\",\n      \"evidence\": {\n        \"counted_event_ids\": [\n          \"N-3\"\n        ],\n        \"exact_duplicate_event_rows_ignored\": 0,\n        \"blockers\": [],\n        \"diagnostic_codes\": []\n      },\n      \"follow_up\": {\n        \"reason\": \"a confirmed excess of 3\",\n        \"owners\": [\n          {\n            \"role\": \"warehouse_lead\",\n            \"recipient\": \"Oren (warehouse)\"\n          }\n        ],\n        \"external_recipient\": null,\n        \"recipient_gaps\": [],\n        \"next_action\": \"reconcile the 3 surplus units against the order and receiving evidence\",\n        \"draft\": \"Draft — not sent. To/owner: warehouse_lead: Oren (warehouse). Order PO-N33, SKU PAD: a confirmed excess of 3. Next action: reconcile the 3 surplus units against the order and receiving evidence.\",\n        \"sent\": false\n      }\n    }\n  ],\n  \"excluded_events\": {\n    \"outside_requested_month\": {\n      \"count\": 1,\n      \"event_ids\": [\n        \"N-4\"\n      ]\n    },\n    \"outside_supplied_order_set\": {\n      \"count\": 0,\n      \"event_ids\": []\n    },\n    \"conflicting_event_ids\": {\n      \"count\": 0,\n      \"event_ids\": []\n    },\n    \"invalid_rows_without_usable_event_id\": 0\n  },\n  \"diagnostics\": [],\n  \"drafts_sent\": false\n}\n",
+      "wall_time_seconds": 0.081986678,
+      "data": {
+        "review_month": "2026-08",
+        "summary": {
+          "supplied_order_rows": 3,
+          "usable_order_rows": 3,
+          "in_scope_lines": 3,
+          "received_as_ordered": 1,
+          "shortfall": 1,
+          "excess": 1,
+          "undetermined": 0,
+          "lines_requiring_follow_up": 2,
+          "lines_with_evidence_gaps": 0
+        },
+        "lines": [
+          {
+            "order_id": "PO-N31",
+            "sku": "PEN",
+            "ordered_quantity": 10,
+            "observed_net_received_quantity": 10,
+            "position": "received_as_ordered",
+            "difference_quantity": 0,
+            "coverage_state": "complete",
+            "evidence": {
+              "counted_event_ids": [
+                "N-1"
+              ],
+              "exact_duplicate_event_rows_ignored": 0,
+              "blockers": [],
+              "diagnostic_codes": []
+            },
+            "follow_up": null
+          },
+          {
+            "order_id": "PO-N32",
+            "sku": "TAPE",
+            "ordered_quantity": 8,
+            "observed_net_received_quantity": 5,
+            "position": "shortfall",
+            "difference_quantity": 3,
+            "coverage_state": "complete",
+            "evidence": {
+              "counted_event_ids": [
+                "N-2"
+              ],
+              "exact_duplicate_event_rows_ignored": 0,
+              "blockers": [],
+              "diagnostic_codes": []
+            },
+            "follow_up": {
+              "reason": "a confirmed shortfall of 3",
+              "owners": [
+                {
+                  "role": "purchasing_coordinator",
+                  "recipient": "Nila (purchasing)"
+                }
+              ],
+              "external_recipient": "Sol at WrapCo",
+              "recipient_gaps": [],
+              "next_action": "ask the supplier contact to confirm the plan and timing for the remaining 3 units",
+              "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); supplier_contact: Sol at WrapCo. Order PO-N32, SKU TAPE: a confirmed shortfall of 3. Next action: ask the supplier contact to confirm the plan and timing for the remaining 3 units.",
+              "sent": false
+            }
+          },
+          {
+            "order_id": "PO-N33",
+            "sku": "PAD",
+            "ordered_quantity": 6,
+            "observed_net_received_quantity": 9,
+            "position": "excess",
+            "difference_quantity": 3,
+            "coverage_state": "complete",
+            "evidence": {
+              "counted_event_ids": [
+                "N-3"
+              ],
+              "exact_duplicate_event_rows_ignored": 0,
+              "blockers": [],
+              "diagnostic_codes": []
+            },
+            "follow_up": {
+              "reason": "a confirmed excess of 3",
+              "owners": [
+                {
+                  "role": "warehouse_lead",
+                  "recipient": "Oren (warehouse)"
+                }
+              ],
+              "external_recipient": null,
+              "recipient_gaps": [],
+              "next_action": "reconcile the 3 surplus units against the order and receiving evidence",
+              "draft": "Draft — not sent. To/owner: warehouse_lead: Oren (warehouse). Order PO-N33, SKU PAD: a confirmed excess of 3. Next action: reconcile the 3 surplus units against the order and receiving evidence.",
+              "sent": false
+            }
+          }
+        ],
+        "excluded_events": {
+          "outside_requested_month": {
+            "count": 1,
+            "event_ids": [
+              "N-4"
+            ]
+          },
+          "outside_supplied_order_set": {
+            "count": 0,
+            "event_ids": []
+          },
+          "conflicting_event_ids": {
+            "count": 0,
+            "event_ids": []
+          },
+          "invalid_rows_without_usable_event_id": 0
+        },
+        "diagnostics": [],
+        "drafts_sent": false
+      }
+    },
+    {
+      "candidate": "K51",
+      "probe": "challenging",
+      "cmd": "python3 /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K51/monthly-receiving-review/scripts/review_receipts.py /workspace/scratch/a75c3a6d9076/alps-v070-assessment/blind/S05/original-consumer-inputs/challenging/receiving.json",
+      "chunk_id": "033e01",
+      "exit_code": 0,
+      "original_token_count": 1890,
+      "output": "{\n  \"review_month\": \"2026-09\",\n  \"summary\": {\n    \"supplied_order_rows\": 5,\n    \"usable_order_rows\": 5,\n    \"in_scope_lines\": 5,\n    \"received_as_ordered\": 0,\n    \"shortfall\": 2,\n    \"excess\": 0,\n    \"undetermined\": 3,\n    \"lines_requiring_follow_up\": 5,\n    \"lines_with_evidence_gaps\": 3\n  },\n  \"lines\": [\n    {\n      \"order_id\": \"PO-C51\",\n      \"sku\": \"WIRE\",\n      \"ordered_quantity\": 8,\n      \"observed_net_received_quantity\": 3,\n      \"position\": \"shortfall\",\n      \"difference_quantity\": 5,\n      \"coverage_state\": \"complete\",\n      \"evidence\": {\n        \"counted_event_ids\": [\n          \"R-51\",\n          \"R-52\"\n        ],\n        \"exact_duplicate_event_rows_ignored\": 1,\n        \"blockers\": [],\n        \"diagnostic_codes\": [\n          \"duplicate_event_row\"\n        ]\n      },\n      \"follow_up\": {\n        \"reason\": \"a confirmed shortfall of 5\",\n        \"owners\": [\n          {\n            \"role\": \"purchasing_coordinator\",\n            \"recipient\": \"Nila (purchasing)\"\n          }\n        ],\n        \"external_recipient\": \"Ivy at CoilCo\",\n        \"recipient_gaps\": [],\n        \"next_action\": \"ask the supplier contact to confirm the plan and timing for the remaining 5 units\",\n        \"draft\": \"Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); supplier_contact: Ivy at CoilCo. Order PO-C51, SKU WIRE: a confirmed shortfall of 5. Next action: ask the supplier contact to confirm the plan and timing for the remaining 5 units.\",\n        \"sent\": false\n      }\n    },\n    {\n      \"order_id\": \"PO-C52\",\n      \"sku\": \"BOLT\",\n      \"ordered_quantity\": 10,\n      \"observed_net_received_quantity\": 12,\n      \"position\": \"undetermined\",\n      \"difference_quantity\": null,\n      \"coverage_state\": \"incomplete\",\n      \"evidence\": {\n        \"counted_event_ids\": [\n          \"R-54\"\n        ],\n        \"exact_duplicate_event_rows_ignored\": 0,\n        \"blockers\": [\n          \"incomplete_coverage\"\n        ],\n        \"diagnostic_codes\": []\n      },\n      \"follow_up\": {\n        \"reason\": \"the requested-month receipt export is not confirmed complete\",\n        \"owners\": [\n          {\n            \"role\": \"data_steward\",\n            \"recipient\": \"Paz (receiving data)\"\n          }\n        ],\n        \"external_recipient\": null,\n        \"recipient_gaps\": [],\n        \"next_action\": \"provide or confirm the full requested-month export, then rerun the comparison\",\n        \"draft\": \"Draft — not sent. To/owner: data_steward: Paz (receiving data). Order PO-C52, SKU BOLT: the requested-month receipt export is not confirmed complete. Next action: provide or confirm the full requested-month export, then rerun the comparison.\",\n        \"sent\": false\n      }\n    },\n    {\n      \"order_id\": \"PO-C53\",\n      \"sku\": \"LAMP\",\n      \"ordered_quantity\": 4,\n      \"observed_net_received_quantity\": 0,\n      \"position\": \"undetermined\",\n      \"difference_quantity\": null,\n      \"coverage_state\": \"complete\",\n      \"evidence\": {\n        \"counted_event_ids\": [],\n        \"exact_duplicate_event_rows_ignored\": 0,\n        \"blockers\": [\n          \"conflicting_event_id\"\n        ],\n        \"diagnostic_codes\": [\n          \"conflicting_event_id\"\n        ]\n      },\n      \"follow_up\": {\n        \"reason\": \"conflicting or invalid order/event identity evidence\",\n        \"owners\": [\n          {\n            \"role\": \"purchasing_coordinator\",\n            \"recipient\": \"Nila (purchasing)\"\n          },\n          {\n            \"role\": \"data_steward\",\n            \"recipient\": \"Paz (receiving data)\"\n          }\n        ],\n        \"external_recipient\": null,\n        \"recipient_gaps\": [],\n        \"next_action\": \"reconcile the identified source records, then rerun the line comparison\",\n        \"draft\": \"Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); data_steward: Paz (receiving data). Order PO-C53, SKU LAMP: conflicting or invalid order/event identity evidence. Next action: reconcile the identified source records, then rerun the line comparison.\",\n        \"sent\": false\n      }\n    },\n    {\n      \"order_id\": \"PO-C54\",\n      \"sku\": \"CORD\",\n      \"ordered_quantity\": 7,\n      \"observed_net_received_quantity\": 0,\n      \"position\": \"undetermined\",\n      \"difference_quantity\": null,\n      \"coverage_state\": \"complete\",\n      \"evidence\": {\n        \"counted_event_ids\": [],\n        \"exact_duplicate_event_rows_ignored\": 0,\n        \"blockers\": [\n          \"conflicting_event_id\"\n        ],\n        \"diagnostic_codes\": [\n          \"conflicting_event_id\"\n        ]\n      },\n      \"follow_up\": {\n        \"reason\": \"conflicting or invalid order/event identity evidence\",\n        \"owners\": [\n          {\n            \"role\": \"purchasing_coordinator\",\n            \"recipient\": \"Nila (purchasing)\"\n          },\n          {\n            \"role\": \"data_steward\",\n            \"recipient\": \"Paz (receiving data)\"\n          }\n        ],\n        \"external_recipient\": null,\n        \"recipient_gaps\": [],\n        \"next_action\": \"reconcile the identified source records, then rerun the line comparison\",\n        \"draft\": \"Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); data_steward: Paz (receiving data). Order PO-C54, SKU CORD: conflicting or invalid order/event identity evidence. Next action: reconcile the identified source records, then rerun the line comparison.\",\n        \"sent\": false\n      }\n    },\n    {\n      \"order_id\": \"PO-C55\",\n      \"sku\": \"SEAL\",\n      \"ordered_quantity\": 5,\n      \"observed_net_received_quantity\": 0,\n      \"position\": \"shortfall\",\n      \"difference_quantity\": 5,\n      \"coverage_state\": \"complete\",\n      \"evidence\": {\n        \"counted_event_ids\": [],\n        \"exact_duplicate_event_rows_ignored\": 0,\n        \"blockers\": [],\n        \"diagnostic_codes\": []\n      },\n      \"follow_up\": {\n        \"reason\": \"a confirmed shortfall of 5\",\n        \"owners\": [\n          {\n            \"role\": \"purchasing_coordinator\",\n            \"recipient\": \"Nila (purchasing)\"\n          }\n        ],\n        \"external_recipient\": \"Miro at SealCo\",\n        \"recipient_gaps\": [],\n        \"next_action\": \"ask the supplier contact to confirm the plan and timing for the remaining 5 units\",\n        \"draft\": \"Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); supplier_contact: Miro at SealCo. Order PO-C55, SKU SEAL: a confirmed shortfall of 5. Next action: ask the supplier contact to confirm the plan and timing for the remaining 5 units.\",\n        \"sent\": false\n      }\n    }\n  ],\n  \"excluded_events\": {\n    \"outside_requested_month\": {\n      \"count\": 1,\n      \"event_ids\": [\n        \"R-53\"\n      ]\n    },\n    \"outside_supplied_order_set\": {\n      \"count\": 0,\n      \"event_ids\": []\n    },\n    \"conflicting_event_ids\": {\n      \"count\": 1,\n      \"event_ids\": [\n        \"R-55\"\n      ]\n    },\n    \"invalid_rows_without_usable_event_id\": 0\n  },\n  \"diagnostics\": [\n    {\n      \"code\": \"duplicate_event_row\",\n      \"severity\": \"warning\",\n      \"message\": \"Exact repeated event copies count once.\",\n      \"event_id\": \"R-51\",\n      \"order_id\": \"PO-C51\",\n      \"sku\": \"WIRE\",\n      \"ignored_rows\": 1\n    },\n    {\n      \"code\": \"conflicting_event_id\",\n      \"severity\": \"error\",\n      \"message\": \"The same event_id has different content; all variants were excluded and affected lines require source reconciliation.\",\n      \"event_id\": \"R-55\",\n      \"rows\": [\n        5,\n        6\n      ],\n      \"affected_lines\": [\n        {\n          \"order_id\": \"PO-C53\",\n          \"sku\": \"LAMP\"\n        },\n        {\n          \"order_id\": \"PO-C54\",\n          \"sku\": \"CORD\"\n        }\n      ]\n    }\n  ],\n  \"drafts_sent\": false\n}\n",
+      "wall_time_seconds": 0.081232358,
+      "data": {
+        "review_month": "2026-09",
+        "summary": {
+          "supplied_order_rows": 5,
+          "usable_order_rows": 5,
+          "in_scope_lines": 5,
+          "received_as_ordered": 0,
+          "shortfall": 2,
+          "excess": 0,
+          "undetermined": 3,
+          "lines_requiring_follow_up": 5,
+          "lines_with_evidence_gaps": 3
+        },
+        "lines": [
+          {
+            "order_id": "PO-C51",
+            "sku": "WIRE",
+            "ordered_quantity": 8,
+            "observed_net_received_quantity": 3,
+            "position": "shortfall",
+            "difference_quantity": 5,
+            "coverage_state": "complete",
+            "evidence": {
+              "counted_event_ids": [
+                "R-51",
+                "R-52"
+              ],
+              "exact_duplicate_event_rows_ignored": 1,
+              "blockers": [],
+              "diagnostic_codes": [
+                "duplicate_event_row"
+              ]
+            },
+            "follow_up": {
+              "reason": "a confirmed shortfall of 5",
+              "owners": [
+                {
+                  "role": "purchasing_coordinator",
+                  "recipient": "Nila (purchasing)"
+                }
+              ],
+              "external_recipient": "Ivy at CoilCo",
+              "recipient_gaps": [],
+              "next_action": "ask the supplier contact to confirm the plan and timing for the remaining 5 units",
+              "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); supplier_contact: Ivy at CoilCo. Order PO-C51, SKU WIRE: a confirmed shortfall of 5. Next action: ask the supplier contact to confirm the plan and timing for the remaining 5 units.",
+              "sent": false
+            }
+          },
+          {
+            "order_id": "PO-C52",
+            "sku": "BOLT",
+            "ordered_quantity": 10,
+            "observed_net_received_quantity": 12,
+            "position": "undetermined",
+            "difference_quantity": null,
+            "coverage_state": "incomplete",
+            "evidence": {
+              "counted_event_ids": [
+                "R-54"
+              ],
+              "exact_duplicate_event_rows_ignored": 0,
+              "blockers": [
+                "incomplete_coverage"
+              ],
+              "diagnostic_codes": []
+            },
+            "follow_up": {
+              "reason": "the requested-month receipt export is not confirmed complete",
+              "owners": [
+                {
+                  "role": "data_steward",
+                  "recipient": "Paz (receiving data)"
+                }
+              ],
+              "external_recipient": null,
+              "recipient_gaps": [],
+              "next_action": "provide or confirm the full requested-month export, then rerun the comparison",
+              "draft": "Draft — not sent. To/owner: data_steward: Paz (receiving data). Order PO-C52, SKU BOLT: the requested-month receipt export is not confirmed complete. Next action: provide or confirm the full requested-month export, then rerun the comparison.",
+              "sent": false
+            }
+          },
+          {
+            "order_id": "PO-C53",
+            "sku": "LAMP",
+            "ordered_quantity": 4,
+            "observed_net_received_quantity": 0,
+            "position": "undetermined",
+            "difference_quantity": null,
+            "coverage_state": "complete",
+            "evidence": {
+              "counted_event_ids": [],
+              "exact_duplicate_event_rows_ignored": 0,
+              "blockers": [
+                "conflicting_event_id"
+              ],
+              "diagnostic_codes": [
+                "conflicting_event_id"
+              ]
+            },
+            "follow_up": {
+              "reason": "conflicting or invalid order/event identity evidence",
+              "owners": [
+                {
+                  "role": "purchasing_coordinator",
+                  "recipient": "Nila (purchasing)"
+                },
+                {
+                  "role": "data_steward",
+                  "recipient": "Paz (receiving data)"
+                }
+              ],
+              "external_recipient": null,
+              "recipient_gaps": [],
+              "next_action": "reconcile the identified source records, then rerun the line comparison",
+              "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); data_steward: Paz (receiving data). Order PO-C53, SKU LAMP: conflicting or invalid order/event identity evidence. Next action: reconcile the identified source records, then rerun the line comparison.",
+              "sent": false
+            }
+          },
+          {
+            "order_id": "PO-C54",
+            "sku": "CORD",
+            "ordered_quantity": 7,
+            "observed_net_received_quantity": 0,
+            "position": "undetermined",
+            "difference_quantity": null,
+            "coverage_state": "complete",
+            "evidence": {
+              "counted_event_ids": [],
+              "exact_duplicate_event_rows_ignored": 0,
+              "blockers": [
+                "conflicting_event_id"
+              ],
+              "diagnostic_codes": [
+                "conflicting_event_id"
+              ]
+            },
+            "follow_up": {
+              "reason": "conflicting or invalid order/event identity evidence",
+              "owners": [
+                {
+                  "role": "purchasing_coordinator",
+                  "recipient": "Nila (purchasing)"
+                },
+                {
+                  "role": "data_steward",
+                  "recipient": "Paz (receiving data)"
+                }
+              ],
+              "external_recipient": null,
+              "recipient_gaps": [],
+              "next_action": "reconcile the identified source records, then rerun the line comparison",
+              "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); data_steward: Paz (receiving data). Order PO-C54, SKU CORD: conflicting or invalid order/event identity evidence. Next action: reconcile the identified source records, then rerun the line comparison.",
+              "sent": false
+            }
+          },
+          {
+            "order_id": "PO-C55",
+            "sku": "SEAL",
+            "ordered_quantity": 5,
+            "observed_net_received_quantity": 0,
+            "position": "shortfall",
+            "difference_quantity": 5,
+            "coverage_state": "complete",
+            "evidence": {
+              "counted_event_ids": [],
+              "exact_duplicate_event_rows_ignored": 0,
+              "blockers": [],
+              "diagnostic_codes": []
+            },
+            "follow_up": {
+              "reason": "a confirmed shortfall of 5",
+              "owners": [
+                {
+                  "role": "purchasing_coordinator",
+                  "recipient": "Nila (purchasing)"
+                }
+              ],
+              "external_recipient": "Miro at SealCo",
+              "recipient_gaps": [],
+              "next_action": "ask the supplier contact to confirm the plan and timing for the remaining 5 units",
+              "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); supplier_contact: Miro at SealCo. Order PO-C55, SKU SEAL: a confirmed shortfall of 5. Next action: ask the supplier contact to confirm the plan and timing for the remaining 5 units.",
+              "sent": false
+            }
+          }
+        ],
+        "excluded_events": {
+          "outside_requested_month": {
+            "count": 1,
+            "event_ids": [
+              "R-53"
+            ]
+          },
+          "outside_supplied_order_set": {
+            "count": 0,
+            "event_ids": []
+          },
+          "conflicting_event_ids": {
+            "count": 1,
+            "event_ids": [
+              "R-55"
+            ]
+          },
+          "invalid_rows_without_usable_event_id": 0
+        },
+        "diagnostics": [
+          {
+            "code": "duplicate_event_row",
+            "severity": "warning",
+            "message": "Exact repeated event copies count once.",
+            "event_id": "R-51",
+            "order_id": "PO-C51",
+            "sku": "WIRE",
+            "ignored_rows": 1
+          },
+          {
+            "code": "conflicting_event_id",
+            "severity": "error",
+            "message": "The same event_id has different content; all variants were excluded and affected lines require source reconciliation.",
+            "event_id": "R-55",
+            "rows": [
+              5,
+              6
+            ],
+            "affected_lines": [
+              {
+                "order_id": "PO-C53",
+                "sku": "LAMP"
+              },
+              {
+                "order_id": "PO-C54",
+                "sku": "CORD"
+              }
+            ]
+          }
+        ],
+        "drafts_sent": false
+      }
+    },
+    {
+      "candidate": "K51",
+      "probe": "unknown_sku",
+      "cmd": "python3 /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K51/monthly-receiving-review/scripts/review_receipts.py /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05/unknown_sku.json",
+      "chunk_id": "ecec2f",
+      "exit_code": 0,
+      "original_token_count": 1167,
+      "output": "{\n  \"review_month\": \"2026-08\",\n  \"summary\": {\n    \"supplied_order_rows\": 3,\n    \"usable_order_rows\": 3,\n    \"in_scope_lines\": 3,\n    \"received_as_ordered\": 0,\n    \"shortfall\": 1,\n    \"excess\": 1,\n    \"undetermined\": 1,\n    \"lines_requiring_follow_up\": 3,\n    \"lines_with_evidence_gaps\": 1\n  },\n  \"lines\": [\n    {\n      \"order_id\": \"PO-N31\",\n      \"sku\": \"PEN\",\n      \"ordered_quantity\": 10,\n      \"observed_net_received_quantity\": 10,\n      \"position\": \"undetermined\",\n      \"difference_quantity\": null,\n      \"coverage_state\": \"complete\",\n      \"evidence\": {\n        \"counted_event_ids\": [\n          \"N-1\"\n        ],\n        \"exact_duplicate_event_rows_ignored\": 0,\n        \"blockers\": [\n          \"unknown_sku_for_in_scope_order\"\n        ],\n        \"diagnostic_codes\": [\n          \"unknown_sku_for_in_scope_order\"\n        ]\n      },\n      \"follow_up\": {\n        \"reason\": \"conflicting or invalid order/event identity evidence\",\n        \"owners\": [\n          {\n            \"role\": \"purchasing_coordinator\",\n            \"recipient\": \"Nila (purchasing)\"\n          },\n          {\n            \"role\": \"data_steward\",\n            \"recipient\": \"Paz (receiving data)\"\n          }\n        ],\n        \"external_recipient\": null,\n        \"recipient_gaps\": [],\n        \"next_action\": \"reconcile the identified source records, then rerun the line comparison\",\n        \"draft\": \"Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); data_steward: Paz (receiving data). Order PO-N31, SKU PEN: conflicting or invalid order/event identity evidence. Next action: reconcile the identified source records, then rerun the line comparison.\",\n        \"sent\": false\n      }\n    },\n    {\n      \"order_id\": \"PO-N32\",\n      \"sku\": \"TAPE\",\n      \"ordered_quantity\": 8,\n      \"observed_net_received_quantity\": 5,\n      \"position\": \"shortfall\",\n      \"difference_quantity\": 3,\n      \"coverage_state\": \"complete\",\n      \"evidence\": {\n        \"counted_event_ids\": [\n          \"N-2\"\n        ],\n        \"exact_duplicate_event_rows_ignored\": 0,\n        \"blockers\": [],\n        \"diagnostic_codes\": []\n      },\n      \"follow_up\": {\n        \"reason\": \"a confirmed shortfall of 3\",\n        \"owners\": [\n          {\n            \"role\": \"purchasing_coordinator\",\n            \"recipient\": \"Nila (purchasing)\"\n          }\n        ],\n        \"external_recipient\": \"Sol at WrapCo\",\n        \"recipient_gaps\": [],\n        \"next_action\": \"ask the supplier contact to confirm the plan and timing for the remaining 3 units\",\n        \"draft\": \"Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); supplier_contact: Sol at WrapCo. Order PO-N32, SKU TAPE: a confirmed shortfall of 3. Next action: ask the supplier contact to confirm the plan and timing for the remaining 3 units.\",\n        \"sent\": false\n      }\n    },\n    {\n      \"order_id\": \"PO-N33\",\n      \"sku\": \"PAD\",\n      \"ordered_quantity\": 6,\n      \"observed_net_received_quantity\": 9,\n      \"position\": \"excess\",\n      \"difference_quantity\": 3,\n      \"coverage_state\": \"complete\",\n      \"evidence\": {\n        \"counted_event_ids\": [\n          \"N-3\"\n        ],\n        \"exact_duplicate_event_rows_ignored\": 0,\n        \"blockers\": [],\n        \"diagnostic_codes\": []\n      },\n      \"follow_up\": {\n        \"reason\": \"a confirmed excess of 3\",\n        \"owners\": [\n          {\n            \"role\": \"warehouse_lead\",\n            \"recipient\": \"Oren (warehouse)\"\n          }\n        ],\n        \"external_recipient\": null,\n        \"recipient_gaps\": [],\n        \"next_action\": \"reconcile the 3 surplus units against the order and receiving evidence\",\n        \"draft\": \"Draft — not sent. To/owner: warehouse_lead: Oren (warehouse). Order PO-N33, SKU PAD: a confirmed excess of 3. Next action: reconcile the 3 surplus units against the order and receiving evidence.\",\n        \"sent\": false\n      }\n    }\n  ],\n  \"excluded_events\": {\n    \"outside_requested_month\": {\n      \"count\": 1,\n      \"event_ids\": [\n        \"N-4\"\n      ]\n    },\n    \"outside_supplied_order_set\": {\n      \"count\": 0,\n      \"event_ids\": []\n    },\n    \"conflicting_event_ids\": {\n      \"count\": 0,\n      \"event_ids\": []\n    },\n    \"invalid_rows_without_usable_event_id\": 0\n  },\n  \"diagnostics\": [\n    {\n      \"code\": \"unknown_sku_for_in_scope_order\",\n      \"severity\": \"error\",\n      \"message\": \"Requested-month event names an in-scope order but a SKU absent from that order; all lines on the order require identity reconciliation.\",\n      \"event_id\": \"PROBE-UNKNOWN\",\n      \"order_id\": \"PO-N31\",\n      \"sku\": \"UNKNOWN\",\n      \"affected_lines\": [\n        {\n          \"order_id\": \"PO-N31\",\n          \"sku\": \"PEN\"\n        }\n      ]\n    }\n  ],\n  \"drafts_sent\": false\n}\n",
+      "wall_time_seconds": 0.080476031,
+      "data": {
+        "review_month": "2026-08",
+        "summary": {
+          "supplied_order_rows": 3,
+          "usable_order_rows": 3,
+          "in_scope_lines": 3,
+          "received_as_ordered": 0,
+          "shortfall": 1,
+          "excess": 1,
+          "undetermined": 1,
+          "lines_requiring_follow_up": 3,
+          "lines_with_evidence_gaps": 1
+        },
+        "lines": [
+          {
+            "order_id": "PO-N31",
+            "sku": "PEN",
+            "ordered_quantity": 10,
+            "observed_net_received_quantity": 10,
+            "position": "undetermined",
+            "difference_quantity": null,
+            "coverage_state": "complete",
+            "evidence": {
+              "counted_event_ids": [
+                "N-1"
+              ],
+              "exact_duplicate_event_rows_ignored": 0,
+              "blockers": [
+                "unknown_sku_for_in_scope_order"
+              ],
+              "diagnostic_codes": [
+                "unknown_sku_for_in_scope_order"
+              ]
+            },
+            "follow_up": {
+              "reason": "conflicting or invalid order/event identity evidence",
+              "owners": [
+                {
+                  "role": "purchasing_coordinator",
+                  "recipient": "Nila (purchasing)"
+                },
+                {
+                  "role": "data_steward",
+                  "recipient": "Paz (receiving data)"
+                }
+              ],
+              "external_recipient": null,
+              "recipient_gaps": [],
+              "next_action": "reconcile the identified source records, then rerun the line comparison",
+              "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); data_steward: Paz (receiving data). Order PO-N31, SKU PEN: conflicting or invalid order/event identity evidence. Next action: reconcile the identified source records, then rerun the line comparison.",
+              "sent": false
+            }
+          },
+          {
+            "order_id": "PO-N32",
+            "sku": "TAPE",
+            "ordered_quantity": 8,
+            "observed_net_received_quantity": 5,
+            "position": "shortfall",
+            "difference_quantity": 3,
+            "coverage_state": "complete",
+            "evidence": {
+              "counted_event_ids": [
+                "N-2"
+              ],
+              "exact_duplicate_event_rows_ignored": 0,
+              "blockers": [],
+              "diagnostic_codes": []
+            },
+            "follow_up": {
+              "reason": "a confirmed shortfall of 3",
+              "owners": [
+                {
+                  "role": "purchasing_coordinator",
+                  "recipient": "Nila (purchasing)"
+                }
+              ],
+              "external_recipient": "Sol at WrapCo",
+              "recipient_gaps": [],
+              "next_action": "ask the supplier contact to confirm the plan and timing for the remaining 3 units",
+              "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); supplier_contact: Sol at WrapCo. Order PO-N32, SKU TAPE: a confirmed shortfall of 3. Next action: ask the supplier contact to confirm the plan and timing for the remaining 3 units.",
+              "sent": false
+            }
+          },
+          {
+            "order_id": "PO-N33",
+            "sku": "PAD",
+            "ordered_quantity": 6,
+            "observed_net_received_quantity": 9,
+            "position": "excess",
+            "difference_quantity": 3,
+            "coverage_state": "complete",
+            "evidence": {
+              "counted_event_ids": [
+                "N-3"
+              ],
+              "exact_duplicate_event_rows_ignored": 0,
+              "blockers": [],
+              "diagnostic_codes": []
+            },
+            "follow_up": {
+              "reason": "a confirmed excess of 3",
+              "owners": [
+                {
+                  "role": "warehouse_lead",
+                  "recipient": "Oren (warehouse)"
+                }
+              ],
+              "external_recipient": null,
+              "recipient_gaps": [],
+              "next_action": "reconcile the 3 surplus units against the order and receiving evidence",
+              "draft": "Draft — not sent. To/owner: warehouse_lead: Oren (warehouse). Order PO-N33, SKU PAD: a confirmed excess of 3. Next action: reconcile the 3 surplus units against the order and receiving evidence.",
+              "sent": false
+            }
+          }
+        ],
+        "excluded_events": {
+          "outside_requested_month": {
+            "count": 1,
+            "event_ids": [
+              "N-4"
+            ]
+          },
+          "outside_supplied_order_set": {
+            "count": 0,
+            "event_ids": []
+          },
+          "conflicting_event_ids": {
+            "count": 0,
+            "event_ids": []
+          },
+          "invalid_rows_without_usable_event_id": 0
+        },
+        "diagnostics": [
+          {
+            "code": "unknown_sku_for_in_scope_order",
+            "severity": "error",
+            "message": "Requested-month event names an in-scope order but a SKU absent from that order; all lines on the order require identity reconciliation.",
+            "event_id": "PROBE-UNKNOWN",
+            "order_id": "PO-N31",
+            "sku": "UNKNOWN",
+            "affected_lines": [
+              {
+                "order_id": "PO-N31",
+                "sku": "PEN"
+              }
+            ]
+          }
+        ],
+        "drafts_sent": false
+      }
+    },
+    {
+      "candidate": "K51",
+      "probe": "conflict_scope",
+      "cmd": "python3 /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K51/monthly-receiving-review/scripts/review_receipts.py /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05/conflict_scope.json",
+      "chunk_id": "013f41",
+      "exit_code": 0,
+      "original_token_count": 2167,
+      "output": "{\n  \"review_month\": \"2026-09\",\n  \"summary\": {\n    \"supplied_order_rows\": 6,\n    \"usable_order_rows\": 6,\n    \"in_scope_lines\": 6,\n    \"received_as_ordered\": 0,\n    \"shortfall\": 3,\n    \"excess\": 0,\n    \"undetermined\": 3,\n    \"lines_requiring_follow_up\": 6,\n    \"lines_with_evidence_gaps\": 3\n  },\n  \"lines\": [\n    {\n      \"order_id\": \"PO-C51\",\n      \"sku\": \"WIRE\",\n      \"ordered_quantity\": 8,\n      \"observed_net_received_quantity\": 3,\n      \"position\": \"shortfall\",\n      \"difference_quantity\": 5,\n      \"coverage_state\": \"complete\",\n      \"evidence\": {\n        \"counted_event_ids\": [\n          \"R-51\",\n          \"R-52\"\n        ],\n        \"exact_duplicate_event_rows_ignored\": 1,\n        \"blockers\": [],\n        \"diagnostic_codes\": [\n          \"duplicate_event_row\"\n        ]\n      },\n      \"follow_up\": {\n        \"reason\": \"a confirmed shortfall of 5\",\n        \"owners\": [\n          {\n            \"role\": \"purchasing_coordinator\",\n            \"recipient\": \"Nila (purchasing)\"\n          }\n        ],\n        \"external_recipient\": \"Ivy at CoilCo\",\n        \"recipient_gaps\": [],\n        \"next_action\": \"ask the supplier contact to confirm the plan and timing for the remaining 5 units\",\n        \"draft\": \"Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); supplier_contact: Ivy at CoilCo. Order PO-C51, SKU WIRE: a confirmed shortfall of 5. Next action: ask the supplier contact to confirm the plan and timing for the remaining 5 units.\",\n        \"sent\": false\n      }\n    },\n    {\n      \"order_id\": \"PO-C52\",\n      \"sku\": \"BOLT\",\n      \"ordered_quantity\": 10,\n      \"observed_net_received_quantity\": 12,\n      \"position\": \"undetermined\",\n      \"difference_quantity\": null,\n      \"coverage_state\": \"incomplete\",\n      \"evidence\": {\n        \"counted_event_ids\": [\n          \"R-54\"\n        ],\n        \"exact_duplicate_event_rows_ignored\": 0,\n        \"blockers\": [\n          \"incomplete_coverage\"\n        ],\n        \"diagnostic_codes\": []\n      },\n      \"follow_up\": {\n        \"reason\": \"the requested-month receipt export is not confirmed complete\",\n        \"owners\": [\n          {\n            \"role\": \"data_steward\",\n            \"recipient\": \"Paz (receiving data)\"\n          }\n        ],\n        \"external_recipient\": null,\n        \"recipient_gaps\": [],\n        \"next_action\": \"provide or confirm the full requested-month export, then rerun the comparison\",\n        \"draft\": \"Draft — not sent. To/owner: data_steward: Paz (receiving data). Order PO-C52, SKU BOLT: the requested-month receipt export is not confirmed complete. Next action: provide or confirm the full requested-month export, then rerun the comparison.\",\n        \"sent\": false\n      }\n    },\n    {\n      \"order_id\": \"PO-C53\",\n      \"sku\": \"LAMP\",\n      \"ordered_quantity\": 4,\n      \"observed_net_received_quantity\": 0,\n      \"position\": \"undetermined\",\n      \"difference_quantity\": null,\n      \"coverage_state\": \"complete\",\n      \"evidence\": {\n        \"counted_event_ids\": [],\n        \"exact_duplicate_event_rows_ignored\": 0,\n        \"blockers\": [\n          \"conflicting_event_id\"\n        ],\n        \"diagnostic_codes\": [\n          \"conflicting_event_id\"\n        ]\n      },\n      \"follow_up\": {\n        \"reason\": \"conflicting or invalid order/event identity evidence\",\n        \"owners\": [\n          {\n            \"role\": \"purchasing_coordinator\",\n            \"recipient\": \"Nila (purchasing)\"\n          },\n          {\n            \"role\": \"data_steward\",\n            \"recipient\": \"Paz (receiving data)\"\n          }\n        ],\n        \"external_recipient\": null,\n        \"recipient_gaps\": [],\n        \"next_action\": \"reconcile the identified source records, then rerun the line comparison\",\n        \"draft\": \"Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); data_steward: Paz (receiving data). Order PO-C53, SKU LAMP: conflicting or invalid order/event identity evidence. Next action: reconcile the identified source records, then rerun the line comparison.\",\n        \"sent\": false\n      }\n    },\n    {\n      \"order_id\": \"PO-C54\",\n      \"sku\": \"CORD\",\n      \"ordered_quantity\": 7,\n      \"observed_net_received_quantity\": 0,\n      \"position\": \"undetermined\",\n      \"difference_quantity\": null,\n      \"coverage_state\": \"complete\",\n      \"evidence\": {\n        \"counted_event_ids\": [],\n        \"exact_duplicate_event_rows_ignored\": 0,\n        \"blockers\": [\n          \"conflicting_event_id\"\n        ],\n        \"diagnostic_codes\": [\n          \"conflicting_event_id\"\n        ]\n      },\n      \"follow_up\": {\n        \"reason\": \"conflicting or invalid order/event identity evidence\",\n        \"owners\": [\n          {\n            \"role\": \"purchasing_coordinator\",\n            \"recipient\": \"Nila (purchasing)\"\n          },\n          {\n            \"role\": \"data_steward\",\n            \"recipient\": \"Paz (receiving data)\"\n          }\n        ],\n        \"external_recipient\": null,\n        \"recipient_gaps\": [],\n        \"next_action\": \"reconcile the identified source records, then rerun the line comparison\",\n        \"draft\": \"Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); data_steward: Paz (receiving data). Order PO-C54, SKU CORD: conflicting or invalid order/event identity evidence. Next action: reconcile the identified source records, then rerun the line comparison.\",\n        \"sent\": false\n      }\n    },\n    {\n      \"order_id\": \"PO-C55\",\n      \"sku\": \"SEAL\",\n      \"ordered_quantity\": 5,\n      \"observed_net_received_quantity\": 0,\n      \"position\": \"shortfall\",\n      \"difference_quantity\": 5,\n      \"coverage_state\": \"complete\",\n      \"evidence\": {\n        \"counted_event_ids\": [],\n        \"exact_duplicate_event_rows_ignored\": 0,\n        \"blockers\": [],\n        \"diagnostic_codes\": []\n      },\n      \"follow_up\": {\n        \"reason\": \"a confirmed shortfall of 5\",\n        \"owners\": [\n          {\n            \"role\": \"purchasing_coordinator\",\n            \"recipient\": \"Nila (purchasing)\"\n          }\n        ],\n        \"external_recipient\": \"Miro at SealCo\",\n        \"recipient_gaps\": [],\n        \"next_action\": \"ask the supplier contact to confirm the plan and timing for the remaining 5 units\",\n        \"draft\": \"Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); supplier_contact: Miro at SealCo. Order PO-C55, SKU SEAL: a confirmed shortfall of 5. Next action: ask the supplier contact to confirm the plan and timing for the remaining 5 units.\",\n        \"sent\": false\n      }\n    },\n    {\n      \"order_id\": \"PO-PROBE\",\n      \"sku\": \"LAMP\",\n      \"ordered_quantity\": 2,\n      \"observed_net_received_quantity\": 0,\n      \"position\": \"shortfall\",\n      \"difference_quantity\": 2,\n      \"coverage_state\": \"complete\",\n      \"evidence\": {\n        \"counted_event_ids\": [],\n        \"exact_duplicate_event_rows_ignored\": 0,\n        \"blockers\": [],\n        \"diagnostic_codes\": []\n      },\n      \"follow_up\": {\n        \"reason\": \"a confirmed shortfall of 2\",\n        \"owners\": [\n          {\n            \"role\": \"purchasing_coordinator\",\n            \"recipient\": \"Nila (purchasing)\"\n          }\n        ],\n        \"external_recipient\": \"Probe supplier\",\n        \"recipient_gaps\": [],\n        \"next_action\": \"ask the supplier contact to confirm the plan and timing for the remaining 2 units\",\n        \"draft\": \"Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); supplier_contact: Probe supplier. Order PO-PROBE, SKU LAMP: a confirmed shortfall of 2. Next action: ask the supplier contact to confirm the plan and timing for the remaining 2 units.\",\n        \"sent\": false\n      }\n    }\n  ],\n  \"excluded_events\": {\n    \"outside_requested_month\": {\n      \"count\": 1,\n      \"event_ids\": [\n        \"R-53\"\n      ]\n    },\n    \"outside_supplied_order_set\": {\n      \"count\": 0,\n      \"event_ids\": []\n    },\n    \"conflicting_event_ids\": {\n      \"count\": 1,\n      \"event_ids\": [\n        \"R-55\"\n      ]\n    },\n    \"invalid_rows_without_usable_event_id\": 0\n  },\n  \"diagnostics\": [\n    {\n      \"code\": \"duplicate_event_row\",\n      \"severity\": \"warning\",\n      \"message\": \"Exact repeated event copies count once.\",\n      \"event_id\": \"R-51\",\n      \"order_id\": \"PO-C51\",\n      \"sku\": \"WIRE\",\n      \"ignored_rows\": 1\n    },\n    {\n      \"code\": \"conflicting_event_id\",\n      \"severity\": \"error\",\n      \"message\": \"The same event_id has different content; all variants were excluded and affected lines require source reconciliation.\",\n      \"event_id\": \"R-55\",\n      \"rows\": [\n        5,\n        6\n      ],\n      \"affected_lines\": [\n        {\n          \"order_id\": \"PO-C53\",\n          \"sku\": \"LAMP\"\n        },\n        {\n          \"order_id\": \"PO-C54\",\n          \"sku\": \"CORD\"\n        }\n      ]\n    }\n  ],\n  \"drafts_sent\": false\n}\n",
+      "wall_time_seconds": 0.000002886,
+      "data": {
+        "review_month": "2026-09",
+        "summary": {
+          "supplied_order_rows": 6,
+          "usable_order_rows": 6,
+          "in_scope_lines": 6,
+          "received_as_ordered": 0,
+          "shortfall": 3,
+          "excess": 0,
+          "undetermined": 3,
+          "lines_requiring_follow_up": 6,
+          "lines_with_evidence_gaps": 3
+        },
+        "lines": [
+          {
+            "order_id": "PO-C51",
+            "sku": "WIRE",
+            "ordered_quantity": 8,
+            "observed_net_received_quantity": 3,
+            "position": "shortfall",
+            "difference_quantity": 5,
+            "coverage_state": "complete",
+            "evidence": {
+              "counted_event_ids": [
+                "R-51",
+                "R-52"
+              ],
+              "exact_duplicate_event_rows_ignored": 1,
+              "blockers": [],
+              "diagnostic_codes": [
+                "duplicate_event_row"
+              ]
+            },
+            "follow_up": {
+              "reason": "a confirmed shortfall of 5",
+              "owners": [
+                {
+                  "role": "purchasing_coordinator",
+                  "recipient": "Nila (purchasing)"
+                }
+              ],
+              "external_recipient": "Ivy at CoilCo",
+              "recipient_gaps": [],
+              "next_action": "ask the supplier contact to confirm the plan and timing for the remaining 5 units",
+              "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); supplier_contact: Ivy at CoilCo. Order PO-C51, SKU WIRE: a confirmed shortfall of 5. Next action: ask the supplier contact to confirm the plan and timing for the remaining 5 units.",
+              "sent": false
+            }
+          },
+          {
+            "order_id": "PO-C52",
+            "sku": "BOLT",
+            "ordered_quantity": 10,
+            "observed_net_received_quantity": 12,
+            "position": "undetermined",
+            "difference_quantity": null,
+            "coverage_state": "incomplete",
+            "evidence": {
+              "counted_event_ids": [
+                "R-54"
+              ],
+              "exact_duplicate_event_rows_ignored": 0,
+              "blockers": [
+                "incomplete_coverage"
+              ],
+              "diagnostic_codes": []
+            },
+            "follow_up": {
+              "reason": "the requested-month receipt export is not confirmed complete",
+              "owners": [
+                {
+                  "role": "data_steward",
+                  "recipient": "Paz (receiving data)"
+                }
+              ],
+              "external_recipient": null,
+              "recipient_gaps": [],
+              "next_action": "provide or confirm the full requested-month export, then rerun the comparison",
+              "draft": "Draft — not sent. To/owner: data_steward: Paz (receiving data). Order PO-C52, SKU BOLT: the requested-month receipt export is not confirmed complete. Next action: provide or confirm the full requested-month export, then rerun the comparison.",
+              "sent": false
+            }
+          },
+          {
+            "order_id": "PO-C53",
+            "sku": "LAMP",
+            "ordered_quantity": 4,
+            "observed_net_received_quantity": 0,
+            "position": "undetermined",
+            "difference_quantity": null,
+            "coverage_state": "complete",
+            "evidence": {
+              "counted_event_ids": [],
+              "exact_duplicate_event_rows_ignored": 0,
+              "blockers": [
+                "conflicting_event_id"
+              ],
+              "diagnostic_codes": [
+                "conflicting_event_id"
+              ]
+            },
+            "follow_up": {
+              "reason": "conflicting or invalid order/event identity evidence",
+              "owners": [
+                {
+                  "role": "purchasing_coordinator",
+                  "recipient": "Nila (purchasing)"
+                },
+                {
+                  "role": "data_steward",
+                  "recipient": "Paz (receiving data)"
+                }
+              ],
+              "external_recipient": null,
+              "recipient_gaps": [],
+              "next_action": "reconcile the identified source records, then rerun the line comparison",
+              "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); data_steward: Paz (receiving data). Order PO-C53, SKU LAMP: conflicting or invalid order/event identity evidence. Next action: reconcile the identified source records, then rerun the line comparison.",
+              "sent": false
+            }
+          },
+          {
+            "order_id": "PO-C54",
+            "sku": "CORD",
+            "ordered_quantity": 7,
+            "observed_net_received_quantity": 0,
+            "position": "undetermined",
+            "difference_quantity": null,
+            "coverage_state": "complete",
+            "evidence": {
+              "counted_event_ids": [],
+              "exact_duplicate_event_rows_ignored": 0,
+              "blockers": [
+                "conflicting_event_id"
+              ],
+              "diagnostic_codes": [
+                "conflicting_event_id"
+              ]
+            },
+            "follow_up": {
+              "reason": "conflicting or invalid order/event identity evidence",
+              "owners": [
+                {
+                  "role": "purchasing_coordinator",
+                  "recipient": "Nila (purchasing)"
+                },
+                {
+                  "role": "data_steward",
+                  "recipient": "Paz (receiving data)"
+                }
+              ],
+              "external_recipient": null,
+              "recipient_gaps": [],
+              "next_action": "reconcile the identified source records, then rerun the line comparison",
+              "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); data_steward: Paz (receiving data). Order PO-C54, SKU CORD: conflicting or invalid order/event identity evidence. Next action: reconcile the identified source records, then rerun the line comparison.",
+              "sent": false
+            }
+          },
+          {
+            "order_id": "PO-C55",
+            "sku": "SEAL",
+            "ordered_quantity": 5,
+            "observed_net_received_quantity": 0,
+            "position": "shortfall",
+            "difference_quantity": 5,
+            "coverage_state": "complete",
+            "evidence": {
+              "counted_event_ids": [],
+              "exact_duplicate_event_rows_ignored": 0,
+              "blockers": [],
+              "diagnostic_codes": []
+            },
+            "follow_up": {
+              "reason": "a confirmed shortfall of 5",
+              "owners": [
+                {
+                  "role": "purchasing_coordinator",
+                  "recipient": "Nila (purchasing)"
+                }
+              ],
+              "external_recipient": "Miro at SealCo",
+              "recipient_gaps": [],
+              "next_action": "ask the supplier contact to confirm the plan and timing for the remaining 5 units",
+              "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); supplier_contact: Miro at SealCo. Order PO-C55, SKU SEAL: a confirmed shortfall of 5. Next action: ask the supplier contact to confirm the plan and timing for the remaining 5 units.",
+              "sent": false
+            }
+          },
+          {
+            "order_id": "PO-PROBE",
+            "sku": "LAMP",
+            "ordered_quantity": 2,
+            "observed_net_received_quantity": 0,
+            "position": "shortfall",
+            "difference_quantity": 2,
+            "coverage_state": "complete",
+            "evidence": {
+              "counted_event_ids": [],
+              "exact_duplicate_event_rows_ignored": 0,
+              "blockers": [],
+              "diagnostic_codes": []
+            },
+            "follow_up": {
+              "reason": "a confirmed shortfall of 2",
+              "owners": [
+                {
+                  "role": "purchasing_coordinator",
+                  "recipient": "Nila (purchasing)"
+                }
+              ],
+              "external_recipient": "Probe supplier",
+              "recipient_gaps": [],
+              "next_action": "ask the supplier contact to confirm the plan and timing for the remaining 2 units",
+              "draft": "Draft — not sent. To/owner: purchasing_coordinator: Nila (purchasing); supplier_contact: Probe supplier. Order PO-PROBE, SKU LAMP: a confirmed shortfall of 2. Next action: ask the supplier contact to confirm the plan and timing for the remaining 2 units.",
+              "sent": false
+            }
+          }
+        ],
+        "excluded_events": {
+          "outside_requested_month": {
+            "count": 1,
+            "event_ids": [
+              "R-53"
+            ]
+          },
+          "outside_supplied_order_set": {
+            "count": 0,
+            "event_ids": []
+          },
+          "conflicting_event_ids": {
+            "count": 1,
+            "event_ids": [
+              "R-55"
+            ]
+          },
+          "invalid_rows_without_usable_event_id": 0
+        },
+        "diagnostics": [
+          {
+            "code": "duplicate_event_row",
+            "severity": "warning",
+            "message": "Exact repeated event copies count once.",
+            "event_id": "R-51",
+            "order_id": "PO-C51",
+            "sku": "WIRE",
+            "ignored_rows": 1
+          },
+          {
+            "code": "conflicting_event_id",
+            "severity": "error",
+            "message": "The same event_id has different content; all variants were excluded and affected lines require source reconciliation.",
+            "event_id": "R-55",
+            "rows": [
+              5,
+              6
+            ],
+            "affected_lines": [
+              {
+                "order_id": "PO-C53",
+                "sku": "LAMP"
+              },
+              {
+                "order_id": "PO-C54",
+                "sku": "CORD"
+              }
+            ]
+          }
+        ],
+        "drafts_sent": false
+      }
+    },
+    {
+      "candidate": "K66",
+      "probe": "ordinary",
+      "cmd": "python3 /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K66/monthly-receiving-review/scripts/review_receipts.py /workspace/scratch/a75c3a6d9076/alps-v070-assessment/blind/S05/original-consumer-inputs/ordinary/receiving.json",
+      "chunk_id": "3e74ee",
+      "exit_code": 0,
+      "original_token_count": 894,
+      "output": "{\n  \"evidence_issues\": [],\n  \"exact_event_duplicates\": [],\n  \"exact_order_duplicates\": [],\n  \"exclusions\": [\n    {\n      \"event_id\": \"N-4\",\n      \"event_month\": \"2026-07\",\n      \"type\": \"event_outside_requested_month\"\n    }\n  ],\n  \"input\": {\n    \"bytes\": 1164,\n    \"sha256\": \"e0c5c976692661d10f559f4bba52ef3003ef23a036c35571c33fe4300ff9ceea\",\n    \"source\": \"/workspace/scratch/a75c3a6d9076/alps-v070-assessment/blind/S05/original-consumer-inputs/ordinary/receiving.json\"\n  },\n  \"lines\": [\n    {\n      \"coverage_record_indexes\": [\n        0\n      ],\n      \"coverage_status\": \"complete\",\n      \"evidence_findings\": [],\n      \"excess_quantity\": null,\n      \"follow_ups\": [],\n      \"included_event_ids\": [\n        \"N-1\"\n      ],\n      \"observed_uncontested_net_received\": 10,\n      \"order_id\": \"PO-N31\",\n      \"order_record_indexes\": [\n        0\n      ],\n      \"ordered\": 10,\n      \"position\": \"received_as_ordered\",\n      \"position_is_final\": true,\n      \"recipient_gaps\": [],\n      \"remaining_quantity\": null,\n      \"sku\": \"PEN\",\n      \"supplier_contact\": \"Rue at PaperCo\"\n    },\n    {\n      \"coverage_record_indexes\": [\n        1\n      ],\n      \"coverage_status\": \"complete\",\n      \"evidence_findings\": [],\n      \"excess_quantity\": null,\n      \"follow_ups\": [\n        {\n          \"next_action\": \"Ask the supplied supplier contact to confirm and resolve the remaining receipt quantity.\",\n          \"recipient\": \"Sol at WrapCo\",\n          \"remaining_quantity\": 3,\n          \"sender\": {\n            \"recipient\": \"Nila (purchasing)\",\n            \"role\": \"purchasing_coordinator\"\n          },\n          \"type\": \"remaining_receipt_follow_up\"\n        }\n      ],\n      \"included_event_ids\": [\n        \"N-2\"\n      ],\n      \"observed_uncontested_net_received\": 5,\n      \"order_id\": \"PO-N32\",\n      \"order_record_indexes\": [\n        1\n      ],\n      \"ordered\": 8,\n      \"position\": \"shortfall\",\n      \"position_is_final\": true,\n      \"recipient_gaps\": [],\n      \"remaining_quantity\": 3,\n      \"sku\": \"TAPE\",\n      \"supplier_contact\": \"Sol at WrapCo\"\n    },\n    {\n      \"coverage_record_indexes\": [\n        2\n      ],\n      \"coverage_status\": \"complete\",\n      \"evidence_findings\": [],\n      \"excess_quantity\": 3,\n      \"follow_ups\": [\n        {\n          \"excess_quantity\": 3,\n          \"next_action\": \"Reconcile the surplus against the purchase order and receiving evidence.\",\n          \"parties\": [\n            {\n              \"recipient\": \"Oren (warehouse)\",\n              \"role\": \"warehouse_lead\"\n            }\n          ],\n          \"type\": \"surplus_reconciliation\"\n        }\n      ],\n      \"included_event_ids\": [\n        \"N-3\"\n      ],\n      \"observed_uncontested_net_received\": 9,\n      \"order_id\": \"PO-N33\",\n      \"order_record_indexes\": [\n        2\n      ],\n      \"ordered\": 6,\n      \"position\": \"excess\",\n      \"position_is_final\": true,\n      \"recipient_gaps\": [],\n      \"remaining_quantity\": null,\n      \"sku\": \"PAD\",\n      \"supplier_contact\": \"Teo at PadCo\"\n    }\n  ],\n  \"requested_month\": \"2026-08\",\n  \"responsibilities\": {\n    \"data_steward\": \"Paz (receiving data)\",\n    \"purchasing_coordinator\": \"Nila (purchasing)\",\n    \"warehouse_lead\": \"Oren (warehouse)\"\n  },\n  \"schema_version\": \"1.0\",\n  \"scope_issues\": [],\n  \"summary\": {\n    \"all_line_positions_final\": true,\n    \"all_supplied_scope_represented\": true,\n    \"lines_requiring_follow_up\": 2,\n    \"position_counts\": {\n      \"excess\": 1,\n      \"received_as_ordered\": 1,\n      \"shortfall\": 1,\n      \"unconfirmed\": 0\n    },\n    \"recipient_gaps\": [],\n    \"represented_order_lines\": 3,\n    \"supplied_order_records\": 3\n  }\n}\n",
+      "wall_time_seconds": 0.000002597,
+      "data": {
+        "evidence_issues": [],
+        "exact_event_duplicates": [],
+        "exact_order_duplicates": [],
+        "exclusions": [
+          {
+            "event_id": "N-4",
+            "event_month": "2026-07",
+            "type": "event_outside_requested_month"
+          }
+        ],
+        "input": {
+          "bytes": 1164,
+          "sha256": "e0c5c976692661d10f559f4bba52ef3003ef23a036c35571c33fe4300ff9ceea",
+          "source": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/blind/S05/original-consumer-inputs/ordinary/receiving.json"
+        },
+        "lines": [
+          {
+            "coverage_record_indexes": [
+              0
+            ],
+            "coverage_status": "complete",
+            "evidence_findings": [],
+            "excess_quantity": null,
+            "follow_ups": [],
+            "included_event_ids": [
+              "N-1"
+            ],
+            "observed_uncontested_net_received": 10,
+            "order_id": "PO-N31",
+            "order_record_indexes": [
+              0
+            ],
+            "ordered": 10,
+            "position": "received_as_ordered",
+            "position_is_final": true,
+            "recipient_gaps": [],
+            "remaining_quantity": null,
+            "sku": "PEN",
+            "supplier_contact": "Rue at PaperCo"
+          },
+          {
+            "coverage_record_indexes": [
+              1
+            ],
+            "coverage_status": "complete",
+            "evidence_findings": [],
+            "excess_quantity": null,
+            "follow_ups": [
+              {
+                "next_action": "Ask the supplied supplier contact to confirm and resolve the remaining receipt quantity.",
+                "recipient": "Sol at WrapCo",
+                "remaining_quantity": 3,
+                "sender": {
+                  "recipient": "Nila (purchasing)",
+                  "role": "purchasing_coordinator"
+                },
+                "type": "remaining_receipt_follow_up"
+              }
+            ],
+            "included_event_ids": [
+              "N-2"
+            ],
+            "observed_uncontested_net_received": 5,
+            "order_id": "PO-N32",
+            "order_record_indexes": [
+              1
+            ],
+            "ordered": 8,
+            "position": "shortfall",
+            "position_is_final": true,
+            "recipient_gaps": [],
+            "remaining_quantity": 3,
+            "sku": "TAPE",
+            "supplier_contact": "Sol at WrapCo"
+          },
+          {
+            "coverage_record_indexes": [
+              2
+            ],
+            "coverage_status": "complete",
+            "evidence_findings": [],
+            "excess_quantity": 3,
+            "follow_ups": [
+              {
+                "excess_quantity": 3,
+                "next_action": "Reconcile the surplus against the purchase order and receiving evidence.",
+                "parties": [
+                  {
+                    "recipient": "Oren (warehouse)",
+                    "role": "warehouse_lead"
+                  }
+                ],
+                "type": "surplus_reconciliation"
+              }
+            ],
+            "included_event_ids": [
+              "N-3"
+            ],
+            "observed_uncontested_net_received": 9,
+            "order_id": "PO-N33",
+            "order_record_indexes": [
+              2
+            ],
+            "ordered": 6,
+            "position": "excess",
+            "position_is_final": true,
+            "recipient_gaps": [],
+            "remaining_quantity": null,
+            "sku": "PAD",
+            "supplier_contact": "Teo at PadCo"
+          }
+        ],
+        "requested_month": "2026-08",
+        "responsibilities": {
+          "data_steward": "Paz (receiving data)",
+          "purchasing_coordinator": "Nila (purchasing)",
+          "warehouse_lead": "Oren (warehouse)"
+        },
+        "schema_version": "1.0",
+        "scope_issues": [],
+        "summary": {
+          "all_line_positions_final": true,
+          "all_supplied_scope_represented": true,
+          "lines_requiring_follow_up": 2,
+          "position_counts": {
+            "excess": 1,
+            "received_as_ordered": 1,
+            "shortfall": 1,
+            "unconfirmed": 0
+          },
+          "recipient_gaps": [],
+          "represented_order_lines": 3,
+          "supplied_order_records": 3
+        }
+      }
+    },
+    {
+      "candidate": "K66",
+      "probe": "challenging",
+      "cmd": "python3 /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K66/monthly-receiving-review/scripts/review_receipts.py /workspace/scratch/a75c3a6d9076/alps-v070-assessment/blind/S05/original-consumer-inputs/challenging/receiving.json",
+      "chunk_id": "e39abf",
+      "exit_code": 0,
+      "original_token_count": 1868,
+      "output": "{\n  \"evidence_issues\": [\n    {\n      \"code\": \"conflicting_event_id\",\n      \"event_id\": \"R-55\",\n      \"message\": \"The same event_id has different content; all variants were excluded.\",\n      \"record_indexes\": [\n        5,\n        6\n      ]\n    }\n  ],\n  \"exact_event_duplicates\": [\n    {\n      \"copies_ignored\": 1,\n      \"event_id\": \"R-51\"\n    }\n  ],\n  \"exact_order_duplicates\": [],\n  \"exclusions\": [\n    {\n      \"event_id\": \"R-53\",\n      \"event_month\": \"2026-08\",\n      \"type\": \"event_outside_requested_month\"\n    }\n  ],\n  \"input\": {\n    \"bytes\": 1848,\n    \"sha256\": \"43ba89782fc9883ff40ba5e84c145e2cced601b0cb7760ad1e717c45a1ea9a67\",\n    \"source\": \"/workspace/scratch/a75c3a6d9076/alps-v070-assessment/blind/S05/original-consumer-inputs/challenging/receiving.json\"\n  },\n  \"lines\": [\n    {\n      \"coverage_record_indexes\": [\n        0\n      ],\n      \"coverage_status\": \"complete\",\n      \"evidence_findings\": [],\n      \"excess_quantity\": null,\n      \"follow_ups\": [\n        {\n          \"next_action\": \"Ask the supplied supplier contact to confirm and resolve the remaining receipt quantity.\",\n          \"recipient\": \"Ivy at CoilCo\",\n          \"remaining_quantity\": 5,\n          \"sender\": {\n            \"recipient\": \"Nila (purchasing)\",\n            \"role\": \"purchasing_coordinator\"\n          },\n          \"type\": \"remaining_receipt_follow_up\"\n        }\n      ],\n      \"included_event_ids\": [\n        \"R-51\",\n        \"R-52\"\n      ],\n      \"observed_uncontested_net_received\": 3,\n      \"order_id\": \"PO-C51\",\n      \"order_record_indexes\": [\n        0\n      ],\n      \"ordered\": 8,\n      \"position\": \"shortfall\",\n      \"position_is_final\": true,\n      \"recipient_gaps\": [],\n      \"remaining_quantity\": 5,\n      \"sku\": \"WIRE\",\n      \"supplier_contact\": \"Ivy at CoilCo\"\n    },\n    {\n      \"coverage_record_indexes\": [\n        1\n      ],\n      \"coverage_status\": \"incomplete\",\n      \"evidence_findings\": [\n        {\n          \"code\": \"incomplete_coverage\",\n          \"message\": \"Coverage explicitly states that the current-month export is incomplete.\",\n          \"record_indexes\": [\n            1\n          ]\n        }\n      ],\n      \"excess_quantity\": null,\n      \"follow_ups\": [\n        {\n          \"event_ids\": [],\n          \"evidence_codes\": [\n            \"incomplete_coverage\"\n          ],\n          \"next_action\": \"Provide or confirm a complete, valid current-month export for this line before final comparison.\",\n          \"parties\": [\n            {\n              \"recipient\": \"Paz (receiving data)\",\n              \"role\": \"data_steward\"\n            }\n          ],\n          \"type\": \"complete_export_confirmation\"\n        }\n      ],\n      \"included_event_ids\": [\n        \"R-54\"\n      ],\n      \"observed_uncontested_net_received\": 12,\n      \"order_id\": \"PO-C52\",\n      \"order_record_indexes\": [\n        1\n      ],\n      \"ordered\": 10,\n      \"position\": \"unconfirmed\",\n      \"position_is_final\": false,\n      \"recipient_gaps\": [],\n      \"remaining_quantity\": null,\n      \"sku\": \"BOLT\",\n      \"supplier_contact\": \"Jules at FastenCo\"\n    },\n    {\n      \"coverage_record_indexes\": [\n        2\n      ],\n      \"coverage_status\": \"complete\",\n      \"evidence_findings\": [\n        {\n          \"code\": \"conflicting_event_id\",\n          \"event_id\": \"R-55\",\n          \"message\": \"The same event_id has different content; all variants were excluded.\",\n          \"record_indexes\": [\n            5,\n            6\n          ]\n        }\n      ],\n      \"excess_quantity\": null,\n      \"follow_ups\": [\n        {\n          \"event_ids\": [\n            \"R-55\"\n          ],\n          \"evidence_codes\": [\n            \"conflicting_event_id\"\n          ],\n          \"next_action\": \"Reconcile the identified order and receipt-event source records before any final line comparison.\",\n          \"parties\": [\n            {\n              \"recipient\": \"Nila (purchasing)\",\n              \"role\": \"purchasing_coordinator\"\n            },\n            {\n              \"recipient\": \"Paz (receiving data)\",\n              \"role\": \"data_steward\"\n            }\n          ],\n          \"type\": \"source_identity_reconciliation\"\n        }\n      ],\n      \"included_event_ids\": [],\n      \"observed_uncontested_net_received\": 0,\n      \"order_id\": \"PO-C53\",\n      \"order_record_indexes\": [\n        2\n      ],\n      \"ordered\": 4,\n      \"position\": \"unconfirmed\",\n      \"position_is_final\": false,\n      \"recipient_gaps\": [],\n      \"remaining_quantity\": null,\n      \"sku\": \"LAMP\",\n      \"supplier_contact\": \"Kiran at LumenCo\"\n    },\n    {\n      \"coverage_record_indexes\": [\n        3\n      ],\n      \"coverage_status\": \"complete\",\n      \"evidence_findings\": [\n        {\n          \"code\": \"conflicting_event_id\",\n          \"event_id\": \"R-55\",\n          \"message\": \"The same event_id has different content; all variants were excluded.\",\n          \"record_indexes\": [\n            5,\n            6\n          ]\n        }\n      ],\n      \"excess_quantity\": null,\n      \"follow_ups\": [\n        {\n          \"event_ids\": [\n            \"R-55\"\n          ],\n          \"evidence_codes\": [\n            \"conflicting_event_id\"\n          ],\n          \"next_action\": \"Reconcile the identified order and receipt-event source records before any final line comparison.\",\n          \"parties\": [\n            {\n              \"recipient\": \"Nila (purchasing)\",\n              \"role\": \"purchasing_coordinator\"\n            },\n            {\n              \"recipient\": \"Paz (receiving data)\",\n              \"role\": \"data_steward\"\n            }\n          ],\n          \"type\": \"source_identity_reconciliation\"\n        }\n      ],\n      \"included_event_ids\": [],\n      \"observed_uncontested_net_received\": 0,\n      \"order_id\": \"PO-C54\",\n      \"order_record_indexes\": [\n        3\n      ],\n      \"ordered\": 7,\n      \"position\": \"unconfirmed\",\n      \"position_is_final\": false,\n      \"recipient_gaps\": [],\n      \"remaining_quantity\": null,\n      \"sku\": \"CORD\",\n      \"supplier_contact\": \"Lin at CableCo\"\n    },\n    {\n      \"coverage_record_indexes\": [\n        4\n      ],\n      \"coverage_status\": \"complete\",\n      \"evidence_findings\": [],\n      \"excess_quantity\": null,\n      \"follow_ups\": [\n        {\n          \"next_action\": \"Ask the supplied supplier contact to confirm and resolve the remaining receipt quantity.\",\n          \"recipient\": \"Miro at SealCo\",\n          \"remaining_quantity\": 5,\n          \"sender\": {\n            \"recipient\": \"Nila (purchasing)\",\n            \"role\": \"purchasing_coordinator\"\n          },\n          \"type\": \"remaining_receipt_follow_up\"\n        }\n      ],\n      \"included_event_ids\": [],\n      \"observed_uncontested_net_received\": 0,\n      \"order_id\": \"PO-C55\",\n      \"order_record_indexes\": [\n        4\n      ],\n      \"ordered\": 5,\n      \"position\": \"shortfall\",\n      \"position_is_final\": true,\n      \"recipient_gaps\": [],\n      \"remaining_quantity\": 5,\n      \"sku\": \"SEAL\",\n      \"supplier_contact\": \"Miro at SealCo\"\n    }\n  ],\n  \"requested_month\": \"2026-09\",\n  \"responsibilities\": {\n    \"data_steward\": \"Paz (receiving data)\",\n    \"purchasing_coordinator\": \"Nila (purchasing)\",\n    \"warehouse_lead\": \"Oren (warehouse)\"\n  },\n  \"schema_version\": \"1.0\",\n  \"scope_issues\": [],\n  \"summary\": {\n    \"all_line_positions_final\": false,\n    \"all_supplied_scope_represented\": true,\n    \"lines_requiring_follow_up\": 5,\n    \"position_counts\": {\n      \"excess\": 0,\n      \"received_as_ordered\": 0,\n      \"shortfall\": 2,\n      \"unconfirmed\": 3\n    },\n    \"recipient_gaps\": [],\n    \"represented_order_lines\": 5,\n    \"supplied_order_records\": 5\n  }\n}\n",
+      "wall_time_seconds": 0.000004034,
+      "data": {
+        "evidence_issues": [
+          {
+            "code": "conflicting_event_id",
+            "event_id": "R-55",
+            "message": "The same event_id has different content; all variants were excluded.",
+            "record_indexes": [
+              5,
+              6
+            ]
+          }
+        ],
+        "exact_event_duplicates": [
+          {
+            "copies_ignored": 1,
+            "event_id": "R-51"
+          }
+        ],
+        "exact_order_duplicates": [],
+        "exclusions": [
+          {
+            "event_id": "R-53",
+            "event_month": "2026-08",
+            "type": "event_outside_requested_month"
+          }
+        ],
+        "input": {
+          "bytes": 1848,
+          "sha256": "43ba89782fc9883ff40ba5e84c145e2cced601b0cb7760ad1e717c45a1ea9a67",
+          "source": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/blind/S05/original-consumer-inputs/challenging/receiving.json"
+        },
+        "lines": [
+          {
+            "coverage_record_indexes": [
+              0
+            ],
+            "coverage_status": "complete",
+            "evidence_findings": [],
+            "excess_quantity": null,
+            "follow_ups": [
+              {
+                "next_action": "Ask the supplied supplier contact to confirm and resolve the remaining receipt quantity.",
+                "recipient": "Ivy at CoilCo",
+                "remaining_quantity": 5,
+                "sender": {
+                  "recipient": "Nila (purchasing)",
+                  "role": "purchasing_coordinator"
+                },
+                "type": "remaining_receipt_follow_up"
+              }
+            ],
+            "included_event_ids": [
+              "R-51",
+              "R-52"
+            ],
+            "observed_uncontested_net_received": 3,
+            "order_id": "PO-C51",
+            "order_record_indexes": [
+              0
+            ],
+            "ordered": 8,
+            "position": "shortfall",
+            "position_is_final": true,
+            "recipient_gaps": [],
+            "remaining_quantity": 5,
+            "sku": "WIRE",
+            "supplier_contact": "Ivy at CoilCo"
+          },
+          {
+            "coverage_record_indexes": [
+              1
+            ],
+            "coverage_status": "incomplete",
+            "evidence_findings": [
+              {
+                "code": "incomplete_coverage",
+                "message": "Coverage explicitly states that the current-month export is incomplete.",
+                "record_indexes": [
+                  1
+                ]
+              }
+            ],
+            "excess_quantity": null,
+            "follow_ups": [
+              {
+                "event_ids": [],
+                "evidence_codes": [
+                  "incomplete_coverage"
+                ],
+                "next_action": "Provide or confirm a complete, valid current-month export for this line before final comparison.",
+                "parties": [
+                  {
+                    "recipient": "Paz (receiving data)",
+                    "role": "data_steward"
+                  }
+                ],
+                "type": "complete_export_confirmation"
+              }
+            ],
+            "included_event_ids": [
+              "R-54"
+            ],
+            "observed_uncontested_net_received": 12,
+            "order_id": "PO-C52",
+            "order_record_indexes": [
+              1
+            ],
+            "ordered": 10,
+            "position": "unconfirmed",
+            "position_is_final": false,
+            "recipient_gaps": [],
+            "remaining_quantity": null,
+            "sku": "BOLT",
+            "supplier_contact": "Jules at FastenCo"
+          },
+          {
+            "coverage_record_indexes": [
+              2
+            ],
+            "coverage_status": "complete",
+            "evidence_findings": [
+              {
+                "code": "conflicting_event_id",
+                "event_id": "R-55",
+                "message": "The same event_id has different content; all variants were excluded.",
+                "record_indexes": [
+                  5,
+                  6
+                ]
+              }
+            ],
+            "excess_quantity": null,
+            "follow_ups": [
+              {
+                "event_ids": [
+                  "R-55"
+                ],
+                "evidence_codes": [
+                  "conflicting_event_id"
+                ],
+                "next_action": "Reconcile the identified order and receipt-event source records before any final line comparison.",
+                "parties": [
+                  {
+                    "recipient": "Nila (purchasing)",
+                    "role": "purchasing_coordinator"
+                  },
+                  {
+                    "recipient": "Paz (receiving data)",
+                    "role": "data_steward"
+                  }
+                ],
+                "type": "source_identity_reconciliation"
+              }
+            ],
+            "included_event_ids": [],
+            "observed_uncontested_net_received": 0,
+            "order_id": "PO-C53",
+            "order_record_indexes": [
+              2
+            ],
+            "ordered": 4,
+            "position": "unconfirmed",
+            "position_is_final": false,
+            "recipient_gaps": [],
+            "remaining_quantity": null,
+            "sku": "LAMP",
+            "supplier_contact": "Kiran at LumenCo"
+          },
+          {
+            "coverage_record_indexes": [
+              3
+            ],
+            "coverage_status": "complete",
+            "evidence_findings": [
+              {
+                "code": "conflicting_event_id",
+                "event_id": "R-55",
+                "message": "The same event_id has different content; all variants were excluded.",
+                "record_indexes": [
+                  5,
+                  6
+                ]
+              }
+            ],
+            "excess_quantity": null,
+            "follow_ups": [
+              {
+                "event_ids": [
+                  "R-55"
+                ],
+                "evidence_codes": [
+                  "conflicting_event_id"
+                ],
+                "next_action": "Reconcile the identified order and receipt-event source records before any final line comparison.",
+                "parties": [
+                  {
+                    "recipient": "Nila (purchasing)",
+                    "role": "purchasing_coordinator"
+                  },
+                  {
+                    "recipient": "Paz (receiving data)",
+                    "role": "data_steward"
+                  }
+                ],
+                "type": "source_identity_reconciliation"
+              }
+            ],
+            "included_event_ids": [],
+            "observed_uncontested_net_received": 0,
+            "order_id": "PO-C54",
+            "order_record_indexes": [
+              3
+            ],
+            "ordered": 7,
+            "position": "unconfirmed",
+            "position_is_final": false,
+            "recipient_gaps": [],
+            "remaining_quantity": null,
+            "sku": "CORD",
+            "supplier_contact": "Lin at CableCo"
+          },
+          {
+            "coverage_record_indexes": [
+              4
+            ],
+            "coverage_status": "complete",
+            "evidence_findings": [],
+            "excess_quantity": null,
+            "follow_ups": [
+              {
+                "next_action": "Ask the supplied supplier contact to confirm and resolve the remaining receipt quantity.",
+                "recipient": "Miro at SealCo",
+                "remaining_quantity": 5,
+                "sender": {
+                  "recipient": "Nila (purchasing)",
+                  "role": "purchasing_coordinator"
+                },
+                "type": "remaining_receipt_follow_up"
+              }
+            ],
+            "included_event_ids": [],
+            "observed_uncontested_net_received": 0,
+            "order_id": "PO-C55",
+            "order_record_indexes": [
+              4
+            ],
+            "ordered": 5,
+            "position": "shortfall",
+            "position_is_final": true,
+            "recipient_gaps": [],
+            "remaining_quantity": 5,
+            "sku": "SEAL",
+            "supplier_contact": "Miro at SealCo"
+          }
+        ],
+        "requested_month": "2026-09",
+        "responsibilities": {
+          "data_steward": "Paz (receiving data)",
+          "purchasing_coordinator": "Nila (purchasing)",
+          "warehouse_lead": "Oren (warehouse)"
+        },
+        "schema_version": "1.0",
+        "scope_issues": [],
+        "summary": {
+          "all_line_positions_final": false,
+          "all_supplied_scope_represented": true,
+          "lines_requiring_follow_up": 5,
+          "position_counts": {
+            "excess": 0,
+            "received_as_ordered": 0,
+            "shortfall": 2,
+            "unconfirmed": 3
+          },
+          "recipient_gaps": [],
+          "represented_order_lines": 5,
+          "supplied_order_records": 5
+        }
+      }
+    },
+    {
+      "candidate": "K66",
+      "probe": "unknown_sku",
+      "cmd": "python3 /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K66/monthly-receiving-review/scripts/review_receipts.py /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05/unknown_sku.json",
+      "chunk_id": "74d686",
+      "exit_code": 0,
+      "original_token_count": 1206,
+      "output": "{\n  \"evidence_issues\": [\n    {\n      \"code\": \"event_sku_absent_from_order\",\n      \"event_id\": \"PROBE-UNKNOWN\",\n      \"event_sku\": \"UNKNOWN\",\n      \"message\": \"Current-month event uses an in-scope order with a SKU absent from that order; all lines for the order require identity reconciliation.\",\n      \"order_id\": \"PO-N31\"\n    }\n  ],\n  \"exact_event_duplicates\": [],\n  \"exact_order_duplicates\": [],\n  \"exclusions\": [\n    {\n      \"event_id\": \"N-4\",\n      \"event_month\": \"2026-07\",\n      \"type\": \"event_outside_requested_month\"\n    }\n  ],\n  \"input\": {\n    \"bytes\": 1280,\n    \"sha256\": \"41de2f0a2a06f86ba78675992f4b976a951e480ec7a863d0992630d2c3f69b69\",\n    \"source\": \"/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05/unknown_sku.json\"\n  },\n  \"lines\": [\n    {\n      \"coverage_record_indexes\": [\n        0\n      ],\n      \"coverage_status\": \"complete\",\n      \"evidence_findings\": [\n        {\n          \"code\": \"event_sku_absent_from_order\",\n          \"event_id\": \"PROBE-UNKNOWN\",\n          \"event_sku\": \"UNKNOWN\",\n          \"message\": \"Current-month event uses an in-scope order with a SKU absent from that order; all lines for the order require identity reconciliation.\",\n          \"order_id\": \"PO-N31\"\n        }\n      ],\n      \"excess_quantity\": null,\n      \"follow_ups\": [\n        {\n          \"event_ids\": [\n            \"PROBE-UNKNOWN\"\n          ],\n          \"evidence_codes\": [\n            \"event_sku_absent_from_order\"\n          ],\n          \"next_action\": \"Reconcile the identified order and receipt-event source records before any final line comparison.\",\n          \"parties\": [\n            {\n              \"recipient\": \"Nila (purchasing)\",\n              \"role\": \"purchasing_coordinator\"\n            },\n            {\n              \"recipient\": \"Paz (receiving data)\",\n              \"role\": \"data_steward\"\n            }\n          ],\n          \"type\": \"source_identity_reconciliation\"\n        }\n      ],\n      \"included_event_ids\": [\n        \"N-1\"\n      ],\n      \"observed_uncontested_net_received\": 10,\n      \"order_id\": \"PO-N31\",\n      \"order_record_indexes\": [\n        0\n      ],\n      \"ordered\": 10,\n      \"position\": \"unconfirmed\",\n      \"position_is_final\": false,\n      \"recipient_gaps\": [],\n      \"remaining_quantity\": null,\n      \"sku\": \"PEN\",\n      \"supplier_contact\": \"Rue at PaperCo\"\n    },\n    {\n      \"coverage_record_indexes\": [\n        1\n      ],\n      \"coverage_status\": \"complete\",\n      \"evidence_findings\": [],\n      \"excess_quantity\": null,\n      \"follow_ups\": [\n        {\n          \"next_action\": \"Ask the supplied supplier contact to confirm and resolve the remaining receipt quantity.\",\n          \"recipient\": \"Sol at WrapCo\",\n          \"remaining_quantity\": 3,\n          \"sender\": {\n            \"recipient\": \"Nila (purchasing)\",\n            \"role\": \"purchasing_coordinator\"\n          },\n          \"type\": \"remaining_receipt_follow_up\"\n        }\n      ],\n      \"included_event_ids\": [\n        \"N-2\"\n      ],\n      \"observed_uncontested_net_received\": 5,\n      \"order_id\": \"PO-N32\",\n      \"order_record_indexes\": [\n        1\n      ],\n      \"ordered\": 8,\n      \"position\": \"shortfall\",\n      \"position_is_final\": true,\n      \"recipient_gaps\": [],\n      \"remaining_quantity\": 3,\n      \"sku\": \"TAPE\",\n      \"supplier_contact\": \"Sol at WrapCo\"\n    },\n    {\n      \"coverage_record_indexes\": [\n        2\n      ],\n      \"coverage_status\": \"complete\",\n      \"evidence_findings\": [],\n      \"excess_quantity\": 3,\n      \"follow_ups\": [\n        {\n          \"excess_quantity\": 3,\n          \"next_action\": \"Reconcile the surplus against the purchase order and receiving evidence.\",\n          \"parties\": [\n            {\n              \"recipient\": \"Oren (warehouse)\",\n              \"role\": \"warehouse_lead\"\n            }\n          ],\n          \"type\": \"surplus_reconciliation\"\n        }\n      ],\n      \"included_event_ids\": [\n        \"N-3\"\n      ],\n      \"observed_uncontested_net_received\": 9,\n      \"order_id\": \"PO-N33\",\n      \"order_record_indexes\": [\n        2\n      ],\n      \"ordered\": 6,\n      \"position\": \"excess\",\n      \"position_is_final\": true,\n      \"recipient_gaps\": [],\n      \"remaining_quantity\": null,\n      \"sku\": \"PAD\",\n      \"supplier_contact\": \"Teo at PadCo\"\n    }\n  ],\n  \"requested_month\": \"2026-08\",\n  \"responsibilities\": {\n    \"data_steward\": \"Paz (receiving data)\",\n    \"purchasing_coordinator\": \"Nila (purchasing)\",\n    \"warehouse_lead\": \"Oren (warehouse)\"\n  },\n  \"schema_version\": \"1.0\",\n  \"scope_issues\": [],\n  \"summary\": {\n    \"all_line_positions_final\": false,\n    \"all_supplied_scope_represented\": true,\n    \"lines_requiring_follow_up\": 3,\n    \"position_counts\": {\n      \"excess\": 1,\n      \"received_as_ordered\": 0,\n      \"shortfall\": 1,\n      \"unconfirmed\": 1\n    },\n    \"recipient_gaps\": [],\n    \"represented_order_lines\": 3,\n    \"supplied_order_records\": 3\n  }\n}\n",
+      "wall_time_seconds": 0.082629911,
+      "data": {
+        "evidence_issues": [
+          {
+            "code": "event_sku_absent_from_order",
+            "event_id": "PROBE-UNKNOWN",
+            "event_sku": "UNKNOWN",
+            "message": "Current-month event uses an in-scope order with a SKU absent from that order; all lines for the order require identity reconciliation.",
+            "order_id": "PO-N31"
+          }
+        ],
+        "exact_event_duplicates": [],
+        "exact_order_duplicates": [],
+        "exclusions": [
+          {
+            "event_id": "N-4",
+            "event_month": "2026-07",
+            "type": "event_outside_requested_month"
+          }
+        ],
+        "input": {
+          "bytes": 1280,
+          "sha256": "41de2f0a2a06f86ba78675992f4b976a951e480ec7a863d0992630d2c3f69b69",
+          "source": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05/unknown_sku.json"
+        },
+        "lines": [
+          {
+            "coverage_record_indexes": [
+              0
+            ],
+            "coverage_status": "complete",
+            "evidence_findings": [
+              {
+                "code": "event_sku_absent_from_order",
+                "event_id": "PROBE-UNKNOWN",
+                "event_sku": "UNKNOWN",
+                "message": "Current-month event uses an in-scope order with a SKU absent from that order; all lines for the order require identity reconciliation.",
+                "order_id": "PO-N31"
+              }
+            ],
+            "excess_quantity": null,
+            "follow_ups": [
+              {
+                "event_ids": [
+                  "PROBE-UNKNOWN"
+                ],
+                "evidence_codes": [
+                  "event_sku_absent_from_order"
+                ],
+                "next_action": "Reconcile the identified order and receipt-event source records before any final line comparison.",
+                "parties": [
+                  {
+                    "recipient": "Nila (purchasing)",
+                    "role": "purchasing_coordinator"
+                  },
+                  {
+                    "recipient": "Paz (receiving data)",
+                    "role": "data_steward"
+                  }
+                ],
+                "type": "source_identity_reconciliation"
+              }
+            ],
+            "included_event_ids": [
+              "N-1"
+            ],
+            "observed_uncontested_net_received": 10,
+            "order_id": "PO-N31",
+            "order_record_indexes": [
+              0
+            ],
+            "ordered": 10,
+            "position": "unconfirmed",
+            "position_is_final": false,
+            "recipient_gaps": [],
+            "remaining_quantity": null,
+            "sku": "PEN",
+            "supplier_contact": "Rue at PaperCo"
+          },
+          {
+            "coverage_record_indexes": [
+              1
+            ],
+            "coverage_status": "complete",
+            "evidence_findings": [],
+            "excess_quantity": null,
+            "follow_ups": [
+              {
+                "next_action": "Ask the supplied supplier contact to confirm and resolve the remaining receipt quantity.",
+                "recipient": "Sol at WrapCo",
+                "remaining_quantity": 3,
+                "sender": {
+                  "recipient": "Nila (purchasing)",
+                  "role": "purchasing_coordinator"
+                },
+                "type": "remaining_receipt_follow_up"
+              }
+            ],
+            "included_event_ids": [
+              "N-2"
+            ],
+            "observed_uncontested_net_received": 5,
+            "order_id": "PO-N32",
+            "order_record_indexes": [
+              1
+            ],
+            "ordered": 8,
+            "position": "shortfall",
+            "position_is_final": true,
+            "recipient_gaps": [],
+            "remaining_quantity": 3,
+            "sku": "TAPE",
+            "supplier_contact": "Sol at WrapCo"
+          },
+          {
+            "coverage_record_indexes": [
+              2
+            ],
+            "coverage_status": "complete",
+            "evidence_findings": [],
+            "excess_quantity": 3,
+            "follow_ups": [
+              {
+                "excess_quantity": 3,
+                "next_action": "Reconcile the surplus against the purchase order and receiving evidence.",
+                "parties": [
+                  {
+                    "recipient": "Oren (warehouse)",
+                    "role": "warehouse_lead"
+                  }
+                ],
+                "type": "surplus_reconciliation"
+              }
+            ],
+            "included_event_ids": [
+              "N-3"
+            ],
+            "observed_uncontested_net_received": 9,
+            "order_id": "PO-N33",
+            "order_record_indexes": [
+              2
+            ],
+            "ordered": 6,
+            "position": "excess",
+            "position_is_final": true,
+            "recipient_gaps": [],
+            "remaining_quantity": null,
+            "sku": "PAD",
+            "supplier_contact": "Teo at PadCo"
+          }
+        ],
+        "requested_month": "2026-08",
+        "responsibilities": {
+          "data_steward": "Paz (receiving data)",
+          "purchasing_coordinator": "Nila (purchasing)",
+          "warehouse_lead": "Oren (warehouse)"
+        },
+        "schema_version": "1.0",
+        "scope_issues": [],
+        "summary": {
+          "all_line_positions_final": false,
+          "all_supplied_scope_represented": true,
+          "lines_requiring_follow_up": 3,
+          "position_counts": {
+            "excess": 1,
+            "received_as_ordered": 0,
+            "shortfall": 1,
+            "unconfirmed": 1
+          },
+          "recipient_gaps": [],
+          "represented_order_lines": 3,
+          "supplied_order_records": 3
+        }
+      }
+    },
+    {
+      "candidate": "K66",
+      "probe": "conflict_scope",
+      "cmd": "python3 /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K66/monthly-receiving-review/scripts/review_receipts.py /workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05/conflict_scope.json",
+      "chunk_id": "c156ec",
+      "exit_code": 0,
+      "original_token_count": 2099,
+      "output": "{\n  \"evidence_issues\": [\n    {\n      \"code\": \"conflicting_event_id\",\n      \"event_id\": \"R-55\",\n      \"message\": \"The same event_id has different content; all variants were excluded.\",\n      \"record_indexes\": [\n        5,\n        6\n      ]\n    }\n  ],\n  \"exact_event_duplicates\": [\n    {\n      \"copies_ignored\": 1,\n      \"event_id\": \"R-51\"\n    }\n  ],\n  \"exact_order_duplicates\": [],\n  \"exclusions\": [\n    {\n      \"event_id\": \"R-53\",\n      \"event_month\": \"2026-08\",\n      \"type\": \"event_outside_requested_month\"\n    }\n  ],\n  \"input\": {\n    \"bytes\": 2028,\n    \"sha256\": \"3b510752ef33825a6b25013eca458e5ea4af32c70b16d76d5cb868c8f24e530a\",\n    \"source\": \"/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05/conflict_scope.json\"\n  },\n  \"lines\": [\n    {\n      \"coverage_record_indexes\": [\n        1\n      ],\n      \"coverage_status\": \"complete\",\n      \"evidence_findings\": [],\n      \"excess_quantity\": null,\n      \"follow_ups\": [\n        {\n          \"next_action\": \"Ask the supplied supplier contact to confirm and resolve the remaining receipt quantity.\",\n          \"recipient\": \"Ivy at CoilCo\",\n          \"remaining_quantity\": 5,\n          \"sender\": {\n            \"recipient\": \"Nila (purchasing)\",\n            \"role\": \"purchasing_coordinator\"\n          },\n          \"type\": \"remaining_receipt_follow_up\"\n        }\n      ],\n      \"included_event_ids\": [\n        \"R-51\",\n        \"R-52\"\n      ],\n      \"observed_uncontested_net_received\": 3,\n      \"order_id\": \"PO-C51\",\n      \"order_record_indexes\": [\n        1\n      ],\n      \"ordered\": 8,\n      \"position\": \"shortfall\",\n      \"position_is_final\": true,\n      \"recipient_gaps\": [],\n      \"remaining_quantity\": 5,\n      \"sku\": \"WIRE\",\n      \"supplier_contact\": \"Ivy at CoilCo\"\n    },\n    {\n      \"coverage_record_indexes\": [\n        2\n      ],\n      \"coverage_status\": \"incomplete\",\n      \"evidence_findings\": [\n        {\n          \"code\": \"incomplete_coverage\",\n          \"message\": \"Coverage explicitly states that the current-month export is incomplete.\",\n          \"record_indexes\": [\n            2\n          ]\n        }\n      ],\n      \"excess_quantity\": null,\n      \"follow_ups\": [\n        {\n          \"event_ids\": [],\n          \"evidence_codes\": [\n            \"incomplete_coverage\"\n          ],\n          \"next_action\": \"Provide or confirm a complete, valid current-month export for this line before final comparison.\",\n          \"parties\": [\n            {\n              \"recipient\": \"Paz (receiving data)\",\n              \"role\": \"data_steward\"\n            }\n          ],\n          \"type\": \"complete_export_confirmation\"\n        }\n      ],\n      \"included_event_ids\": [\n        \"R-54\"\n      ],\n      \"observed_uncontested_net_received\": 12,\n      \"order_id\": \"PO-C52\",\n      \"order_record_indexes\": [\n        2\n      ],\n      \"ordered\": 10,\n      \"position\": \"unconfirmed\",\n      \"position_is_final\": false,\n      \"recipient_gaps\": [],\n      \"remaining_quantity\": null,\n      \"sku\": \"BOLT\",\n      \"supplier_contact\": \"Jules at FastenCo\"\n    },\n    {\n      \"coverage_record_indexes\": [\n        3\n      ],\n      \"coverage_status\": \"complete\",\n      \"evidence_findings\": [\n        {\n          \"code\": \"conflicting_event_id\",\n          \"event_id\": \"R-55\",\n          \"message\": \"The same event_id has different content; all variants were excluded.\",\n          \"record_indexes\": [\n            5,\n            6\n          ]\n        }\n      ],\n      \"excess_quantity\": null,\n      \"follow_ups\": [\n        {\n          \"event_ids\": [\n            \"R-55\"\n          ],\n          \"evidence_codes\": [\n            \"conflicting_event_id\"\n          ],\n          \"next_action\": \"Reconcile the identified order and receipt-event source records before any final line comparison.\",\n          \"parties\": [\n            {\n              \"recipient\": \"Nila (purchasing)\",\n              \"role\": \"purchasing_coordinator\"\n            },\n            {\n              \"recipient\": \"Paz (receiving data)\",\n              \"role\": \"data_steward\"\n            }\n          ],\n          \"type\": \"source_identity_reconciliation\"\n        }\n      ],\n      \"included_event_ids\": [],\n      \"observed_uncontested_net_received\": 0,\n      \"order_id\": \"PO-C53\",\n      \"order_record_indexes\": [\n        3\n      ],\n      \"ordered\": 4,\n      \"position\": \"unconfirmed\",\n      \"position_is_final\": false,\n      \"recipient_gaps\": [],\n      \"remaining_quantity\": null,\n      \"sku\": \"LAMP\",\n      \"supplier_contact\": \"Kiran at LumenCo\"\n    },\n    {\n      \"coverage_record_indexes\": [\n        4\n      ],\n      \"coverage_status\": \"complete\",\n      \"evidence_findings\": [\n        {\n          \"code\": \"conflicting_event_id\",\n          \"event_id\": \"R-55\",\n          \"message\": \"The same event_id has different content; all variants were excluded.\",\n          \"record_indexes\": [\n            5,\n            6\n          ]\n        }\n      ],\n      \"excess_quantity\": null,\n      \"follow_ups\": [\n        {\n          \"event_ids\": [\n            \"R-55\"\n          ],\n          \"evidence_codes\": [\n            \"conflicting_event_id\"\n          ],\n          \"next_action\": \"Reconcile the identified order and receipt-event source records before any final line comparison.\",\n          \"parties\": [\n            {\n              \"recipient\": \"Nila (purchasing)\",\n              \"role\": \"purchasing_coordinator\"\n            },\n            {\n              \"recipient\": \"Paz (receiving data)\",\n              \"role\": \"data_steward\"\n            }\n          ],\n          \"type\": \"source_identity_reconciliation\"\n        }\n      ],\n      \"included_event_ids\": [],\n      \"observed_uncontested_net_received\": 0,\n      \"order_id\": \"PO-C54\",\n      \"order_record_indexes\": [\n        4\n      ],\n      \"ordered\": 7,\n      \"position\": \"unconfirmed\",\n      \"position_is_final\": false,\n      \"recipient_gaps\": [],\n      \"remaining_quantity\": null,\n      \"sku\": \"CORD\",\n      \"supplier_contact\": \"Lin at CableCo\"\n    },\n    {\n      \"coverage_record_indexes\": [\n        5\n      ],\n      \"coverage_status\": \"complete\",\n      \"evidence_findings\": [],\n      \"excess_quantity\": null,\n      \"follow_ups\": [\n        {\n          \"next_action\": \"Ask the supplied supplier contact to confirm and resolve the remaining receipt quantity.\",\n          \"recipient\": \"Miro at SealCo\",\n          \"remaining_quantity\": 5,\n          \"sender\": {\n            \"recipient\": \"Nila (purchasing)\",\n            \"role\": \"purchasing_coordinator\"\n          },\n          \"type\": \"remaining_receipt_follow_up\"\n        }\n      ],\n      \"included_event_ids\": [],\n      \"observed_uncontested_net_received\": 0,\n      \"order_id\": \"PO-C55\",\n      \"order_record_indexes\": [\n        5\n      ],\n      \"ordered\": 5,\n      \"position\": \"shortfall\",\n      \"position_is_final\": true,\n      \"recipient_gaps\": [],\n      \"remaining_quantity\": 5,\n      \"sku\": \"SEAL\",\n      \"supplier_contact\": \"Miro at SealCo\"\n    },\n    {\n      \"coverage_record_indexes\": [\n        0\n      ],\n      \"coverage_status\": \"complete\",\n      \"evidence_findings\": [],\n      \"excess_quantity\": null,\n      \"follow_ups\": [\n        {\n          \"next_action\": \"Ask the supplied supplier contact to confirm and resolve the remaining receipt quantity.\",\n          \"recipient\": \"Probe supplier\",\n          \"remaining_quantity\": 2,\n          \"sender\": {\n            \"recipient\": \"Nila (purchasing)\",\n            \"role\": \"purchasing_coordinator\"\n          },\n          \"type\": \"remaining_receipt_follow_up\"\n        }\n      ],\n      \"included_event_ids\": [],\n      \"observed_uncontested_net_received\": 0,\n      \"order_id\": \"PO-PROBE\",\n      \"order_record_indexes\": [\n        0\n      ],\n      \"ordered\": 2,\n      \"position\": \"shortfall\",\n      \"position_is_final\": true,\n      \"recipient_gaps\": [],\n      \"remaining_quantity\": 2,\n      \"sku\": \"LAMP\",\n      \"supplier_contact\": \"Probe supplier\"\n    }\n  ],\n  \"requested_month\": \"2026-09\",\n  \"responsibilities\": {\n    \"data_steward\": \"Paz (receiving data)\",\n    \"purchasing_coordinator\": \"Nila (purchasing)\",\n    \"warehouse_lead\": \"Oren (warehouse)\"\n  },\n  \"schema_version\": \"1.0\",\n  \"scope_issues\": [],\n  \"summary\": {\n    \"all_line_positions_final\": false,\n    \"all_supplied_scope_represented\": true,\n    \"lines_requiring_follow_up\": 6,\n    \"position_counts\": {\n      \"excess\": 0,\n      \"received_as_ordered\": 0,\n      \"shortfall\": 3,\n      \"unconfirmed\": 3\n    },\n    \"recipient_gaps\": [],\n    \"represented_order_lines\": 6,\n    \"supplied_order_records\": 6\n  }\n}\n",
+      "wall_time_seconds": 0.082100252,
+      "data": {
+        "evidence_issues": [
+          {
+            "code": "conflicting_event_id",
+            "event_id": "R-55",
+            "message": "The same event_id has different content; all variants were excluded.",
+            "record_indexes": [
+              5,
+              6
+            ]
+          }
+        ],
+        "exact_event_duplicates": [
+          {
+            "copies_ignored": 1,
+            "event_id": "R-51"
+          }
+        ],
+        "exact_order_duplicates": [],
+        "exclusions": [
+          {
+            "event_id": "R-53",
+            "event_month": "2026-08",
+            "type": "event_outside_requested_month"
+          }
+        ],
+        "input": {
+          "bytes": 2028,
+          "sha256": "3b510752ef33825a6b25013eca458e5ea4af32c70b16d76d5cb868c8f24e530a",
+          "source": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05/conflict_scope.json"
+        },
+        "lines": [
+          {
+            "coverage_record_indexes": [
+              1
+            ],
+            "coverage_status": "complete",
+            "evidence_findings": [],
+            "excess_quantity": null,
+            "follow_ups": [
+              {
+                "next_action": "Ask the supplied supplier contact to confirm and resolve the remaining receipt quantity.",
+                "recipient": "Ivy at CoilCo",
+                "remaining_quantity": 5,
+                "sender": {
+                  "recipient": "Nila (purchasing)",
+                  "role": "purchasing_coordinator"
+                },
+                "type": "remaining_receipt_follow_up"
+              }
+            ],
+            "included_event_ids": [
+              "R-51",
+              "R-52"
+            ],
+            "observed_uncontested_net_received": 3,
+            "order_id": "PO-C51",
+            "order_record_indexes": [
+              1
+            ],
+            "ordered": 8,
+            "position": "shortfall",
+            "position_is_final": true,
+            "recipient_gaps": [],
+            "remaining_quantity": 5,
+            "sku": "WIRE",
+            "supplier_contact": "Ivy at CoilCo"
+          },
+          {
+            "coverage_record_indexes": [
+              2
+            ],
+            "coverage_status": "incomplete",
+            "evidence_findings": [
+              {
+                "code": "incomplete_coverage",
+                "message": "Coverage explicitly states that the current-month export is incomplete.",
+                "record_indexes": [
+                  2
+                ]
+              }
+            ],
+            "excess_quantity": null,
+            "follow_ups": [
+              {
+                "event_ids": [],
+                "evidence_codes": [
+                  "incomplete_coverage"
+                ],
+                "next_action": "Provide or confirm a complete, valid current-month export for this line before final comparison.",
+                "parties": [
+                  {
+                    "recipient": "Paz (receiving data)",
+                    "role": "data_steward"
+                  }
+                ],
+                "type": "complete_export_confirmation"
+              }
+            ],
+            "included_event_ids": [
+              "R-54"
+            ],
+            "observed_uncontested_net_received": 12,
+            "order_id": "PO-C52",
+            "order_record_indexes": [
+              2
+            ],
+            "ordered": 10,
+            "position": "unconfirmed",
+            "position_is_final": false,
+            "recipient_gaps": [],
+            "remaining_quantity": null,
+            "sku": "BOLT",
+            "supplier_contact": "Jules at FastenCo"
+          },
+          {
+            "coverage_record_indexes": [
+              3
+            ],
+            "coverage_status": "complete",
+            "evidence_findings": [
+              {
+                "code": "conflicting_event_id",
+                "event_id": "R-55",
+                "message": "The same event_id has different content; all variants were excluded.",
+                "record_indexes": [
+                  5,
+                  6
+                ]
+              }
+            ],
+            "excess_quantity": null,
+            "follow_ups": [
+              {
+                "event_ids": [
+                  "R-55"
+                ],
+                "evidence_codes": [
+                  "conflicting_event_id"
+                ],
+                "next_action": "Reconcile the identified order and receipt-event source records before any final line comparison.",
+                "parties": [
+                  {
+                    "recipient": "Nila (purchasing)",
+                    "role": "purchasing_coordinator"
+                  },
+                  {
+                    "recipient": "Paz (receiving data)",
+                    "role": "data_steward"
+                  }
+                ],
+                "type": "source_identity_reconciliation"
+              }
+            ],
+            "included_event_ids": [],
+            "observed_uncontested_net_received": 0,
+            "order_id": "PO-C53",
+            "order_record_indexes": [
+              3
+            ],
+            "ordered": 4,
+            "position": "unconfirmed",
+            "position_is_final": false,
+            "recipient_gaps": [],
+            "remaining_quantity": null,
+            "sku": "LAMP",
+            "supplier_contact": "Kiran at LumenCo"
+          },
+          {
+            "coverage_record_indexes": [
+              4
+            ],
+            "coverage_status": "complete",
+            "evidence_findings": [
+              {
+                "code": "conflicting_event_id",
+                "event_id": "R-55",
+                "message": "The same event_id has different content; all variants were excluded.",
+                "record_indexes": [
+                  5,
+                  6
+                ]
+              }
+            ],
+            "excess_quantity": null,
+            "follow_ups": [
+              {
+                "event_ids": [
+                  "R-55"
+                ],
+                "evidence_codes": [
+                  "conflicting_event_id"
+                ],
+                "next_action": "Reconcile the identified order and receipt-event source records before any final line comparison.",
+                "parties": [
+                  {
+                    "recipient": "Nila (purchasing)",
+                    "role": "purchasing_coordinator"
+                  },
+                  {
+                    "recipient": "Paz (receiving data)",
+                    "role": "data_steward"
+                  }
+                ],
+                "type": "source_identity_reconciliation"
+              }
+            ],
+            "included_event_ids": [],
+            "observed_uncontested_net_received": 0,
+            "order_id": "PO-C54",
+            "order_record_indexes": [
+              4
+            ],
+            "ordered": 7,
+            "position": "unconfirmed",
+            "position_is_final": false,
+            "recipient_gaps": [],
+            "remaining_quantity": null,
+            "sku": "CORD",
+            "supplier_contact": "Lin at CableCo"
+          },
+          {
+            "coverage_record_indexes": [
+              5
+            ],
+            "coverage_status": "complete",
+            "evidence_findings": [],
+            "excess_quantity": null,
+            "follow_ups": [
+              {
+                "next_action": "Ask the supplied supplier contact to confirm and resolve the remaining receipt quantity.",
+                "recipient": "Miro at SealCo",
+                "remaining_quantity": 5,
+                "sender": {
+                  "recipient": "Nila (purchasing)",
+                  "role": "purchasing_coordinator"
+                },
+                "type": "remaining_receipt_follow_up"
+              }
+            ],
+            "included_event_ids": [],
+            "observed_uncontested_net_received": 0,
+            "order_id": "PO-C55",
+            "order_record_indexes": [
+              5
+            ],
+            "ordered": 5,
+            "position": "shortfall",
+            "position_is_final": true,
+            "recipient_gaps": [],
+            "remaining_quantity": 5,
+            "sku": "SEAL",
+            "supplier_contact": "Miro at SealCo"
+          },
+          {
+            "coverage_record_indexes": [
+              0
+            ],
+            "coverage_status": "complete",
+            "evidence_findings": [],
+            "excess_quantity": null,
+            "follow_ups": [
+              {
+                "next_action": "Ask the supplied supplier contact to confirm and resolve the remaining receipt quantity.",
+                "recipient": "Probe supplier",
+                "remaining_quantity": 2,
+                "sender": {
+                  "recipient": "Nila (purchasing)",
+                  "role": "purchasing_coordinator"
+                },
+                "type": "remaining_receipt_follow_up"
+              }
+            ],
+            "included_event_ids": [],
+            "observed_uncontested_net_received": 0,
+            "order_id": "PO-PROBE",
+            "order_record_indexes": [
+              0
+            ],
+            "ordered": 2,
+            "position": "shortfall",
+            "position_is_final": true,
+            "recipient_gaps": [],
+            "remaining_quantity": 2,
+            "sku": "LAMP",
+            "supplier_contact": "Probe supplier"
+          }
+        ],
+        "requested_month": "2026-09",
+        "responsibilities": {
+          "data_steward": "Paz (receiving data)",
+          "purchasing_coordinator": "Nila (purchasing)",
+          "warehouse_lead": "Oren (warehouse)"
+        },
+        "schema_version": "1.0",
+        "scope_issues": [],
+        "summary": {
+          "all_line_positions_final": false,
+          "all_supplied_scope_represented": true,
+          "lines_requiring_follow_up": 6,
+          "position_counts": {
+            "excess": 0,
+            "received_as_ordered": 0,
+            "shortfall": 3,
+            "unconfirmed": 3
+          },
+          "recipient_gaps": [],
+          "represented_order_lines": 6,
+          "supplied_order_records": 6
+        }
+      }
+    }
+  ]
+}

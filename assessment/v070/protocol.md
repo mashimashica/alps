@@ -90,6 +90,8 @@ Creators: gpt-5.6-luna, gpt-5.6-sol and gpt-6-astra, each low/high. Reference co
 
 The base total is up to 2,028 task trials, not including independent grades, double grading, Host sessions or separately recorded development diagnostics. Record measured runtime and available usage data; do not invent monetary costs. At most six child agents run concurrently. An unavailable model/configuration is a recorded limitation, not silently replaced with another under the same label.
 
+The prospective closeout in gates.md bounds additional development, retry and replacement-confirmation task executions at 72 across at most three development rounds. Fresh task trials remain counted even when called diagnostics or Host checks. Its fixed acceptance, missingness, candidate-identity, ranking and convergence rules operationalize this protocol; they were settled before B1 or main creator outputs.
+
 Preselected C families: S01, S03, S05, S06, S09, S10. Main repetitions are distinct creator threads. Additional transfer consumers: gpt-5.6-luna/low and gpt-6-astra/high. Locale creator: gpt-5.6-sol/high. Other-task settings: luna/low and sol/high. Transfer artifacts are selected by a fixed balanced rule before inspecting their results.
 
 ## Improvement and stopping

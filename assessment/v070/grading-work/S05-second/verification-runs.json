@@ -1,0 +1,52 @@
+[
+  {
+    "label": "K51 bundled tests",
+    "cmd": "python3 -m unittest discover -s tests -p 'test_*.py' -v",
+    "workdir": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K51/monthly-receiving-review",
+    "chunk_id": "042537",
+    "exit_code": 0,
+    "original_token_count": 334,
+    "output": "test_conflicting_event_id_is_excluded_and_limited (test_review_receipts.ReceivingReviewTests.test_conflicting_event_id_is_excluded_and_limited) ... ok\ntest_conflicting_order_does_not_block_unrelated_line (test_review_receipts.ReceivingReviewTests.test_conflicting_order_does_not_block_unrelated_line) ... ok\ntest_coverage_conflict_and_missing_recipients_stay_explicit (test_review_receipts.ReceivingReviewTests.test_coverage_conflict_and_missing_recipients_stay_explicit) ... ok\ntest_invalid_event_month_blocks_only_identifiable_line (test_review_receipts.ReceivingReviewTests.test_invalid_event_month_blocks_only_identifiable_line) ... ok\ntest_missing_event_id_blocks_identifiable_current_line (test_review_receipts.ReceivingReviewTests.test_missing_event_id_blocks_identifiable_current_line) ... ok\ntest_shortfall_exact_duplicate_and_exclusions (test_review_receipts.ReceivingReviewTests.test_shortfall_exact_duplicate_and_exclusions) ... ok\ntest_signed_totals_positions_and_incomplete_subtotal (test_review_receipts.ReceivingReviewTests.test_signed_totals_positions_and_incomplete_subtotal) ... ok\ntest_unknown_sku_blocks_all_lines_on_order (test_review_receipts.ReceivingReviewTests.test_unknown_sku_blocks_all_lines_on_order) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.001s\n\nOK\n",
+    "wall_time_seconds": 0.000003556
+  },
+  {
+    "label": "K66 bundled tests",
+    "cmd": "python3 -m unittest discover -s tests -p 'test_*.py' -v",
+    "workdir": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K66/monthly-receiving-review",
+    "chunk_id": "913c17",
+    "exit_code": 0,
+    "original_token_count": 177,
+    "output": "test_conflict_and_unknown_sku_block_only_affected_orders (test_review_receipts.ReviewReceiptsTests.test_conflict_and_unknown_sku_block_only_affected_orders) ... ok\ntest_invalid_requested_month_is_fatal (test_review_receipts.ReviewReceiptsTests.test_invalid_requested_month_is_fatal) ... ok\ntest_positions_duplicates_signed_quantities_and_scope (test_review_receipts.ReviewReceiptsTests.test_positions_duplicates_signed_quantities_and_scope) ... ok\ntest_unlocalizable_current_month_event_blocks_all_lines (test_review_receipts.ReviewReceiptsTests.test_unlocalizable_current_month_event_blocks_all_lines) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.131s\n\nOK\n",
+    "wall_time_seconds": 0.069362192
+  },
+  {
+    "label": "K14 compile",
+    "cmd": "python3 -m compileall -q scripts",
+    "workdir": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K14/receiving-review",
+    "chunk_id": "1d7a52",
+    "exit_code": 0,
+    "original_token_count": 0,
+    "output": "",
+    "wall_time_seconds": 0.000003415
+  },
+  {
+    "label": "K23 compile",
+    "cmd": "python3 -m compileall -q scripts",
+    "workdir": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K23/receiving-review",
+    "chunk_id": "4d9152",
+    "exit_code": 0,
+    "original_token_count": 0,
+    "output": "",
+    "wall_time_seconds": 0.000003258
+  },
+  {
+    "label": "K23 documented direct invocation",
+    "cmd": "scripts/review_receiving.py /workspace/scratch/a75c3a6d9076/alps-v070-assessment/blind/S05/original-consumer-inputs/ordinary/receiving.json",
+    "workdir": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S05-second/K23/receiving-review",
+    "chunk_id": "97710c",
+    "exit_code": 126,
+    "original_token_count": 17,
+    "output": "/bin/bash: line 1: scripts/review_receiving.py: Permission denied\n",
+    "wall_time_seconds": 0
+  }
+]

@@ -74,7 +74,7 @@ def mark():
     print(f"Recorded hashes for {len(hashes)} verified published files")
 
 
-def export(offset=0, limit=None):
+def export(offset=0, limit=None, char_offset=None, char_limit=8000):
     verify()
     previous_path = ROOT / ".local" / "published-hashes.json"
     previous = json.loads(previous_path.read_text()) if previous_path.exists() else {}
@@ -89,7 +89,11 @@ def export(offset=0, limit=None):
             raise SystemExit(f"Non-text evidence needs an explicit direct storage route: {relative}")
         entries.append({"path": "assessment/v070/" + relative.as_posix(), "mode": file_mode(path), "type": "blob", "content": value})
     selected = entries[offset:] if limit is None else entries[offset:offset+limit]
-    print(json.dumps(selected, ensure_ascii=False))
+    encoded = json.dumps(selected, ensure_ascii=False)
+    if char_offset is None:
+        print(encoded)
+    else:
+        print(encoded[char_offset:char_offset + char_limit], end="")
 
 
 if __name__ == "__main__":
@@ -97,6 +101,8 @@ if __name__ == "__main__":
     parser.add_argument("operation", choices=("freeze", "verify", "export", "mark"))
     parser.add_argument("--offset", type=int, default=0)
     parser.add_argument("--limit", type=int)
+    parser.add_argument("--char-offset", type=int)
+    parser.add_argument("--char-limit", type=int, default=8000)
     parser.add_argument("--root", type=Path)
     args = parser.parse_args()
     if args.root is not None:
@@ -110,4 +116,4 @@ if __name__ == "__main__":
         verify()
         print("Frozen input hashes verified")
     else:
-        export(args.offset, args.limit)
+        export(args.offset, args.limit, args.char_offset, args.char_limit)
