@@ -1,0 +1,116 @@
+{
+  "month": "2026-06",
+  "lines": [
+    {
+      "order_id": "PO-R2606-410",
+      "sku": "LABEL-60",
+      "ordered": 120,
+      "event_ids": [
+        "RCV-H1801",
+        "RCV-H1802",
+        "RCV-H1803"
+      ],
+      "evidence_issues": [],
+      "evidence_complete": true,
+      "observed_net_received": 120,
+      "position": "received as ordered"
+    },
+    {
+      "order_id": "PO-R2606-410",
+      "sku": "CARTON-M",
+      "ordered": 80,
+      "event_ids": [
+        "RCV-H1804",
+        "RCV-H1805"
+      ],
+      "evidence_issues": [],
+      "evidence_complete": true,
+      "observed_net_received": 42,
+      "position": "shortfall"
+    },
+    {
+      "order_id": "PO-R2606-411",
+      "sku": "GLOVE-N",
+      "ordered": 60,
+      "event_ids": [
+        "RCV-H1806",
+        "RCV-H1807"
+      ],
+      "evidence_issues": [],
+      "evidence_complete": true,
+      "observed_net_received": 64,
+      "position": "excess"
+    },
+    {
+      "order_id": "PO-R2606-412",
+      "sku": "FILM-300",
+      "ordered": 24,
+      "event_ids": [
+        "RCV-H1808"
+      ],
+      "evidence_issues": [],
+      "evidence_complete": true,
+      "observed_net_received": 24,
+      "position": "received as ordered"
+    },
+    {
+      "order_id": "PO-R2606-413",
+      "sku": "SEAL-BLUE",
+      "ordered": 40,
+      "event_ids": [
+        "RCV-H1809",
+        "RCV-H1810"
+      ],
+      "evidence_issues": [
+        "receiving export is not confirmed complete"
+      ],
+      "evidence_complete": false,
+      "observed_net_received": 30,
+      "position": "undetermined"
+    },
+    {
+      "order_id": "PO-R2606-414",
+      "sku": "TAPE-48",
+      "ordered": 30,
+      "event_ids": [],
+      "evidence_issues": [],
+      "evidence_complete": true,
+      "observed_net_received": null,
+      "position": "shortfall"
+    }
+  ],
+  "follow_ups": [
+    {
+      "order_id": "PO-R2606-410",
+      "sku": "CARTON-M",
+      "recipient": "Mara Quinn <mara.quinn@harborpack.example>",
+      "draft": "Ask the supplier contact to confirm the remaining 38 unit(s) for PO-R2606-410 / CARTON-M."
+    },
+    {
+      "order_id": "PO-R2606-411",
+      "sku": "GLOVE-N",
+      "recipient": "Noel Price <noel.price@juniperworks.example>",
+      "draft": "Reconcile the 4 unit surplus for PO-R2606-411 / GLOVE-N against the order and receiving evidence."
+    },
+    {
+      "order_id": "PO-R2606-413",
+      "sku": "SEAL-BLUE",
+      "recipient": "Simone Bell <simone.bell@juniperworks.example>",
+      "draft": "Provide or confirm the full 2026-06 export for PO-R2606-413 / SEAL-BLUE before making the final receipt comparison."
+    },
+    {
+      "order_id": "PO-R2606-414",
+      "sku": "TAPE-48",
+      "recipient": "Owen Malik <owen.malik@bindwell.example>",
+      "draft": "Ask the supplier contact to confirm the remaining 30 unit(s) for PO-R2606-414 / TAPE-48."
+    }
+  ],
+  "issues": [
+    {
+      "order_id": "PO-R2606-413",
+      "sku": "SEAL-BLUE",
+      "issue": "receiving export is not confirmed complete"
+    }
+  ],
+  "validation_errors": []
+}

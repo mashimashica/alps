@@ -1,0 +1,179 @@
+{
+  "lines": [
+    {
+      "coverage_complete": true,
+      "coverage_declared": true,
+      "event_ids": [
+        "RCV-K7101",
+        "RCV-K7102",
+        "RCV-K7103"
+      ],
+      "identity_conflict": true,
+      "observed_subtotal": 90,
+      "order_id": "PO-S2607-820",
+      "ordered": 100,
+      "sku": "BOLT-M8"
+    },
+    {
+      "coverage_complete": true,
+      "coverage_declared": true,
+      "event_ids": [
+        "RCV-K7104"
+      ],
+      "identity_conflict": true,
+      "observed_subtotal": 200,
+      "order_id": "PO-S2607-820",
+      "ordered": 200,
+      "sku": "WASHER-M8"
+    },
+    {
+      "coverage_complete": true,
+      "coverage_declared": true,
+      "event_ids": [
+        "RCV-K7106",
+        "RCV-K7107"
+      ],
+      "identity_conflict": true,
+      "observed_subtotal": 38,
+      "order_id": "PO-S2607-821",
+      "ordered": 48,
+      "sku": "PACK-RACK"
+    },
+    {
+      "coverage_complete": true,
+      "coverage_declared": true,
+      "event_ids": [
+        "RCV-K7109"
+      ],
+      "identity_conflict": true,
+      "observed_subtotal": 60,
+      "order_id": "PO-S2607-821",
+      "ordered": 60,
+      "sku": "STRAP-20"
+    },
+    {
+      "coverage_complete": true,
+      "coverage_declared": true,
+      "event_ids": [
+        "RCV-K7108",
+        "RCV-K7107"
+      ],
+      "identity_conflict": true,
+      "observed_subtotal": 40,
+      "order_id": "PO-S2607-822",
+      "ordered": 40,
+      "sku": "SHIELD-CLR"
+    },
+    {
+      "coverage_complete": false,
+      "coverage_declared": true,
+      "event_ids": [
+        "RCV-K7110",
+        "RCV-K7111"
+      ],
+      "identity_conflict": false,
+      "observed_subtotal": 34,
+      "order_id": "PO-S2607-823",
+      "ordered": 30,
+      "sku": "POUCH-12"
+    },
+    {
+      "coverage_complete": false,
+      "coverage_declared": false,
+      "event_ids": [
+        "RCV-K7112",
+        "RCV-K7113"
+      ],
+      "identity_conflict": false,
+      "observed_subtotal": 9,
+      "order_id": "PO-S2607-824",
+      "ordered": 18,
+      "sku": "TRAY-L"
+    },
+    {
+      "coverage_complete": false,
+      "coverage_declared": true,
+      "event_ids": [],
+      "identity_conflict": false,
+      "observed_subtotal": 0,
+      "order_id": "PO-S2607-825",
+      "ordered": 25,
+      "sku": "BINDER-B"
+    },
+    {
+      "coverage_complete": true,
+      "coverage_declared": true,
+      "event_ids": [
+        "RCV-K7114",
+        "RCV-K7115",
+        "RCV-K7116"
+      ],
+      "identity_conflict": false,
+      "observed_subtotal": 75,
+      "order_id": "PO-S2607-826",
+      "ordered": 70,
+      "sku": "INSERT-G"
+    },
+    {
+      "coverage_complete": true,
+      "coverage_declared": true,
+      "event_ids": [
+        "RCV-K7117",
+        "RCV-K7118",
+        "RCV-K7119"
+      ],
+      "identity_conflict": false,
+      "observed_subtotal": 18,
+      "order_id": "PO-S2607-827",
+      "ordered": 40,
+      "sku": "WRAP-500"
+    },
+    {
+      "coverage_complete": true,
+      "coverage_declared": true,
+      "event_ids": [
+        "RCV-K7120",
+        "RCV-K7121"
+      ],
+      "identity_conflict": false,
+      "observed_subtotal": 10,
+      "order_id": "PO-S2607-828",
+      "ordered": 10,
+      "sku": "CLIP-R"
+    },
+    {
+      "coverage_complete": true,
+      "coverage_declared": true,
+      "event_ids": [
+        "RCV-K7122",
+        "RCV-K7123"
+      ],
+      "identity_conflict": false,
+      "observed_subtotal": -4,
+      "order_id": "PO-S2607-829",
+      "ordered": 12,
+      "sku": "PAD-FOAM"
+    },
+    {
+      "coverage_complete": true,
+      "coverage_declared": true,
+      "event_ids": [],
+      "identity_conflict": false,
+      "observed_subtotal": 0,
+      "order_id": "PO-S2607-830",
+      "ordered": 16,
+      "sku": "CRATE-S"
+    }
+  ],
+  "month": "2026-07",
+  "out_of_scope_events": [
+    {
+      "event_id": "RCV-K7124",
+      "event_month": "2026-07",
+      "order_id": "PO-S2607-899",
+      "quantity": 500,
+      "sku": "WRAP-500"
+    }
+  ],
+  "validation_errors": []
+}
