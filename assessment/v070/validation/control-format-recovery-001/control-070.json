@@ -1,0 +1,20 @@
+{
+  "observation_utc": "2026-09-07T23:18:52.166004+00:00",
+  "scope": "New recovery-time physical Agent Skill format observation; not the missing original report, semantic validity or effectiveness",
+  "validator_source": "agentskills/agentskills@f130f348f502d9804278a617f86929846896d2e9 skills-ref",
+  "trial": "control-070",
+  "target_sha256": {
+    "SKILL.md": "fbcd4df0d8b9982418ea03cf932a52890724199153693bb0d11f806e2f6a2b13",
+    "assets/release-request.json": "c722ac5cd8ccffe58d5ebc9a183e1f408aad14023d98f4548dfd0ba183548e81",
+    "references/interface.md": "fbba8572896b42c590a6690216400e633fae8a5485bcd8c0c9392ab693c90a4f"
+  },
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+    "validate",
+    "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/control-070/deliverables/skills/checkout-release"
+  ],
+  "exit_code": 0,
+  "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/control-070/deliverables/skills/checkout-release\n",
+  "stderr": ""
+}

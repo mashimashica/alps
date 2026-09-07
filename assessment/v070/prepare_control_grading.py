@@ -15,6 +15,7 @@ import stat
 
 from prepare_control_consumers import artifact_inventory, checked_path, ignore_runtime_caches
 from recovery_ledger_binding import record_path, validate_snapshot_identity
+import recovered_control_grading
 
 ROOT = Path(__file__).resolve().parent
 ALLOCATION_SHA256 = "bb463eceeccea6502418daf3263558d386c8fd31f4b1dcfe4f5fba411c577a0f"
@@ -184,7 +185,9 @@ def main():
                     or assignment["context"] != "fresh"
                     or assignment["artifact_freeze_sha256"] != sha(freeze_path)):
                 raise ValueError(f"Application identity differs: {use_id}")
-            for name in ("answer.md", "execution-note.md", "prompt.md"):
+            supplemented = family == "S06" and use_id in recovered_control_grading.ASSIGNMENT_SHA256
+            required = ("prompt.md",) if supplemented else ("answer.md", "execution-note.md", "prompt.md")
+            for name in required:
                 if not (folder / name).is_file():
                     raise ValueError(f"Completed observation is absent: {use_id}/{name}")
             if sha(folder / "prompt.md") != assignment["prompt_sha256"]:
@@ -210,14 +213,15 @@ def main():
                 if (state.parent.parent != ROOT.parent or state.name != "ledger.sqlite" or
                         not state.parent.name.startswith(use_id + "-ledger-state-")):
                     raise ValueError(f"Native allocated state identity differs: {use_id}")
-                for label in ("initial", "final"):
+                for label in (("initial",) if supplemented else ("initial", "final")):
                     snapshot = ROOT / "state-snapshots" / use_id
                     metadata = read_json(snapshot / f"{label}.json")
                     if (metadata.get("consumer_id") != use_id or metadata.get("snapshot") != label
                             or sha(snapshot / f"{label}.sql") != metadata["sql_sha256"]):
                         raise ValueError(f"Native state evidence differs: {use_id}/{label}")
                     validate_snapshot_identity(ROOT, use_id, setup, label, metadata)
-            applications.append((variant, use_id, folder, assignment))
+            recovered = recovered_control_grading.plan_application(ROOT, use_id, assignment) if supplemented else None
+            applications.append((variant, use_id, folder, assignment, recovered))
         plans.append((code, creator_id, package, applications))
     target.mkdir(parents=True, exist_ok=False)
     excluded_caches = {}
@@ -225,6 +229,8 @@ def main():
     copy_file(ROOT / "grading-guidance.md", target / "grading-guidance.md")
     with (target / "judgment-boundaries.md").open("x", encoding="utf-8") as stream:
         stream.write(BOUNDARIES)
+        if any(app[4] is not None for _, _, _, apps in plans for app in apps):
+            stream.write(recovered_control_grading.BOUNDARY_ADDENDUM)
     for relative in original_files:
         copy_file(ROOT / "frozen/main-cases" / family / relative,
                   target / "original-creator-input" / relative)
@@ -247,8 +253,12 @@ def main():
             else:
                 copy_file(path, destination)
         mapping[code] = {"creator": creator_id, "consumers": []}
-        for variant, use_id, folder, assignment in applications:
+        for variant, use_id, folder, assignment, recovered in applications:
             dest = candidate / variant
+            if recovered is not None:
+                recovered_control_grading.write_application(ROOT, recovered, dest, copy_file)
+                mapping[code]["consumers"].append(use_id)
+                continue
             application_caches = artifact_inventory(folder)[1]
             if application_caches:
                 excluded_caches[folder.relative_to(ROOT).as_posix()] = application_caches

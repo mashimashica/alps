@@ -1,0 +1,65 @@
+{
+  "observed_utc": "2026-09-07T23:18:51.841757+00:00",
+  "scope": "Exclusive byte-for-byte rematerialization of reviewed retained authored text. No authoring or business execution. Original coordinator validation/freeze/preparation bytes remain unavailable.",
+  "review_path": "audits/recovered-evidence-sufficiency-review.md",
+  "review_sha256": "b396d405b574b5dbed485a1773c97bc6cf01e5ab738ed697ff06075b7ef8f38b",
+  "source_provenance_sha256": "dbc8daf266df30f2cdd99216491caebd0937a5209f69be3acaea1ee83b1209c2",
+  "files": [
+    {
+      "source_path": "recovery/extracted-creators/control-071/deliverables/skills/checkout-release/SKILL.md",
+      "destination_path": "trials/control-071/deliverables/skills/checkout-release/SKILL.md",
+      "sha256": "bebf2179ccd570a8a720195374974641943bd6cfa00bf1e3017812a7ad6781f2",
+      "new_placement_mode": "0644",
+      "original_mode": "unavailable"
+    },
+    {
+      "source_path": "recovery/extracted-creators/control-071/deliverables/skills/checkout-release/references/release-interface.md",
+      "destination_path": "trials/control-071/deliverables/skills/checkout-release/references/release-interface.md",
+      "sha256": "6a07585c88b0d830a18c6efb37779a65e8f8c1af909fb6c3f189b3a9d9620529",
+      "new_placement_mode": "0644",
+      "original_mode": "unavailable"
+    },
+    {
+      "source_path": "recovery/extracted-creators/control-071/deliverables/skills/checkout-release/assets/release-request.json",
+      "destination_path": "trials/control-071/deliverables/skills/checkout-release/assets/release-request.json",
+      "sha256": "9d06ff9ca3875eeb20acf7d15d6a4c65e22c1a65a6ff4df94b0e11e7b7fb0f26",
+      "new_placement_mode": "0644",
+      "original_mode": "unavailable"
+    },
+    {
+      "source_path": "recovery/extracted-creators/control-071/execution-note.md",
+      "destination_path": "trials/control-071/execution-note.md",
+      "sha256": "a0afe632487602bad243bd24e071b88ad803812615a8606de7f72eb4d3569626",
+      "new_placement_mode": "0644",
+      "original_mode": "unavailable"
+    },
+    {
+      "source_path": "recovery/extracted-creators/control-072/deliverables/skills/checkout-service-release/SKILL.md",
+      "destination_path": "trials/control-072/deliverables/skills/checkout-service-release/SKILL.md",
+      "sha256": "91bc6db2f85646194abd9d4892fbdeebf21dba5159bdf0f2e205646502396fbc",
+      "new_placement_mode": "0644",
+      "original_mode": "unavailable"
+    },
+    {
+      "source_path": "recovery/extracted-creators/control-072/deliverables/skills/checkout-service-release/assets/release-context.template.json",
+      "destination_path": "trials/control-072/deliverables/skills/checkout-service-release/assets/release-context.template.json",
+      "sha256": "f5393ac11cbf94218ecc6f64f24a3b40431751148deb5f22086fd27bf2b3b962",
+      "new_placement_mode": "0644",
+      "original_mode": "unavailable"
+    },
+    {
+      "source_path": "recovery/extracted-creators/control-072/deliverables/skills/checkout-service-release/references/interface.md",
+      "destination_path": "trials/control-072/deliverables/skills/checkout-service-release/references/interface.md",
+      "sha256": "b2a8bd70dd2a568a635f38e6e03985f5401977abb6f8d30ca508b4d80643c61b",
+      "new_placement_mode": "0644",
+      "original_mode": "unavailable"
+    },
+    {
+      "source_path": "recovery/extracted-creators/control-072/execution-note.md",
+      "destination_path": "trials/control-072/execution-note.md",
+      "sha256": "eb833ccecc88626b8f52a2ece1b1393d9add0c6e0247dd24d02d58215c397313",
+      "new_placement_mode": "0644",
+      "original_mode": "unavailable"
+    }
+  ]
+}

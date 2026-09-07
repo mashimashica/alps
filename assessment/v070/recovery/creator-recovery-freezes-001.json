@@ -1,0 +1,168 @@
+{
+  "observation_utc": "2026-09-07T23:22:01.008378+00:00",
+  "scope": "New recovery freezes and reconstructed fixed consumer preparation; no new authoring, business run, retry, source edit or quality judgment. Canonical freeze paths are current recovery products, not recovered historical manifests.",
+  "evidence_reviews": [
+    {
+      "path": "audits/environment-restoration-review.md",
+      "sha256": "b24460ae1ebd8813cd67e378d894e7ef97ed0b427c503f2e80345484eeff7890"
+    },
+    {
+      "path": "audits/recovered-evidence-sufficiency-review.md",
+      "sha256": "b396d405b574b5dbed485a1773c97bc6cf01e5ab738ed697ff06075b7ef8f38b"
+    }
+  ],
+  "rematerialization": {
+    "path": "recovery/creator-rematerialization-001.json",
+    "sha256": "e3384a22eb996eb457c085aaaf0463980d53ee274125fc102a579fdf6a388392"
+  },
+  "common_display_recovery": {
+    "path": "audits/common-aid-display-restoration.md",
+    "sha256": "3d243637cf24f9ff04340e8d2e10fb5ceb7c1c9961fbf9d1fc55f45e2ea14a07"
+  },
+  "creators": {
+    "control-069": {
+      "content_provenance": "Committed original bytes at75c0ea9 corroborated by original authored-text relay",
+      "relay": {
+        "path": "recovery/control-069-authored-text.md",
+        "sha256": "0d3a07d2c81aed3827db60896df08244c096606f1bc80cbcb70a0e001f427456"
+      },
+      "format_observation": {
+        "path": "validation/control-format-recovery-001/control-069.json",
+        "sha256": "82419e6f7e7278142fbff5136adcf8a91369a199c99dc2e14c0bc2c42346d0a5"
+      },
+      "freeze_manifest": {
+        "path": "control-artifact-freezes/control-069.json",
+        "sha256": "3e62632b6db3d567a60aeea45365b0e7322a1e26c009011e6aaaa30103b65bd6"
+      },
+      "frozen_resource_sha256": {
+        "SKILL.md": "c874a35595d8a0a4d8b962732a4463fd40bfbf1bc898ba9296ec70004d777b3e",
+        "assets/release-request.json": "d75a599912be5fac9c5c49ce2aa1e49572316d1466b95cba2f871926302e39d0",
+        "references/tool-contract.md": "55f1d2f05cf027830f5137430a80cc3a28a97c29410a76f80bc6b3ab2b2e101c"
+      },
+      "newly_observed_source_file_modes": {
+        "SKILL.md": 420,
+        "assets/release-request.json": 420,
+        "references/tool-contract.md": 420
+      },
+      "consumer_assignments": [
+        {
+          "path": "consumer-assignments/C-U137.json",
+          "sha256": "452521f430f17203853f3dd0c114ca7b34f8f7b2a84bc95044d5439306e85550"
+        },
+        {
+          "path": "consumer-assignments/C-U138.json",
+          "sha256": "b00ec53685c496ffc0830ed9c780cff4e556e250ff8530143c5a636660b478fa"
+        }
+      ],
+      "historical_limits": "These are new recovery-time validation, freezes and reconstructed preparation. The lost original coordinator format report, freeze manifest and preparation bytes are unavailable. Source modes describe current recovery observations; original-mode attestation exists only where committed originals survive."
+    },
+    "control-070": {
+      "content_provenance": "Committed original bytes at75c0ea9 corroborated by original authored-text relay",
+      "relay": {
+        "path": "recovery/control-070-authored-text.md",
+        "sha256": "a40cd71e3b01a52879d6a3ff1e43b23e5bb8030728b6e0f6bcc48340963e2e3f"
+      },
+      "format_observation": {
+        "path": "validation/control-format-recovery-001/control-070.json",
+        "sha256": "23e4681e8c0214ab40d9a8377c09261386fe85b24e10e70e1f77c28fc0d09b36"
+      },
+      "freeze_manifest": {
+        "path": "control-artifact-freezes/control-070.json",
+        "sha256": "3ae7dd5b69774f54b33884cc2781d6b8a3b5d082de26ccca6db66875cabd643f"
+      },
+      "frozen_resource_sha256": {
+        "SKILL.md": "fbcd4df0d8b9982418ea03cf932a52890724199153693bb0d11f806e2f6a2b13",
+        "assets/release-request.json": "c722ac5cd8ccffe58d5ebc9a183e1f408aad14023d98f4548dfd0ba183548e81",
+        "references/interface.md": "fbba8572896b42c590a6690216400e633fae8a5485bcd8c0c9392ab693c90a4f"
+      },
+      "newly_observed_source_file_modes": {
+        "SKILL.md": 420,
+        "assets/release-request.json": 420,
+        "references/interface.md": 420
+      },
+      "consumer_assignments": [
+        {
+          "path": "consumer-assignments/C-U139.json",
+          "sha256": "512c3608753bd27947df44e3185864afd93dc273f1607240506eaf60b7743e70"
+        },
+        {
+          "path": "consumer-assignments/C-U140.json",
+          "sha256": "ea7794a71689a00d98aba2be08f070a872b373ea05a09702f1d46ffdcbb7e2dc"
+        }
+      ],
+      "historical_limits": "These are new recovery-time validation, freezes and reconstructed preparation. The lost original coordinator format report, freeze manifest and preparation bytes are unavailable. Source modes describe current recovery observations; original-mode attestation exists only where committed originals survive."
+    },
+    "control-071": {
+      "content_provenance": "Reviewed complete retained successful authored text; exclusive rematerialization at new observed mode0644",
+      "relay": {
+        "path": "recovery/control-071-authored-text.md",
+        "sha256": "94131018b4cade42cb16786ba875166073b793493bb6ccacd2735fa3f422ca01"
+      },
+      "format_observation": {
+        "path": "validation/control-format-recovery-001/control-071.json",
+        "sha256": "2dcff3098dc4eb0ec9a0852f270a25f145e6ffa0fb9a8b15c50e1d7f12ad8df8"
+      },
+      "freeze_manifest": {
+        "path": "control-artifact-freezes/control-071.json",
+        "sha256": "6e7150aabde25b81b9307b186808633c72e88d9dcc0c930dde42dce92b9a87c8"
+      },
+      "frozen_resource_sha256": {
+        "SKILL.md": "bebf2179ccd570a8a720195374974641943bd6cfa00bf1e3017812a7ad6781f2",
+        "assets/release-request.json": "9d06ff9ca3875eeb20acf7d15d6a4c65e22c1a65a6ff4df94b0e11e7b7fb0f26",
+        "references/release-interface.md": "6a07585c88b0d830a18c6efb37779a65e8f8c1af909fb6c3f189b3a9d9620529"
+      },
+      "newly_observed_source_file_modes": {
+        "SKILL.md": 420,
+        "assets/release-request.json": 420,
+        "references/release-interface.md": 420
+      },
+      "consumer_assignments": [
+        {
+          "path": "consumer-assignments/C-U141.json",
+          "sha256": "44a8c7f440e116bca463a55ca84c70a68735e7479cf8cffdabfb7a3a2ef6eed4"
+        },
+        {
+          "path": "consumer-assignments/C-U142.json",
+          "sha256": "ffd43c9bbd178929283ad83586b0c92fa4bede637366881db6eae01cdb3a1a56"
+        }
+      ],
+      "historical_limits": "These are new recovery-time validation, freezes and reconstructed preparation. The lost original coordinator format report, freeze manifest and preparation bytes are unavailable. Source modes describe current recovery observations; original-mode attestation exists only where committed originals survive."
+    },
+    "control-072": {
+      "content_provenance": "Reviewed complete retained successful authored text; exclusive rematerialization at new observed mode0644",
+      "relay": {
+        "path": "recovery/control-072-authored-text.md",
+        "sha256": "359294217d7731bce81b23bfe92424fbc4cd4361f19b0957c7b86b1d0dc86901"
+      },
+      "format_observation": {
+        "path": "validation/control-format-recovery-001/control-072.json",
+        "sha256": "3895a2eed02a59c3e4f24c86faf931c5332fcd3069d89323a7e4cf12d70c6269"
+      },
+      "freeze_manifest": {
+        "path": "control-artifact-freezes/control-072.json",
+        "sha256": "c72f4e02301dcf76fc7f7237a4deb1d4e9e39185bffe67c6c6e2bfc44e27e89d"
+      },
+      "frozen_resource_sha256": {
+        "SKILL.md": "91bc6db2f85646194abd9d4892fbdeebf21dba5159bdf0f2e205646502396fbc",
+        "assets/release-context.template.json": "f5393ac11cbf94218ecc6f64f24a3b40431751148deb5f22086fd27bf2b3b962",
+        "references/interface.md": "b2a8bd70dd2a568a635f38e6e03985f5401977abb6f8d30ca508b4d80643c61b"
+      },
+      "newly_observed_source_file_modes": {
+        "SKILL.md": 420,
+        "assets/release-context.template.json": 420,
+        "references/interface.md": 420
+      },
+      "consumer_assignments": [
+        {
+          "path": "consumer-assignments/C-U143.json",
+          "sha256": "3ce60b32a229f9497ec2a6000f8d84bd960fc0f4b40e9ece81053808a35765ac"
+        },
+        {
+          "path": "consumer-assignments/C-U144.json",
+          "sha256": "c3c3c5bb101631fd5e5ac0b1f302a7a175f4cb7bc39d997fbe96ffe533a1900b"
+        }
+      ],
+      "historical_limits": "These are new recovery-time validation, freezes and reconstructed preparation. The lost original coordinator format report, freeze manifest and preparation bytes are unavailable. Source modes describe current recovery observations; original-mode attestation exists only where committed originals survive."
+    }
+  }
+}

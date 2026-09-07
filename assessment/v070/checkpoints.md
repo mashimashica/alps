@@ -79,3 +79,7 @@ Verified commit `95cc0e23a69f8eca8f8cae64bac7adea8ed2c696`, tree `ecd225acf4d144
 ## Recovered text and continuation checkpoint
 
 Verified commit `fcedf4b0c327843f334ae0b8a547fa09f6cfc48e`, tree `085779dc6414871b62cd7beecc15952c4a179757`, parent `95cc0e23a69f8eca8f8cae64bac7adea8ed2c696`. Snapshot `../assessment-checkpoint-Yke79O`; 51 changed entries and 5,340 published files. Commit parent/tree/author-matching DCO, non-forced ref and all 51 changed UTF-8 file contents were verified by exact-commit read-back. The save includes extracted creator/consumer text and matched-SQL supplements with provenance, plus started continuation observations; it does not attest later task completions or independent approval of in-progress recovery code.
+
+## First resumed business batch
+
+Verified commit `dbbc1c6d2198fb8c0ed55f5a7e42329b77918bcd`, tree `2f33ccc4b55359108ecd4b142c13dc336bd6366c`, parent `fcedf4b0c327843f334ae0b8a547fa09f6cfc48e`. Snapshot `../assessment-checkpoint-HR1bZv`;125 changed entries and5,457 published files. Exact commit/ref/DCO and all125 changed Git blob hashes/modes were fetched and compared with the submitted UTF-8 content identities. This preserves final C-U097–100 evidence and the native-SQL observations of15 actual second-review disposable databases. The grader subsequently confirmed all database writes were finished; all15 source hashes still match. Component observations are separate from original business trials. Later independent recovery reviews and C-U101–105 completions await the next save.
