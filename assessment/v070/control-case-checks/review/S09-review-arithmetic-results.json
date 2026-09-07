@@ -1,0 +1,108 @@
+{
+  "all_assertions_passed": true,
+  "cases": {
+    "challenging": {
+      "comparison_adjusted_expected_avoided_errors": "-864/5",
+      "comparison_adjusted_extra_labor_hours": "144",
+      "comparison_adjusted_net_benefit_usd": "-14400",
+      "comparison_adjusted_no_check_headroom_hours": "6/5",
+      "comparison_adjusted_no_check_hours_per_shift": "504/5",
+      "comparison_adjusted_reduction_percentage_points": "-3/5",
+      "dispatch": {
+        "all_pilot": {
+          "late": 42,
+          "rate": "1/100",
+          "shipped": 4200
+        },
+        "full_shifts": {
+          "late": 42,
+          "rate": "7/600",
+          "shipped": 3600
+        }
+      },
+      "linear_full_check_hours_per_shift": "108",
+      "parameters_from_packet": {
+        "cap_hours": 102,
+        "error_cost_usd": 55,
+        "planned_orders_per_shift": 1440,
+        "snapshot_date": "2026-08-31",
+        "standard_share": "7/10",
+        "wage_usd": 34
+      },
+      "planned_mix_quality_rates": {
+        "Alder/baseline": "4/125",
+        "Alder/pilot": "37/1000",
+        "Birch/baseline": "13/500",
+        "Birch/pilot": "1/40"
+      },
+      "raw_net_benefit_usd": "-14448",
+      "shipment_age_calendar_days_at_snapshot": {
+        "2026-08-03": 28,
+        "2026-08-04": 27,
+        "2026-08-05": 26,
+        "2026-08-17": 14,
+        "2026-08-18": 13,
+        "2026-08-19": 12,
+        "2026-08-28": 3
+      },
+      "source_sha256": {
+        "decision_context.md": "6be5c47c8e0f2694b101e347fe426d718722d1c1faa5f550594dd2d2fd7ff86c",
+        "measurement_notes.md": "5f5b74ba22dce01da904cff2025b013c5c9d55ce56b247c28ba1a5500a3e3a78",
+        "shift_operations.csv": "3c2afe07beaeb67a012b790435d2b29beed50e9b46d578223c5809693e1e8e5d",
+        "shipment_cohorts.csv": "d7eb6b5d4b00da5f0f4bb418bfb83e490d444a5c2d281022ba545ec99e55edec"
+      }
+    },
+    "ordinary": {
+      "comparison_adjusted_expected_avoided_errors": "200",
+      "comparison_adjusted_extra_labor_hours": "60",
+      "comparison_adjusted_net_benefit_usd": "7680",
+      "comparison_adjusted_no_check_headroom_hours": "6",
+      "comparison_adjusted_no_check_hours_per_shift": "62",
+      "comparison_adjusted_reduction_percentage_points": "5/4",
+      "dispatch": {
+        "all_pilot": {
+          "late": 15,
+          "rate": "3/544",
+          "shipped": 2720
+        },
+        "full_shifts": {
+          "late": 13,
+          "rate": "13/2400",
+          "shipped": 2400
+        }
+      },
+      "linear_full_check_hours_per_shift": "65",
+      "parameters_from_packet": {
+        "cap_hours": 68,
+        "error_cost_usd": 48,
+        "planned_orders_per_shift": 800,
+        "snapshot_date": "2026-08-03",
+        "standard_share": "3/4",
+        "wage_usd": 32
+      },
+      "planned_mix_quality_rates": {
+        "Harbor/baseline": "21/800",
+        "Harbor/pilot": "1/80",
+        "Ridge/baseline": "21/800",
+        "Ridge/pilot": "1/40"
+      },
+      "raw_net_benefit_usd": "8640",
+      "shipment_age_calendar_days_at_snapshot": {
+        "2026-07-06": 28,
+        "2026-07-07": 27,
+        "2026-07-08": 26,
+        "2026-07-20": 14,
+        "2026-07-21": 13,
+        "2026-07-22": 12,
+        "2026-07-31": 3
+      },
+      "source_sha256": {
+        "decision_context.md": "db617bd327c581d41163649f373944101be1394c760359d77760b395ba42d267",
+        "measurement_notes.md": "4f89f6c363b70e69e5acdabde1ba46f3ca96c4a65530ac524a47786830f4a91e",
+        "shift_operations.csv": "821cefcd24d45b7acebc6a30d1b9f3ab6f2f2cbb300a66aee359ef7cd2779c85",
+        "shipment_cohorts.csv": "280644532300832a9b74e2b3bc8daf7318f42124bf74f50f630dd22c15ea25b0"
+      }
+    }
+  },
+  "scope": "Independent arithmetic/timing review only; projections are conditional assumptions, not demonstrated effects or capacities."
+}
