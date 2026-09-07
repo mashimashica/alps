@@ -47,7 +47,7 @@ Do not infer Process requirements from tests, templates, Host manifests, icons, 
 Keep the following evidence distinct:
 
 1. Agent Skill and Plugin form validation against their applicable formats.
-2. Repository integrity: required files, versions, relative links, symlinks, Host resources, and distribution boundaries.
+2. Repository validation: automated checks of manifest versions and relative links, and review of affected file layout, symlinks, Host resources, and distribution boundaries.
 3. Semantic review: purpose and Outcome sufficiency, required details and obligations, references, evaluation limits, and English/Japanese meaning and normative force.
 4. Tool and connection verification against the specified behavior, including failures and incomplete results.
 5. Work-system effectiveness through representative work with an agent, information, tools, and environment, assessed against the work's Outcomes and conditions.
