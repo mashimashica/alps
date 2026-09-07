@@ -21,6 +21,7 @@ The user authorized execution of the finalized assessment/improvement plan on 20
 4. Verify frozen input hashes. Do not update baseline A when main advances. Reconcile the eventual PR with current main separately.
 5. Resume the earliest unfinished dependency. Never rerun completed trials just to get better results.
 6. Save a durable checkpoint after each generation or consumer batch and before changing phase. Use the separate assessment/v070-evidence GitHub branch, assessment/v070/ prefix, direct APIs and plain UTF-8 content. Verify tree, commit and branch ref. Read checkpoints.md for the last confirmed save; retain previous commits. Do not merge this evidence branch into the product. Restore frozen/alps from the baseline commit and verify frozen-hashes.sha256 before resuming.
+7. Volatile orchestration values can disappear with agent/runtime loss. Before each checkpoint mutation, fetch the exact evidence branch ref and its Git commit/tree and reconcile them with the last confirmed receipt. Validate required SHAs before create_tree/create_commit; never allow an absent base tree to turn a delta export into a replacement tree. The API rejected one missing-parent commit attempt after volatile values disappeared; no branch update occurred. Its delta was rebuilt on the verified remote base and saved successfully. Exact ref recovery is required even when a local export cache survives.
 
 ## Current phase
 

@@ -1,0 +1,71 @@
+{
+  "month": "2026-07",
+  "orders": [
+    {
+      "order_id": "A",
+      "sku": "X",
+      "ordered": 10,
+      "supplier_contact": "Supplier A"
+    },
+    {
+      "order_id": "A",
+      "sku": "SOUND",
+      "ordered": 5,
+      "supplier_contact": "Supplier A"
+    },
+    {
+      "order_id": "B",
+      "sku": "Z",
+      "ordered": 10,
+      "supplier_contact": "Supplier B"
+    }
+  ],
+  "events": [
+    {
+      "event_id": "CONFLICT",
+      "order_id": "A",
+      "sku": "X",
+      "event_month": "2026-07",
+      "quantity": 4
+    },
+    {
+      "event_id": "CONFLICT",
+      "order_id": "B",
+      "sku": "Z",
+      "event_month": "2026-07",
+      "quantity": 6
+    },
+    {
+      "event_id": "CLEAN",
+      "order_id": "A",
+      "sku": "SOUND",
+      "event_month": "2026-07",
+      "quantity": 5
+    }
+  ],
+  "coverage": [
+    {
+      "order_id": "A",
+      "sku": "X",
+      "month": "2026-07",
+      "complete": true
+    },
+    {
+      "order_id": "A",
+      "sku": "SOUND",
+      "month": "2026-07",
+      "complete": true
+    },
+    {
+      "order_id": "B",
+      "sku": "Z",
+      "month": "2026-07",
+      "complete": true
+    }
+  ],
+  "responsibilities": {
+    "purchasing_coordinator": "Coordinator",
+    "warehouse_lead": "Warehouse",
+    "data_steward": "Steward"
+  }
+}

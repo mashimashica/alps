@@ -14,7 +14,7 @@ PACKAGES = ROOT.parent / "validation-env/lib/python3.12/site-packages"
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--prefix", choices=("cal", "dev1", "dev2"), default="cal")
+    parser.add_argument("--prefix", choices=("cal", "dev1", "dev2", "dev3"), default="cal")
     args = parser.parse_args()
     environment = os.environ.copy()
     environment["PYTHONPATH"] = str(PACKAGES)

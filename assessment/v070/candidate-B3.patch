@@ -1,0 +1,40 @@
+diff --git a/skills/design-agent-work-system/SKILL.md b/skills/design-agent-work-system/SKILL.md
+index 153f025..8f3532e 100644
+--- a/skills/design-agent-work-system/SKILL.md
++++ b/skills/design-agent-work-system/SKILL.md
+@@ -40,13 +40,13 @@ The following Tasks are required within the requested scope, except where stated
+ ### Realizing the requested configuration
+ 
+ 1. Within the requested scope, implement and connect the necessary capabilities using the applicable environment. Existing CLIs or APIs may be used directly. Make tool use, dependencies, result interpretation, failure handling, and state-changing effects available where they are needed.
+-2. For a target Skill, reflect the work, judgment criteria, required tool use, and conditions in `SKILL.md` and necessary resources. Apply the Framework's Markdown rules and the [Process Description Design guidance](../design-process-description/SKILL.md) for Agent Skill correspondence. Put bundled business processing in that target Skill's `scripts/` and document it using the script guidance; scripts in a design Skill must support its design or evaluation work.
++2. For a target Skill, describe the target work's Name, Purpose, and Outcomes in `SKILL.md`, with the necessary work detail, judgment criteria, required tool use, and conditions in that description and its resources. Apply the Framework's Markdown rules and the [Process Description Design guidance](../design-process-description/SKILL.md) for Agent Skill correspondence. Put bundled business processing in that target Skill's `scripts/` and document it using the script guidance; scripts in a design Skill must support its design or evaluation work.
+ 3. Verify that required resources and their conditions of use are available under the intended distribution. Packaged links must resolve within it; external references must identify their intended sources and any access conditions.
+ 4. Confirm required conditions before dependent operations. Address uncertain or partial effects before retrying an operation that changes state.
+ 
+ ### Evaluating and adjusting the system
+ 
+-1. Review the design's responsibilities, relationships, and conditions against the target work. Check the components and connections against their specified behavior, including relevant failures and incomplete results.
++1. Review the design's responsibilities, relationships, and conditions against the target work. For a target Skill, review its stated Purpose and Outcomes against the target work and its applicable conditions using the [Process Description Design guidance](../design-process-description/SKILL.md). Check the components and connections against their specified behavior, including relevant failures and incomplete results.
+ 
+     > NOTE In this design work, specifications and applicable work requirements supply the criteria. Existing command tools support component checks and integration trials. Their observations provide evidence for assessing the design; whole-system effectiveness also depends on the agent's interpretation and response during representative work.
+ 
+diff --git a/skills/design-agent-work-system/references/locales/ja/SKILL.md b/skills/design-agent-work-system/references/locales/ja/SKILL.md
+index e504bf2..fec12b7 100644
+--- a/skills/design-agent-work-system/references/locales/ja/SKILL.md
++++ b/skills/design-agent-work-system/references/locales/ja/SKILL.md
+@@ -40,13 +40,13 @@ description: 仕事を実現するエージェント・ツール・情報資源
+ ### 依頼された構成の実現
+ 
+ 1. 依頼範囲内で、適用される環境を用いて必要な能力を実装・接続する。既存のCLIやAPIを直接利用してよい。ツールの利用方法、依存関係、結果の解釈、失敗への対応、状態を変更する影響を、必要な箇所で確認できるようにする。
+-2. 対象がSkillである場合、仕事、判断基準、必要なツール利用、条件を`SKILL.md`と必要な資源へ反映する。Markdownにはフレームワークの記述規則を、Agent Skillとの対応付けには[プロセス記述の設計に関する指示](../../../../design-process-description/references/locales/ja/SKILL.md)を適用する。同梱する業務処理は対象Skillの`scripts/`へ置き、スクリプト作成ガイドに従って説明する。設計Skillのスクリプトは、その設計や評価の仕事を支援しなければならない。
++2. 対象がSkillである場合、対象の仕事の名称・目的・成果を`SKILL.md`に記述し、必要な作業の詳細、判断基準、必要なツール利用、条件を、その記述と資源へ反映する。Markdownにはフレームワークの記述規則を、Agent Skillとの対応付けには[プロセス記述の設計に関する指示](../../../../design-process-description/references/locales/ja/SKILL.md)を適用する。同梱する業務処理は対象Skillの`scripts/`へ置き、スクリプト作成ガイドに従って説明する。設計Skillのスクリプトは、その設計や評価の仕事を支援しなければならない。
+ 3. 必要な資源とその利用条件を、意図した配布構成の下で確認できることを検証する。パッケージ内のリンクはその構成の下で解決しなければならない。外部参照は、意図した参照元を識別し、アクセス条件がある場合はそれも識別しなければならない。
+ 4. 依存する操作の前に、必要条件を確認する。状態を変更する操作を再試行する前に、不確かな影響や一部だけ生じた影響へ対応する。
+ 
+ ### システムの評価と調整
+ 
+-1. 対象の仕事に照らして、設計の責務、関係、条件をレビューする。関係する失敗や不完全な結果を含め、構成要素と接続を定められた動作に照らして検証する。
++1. 対象の仕事に照らして、設計の責務、関係、条件をレビューする。対象がSkillである場合、[プロセス記述の設計に関する指示](../../../../design-process-description/references/locales/ja/SKILL.md)に従って、そこに記述した目的・成果を対象の仕事とその適用条件に照らしてレビューする。関係する失敗や不完全な結果を含め、構成要素と接続を定められた動作に照らして検証する。
+ 
+     > 注記 この設計の仕事では、仕様と適用される仕事の要求が基準となる。既存のコマンドツールが、構成要素の検査や接続の試行を支える。その観測は設計を評価する証拠となり、システム全体の有効性には、代表的な仕事におけるエージェントの解釈と対応も関わる。
+ 

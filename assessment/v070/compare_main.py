@@ -159,6 +159,12 @@ def bootstrap_keys(layout, rng):
     return result
 
 
+def observation_counts(cells, keys):
+    return {arm: {"planned": sum(len(cells[key][arm]) for key in keys),
+                  "unconfirmed": sum(v is None for key in keys for v, _ in cells[key][arm])}
+            for arm in ("A", "B")}
+
+
 def analyze(cells, layout, replicates=10000, seed=700, types=None):
     if replicates < 1:
         raise ValueError("At least one bootstrap replicate is needed")
@@ -171,7 +177,7 @@ def analyze(cells, layout, replicates=10000, seed=700, types=None):
               "families": len(layout), "replicates": replicates, "seed": seed,
               "burden_observed": burden, "assignments": {}, "by_family": {},
               "by_configuration": {}, "by_variant": {}, "by_case_type": {},
-              "leave_one_family_out": {}}
+              "leave_one_family_out": {}, "group_counts": {}}
     for assignment in (("conservative", "favorable") if missing_count else ("observed",)):
         point = summarize(cells, keys, assignment, burden)
         rng = random.Random(seed)
@@ -193,11 +199,13 @@ def analyze(cells, layout, replicates=10000, seed=700, types=None):
             subset = [key for key in keys if key[key_index] == label]
             result[output_key][label] = [summarize(cells, subset, a, False)[:3]
                                         for a in ("conservative", "favorable")]
+            result["group_counts"][output_key, label] = observation_counts(cells, subset)
     for index, variant in enumerate(VARIANTS):
         variant_cells = {key: {arm: [cell[arm][index]] for arm in ("A", "B")}
                          for key, cell in cells.items()}
         result["by_variant"][variant] = [summarize(variant_cells, keys, a, False)[:3]
                                          for a in ("conservative", "favorable")]
+        result["group_counts"]["by_variant", variant] = observation_counts(variant_cells, keys)
     if types is not None:
         for label in sorted(set(types.values())):
             subset = {}
@@ -207,11 +215,13 @@ def analyze(cells, layout, replicates=10000, seed=700, types=None):
                     subset[key] = {arm: [cell[arm][i] for i in indices] for arm in ("A", "B")}
             result["by_case_type"][label] = [summarize(subset, sorted(subset), a, False)[:3]
                                              for a in ("conservative", "favorable")]
+            result["group_counts"]["by_case_type", label] = observation_counts(subset, sorted(subset))
     if len(layout) > 1:
         for excluded in sorted(layout):
             subset = [key for key in keys if key[0] != excluded]
             result["leave_one_family_out"][excluded] = [summarize(cells, subset, a, False)[:3]
                                                         for a in ("conservative", "favorable")]
+            result["group_counts"]["leave_one_family_out", excluded] = observation_counts(cells, subset)
     return result
 
 
@@ -243,10 +253,13 @@ def render(result):
                   f"{percent(interval[1])}; numeric gate {data['burden_numeric_gate']}.\n")
     for section in ("by_family", "by_configuration", "by_variant", "by_case_type", "leave_one_family_out"):
         print(f"## {section.replace('_', ' ')}\n")
-        print("| Group | Conservative A / B / difference | Favorable A / B / difference |")
-        print("| --- | --- | --- |")
+        print("| Group | Planned A / B | Unconfirmed A / B | Conservative A / B / difference | Favorable A / B / difference |")
+        print("| --- | ---: | ---: | --- | --- |")
         for label, bounds in result[section].items():
-            print(f"| {label} | {' / '.join(map(percent, bounds[0]))} | "
+            counts = result["group_counts"][section, label]
+            print(f"| {label} | {counts['A']['planned']} / {counts['B']['planned']} | "
+                  f"{counts['A']['unconfirmed']} / {counts['B']['unconfirmed']} | "
+                  f"{' / '.join(map(percent, bounds[0]))} | "
                   f"{' / '.join(map(percent, bounds[1]))} |")
         print()
     print("These are empirical synthetic-case estimates. The family sample and fixed model mixture "

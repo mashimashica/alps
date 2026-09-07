@@ -11,7 +11,8 @@ import shutil
 
 ROOT = Path(__file__).resolve().parent
 ORDER = {1: {"S10": (3, 1, 4, 2), "S08": (6, 5), "S05": (8, 7)},
-         2: {"S05": (5, 1, 6, 2), "S10": (7, 3, 8, 4)}}
+         2: {"S05": (5, 1, 6, 2), "S10": (7, 3, 8, 4)},
+         3: {"S05": (4, 3), "S10": (5, 1, 6, 2)}}
 CODES = ("R17", "R63", "R28", "R44")
 IGNORE = shutil.ignore_patterns("__pycache__", "*.pyc")
 
@@ -46,7 +47,7 @@ consumer observations. Do not repair a candidate or impose a preferred prose.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("case", choices=("S05", "S08", "S10"))
-    parser.add_argument("--round", type=int, choices=(1, 2), default=1)
+    parser.add_argument("--round", type=int, choices=(1, 2, 3), default=1)
     args = parser.parse_args()
     if args.case not in ORDER[args.round]:
         raise SystemExit("No preregistered creator cells for this round and family")

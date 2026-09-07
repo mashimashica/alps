@@ -99,6 +99,9 @@ class ComparisonChecks(unittest.TestCase):
         self.assertEqual(result["unconfirmed"], 1)
         self.assertEqual(result["assignments"]["conservative"]["point"][:3], (0, .5, .5))
         self.assertEqual(result["assignments"]["favorable"]["point"][:3], (0, 1, 1))
+        self.assertEqual(result["group_counts"]["by_variant", "challenging"],
+                         {"A": {"planned": 1, "unconfirmed": 0},
+                          "B": {"planned": 1, "unconfirmed": 1}})
 
     def test_unknown_compensation_disables_burden_only(self):
         schedule, grades = fixture()

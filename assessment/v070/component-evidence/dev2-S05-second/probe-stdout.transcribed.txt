@@ -1,0 +1,5 @@
+{"exit": 0, "lines": [{"flags": [], "line": "A/X", "status": "complete shortfall"}, {"flags": [], "line": "A/SOUND", "status": "received as ordered"}, {"flags": ["conflicting event content for event_id CONFLICT"], "line": "B/Z", "status": "conflicting evidence"}], "package": "R17", "stderr": ""}
+{"exit": 0, "lines": [{"flags": ["conflicting_event_evidence"], "line": "A/X", "status": "undetermined"}, {"flags": [], "line": "A/SOUND", "status": "received_as_ordered"}, {"flags": [], "line": "B/Z", "status": "shortfall"}], "package": "R28", "stderr": ""}
+{"exit": 0, "lines": [{"flags": ["conflicting content for event_id CONFLICT"], "line": "A/X", "status": "undetermined"}, {"flags": [], "line": "A/SOUND", "status": "received as ordered"}, {"flags": [], "line": "B/Z", "status": "shortfall"}], "package": "R44", "stderr": ""}
+{"exit": 0, "lines": [{"flags": true, "line": "A/X", "status": null}, {"flags": true, "line": "A/SOUND", "status": null}, {"flags": true, "line": "B/Z", "status": null}], "package": "R63", "stderr": ""}
+Probe scope: unchanged disposable script copies; new three-line synthetic conflict fixture; no business fixture rerun or candidate repair.

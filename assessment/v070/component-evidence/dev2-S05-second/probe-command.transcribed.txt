@@ -1,0 +1,21 @@
+python3 - <<'PY'
+from pathlib import Path
+import json, shutil, subprocess, sys, tempfile
+b=Path('/workspace/scratch/a75c3a6d9076/alps-v070-assessment/blind-dev2/S05')
+d={'month':'2026-07','orders':[{'order_id':'A','sku':'X','ordered':10,'supplier_contact':'Supplier A'},{'order_id':'A','sku':'SOUND','ordered':5,'supplier_contact':'Supplier A'},{'order_id':'B','sku':'Z','ordered':10,'supplier_contact':'Supplier B'}],'events':[{'event_id':'CONFLICT','order_id':'A','sku':'X','event_month':'2026-07','quantity':4},{'event_id':'CONFLICT','order_id':'B','sku':'Z','event_month':'2026-07','quantity':6},{'event_id':'CLEAN','order_id':'A','sku':'SOUND','event_month':'2026-07','quantity':5}],'coverage':[{'order_id':'A','sku':'X','month':'2026-07','complete':True},{'order_id':'A','sku':'SOUND','month':'2026-07','complete':True},{'order_id':'B','sku':'Z','month':'2026-07','complete':True}],'responsibilities':{'purchasing_coordinator':'Coordinator','warehouse_lead':'Warehouse','data_steward':'Steward'}}
+with tempfile.TemporaryDirectory(prefix='s05-second-conflict-probe-') as td:
+    tmp=Path(td)
+    (tmp/'input.json').write_text(json.dumps(d))
+    for pkg in ('R17','R28','R44','R63'):
+        src=b/pkg/'package/receiving-review/scripts'/('review.py' if pkg=='R17' else 'review_receipts.py')
+        dst=tmp/(pkg+'.py')
+        shutil.copyfile(src,dst)
+        p=subprocess.run([sys.executable,str(dst),str(tmp/'input.json')],capture_output=True,text=True)
+        out=json.loads(p.stdout)
+        lines=[]
+        for row in out['lines']:
+            evidence=row.get('evidence',{})
+            lines.append({'line':row['order_id']+'/'+row['sku'],'status':row.get('position',row.get('status')),'flags':row.get('flags',row.get('evidence_issues',evidence.get('flags',row.get('identity_conflict'))))})
+        print(json.dumps({'package':pkg,'exit':p.returncode,'stderr':p.stderr,'lines':lines},sort_keys=True))
+print('Probe scope: unchanged disposable script copies; new three-line synthetic conflict fixture; no business fixture rerun or candidate repair.')
+PY

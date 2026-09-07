@@ -22,7 +22,7 @@ def main():
     for creator_id in args.creator_ids:
         creator = ROOT / "trials" / creator_id
         assignment = json.loads((creator / "assignment.json").read_text())
-        development = creator_id.startswith(("dev1-", "dev2-"))
+        development = creator_id.startswith(("dev1-", "dev2-", "dev3-"))
         if development and assignment["case"] not in {"S05", "S08", "S10"}:
             raise SystemExit("No reviewed development consumer case for this family")
         skills = [p for p in (creator / "output").iterdir() if p.is_dir() and (p / "SKILL.md").is_file()]
