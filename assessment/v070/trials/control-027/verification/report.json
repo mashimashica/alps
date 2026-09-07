@@ -1,0 +1,261 @@
+{
+  "schema_version": "1.0",
+  "scope": {
+    "month": "2026-08",
+    "order_line_count": 7
+  },
+  "lines": [
+    {
+      "order_id": "PO-1",
+      "sku": "A",
+      "ordered": 10,
+      "supplier_contact": "Aya at Example Supplies",
+      "status": "complete_shortfall",
+      "coverage": "complete",
+      "supporting_event_ids": [
+        "E-1"
+      ],
+      "observed_subtotal": 7,
+      "final_position": {
+        "net_received": 7,
+        "ordered": 10,
+        "difference": -3
+      },
+      "follow_up": {
+        "recipient": "Mina (purchasing)",
+        "role": "purchasing_coordinator",
+        "subject": "Receipt follow-up for PO-1 / A",
+        "action": "Ask Aya at Example Supplies to confirm and arrange receipt of the remaining 3 unit(s).",
+        "draft": "To: Aya at Example Supplies\nSubject: Receipt follow-up for PO-1 / A\n\nPlease confirm the remaining 3 unit(s) for order PO-1 and advise the expected receipt date."
+      }
+    },
+    {
+      "order_id": "PO-1",
+      "sku": "B",
+      "ordered": 5,
+      "supplier_contact": "Aya at Example Supplies",
+      "status": "complete_excess",
+      "coverage": "complete",
+      "supporting_event_ids": [
+        "E-2",
+        "E-3"
+      ],
+      "observed_subtotal": 6,
+      "final_position": {
+        "net_received": 6,
+        "ordered": 5,
+        "difference": 1
+      },
+      "follow_up": {
+        "recipient": "Ren (warehouse)",
+        "role": "warehouse_lead",
+        "subject": "Receipt reconciliation for PO-1 / B",
+        "action": "Reconcile the surplus of 1 unit(s) against the order and receiving evidence.",
+        "draft": "To: Ren (warehouse)\nSubject: Receipt reconciliation for PO-1 / B\n\nPlease reconcile the 1 unit surplus for order PO-1 against the order and receiving records, and document the result."
+      }
+    },
+    {
+      "order_id": "PO-2",
+      "sku": "C",
+      "ordered": 4,
+      "supplier_contact": "Bea at Example Supplies",
+      "status": "incomplete_export",
+      "coverage": "incomplete",
+      "supporting_event_ids": [
+        "E-4"
+      ],
+      "observed_subtotal": 2,
+      "blocking_conditions": [
+        "coverage declares an incomplete export"
+      ],
+      "follow_up": {
+        "recipient": "Sora (receiving data)",
+        "role": "data_steward",
+        "subject": "Complete receiving export for PO-2 / C",
+        "action": "Provide or confirm the full requested-month receipt export before final comparison.",
+        "draft": "To: Sora (receiving data)\nSubject: Complete receiving export for PO-2 / C\n\nPlease provide or confirm the complete receiving export for PO-2 / C for the requested month so its final receipt position can be assessed."
+      }
+    },
+    {
+      "order_id": "PO-3",
+      "sku": "D",
+      "ordered": 3,
+      "supplier_contact": "Cy at Example Supplies",
+      "status": "complete_shortfall",
+      "coverage": "complete",
+      "supporting_event_ids": [],
+      "observed_subtotal": 0,
+      "final_position": {
+        "net_received": 0,
+        "ordered": 3,
+        "difference": -3
+      },
+      "follow_up": {
+        "recipient": "Mina (purchasing)",
+        "role": "purchasing_coordinator",
+        "subject": "Receipt follow-up for PO-3 / D",
+        "action": "Ask Cy at Example Supplies to confirm and arrange receipt of the remaining 3 unit(s).",
+        "draft": "To: Cy at Example Supplies\nSubject: Receipt follow-up for PO-3 / D\n\nPlease confirm the remaining 3 unit(s) for order PO-3 and advise the expected receipt date."
+      }
+    },
+    {
+      "order_id": "PO-4",
+      "sku": "E",
+      "ordered": 2,
+      "supplier_contact": "Dee at Example Supplies",
+      "status": "identity_reconciliation_required",
+      "coverage": "complete",
+      "supporting_event_ids": [],
+      "observed_subtotal": 0,
+      "blocking_conditions": [
+        "current-month event SKU is absent from this order"
+      ],
+      "follow_up": {
+        "recipient": "Mina (purchasing) and Sora (receiving data)",
+        "role": "purchasing_coordinator_and_data_steward",
+        "subject": "Reconcile receiving evidence for PO-4 / E",
+        "action": "Reconcile the identified source records before final line comparison (current-month event SKU is absent from this order).",
+        "draft": "To: Mina (purchasing) and Sora (receiving data)\nSubject: Reconcile receiving evidence for PO-4 / E\n\nPlease reconcile the order and receiving source records for PO-4 / E (current-month event SKU is absent from this order) and confirm the evidence to use for the final review."
+      }
+    },
+    {
+      "order_id": "PO-5",
+      "sku": "F",
+      "ordered": 1,
+      "supplier_contact": "Eli at Example Supplies",
+      "status": "conflicting_evidence",
+      "coverage": "complete",
+      "supporting_event_ids": [
+        "E-conf"
+      ],
+      "observed_subtotal": 3,
+      "blocking_conditions": [
+        "event_id has conflicting content"
+      ],
+      "follow_up": {
+        "recipient": "Mina (purchasing) and Sora (receiving data)",
+        "role": "purchasing_coordinator_and_data_steward",
+        "subject": "Reconcile receiving evidence for PO-5 / F",
+        "action": "Reconcile the identified source records before final line comparison (event_id has conflicting content).",
+        "draft": "To: Mina (purchasing) and Sora (receiving data)\nSubject: Reconcile receiving evidence for PO-5 / F\n\nPlease reconcile the order and receiving source records for PO-5 / F (event_id has conflicting content) and confirm the evidence to use for the final review."
+      }
+    },
+    {
+      "order_id": "PO-6",
+      "sku": "G",
+      "ordered": 1,
+      "supplier_contact": "Fox at Example Supplies",
+      "status": "incomplete_export",
+      "coverage": "complete",
+      "supporting_event_ids": [],
+      "observed_subtotal": 0,
+      "blocking_conditions": [
+        "current-month event evidence is invalid"
+      ],
+      "follow_up": {
+        "recipient": "Sora (receiving data)",
+        "role": "data_steward",
+        "subject": "Complete receiving export for PO-6 / G",
+        "action": "Provide or confirm the full requested-month receipt export before final comparison.",
+        "draft": "To: Sora (receiving data)\nSubject: Complete receiving export for PO-6 / G\n\nPlease provide or confirm the complete receiving export for PO-6 / G for the requested month so its final receipt position can be assessed."
+      }
+    }
+  ],
+  "anomalies": [
+    {
+      "type": "conflicting_event_id",
+      "event_id": "E-conf",
+      "message": "Different content was supplied for the same event_id."
+    },
+    {
+      "type": "order_sku_identity_mismatch",
+      "order_id": "PO-4",
+      "events": [
+        "E-6"
+      ],
+      "message": "A current-month event uses a SKU absent from the supplied order."
+    }
+  ],
+  "out_of_scope_events": [
+    {
+      "event_id": "E-out",
+      "order_id": "PO-OUT",
+      "sku": "Z",
+      "event_month": "2026-08",
+      "quantity": 9,
+      "reason": "order outside supplied order set"
+    }
+  ],
+  "validation_warnings": [
+    {
+      "code": "invalid_event",
+      "message": "event is missing a required value; no zero was substituted",
+      "row": 9
+    }
+  ],
+  "follow_up_drafts": [
+    {
+      "order_id": "PO-1",
+      "sku": "A",
+      "recipient": "Mina (purchasing)",
+      "role": "purchasing_coordinator",
+      "subject": "Receipt follow-up for PO-1 / A",
+      "action": "Ask Aya at Example Supplies to confirm and arrange receipt of the remaining 3 unit(s).",
+      "draft": "To: Aya at Example Supplies\nSubject: Receipt follow-up for PO-1 / A\n\nPlease confirm the remaining 3 unit(s) for order PO-1 and advise the expected receipt date."
+    },
+    {
+      "order_id": "PO-1",
+      "sku": "B",
+      "recipient": "Ren (warehouse)",
+      "role": "warehouse_lead",
+      "subject": "Receipt reconciliation for PO-1 / B",
+      "action": "Reconcile the surplus of 1 unit(s) against the order and receiving evidence.",
+      "draft": "To: Ren (warehouse)\nSubject: Receipt reconciliation for PO-1 / B\n\nPlease reconcile the 1 unit surplus for order PO-1 against the order and receiving records, and document the result."
+    },
+    {
+      "order_id": "PO-2",
+      "sku": "C",
+      "recipient": "Sora (receiving data)",
+      "role": "data_steward",
+      "subject": "Complete receiving export for PO-2 / C",
+      "action": "Provide or confirm the full requested-month receipt export before final comparison.",
+      "draft": "To: Sora (receiving data)\nSubject: Complete receiving export for PO-2 / C\n\nPlease provide or confirm the complete receiving export for PO-2 / C for the requested month so its final receipt position can be assessed."
+    },
+    {
+      "order_id": "PO-3",
+      "sku": "D",
+      "recipient": "Mina (purchasing)",
+      "role": "purchasing_coordinator",
+      "subject": "Receipt follow-up for PO-3 / D",
+      "action": "Ask Cy at Example Supplies to confirm and arrange receipt of the remaining 3 unit(s).",
+      "draft": "To: Cy at Example Supplies\nSubject: Receipt follow-up for PO-3 / D\n\nPlease confirm the remaining 3 unit(s) for order PO-3 and advise the expected receipt date."
+    },
+    {
+      "order_id": "PO-4",
+      "sku": "E",
+      "recipient": "Mina (purchasing) and Sora (receiving data)",
+      "role": "purchasing_coordinator_and_data_steward",
+      "subject": "Reconcile receiving evidence for PO-4 / E",
+      "action": "Reconcile the identified source records before final line comparison (current-month event SKU is absent from this order).",
+      "draft": "To: Mina (purchasing) and Sora (receiving data)\nSubject: Reconcile receiving evidence for PO-4 / E\n\nPlease reconcile the order and receiving source records for PO-4 / E (current-month event SKU is absent from this order) and confirm the evidence to use for the final review."
+    },
+    {
+      "order_id": "PO-5",
+      "sku": "F",
+      "recipient": "Mina (purchasing) and Sora (receiving data)",
+      "role": "purchasing_coordinator_and_data_steward",
+      "subject": "Reconcile receiving evidence for PO-5 / F",
+      "action": "Reconcile the identified source records before final line comparison (event_id has conflicting content).",
+      "draft": "To: Mina (purchasing) and Sora (receiving data)\nSubject: Reconcile receiving evidence for PO-5 / F\n\nPlease reconcile the order and receiving source records for PO-5 / F (event_id has conflicting content) and confirm the evidence to use for the final review."
+    },
+    {
+      "order_id": "PO-6",
+      "sku": "G",
+      "recipient": "Sora (receiving data)",
+      "role": "data_steward",
+      "subject": "Complete receiving export for PO-6 / G",
+      "action": "Provide or confirm the full requested-month receipt export before final comparison.",
+      "draft": "To: Sora (receiving data)\nSubject: Complete receiving export for PO-6 / G\n\nPlease provide or confirm the complete receiving export for PO-6 / G for the requested month so its final receipt position can be assessed."
+    }
+  ]
+}

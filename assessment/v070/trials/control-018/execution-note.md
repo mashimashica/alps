@@ -22,7 +22,13 @@
 
 ## Checks
 
-Checks are recorded after they are run.
+- `python ../../frozen/skill-creator/scripts/quick_validate.py deliverables/skills/confirm-operational-handover`
+  - First run: exit 0; output `Skill is valid!`
+  - Final run after revision: exit 0; output `Skill is valid!`
+- A local Python standard-library assertion check inspected the authored `SKILL.md` for frontmatter, folder/name agreement, a description, absence of scaffold TODO text, and independence from the fictional names.
+  - First run: exit 1. All checks passed except `no_example_names: False`; a sample question still named a fictional participant.
+  - Revision: replaced the participant-specific wording with a generic spoken read-back.
+  - Final run: exit 0. Output reported `True` for `frontmatter_starts`, `name_matches_folder`, `has_description`, `no_example_names`, and `no_scaffold_todo`.
 
 ## Limits
 

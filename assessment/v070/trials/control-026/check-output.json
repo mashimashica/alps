@@ -1,0 +1,41 @@
+{
+  "lines": [
+    {
+      "evidence_issues": [],
+      "follow_up": {
+        "draft": "Ask Mina about the remaining receipt for PO-1/A.",
+        "recipient": "Mina"
+      },
+      "observed_received": 7,
+      "order_id": "PO-1",
+      "ordered": 10,
+      "sku": "A",
+      "status": "complete_shortfall"
+    },
+    {
+      "evidence_issues": [],
+      "follow_up": {
+        "draft": "Ask Sora to provide or confirm the full export for PO-2/B for 2026-08.",
+        "recipient": "Sora"
+      },
+      "observed_received": null,
+      "order_id": "PO-2",
+      "ordered": 5,
+      "sku": "B",
+      "status": "incomplete_export"
+    }
+  ],
+  "month": "2026-08",
+  "out_of_scope_events": [],
+  "scope": [
+    {
+      "order_id": "PO-1",
+      "sku": "A"
+    },
+    {
+      "order_id": "PO-2",
+      "sku": "B"
+    }
+  ],
+  "warnings": []
+}

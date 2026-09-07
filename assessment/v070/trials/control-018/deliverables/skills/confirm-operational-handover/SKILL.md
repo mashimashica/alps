@@ -45,7 +45,7 @@ Choose a natural spoken read-back or a concise structured response based on the 
 2. what remains tentative, disputed, or unconfirmed;
 3. the smallest set of direct questions needed before the next consequential action.
 
-Address each question to the person with the knowledge or authority to answer it when that person is present. Phrase questions so a reply can confirm or correct a concrete proposition, for example: “Maya, can you confirm that Eli owns both packing tasks and that reception is the 15:10 deadline?” Ask separately for an exception that needs explicit approval. Do not bundle unrelated uncertainties when separate answers may differ.
+Address each question to the person with the knowledge or authority to answer it when that person is present. Phrase questions so a reply can confirm or correct a concrete proposition, for example: “Can you confirm that I own both packing tasks and that reception is the 15:10 deadline?” Ask separately for an exception that needs explicit approval. Do not bundle unrelated uncertainties when separate answers may differ.
 
 If the user is one participant, offer words they can say. If a needed person is absent, identify what must be checked with them and give the user a draft question if useful, without claiming it was sent. Do not invent closure when no reply is available. Instead provide the best current understanding, label its limits, and state which action should wait for confirmation when authority or a critical dependency requires it.
 
