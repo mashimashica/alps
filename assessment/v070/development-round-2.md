@@ -66,7 +66,12 @@ read; exact reviewed hashes match B2. The root's complete-diff review, nine
 product tests, changed whitespace and both pinned Skill form checks passed.
 The target-source change is one first sentence per language; all other source
 content equals A. All eight creators completed and all eight generated packages
-pass pinned Skill form checks. Sixteen new isolated consumers are prepared and
-unstarted, using the preregistered repeated developmental fixtures. See
-dev2-list.tsv and dev2-consumer-list.tsv for exact task states and recorded
-notification times, not inferred historical runtime.
+pass pinned Skill form checks. All sixteen valid consumer applications are now
+complete using the preregistered repeated developmental fixtures. Two original
+consumer agents disappeared mid-task; their partial originals are retained and
+independent arm-blind adjudication permitted one distinct retry each, both now
+complete. These consume two additional reserve slots (22 remain unallocated).
+See dev2-list.tsv, dev2-consumer-list.tsv, consumer-retry-list.tsv and
+interruptions/ for exact observations. Notification timestamps are not inferred
+historical runtimes. Source fidelity is reviewed; independent primary/second
+business grades are running. No mechanism improvement or core change is accepted.

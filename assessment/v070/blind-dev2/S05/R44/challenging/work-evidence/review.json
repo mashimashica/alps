@@ -1,0 +1,280 @@
+{
+  "month": "2026-07",
+  "lines": [
+    {
+      "order_id": "PO-S2607-820",
+      "sku": "BOLT-M8",
+      "ordered": 100,
+      "event_ids": [
+        "RCV-K7101",
+        "RCV-K7102",
+        "RCV-K7103"
+      ],
+      "evidence_issues": [
+        "order/event identity reconciliation required"
+      ],
+      "evidence_complete": false,
+      "observed_net_received": 90,
+      "position": "undetermined"
+    },
+    {
+      "order_id": "PO-S2607-820",
+      "sku": "WASHER-M8",
+      "ordered": 200,
+      "event_ids": [
+        "RCV-K7104"
+      ],
+      "evidence_issues": [
+        "order/event identity reconciliation required"
+      ],
+      "evidence_complete": false,
+      "observed_net_received": 200,
+      "position": "undetermined"
+    },
+    {
+      "order_id": "PO-S2607-821",
+      "sku": "PACK-RACK",
+      "ordered": 48,
+      "event_ids": [
+        "RCV-K7106"
+      ],
+      "evidence_issues": [
+        "conflicting content for event_id RCV-K7107"
+      ],
+      "evidence_complete": false,
+      "observed_net_received": 20,
+      "position": "undetermined"
+    },
+    {
+      "order_id": "PO-S2607-821",
+      "sku": "STRAP-20",
+      "ordered": 60,
+      "event_ids": [
+        "RCV-K7109"
+      ],
+      "evidence_issues": [],
+      "evidence_complete": true,
+      "observed_net_received": 60,
+      "position": "received as ordered"
+    },
+    {
+      "order_id": "PO-S2607-822",
+      "sku": "SHIELD-CLR",
+      "ordered": 40,
+      "event_ids": [
+        "RCV-K7108"
+      ],
+      "evidence_issues": [],
+      "evidence_complete": true,
+      "observed_net_received": 28,
+      "position": "shortfall"
+    },
+    {
+      "order_id": "PO-S2607-823",
+      "sku": "POUCH-12",
+      "ordered": 30,
+      "event_ids": [
+        "RCV-K7110",
+        "RCV-K7111"
+      ],
+      "evidence_issues": [
+        "receiving export is not confirmed complete"
+      ],
+      "evidence_complete": false,
+      "observed_net_received": 34,
+      "position": "undetermined"
+    },
+    {
+      "order_id": "PO-S2607-824",
+      "sku": "TRAY-L",
+      "ordered": 18,
+      "event_ids": [
+        "RCV-K7112",
+        "RCV-K7113"
+      ],
+      "evidence_issues": [
+        "no coverage declaration for requested month"
+      ],
+      "evidence_complete": false,
+      "observed_net_received": 9,
+      "position": "undetermined"
+    },
+    {
+      "order_id": "PO-S2607-825",
+      "sku": "BINDER-B",
+      "ordered": 25,
+      "event_ids": [],
+      "evidence_issues": [
+        "receiving export is not confirmed complete"
+      ],
+      "evidence_complete": false,
+      "observed_net_received": null,
+      "position": "undetermined"
+    },
+    {
+      "order_id": "PO-S2607-826",
+      "sku": "INSERT-G",
+      "ordered": 70,
+      "event_ids": [
+        "RCV-K7114",
+        "RCV-K7115",
+        "RCV-K7116"
+      ],
+      "evidence_issues": [],
+      "evidence_complete": true,
+      "observed_net_received": 75,
+      "position": "excess"
+    },
+    {
+      "order_id": "PO-S2607-827",
+      "sku": "WRAP-500",
+      "ordered": 40,
+      "event_ids": [
+        "RCV-K7117",
+        "RCV-K7118",
+        "RCV-K7119"
+      ],
+      "evidence_issues": [],
+      "evidence_complete": true,
+      "observed_net_received": 18,
+      "position": "shortfall"
+    },
+    {
+      "order_id": "PO-S2607-828",
+      "sku": "CLIP-R",
+      "ordered": 10,
+      "event_ids": [
+        "RCV-K7120",
+        "RCV-K7121"
+      ],
+      "evidence_issues": [],
+      "evidence_complete": true,
+      "observed_net_received": 10,
+      "position": "received as ordered"
+    },
+    {
+      "order_id": "PO-S2607-829",
+      "sku": "PAD-FOAM",
+      "ordered": 12,
+      "event_ids": [
+        "RCV-K7122",
+        "RCV-K7123"
+      ],
+      "evidence_issues": [],
+      "evidence_complete": true,
+      "observed_net_received": -4,
+      "position": "shortfall"
+    },
+    {
+      "order_id": "PO-S2607-830",
+      "sku": "CRATE-S",
+      "ordered": 16,
+      "event_ids": [],
+      "evidence_issues": [],
+      "evidence_complete": true,
+      "observed_net_received": null,
+      "position": "shortfall"
+    }
+  ],
+  "follow_ups": [
+    {
+      "order_id": "PO-S2607-820",
+      "sku": "BOLT-M8",
+      "recipient": "Rowan Ames <rowan.ames@northquayassembly.example>, Beck Lin <beck.lin@northquayassembly.example>",
+      "draft": "Reconcile the identified order/event source records for PO-S2607-820 / BOLT-M8 before comparing receipts."
+    },
+    {
+      "order_id": "PO-S2607-820",
+      "sku": "WASHER-M8",
+      "recipient": "Rowan Ames <rowan.ames@northquayassembly.example>, Beck Lin <beck.lin@northquayassembly.example>",
+      "draft": "Reconcile the identified order/event source records for PO-S2607-820 / WASHER-M8 before comparing receipts."
+    },
+    {
+      "order_id": "PO-S2607-821",
+      "sku": "PACK-RACK",
+      "recipient": "Rowan Ames <rowan.ames@northquayassembly.example>, Beck Lin <beck.lin@northquayassembly.example>",
+      "draft": "Reconcile the identified order/event source records for PO-S2607-821 / PACK-RACK before comparing receipts."
+    },
+    {
+      "order_id": "PO-S2607-822",
+      "sku": "SHIELD-CLR",
+      "recipient": "Anika Roy <anika.roy@lucidguard.example>",
+      "draft": "Ask the supplier contact to confirm the remaining 12 unit(s) for PO-S2607-822 / SHIELD-CLR."
+    },
+    {
+      "order_id": "PO-S2607-823",
+      "sku": "POUCH-12",
+      "recipient": "Beck Lin <beck.lin@northquayassembly.example>",
+      "draft": "Provide or confirm the full 2026-07 export for PO-S2607-823 / POUCH-12 before making the final receipt comparison."
+    },
+    {
+      "order_id": "PO-S2607-824",
+      "sku": "TRAY-L",
+      "recipient": "Beck Lin <beck.lin@northquayassembly.example>",
+      "draft": "Provide or confirm the full 2026-07 export for PO-S2607-824 / TRAY-L before making the final receipt comparison."
+    },
+    {
+      "order_id": "PO-S2607-825",
+      "sku": "BINDER-B",
+      "recipient": "Beck Lin <beck.lin@northquayassembly.example>",
+      "draft": "Provide or confirm the full 2026-07 export for PO-S2607-825 / BINDER-B before making the final receipt comparison."
+    },
+    {
+      "order_id": "PO-S2607-826",
+      "sku": "INSERT-G",
+      "recipient": "Inez Cole <inez.cole@northquayassembly.example>",
+      "draft": "Reconcile the 5 unit surplus for PO-S2607-826 / INSERT-G against the order and receiving evidence."
+    },
+    {
+      "order_id": "PO-S2607-827",
+      "sku": "WRAP-500",
+      "recipient": "Felix Arun <felix.arun@wrapline.example>",
+      "draft": "Ask the supplier contact to confirm the remaining 22 unit(s) for PO-S2607-827 / WRAP-500."
+    },
+    {
+      "order_id": "PO-S2607-829",
+      "sku": "PAD-FOAM",
+      "recipient": "Rafael Brooks <rafael.brooks@cushionstock.example>",
+      "draft": "Ask the supplier contact to confirm the remaining 16 unit(s) for PO-S2607-829 / PAD-FOAM."
+    },
+    {
+      "order_id": "PO-S2607-830",
+      "sku": "CRATE-S",
+      "recipient": "Elena Duarte <elena.duarte@crateforge.example>",
+      "draft": "Ask the supplier contact to confirm the remaining 16 unit(s) for PO-S2607-830 / CRATE-S."
+    }
+  ],
+  "issues": [
+    {
+      "order_id": "PO-S2607-820",
+      "sku": "BOLT-M8",
+      "issue": "order/event identity reconciliation required"
+    },
+    {
+      "order_id": "PO-S2607-820",
+      "sku": "WASHER-M8",
+      "issue": "order/event identity reconciliation required"
+    },
+    {
+      "order_id": "PO-S2607-821",
+      "sku": "PACK-RACK",
+      "issue": "conflicting content for event_id RCV-K7107"
+    },
+    {
+      "order_id": "PO-S2607-823",
+      "sku": "POUCH-12",
+      "issue": "receiving export is not confirmed complete"
+    },
+    {
+      "order_id": "PO-S2607-824",
+      "sku": "TRAY-L",
+      "issue": "no coverage declaration for requested month"
+    },
+    {
+      "order_id": "PO-S2607-825",
+      "sku": "BINDER-B",
+      "issue": "receiving export is not confirmed complete"
+    }
+  ],
+  "validation_errors": []
+}

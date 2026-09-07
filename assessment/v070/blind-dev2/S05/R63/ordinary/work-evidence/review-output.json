@@ -1,0 +1,90 @@
+{
+  "lines": [
+    {
+      "coverage_complete": true,
+      "coverage_declared": true,
+      "event_ids": [
+        "RCV-H1801",
+        "RCV-H1802",
+        "RCV-H1803"
+      ],
+      "identity_conflict": false,
+      "observed_subtotal": 120,
+      "order_id": "PO-R2606-410",
+      "ordered": 120,
+      "sku": "LABEL-60"
+    },
+    {
+      "coverage_complete": true,
+      "coverage_declared": true,
+      "event_ids": [
+        "RCV-H1804",
+        "RCV-H1805"
+      ],
+      "identity_conflict": false,
+      "observed_subtotal": 42,
+      "order_id": "PO-R2606-410",
+      "ordered": 80,
+      "sku": "CARTON-M"
+    },
+    {
+      "coverage_complete": true,
+      "coverage_declared": true,
+      "event_ids": [
+        "RCV-H1806",
+        "RCV-H1807"
+      ],
+      "identity_conflict": false,
+      "observed_subtotal": 64,
+      "order_id": "PO-R2606-411",
+      "ordered": 60,
+      "sku": "GLOVE-N"
+    },
+    {
+      "coverage_complete": true,
+      "coverage_declared": true,
+      "event_ids": [
+        "RCV-H1808"
+      ],
+      "identity_conflict": false,
+      "observed_subtotal": 24,
+      "order_id": "PO-R2606-412",
+      "ordered": 24,
+      "sku": "FILM-300"
+    },
+    {
+      "coverage_complete": false,
+      "coverage_declared": true,
+      "event_ids": [
+        "RCV-H1809",
+        "RCV-H1810"
+      ],
+      "identity_conflict": false,
+      "observed_subtotal": 30,
+      "order_id": "PO-R2606-413",
+      "ordered": 40,
+      "sku": "SEAL-BLUE"
+    },
+    {
+      "coverage_complete": true,
+      "coverage_declared": true,
+      "event_ids": [],
+      "identity_conflict": false,
+      "observed_subtotal": 0,
+      "order_id": "PO-R2606-414",
+      "ordered": 30,
+      "sku": "TAPE-48"
+    }
+  ],
+  "month": "2026-06",
+  "out_of_scope_events": [
+    {
+      "event_id": "RCV-H1811",
+      "event_month": "2026-06",
+      "order_id": "PO-R2606-499",
+      "quantity": 90,
+      "sku": "PALLET-STD"
+    }
+  ],
+  "validation_errors": []
+}

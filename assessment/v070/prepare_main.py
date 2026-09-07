@@ -93,6 +93,14 @@ Write {trial}/execution-note.md outside the target Skill. Record public commands
         writer = csv.writer(stream, delimiter="\t", lineterminator="\n")
         writer.writerow(["trial_id", "stage", "case", "arm", "repetition", "model", "effort", "execution", "agent"])
         writer.writerows(rows)
+    # The execution ledger changes status; this independent schedule fixes the
+    # prospective denominator and is checkpointed before the first creator.
+    schedule = ROOT / "main-schedule.tsv"
+    with schedule.open("x", newline="", encoding="utf-8") as stream:
+        writer = csv.writer(stream, delimiter="\t", lineterminator="\n")
+        writer.writerow(["trial_id", "stage", "case", "arm", "repetition", "model", "effort"])
+        writer.writerows(row[:7] for row in rows)
+    (ROOT / "main-schedule-sha256.txt").write_text(hashlib.sha256(schedule.read_bytes()).hexdigest() + "\n")
     (ROOT / "main-candidate-hashes.json").write_text(
         json.dumps({"identity": args.candidate, "files": candidate_hashes}, indent=2) + "\n")
     print("Prepared 288 main and 72 C creator assignments; no trials executed or consumer inputs materialized")

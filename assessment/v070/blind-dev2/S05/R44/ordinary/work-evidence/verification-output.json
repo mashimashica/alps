@@ -1,0 +1,154 @@
+{
+  "month": "2026-06",
+  "lines": [
+    {
+      "order_id": "PO-T1",
+      "sku": "COMPLETE",
+      "ordered": 10,
+      "event_ids": [
+        "EV-DUP"
+      ],
+      "evidence_issues": [],
+      "evidence_complete": true,
+      "observed_net_received": 10,
+      "position": "received as ordered"
+    },
+    {
+      "order_id": "PO-T2",
+      "sku": "SHORT",
+      "ordered": 10,
+      "event_ids": [
+        "EV-SHORT"
+      ],
+      "evidence_issues": [],
+      "evidence_complete": true,
+      "observed_net_received": 7,
+      "position": "shortfall"
+    },
+    {
+      "order_id": "PO-T3",
+      "sku": "EXCESS",
+      "ordered": 10,
+      "event_ids": [
+        "EV-EXCESS"
+      ],
+      "evidence_issues": [],
+      "evidence_complete": true,
+      "observed_net_received": 12,
+      "position": "excess"
+    },
+    {
+      "order_id": "PO-T4",
+      "sku": "INCOMPLETE",
+      "ordered": 10,
+      "event_ids": [
+        "EV-INC"
+      ],
+      "evidence_issues": [
+        "receiving export is not confirmed complete"
+      ],
+      "evidence_complete": false,
+      "observed_net_received": 4,
+      "position": "undetermined"
+    },
+    {
+      "order_id": "PO-T5",
+      "sku": "RETURN",
+      "ordered": 10,
+      "event_ids": [
+        "EV-RET-A",
+        "EV-RET-B"
+      ],
+      "evidence_issues": [],
+      "evidence_complete": true,
+      "observed_net_received": 10,
+      "position": "received as ordered"
+    },
+    {
+      "order_id": "PO-T6",
+      "sku": "MONTH-FILTER",
+      "ordered": 10,
+      "event_ids": [
+        "EV-MON-A"
+      ],
+      "evidence_issues": [],
+      "evidence_complete": true,
+      "observed_net_received": 10,
+      "position": "received as ordered"
+    },
+    {
+      "order_id": "PO-T7",
+      "sku": "EXPECTED-SKU",
+      "ordered": 10,
+      "event_ids": [],
+      "evidence_issues": [
+        "order/event identity reconciliation required"
+      ],
+      "evidence_complete": false,
+      "observed_net_received": null,
+      "position": "undetermined"
+    },
+    {
+      "order_id": "PO-T8",
+      "sku": "CONFLICT",
+      "ordered": 10,
+      "event_ids": [],
+      "evidence_issues": [
+        "conflicting content for event_id EV-CONFLICT"
+      ],
+      "evidence_complete": false,
+      "observed_net_received": null,
+      "position": "undetermined"
+    }
+  ],
+  "follow_ups": [
+    {
+      "order_id": "PO-T2",
+      "sku": "SHORT",
+      "recipient": "Supplier Two",
+      "draft": "Ask the supplier contact to confirm the remaining 3 unit(s) for PO-T2 / SHORT."
+    },
+    {
+      "order_id": "PO-T3",
+      "sku": "EXCESS",
+      "recipient": "Warehouse Lead",
+      "draft": "Reconcile the 2 unit surplus for PO-T3 / EXCESS against the order and receiving evidence."
+    },
+    {
+      "order_id": "PO-T4",
+      "sku": "INCOMPLETE",
+      "recipient": "Data Steward",
+      "draft": "Provide or confirm the full 2026-06 export for PO-T4 / INCOMPLETE before making the final receipt comparison."
+    },
+    {
+      "order_id": "PO-T7",
+      "sku": "EXPECTED-SKU",
+      "recipient": "Purchasing Coordinator, Data Steward",
+      "draft": "Reconcile the identified order/event source records for PO-T7 / EXPECTED-SKU before comparing receipts."
+    },
+    {
+      "order_id": "PO-T8",
+      "sku": "CONFLICT",
+      "recipient": "Purchasing Coordinator, Data Steward",
+      "draft": "Reconcile the identified order/event source records for PO-T8 / CONFLICT before comparing receipts."
+    }
+  ],
+  "issues": [
+    {
+      "order_id": "PO-T4",
+      "sku": "INCOMPLETE",
+      "issue": "receiving export is not confirmed complete"
+    },
+    {
+      "order_id": "PO-T7",
+      "sku": "EXPECTED-SKU",
+      "issue": "order/event identity reconciliation required"
+    },
+    {
+      "order_id": "PO-T8",
+      "sku": "CONFLICT",
+      "issue": "conflicting content for event_id EV-CONFLICT"
+    }
+  ],
+  "validation_errors": []
+}

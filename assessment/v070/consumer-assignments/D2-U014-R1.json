@@ -1,0 +1,20 @@
+{
+  "consumer_id": "D2-U014-R1",
+  "creator_id": "dev2-007",
+  "case": "S10",
+  "variant": "challenging",
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "high",
+  "context": "fresh",
+  "copied_sha256": {
+    "skill/checkout-service-release/SKILL.md": "74106ebe099af79321b9ae68b00886c432c7bb8b136799d0be4687df09dbfd5f",
+    "skill/checkout-service-release/agents/openai.yaml": "fa97441e13a8074048f9268188e0e56cd97103a31a523909ec906838b315c6cf",
+    "input/release_tool.py": "939931810a40d9f813280ea46c95fec2c4a1ed72368937353bf5c899b8217577",
+    "input/request.md": "df55f85390f48311b697ebb2398eefd5cd5ce3c64a4fcbdd5b89ad3aa50b5bb7",
+    "input/state.json": "88113554cedb729543be2f86c47663a8a14bcd95ef9d3a9ba038242eeddcb4c2"
+  },
+  "prompt_sha256": "e0ad0ac617c7da70910eb816e6812daeb25bf8c17d77440f3d44cbcea45a4982",
+  "original_slot": "D2-U014",
+  "attempt": 1,
+  "recovery_basis": "audits/consumer-loss-adjudication.md"
+}

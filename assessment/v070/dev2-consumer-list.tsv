@@ -5,13 +5,13 @@ D2-U003	dev2-002	S05	ordinary	gpt-5.6-sol	high	completed; not graded	/root/dev2_
 D2-U004	dev2-002	S05	challenging	gpt-5.6-sol	high	completed; not graded	/root/dev2_use_004	2026-09-07T16:31:19.753565+00:00	2026-09-07T16:37:54.174038+00:00
 D2-U005	dev2-003	S10	ordinary	gpt-5.6-sol	high	completed; not graded	/root/dev2_use_005	2026-09-07T16:31:20.173042+00:00	2026-09-07T16:37:54.174038+00:00
 D2-U006	dev2-003	S10	challenging	gpt-5.6-sol	high	completed; not graded	/root/dev2_use_006	2026-09-07T16:31:20.606021+00:00	2026-09-07T16:37:54.174038+00:00
-D2-U007	dev2-004	S10	ordinary	gpt-5.6-sol	high	running	/root/dev2_use_007	2026-09-07T16:38:59.928791+00:00	
-D2-U008	dev2-004	S10	challenging	gpt-5.6-sol	high	running	/root/dev2_use_008	2026-09-07T16:39:00.352414+00:00	
-D2-U009	dev2-005	S05	ordinary	gpt-5.6-sol	high	running	/root/dev2_use_009	2026-09-07T16:39:00.768377+00:00	
-D2-U010	dev2-005	S05	challenging	gpt-5.6-sol	high	running	/root/dev2_use_010	2026-09-07T16:39:01.188712+00:00	
-D2-U011	dev2-006	S05	ordinary	gpt-5.6-sol	high	running	/root/dev2_use_011	2026-09-07T16:39:01.605523+00:00	
-D2-U012	dev2-006	S05	challenging	gpt-5.6-sol	high	not started			
-D2-U013	dev2-007	S10	ordinary	gpt-5.6-sol	high	not started			
-D2-U014	dev2-007	S10	challenging	gpt-5.6-sol	high	not started			
-D2-U015	dev2-008	S10	ordinary	gpt-5.6-sol	high	not started			
-D2-U016	dev2-008	S10	challenging	gpt-5.6-sol	high	not started			
+D2-U007	dev2-004	S10	ordinary	gpt-5.6-sol	high	completed; not graded	/root/dev2_use_007	2026-09-07T16:38:59.928791+00:00	2026-09-07T16:43:14.977737+00:00
+D2-U008	dev2-004	S10	challenging	gpt-5.6-sol	high	completed; not graded	/root/dev2_use_008	2026-09-07T16:39:00.352414+00:00	2026-09-07T16:43:14.977737+00:00
+D2-U009	dev2-005	S05	ordinary	gpt-5.6-sol	high	completed; recovered artifacts and public notes; not graded	/root/dev2_use_009	2026-09-07T16:39:00.768377+00:00	2026-09-07T16:51:07.692807+00:00
+D2-U010	dev2-005	S05	challenging	gpt-5.6-sol	high	completed; not graded	/root/dev2_use_010	2026-09-07T16:39:01.188712+00:00	2026-09-07T16:45:07.378789+00:00
+D2-U011	dev2-006	S05	ordinary	gpt-5.6-sol	high	completed; recovered artifacts and public notes; not graded	/root/dev2_use_011	2026-09-07T16:39:01.605523+00:00	2026-09-07T16:51:07.692807+00:00
+D2-U012	dev2-006	S05	challenging	gpt-5.6-sol	high	interrupted; agent missing; no final answer or execution note	/root/dev2_use_012	2026-09-07T16:43:15.393969+00:00	2026-09-07T16:51:08.123598+00:00
+D2-U013	dev2-007	S10	ordinary	gpt-5.6-sol	high	completed; recovered artifacts and public notes; not graded	/root/dev2_use_013	2026-09-07T16:43:15.834440+00:00	2026-09-07T16:51:07.692807+00:00
+D2-U014	dev2-007	S10	challenging	gpt-5.6-sol	high	interrupted; agent missing; no final answer or execution note	/root/dev2_use_014	2026-09-07T16:45:07.801772+00:00	2026-09-07T16:51:08.123598+00:00
+D2-U015	dev2-008	S10	ordinary	gpt-5.6-sol	high	completed; not graded	/root/dev2_use_015	2026-09-07T16:51:08.552254+00:00	2026-09-07T16:54:11.111214+00:00
+D2-U016	dev2-008	S10	challenging	gpt-5.6-sol	high	completed; not graded	/root/dev2_use_016	2026-09-07T16:51:08.974425+00:00	2026-09-07T16:54:11.111214+00:00

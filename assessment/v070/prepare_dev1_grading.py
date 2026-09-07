@@ -51,6 +51,8 @@ def main():
     if args.case not in ORDER[args.round]:
         raise SystemExit("No preregistered creator cells for this round and family")
     order = ORDER[args.round][args.case]
+    selection_path = ROOT / "consumer-selected-attempts.json"
+    selected = json.loads(selection_path.read_text()) if selection_path.exists() else {}
     stage = f"dev{args.round}"
     target = ROOT / f"blind-{stage}" / args.case
     if target.exists():
@@ -58,9 +60,10 @@ def main():
     for number in order:
         for index in range(2):
             use_id = f"D{args.round}-U{2 * (number - 1) + index + 1:03}"
+            attempt_id = selected.get(use_id, use_id)
             for name in ("answer.md", "execution-note.md"):
-                if not (ROOT / "consumers" / use_id / name).is_file():
-                    raise SystemExit(f"Completed evidence missing: {use_id}/{name}")
+                if not (ROOT / "consumers" / attempt_id / name).is_file():
+                    raise SystemExit(f"Completed evidence missing: {attempt_id}/{name}")
             if args.case == "S08" and not (ROOT / "state-snapshots" / use_id / "final.sql").is_file():
                 raise SystemExit(f"Final committed state not yet preserved: {use_id}")
     target.mkdir(parents=True)
@@ -79,7 +82,8 @@ def main():
         consumers = []
         for index, variant in enumerate(("ordinary", "challenging")):
             use_id = f"D{args.round}-U{2 * (number - 1) + index + 1:03}"
-            source = ROOT / "consumers" / use_id
+            attempt_id = selected.get(use_id, use_id)
+            source = ROOT / "consumers" / attempt_id
             dest = candidate / variant
             dest.mkdir()
             for name in ("answer.md", "execution-note.md"):
@@ -87,9 +91,20 @@ def main():
             shutil.copytree(source / "input", dest / "final-input-state", ignore=IGNORE)
             if any((source / "work").iterdir()):
                 shutil.copytree(source / "work", dest / "work-evidence", ignore=IGNORE)
+            if attempt_id != use_id:
+                if attempt_id != f"{use_id}-R1":
+                    raise SystemExit("Only the separately adjudicated first retry is supported")
+                shutil.copytree(ROOT / "consumers" / use_id, dest / "interrupted-original", ignore=IGNORE)
+                shutil.copy2(ROOT / "audits/consumer-loss-adjudication.md", dest / "observation-validity.md")
+                (dest / "attempt-selection.md").write_text(
+                    f"Original slot {use_id} was unfinished after recorded runtime loss. "
+                    f"The complete answer, note and final state above are from {attempt_id}, "
+                    "the single permitted retry and first valid attempt. Judge that completed "
+                    "application. The interrupted original is separate partial evidence, not "
+                    "a second application in the denominator or an alternative result to select.\n")
             if args.case == "S08":
                 shutil.copytree(ROOT / "state-snapshots" / use_id, dest / "committed-state")
-            consumers.append(use_id)
+            consumers.append(attempt_id)
         mapping[code] = {"creator": creator_id, "consumers": consumers}
     (ROOT / "blind-mappings").mkdir(exist_ok=True)
     (ROOT / "blind-mappings" / f"{stage}-{args.case}.json").write_text(

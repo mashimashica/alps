@@ -1,0 +1,1 @@
+Original slot D2-U012 was unfinished after recorded runtime loss. The complete answer, note and final state above are from D2-U012-R1, the single permitted retry and first valid attempt. Judge that completed application. The interrupted original is separate partial evidence, not a second application in the denominator or an alternative result to select.

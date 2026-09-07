@@ -120,22 +120,30 @@
     {
       "consumer": "D2-U005",
       "unexpected_changes": [],
-      "state_changes_requiring_behavior_review": []
+      "state_changes_requiring_behavior_review": [
+        "input/state.json"
+      ]
     },
     {
       "consumer": "D2-U006",
       "unexpected_changes": [],
-      "state_changes_requiring_behavior_review": []
+      "state_changes_requiring_behavior_review": [
+        "input/state.json"
+      ]
     },
     {
       "consumer": "D2-U007",
       "unexpected_changes": [],
-      "state_changes_requiring_behavior_review": []
+      "state_changes_requiring_behavior_review": [
+        "input/state.json"
+      ]
     },
     {
       "consumer": "D2-U008",
       "unexpected_changes": [],
-      "state_changes_requiring_behavior_review": []
+      "state_changes_requiring_behavior_review": [
+        "input/state.json"
+      ]
     },
     {
       "consumer": "D2-U009",
@@ -153,6 +161,11 @@
       "state_changes_requiring_behavior_review": []
     },
     {
+      "consumer": "D2-U012-R1",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": []
+    },
+    {
       "consumer": "D2-U012",
       "unexpected_changes": [],
       "state_changes_requiring_behavior_review": []
@@ -160,22 +173,37 @@
     {
       "consumer": "D2-U013",
       "unexpected_changes": [],
-      "state_changes_requiring_behavior_review": []
+      "state_changes_requiring_behavior_review": [
+        "input/state.json"
+      ]
+    },
+    {
+      "consumer": "D2-U014-R1",
+      "unexpected_changes": [],
+      "state_changes_requiring_behavior_review": [
+        "input/state.json"
+      ]
     },
     {
       "consumer": "D2-U014",
       "unexpected_changes": [],
-      "state_changes_requiring_behavior_review": []
+      "state_changes_requiring_behavior_review": [
+        "input/state.json"
+      ]
     },
     {
       "consumer": "D2-U015",
       "unexpected_changes": [],
-      "state_changes_requiring_behavior_review": []
+      "state_changes_requiring_behavior_review": [
+        "input/state.json"
+      ]
     },
     {
       "consumer": "D2-U016",
       "unexpected_changes": [],
-      "state_changes_requiring_behavior_review": []
+      "state_changes_requiring_behavior_review": [
+        "input/state.json"
+      ]
     },
     {
       "consumer": "U001",

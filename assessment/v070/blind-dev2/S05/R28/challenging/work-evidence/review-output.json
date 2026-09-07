@@ -1,0 +1,232 @@
+{
+  "conflicting_event_ids": [
+    "RCV-K7107"
+  ],
+  "identity_issues": {
+    "PO-S2607-820": [
+      "RCV-K7105"
+    ]
+  },
+  "lines": [
+    {
+      "evidence": {
+        "coverage_complete": true,
+        "event_ids": [
+          "RCV-K7101",
+          "RCV-K7102",
+          "RCV-K7103"
+        ],
+        "flags": [
+          "identity_reconciliation_needed"
+        ],
+        "observed_net_received": 90
+      },
+      "order_id": "PO-S2607-820",
+      "ordered": 100,
+      "position": "undetermined",
+      "sku": "BOLT-M8",
+      "supplier_contact": "Tessa Holt <tessa.holt@ridgefast.example>"
+    },
+    {
+      "evidence": {
+        "coverage_complete": true,
+        "event_ids": [
+          "RCV-K7104"
+        ],
+        "flags": [
+          "identity_reconciliation_needed"
+        ],
+        "observed_net_received": 200
+      },
+      "order_id": "PO-S2607-820",
+      "ordered": 200,
+      "position": "undetermined",
+      "sku": "WASHER-M8",
+      "supplier_contact": "Tessa Holt <tessa.holt@ridgefast.example>"
+    },
+    {
+      "evidence": {
+        "coverage_complete": true,
+        "event_ids": [
+          "RCV-K7106",
+          "RCV-K7107"
+        ],
+        "flags": [
+          "conflicting_event_evidence"
+        ],
+        "observed_net_received": 38
+      },
+      "order_id": "PO-S2607-821",
+      "ordered": 48,
+      "position": "undetermined",
+      "sku": "PACK-RACK",
+      "supplier_contact": "Leif Moreno <leif.moreno@silverrack.example>"
+    },
+    {
+      "evidence": {
+        "coverage_complete": true,
+        "event_ids": [
+          "RCV-K7109"
+        ],
+        "flags": [],
+        "observed_net_received": 60
+      },
+      "order_id": "PO-S2607-821",
+      "ordered": 60,
+      "position": "received_as_ordered",
+      "sku": "STRAP-20",
+      "supplier_contact": "Leif Moreno <leif.moreno@silverrack.example>"
+    },
+    {
+      "evidence": {
+        "coverage_complete": true,
+        "event_ids": [
+          "RCV-K7108"
+        ],
+        "flags": [],
+        "observed_net_received": 28
+      },
+      "order_id": "PO-S2607-822",
+      "ordered": 40,
+      "position": "shortfall",
+      "sku": "SHIELD-CLR",
+      "supplier_contact": "Anika Roy <anika.roy@lucidguard.example>"
+    },
+    {
+      "evidence": {
+        "coverage_complete": false,
+        "event_ids": [
+          "RCV-K7110",
+          "RCV-K7111"
+        ],
+        "flags": [],
+        "observed_net_received": 34
+      },
+      "order_id": "PO-S2607-823",
+      "ordered": 30,
+      "position": "undetermined",
+      "sku": "POUCH-12",
+      "supplier_contact": "Hugo Silva <hugo.silva@softpack.example>"
+    },
+    {
+      "evidence": {
+        "coverage_complete": null,
+        "event_ids": [
+          "RCV-K7112",
+          "RCV-K7113"
+        ],
+        "flags": [
+          "coverage_missing"
+        ],
+        "observed_net_received": 9
+      },
+      "order_id": "PO-S2607-824",
+      "ordered": 18,
+      "position": "undetermined",
+      "sku": "TRAY-L",
+      "supplier_contact": "Celia Grant <celia.grant@traycraft.example>"
+    },
+    {
+      "evidence": {
+        "coverage_complete": false,
+        "event_ids": [],
+        "flags": [],
+        "observed_net_received": 0
+      },
+      "order_id": "PO-S2607-825",
+      "ordered": 25,
+      "position": "undetermined",
+      "sku": "BINDER-B",
+      "supplier_contact": "Idris Fox <idris.fox@bindersupply.example>"
+    },
+    {
+      "evidence": {
+        "coverage_complete": true,
+        "event_ids": [
+          "RCV-K7114",
+          "RCV-K7115",
+          "RCV-K7116"
+        ],
+        "flags": [],
+        "observed_net_received": 75
+      },
+      "order_id": "PO-S2607-826",
+      "ordered": 70,
+      "position": "excess",
+      "sku": "INSERT-G",
+      "supplier_contact": "Nora Vega <nora.vega@greeninsert.example>"
+    },
+    {
+      "evidence": {
+        "coverage_complete": true,
+        "event_ids": [
+          "RCV-K7117",
+          "RCV-K7118",
+          "RCV-K7119"
+        ],
+        "flags": [],
+        "observed_net_received": 18
+      },
+      "order_id": "PO-S2607-827",
+      "ordered": 40,
+      "position": "shortfall",
+      "sku": "WRAP-500",
+      "supplier_contact": "Felix Arun <felix.arun@wrapline.example>"
+    },
+    {
+      "evidence": {
+        "coverage_complete": true,
+        "event_ids": [
+          "RCV-K7120",
+          "RCV-K7121"
+        ],
+        "flags": [],
+        "observed_net_received": 10
+      },
+      "order_id": "PO-S2607-828",
+      "ordered": 10,
+      "position": "received_as_ordered",
+      "sku": "CLIP-R",
+      "supplier_contact": "Asha Wren <asha.wren@clipworks.example>"
+    },
+    {
+      "evidence": {
+        "coverage_complete": true,
+        "event_ids": [
+          "RCV-K7122",
+          "RCV-K7123"
+        ],
+        "flags": [],
+        "observed_net_received": -4
+      },
+      "order_id": "PO-S2607-829",
+      "ordered": 12,
+      "position": "shortfall",
+      "sku": "PAD-FOAM",
+      "supplier_contact": "Rafael Brooks <rafael.brooks@cushionstock.example>"
+    },
+    {
+      "evidence": {
+        "coverage_complete": true,
+        "event_ids": [],
+        "flags": [],
+        "observed_net_received": 0
+      },
+      "order_id": "PO-S2607-830",
+      "ordered": 16,
+      "position": "shortfall",
+      "sku": "CRATE-S",
+      "supplier_contact": "Elena Duarte <elena.duarte@crateforge.example>"
+    }
+  ],
+  "month": "2026-07",
+  "notes": [
+    "Events outside the requested month or outside supplied orders are excluded from in-scope totals.",
+    "Observed subtotals are not final positions when evidence is incomplete or flagged."
+  ],
+  "responsibilities": {
+    "data_steward": "Beck Lin <beck.lin@northquayassembly.example>",
+    "purchasing_coordinator": "Rowan Ames <rowan.ames@northquayassembly.example>",
+    "warehouse_lead": "Inez Cole <inez.cole@northquayassembly.example>"
+  }
+}
