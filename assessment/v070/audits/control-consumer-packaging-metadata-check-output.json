@@ -1,0 +1,52 @@
+{
+  "scope": "Narrow disposable metadata readback and two storage-path refusals; no live preparation or consumer task",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "/tmp/control-metadata-check-a88zd0o5/assessment/prepare_control_consumers.py",
+    "control-001",
+    "control-037"
+  ],
+  "exit_code": 0,
+  "stdout": "C-U001: prepared from control-001, ordinary; not started\nC-U002: prepared from control-001, challenging; not started\nC-U073: prepared from control-037, ordinary; not started\nC-U074: prepared from control-037, challenging; not started\n",
+  "stderr": "",
+  "metadata_readback": [
+    {
+      "consumer": "C-U001",
+      "recorded_file_modes": 4,
+      "initial_state_identities": 0,
+      "script_mode": "0o755",
+      "readonly_mode": "0o440"
+    },
+    {
+      "consumer": "C-U002",
+      "recorded_file_modes": 4,
+      "initial_state_identities": 0,
+      "script_mode": "0o755",
+      "readonly_mode": "0o440"
+    },
+    {
+      "consumer": "C-U073",
+      "recorded_file_modes": 5,
+      "initial_state_identities": 3,
+      "script_mode": "0o755",
+      "readonly_mode": "0o440"
+    },
+    {
+      "consumer": "C-U074",
+      "recorded_file_modes": 5,
+      "initial_state_identities": 3,
+      "script_mode": "0o755",
+      "readonly_mode": "0o440"
+    }
+  ],
+  "storage_refusals": [
+    {
+      "path_component": ".local",
+      "observation": "Checkpoint would omit a resource at this path; preserve and reconcile it: /tmp/control-metadata-check-a88zd0o5/assessment/disposable-storage-probe/local/.local/evidence.txt"
+    },
+    {
+      "path_component": ".git",
+      "observation": "Checkpoint would omit a resource at this path; preserve and reconcile it: /tmp/control-metadata-check-a88zd0o5/assessment/disposable-storage-probe/git/.git/evidence.txt"
+    }
+  ]
+}

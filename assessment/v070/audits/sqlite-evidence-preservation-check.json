@@ -1,0 +1,20 @@
+{
+  "scope": "Three completed creator verification databases only; not consumer effectiveness",
+  "results": [
+    {
+      "source": "trials/control-037/verify1/source.sqlite",
+      "native_sql_roundtrip": "equal logical dump",
+      "source_bytes_unchanged": true
+    },
+    {
+      "source": "trials/control-037/verify2/source.sqlite",
+      "native_sql_roundtrip": "equal logical dump",
+      "source_bytes_unchanged": true
+    },
+    {
+      "source": "trials/control-037/verify3/source.sqlite",
+      "native_sql_roundtrip": "equal logical dump",
+      "source_bytes_unchanged": true
+    }
+  ]
+}

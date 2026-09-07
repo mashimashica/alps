@@ -307,6 +307,10 @@ def process(data: Any) -> dict[str, Any]:
             "supporting_event_ids": sorted({r["event_id"] for r in records}),
             "observed_subtotal": observed,
         }
+        if key[0] in identity_orders:
+            item["related_identity_event_ids"] = sorted({r["event_id"] for r in identity_orders[key[0]]})
+        if key in conflict_lines:
+            item["conflicting_event_ids"] = sorted({r["event_id"] for r in records if r["event_id"] in conflict_ids})
         if blocking:
             item["blocking_conditions"] = blocking
         if status in {"received_as_ordered", "complete_shortfall", "complete_excess"}:

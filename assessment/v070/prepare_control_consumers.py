@@ -105,6 +105,28 @@ def skill_path(creator_id):
     return targets[0]
 
 
+def artifact_inventory(skill):
+    resources, caches = {}, {}
+    for relative, value in file_hashes(skill).items():
+        path = Path(relative)
+        stored_parts = (skill.name, *path.parts)
+        if any(part in {".git", ".local"} for part in stored_parts):
+            raise ValueError(f"Checkpoint would omit a resource at this path; preserve and reconcile it: {skill / relative}")
+        if path.parent.name == "__pycache__" and path.suffix == ".pyc":
+            caches[relative] = value
+        elif "__pycache__" in stored_parts:
+            raise ValueError(f"Checkpoint would omit a non-cache resource; preserve and reconcile it: {skill / relative}")
+        else:
+            resources[relative] = value
+    return resources, caches
+
+
+def ignore_runtime_caches(directory, names):
+    if Path(directory).name != "__pycache__":
+        return []
+    return [name for name in names if Path(name).suffix == ".pyc" and (Path(directory) / name).is_file()]
+
+
 def refuse_existing(path):
     checked_path(path)
     if path.exists():
@@ -168,7 +190,7 @@ def main():
         if digest(creator / "prompt.md") != assignment["prompt_sha256"]:
             raise ValueError(f"Original creator prompt changed: {creator_id}")
         skill = skill_path(creator_id)
-        hashes = file_hashes(skill)
+        hashes, caches = artifact_inventory(skill)
         freeze = ROOT / "frozen/control-artifacts" / creator_id
         manifest = ROOT / "control-artifact-freezes" / f"{creator_id}.json"
         refuse_existing(freeze)
@@ -201,23 +223,25 @@ def main():
             if row["case"] == "S10" and "release_tool.py" in source_hashes:
                 raise ValueError("S10 interface must be supplied from the unchanged frozen public source")
             consumers.append((use_id, variant, folder, source, source_hashes))
-        plans.append((creator_id, row, skill, hashes, freeze, manifest, consumers))
+        plans.append((creator_id, row, skill, hashes, caches, freeze, manifest, consumers))
 
     # All selected creators and owned destinations pass preflight before writes.
     # Any later failure retains its files; no automated overwrite or retry occurs.
-    for creator_id, row, skill, hashes, freeze, manifest, consumers in plans:
+    for creator_id, row, skill, hashes, caches, freeze, manifest, consumers in plans:
         freeze.mkdir(parents=True, exist_ok=False)
         frozen_skill = freeze / skill.name
-        shutil.copytree(skill, frozen_skill)
-        if file_hashes(skill) != hashes or file_hashes(frozen_skill) != hashes:
+        shutil.copytree(skill, frozen_skill, ignore=ignore_runtime_caches)
+        if artifact_inventory(skill) != (hashes, caches) or file_hashes(frozen_skill) != hashes:
             raise ValueError(f"Artifact changed while freezing: {creator_id}")
         write_json(manifest, {"creator_id": creator_id, "source_path": str(skill),
                              "frozen_path": str(frozen_skill), "file_sha256": hashes,
                              "source_file_modes": {key: stat.S_IMODE((skill / key).stat().st_mode)
                                                    for key in hashes},
+                             "excluded_runtime_cache_sha256": caches,
+                             "cache_handling": "Regular *.pyc directly inside __pycache__ are retained in the original creator folder but omitted from the frozen/copy resources and durable checkpoint; their bytes are not claimed preserved",
                              "schedule_sha256": SCHEDULE_SHA256,
                              "case_bank_manifest_sha256": digest(case_manifest),
-                             "scope": "Entire supplied Skill file set and bytes; no quality judgment"})
+                             "scope": "Supplied Skill resources and bytes, with explicitly recorded Python runtime-cache exclusions; no quality judgment"})
         for use_id, variant, folder, source, source_hashes in consumers:
             folder.mkdir(parents=True, exist_ok=False)
             (folder / "work").mkdir()
@@ -263,10 +287,19 @@ Record actual public commands, exit codes, relevant stdout/stderr and files used
                 stream.write(prompt)
             copied = {part + "/" + key: value for part in ("skill", "input")
                       for key, value in file_hashes(folder / part).items()}
+            copied_modes = {key: stat.S_IMODE((folder / key).stat().st_mode) for key in copied}
+            initial_state_evidence = {}
+            if row["case"] == "S06":
+                for relative in (f"consumer-setup/{use_id}.json",
+                                 f"state-snapshots/{use_id}/initial.sql",
+                                 f"state-snapshots/{use_id}/initial.json"):
+                    initial_state_evidence[relative] = digest(checked_path(ROOT / relative))
             metadata = {"consumer_id": use_id, "creator_id": creator_id, "case": row["case"],
                         "variant": variant, "requested_model": "gpt-5.6-sol",
                         "requested_effort": "high", "context": "fresh",
                         "copied_sha256": copied, "prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(),
+                        "copied_file_modes": copied_modes,
+                        "initial_state_evidence_sha256": initial_state_evidence,
                         "artifact_freeze_manifest": str(manifest), "artifact_freeze_sha256": digest(manifest),
                         "case_bank_manifest_sha256": digest(case_manifest),
                         "request_source": str(original_request), "request_source_sha256": digest(original_request),

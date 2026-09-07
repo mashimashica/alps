@@ -150,6 +150,7 @@ def draft_for(line: dict[str, Any], status: str, responsibilities: dict[str, Any
 def review(data: Any) -> dict[str, Any]:
     month, orders, events, coverage, responsibilities = normalize(data)
     lines_by_key = {(o["order_id"], o["sku"]): o for o in orders}
+    in_scope_order_ids = {o["order_id"] for o in orders}
 
     # Collapse exact duplicate event rows, while retaining all content variants for conflict reporting.
     by_event_id: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -180,7 +181,7 @@ def review(data: Any) -> dict[str, Any]:
             key = (event["order_id"], event["sku"])
             if event["event_month"] != month:
                 continue
-            if event["order_id"] not in {o["order_id"] for o in orders}:
+            if event["order_id"] not in in_scope_order_ids:
                 ignored_ids.add(eid)
                 continue
             if key not in lines_by_key:
@@ -192,6 +193,11 @@ def review(data: Any) -> dict[str, Any]:
             if eid not in used_event_ids[key]:
                 observed[key] += event["quantity"]
                 used_event_ids[key].append(eid)
+    # A shared event ID that also has an in-scope current-month variant is
+    # conflicting evidence, not an entirely out-of-scope event.
+    for eid, variants in by_event_id.items():
+        if any(e["event_month"] == month and e["order_id"] in in_scope_order_ids for e in variants):
+            ignored_ids.discard(eid)
 
     global_issues: list[dict[str, Any]] = []
     for key in sorted(identity_keys):

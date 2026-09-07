@@ -58,10 +58,23 @@ def verify():
 
 
 def evidence_files():
+    native_index = ROOT / "sqlite-evidence-index.json"
+    represented = json.loads(native_index.read_text()) if native_index.exists() else {}
+    for relative, record in represented.items():
+        source = ROOT / relative
+        for key, hash_key in (("sql_path", "sql_sha256"), ("metadata_path", "metadata_sha256")):
+            target = ROOT / record[key]
+            if (target.resolve() != target or not target.is_relative_to(ROOT)
+                    or hashlib.sha256(target.read_bytes()).hexdigest() != record[hash_key]):
+                raise SystemExit(f"Native SQL representation changed or missing: {relative}")
+        if source.exists() and hashlib.sha256(source.read_bytes()).hexdigest() != record["source_sha256"]:
+            raise SystemExit(f"SQLite evidence changed since its preserved native SQL: {relative}")
     for path, relative in files():
         if relative.parts[:2] == ("frozen", "alps"):
             continue
         if relative.parts[:3] == ("frozen", "skill-creator", "assets"):
+            continue
+        if relative.as_posix() in represented:
             continue
         yield path, relative
 

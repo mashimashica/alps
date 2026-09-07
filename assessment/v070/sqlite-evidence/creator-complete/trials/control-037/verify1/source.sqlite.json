@@ -1,0 +1,8 @@
+{
+  "source_path": "trials/control-037/verify1/source.sqlite",
+  "source_sha256": "09a3ab50d2f062e2eba80456a762e000caee14c23f3457aef34689769cdfa91b",
+  "sql_path": "sqlite-evidence/creator-complete/trials/control-037/verify1/source.sqlite.sql",
+  "sql_sha256": "219e63be90b1d1eb5c8e921ba5474934bd30a8fedf2bdb687eb18f441e5397e8",
+  "sqlite_version": "3.53.1",
+  "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history"
+}

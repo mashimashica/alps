@@ -25,6 +25,8 @@
 
 | First C creators and frozen consumer bank | 9010eb90c0df7bd651d28edf7b58ff204d21f750 | 2,403 evidence files; tree 55259625a892256f9ef0e2b8c5a1de5f1c43c933. Creators 001–014 complete, partial later creator artifacts, completed/read new-case review and S09 correction follow-up, frozen 29-file consumer bank and six oracle hashes. Consumer packaging was under implementation; no C consumer had started. |
 
+| C creators and predeclared consumer/grading allocation | cdbb51b991c9d6efe44dd61a602f8e41fcfbb4ce | 2,446 evidence files; tree ffcca382b8b477a5e1b304cbde481f880176de4e. 26 creators explicitly complete, later creator evidence in progress; fixed 144-cell consumer schedule and prespecified secondary-review sample; concrete blocked-stage decision record. Consumer packaging drafts are preserved but not yet approved or used. |
+
 Branch: assessment/v070-evidence. Prefix: assessment/v070/. Initial tree: c40d6345d778cb1c44be80f20382ccc9d8b059f2. Commit tree, parent, author-matching DCO, and branch ref were verified through the direct API. The local frozen/alps convenience export is reconstructed from the baseline commit and is not duplicated in the checkpoint.
 
 This log is included in the next checkpoint; the latest branch ref is authoritative when recovering after a save whose local log update was interrupted.

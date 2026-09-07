@@ -1,0 +1,32 @@
+{
+  "trials/control-037/verify1/source.sqlite": {
+    "metadata_path": "sqlite-evidence/creator-complete/trials/control-037/verify1/source.sqlite.json",
+    "metadata_sha256": "17fb4b88117fb3e87d85615095f749b223f860ea8467cb48d2d67b06c33d9f6a",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/control-037/verify1/source.sqlite",
+    "source_sha256": "09a3ab50d2f062e2eba80456a762e000caee14c23f3457aef34689769cdfa91b",
+    "sql_path": "sqlite-evidence/creator-complete/trials/control-037/verify1/source.sqlite.sql",
+    "sql_sha256": "219e63be90b1d1eb5c8e921ba5474934bd30a8fedf2bdb687eb18f441e5397e8",
+    "sqlite_version": "3.53.1"
+  },
+  "trials/control-037/verify2/source.sqlite": {
+    "metadata_path": "sqlite-evidence/creator-complete/trials/control-037/verify2/source.sqlite.json",
+    "metadata_sha256": "b79d368bd1029236070fba5f7a8d2987bf19e43f7b9f2d6ca2be02dd94c2b2e4",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/control-037/verify2/source.sqlite",
+    "source_sha256": "48384daa5b4ef3a0576e5950c025fe623be38d2cf90c65ec6e6d9104ea0637b6",
+    "sql_path": "sqlite-evidence/creator-complete/trials/control-037/verify2/source.sqlite.sql",
+    "sql_sha256": "6f349b0986fd242c4479a8b1497f8eda60ed553091b8f2aa2f2d8e433cad0f56",
+    "sqlite_version": "3.53.1"
+  },
+  "trials/control-037/verify3/source.sqlite": {
+    "metadata_path": "sqlite-evidence/creator-complete/trials/control-037/verify3/source.sqlite.json",
+    "metadata_sha256": "f585919396a632e43278a5efa90784c7e4b342ec3baf292a78df64076a00417f",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/control-037/verify3/source.sqlite",
+    "source_sha256": "750f7b1217622fe9d4ee416987a35adbd2be5d04c2dcb088600f8aa950d5e3ab",
+    "sql_path": "sqlite-evidence/creator-complete/trials/control-037/verify3/source.sqlite.sql",
+    "sql_sha256": "76663ce0dc1bcdd9daca679aa9f5665e38123a58a5213bab37e4a414cd1ec479",
+    "sqlite_version": "3.53.1"
+  }
+}
