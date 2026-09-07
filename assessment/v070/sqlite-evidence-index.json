@@ -188,5 +188,45 @@
     "sql_path": "sqlite-evidence/in-progress-observation-001/trials/control-045/verification-67gg939x/source.sqlite.sql",
     "sql_sha256": "4ce661ac48573972ab743e9d93a88ce8ae53b9450dd7cad6b1d7abf3cfaefa6a",
     "sqlite_version": "3.53.1"
+  },
+  "trials/control-046/verification/empty.sqlite": {
+    "metadata_path": "sqlite-evidence/creator-complete/trials/control-046/verification/empty.sqlite.json",
+    "metadata_sha256": "2974ef8960c2cd82feb7ef7f17656a62b11bd98802bce637fe4ac738bb9c106a",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/control-046/verification/empty.sqlite",
+    "source_sha256": "32e4481e5945c7e557ce8e87132f9c4bafa287f8d32bff927bceae4a54df3afb",
+    "sql_path": "sqlite-evidence/creator-complete/trials/control-046/verification/empty.sqlite.sql",
+    "sql_sha256": "85988cf56b2374a06fbb212b98b3d87868704f2b75171fac68c1b14625bab2e7",
+    "sqlite_version": "3.53.1"
+  },
+  "trials/control-046/verification/lost.sqlite": {
+    "metadata_path": "sqlite-evidence/creator-complete/trials/control-046/verification/lost.sqlite.json",
+    "metadata_sha256": "188bc30d91056e1a97ba415a5a3c41e119eb5b1e88753996f192d5e4a51992b2",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/control-046/verification/lost.sqlite",
+    "source_sha256": "c2ebc9504d2d8939e50e17ed525bd121f5f6b9c0a9c21ddda45b4e22c21809d5",
+    "sql_path": "sqlite-evidence/creator-complete/trials/control-046/verification/lost.sqlite.sql",
+    "sql_sha256": "25870fcb24fbdde1bdd8349b47f20c0430ad93f2b3a8d65cec579435e480c40c",
+    "sqlite_version": "3.53.1"
+  },
+  "trials/control-046/verification/main.sqlite": {
+    "metadata_path": "sqlite-evidence/creator-complete/trials/control-046/verification/main.sqlite.json",
+    "metadata_sha256": "15a8ef466e9f3e5fc07e071a5efd62295e4af05d8067129a0cfe63b9b133ceb0",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/control-046/verification/main.sqlite",
+    "source_sha256": "dc2fbf3e44cb5d135b61ed552cc554f13fb8c458873bc54b2e1a9742663b7fb9",
+    "sql_path": "sqlite-evidence/creator-complete/trials/control-046/verification/main.sqlite.sql",
+    "sql_sha256": "4ce661ac48573972ab743e9d93a88ce8ae53b9450dd7cad6b1d7abf3cfaefa6a",
+    "sqlite_version": "3.53.1"
+  },
+  "trials/control-046/verification/no-match.sqlite": {
+    "metadata_path": "sqlite-evidence/creator-complete/trials/control-046/verification/no-match.sqlite.json",
+    "metadata_sha256": "f6bad33d9d7cbf703f5af78c4937437a51175f67e385cc684ac915eff84775db",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/control-046/verification/no-match.sqlite",
+    "source_sha256": "83eb720a67eca01f2a6a40adf3d25de5cabaa9d0fa5d82451db2a10692039ea6",
+    "sql_path": "sqlite-evidence/creator-complete/trials/control-046/verification/no-match.sqlite.sql",
+    "sql_sha256": "f542f4c33b773332629af01b7a405e26c558d7663c385a592bee9273a0d324f7",
+    "sqlite_version": "3.53.1"
   }
 }

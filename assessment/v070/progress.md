@@ -9,7 +9,7 @@ Frozen current main A is dee3866d35e43db5db480fc9f85166a8dcb1ec3b, VERSION 0.7.0
 | Stage | Completed design | Completed consumer | Other completed | Planned task trials |
 | --- | ---: | ---: | ---: | ---: |
 | Calibration | 12 | 24 | 0 | 36 |
-| C control | 42 | 43 | 0 | 216 |
+| C control | 46 | 48 | 0 | 216 |
 | Remaining base plan | 0 | 0 | 0 | up to 1,776 |
 
 Additional diagnostic reserve: at most 72 starts across at most three rounds. H01–H03 used 68 starts: 66 complete and two retained interrupted originals. Four slots remain, but do not authorize a fourth ordinary round. Across calibration/development, 34 creators and 68 valid consumers are complete. Completed tasks, observation validity, business adequacy and achieved Outcomes are different counts.
@@ -24,11 +24,11 @@ Additional diagnostic reserve: at most 72 starts across at most three rounds. H0
 
 ## Work in progress
 
-C creators 001–042 are complete/form-pass; 043–044 running. C-U001–084 are prepared; 001–043 complete and 044–046 running. S03-P03's saved blind packet is under independent primary review. All C schedules, consumer cases/oracles and review allocation are fixed. S01/S05/S10 use original independent stimuli, not newly held-out cases. The recorded creator-029 workspace-enumeration deviation is retained without an ungrounded exclusion or retry.
+C creators 001–046 are complete/form-pass; 047–048 running. C-U001–092 are prepared; 001–048 complete, later applications unstarted. All S03 packets are saved. P03 primary is complete/read; it identifies one bounded dependency-communication deficiency for independent second review. P03 second, P01 primary/second and P02 primary are running. All C schedules, consumer cases/oracles and review allocation remain fixed. S01/S05/S10 use original independent stimuli, not newly held-out cases. The recorded creator-029 workspace-enumeration deviation is retained without an ungrounded exclusion or retry.
 
 Consumer/blind packaging reviews and SQLite preservation integration are complete/read. Helpers verify frozen bytes/modes and maintain original final-state evidence without interpreting semantic success. Actual creator verification databases are preserved at their original paths and, for direct UTF-8 saving, as indexed native SQL with hashes. S06 consumer states are independently initialized outside the evidence tree; preserve their actual final committed state with control_ledger_state.py after completion, without resetting quota or granting another tranche.
 
-Latest verified checkpoint is cda73fd475601693c10071e50a7294a6f29ebb00 (3,573 published files). It saves 42 creators, 84 prepared consumers and S03-P03 before review. Later statuses and resume/progress updates await the next checkpoint. Exact tree/ref receipts and failed-export reconciliations are in checkpoints.md. The separate assessment/v070-evidence branch is not merged into product distribution.
+Latest verified checkpoint before this update is 9bc9547b2b4ba7cefb5ecab8b859fecdd19f8974 (3,821 published files). It saves all 48 completed consumers and S03 packets, 43 completed creators and 86 prepared consumers, with explicit committed observations from then-running C044/C045. Both creators later completed; all six observed database hashes were unchanged. C046's completed states and preparation through consumer 092 await the next checkpoint. Exact tree/ref receipts and failed-export reconciliations are in checkpoints.md. The separate assessment/v070-evidence branch is not merged into product distribution.
 
 ## Remaining decisions and verification limits
 

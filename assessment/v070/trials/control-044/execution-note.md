@@ -126,3 +126,20 @@ Exit code: `2`. An unmetered `describe` afterward reported tranche `1` and `rema
 - The supplied nonempty 17-entry snapshot and requested interval were tested end to end. A separate empty source and a valid interval with no qualifying entries were not run; those paths use the same exhaustion and finalization logic.
 - Lost stdout, malformed successful page responses, process interruption during checkpoint replacement, invalid cursors, and snapshot mismatches were not fault-injected. Their stop or recovery behavior was reviewed from the implementation but not demonstrated against a faulting API wrapper.
 - `quick_validate.py` checks physical Skill form, not business correctness. Business behavior was checked with the live stand-in traversal and independent fixture calculation described above.
+
+## Final artifact check
+
+Command:
+
+```sh
+find deliverables -type f -print | sort
+```
+
+Observed output:
+
+```text
+deliverables/skills/reimbursement-ledger-rollup/SKILL.md
+deliverables/skills/reimbursement-ledger-rollup/scripts/reimbursement_rollup.py
+```
+
+Exit code: `0`. A final repeat of the physical-format validator again printed `Skill is valid!` and exited `0`.

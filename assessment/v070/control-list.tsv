@@ -42,11 +42,11 @@ control-040	control	S06	C	2	gpt-5.6-luna	high	completed	/root/control_make_040	2
 control-041	control	S06	C	1	gpt-5.6-sol	low	completed	/root/control_make_041	2026-09-07T19:35:37.246403+00:00	2026-09-07T19:39:38.265900+00:00
 control-042	control	S06	C	2	gpt-5.6-sol	low	completed	/root/control_make_042	2026-09-07T19:35:37.656578+00:00	2026-09-07T19:41:58.913361+00:00
 control-043	control	S06	C	1	gpt-5.6-sol	high	completed	/root/control_make_043	2026-09-07T19:39:38.674951+00:00	2026-09-07T19:51:59.826225+00:00
-control-044	control	S06	C	2	gpt-5.6-sol	high	running	/root/control_make_044	2026-09-07T19:43:19.697081+00:00	
-control-045	control	S06	C	1	gpt-6-astra	low	running	/root/control_make_045	2026-09-07T19:50:18.947703+00:00	
-control-046	control	S06	C	2	gpt-6-astra	low	running	/root/control_make_046	2026-09-07T19:51:59.417777+00:00	
-control-047	control	S06	C	1	gpt-6-astra	high	not started			
-control-048	control	S06	C	2	gpt-6-astra	high	not started			
+control-044	control	S06	C	2	gpt-5.6-sol	high	completed	/root/control_make_044	2026-09-07T19:43:19.697081+00:00	2026-09-07T19:55:19.096728+00:00
+control-045	control	S06	C	1	gpt-6-astra	low	completed	/root/control_make_045	2026-09-07T19:50:18.947703+00:00	2026-09-07T19:55:19.096728+00:00
+control-046	control	S06	C	2	gpt-6-astra	low	completed	/root/control_make_046	2026-09-07T19:51:59.417777+00:00	2026-09-07T19:55:19.096728+00:00
+control-047	control	S06	C	1	gpt-6-astra	high	running	/root/control_make_047	2026-09-07T19:55:19.532358+00:00	
+control-048	control	S06	C	2	gpt-6-astra	high	running	/root/control_make_048	2026-09-07T19:55:19.943969+00:00	
 control-049	control	S09	C	1	gpt-5.6-luna	low	not started			
 control-050	control	S09	C	2	gpt-5.6-luna	low	not started			
 control-051	control	S09	C	1	gpt-5.6-luna	high	not started			

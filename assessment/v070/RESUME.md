@@ -30,10 +30,10 @@ No qualifying B exists. Main A/B and its dependent stages remain blocked, not wa
 All 72 creator assignments and the 144-consumer schedule were frozen before execution. Creator families: 001–012 S01, 013–024 S03, 025–036 S05, 037–048 S06, 049–060 S09, 061–072 S10. Within each family, pairs are luna/low, luna/high, sol/low, sol/high, astra/low, astra/high. Consumers are fresh sol/high. Each creator has ordinary then challenging consumers.
 
 At this reconciliation:
-- Creators 001–042 complete/form-pass; 043–044 running; 045–072 unstarted.
-- Consumers 001–084 prepared. C-U001–039 complete; 040–042 running; later prepared consumers unstarted.
+- Creators 001–046 complete/form-pass; 047–048 running; 049–072 unstarted.
+- Consumers 001–092 prepared. C-U001–048 complete; later prepared consumers unstarted.
 - S01 all three primary grades and prespecified P01 second grade complete/read. control-S01-closeout.md: 24 correct adequate answers, no evidenced package compensation, six separately unconfirmed writing-method observations.
-- S03-P03 packet is saved; business_s03_p03_primary is running. Other S03 packets are not prepared.
+- All S03 packets are saved. P03 primary is complete/read; P03 second is running on unchanged evidence after a bounded clarity finding. P01 primary/second and P02 primary are running. Read the full reports before root closeout; a progress message is not a completed grade.
 - Consult control-list.tsv, control-consumer-list.tsv, control-grading-list.tsv and live agents for later notifications. Counts above are an observation, not a claim that later work has not completed.
 - Preserve creator-029's reported workspace-enumeration deviation in audits/control-creator-observation-limits.md. It neither authorized a rerun nor established complete absence of leakage.
 
