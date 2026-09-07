@@ -58,5 +58,35 @@
     "sql_path": "sqlite-evidence/creator-complete/trials/control-039/verification/source.sqlite.sql",
     "sql_sha256": "4ce661ac48573972ab743e9d93a88ce8ae53b9450dd7cad6b1d7abf3cfaefa6a",
     "sqlite_version": "3.53.1"
+  },
+  "trials/control-041/verify-20260907/source.sqlite": {
+    "metadata_path": "sqlite-evidence/creator-complete/trials/control-041/verify-20260907/source.sqlite.json",
+    "metadata_sha256": "0d053d3a3f17309bda6946e8e7991acda468ffb5e736832c78031d7c02fb4ad1",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/control-041/verify-20260907/source.sqlite",
+    "source_sha256": "dc2fbf3e44cb5d135b61ed552cc554f13fb8c458873bc54b2e1a9742663b7fb9",
+    "sql_path": "sqlite-evidence/creator-complete/trials/control-041/verify-20260907/source.sqlite.sql",
+    "sql_sha256": "4ce661ac48573972ab743e9d93a88ce8ae53b9450dd7cad6b1d7abf3cfaefa6a",
+    "sqlite_version": "3.53.1"
+  },
+  "trials/control-041/verify-invalid/source.sqlite": {
+    "metadata_path": "sqlite-evidence/creator-complete/trials/control-041/verify-invalid/source.sqlite.json",
+    "metadata_sha256": "57083a0c12d85a3577b409cf586d19763944e6dc4b4a758ba1a35afcd2e71e0d",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/control-041/verify-invalid/source.sqlite",
+    "source_sha256": "48384daa5b4ef3a0576e5950c025fe623be38d2cf90c65ec6e6d9104ea0637b6",
+    "sql_path": "sqlite-evidence/creator-complete/trials/control-041/verify-invalid/source.sqlite.sql",
+    "sql_sha256": "6f349b0986fd242c4479a8b1497f8eda60ed553091b8f2aa2f2d8e433cad0f56",
+    "sqlite_version": "3.53.1"
+  },
+  "trials/control-042/disposable/source.sqlite": {
+    "metadata_path": "sqlite-evidence/creator-complete/trials/control-042/disposable/source.sqlite.json",
+    "metadata_sha256": "7040af1eec876c086fdc1626fddecfbfbbf1aa0537776b1db1a182ce479edb27",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/control-042/disposable/source.sqlite",
+    "source_sha256": "dc2fbf3e44cb5d135b61ed552cc554f13fb8c458873bc54b2e1a9742663b7fb9",
+    "sql_path": "sqlite-evidence/creator-complete/trials/control-042/disposable/source.sqlite.sql",
+    "sql_sha256": "4ce661ac48573972ab743e9d93a88ce8ae53b9450dd7cad6b1d7abf3cfaefa6a",
+    "sqlite_version": "3.53.1"
   }
 }
