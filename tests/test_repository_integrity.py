@@ -17,7 +17,13 @@ ROOT = Path(__file__).resolve().parents[1]
 VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 SKILLS_ROOT = ROOT / "skills"
 DISTRIBUTED_SKILLS = ("design-agent-work-system", "design-process-description")
-PACKAGE_DIRECTORIES = ("skills", "spec", "assets", "examples")
+PACKAGE_DIRECTORIES = ("skills", "assets", "examples")
+PROCESS_FRAMEWORK = (
+    SKILLS_ROOT / "design-process-description/references/process-framework.md"
+)
+WORK_SYSTEM_PRINCIPLES = (
+    SKILLS_ROOT / "design-agent-work-system/references/agent-work-system-design.md"
+)
 PLUGIN_MANIFESTS = (
     ROOT / "plugin.json",
     ROOT / ".claude-plugin/plugin.json",
@@ -34,12 +40,10 @@ REQUIRED_PATHS = (
     ROOT / "README.md",
     ROOT / "docs/locales/ja/README.md",
     ROOT / "localization.yaml",
-    ROOT / "spec/process-framework.md",
-    ROOT / "spec/locales/ja/process-framework.md",
-    ROOT / "spec/ALPS-SPEC.md",
-    ROOT / "spec/locales/ja/ALPS-SPEC.md",
-    ROOT / "spec/agent-work-system-design.md",
-    ROOT / "spec/locales/ja/agent-work-system-design.md",
+    PROCESS_FRAMEWORK,
+    PROCESS_FRAMEWORK.parent / "locales/ja" / PROCESS_FRAMEWORK.name,
+    WORK_SYSTEM_PRINCIPLES,
+    WORK_SYSTEM_PRINCIPLES.parent / "locales/ja" / WORK_SYSTEM_PRINCIPLES.name,
     ROOT / "CONTRIBUTING.md",
     ROOT / "docs/locales/ja/CONTRIBUTING.md",
     ROOT / "docs/versioning.md",
@@ -110,8 +114,10 @@ def active_markdown_files(root: Path) -> list[Path]:
     files += [root / ".github/pull_request_template.md"]
     files += list((root / "docs").glob("*.md"))
     files += [root / "docs/releases" / f"{VERSION}.md"]
-    for directory in ("spec", "skills", "examples", "docs/locales/ja"):
+    for directory in ("skills", "examples"):
         files += list((root / directory).rglob("*.md"))
+    files += list((root / "docs/locales/ja").glob("*.md"))
+    files += [root / "docs/locales/ja/releases" / f"{VERSION}.md"]
     files += [root / ".agents/skills" / name / "SKILL.md" for name in REPOSITORY_SKILLS]
     return sorted(set(files))
 
@@ -320,7 +326,7 @@ class RepositoryIntegrityTests(unittest.TestCase):
             self.assertNotIn(skill_name, serialized_manifests)
         self.assertNotIn(".agents/skills", serialized_manifests)
 
-    def test_required_specification_references_survive_plugin_packaging(self) -> None:
+    def test_required_principle_references_survive_plugin_packaging(self) -> None:
         # Copy the actual distributable sources, without repository development
         # Skills or parent checkout files. Relative references must still work.
         with tempfile.TemporaryDirectory() as directory:
@@ -336,10 +342,11 @@ class RepositoryIntegrityTests(unittest.TestCase):
             for name in DISTRIBUTED_SKILLS:
                 skill = package / "skills" / name / "SKILL.md"
                 targets = {(skill.parent / link).resolve() for link in local_links(skill)}
-                for required in ("process-framework.md", "ALPS-SPEC.md"):
-                    self.assertIn(package / "spec" / required, targets)
+                self.assertIn(package / PROCESS_FRAMEWORK.relative_to(ROOT), targets)
                 if name == "design-agent-work-system":
-                    self.assertIn(package / "spec/agent-work-system-design.md", targets)
+                    self.assertIn(
+                        package / WORK_SYSTEM_PRINCIPLES.relative_to(ROOT), targets
+                    )
             for path in package.rglob("*.md"):
                 for link in local_links(path):
                     with self.subTest(source=path.relative_to(package), link=link):
@@ -389,9 +396,8 @@ class RepositoryIntegrityTests(unittest.TestCase):
 
     def test_foundations_have_only_their_own_translation_as_local_reference(self) -> None:
         # This checks the declared dependency graph, not the meaning of prose.
-        for name in ("process-framework.md", "agent-work-system-design.md"):
-            english = ROOT / "spec" / name
-            japanese = ROOT / "spec/locales/ja" / name
+        for english in (PROCESS_FRAMEWORK, WORK_SYSTEM_PRINCIPLES):
+            japanese = english.parent / "locales/ja" / english.name
             for source, counterpart in ((english, japanese), (japanese, english)):
                 with self.subTest(source=source.relative_to(ROOT)):
                     self.assertEqual(

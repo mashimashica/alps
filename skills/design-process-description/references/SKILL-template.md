@@ -19,7 +19,7 @@ description: <What this Skill does and when to use it.>
 
 The frontmatter is ordinary Agent Skill discovery information. Name, Purpose, and one or more Outcomes are the required Process content. Replace the placeholders; do not add empty optional sections.
 
-Each Outcome describes a result state needed for the Purpose; together, the Outcomes must be sufficient to satisfy it. Use [examples](examples.md) when additional work detail, conditions, references, or evaluation context is needed. This template is informative; the [Framework](../../../spec/process-framework.md) and [Specification](../../../spec/ALPS-SPEC.md) govern meaning and representation.
+Each Outcome describes a result state needed for the Purpose; together, the Outcomes must be sufficient to satisfy it. Use [examples](examples.md) when additional work detail, conditions, references, or evaluation context is needed. This template is informative; the [Framework](process-framework.md) governs meaning and Markdown presentation. The [design Skill](../SKILL.md) explains the correspondence to Agent Skills.
 
 The [Production Release example](examples.md#production-release) shows how to add Activity headings, numbered Tasks, and attached NOTEs while keeping obligations in the main text.
 

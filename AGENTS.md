@@ -8,10 +8,9 @@ These instructions apply to the repository. Follow the user's authorized scope a
 
 | Subject | Source |
 | --- | --- |
-| Process meaning, boundaries, references, change, and evaluation | [Process Framework](spec/process-framework.md) |
-| Agent, tool, information, and environment design | [Design Principles for Agent Work Systems](spec/agent-work-system-design.md) |
-| Integration of the two foundations in Agent Skills | [ALPS Specification](spec/ALPS-SPEC.md), with each source governing its subject |
-| The distributed design Processes | [design-process-description](skills/design-process-description/SKILL.md) and [design-agent-work-system](skills/design-agent-work-system/SKILL.md) |
+| Process meaning, boundaries, references, change, and evaluation | [Process Framework](skills/design-process-description/references/process-framework.md) |
+| Agent, tool, information, and environment design | [Design Principles for Agent Work Systems](skills/design-agent-work-system/references/agent-work-system-design.md) |
+| Design work and its application to Agent Skills | [design-process-description](skills/design-process-description/SKILL.md) and [design-agent-work-system](skills/design-agent-work-system/SKILL.md) |
 | Repository work and distribution | This file |
 | Drafting aids | [Template](skills/design-process-description/references/SKILL-template.md) and [examples](skills/design-process-description/references/examples.md), both informative |
 
@@ -25,13 +24,13 @@ Do not infer Process requirements from tests, templates, Host manifests, icons, 
 | `.agents/skills/<distributed-skill>` | Relative symlink to `../../skills/<distributed-skill>` for repository discovery. |
 | `.agents/skills/review-alps/` | Real directory for repository semantic and distribution review; not a Plugin Skill. |
 | `.agents/skills/sync-locales/` | Real directory for English/Japanese review; not a Plugin Skill. |
-| `spec/` | Shared normative sources included in the Plugin root. |
-| `spec/locales/ja/`, `docs/locales/ja/`, and each Skill's `references/locales/ja/` | Supported translations of the corresponding English source files. |
+| Each Skill's `references/` | Principles and supporting material used by that Skill; each document's role determines its normative force. |
+| `docs/locales/ja/` and each Skill's `references/locales/ja/` | Supported translations of the corresponding English source files. |
 | `examples/` | Bundled reference material, including a working target Skill; outside Plugin Skill discovery. The guide's translation is in `examples/locales/ja/`, and the target Skill's translations are in its `references/locales/ja/`. |
 | `plugin.json`, `.claude-plugin/`, `.cursor-plugin/`, `.codex-plugin/` | Root Plugin format and distinct Host adapters. |
 | `assets/` and the Skill's `agents/` and `assets/` | Presentation resources. |
 
-`skills/` is the source of Plugin Skills. Hosts discover it through their applicable conventions and manifests. `.agents/skills/` is an integrated repository view, not a universal Host convention. A checkout can contain development Skills without exposing them as Plugin Skills. Preserve the Plugin root layout so links to `spec/` and `examples/` remain usable. Keep development Skills and example Skills outside `skills/`.
+`skills/` is the source of Plugin Skills. Hosts discover it through their applicable conventions and manifests. `.agents/skills/` is an integrated repository view, not a universal Host convention. A checkout can contain development Skills without exposing them as Plugin Skills. Preserve the complete Plugin layout so references within and between Skills, and to `examples/`, remain usable. Keep development Skills and example Skills outside `skills/`.
 
 ## Change and review
 
@@ -39,7 +38,7 @@ Do not infer Process requirements from tests, templates, Host manifests, icons, 
 - Use `review-alps` for changes to specifications, Skill content, repository guidance, tests, distribution, or presentation that affect their meaning or boundaries.
 - Use `sync-locales` for each affected English/Japanese pair. Repository-development Skills have no Japanese Plugin counterparts.
 - Use `design-process-description` when authoring or reviewing a Process Description.
-- Use `design-agent-work-system` when designing or reviewing the supporting configuration, implementation, or effectiveness. Preserve shared work meaning and keep integration rules in ALPS-SPEC; the two foundational specifications are independently usable.
+- Use `design-agent-work-system` when designing or reviewing the supporting configuration, implementation, or effectiveness. Preserve shared work meaning and apply each foundation within its subject.
 - Keep each Host adapter aligned with its native format and the distribution layout above.
 - Apply [CONTRIBUTING](CONTRIBUTING.md) for contribution and licensing requirements and [Versioning](docs/versioning.md) for release policy.
 

@@ -14,9 +14,13 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ### Changed
 
-- Integrate Process Description and work-system design in ALPS-SPEC while preserving the Process Framework and the central responsibility of `design-process-description`.
-- Define Skill section and NOTE rules, apply the writing structure to both design Skills, and clarify how tools implement Controls and enforce Constraints alongside their enabling role.
+- Bundle the Process Framework and work-system design principles in their corresponding Skills' references, and place Agent Skill application rules in the design Skills.
+- Define Markdown Process section and explanatory-note rules in the Framework, using `NOTE` in English and `注記` in Japanese. Apply the writing structure to both design Skills, and clarify how tools implement Controls and enforce Constraints alongside their enabling role.
 - Align discovery, native Host manifests, resources, guidance, and validation with the two design Skills and bundled example material.
+
+### Removed
+
+- The separate ALPS Specification and `spec/` directory; the design Skills and their referenced principles carry the applicable rules.
 
 See the [release notes](docs/releases/0.7.0.md) ([Japanese](docs/locales/ja/releases/0.7.0.md)) for the scope and update guidance.
 

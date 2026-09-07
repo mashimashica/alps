@@ -145,3 +145,13 @@ A successful description review must not be reported as successful execution. Ex
 Measures used in an evaluation should connect the information needed to defined measures, collected data, analysis, indicators, and the decisions they support. Findings and lessons should inform improvement decisions, and the effects of resulting changes should be assessed against the intended results. Execution, approval, measurement, and record-keeping arrangements are supplied by the applying environment.
 
 Unconfirmed facts, assumptions, unmet conditions, and exclusions must remain distinguishable. An exclusion needs an applicability rationale; missing evidence is not a reason to mark a requirement inapplicable. None of these conditions may be silently converted into success. Findings must expose evidence gaps and their consequences.
+
+## 9. Markdown presentation
+
+A Process Description written in Markdown must use a title for Name and separate Purpose and Outcomes sections, using these headings or their equivalents in the document's language. The Outcomes section must contain one or more list items, each stating one Outcome. Additional elements are included according to the detail needed.
+
+Work detail should use an Activities & Tasks section, with Activity subheadings and numbered Tasks under each Activity. A Tasks section may be used where grouping adds no useful distinction. Each Task's action and normative force must be clear in its statement or through an explicit statement governing the list. Numbering identifies list items; necessary execution order must be stated as Constraints. Other Process elements should use their element names, or translated equivalents, as section headings where separate treatment is useful.
+
+An explanatory note must be a Markdown blockquote beginning with `NOTE` in English or `注記` in Japanese, placed immediately after the text it explains, with its scope clear from that placement. In another language, use the equivalent label. A note attached to a list item must be indented within that item. Numbers may be added after the label to distinguish multiple notes within the relevant section; references to numbered notes must identify that section.
+
+Notes may explain scope, terminology, rationale, examples, or relationships where that helps understanding or application. Requirements, prohibitions, recommendations, and permissions must be stated outside notes. A note must preserve the meaning and normative force of the content it explains.

@@ -18,7 +18,7 @@ ALPS is an [Agent Plugins](https://agent-plugins.org/) package with Claude, Curs
 npx plugins add mashimashica/alps
 ```
 
-Reload affected clients after installation. Keep the Plugin root layout, including `spec/` and `examples/`, so required specifications and bundled references remain accessible. Check that your client exposes `design-process-description` and `design-agent-work-system` and that their specification links open.
+Reload affected clients after installation. Keep both Skills with their reference resources and the bundled `examples/` in the complete Plugin layout, so required links within and between Skills remain accessible. Check that your client exposes `design-process-description` and `design-agent-work-system` and that their reference links open.
 
 ## Use the Skills
 
@@ -66,9 +66,8 @@ ALPS supplies descriptions, design principles, and design support. Your environm
 
 | Resource | English | Japanese |
 | --- | --- | --- |
-| Meaning of Process Descriptions | [Process Framework](spec/process-framework.md) | [プロセスフレームワーク](spec/locales/ja/process-framework.md) |
-| Work-system design | [Design principles](spec/agent-work-system-design.md) | [エージェント作業システムの設計原則](spec/locales/ja/agent-work-system-design.md) |
-| Integration in Agent Skills | [ALPS Specification](spec/ALPS-SPEC.md) | [ALPS Specification](spec/locales/ja/ALPS-SPEC.md) |
+| Meaning of Process Descriptions | [Process Framework](skills/design-process-description/references/process-framework.md) | [プロセスフレームワーク](skills/design-process-description/references/locales/ja/process-framework.md) |
+| Work-system design | [Design principles](skills/design-agent-work-system/references/agent-work-system-design.md) | [エージェント作業システムの設計原則](skills/design-agent-work-system/references/locales/ja/agent-work-system-design.md) |
 | Process Description Design | [Skill](skills/design-process-description/SKILL.md) | [Skill](skills/design-process-description/references/locales/ja/SKILL.md) |
 | Agent Work System Design | [Skill](skills/design-agent-work-system/SKILL.md) | [Skill](skills/design-agent-work-system/references/locales/ja/SKILL.md) |
 | Contribution and repository work | [CONTRIBUTING](CONTRIBUTING.md), [AGENTS](AGENTS.md) | [CONTRIBUTING](docs/locales/ja/CONTRIBUTING.md), [AGENTS](docs/locales/ja/AGENTS.md) |
