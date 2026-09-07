@@ -14,19 +14,19 @@ Support a justified decision about a service change's suitability for the specif
 - A judgment against each applicable pilot criterion is supported by comparable measurements and traceable calculations.
 - The scope and limits of the judgment, including their effects on the pilot decision, are explicit.
 
-## Activities
+## Activities & Tasks
 
 The following Tasks are required for this assessment. Their dependencies follow the evidence needed for each judgment.
 
 ### Establishing the assessment basis
 
-- Identify the baseline and candidate measurements and confirm the source and applicability of the [pilot conditions](references/pilot-context.md). Check that the service operation, load, duration, and environment are comparable. Identify missing or contradictory information.
-- Select the applicable criteria and parameters from those conditions. A changed pilot needs criteria and evidence that apply to that pilot.
+1. Identify the baseline and candidate measurements and confirm the source and applicability of the [pilot conditions](references/pilot-context.md). Check that the service operation, load, duration, and environment are comparable. Identify missing or contradictory information.
+2. Select the applicable criteria and parameters from those conditions. A changed pilot needs criteria and evidence that apply to that pilot.
 
 ### Producing and interpreting evidence
 
-- Use the [measurement tool](scripts/compare_measurements.py) as described in the [tool instructions](references/tool-use.md) to validate the inputs, calculate metrics, and compare them with the selected limits. Check its diagnostics and the identity of the measurements used.
-- Evaluate each criterion using the calculations and confirmed measurement conditions. Report a justified positive or negative assessment and its scope. If evidence is insufficient, report the gap and its effect; the affected Outcome remains unconfirmed.
+1. Use the [measurement tool](scripts/compare_measurements.py) as described in the [tool instructions](references/tool-use.md) to validate the inputs, calculate metrics, and compare them with the selected limits. Check its diagnostics and the identity of the measurements used.
+2. Evaluate each criterion using the calculations and confirmed measurement conditions. Report a justified positive or negative assessment and its scope. If evidence is insufficient, report the gap and its effect; the affected Outcome remains unconfirmed.
 
 ## Inputs
 

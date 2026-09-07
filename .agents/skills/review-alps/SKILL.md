@@ -26,10 +26,12 @@ The following Tasks are required within the requested review scope.
 - For work-system changes, read the [design principles](../../../spec/agent-work-system-design.md). Review responsibility allocation, public tool operations, information supply, execution conditions, and adaptation against the work. Verify the independent meaning of each foundation and their integration in the Specification.
 - Compare changed propositions by subject, modality, action or state, object, condition, quantifier, polarity, exception, and scope. Check that editorial changes preserve meaning and that intentional redefinitions have a basis in the requested design.
 - Assess each description's Purpose and independently assessable Outcomes for relevance, individual necessity, and collective sufficiency. Check necessary detail, Activity/Task cohesion and coverage, boundary roles, and the distinction between work relationships and execution order.
+- Review Skill sections, Task lists, and NOTE placement against the Specification. Check that notes explain the relevant content while obligations remain explicit in the main text; assess meaning separately from formatting.
 - Follow required references and information relationships. Assess source identity, shared conditions, context-limited changes, and effects on related work.
 - Check that description validity, execution results, satisfaction of requirements, and their supporting evidence remain distinguishable.
 - Assess the basis for Process selection and changes, including necessary information from affected parties and the applicability of criteria and evidence. Check the effects of changed conditions on dependent judgments and the treatment of unresolved findings.
 - Check the distinct design and evaluation subjects of both Skills, the common source of target work meaning, and resource roles. Assess the necessary correspondence between Tasks and tool operations, and between Process boundary information and tool interfaces.
+- For rules or restrictions implemented by tools, examine their correspondence to applicable Controls and Constraints, their sources and scope, and evidence that implementation preserves them. Distinguish configuration limits from requirements of the work.
 
 ### Distribution assessment
 

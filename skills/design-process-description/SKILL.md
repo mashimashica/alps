@@ -18,35 +18,42 @@ Clarify the purpose and success conditions of the target work as an understandab
 - The description's consistency with the Framework and required references is clear.
 - Unconfirmed matters and limits of application are explicit.
 
-## Activities
+## Activities & Tasks
 
 The Tasks below are required within the requested scope, except where stated as recommendations. Their relationships support revisiting the description as understanding develops.
 
 ### Work framing
 
-- Identify the requested scope and the available description or information about the target work.
-- Clarify the work's purpose and its boundary with adjacent work using the necessary information from affected parties. Confirm that information's source and applicability, and identify any gaps.
-- Identify uncertainties that could change the intended scope or success conditions.
+1. Identify the requested scope and the available description or information about the target work.
+2. Clarify the work's purpose and its boundary with adjacent work using the necessary information from affected parties. Confirm that information's source and applicability, and identify any gaps.
+3. Identify uncertainties that could change the intended scope or success conditions.
 
 ### Success and work description
 
-- Formulate observable Outcomes that are individually necessary and collectively sufficient for the Purpose. Keep independently assessable results distinguishable.
-- Determine the detail needed to understand, apply, or evaluate the work. Where work detail is needed, organize related actions into Activities and Tasks at a useful granularity and check their contribution to the Outcomes.
-- Describe necessary Inputs, Outputs, Controls, Constraints, Enablers, and Entry/Exit Criteria by their function. Preserve required methods and dependencies with their scope and leave other execution choices open.
+1. Formulate observable Outcomes that are individually necessary and collectively sufficient for the Purpose. Keep independently assessable results distinguishable.
+2. Determine the detail needed to understand, apply, or evaluate the work. Where work detail is needed, organize related actions into Activities and Tasks at a useful granularity and check their contribution to the Outcomes.
+
+    > NOTE Activities group related work, while Tasks state individual actions. The [Production Release example](references/examples.md#production-release) shows this structure with explanatory notes attached to the relevant work.
+
+3. Describe necessary Inputs, Outputs, Controls, Constraints, Enablers, and Entry/Exit Criteria by their function. Preserve required methods and dependencies with their scope and leave other execution choices open.
+4. When the target is an Agent Skill, apply the Specification's section, list, and NOTE rules. Keep the work's obligations explicit in the main text and add explanatory notes only where useful.
 
 ### Source and relationship alignment
 
-- Identify the description used as the reference point for meaning and confirm required references against their intended sources.
-- Clarify the meaning, use, and change effects of information shared with related work, including which work reads or updates it.
-- For changes, establish the affected description and elements, scope, rationale, consequences, and necessary revalidation. Distinguish a change to the description used as the reference point for meaning, a context-limited change, an application-specific choice, and a change in presentation.
-- For Process selection or changes to Process meaning, evaluate proposed choices against the Purpose and applicable conditions using the evidence needed to justify the decision.
+1. Identify the description used as the reference point for meaning and confirm required references against their intended sources.
+2. Clarify the meaning, use, and change effects of information shared with related work, including which work reads or updates it.
+3. For changes, establish the affected description and elements, scope, rationale, consequences, and necessary revalidation. Distinguish a change to the description used as the reference point for meaning, a context-limited change, an application-specific choice, and a change in presentation.
+4. For Process selection or changes to Process meaning, evaluate proposed choices against the Purpose and applicable conditions using the evidence needed to justify the decision.
 
 ### Description evaluation
 
-- Evaluate the description against the Framework and applicable contextual requirements, including the coherence of its elements and the coverage of its Outcomes. Confirm that the criteria and evidence apply to the description and context being reviewed. Re-evaluate affected judgments when their supporting information or conditions change.
-- Representative cases should be examined when they can expose ambiguity, unsupported success conditions, or limits of application.
-- Findings should guide further revision or review within the requested scope.
-- Report findings with their evidence and affected scope, including remaining defects and unconfirmed matters. In a review, assess these Outcomes in the supplied description; identifying a defect does not satisfy the condition that remains unmet.
+1. Evaluate the description against the Framework and applicable contextual requirements, including the coherence of its elements and the coverage of its Outcomes. Confirm that the criteria and evidence apply to the description and context being reviewed. Re-evaluate affected judgments when their supporting information or conditions change.
+
+    > NOTE In this design work, the Framework and applicable requirements supply Controls. Reading, search, and format-checking capabilities supply Enablers; format-check results provide evidence about the aspects they check. Coherence and Outcome sufficiency also depend on interpretation of the work and its conditions.
+
+2. Representative cases should be examined when they can expose ambiguity, unsupported success conditions, or limits of application.
+3. Findings should guide further revision or review within the requested scope.
+4. Report findings with their evidence and affected scope, including remaining defects and unconfirmed matters. In a review, assess these Outcomes in the supplied description; identifying a defect does not satisfy the condition that remains unmet.
 
 ## Controls
 

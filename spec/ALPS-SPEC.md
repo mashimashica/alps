@@ -18,7 +18,13 @@ The [Agent Skills format](https://agentskills.io/specification) governs the phys
 | Purpose and Outcomes in the body | The objective and observable result conditions of the work. |
 | Other body content and linked resources, when needed | Work detail, boundary elements, application conditions, or reference information with the meanings defined by the Framework. |
 
-The body must contain Name, Purpose, and one or more Outcomes. Additional elements are included according to the detail needed. Activities and Tasks can be expressed through headings and statements that make their grouping, contribution, and normative force clear. The document structure must preserve the distinction between work relationships and execution order.
+The body must contain a title for Name and separate Purpose and Outcomes sections, using these headings or their equivalents in the document's language. The Outcomes section must contain one or more list items, each stating one Outcome. Additional elements are included according to the detail needed.
+
+Work detail should use an Activities & Tasks section, with Activity subheadings and numbered Tasks under each Activity. A Tasks section may be used where grouping adds no useful distinction. Each Task must make its action and normative force clear, either in the statement or through an explicit statement governing the list. Numbering identifies list items; necessary execution order must be stated as Constraints. Other Process elements should use their element names, or translated equivalents, as section headings where separate treatment is useful.
+
+A NOTE must be a Markdown blockquote beginning with `NOTE`, placed immediately after the text it explains, with its scope clear from that placement. A NOTE attached to a list item must be indented within that item. Numbers may be added after `NOTE` to distinguish multiple notes within the relevant section; references to numbered notes must identify that section.
+
+NOTEs are informative. They may explain scope, terminology, rationale, examples, or relationships. Requirements, prohibitions, recommendations, and permissions must be stated outside NOTEs. A NOTE must preserve the meaning and normative force of the content it explains. A NOTE may be included where its explanation helps understanding or application.
 
 Frontmatter and Host displays must remain consistent with the description's meaning and scope. Discovery information summarizes the description; it does not replace it. Loading a Skill does not establish that its work has been performed. Reference material must remain distinguishable from a Process Description.
 
@@ -27,6 +33,8 @@ Frontmatter and Host displays must remain consistent with the description's mean
 Process Description design evaluates whether the meaning, relationships, and applicable conditions of work are coherent and sufficient to understand, apply, and evaluate it. Agent Work System design evaluates the configuration that realizes the work and the evidence of its feasibility and effectiveness. Necessary work detail, methods, and order remain part of the Process Description as defined by the Framework.
 
 When a supporting configuration is described, the agents, tools, and execution environment used to perform work must be related to its description as Enablers. Resources must be classified by the role they play in the particular work: a script used for processing is an Enabler, while a script being produced is an Output. Information examined or transformed can be Input, and information that directs or evaluates work can be Control; its role must be identified for the relevant relationship.
+
+A tool can implement Controls and enforce Constraints as well as supply capability. Where it does, the correspondence must identify the applicable rules or restrictions, their source and scope, and how the operation applies them. Those rules and restrictions may be expressed in documents, configuration, or code, with a common identifiable source for their meaning. Limitations imposed by the selected tool or environment must be distinguished from requirements of the work; their effects on feasible execution and Outcome assessment must be clear where relevant.
 
 Where a Task relies on tools, the correspondence must explain how the tool operations contribute to the work and how their results support Outcome assessment. Task boundaries and tool interfaces must be designed for their respective responsibilities. The meaning of Process Inputs and Outputs must be related to tool arguments and returned information where needed to perform or evaluate the work.
 

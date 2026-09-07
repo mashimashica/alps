@@ -18,6 +18,21 @@ For a repository maintenance task, an existing search tool locates candidate fil
 
 The [service-change example](../../../examples/README.md) uses a target Skill with a script for CSV validation, measurement aggregation, and threshold comparisons. These calculations form one public operation. The agent selects the applicable measurement pair and criteria, assesses comparability, interprets the evidence, and determines whether further measurement is needed. The example's source description holds its Purpose and Outcomes; its supporting design refers to them.
 
+## Capabilities, criteria, and limits
+
+The same measurement operation has several relationships to the [service assessment](../../../examples/assess-service-change/SKILL.md):
+
+| Aspect | Role in the work | Design and evaluation consequence |
+| --- | --- | --- |
+| Reading measurements, calculating metrics, and comparing values | The script supplies an Enabler. | Check that the capability realizes its specified behavior. |
+| The pilot's metric definitions and acceptance limits | These supply Controls; the script implements their calculations and comparisons. | Relate the implemented criteria to the applicable [pilot conditions](../../../examples/assess-service-change/references/pilot-context.md). |
+| The required CSV encoding and columns | These constrain use of this tool interface. | Establish whether the available information can be supplied through that interface without changing its meaning. |
+| Returned measurements and comparison results | These provide evidence for the assessment. | Interpret them together with the measurement context and applicable criteria. |
+
+The tool's capability and its implementation of criteria are distinct relationships. A rule can be represented in configuration or code when its meaning and applicable scope are identifiable. The pilot example passes acceptance limits explicitly; a tool with fixed criteria would instead need an identifiable basis for those criteria and their applicability. Changing a threshold affects the judgment basis, while changing CSV parsing without changing accepted information or behavior can be an implementation change.
+
+If an available API returns at most 1,000 records per page, that limit applies to the call. A work requirement to assess all records still calls for complete coverage, using pagination or another adequate capability. Evidence from the first page establishes only that page's results. The limit does not establish that the remaining records are irrelevant.
+
 ## A tool that changes state
 
 A calendar API can combine conflict detection and event creation in one operation if its guarantees meet the work's requirements. The design still needs to state who can create which events, what state can change, and how concurrent changes affect the result. If a request times out after a possible creation, a supported request identifier and status lookup can establish the effect before retrying. When those capabilities are unavailable, the result remains uncertain until the state is checked; an agent must not infer that a timeout means nothing happened.
