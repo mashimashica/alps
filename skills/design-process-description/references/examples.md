@@ -76,30 +76,65 @@ This service's production policy requires qualification of a candidate and confi
 
 ### Production Release
 
-**Purpose:** Make the approved change available to this service's production users with a functioning checkout.
+#### Purpose
 
-**Outcomes:**
+Make the approved change available to this service's production users with a functioning checkout.
+
+#### Outcomes
 
 - The approved change is available in production.
 - The production health endpoint reports ready.
 - A test purchase completes through the user checkout path.
 
-**Activities and Tasks:**
+#### Activities & Tasks
 
-- **Candidate qualification:** The release candidate must be checked against the service's acceptance criteria. Approval for that exact candidate must be obtained from the service owner.
-- **Production availability:** The approved candidate must be deployed through the service's authorized release job. The production result must be checked against the acceptance criteria.
+The following Tasks are required for this service's production release.
 
-Qualification establishes the basis for using a candidate; production work establishes and checks the resulting service state. Both Activities contribute to the Outcomes, and their Tasks state the individual actions. Each can be revisited if the candidate or production evidence changes.
+##### Candidate qualification
 
-**Control:** For this service, the production policy requires the service owner's approval of the exact checked candidate and use of the authorized release job. The acceptance criteria require a ready health endpoint and a completed test purchase.
+1. Check the release candidate against the service's acceptance criteria.
+2. Obtain the service owner's approval for that exact candidate.
 
-**Constraints:** Candidate checks must precede approval; approval must precede deployment; production checks follow deployment. A candidate change invalidates the earlier check and approval basis. Deployment must not occur while approval is missing or unconfirmed.
+    > NOTE Qualification establishes the basis for using a candidate. A revision to the candidate can affect both the checked behavior and the scope of an earlier approval.
 
-**Entry Criteria:** The candidate and acceptance criteria are available for qualification. **Exit Criteria:** Achievement of all three Outcomes is supported by production evidence, and the applicable release requirements are satisfied.
+##### Production availability
 
-**Input:** The release candidate and change request. **Output:** The deployed service revision. **Enablers:** Checking capability and the authorized release job.
+1. Deploy the approved candidate through the service's authorized release job.
+2. Check the production result against the acceptance criteria.
+
+    > NOTE Production evidence concerns the resulting service state. It can reveal differences from the conditions under which the candidate was checked.
+
+#### Controls
+
+For this service, the production policy requires the service owner's approval of the exact checked candidate and use of the authorized release job. The acceptance criteria require a ready health endpoint and a completed test purchase.
+
+#### Constraints
+
+Candidate checks must precede approval; approval must precede deployment; production checks follow deployment. A candidate change invalidates the earlier check and approval basis. Deployment must not occur while approval is missing or unconfirmed.
+
+#### Entry Criteria
+
+The candidate and acceptance criteria are available for qualification.
+
+#### Exit Criteria
+
+Achievement of all three Outcomes is supported by production evidence, and the applicable release requirements are satisfied.
+
+#### Inputs
+
+The release candidate and change request.
+
+#### Outputs
+
+The deployed service revision.
+
+#### Enablers
+
+Checking capability and the authorized release job.
 
 A policy directs the work; its approval condition limits deployment. The release job supplies an Enabler. The Entry Criteria allow candidate qualification to begin before deployment approval, while the deployment Constraint still applies to the action it governs.
+
+The Activity headings group related work and the numbered Tasks state actions. Both Activities contribute to the Outcomes and can be revisited as the candidate or production evidence changes. The NOTEs explain the adjacent Tasks; the obligations and necessary order are stated in the main text.
 
 ## 5. Shared information updated by multiple Processes
 
@@ -164,3 +199,7 @@ The deployed revision and log are Outputs. Evaluate the result conditions separa
 The release Exit Criteria are not satisfied. The facts support reporting the failed purchase and requesting the missing approval evidence. They do not establish that approval occurred or never occurred, and the existing Outputs and successful health check do not establish overall success.
 
 The service owner pauses further rollout. The team's authorized investigation finds that qualification omitted a payment-provider error case and adds that case to the checks. A subsequent trial detects the reproduced fault. This evidence supports the change for that case. The purchase Outcome remains unmet and approval remains unconfirmed pending the required production and approval evidence.
+
+## 9. A description and its supporting system
+
+The [working service-assessment example](../../../examples/README.md) keeps the work's Purpose and Outcomes in one target Skill. Its supporting design refers to that description and assigns established calculations to a tool and contextual assessment to an agent. The example identifies how tool evidence contributes to the work without making tool completion its success condition.

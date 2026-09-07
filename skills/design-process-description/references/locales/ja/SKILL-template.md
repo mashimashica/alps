@@ -21,4 +21,8 @@ frontmatterは通常のAgent Skillの発見情報である。プロセスとし�
 
 各成果は目的の達成に必要な結果状態を述べ、全体として目的を満たすために十分でなければならない。作業詳細、条件、参照、評価の文脈を追加する必要がある場合は[具体例](examples.md)を用いる。本テンプレートは参考情報であり、意味と表現は[フレームワーク](../../../../../spec/locales/ja/process-framework.md)と[仕様](../../../../../spec/locales/ja/ALPS-SPEC.md)が定める。
 
+[本番リリースの例](examples.md#本番リリース)は、義務を本文に明示したまま、活動の見出し、番号付きのタスク、それらに付くNOTEを追加する方法を示している。
+
+実現を支えるツールの記述が必要な場合は、[システム設計の具体例](../../../../design-agent-work-system/references/locales/ja/examples.md)を用い、必要な責務、インターフェース、条件を対象Skillまたはその資源へ追加する。
+
 [英語版](../../SKILL-template.md)

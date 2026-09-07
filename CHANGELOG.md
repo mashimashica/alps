@@ -4,6 +4,22 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-06
+
+### Added
+
+- `design-agent-work-system` for designing, implementing, and evaluating the configuration of agents, tools, information resources, and execution environments that realizes work.
+- Independent Design Principles for Agent Work Systems, with an English text and Japanese translation.
+- A service-change assessment example with a working Python tool, synthetic measurement fixtures, and separate description, tool, and work-system evaluation cases.
+
+### Changed
+
+- Integrate Process Description and work-system design in ALPS-SPEC while preserving the Process Framework and the central responsibility of `design-process-description`.
+- Define Skill section and NOTE rules, apply the writing structure to both design Skills, and clarify how tools implement Controls and enforce Constraints alongside their enabling role.
+- Align discovery, native Host manifests, resources, guidance, and validation with the two design Skills and bundled example material.
+
+See the [release notes](docs/releases/0.7.0.md) ([Japanese](docs/locales/ja/releases/0.7.0.md)) for the scope and update guidance.
+
 ## [0.6.0] - 2026-09-06
 
 ### Changed
