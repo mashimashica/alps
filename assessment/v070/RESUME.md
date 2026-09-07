@@ -30,8 +30,8 @@ No qualifying B exists. Main A/B and its dependent stages remain blocked, not wa
 All 72 creator assignments and the 144-consumer schedule were frozen before execution. Creator families: 001–012 S01, 013–024 S03, 025–036 S05, 037–048 S06, 049–060 S09, 061–072 S10. Within each family, pairs are luna/low, luna/high, sol/low, sol/high, astra/low, astra/high. Consumers are fresh sol/high. Each creator has ordinary then challenging consumers.
 
 At this reconciliation:
-- Creators 001–052 complete/form-pass; 053–054 running; 055–072 unstarted.
-- Consumers 001–104 prepared. C-U001–058 complete; 059–062 running; later prepared consumers unstarted.
+- Creators 001–054 complete/form-pass; 055–056 running; 057–072 unstarted.
+- Consumers 001–108 prepared. C-U001–063 and 065 complete; 064 and 066–068 running; later prepared consumers unstarted.
 - S01 all three primary grades and prespecified P01 second grade complete/read. control-S01-closeout.md: 24 correct adequate answers, no evidenced package compensation, six separately unconfirmed writing-method observations.
 - S03 is closed out with all six reports and the clarification read. P03 R63 challenging is control-017/C-U034: primary bounded deficiency, second clarified adequate, root adequate with optional clarity improvement; disagreement retained. P02's fresh additional second agrees on all eight applications without erasing the primary's filename-scope deviation. See control-S03-closeout.md and audits/control-S03-adjudication.md. No S05 packet is prepared yet; use the fixed allocation and explicit completed consumers to determine readiness.
 - Consult control-list.tsv, control-consumer-list.tsv, control-grading-list.tsv and live agents for later notifications. Counts above are an observation, not a claim that later work has not completed.

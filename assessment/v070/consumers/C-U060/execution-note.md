@@ -106,6 +106,33 @@ One initial orchestration attempt failed before a shell command ran. Captured er
 
 5. `apply_patch` created `answer.md` and `execution-note.md` in the task directory. No supplied skill or input file was modified.
 
+6. Final validation command:
+
+   ```text
+   cmp input/receiving.json work/receiving.json && echo 'input_copy=identical'
+   python3 - <<'PY'
+   # Loaded input/receiving.json, work/review.json, and answer.md; asserted the
+   # 13-line scope and exact line-key set, checked every expected processor
+   # outcome tuple, confirmed every supplied order/SKU appears in answer.md,
+   # and counted the recipient-specific draft headings.
+   PY
+   ```
+
+   - Working directory: task directory above.
+   - Exit code: `0`.
+   - Exact stdout:
+
+     ```text
+     input_copy=identical
+     scope_and_line_set=verified
+     line_outcomes=verified
+     follow_up_draft_count=11
+     ```
+
+   - Stderr: none.
+
+7. A second `apply_patch` added this final validation record to `execution-note.md`.
+
 ## Summaries and unperformed actions
 
 The prose explanations and draft wording in `answer.md` summarize and adapt the machine-readable observations above. No messages were sent, no contacts were contacted, no receiving records or external state were changed, and no external checks were performed or needed.

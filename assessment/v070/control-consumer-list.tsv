@@ -57,16 +57,16 @@ C-U055	control-028	control	S05	ordinary	gpt-5.6-sol	high	completed	/root/control
 C-U056	control-028	control	S05	challenging	gpt-5.6-sol	high	completed	/root/control_use_056	2026-09-07T20:08:58.392060+00:00	2026-09-07T20:13:58.998022+00:00
 C-U057	control-029	control	S05	ordinary	gpt-5.6-sol	high	completed	/root/control_use_057	2026-09-07T20:13:59.414040+00:00	2026-09-07T20:15:54.630117+00:00
 C-U058	control-029	control	S05	challenging	gpt-5.6-sol	high	completed	/root/control_use_058	2026-09-07T20:13:59.839021+00:00	2026-09-07T20:17:58.310723+00:00
-C-U059	control-030	control	S05	ordinary	gpt-5.6-sol	high	running	/root/control_use_059	2026-09-07T20:14:00.286964+00:00	
-C-U060	control-030	control	S05	challenging	gpt-5.6-sol	high	running	/root/control_use_060	2026-09-07T20:14:00.697605+00:00	
-C-U061	control-031	control	S05	ordinary	gpt-5.6-sol	high	running	/root/control_use_061	2026-09-07T20:15:55.057864+00:00	
-C-U062	control-031	control	S05	challenging	gpt-5.6-sol	high	running	/root/control_use_062	2026-09-07T20:17:58.743036+00:00	
-C-U063	control-032	control	S05	ordinary	gpt-5.6-sol	high	prepared			
-C-U064	control-032	control	S05	challenging	gpt-5.6-sol	high	prepared			
-C-U065	control-033	control	S05	ordinary	gpt-5.6-sol	high	prepared			
-C-U066	control-033	control	S05	challenging	gpt-5.6-sol	high	prepared			
-C-U067	control-034	control	S05	ordinary	gpt-5.6-sol	high	prepared			
-C-U068	control-034	control	S05	challenging	gpt-5.6-sol	high	prepared			
+C-U059	control-030	control	S05	ordinary	gpt-5.6-sol	high	completed	/root/control_use_059	2026-09-07T20:14:00.286964+00:00	2026-09-07T20:20:02.473038+00:00
+C-U060	control-030	control	S05	challenging	gpt-5.6-sol	high	completed	/root/control_use_060	2026-09-07T20:14:00.697605+00:00	2026-09-07T20:20:02.473038+00:00
+C-U061	control-031	control	S05	ordinary	gpt-5.6-sol	high	completed	/root/control_use_061	2026-09-07T20:15:55.057864+00:00	2026-09-07T20:20:02.473038+00:00
+C-U062	control-031	control	S05	challenging	gpt-5.6-sol	high	completed	/root/control_use_062	2026-09-07T20:17:58.743036+00:00	2026-09-07T20:22:35.203888+00:00
+C-U063	control-032	control	S05	ordinary	gpt-5.6-sol	high	completed	/root/control_use_063	2026-09-07T20:20:02.887056+00:00	2026-09-07T20:22:35.203888+00:00
+C-U064	control-032	control	S05	challenging	gpt-5.6-sol	high	running	/root/control_use_064	2026-09-07T20:20:03.317837+00:00	
+C-U065	control-033	control	S05	ordinary	gpt-5.6-sol	high	completed	/root/control_use_065	2026-09-07T20:20:03.751276+00:00	2026-09-07T20:23:52.763941+00:00
+C-U066	control-033	control	S05	challenging	gpt-5.6-sol	high	running	/root/control_use_066	2026-09-07T20:22:35.630616+00:00	
+C-U067	control-034	control	S05	ordinary	gpt-5.6-sol	high	running	/root/control_use_067	2026-09-07T20:22:36.036956+00:00	
+C-U068	control-034	control	S05	challenging	gpt-5.6-sol	high	running	/root/control_use_068	2026-09-07T20:23:53.182728+00:00	
 C-U069	control-035	control	S05	ordinary	gpt-5.6-sol	high	prepared			
 C-U070	control-035	control	S05	challenging	gpt-5.6-sol	high	prepared			
 C-U071	control-036	control	S05	ordinary	gpt-5.6-sol	high	prepared			
@@ -103,10 +103,10 @@ C-U101	control-051	control	S09	ordinary	gpt-5.6-sol	high	prepared
 C-U102	control-051	control	S09	challenging	gpt-5.6-sol	high	prepared			
 C-U103	control-052	control	S09	ordinary	gpt-5.6-sol	high	prepared			
 C-U104	control-052	control	S09	challenging	gpt-5.6-sol	high	prepared			
-C-U105	control-053	control	S09	ordinary	gpt-5.6-sol	high	not prepared			
-C-U106	control-053	control	S09	challenging	gpt-5.6-sol	high	not prepared			
-C-U107	control-054	control	S09	ordinary	gpt-5.6-sol	high	not prepared			
-C-U108	control-054	control	S09	challenging	gpt-5.6-sol	high	not prepared			
+C-U105	control-053	control	S09	ordinary	gpt-5.6-sol	high	prepared			
+C-U106	control-053	control	S09	challenging	gpt-5.6-sol	high	prepared			
+C-U107	control-054	control	S09	ordinary	gpt-5.6-sol	high	prepared			
+C-U108	control-054	control	S09	challenging	gpt-5.6-sol	high	prepared			
 C-U109	control-055	control	S09	ordinary	gpt-5.6-sol	high	not prepared			
 C-U110	control-055	control	S09	challenging	gpt-5.6-sol	high	not prepared			
 C-U111	control-056	control	S09	ordinary	gpt-5.6-sol	high	not prepared			
