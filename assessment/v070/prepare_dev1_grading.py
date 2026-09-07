@@ -5,6 +5,7 @@ Original evaluated packages and observations are retained unchanged.
 """
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import shutil
@@ -68,8 +69,15 @@ def main():
             if args.case == "S08" and not (ROOT / "state-snapshots" / use_id / "final.sql").is_file():
                 raise SystemExit(f"Final committed state not yet preserved: {use_id}")
     target.mkdir(parents=True)
-    first_input = ROOT / "trials" / f"{stage}-{order[0]:03}" / "input"
-    shutil.copytree(first_input, target / "original-creator-input", ignore=IGNORE)
+    first_trial = ROOT / "trials" / f"{stage}-{order[0]:03}"
+    first_assignment = json.loads((first_trial / "assignment.json").read_text())
+    for relative, digest in first_assignment["input_sha256"].items():
+        source = first_trial / relative
+        if hashlib.sha256(source.read_bytes()).hexdigest() != digest:
+            raise SystemExit(f"Original creator input changed: {source}")
+        destination = target / "original-creator-input" / Path(relative).relative_to("input")
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
     shutil.copy2(ROOT / "development-oracles" / f"{args.case}.md", target / "business-oracle.md")
     shutil.copy2(ROOT / "grading-guidance.md", target / "grading-guidance.md")
     (target / "judgment-boundaries.md").write_text(BOUNDARIES, encoding="utf-8")

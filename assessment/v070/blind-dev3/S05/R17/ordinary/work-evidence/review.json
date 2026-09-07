@@ -1,0 +1,81 @@
+{
+  "issues": [
+    {
+      "event_id": "RCV-H1811",
+      "line": [
+        "PO-R2606-499",
+        "PALLET-STD"
+      ],
+      "type": "out_of_scope_event"
+    }
+  ],
+  "lines": [
+    {
+      "event_count": 3,
+      "evidence_status": "complete",
+      "follow_up": null,
+      "observed_subtotal": 120,
+      "order_id": "PO-R2606-410",
+      "ordered": 120,
+      "position": "received_as_ordered",
+      "recipient": null,
+      "sku": "LABEL-60"
+    },
+    {
+      "event_count": 2,
+      "evidence_status": "complete",
+      "follow_up": "Ask the supplier contact (Mara Quinn <mara.quinn@harborpack.example>) about the remaining 38 units.",
+      "observed_subtotal": 42,
+      "order_id": "PO-R2606-410",
+      "ordered": 80,
+      "position": "shortfall",
+      "recipient": "Dana Ivers <dana.ivers@juniperworks.example>",
+      "sku": "CARTON-M"
+    },
+    {
+      "event_count": 2,
+      "evidence_status": "complete",
+      "follow_up": "Reconcile the surplus of 4 units against the order and receiving evidence.",
+      "observed_subtotal": 64,
+      "order_id": "PO-R2606-411",
+      "ordered": 60,
+      "position": "excess",
+      "recipient": "Noel Price <noel.price@juniperworks.example>",
+      "sku": "GLOVE-N"
+    },
+    {
+      "event_count": 1,
+      "evidence_status": "complete",
+      "follow_up": null,
+      "observed_subtotal": 24,
+      "order_id": "PO-R2606-412",
+      "ordered": 24,
+      "position": "received_as_ordered",
+      "recipient": null,
+      "sku": "FILM-300"
+    },
+    {
+      "event_count": 2,
+      "evidence_status": "incomplete_export",
+      "follow_up": "Provide or confirm the full receipt export for this order line and month before final comparison.",
+      "observed_subtotal": 30,
+      "order_id": "PO-R2606-413",
+      "ordered": 40,
+      "position": "undetermined_incomplete_export",
+      "recipient": "Simone Bell <simone.bell@juniperworks.example>",
+      "sku": "SEAL-BLUE"
+    },
+    {
+      "event_count": 0,
+      "evidence_status": "complete",
+      "follow_up": "Ask the supplier contact (Owen Malik <owen.malik@bindwell.example>) about the remaining 30 units.",
+      "observed_subtotal": 0,
+      "order_id": "PO-R2606-414",
+      "ordered": 30,
+      "position": "shortfall",
+      "recipient": "Dana Ivers <dana.ivers@juniperworks.example>",
+      "sku": "TAPE-48"
+    }
+  ],
+  "month": "2026-06"
+}

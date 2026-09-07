@@ -1,0 +1,16 @@
+{
+  "R17": {
+    "creator": "dev3-004",
+    "consumers": [
+      "D3-U007",
+      "D3-U008"
+    ]
+  },
+  "R63": {
+    "creator": "dev3-003",
+    "consumers": [
+      "D3-U005",
+      "D3-U006"
+    ]
+  }
+}
