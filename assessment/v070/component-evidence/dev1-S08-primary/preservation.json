@@ -1,0 +1,146 @@
+{
+  "original_workspace": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8",
+  "role": "Completed independent component probes, not consumer trials",
+  "files": {
+    "R17-after-commit/bookings.sql": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R17-after-commit/bookings.sqlite",
+      "representation": "Native SQL of consistent committed state; not original SQLite bytes",
+      "sha256": "6199d424c074c078e6e2f3f42d84fb956e815a48abaf754550652af1fc7a59f7"
+    },
+    "R17-after-commit/record.json": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R17-after-commit/record.json",
+      "representation": "Unchanged original text bytes",
+      "sha256": "3ee9619860df96f46440d1044656f1afe36587f4b0df4f5ebbf1ca899a49793c"
+    },
+    "R17-before-commit/bookings.sql": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R17-before-commit/bookings.sqlite",
+      "representation": "Native SQL of consistent committed state; not original SQLite bytes",
+      "sha256": "bd23eae33bc82b76a6eb55f4992bf5aff77518ab6cbcb15f5d47d6406d6730e2"
+    },
+    "R17-before-commit/record.json": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R17-before-commit/record.json",
+      "representation": "Unchanged original text bytes",
+      "sha256": "6868d9d8a6ea39d89887e5cb19be18ecbc3ef1de2ed34f7b1166a2307f58b992"
+    },
+    "R17-conflict/bookings.sql": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R17-conflict/bookings.sqlite",
+      "representation": "Native SQL of consistent committed state; not original SQLite bytes",
+      "sha256": "d985ff0d8c4e20a2cfc33f09bbc8d8d64af47d2f159d141f543c029fa2d127de"
+    },
+    "R17-conflict/record.json": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R17-conflict/record.json",
+      "representation": "Unchanged original text bytes",
+      "sha256": "47b8381ad238f71b6a2476bdcffa0da684decf022a83dddcb2d61ff0ea38e722"
+    },
+    "R17-distinct-concurrent/bookings.sql": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R17-distinct-concurrent/bookings.sqlite",
+      "representation": "Native SQL of consistent committed state; not original SQLite bytes",
+      "sha256": "d028ab02e4cefb0c68c68ca56e5f343d6653e63cb53dcfa7cc2d666ba2132947"
+    },
+    "R17-distinct-concurrent/record.json": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R17-distinct-concurrent/record.json",
+      "representation": "Unchanged original text bytes",
+      "sha256": "975cc1c7a0a3262b76b895798acaf401123605e9be59af84ba3cdde17ace84fa"
+    },
+    "R17-invalid/bookings.sql": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R17-invalid/bookings.sqlite",
+      "representation": "Native SQL of consistent committed state; not original SQLite bytes",
+      "sha256": "7786d39f39e27e5ec2485a88b23a716468c577cd7f53a1aaf80b18a9fd93f456"
+    },
+    "R17-invalid/record.json": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R17-invalid/record.json",
+      "representation": "Unchanged original text bytes",
+      "sha256": "376114444cf245d033470ac391c37ad0f35eda4338e5a041deb96f5f47df0427"
+    },
+    "R17-missing-key/bookings.sql": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R17-missing-key/bookings.sqlite",
+      "representation": "Native SQL of consistent committed state; not original SQLite bytes",
+      "sha256": "7786d39f39e27e5ec2485a88b23a716468c577cd7f53a1aaf80b18a9fd93f456"
+    },
+    "R17-same-concurrent/bookings.sql": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R17-same-concurrent/bookings.sqlite",
+      "representation": "Native SQL of consistent committed state; not original SQLite bytes",
+      "sha256": "83a8954b5800ccc41a8819a7faf6ba89fa12a2599781d5151a4cfb855420a46b"
+    },
+    "R17-same-concurrent/record.json": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R17-same-concurrent/record.json",
+      "representation": "Unchanged original text bytes",
+      "sha256": "b467fbbcecc1eae031ec7b35532b3d52a8e3d9a00a5516c9e15eb157e9f5db8a"
+    },
+    "R63-after-commit/bookings.sql": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R63-after-commit/bookings.sqlite",
+      "representation": "Native SQL of consistent committed state; not original SQLite bytes",
+      "sha256": "6199d424c074c078e6e2f3f42d84fb956e815a48abaf754550652af1fc7a59f7"
+    },
+    "R63-after-commit/record.json": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R63-after-commit/record.json",
+      "representation": "Unchanged original text bytes",
+      "sha256": "5c07c40adc3fcdbcbe73e18076471085372a29f308b2ab46c63763da2c2d7e79"
+    },
+    "R63-before-commit/bookings.sql": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R63-before-commit/bookings.sqlite",
+      "representation": "Native SQL of consistent committed state; not original SQLite bytes",
+      "sha256": "bd23eae33bc82b76a6eb55f4992bf5aff77518ab6cbcb15f5d47d6406d6730e2"
+    },
+    "R63-before-commit/record.json": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R63-before-commit/record.json",
+      "representation": "Unchanged original text bytes",
+      "sha256": "59b549b264f3c3f47f87be8afd62dd1e96f0389d37e3db1e72f4421ab085ccf2"
+    },
+    "R63-conflict/bookings.sql": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R63-conflict/bookings.sqlite",
+      "representation": "Native SQL of consistent committed state; not original SQLite bytes",
+      "sha256": "d985ff0d8c4e20a2cfc33f09bbc8d8d64af47d2f159d141f543c029fa2d127de"
+    },
+    "R63-conflict/record.json": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R63-conflict/record.json",
+      "representation": "Unchanged original text bytes",
+      "sha256": "8f3c7b42abac2a1c3410e542edae516cc7852cc76cd2346cb557129a248d1864"
+    },
+    "R63-distinct-concurrent/bookings.sql": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R63-distinct-concurrent/bookings.sqlite",
+      "representation": "Native SQL of consistent committed state; not original SQLite bytes",
+      "sha256": "f70e3ca098fc8cbad8da43a96e8c25130d88b1a4507149eb26f7be4c09bf620e"
+    },
+    "R63-distinct-concurrent/record.json": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R63-distinct-concurrent/record.json",
+      "representation": "Unchanged original text bytes",
+      "sha256": "79a26cfa50b11c054e5d890b303803b2552b48f714f7bc116f916dd6b5a225d3"
+    },
+    "R63-invalid/bookings.sql": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R63-invalid/bookings.sqlite",
+      "representation": "Native SQL of consistent committed state; not original SQLite bytes",
+      "sha256": "7786d39f39e27e5ec2485a88b23a716468c577cd7f53a1aaf80b18a9fd93f456"
+    },
+    "R63-invalid/record.json": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R63-invalid/record.json",
+      "representation": "Unchanged original text bytes",
+      "sha256": "7eda44eb0e02e66e6e1fbe9b50f127fb22b8a7d2290ce9e6b7556885391a53db"
+    },
+    "R63-missing-key/bookings.sql": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R63-missing-key/bookings.sqlite",
+      "representation": "Native SQL of consistent committed state; not original SQLite bytes",
+      "sha256": "bc15d351ab712d6862eeec847aca0c8200fdcf20ccec49c636b3fa6c2f21a5e5"
+    },
+    "R63-missing-key/record.json": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R63-missing-key/record.json",
+      "representation": "Unchanged original text bytes",
+      "sha256": "3cdd083fed21b4b6eed91728ad776eec489614f107a3d9a7a5da4aa3e29d8c0c"
+    },
+    "R63-same-concurrent/bookings.sql": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R63-same-concurrent/bookings.sqlite",
+      "representation": "Native SQL of consistent committed state; not original SQLite bytes",
+      "sha256": "83a8954b5800ccc41a8819a7faf6ba89fa12a2599781d5151a4cfb855420a46b"
+    },
+    "R63-same-concurrent/record.json": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/R63-same-concurrent/record.json",
+      "representation": "Unchanged original text bytes",
+      "sha256": "5b969f0a6a470666f25d6a0228a9ce2ebca13abfa2f29b696cf191be90d67157"
+    },
+    "probe.py": {
+      "source": "/workspace/scratch/a75c3a6d9076/s08-grade-probes-R7GDu8/probe.py",
+      "representation": "Unchanged original text bytes",
+      "sha256": "ecb0f799e6e96ff27792ec044aa0bfb59b9bcb2d47e8202d632803f197b9020f"
+    }
+  }
+}

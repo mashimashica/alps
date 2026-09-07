@@ -1,0 +1,17 @@
+{
+  "race-0": {
+    "last_receipt": {
+      "booking_id": "booking:race-0",
+      "party_id": "party-0",
+      "replayed": false,
+      "request_key": "race-0",
+      "seats": 4,
+      "slot_id": "paper-lab-am",
+      "state": "confirmed"
+    },
+    "party_id": "party-0",
+    "request_key": "race-0",
+    "seats": 4,
+    "slot_id": "paper-lab-am"
+  }
+}

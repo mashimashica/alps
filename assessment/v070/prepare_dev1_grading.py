@@ -10,7 +10,8 @@ from pathlib import Path
 import shutil
 
 ROOT = Path(__file__).resolve().parent
-ORDER = {"S10": (3, 1, 4, 2), "S08": (6, 5), "S05": (8, 7)}
+ORDER = {1: {"S10": (3, 1, 4, 2), "S08": (6, 5), "S05": (8, 7)},
+         2: {"S05": (5, 1, 6, 2), "S10": (7, 3, 8, 4)}}
 CODES = ("R17", "R63", "R28", "R44")
 IGNORE = shutil.ignore_patterns("__pycache__", "*.pyc")
 
@@ -44,21 +45,26 @@ consumer observations. Do not repair a candidate or impose a preferred prose.
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("case", choices=ORDER)
+    parser.add_argument("case", choices=("S05", "S08", "S10"))
+    parser.add_argument("--round", type=int, choices=(1, 2), default=1)
     args = parser.parse_args()
-    target = ROOT / "blind-dev1" / args.case
+    if args.case not in ORDER[args.round]:
+        raise SystemExit("No preregistered creator cells for this round and family")
+    order = ORDER[args.round][args.case]
+    stage = f"dev{args.round}"
+    target = ROOT / f"blind-{stage}" / args.case
     if target.exists():
         raise SystemExit("Packet already exists; preserve it")
-    for number in ORDER[args.case]:
+    for number in order:
         for index in range(2):
-            use_id = f"D1-U{2 * (number - 1) + index + 1:03}"
+            use_id = f"D{args.round}-U{2 * (number - 1) + index + 1:03}"
             for name in ("answer.md", "execution-note.md"):
                 if not (ROOT / "consumers" / use_id / name).is_file():
                     raise SystemExit(f"Completed evidence missing: {use_id}/{name}")
             if args.case == "S08" and not (ROOT / "state-snapshots" / use_id / "final.sql").is_file():
                 raise SystemExit(f"Final committed state not yet preserved: {use_id}")
     target.mkdir(parents=True)
-    first_input = ROOT / "trials" / f"dev1-{ORDER[args.case][0]:03}" / "input"
+    first_input = ROOT / "trials" / f"{stage}-{order[0]:03}" / "input"
     shutil.copytree(first_input, target / "original-creator-input", ignore=IGNORE)
     shutil.copy2(ROOT / "development-oracles" / f"{args.case}.md", target / "business-oracle.md")
     shutil.copy2(ROOT / "grading-guidance.md", target / "grading-guidance.md")
@@ -66,13 +72,13 @@ def main():
     shutil.copytree(ROOT / "development-consumer-cases" / args.case,
                     target / "original-consumer-inputs", ignore=IGNORE)
     mapping = {}
-    for code, number in zip(CODES, ORDER[args.case]):
-        creator_id = f"dev1-{number:03}"
+    for code, number in zip(CODES, order):
+        creator_id = f"{stage}-{number:03}"
         candidate = target / code
         shutil.copytree(ROOT / "trials" / creator_id / "output", candidate / "package", ignore=IGNORE)
         consumers = []
         for index, variant in enumerate(("ordinary", "challenging")):
-            use_id = f"D1-U{2 * (number - 1) + index + 1:03}"
+            use_id = f"D{args.round}-U{2 * (number - 1) + index + 1:03}"
             source = ROOT / "consumers" / use_id
             dest = candidate / variant
             dest.mkdir()
@@ -86,7 +92,7 @@ def main():
             consumers.append(use_id)
         mapping[code] = {"creator": creator_id, "consumers": consumers}
     (ROOT / "blind-mappings").mkdir(exist_ok=True)
-    (ROOT / "blind-mappings" / f"dev1-{args.case}.json").write_text(
+    (ROOT / "blind-mappings" / f"{stage}-{args.case}.json").write_text(
         json.dumps(mapping, indent=2) + "\n", encoding="utf-8")
     print(f"Prepared {len(mapping)} anonymized packages with two applications each: {args.case}")
 

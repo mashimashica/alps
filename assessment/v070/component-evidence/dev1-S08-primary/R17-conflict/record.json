@@ -1,0 +1,1 @@
+{"probe-conflict": {"receipt": {"booking_id": "booking:probe-conflict", "party_id": "crew-other", "request_key": "probe-conflict", "seats": 1, "slot_id": "paper-lab-am", "state": "confirmed"}, "request": {"party_id": "crew-cedar", "request_key": "probe-conflict", "seats": 2, "slot_id": "paper-lab-am"}, "state": "confirmed"}}

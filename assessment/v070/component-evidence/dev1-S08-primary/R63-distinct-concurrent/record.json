@@ -1,0 +1,38 @@
+{
+  "probe-distinct-4": {
+    "last_receipt": {
+      "booking_id": "booking:probe-distinct-4",
+      "party_id": "party-4",
+      "replayed": false,
+      "request_key": "probe-distinct-4",
+      "seats": 1,
+      "slot_id": "paper-lab-am",
+      "state": "confirmed"
+    },
+    "party_id": "party-4",
+    "request_key": "probe-distinct-4",
+    "seats": 1,
+    "slot_id": "paper-lab-am"
+  },
+  "probe-distinct-6": {
+    "party_id": "party-6",
+    "request_key": "probe-distinct-6",
+    "seats": 1,
+    "slot_id": "paper-lab-am"
+  },
+  "probe-distinct-9": {
+    "last_receipt": {
+      "party_id": "party-9",
+      "reason": "insufficient_capacity",
+      "replayed": false,
+      "request_key": "probe-distinct-9",
+      "seats": 1,
+      "slot_id": "paper-lab-am",
+      "state": "rejected"
+    },
+    "party_id": "party-9",
+    "request_key": "probe-distinct-9",
+    "seats": 1,
+    "slot_id": "paper-lab-am"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "consumer_id": "D2-U006",
+  "creator_id": "dev2-003",
+  "case": "S10",
+  "variant": "challenging",
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "high",
+  "context": "fresh",
+  "copied_sha256": {
+    "skill/checkout-service-release/SKILL.md": "813d8b99ab5a6626257c549061c461f84b0c8e1fa82abe0aea6a38aec99ddd14",
+    "skill/checkout-service-release/.keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "input/state.json": "88113554cedb729543be2f86c47663a8a14bcd95ef9d3a9ba038242eeddcb4c2",
+    "input/release_tool.py": "939931810a40d9f813280ea46c95fec2c4a1ed72368937353bf5c899b8217577",
+    "input/request.md": "294af6d92bfa28520285bc9f9d01124c55b00fce1e9a62fd7d20b262bc7dd8cc"
+  },
+  "prompt_sha256": "a146bc9a80bf4e23548ddebc54fe8090cc01b783197e51e0316648819e319933"
+}

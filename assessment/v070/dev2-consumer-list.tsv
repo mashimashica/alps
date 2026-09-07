@@ -1,0 +1,17 @@
+consumer_id	creator_id	case	variant	model	effort	execution	agent
+D2-U001	dev2-001	S05	ordinary	gpt-5.6-sol	high	not started	
+D2-U002	dev2-001	S05	challenging	gpt-5.6-sol	high	not started	
+D2-U003	dev2-002	S05	ordinary	gpt-5.6-sol	high	not started	
+D2-U004	dev2-002	S05	challenging	gpt-5.6-sol	high	not started	
+D2-U005	dev2-003	S10	ordinary	gpt-5.6-sol	high	not started	
+D2-U006	dev2-003	S10	challenging	gpt-5.6-sol	high	not started	
+D2-U007	dev2-004	S10	ordinary	gpt-5.6-sol	high	not started	
+D2-U008	dev2-004	S10	challenging	gpt-5.6-sol	high	not started	
+D2-U009	dev2-005	S05	ordinary	gpt-5.6-sol	high	not started	
+D2-U010	dev2-005	S05	challenging	gpt-5.6-sol	high	not started	
+D2-U011	dev2-006	S05	ordinary	gpt-5.6-sol	high	not started	
+D2-U012	dev2-006	S05	challenging	gpt-5.6-sol	high	not started	
+D2-U013	dev2-007	S10	ordinary	gpt-5.6-sol	high	not started	
+D2-U014	dev2-007	S10	challenging	gpt-5.6-sol	high	not started	
+D2-U015	dev2-008	S10	ordinary	gpt-5.6-sol	high	not started	
+D2-U016	dev2-008	S10	challenging	gpt-5.6-sol	high	not started	

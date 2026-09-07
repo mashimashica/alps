@@ -1,0 +1,102 @@
+{
+  "scope": "Physical Agent Skill format only; not semantics or work effectiveness",
+  "validator_source": "agentskills/agentskills@f130f348f502d9804278a617f86929846896d2e9 skills-ref",
+  "results": [
+    {
+      "trial": "dev2-001",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+        "validate",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev2-001/output/receiving-review"
+      ],
+      "exit_code": 0,
+      "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev2-001/output/receiving-review\n",
+      "stderr": ""
+    },
+    {
+      "trial": "dev2-002",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+        "validate",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev2-002/output/receiving-review"
+      ],
+      "exit_code": 0,
+      "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev2-002/output/receiving-review\n",
+      "stderr": ""
+    },
+    {
+      "trial": "dev2-003",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+        "validate",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev2-003/output/checkout-service-release"
+      ],
+      "exit_code": 0,
+      "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev2-003/output/checkout-service-release\n",
+      "stderr": ""
+    },
+    {
+      "trial": "dev2-004",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+        "validate",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev2-004/output/release-checkout-service"
+      ],
+      "exit_code": 0,
+      "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev2-004/output/release-checkout-service\n",
+      "stderr": ""
+    },
+    {
+      "trial": "dev2-005",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+        "validate",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev2-005/output/receiving-review"
+      ],
+      "exit_code": 0,
+      "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev2-005/output/receiving-review\n",
+      "stderr": ""
+    },
+    {
+      "trial": "dev2-006",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+        "validate",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev2-006/output/receiving-review"
+      ],
+      "exit_code": 0,
+      "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev2-006/output/receiving-review\n",
+      "stderr": ""
+    },
+    {
+      "trial": "dev2-007",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+        "validate",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev2-007/output/checkout-service-release"
+      ],
+      "exit_code": 0,
+      "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev2-007/output/checkout-service-release\n",
+      "stderr": ""
+    },
+    {
+      "trial": "dev2-008",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+        "validate",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev2-008/output/release-checkout-service"
+      ],
+      "exit_code": 0,
+      "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/dev2-008/output/release-checkout-service\n",
+      "stderr": ""
+    }
+  ]
+}

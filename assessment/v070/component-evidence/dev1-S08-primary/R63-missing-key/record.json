@@ -1,0 +1,17 @@
+{
+  "req-edff12f7d0044971acbfde09febbe9c3": {
+    "last_receipt": {
+      "booking_id": "booking:req-edff12f7d0044971acbfde09febbe9c3",
+      "party_id": "crew-cedar",
+      "replayed": false,
+      "request_key": "req-edff12f7d0044971acbfde09febbe9c3",
+      "seats": 2,
+      "slot_id": "paper-lab-am",
+      "state": "confirmed"
+    },
+    "party_id": "crew-cedar",
+    "request_key": "req-edff12f7d0044971acbfde09febbe9c3",
+    "seats": 2,
+    "slot_id": "paper-lab-am"
+  }
+}

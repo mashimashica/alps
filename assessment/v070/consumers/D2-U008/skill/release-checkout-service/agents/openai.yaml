@@ -1,0 +1,4 @@
+interface:
+  display_name: "Checkout Service Release"
+  short_description: "Qualify, gate, promote, and verify a checkout release"
+  default_prompt: "Release the exact requested checkout-service candidate in the supplied simulation, preserving approval and evidence gates, then verify health and checkout."

@@ -1,0 +1,15 @@
+{
+  "trial_id": "dev2-008",
+  "stage": "development-2",
+  "case": "S10",
+  "arm": "A",
+  "repetition": 2,
+  "requested_model": "gpt-5.6-luna",
+  "requested_effort": "low",
+  "context": "fresh",
+  "input_sha256": {
+    "input/brief.md": "284eab48172c8b996d5eb3218590fb453c1e24f5b532f9d4457bda99fb38485e",
+    "input/release_tool.py": "939931810a40d9f813280ea46c95fec2c4a1ed72368937353bf5c899b8217577"
+  },
+  "prompt_sha256": "847a7d42349a6c701a8c39b5e6f6a2c66b8bc24f710975e752a2b04d9f5c6e24"
+}

@@ -61,8 +61,12 @@ effectiveness/burden gates remain necessary for eventual core acceptance.
 
 The B2 English/Japanese draft is in the improvement worktree and frozen as
 frozen/candidate-B2, with exact patch and hashes, based on A without the rejected
-B1 note. No B2 creator or consumer has occurred. Independent semantic/locale
-review and the remaining H01 reviews precede its first creator. The root's
-complete-diff review, nine product tests and changed whitespace passed. The
-target-source change is one first sentence per language; all other source
-content equals A.
+B1 note. Independent semantic/locale review and H01 closeout are complete and
+read; exact reviewed hashes match B2. The root's complete-diff review, nine
+product tests, changed whitespace and both pinned Skill form checks passed.
+The target-source change is one first sentence per language; all other source
+content equals A. All eight creators completed and all eight generated packages
+pass pinned Skill form checks. Sixteen new isolated consumers are prepared and
+unstarted, using the preregistered repeated developmental fixtures. See
+dev2-list.tsv and dev2-consumer-list.tsv for exact task states and recorded
+notification times, not inferred historical runtime.

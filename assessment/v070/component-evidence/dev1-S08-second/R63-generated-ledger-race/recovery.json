@@ -1,0 +1,50 @@
+{
+  "req-639e584d6c9743a8b40afeb23ce3d608": {
+    "last_receipt": {
+      "booking_id": "booking:req-639e584d6c9743a8b40afeb23ce3d608",
+      "party_id": "party-1",
+      "replayed": false,
+      "request_key": "req-639e584d6c9743a8b40afeb23ce3d608",
+      "seats": 1,
+      "slot_id": "paper-lab-am",
+      "state": "confirmed"
+    },
+    "party_id": "party-1",
+    "request_key": "req-639e584d6c9743a8b40afeb23ce3d608",
+    "seats": 1,
+    "slot_id": "paper-lab-am"
+  },
+  "req-88e8d5508a2b4e9aae7f106cb9c09020": {
+    "party_id": "party-10",
+    "request_key": "req-88e8d5508a2b4e9aae7f106cb9c09020",
+    "seats": 1,
+    "slot_id": "paper-lab-am"
+  },
+  "req-9622568965c34b63b713c1a86d204749": {
+    "last_receipt": {
+      "party_id": "party-9",
+      "reason": "insufficient_capacity",
+      "replayed": false,
+      "request_key": "req-9622568965c34b63b713c1a86d204749",
+      "seats": 1,
+      "slot_id": "paper-lab-am",
+      "state": "rejected"
+    },
+    "party_id": "party-9",
+    "request_key": "req-9622568965c34b63b713c1a86d204749",
+    "seats": 1,
+    "slot_id": "paper-lab-am"
+  },
+  "req-c0eb4ac8fece41aaa2ead46544b80183": {
+    "party_id": "party-4",
+    "request_key": "req-c0eb4ac8fece41aaa2ead46544b80183",
+    "seats": 1,
+    "slot_id": "paper-lab-am"
+  },
+  "req-cd0c2d7fc6874c3fbbbed9ce1418b860": {
+    "party_id": "party-0",
+    "request_key": "req-cd0c2d7fc6874c3fbbbed9ce1418b860",
+    "seats": 1,
+    "slot_id": "paper-lab-am"
+  }
+}

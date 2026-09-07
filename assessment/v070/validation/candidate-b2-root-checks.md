@@ -12,6 +12,11 @@ Executed in `../alps-assessment-improvements`:
 - `python3 -m unittest discover -s tests -v`: exit 0, all nine tests passed.
   These are the manifest-version test and eight service-comparison example
   tests. They do not assess the new sentence's meaning or behavioral effect.
+- Pinned `skills-ref validate` on both distributed Skill directories: both
+  exit 0 (`Valid skill`). The root used the existing validation-env with
+  PYTHONPATH set to its Python 3.12 packages and bytecode writes disabled.
+  Validator source: agentskills/agentskills commit
+  `f130f348f502d9804278a617f86929846896d2e9`. This confirms physical form only.
 
 The full English/Japanese Skill pair, PF, work-system principles, review-alps,
 and sync-locales were read by the root. A separate reviewer is examining the

@@ -33,14 +33,14 @@ are preserved as native SQL. These checks do not establish business correctness.
 
 ## Review completion and next dependency
 
-Primary grades for all three families and both S10 grades have been read by the
-root. Supplemental S05/S08 second grades and the development source-fidelity
-report are still pending. Their findings must be retained and adjudicated before
-H01 reporting is called complete, but cannot turn the observed S10 matched tie
-into the required directional observation. B1 is rejected, not provisionally
-accepted while waiting for those reports.
+The decision above was recorded after primary grades for all three families and
+both S10 grades were read, while supplemental S05/S08 and source-fidelity work
+was pending. Those reports are now complete and read; the final adjudication is
+in development-1-closeout.md. They did not reverse the observed matched S10 tie
+or supply the required directional observation. B1 remains rejected.
 
-H02 is separately proposed in development-round-2.md. Its source drafting and
-independent semantic/locale review may proceed without using any pending report
-as established evidence. No H02 creator begins until the round-1 reviews and
-closeout are complete. No product PR or main comparison has started.
+H02 is separately proposed in development-round-2.md. Source drafting and
+independent semantic/locale review were completed without treating a pending
+report as established evidence. The round-1 reviews and closeout are now
+complete, allowing H02's first creator. No product PR or main comparison has
+started.

@@ -1,0 +1,8 @@
+{
+  "probe-invalid": {
+    "party_id": "crew-cedar",
+    "request_key": "probe-invalid",
+    "seats": 0,
+    "slot_id": "paper-lab-am"
+  }
+}
