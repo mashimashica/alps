@@ -14,6 +14,7 @@ import shutil
 import stat
 
 from prepare_control_consumers import artifact_inventory, checked_path, ignore_runtime_caches
+from recovery_ledger_binding import record_path, validate_snapshot_identity
 
 ROOT = Path(__file__).resolve().parent
 ALLOCATION_SHA256 = "bb463eceeccea6502418daf3263558d386c8fd31f4b1dcfe4f5fba411c577a0f"
@@ -213,9 +214,9 @@ def main():
                     snapshot = ROOT / "state-snapshots" / use_id
                     metadata = read_json(snapshot / f"{label}.json")
                     if (metadata.get("consumer_id") != use_id or metadata.get("snapshot") != label
-                            or metadata.get("state_path") != setup["state_path"]
                             or sha(snapshot / f"{label}.sql") != metadata["sql_sha256"]):
                         raise ValueError(f"Native state evidence differs: {use_id}/{label}")
+                    validate_snapshot_identity(ROOT, use_id, setup, label, metadata)
             applications.append((variant, use_id, folder, assignment))
         plans.append((code, creator_id, package, applications))
     target.mkdir(parents=True, exist_ok=False)
@@ -288,6 +289,9 @@ def main():
             if family == "S06":
                 copy_tree(ROOT / "state-snapshots" / use_id, dest / "committed-state", excluded_caches)
                 copy_file(ROOT / "consumer-setup" / f"{use_id}.json", dest / "setup-observations.json")
+                binding = record_path(ROOT, use_id)
+                if binding.exists():
+                    copy_file(binding, dest / "recovery-binding.json")
             mapping[code]["consumers"].append(use_id)
     mapping_path.parent.mkdir(exist_ok=True)
     with mapping_path.open("x") as stream:

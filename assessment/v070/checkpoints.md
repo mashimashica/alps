@@ -75,3 +75,7 @@ Direct API save verified commit `7bcb55a9886778f2026c550377aefad8876e7108`, tree
 ## Environment restoration checkpoint
 
 Verified commit `95cc0e23a69f8eca8f8cae64bac7adea8ed2c696`, tree `ecd225acf4d144f403c22a7ab3f0fc9d46256be7`, parent `75c0ea9bddf379c5e1803e4c0114ba5b47c871d8`. Immutable local snapshot: `../assessment-checkpoint-fr8mfC`. Nine changed entries; 5,292 published files. Commit parent/tree/author-matching DCO and non-forced ref update were verified. All nine changed files were fetched at the exact commit and matched their submitted UTF-8 text in full. This saves restoration audits and reconciled 72 creator/93 consumer/17 grading completions, adding no trial. Product remains clean frozen A. C-U097 resumed only after read-back; its newly recorded start is a coordinator continuation observation, not reconstruction of its historical initial spawn.
+
+## Recovered text and continuation checkpoint
+
+Verified commit `fcedf4b0c327843f334ae0b8a547fa09f6cfc48e`, tree `085779dc6414871b62cd7beecc15952c4a179757`, parent `95cc0e23a69f8eca8f8cae64bac7adea8ed2c696`. Snapshot `../assessment-checkpoint-Yke79O`; 51 changed entries and 5,340 published files. Commit parent/tree/author-matching DCO, non-forced ref and all 51 changed UTF-8 file contents were verified by exact-commit read-back. The save includes extracted creator/consumer text and matched-SQL supplements with provenance, plus started continuation observations; it does not attest later task completions or independent approval of in-progress recovery code.

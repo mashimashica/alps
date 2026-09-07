@@ -15,6 +15,8 @@ import subprocess
 import sys
 import tempfile
 
+from recovery_ledger_binding import snapshot_identity
+
 ROOT = Path(__file__).resolve().parent
 
 
@@ -27,9 +29,11 @@ def snapshot(consumer_id, label):
     setup = json.loads(setup_path.read_text())
     if setup.get("consumer_id") != consumer_id or not setup.get("setup_verified"):
         raise ValueError("Matching completed setup evidence is required")
-    path = Path(setup["state_path"])
+    identity = snapshot_identity(ROOT, consumer_id, setup, label)
+    path = Path(identity["state_path"])
+    prefix = consumer_id + ("-ledger-recovery-" if "recovery_binding_path" in identity else "-ledger-state-")
     if (path.parent.parent != ROOT.parent or path.name != "ledger.sqlite"
-            or not path.parent.name.startswith(consumer_id + "-ledger-state-")
+            or not path.parent.name.startswith(prefix)
             or path.is_symlink() or path.parent.is_symlink() or not path.is_file()):
         raise ValueError("State is outside this consumer's allocated native file")
     target = ROOT / "state-snapshots" / consumer_id
@@ -51,7 +55,7 @@ def snapshot(consumer_id, label):
     target.mkdir(parents=True, exist_ok=True)
     with (target / f"{label}.sql").open("x", encoding="utf-8") as stream:
         stream.write(sql)
-    metadata = {"consumer_id": consumer_id, "state_path": str(path), "snapshot": label,
+    metadata = {"consumer_id": consumer_id, **identity, "snapshot": label,
                 "representation": "Native SQL from a consistent committed read transaction; not byte-identical SQLite",
                 "sqlite_version": sqlite3.sqlite_version,
                 "sql_sha256": hashlib.sha256(sql.encode()).hexdigest()}

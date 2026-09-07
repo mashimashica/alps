@@ -1,4 +1,154 @@
 {
+  "grading-work/S06-P02-second/disposable-probes/R17/approved-continuation/source.sqlite": {
+    "metadata_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R17/approved-continuation/source.sqlite.json",
+    "metadata_sha256": "405eba4b6ba7b57dcd8ad4b06afe2e116a27741bf875826fe4c0bd12b6deb870",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "grading-work/S06-P02-second/disposable-probes/R17/approved-continuation/source.sqlite",
+    "source_sha256": "82bb16d434dc5b764d4df1e3a21047218f503ef947def85f24f49ccce8a521bd",
+    "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R17/approved-continuation/source.sqlite.sql",
+    "sql_sha256": "fcde1987ec157e7300be5b336800e6f0d8f8099e927acc1e77d15156c162266b",
+    "sqlite_version": "3.53.1"
+  },
+  "grading-work/S06-P02-second/disposable-probes/R17/different-state-same-snapshot/second-disposable-source.sqlite": {
+    "metadata_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R17/different-state-same-snapshot/second-disposable-source.sqlite.json",
+    "metadata_sha256": "95fcc0656b13d268508f61989d80315d4c713c55ea5339e4e8f6746b2a6a31f5",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "grading-work/S06-P02-second/disposable-probes/R17/different-state-same-snapshot/second-disposable-source.sqlite",
+    "source_sha256": "a9cf0638210b26eea01d9539fe0f478b0dae0d9e1b8b3a6144a7c05ebab2c318",
+    "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R17/different-state-same-snapshot/second-disposable-source.sqlite.sql",
+    "sql_sha256": "071ead7c2855dc57b35546ff0515c79039899eae12b921f60584232f858cb496",
+    "sqlite_version": "3.53.1"
+  },
+  "grading-work/S06-P02-second/disposable-probes/R17/different-state-same-snapshot/source.sqlite": {
+    "metadata_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R17/different-state-same-snapshot/source.sqlite.json",
+    "metadata_sha256": "7c1505fca3e3fce8cc9ac8040797a6aed2c13408048bc53bb36e3d141accd2c7",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "grading-work/S06-P02-second/disposable-probes/R17/different-state-same-snapshot/source.sqlite",
+    "source_sha256": "a9cf0638210b26eea01d9539fe0f478b0dae0d9e1b8b3a6144a7c05ebab2c318",
+    "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R17/different-state-same-snapshot/source.sqlite.sql",
+    "sql_sha256": "071ead7c2855dc57b35546ff0515c79039899eae12b921f60584232f858cb496",
+    "sqlite_version": "3.53.1"
+  },
+  "grading-work/S06-P02-second/disposable-probes/R17/empty-source/source.sqlite": {
+    "metadata_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R17/empty-source/source.sqlite.json",
+    "metadata_sha256": "0aceed683d090363803eeb5043f5b8e5ba4b7a2db1b756ccdfb67685e94ff407",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "grading-work/S06-P02-second/disposable-probes/R17/empty-source/source.sqlite",
+    "source_sha256": "32e4481e5945c7e557ce8e87132f9c4bafa287f8d32bff927bceae4a54df3afb",
+    "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R17/empty-source/source.sqlite.sql",
+    "sql_sha256": "85988cf56b2374a06fbb212b98b3d87868704f2b75171fac68c1b14625bab2e7",
+    "sqlite_version": "3.53.1"
+  },
+  "grading-work/S06-P02-second/disposable-probes/R17/lost-first-response/source.sqlite": {
+    "metadata_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R17/lost-first-response/source.sqlite.json",
+    "metadata_sha256": "9eeb0b2155a7986253f0f1c2ee16b7dea57db5d8cdd948629f8d1f4919457092",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "grading-work/S06-P02-second/disposable-probes/R17/lost-first-response/source.sqlite",
+    "source_sha256": "a9cf0638210b26eea01d9539fe0f478b0dae0d9e1b8b3a6144a7c05ebab2c318",
+    "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R17/lost-first-response/source.sqlite.sql",
+    "sql_sha256": "071ead7c2855dc57b35546ff0515c79039899eae12b921f60584232f858cb496",
+    "sqlite_version": "3.53.1"
+  },
+  "grading-work/S06-P02-second/disposable-probes/R28/approved-continuation/source.sqlite": {
+    "metadata_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R28/approved-continuation/source.sqlite.json",
+    "metadata_sha256": "8c25b23363c2283393682f307380624a4e9037b5ef106f75c0d2705c5cc263db",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "grading-work/S06-P02-second/disposable-probes/R28/approved-continuation/source.sqlite",
+    "source_sha256": "60b3b6a17714106fbe86bed9cbdb072fa902239193a00ba0b4d5db4f3e8f3f1a",
+    "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R28/approved-continuation/source.sqlite.sql",
+    "sql_sha256": "9a5b4bede86bf144f4eb1b7b9d656a510d7d7622362fdac71c9f6ee1dced735b",
+    "sqlite_version": "3.53.1"
+  },
+  "grading-work/S06-P02-second/disposable-probes/R28/empty-source/source.sqlite": {
+    "metadata_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R28/empty-source/source.sqlite.json",
+    "metadata_sha256": "92f3397b2a876295848ec521295797b81940526ab4dd8555dd9e2038891586c2",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "grading-work/S06-P02-second/disposable-probes/R28/empty-source/source.sqlite",
+    "source_sha256": "32e4481e5945c7e557ce8e87132f9c4bafa287f8d32bff927bceae4a54df3afb",
+    "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R28/empty-source/source.sqlite.sql",
+    "sql_sha256": "85988cf56b2374a06fbb212b98b3d87868704f2b75171fac68c1b14625bab2e7",
+    "sqlite_version": "3.53.1"
+  },
+  "grading-work/S06-P02-second/disposable-probes/R28/lost-first-response/source.sqlite": {
+    "metadata_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R28/lost-first-response/source.sqlite.json",
+    "metadata_sha256": "5cb633228172d650fd4f31a44df0fece83714d86be5515f9b2af8fdad73ec01b",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "grading-work/S06-P02-second/disposable-probes/R28/lost-first-response/source.sqlite",
+    "source_sha256": "a9cf0638210b26eea01d9539fe0f478b0dae0d9e1b8b3a6144a7c05ebab2c318",
+    "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R28/lost-first-response/source.sqlite.sql",
+    "sql_sha256": "071ead7c2855dc57b35546ff0515c79039899eae12b921f60584232f858cb496",
+    "sqlite_version": "3.53.1"
+  },
+  "grading-work/S06-P02-second/disposable-probes/R44/approved-continuation/source.sqlite": {
+    "metadata_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R44/approved-continuation/source.sqlite.json",
+    "metadata_sha256": "4af5ac663193b9ec1402977a07824a5ea677b44502fb1df4dfcfdb7e92d5a484",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "grading-work/S06-P02-second/disposable-probes/R44/approved-continuation/source.sqlite",
+    "source_sha256": "60b3b6a17714106fbe86bed9cbdb072fa902239193a00ba0b4d5db4f3e8f3f1a",
+    "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R44/approved-continuation/source.sqlite.sql",
+    "sql_sha256": "9a5b4bede86bf144f4eb1b7b9d656a510d7d7622362fdac71c9f6ee1dced735b",
+    "sqlite_version": "3.53.1"
+  },
+  "grading-work/S06-P02-second/disposable-probes/R44/empty-source/source.sqlite": {
+    "metadata_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R44/empty-source/source.sqlite.json",
+    "metadata_sha256": "d16420a4352ee137b8335c45adb42f65293a66d4083f1b3b8309edffd17ae83f",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "grading-work/S06-P02-second/disposable-probes/R44/empty-source/source.sqlite",
+    "source_sha256": "32e4481e5945c7e557ce8e87132f9c4bafa287f8d32bff927bceae4a54df3afb",
+    "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R44/empty-source/source.sqlite.sql",
+    "sql_sha256": "85988cf56b2374a06fbb212b98b3d87868704f2b75171fac68c1b14625bab2e7",
+    "sqlite_version": "3.53.1"
+  },
+  "grading-work/S06-P02-second/disposable-probes/R44/lost-first-response/source.sqlite": {
+    "metadata_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R44/lost-first-response/source.sqlite.json",
+    "metadata_sha256": "64a1393c47e72057d20e40be222582eb499e2fc67b9a960a98fff024e0591c5e",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "grading-work/S06-P02-second/disposable-probes/R44/lost-first-response/source.sqlite",
+    "source_sha256": "a9cf0638210b26eea01d9539fe0f478b0dae0d9e1b8b3a6144a7c05ebab2c318",
+    "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R44/lost-first-response/source.sqlite.sql",
+    "sql_sha256": "071ead7c2855dc57b35546ff0515c79039899eae12b921f60584232f858cb496",
+    "sqlite_version": "3.53.1"
+  },
+  "grading-work/S06-P02-second/disposable-probes/R44/singleton-source/source.sqlite": {
+    "metadata_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R44/singleton-source/source.sqlite.json",
+    "metadata_sha256": "ffaa77b63253b1c37d8609563b07e3cd9903a2dc6291044c72557702aba56f54",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "grading-work/S06-P02-second/disposable-probes/R44/singleton-source/source.sqlite",
+    "source_sha256": "54684b705affc0666294b1c1d9baa7f25bb88bafc9f61a426c0146f394f068e4",
+    "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R44/singleton-source/source.sqlite.sql",
+    "sql_sha256": "87619964b5a5a3ee270505fd6a002aadbaa7b64293d8a4b17e3c25345babdd00",
+    "sqlite_version": "3.53.1"
+  },
+  "grading-work/S06-P02-second/disposable-probes/R63/approved-continuation/source.sqlite": {
+    "metadata_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R63/approved-continuation/source.sqlite.json",
+    "metadata_sha256": "cf1549e664ed09a2614d86b00ba7bfdd0c7f10bf6afea7cb492639b920091b53",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "grading-work/S06-P02-second/disposable-probes/R63/approved-continuation/source.sqlite",
+    "source_sha256": "60b3b6a17714106fbe86bed9cbdb072fa902239193a00ba0b4d5db4f3e8f3f1a",
+    "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R63/approved-continuation/source.sqlite.sql",
+    "sql_sha256": "9a5b4bede86bf144f4eb1b7b9d656a510d7d7622362fdac71c9f6ee1dced735b",
+    "sqlite_version": "3.53.1"
+  },
+  "grading-work/S06-P02-second/disposable-probes/R63/empty-source/source.sqlite": {
+    "metadata_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R63/empty-source/source.sqlite.json",
+    "metadata_sha256": "93f53d4184f97f337c2dde543e6e92710870eab98043fb04abcbade620861345",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "grading-work/S06-P02-second/disposable-probes/R63/empty-source/source.sqlite",
+    "source_sha256": "32e4481e5945c7e557ce8e87132f9c4bafa287f8d32bff927bceae4a54df3afb",
+    "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R63/empty-source/source.sqlite.sql",
+    "sql_sha256": "85988cf56b2374a06fbb212b98b3d87868704f2b75171fac68c1b14625bab2e7",
+    "sqlite_version": "3.53.1"
+  },
+  "grading-work/S06-P02-second/disposable-probes/R63/lost-first-response/source.sqlite": {
+    "metadata_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R63/lost-first-response/source.sqlite.json",
+    "metadata_sha256": "43d0472d1466fdaccf50e0f9184fb24e1995b1e207f478829ab8dad8218df379",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "grading-work/S06-P02-second/disposable-probes/R63/lost-first-response/source.sqlite",
+    "source_sha256": "a9cf0638210b26eea01d9539fe0f478b0dae0d9e1b8b3a6144a7c05ebab2c318",
+    "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R63/lost-first-response/source.sqlite.sql",
+    "sql_sha256": "071ead7c2855dc57b35546ff0515c79039899eae12b921f60584232f858cb496",
+    "sqlite_version": "3.53.1"
+  },
   "trials/control-037/verify1/source.sqlite": {
     "metadata_path": "sqlite-evidence/creator-complete/trials/control-037/verify1/source.sqlite.json",
     "metadata_sha256": "17fb4b88117fb3e87d85615095f749b223f860ea8467cb48d2d67b06c33d9f6a",

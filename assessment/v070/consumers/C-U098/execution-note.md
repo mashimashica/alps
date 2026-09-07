@@ -95,6 +95,22 @@ Created:
 
 7. `apply_patch` created this `execution-note.md`. Tool result: `{}` (success).
 
+8. Final checks, executed concurrently from the assigned task directory:
+   - `python3 -m py_compile work/reproduce.py` — exit code `0`; stdout and stderr empty.
+   - `test -s answer.md && test -s execution-note.md && test -s work/reproduce.py` — exit code `0`; stdout and stderr empty.
+   - `rg -n "Recommendation:|102-hour|1\\.17%|planning scenarios|Follow-up and review point|python3 work/reproduce.py" answer.md` — exit code `0`.
+   - Exact relevant stdout from the content check:
+
+     ```text
+     3:**Recommendation: stop Alder's all-order second-person check for the next 20 full shifts, and do not expand it to Birch.** Run both lines without a dedicated checker. This is an interim operating decision for the stated horizon; Nessa retains the actual decision.
+     5:The quality records do not show that the measured check improves downstream mispacks, and its observed workload does not fit the hard 102-hour-per-line-per-shift cap at the planned volume. Narrowing to selective checking is not an implementable substitute because its time, quality, and dispatch effects have not been measured.
+     26:Alder's late-dispatch rate on the three comparable full pilot shifts was **42 / 3,600 = 1.17%**, above the 1% commitment. At a constant rate, the next period would have 336 late orders against a maximum of 288. Including the unusually short, simple August 28 shift makes the full pilot record 42 / 4,200 = 1.00%, but that shift is not evidence of full-shift capacity. Alder's baseline full-shift rate was 21 / 3,600 = 0.58%.
+     28:The following quality figures are **planning scenarios, not causal forecasts**. Applying Alder's own baseline band rates to 28,800 planned orders at the stated 70% standard / 30% complex mix yields 921.6 expected mispacks and **$50,688** in avoidable error cost at $55 each. Applying Alder's checked-pilot band rates yields 1,065.6 mispacks and **$58,608**. The latter is $7,920 higher before the $6,528 additional-hour cost. The periods differ in template, account mix, and allocation, so this comparison supports no claim that checking causes harm; it does show that the supplied evidence cannot justify paying for or operationally accommodating the check.
+     30:## Follow-up and review point
+     41:python3 work/reproduce.py
+     44:The script uses only the supplied CSV files, aggregates outcomes by period, line, and band, counts each line-level operations row once, excludes immature outcomes, and prints the stated planning scenarios.
+     ```
+
 ## Interpretation boundary
 
 The recommendation and cost/workload figures in `answer.md` distinguish observed measurements from planning scenarios. No causal effect was estimated. Selective checking was not modeled as observed because the source packet says its time, quality, and dispatch effects are unmeasured.

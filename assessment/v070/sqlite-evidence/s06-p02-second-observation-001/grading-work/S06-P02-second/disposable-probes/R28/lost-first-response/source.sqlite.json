@@ -1,0 +1,8 @@
+{
+  "source_path": "grading-work/S06-P02-second/disposable-probes/R28/lost-first-response/source.sqlite",
+  "source_sha256": "a9cf0638210b26eea01d9539fe0f478b0dae0d9e1b8b3a6144a7c05ebab2c318",
+  "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R28/lost-first-response/source.sqlite.sql",
+  "sql_sha256": "071ead7c2855dc57b35546ff0515c79039899eae12b921f60584232f858cb496",
+  "sqlite_version": "3.53.1",
+  "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history"
+}

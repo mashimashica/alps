@@ -9,7 +9,7 @@ Frozen current main A is dee3866d35e43db5db480fc9f85166a8dcb1ec3b, VERSION 0.7.0
 | Stage | Completed design | Completed consumer | Other completed | Planned task trials |
 | --- | ---: | ---: | ---: | ---: |
 | Calibration | 12 | 24 | 0 | 36 |
-| C control | 72 | 93 | 0 | 216 |
+| C control | 72 | 97 | 0 | 216 |
 | Remaining base plan | 0 | 0 | 0 | up to 1,776 |
 
 Additional diagnostic reserve: at most 72 starts across at most three rounds. H01–H03 used 68 starts: 66 complete and two retained interrupted originals. Four slots remain, but do not authorize a fourth ordinary round. Across calibration/development, 34 creators and 68 valid consumers are complete. Completed tasks, observation validity, business adequacy and achieved Outcomes are different counts.
@@ -34,7 +34,7 @@ S03 is closed out after all reports/clarification: 24 adequate, with prior full 
 
 Consumer/blind packaging reviews and SQLite preservation integration are complete/read. Helpers verify frozen bytes/modes and maintain original final-state evidence without interpreting semantic success. Actual creator verification databases are preserved at their original paths and, for direct UTF-8 saving, as indexed native SQL with hashes. S06 consumer states are independently initialized outside the evidence tree; preserve their actual final committed state with control_ledger_state.py after completion, without resetting quota or granting another tranche.
 
-The environment reconnected with an older local snapshot. Exact remote commit 75c0ea9bddf379c5e1803e4c0114ba5b47c871d8 (5,290 files) was restored to the original assessment root, every tracked blob/mode was verified, frozen hashes passed, and the publication cache was rebuilt only against those verified bytes. The older local snapshot is separately preserved. This update and the reconciliation reviews await the next verified checkpoint; use later receipts when present. Recovery adds no task completion: 267 of at most 2,100 planned trial slots, about 13%, and C 165/216, about 76%. These are execution ratios, not grading/improvement/PR completion percentages. The separate assessment/v070-evidence branch is not merged into product distribution.
+The environment reconnected with an older local snapshot. Exact remote commit 75c0ea9bddf379c5e1803e4c0114ba5b47c871d8 (5,290 files) was restored to the original assessment root, every tracked blob/mode was verified, frozen hashes passed, and the publication cache was rebuilt only against those verified bytes. The older local snapshot is separately preserved. This update and the reconciliation reviews await the next verified checkpoint; use later receipts when present. Recovery adds no task completion. After recovery, original C-U097 and first-start C-U098–100 explicitly completed, with their four answer/note pairs present and all copied original input/Skill hashes unchanged. Current observed execution is 271 of at most 2,100 planned trial slots, about 12.9%, and C 169/216, about 78.2%. C has 47 consumer slots remaining. These four applications are not yet independently graded. These are execution ratios, not grading/improvement/PR completion percentages. The separate assessment/v070-evidence branch is not merged into product distribution.
 
 ## Remaining decisions and verification limits
 

@@ -1,0 +1,8 @@
+{
+  "source_path": "grading-work/S06-P02-second/disposable-probes/R44/singleton-source/source.sqlite",
+  "source_sha256": "54684b705affc0666294b1c1d9baa7f25bb88bafc9f61a426c0146f394f068e4",
+  "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R44/singleton-source/source.sqlite.sql",
+  "sql_sha256": "87619964b5a5a3ee270505fd6a002aadbaa7b64293d8a4b17e3c25345babdd00",
+  "sqlite_version": "3.53.1",
+  "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history"
+}
