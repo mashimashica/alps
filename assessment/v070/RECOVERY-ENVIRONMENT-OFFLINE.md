@@ -81,3 +81,13 @@ No new product PR, merge, tag or Release has occurred in this assessment program
 After the first emergency checkpoint, the original completed C070, C071 and C072 agents also relayed their retained successful apply_patch contents without filesystem access or new authoring. The corresponding recovery/control-070-authored-text.md, control-071-authored-text.md and control-072-authored-text.md preserve each Skill, supporting resources and public execution note separately from the inaccessible originals. Together with C069, all four later creators now have supplemental conversation recovery text. Original package/freeze byte reconciliation and the later consumer artifacts remain pending.
 
 The first emergency commit is 6a0a6dc737ba93df750c449c3ca752d492300053, tree 6b1d4db53f66af3ec70c9c84efe159736a4bd63f, parent bb0b730b49dae994a4869e8002f246e338e9da1f. Its four changed files were fetched back as UTF-8 and compared in full to the submitted text; all four matched. See recovery/checkpoint-receipts.md. Always fetch the latest exact evidence ref before another update.
+
+## Supplemental probe and consumer recovery
+
+The original completed S06-P02 primary grader recovered the exact successful component_probes.py patch text and all eight observed result-event objects from retained command output. They are preserved in recovery/S06-P02-primary-probes-relay.md. The original pretty-printed JSON serialization, database bytes, native SQL and original hashes were not reconstructed. The parent read the complete relay and verified its immutable tree/blob identity.
+
+The original C-U084 agent recovered the final answer implied by its successful creation/update patches, its public execution note and exact checkpoint JSON from a successful cat output. recovery/control-use-084-relay.md records provenance and unavailable material. No business operation was repeated. Original final file identity and native state reconciliation remain pending.
+
+The parent ended only the suspended waiting turns of C-U094–097 with interrupt_agent to free recovery capacity. Each had reported no prompt/resource read or task operation before the environment failed. Their existing contexts remain available for follow-up; this administrative pause is not a completed, invalidated or retried business trial. On reconnection inspect and resume those same contexts before considering any infrastructure-loss adjudication.
+
+Commit 4472e61bff470bab758c98eaa0480330e7566afa (tree e96fbf3723deb4dd0abc226c784104a63c7bf7ec, parent 6a0a6dc737ba93df750c449c3ca752d492300053) saved C070–072 recovery and the first receipt. All five changed files were fetched back and matched the submitted UTF-8 text in full.
