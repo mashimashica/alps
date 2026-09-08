@@ -111,3 +111,7 @@ Verified commit `ce044c0c137048cdfff2c1b1848c3bb129c31d04`, tree `9e3fdd089cf192
 ## S06 closeout and complete S09 packets
 
 Verified commit `db01dc033dcb28f7f261a8d886181ed8ee233233`, tree `91e04747830cde4e3c361b8dbea9df1cadd5a16a`, parent `ce044c0c137048cdfff2c1b1848c3bb129c31d04`. Snapshot `../assessment-checkpoint-8lIxoU`; 461 changed entries and 6,647 published files. Exact commit/ref/DCO and all 461 changed blob identities/modes matched. Saves S06-P03 second final report and root adjudication/family closeout, completed C001–123 observations, all three fixed S09 packets and refreshed continuation records. S09 grading starts only after this verification.
+
+## User-requested interim report boundary
+
+Verified commit `68a7e41fbe7a855cca407a9365629bea6d992516`, tree `1174da73b011ade6a5db6c370da2c5b5f0145372`, parent `db01dc033dcb28f7f261a8d886181ed8ee233233`. Snapshot `../assessment-checkpoint-VAUjwW`; 6 changed entries and 6,649 published files. Exact commit/ref/author-matching DCO and full read-back of all six submitted UTF-8 files matched. Saves the interim report, explicit user-requested pause, final S09-P01 primary report and ledger, and the preceding checkpoint receipt. All children are complete; new executions await the user's continuation decision.

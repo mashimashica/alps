@@ -1,3 +1,9 @@
+# Active focused comparison — 2026-09-08
+
+The user authorized continuing through the final actual comparison chart report. The 44-trial amendment in focused-comparison-plan.md is now active. Preserve all original evidence; no core edit or conditional example phase. Check focused ledgers and the newest verified checkpoint receipt before resuming. This instruction supersedes the earlier pause and older broad automatic continuation instructions below.
+
+---
+
 # User-requested interim decision boundary — 2026-09-08
 
 The user requested a clear interim report with graphs and decision support because token consumption is high. Stop new task and grading launches. The sole already-started S09-P01 primary report has completed, been read and recorded; its mandatory independent second assessment remains unperformed. No child is running. This latest instruction supersedes the prior automatic continuation directions below. Do not start C124–144, remaining graders, new candidates or the proposed reduced program until the user makes the continuation decision.

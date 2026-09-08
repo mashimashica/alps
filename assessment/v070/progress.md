@@ -1,3 +1,9 @@
+# Active focused comparison — 2026-09-08
+
+The user authorized continuing through the final actual comparison chart report. The 44-trial amendment in focused-comparison-plan.md is now active. Preserve all original evidence; no core edit or conditional example phase. Check focused ledgers and the newest verified checkpoint receipt before resuming. This instruction supersedes the earlier pause and older broad automatic continuation instructions below.
+
+---
+
 # Progress
 
 Updated: 2026-09-07 UTC. Execution counts are coordinator observations; consult the mutable ledgers and live agents for later completions.

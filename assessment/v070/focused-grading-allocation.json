@@ -1,0 +1,149 @@
+{
+  "seed": 7070,
+  "packets": [
+    {
+      "packet": "FP01",
+      "case": "S03",
+      "labels": {
+        "R17": {
+          "creator_id": "focus-002",
+          "arm": "A"
+        },
+        "R63": {
+          "creator_id": "focus-001",
+          "arm": "A"
+        },
+        "R28": {
+          "creator_id": "control-020",
+          "arm": "C"
+        },
+        "R44": {
+          "creator_id": "control-019",
+          "arm": "C"
+        }
+      },
+      "primary": "focused-FP01-primary.md",
+      "second": "focused-FP01-second.md"
+    },
+    {
+      "packet": "FP02",
+      "case": "S03",
+      "labels": {
+        "R17": {
+          "creator_id": "control-023",
+          "arm": "C"
+        },
+        "R63": {
+          "creator_id": "control-024",
+          "arm": "C"
+        },
+        "R28": {
+          "creator_id": "focus-003",
+          "arm": "A"
+        },
+        "R44": {
+          "creator_id": "focus-004",
+          "arm": "A"
+        }
+      },
+      "primary": "focused-FP02-primary.md",
+      "second": "focused-FP02-second.md"
+    },
+    {
+      "packet": "FP03",
+      "case": "S06",
+      "labels": {
+        "R17": {
+          "creator_id": "control-043",
+          "arm": "C"
+        },
+        "R63": {
+          "creator_id": "focus-005",
+          "arm": "A"
+        },
+        "R28": {
+          "creator_id": "control-044",
+          "arm": "C"
+        },
+        "R44": {
+          "creator_id": "focus-006",
+          "arm": "A"
+        }
+      },
+      "primary": "focused-FP03-primary.md",
+      "second": "focused-FP03-second.md"
+    },
+    {
+      "packet": "FP04",
+      "case": "S06",
+      "labels": {
+        "R17": {
+          "creator_id": "focus-007",
+          "arm": "A"
+        },
+        "R63": {
+          "creator_id": "control-047",
+          "arm": "C"
+        },
+        "R28": {
+          "creator_id": "focus-008",
+          "arm": "A"
+        },
+        "R44": {
+          "creator_id": "control-048",
+          "arm": "C"
+        }
+      },
+      "primary": "focused-FP04-primary.md",
+      "second": "focused-FP04-second.md"
+    },
+    {
+      "packet": "FP05",
+      "case": "S10",
+      "labels": {
+        "R17": {
+          "creator_id": "focus-010",
+          "arm": "A"
+        },
+        "R63": {
+          "creator_id": "control-068",
+          "arm": "C"
+        },
+        "R28": {
+          "creator_id": "control-067",
+          "arm": "C"
+        },
+        "R44": {
+          "creator_id": "focus-009",
+          "arm": "A"
+        }
+      },
+      "primary": "focused-FP05-primary.md",
+      "second": "focused-FP05-second.md"
+    },
+    {
+      "packet": "FP06",
+      "case": "S10",
+      "labels": {
+        "R17": {
+          "creator_id": "focus-011",
+          "arm": "A"
+        },
+        "R63": {
+          "creator_id": "control-071",
+          "arm": "C"
+        },
+        "R28": {
+          "creator_id": "control-072",
+          "arm": "C"
+        },
+        "R44": {
+          "creator_id": "focus-012",
+          "arm": "A"
+        }
+      },
+      "primary": "focused-FP06-primary.md",
+      "second": "focused-FP06-second.md"
+    }
+  ]
+}
