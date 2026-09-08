@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="920" viewBox="0 0 1600 920" role="img" aria-labelledby="title desc">
+<title id="title">The agent exercises judgment between the meaning of work and available means</title>
+<desc id="desc">Hand-drawn onion diagram. Why and What are the meaning of work at the center. How is the available means in the outer ring. The Agent occupies the middle ring as judgment between them. User needs enter from the left and an outcome emerges to the right.</desc>
+<defs>
+  <filter id="rough" x="-3%" y="-3%" width="106%" height="106%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="31" result="noise"/>
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.7" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <style>
+    .ink{fill:none;stroke:#272828;stroke-linecap:round;stroke-linejoin:round}
+    .ghost{fill:none;stroke:#272828;stroke-linecap:round;stroke-linejoin:round;opacity:.28}
+    .label{fill:#272828;font-family:"Comic Sans MS","Segoe Print","Bradley Hand",cursive;text-anchor:middle}
+    .small{fill:#626464;font-family:"Comic Sans MS","Segoe Print","Bradley Hand",cursive;text-anchor:middle}
+  </style>
+</defs>
+<rect width="1600" height="920" fill="#fff"/>
+<g filter="url(#rough)">
+  <path d="M804 69 C1014 70 1186 241 1191 450 C1196 664 1023 838 806 839 C588 840 416 666 421 451 C426 240 594 67 804 69Z" fill="#fff" stroke="#272828" stroke-width="3.2"/>
+  <path d="M804 187 C954 185 1076 307 1077 455 C1078 606 955 727 804 728 C652 728 532 606 535 454 C538 306 655 188 804 187Z" fill="#eee" stroke="#272828" stroke-width="3"/>
+  <path d="M804 303 C889 302 958 371 958 455 C958 541 890 609 804 609 C718 609 650 542 650 456 C650 371 719 304 804 303Z" fill="#fff" stroke="#272828" stroke-width="3"/>
+  <path class="ghost" stroke-width="1.2" d="M800 71 C1011 66 1189 242 1188 456 C1187 663 1017 835 807 836"/>
+  <path class="ghost" stroke-width="1.1" d="M803 190 C953 188 1073 308 1074 456 C1075 604 954 724 805 725"/>
+  <path class="ghost" stroke-width="1.1" d="M802 305 C888 303 956 371 956 455 C956 539 889 606 805 607"/>
+  <path class="ink" stroke-width="3" d="M184 456 Q287 454 397 456 M382 445 L398 456 L382 466"/>
+  <path class="ink" stroke-width="3" d="M1209 456 Q1260 454 1311 456 M1295 446 L1312 456 L1295 466"/>
+  <path class="ink" stroke-width="2.1" stroke="#626464" d="M555 457 Q593 454 631 456 M567 449 L555 457 L567 465 M619 448 L631 456 L619 464"/>
+  <path class="ink" stroke-width="2.1" stroke="#626464" d="M977 457 Q1015 454 1053 456 M989 449 L977 457 L989 465 M1041 448 L1053 456 L1041 464"/>
+  <circle cx="118" cy="436" r="25" class="ink" stroke-width="3"/>
+  <path class="ink" stroke-width="3" d="M80 536 C82 487 94 466 118 465 C143 464 155 489 158 536"/>
+  <ellipse cx="570" cy="205" rx="23" ry="9" class="ink" stroke-width="2.6"/>
+  <path class="ink" stroke-width="2.6" d="M547 205 V246 C547 258 593 258 593 246 V205 M547 219 C547 231 593 231 593 219 M547 233 C547 245 593 245 593 233"/>
+  <path class="ink" stroke-width="3" d="M1020 198 l14 14 -42 44 -16 4 4 -16 42 -44 15 14"/>
+  <path class="ink" stroke-width="2.8" d="M548 671 h32 l14 14 v49 h-46 z M580 671 v14 h14 M557 709 l8 -9 M565 718 l-8 -9 M575 700 l-5 18"/>
+  <path class="ink" stroke-width="2.8" d="M1017 677 l25 -14 25 14 v32 l-25 14 -25 -14 z M1017 677 l25 14 25 -14 M1042 691 v32"/>
+</g>
+<text x="804" y="144" class="label" font-size="62" font-weight="700" transform="rotate(-1 804 144)">How</text>
+<text x="804" y="802" class="small" font-size="29" transform="rotate(-.6 804 802)">Available means</text>
+<text x="804" y="252" class="label" font-size="61" font-weight="700" transform="rotate(.7 804 252)">Agent</text>
+<text x="804" y="288" class="small" font-size="28" transform="rotate(-.5 804 288)">Judgment</text>
+<text x="804" y="421" class="label" font-size="63" font-weight="700" transform="rotate(-1.2 804 421)">Why</text>
+<path d="M757 445 Q803 442 851 444" class="ink" stroke-width="2.5"/>
+<text x="804" y="510" class="label" font-size="63" font-weight="700" transform="rotate(.5 804 510)">What</text>
+<text x="804" y="555" class="small" font-size="27" transform="rotate(-.3 804 555)">Meaning of work</text>
+<text x="118" y="567" class="label" font-size="35" transform="rotate(-1 118 567)">User</text>
+<text x="289" y="421" class="label" font-size="32" transform="rotate(-.5 289 421)">Needs</text>
+<text x="1440" y="468" class="label" font-size="46" transform="rotate(-1 1440 468)">Outcome</text>
+<path d="M1338 489 Q1435 491 1541 486" class="ink" stroke-width="2.3"/>
+<path d="M1500 405 L1509 390 M1528 420 L1543 410" class="ink" stroke-width="2.3"/>
+<text x="570" y="276" class="small" font-size="25" transform="rotate(-1 570 276)">Data</text>
+<text x="1025" y="276" class="small" font-size="25" transform="rotate(.8 1025 276)">Tools</text>
+<text x="570" y="760" class="small" font-size="25" transform="rotate(-.7 570 760)">APIs</text>
+<text x="1025" y="760" class="small" font-size="25" transform="rotate(.5 1025 760)">Environment</text>
+</svg>
