@@ -60,6 +60,22 @@ def verify():
 def evidence_files():
     native_index = ROOT / "sqlite-evidence-index.json"
     represented = json.loads(native_index.read_text()) if native_index.exists() else {}
+    # This completed creator redirected Python's verification cache outside
+    # __pycache__. Retain those observed runtime bytes locally, like the
+    # ordinary excluded caches, without omitting any Skill or input resource.
+    cache_index = ROOT / "focused-runtime-cache-omissions.json"
+    caches = json.loads(cache_index.read_text()) if cache_index.exists() else {}
+    for relative, record in caches.items():
+        source = ROOT / relative
+        prefixes = ("trials/focus-005/.verification/pycache/",
+                    "trials/focus-005/.verification/pycache-final/")
+        if (not relative.startswith(prefixes) or source.suffix != ".pyc"
+                or source.resolve() != source or not source.is_file()):
+            raise SystemExit(f"Unexpected runtime-cache omission: {relative}")
+        raw = source.read_bytes()
+        if (len(raw) < 16 or raw[:4].hex() != record["python_magic_hex"]
+                or hashlib.sha256(raw).hexdigest() != record["sha256"]):
+            raise SystemExit(f"Observed runtime cache changed: {relative}")
     for relative, record in represented.items():
         source = ROOT / relative
         for key, hash_key in (("sql_path", "sql_sha256"), ("metadata_path", "metadata_sha256")):
@@ -74,7 +90,7 @@ def evidence_files():
             continue
         if relative.parts[:3] == ("frozen", "skill-creator", "assets"):
             continue
-        if relative.as_posix() in represented:
+        if relative.as_posix() in represented or relative.as_posix() in caches:
             continue
         yield path, relative
 

@@ -1,0 +1,3 @@
+“Thanks, Rosa. I’ve got it: I’ll pack Cove with its charger, test Heron’s spare hub by 15:00 and pack it only if it passes, attach Jules’s labels when they arrive by 15:05, and take each complete kit to south reception by 15:50 for the 16:10 collection. If Heron’s hub fails, I’ll hold Heron and call you before 15:25; Cove can still go if it’s complete.”
+
+Nothing important remains to settle before Rosa leaves: Rosa confirmed that full read-back and her authority over any Heron exception, and Jules confirmed both labels. The packing, test, and label printing are assigned but have not happened yet.

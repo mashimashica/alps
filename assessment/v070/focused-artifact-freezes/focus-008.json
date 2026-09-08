@@ -1,0 +1,28 @@
+{
+  "file_sha256": {
+    "SKILL.md": "c78d07908e334508b1a7cad7d37f18c37d2ca794b1a3ed649fc4e1229d81c285",
+    "references/runtime.md": "9b53aea89e703d18c4200da3f3dee85fae56ef48df7c3610db0458aa64f90309",
+    "scripts/rollup.py": "4a376c356ef3307290ecee959d848835d5d3e7619a51e1a4f661fa1eafc139b8"
+  },
+  "source_file_modes": {
+    "SKILL.md": 420,
+    "references/runtime.md": 420,
+    "scripts/rollup.py": 420
+  },
+  "excluded_runtime_cache_sha256": {},
+  "creator_input_added_runtime_cache_sha256": {},
+  "public_completion_evidence_sha256": {
+    "trials/focus-008/execution-note.md": "7ff35b603fae4065035c1f3803e37557c9480fcb8a1396d2d67961046f93355d",
+    "focused-public/focus-008/final-response.md": "4d73115a65828218d351711d0ec23af01ea22b6aa474561788830651d29e68d1"
+  },
+  "creator_id": "focus-008",
+  "source_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/focus-008/deliverables/skills/reimbursement-ledger-rollup",
+  "frozen_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/focused-artifacts/focus-008/reimbursement-ledger-rollup",
+  "paired_control_id": "control-048",
+  "cache_handling": "Regular *.pyc directly inside __pycache__ remain in their original folders; their hashes are recorded but those bytes are omitted from frozen/copied resources and durable checkpointing. No non-cache resource is silently discarded.",
+  "schedule_sha256": "9a912fe9ce9a1bc293f72330b3490554f035fbdc7fc418dcb2f2feb3d8107605",
+  "case_bank_manifest_sha256": "f26be07f6cfba54aedc3068a67ae32292877f6ee005f0c190156f5786d1cbdc2",
+  "source_identities_sha256": "efd12e1f239b4554bf71158aa47cc3d13279caea64ce2c9eb892320c86ffde71",
+  "physical_validation_sha256": "8007c90f86f47cb017628d8d28314fd83f6cb38974dab0c482210a74a7df336d",
+  "scope": "Resource identity; no quality judgment"
+}

@@ -1,0 +1,28 @@
+{
+  "file_sha256": {
+    "SKILL.md": "569b6753cb5da5503d0a8fab30120f535d42927ffc9281063d9e6f82aaf4899e",
+    "references/command-contract.md": "fb34c032090f1631bf3c162fc6370305c0519428b728caf760d08b4c143ba803",
+    "references/configuration.md": "3c04f40064f26cbea771949b2a81df681f1dbc6d2428df4a53ce797dc4edea10"
+  },
+  "source_file_modes": {
+    "SKILL.md": 420,
+    "references/command-contract.md": 420,
+    "references/configuration.md": 420
+  },
+  "excluded_runtime_cache_sha256": {},
+  "creator_input_added_runtime_cache_sha256": {},
+  "public_completion_evidence_sha256": {
+    "trials/focus-012/execution-note.md": "8ffba341654fd3801939c6121538e7fd7dffb14284c8813a40c89875bc84f852",
+    "focused-public/focus-012/final-response.md": "1222058a38888a7a925de2b70846a433dd76de2944cc2c4a548d920a1f29da1c"
+  },
+  "creator_id": "focus-012",
+  "source_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/focus-012/deliverables/skills/checkout-release",
+  "frozen_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/focused-artifacts/focus-012/checkout-release",
+  "paired_control_id": "control-072",
+  "cache_handling": "Regular *.pyc directly inside __pycache__ remain in their original folders; their hashes are recorded but those bytes are omitted from frozen/copied resources and durable checkpointing. No non-cache resource is silently discarded.",
+  "schedule_sha256": "9a912fe9ce9a1bc293f72330b3490554f035fbdc7fc418dcb2f2feb3d8107605",
+  "case_bank_manifest_sha256": "f26be07f6cfba54aedc3068a67ae32292877f6ee005f0c190156f5786d1cbdc2",
+  "source_identities_sha256": "efd12e1f239b4554bf71158aa47cc3d13279caea64ce2c9eb892320c86ffde71",
+  "physical_validation_sha256": "d2248adecdf6200ff3a095f3ce6af8eaff723ce8f88123f037f28c61b0bcca5c",
+  "scope": "Resource identity; no quality judgment"
+}

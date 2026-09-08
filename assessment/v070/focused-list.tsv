@@ -3,11 +3,11 @@ focus-001	focused	S03	A	1	gpt-5.6-sol	high	control-019	completed	/root/focus_001
 focus-002	focused	S03	A	2	gpt-5.6-sol	high	control-020	completed	/root/focus_002	2026-09-08T01:16:00.666488+00:00	2026-09-08T01:19:17.451180+00:00
 focus-003	focused	S03	A	1	gpt-6-astra	high	control-023	completed	/root/focus_003	2026-09-08T01:16:00.768676+00:00	2026-09-08T01:19:17.529559+00:00
 focus-004	focused	S03	A	2	gpt-6-astra	high	control-024	completed	/root/focus_004	2026-09-08T01:16:00.837636+00:00	2026-09-08T01:19:17.606724+00:00
-focus-005	focused	S06	A	1	gpt-5.6-sol	high	control-043	running	/root/focus_005	2026-09-08T01:19:17.687835+00:00	
-focus-006	focused	S06	A	2	gpt-5.6-sol	high	control-044	running	/root/focus_006	2026-09-08T01:19:17.767601+00:00	
-focus-007	focused	S06	A	1	gpt-6-astra	high	control-047	running	/root/focus_007	2026-09-08T01:19:17.849647+00:00	
-focus-008	focused	S06	A	2	gpt-6-astra	high	control-048	not started			
-focus-009	focused	S10	A	1	gpt-5.6-sol	high	control-067	not started			
-focus-010	focused	S10	A	2	gpt-5.6-sol	high	control-068	not started			
-focus-011	focused	S10	A	1	gpt-6-astra	high	control-071	not started			
-focus-012	focused	S10	A	2	gpt-6-astra	high	control-072	not started			
+focus-005	focused	S06	A	1	gpt-5.6-sol	high	control-043	completed	/root/focus_005	2026-09-08T01:19:17.687835+00:00	2026-09-08T01:31:56.652443+00:00
+focus-006	focused	S06	A	2	gpt-5.6-sol	high	control-044	completed	/root/focus_006	2026-09-08T01:19:17.767601+00:00	2026-09-08T01:28:18.843280+00:00
+focus-007	focused	S06	A	1	gpt-6-astra	high	control-047	completed	/root/focus_007	2026-09-08T01:19:17.849647+00:00	2026-09-08T01:24:52.222031+00:00
+focus-008	focused	S06	A	2	gpt-6-astra	high	control-048	completed	/root/focus_008	2026-09-08T01:20:44.418155+00:00	2026-09-08T01:26:45.178247+00:00
+focus-009	focused	S10	A	1	gpt-5.6-sol	high	control-067	completed	/root/focus_009	2026-09-08T01:24:52.837996+00:00	2026-09-08T01:29:50.610316+00:00
+focus-010	focused	S10	A	2	gpt-5.6-sol	high	control-068	completed	/root/focus_010	2026-09-08T01:26:45.703932+00:00	2026-09-08T01:31:56.719950+00:00
+focus-011	focused	S10	A	1	gpt-6-astra	high	control-071	completed	/root/focus_011	2026-09-08T01:28:18.916160+00:00	2026-09-08T01:31:56.785542+00:00
+focus-012	focused	S10	A	2	gpt-6-astra	high	control-072	completed	/root/focus_012	2026-09-08T01:28:18.995784+00:00	2026-09-08T01:31:56.868672+00:00

@@ -1,20 +1,36 @@
+# Latest focused observation
+
+All12 A creators completed; all12 original physical-format observations passed. Eight A consumers and all eight newly scheduled C consumers completed. New task trials28/44 complete, cumulative325;16 A consumers remain prepared/unstarted. FP01/FP02 prepared; all15 grading/fidelity reviews unstarted. Creator verification SQLite has native logical SQL observations. A narrow cache omission review is pending before the next save; the prior failed export performed no remote mutation. Read current ledgers and latest verified receipt before resuming.
+
+---
+
 # Focused comparison progress
 
-Active authorized endpoint: actual A/C graphical report under focused-comparison-plan.md. Do not launch conditional example work or the earlier broad unfinished program.
+Active endpoint: the actual A/C chart report under focused-comparison-plan.md. No conditional example phase or broad-program continuation.
 
-## Current observation
+New task trials completed: 23/44; cumulative historical completed task trials: 320. Interrupted development originals remain separate.
 
-- New C consumers C-U133–136 and C-U141–144: all eight explicitly completed; answers, public notes, final responses and observed state changes preserved. Business grades pending.
-- A creators focus-001–004: running in fresh requested sol/high, sol/high, astra/high, astra/high contexts respectively. Exact assignments and prompts were saved before launch at a14d5986a3734944b3c55f9588bbb99ec400fc87; all83 changed blob identities/modes verified.
-- A creators focus-005–012: prepared, not started.
-- A consumers F-U001–024: fixed schedule, not prepared or started.
-- New task executions completed:8/44. Historical task executions completed:305 including the eight; interrupted development originals remain separate.
-- Six fixed blind packets and fifteen grading/fidelity review slots: not yet executed. Packet preparation helper and independent infrastructure review are in progress; no quality findings inferred from file counts.
+All eight prescribed new C consumers completed; their answers, notes, final responses and observed final state are preserved.
 
-Read the mutable focused-list.tsv, focused-consumer-list.tsv and control-consumer-list.tsv for later explicitly recorded execution status. Read the latest verified receipt in checkpoints.md before a remote mutation. Old pause notices are superseded by the authorized focused plan, while original broader stage requirements remain unperformed.
+## A creators
 
-## Next operations
+- completed: focus-001, focus-002, focus-003, focus-004, focus-006, focus-007, focus-008
+- running: focus-005, focus-009, focus-010, focus-011, focus-012
 
-Complete and preserve each creator's actual public final response under focused-public/focus-NNN/final-response.md, record explicit completion, preserve any native SQLite as reviewed logical SQL, run prepare_focused.py validate and consumers for those exact completed IDs, and save before fresh consumer launches. Final native S06 snapshots require explicit consumer completion and use prepare_focused.py snapshot. Frozen generated Skills must not be repaired or regenerated.
+## A consumers
 
-Use no more than six child agents concurrently. Continue the fixed creator/consumer schedule and six independently double-reviewed business packets plus three A semantic-fidelity reviews. Read full reports, adjudicate against actual business evidence, and retain disagreement and recovery limits. Final report must distinguish task adequacy, generated-Skill quality, intended business Outcome and evidenced compensation. Earlier hypothetical chart data is not evidence.
+- completed: F-U001, F-U002, F-U003, F-U004, F-U005, F-U006, F-U007, F-U008
+- not prepared: F-U009, F-U010, F-U017, F-U018, F-U019, F-U020, F-U021, F-U022, F-U023, F-U024
+- prepared: F-U011, F-U012, F-U013, F-U014, F-U015, F-U016
+
+## Review slots
+
+- not started: FP01-primary, FP01-second, FP02-primary, FP02-second, FP03-primary, FP03-second, FP04-primary, FP04-second, FP05-primary, FP05-second, FP06-primary, FP06-second, S03-fidelity, S06-fidelity, S10-fidelity
+
+FP01 and FP02 have passed preflight and copy readback; save them before independent business reviewers start. Other packets await their fixed completed applications.
+
+Completed A Skills must retain their original bytes. Capture actual public final responses in focused-public/, record explicit status with record_status.py, preserve any native SQLite through the reviewed SQL route, validate/freeze/prepare with prepare_focused.py, and save before consumer launches. Snapshot completed S06 consumers before packet preparation. All15 business/fidelity review slots are fixed; report infrastructure reviews separately.
+
+Current source/helper identities and the independent review are in audits/focused-infrastructure-review.md. All7 currently observed creator SQLite files were captured as logical SQL under focused-creator-observation-01; focus-005 was still running at observation time, so verify its final source hash before relying on that observation as final evidence. Native API states outside the assessment are captured through state-snapshots.
+
+Read current ledgers and latest verified checkpoints.md receipt before resuming or writing remotely. Preserved hypotheses and fictional graph values are not actual focused results.

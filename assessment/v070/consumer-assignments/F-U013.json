@@ -1,0 +1,63 @@
+{
+  "consumer_id": "F-U013",
+  "creator_id": "focus-007",
+  "stage": "focused",
+  "case": "S06",
+  "variant": "ordinary",
+  "paired_consumer_id": "C-U093",
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "high",
+  "context": "fresh",
+  "copied_sha256": {
+    "skill/rollup-reimbursements/SKILL.md": "0a7c3fe9e3ece31479d4f181431267822d35241a77f9dbd4c9faae7765a2be75",
+    "skill/rollup-reimbursements/references/interface.md": "4deaeffc933e0f8896ccfedbbb5f5c5f84c526aa98d43b5a7530d91bd7a88653",
+    "skill/rollup-reimbursements/references/verification.md": "4c8fd36fd3778be887081712211bd3ff056753e31769d5d756598a1c6e2526d4",
+    "skill/rollup-reimbursements/scripts/rollup.py": "6927602a0f5f1c3b011b94786847df9112c885adb3a913e72d8cec421ef792b6",
+    "input/ledger_api.py": "4622ec041dcfe8057aed319bc0ad168f24aebf4520a68c2961cdf046483315f3",
+    "input/request.md": "496c26505ba1ede530c07f698fd823bcc1f0dffde74065b1c03532fb71145510"
+  },
+  "copied_file_modes": {
+    "skill/rollup-reimbursements/SKILL.md": 420,
+    "skill/rollup-reimbursements/references/interface.md": 420,
+    "skill/rollup-reimbursements/references/verification.md": 420,
+    "skill/rollup-reimbursements/scripts/rollup.py": 420,
+    "input/ledger_api.py": 420,
+    "input/request.md": 420
+  },
+  "prompt_sha256": "ca631a1052f1c4bc08104969afcbcfd4bda1295a3034283e392cd538d98e3612",
+  "artifact_freeze_manifest": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/focused-artifact-freezes/focus-007.json",
+  "artifact_freeze_sha256": "e0189a400a0895f3772f9c378869e6c6e7dd03e5cac1b2e700bec468839f0bcf",
+  "initial_state_evidence_sha256": {
+    "consumer-setup/F-U013.json": "f5dfd699db61fa6ab49bf64df2a5323cea03a83a89531eace0b92e022673447a",
+    "state-snapshots/F-U013/initial.sql": "1206581aaa26d95a4831a91f82dd1b59f06cfc56195294559db2af8192f63204",
+    "state-snapshots/F-U013/initial.json": "b96f1d2eb116bc930aa0d1a924509620238dcd42b85980b10a5d6f40202400a9"
+  },
+  "request_source": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S06/ordinary/input/request.md",
+  "request_source_sha256": "724929c06b67118a4f9468d1351c627b7396a03f1ed983c7cf23e2ab90988b09",
+  "request_substitutions": [
+    {
+      "token": "{{INPUT_DIR}}",
+      "value": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/F-U013/input",
+      "occurrences": 1
+    },
+    {
+      "token": "{{STATE_PATH}}",
+      "value": "/workspace/scratch/a75c3a6d9076/F-U013-ledger-state-z5kvagho/ledger.sqlite",
+      "occurrences": 1
+    }
+  ],
+  "case_bank_manifest_sha256": "f26be07f6cfba54aedc3068a67ae32292877f6ee005f0c190156f5786d1cbdc2",
+  "schedule_sha256": "63b92c67cac765926ee47f4c4b71e6f4ae9edb4ba1f12dc1cf71ed4a8bb3cfc3",
+  "common_authoring_aid_sha256": {
+    "SKILL.md": "6656e54755638e8efcf275a472b9672eaa8a9a1b9e59dc210e275b03b59e1e66",
+    "agents/openai.yaml": "d07d21b93fcf3d4dc8d9a3399c05fc226a49a333a96d3e1c68b451b8dd9eade6",
+    "assets/skill-creator-small.svg": "6591bf8ea9bb9435890dbdea299e0d2bd05f3aa893a335d26e4c535e93c8e7fb",
+    "assets/skill-creator.png": "a4024b0306ddb05847e1012879d37aaf1e658205199da596f5145ed7a88d9162",
+    "license.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "references/openai_yaml.md": "ffac39318e408108141d40f820968e59f70434a891694f9bf1d25be8237b150c",
+    "scripts/generate_openai_yaml.py": "ddaf9abdfb3e762ed3c82571e9c607ce964188f49f2146281beb2cb8a553a93d",
+    "scripts/init_skill.py": "bc04fae1e671aa1e5104212674e7f22c9665a791fafa2fc2b3897187a89801b2",
+    "scripts/quick_validate.py": "1fd66498c219616fd9249eacdf16c458412ea9065a9d887fd716aeef03907762"
+  },
+  "source_identities_sha256": "efd12e1f239b4554bf71158aa47cc3d13279caea64ce2c9eb892320c86ffde71"
+}

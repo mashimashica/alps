@@ -1,0 +1,26 @@
+{
+  "file_sha256": {
+    "SKILL.md": "95e1889cb77b263fd1ed18e874a09c342a0632cf6cecdb1cadf90780c39f1ca3",
+    "agents/openai.yaml": "0cbda773f9e868483c10af215dd10b1b78b04d77f0534a4b773c882e866516f6"
+  },
+  "source_file_modes": {
+    "SKILL.md": 420,
+    "agents/openai.yaml": 420
+  },
+  "excluded_runtime_cache_sha256": {},
+  "creator_input_added_runtime_cache_sha256": {},
+  "public_completion_evidence_sha256": {
+    "trials/focus-010/execution-note.md": "2ca7b5f1442ac567e5d1fa5c2886fd9a055a6411d0636b2f317bcbe3db58c87e",
+    "focused-public/focus-010/final-response.md": "92a04ce8a327b6114a4049b890869c72b67d3f33afd75383130ed109e8eab51c"
+  },
+  "creator_id": "focus-010",
+  "source_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/focus-010/deliverables/skills/release-checkout-service",
+  "frozen_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/focused-artifacts/focus-010/release-checkout-service",
+  "paired_control_id": "control-068",
+  "cache_handling": "Regular *.pyc directly inside __pycache__ remain in their original folders; their hashes are recorded but those bytes are omitted from frozen/copied resources and durable checkpointing. No non-cache resource is silently discarded.",
+  "schedule_sha256": "9a912fe9ce9a1bc293f72330b3490554f035fbdc7fc418dcb2f2feb3d8107605",
+  "case_bank_manifest_sha256": "f26be07f6cfba54aedc3068a67ae32292877f6ee005f0c190156f5786d1cbdc2",
+  "source_identities_sha256": "efd12e1f239b4554bf71158aa47cc3d13279caea64ce2c9eb892320c86ffde71",
+  "physical_validation_sha256": "a6b501cf2c0fa5aca97a9c6387330157eb1e2a214eb0628bb17fbe549447b501",
+  "scope": "Resource identity; no quality judgment"
+}

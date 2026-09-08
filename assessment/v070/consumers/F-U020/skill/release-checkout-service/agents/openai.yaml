@@ -1,0 +1,4 @@
+interface:
+  display_name: "Checkout Service Release"
+  short_description: "Release and verify an approved checkout build"
+  default_prompt: "Use $release-checkout-service to release the exact approved checkout candidate in the supplied synthetic environment and verify health and checkout."

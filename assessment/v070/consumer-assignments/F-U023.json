@@ -1,0 +1,59 @@
+{
+  "consumer_id": "F-U023",
+  "creator_id": "focus-012",
+  "stage": "focused",
+  "case": "S10",
+  "variant": "ordinary",
+  "paired_consumer_id": "C-U143",
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "high",
+  "context": "fresh",
+  "copied_sha256": {
+    "skill/checkout-release/SKILL.md": "569b6753cb5da5503d0a8fab30120f535d42927ffc9281063d9e6f82aaf4899e",
+    "skill/checkout-release/references/command-contract.md": "fb34c032090f1631bf3c162fc6370305c0519428b728caf760d08b4c143ba803",
+    "skill/checkout-release/references/configuration.md": "3c04f40064f26cbea771949b2a81df681f1dbc6d2428df4a53ce797dc4edea10",
+    "input/release_tool.py": "939931810a40d9f813280ea46c95fec2c4a1ed72368937353bf5c899b8217577",
+    "input/request.md": "270be73a654746dd5f3f7e714eca06888ade371d126d9f1b430645ee9fe1a568",
+    "input/state.json": "94bdfeb6c040ffcc7713ce93762bdb72fa18c065dafc6bbbc6f8f57f554f4c49"
+  },
+  "copied_file_modes": {
+    "skill/checkout-release/SKILL.md": 420,
+    "skill/checkout-release/references/command-contract.md": 420,
+    "skill/checkout-release/references/configuration.md": 420,
+    "input/release_tool.py": 420,
+    "input/request.md": 420,
+    "input/state.json": 420
+  },
+  "prompt_sha256": "13e8e06838f57a7f68ef51986e4464478e526ada8dab9095ef9866987844a3c5",
+  "artifact_freeze_manifest": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/focused-artifact-freezes/focus-012.json",
+  "artifact_freeze_sha256": "cbf27dbf65ed8185761f1c4c16bb589769097f8437af6f67dd8182d682a942d6",
+  "initial_state_evidence_sha256": {},
+  "request_source": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S10/ordinary/input/request.md",
+  "request_source_sha256": "3122fa3da2dd1c9e642c1f6b75db9f9d01668de14da6026cad91ef81d676210d",
+  "request_substitutions": [
+    {
+      "token": "{{STATE_PATH}}",
+      "value": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/F-U023/input/state.json",
+      "occurrences": 2
+    },
+    {
+      "token": "{{ENVIRONMENT_PATH}}",
+      "value": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/F-U023/input",
+      "occurrences": 1
+    }
+  ],
+  "case_bank_manifest_sha256": "f26be07f6cfba54aedc3068a67ae32292877f6ee005f0c190156f5786d1cbdc2",
+  "schedule_sha256": "63b92c67cac765926ee47f4c4b71e6f4ae9edb4ba1f12dc1cf71ed4a8bb3cfc3",
+  "common_authoring_aid_sha256": {
+    "SKILL.md": "6656e54755638e8efcf275a472b9672eaa8a9a1b9e59dc210e275b03b59e1e66",
+    "agents/openai.yaml": "d07d21b93fcf3d4dc8d9a3399c05fc226a49a333a96d3e1c68b451b8dd9eade6",
+    "assets/skill-creator-small.svg": "6591bf8ea9bb9435890dbdea299e0d2bd05f3aa893a335d26e4c535e93c8e7fb",
+    "assets/skill-creator.png": "a4024b0306ddb05847e1012879d37aaf1e658205199da596f5145ed7a88d9162",
+    "license.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "references/openai_yaml.md": "ffac39318e408108141d40f820968e59f70434a891694f9bf1d25be8237b150c",
+    "scripts/generate_openai_yaml.py": "ddaf9abdfb3e762ed3c82571e9c607ce964188f49f2146281beb2cb8a553a93d",
+    "scripts/init_skill.py": "bc04fae1e671aa1e5104212674e7f22c9665a791fafa2fc2b3897187a89801b2",
+    "scripts/quick_validate.py": "1fd66498c219616fd9249eacdf16c458412ea9065a9d887fd716aeef03907762"
+  },
+  "source_identities_sha256": "efd12e1f239b4554bf71158aa47cc3d13279caea64ce2c9eb892320c86ffde71"
+}

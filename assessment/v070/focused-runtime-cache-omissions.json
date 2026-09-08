@@ -1,0 +1,458 @@
+{
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/enum.cpython-312.pyc": {
+    "sha256": "ac8012bbb42715b30fbef38b3501ad3b6e7806fd52394ce4ba96b24910605436",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/operator.cpython-312.pyc": {
+    "sha256": "66e1dbc3cc71ee4bdd899fe94a919aa372e5fe93fe57edbd26911c02aa94e584",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/_compression.cpython-312.pyc": {
+    "sha256": "496f4efafc1791546acc8e2db3d6f0341feef3793486cfdde59acafe8ab098b3",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/traceback.cpython-312.pyc": {
+    "sha256": "fe6aca65960b97c5083b21631d578523138764c4b04423a14ca2c9d6b9569ac9",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/fnmatch.cpython-312.pyc": {
+    "sha256": "8551fdf403e709f0949e07b377fd9d61611c548cfb13b4aeab00b0b59fa1e833",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.cpython-312.pyc": {
+    "sha256": "0ab6602ffa37f81b5bcbe3a467a7f1b8508cb7eef96b1e6b611029c4ec68ffc7",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/functools.cpython-312.pyc": {
+    "sha256": "235652c2400297daf5170871e92fd4a322a77daed759dc51a471e8e3f01ca8da",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/tokenize.cpython-312.pyc": {
+    "sha256": "793105e16b0551ceca2d4f4ae5168185fbd64661e20345a8ca61c9ad0bbbec86",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/textwrap.cpython-312.pyc": {
+    "sha256": "46f284d8cef2418fa565ec60b36de785af8336dc41ef100d66415d3709e67465",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/types.cpython-312.pyc": {
+    "sha256": "9b6fcf3f41d391c5c9fb4040bf36ce235d5e0bcd0d0a0501166f6afbb9cde7eb",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/argparse.cpython-312.pyc": {
+    "sha256": "0675eabfc84f70d4083b91a98ab1c07db4c7a35e053509b7abc00a3b82741dfc",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/linecache.cpython-312.pyc": {
+    "sha256": "7ef534231d97bb898bdaf6c2c49cbc6595a875e7004e078d1913cd3f0df82123",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/bz2.cpython-312.pyc": {
+    "sha256": "098f67ab24cb41f14cf1dea0d948ec375e8f4623e6df36f184a5ada8c4f69214",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/locale.cpython-312.pyc": {
+    "sha256": "23a740e3d24c443cf2694b890f754d63c2441ee562d1cf18cbb255f4b3e74b6e",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/py_compile.cpython-312.pyc": {
+    "sha256": "c4240653e10d06bcbf7dcf355cc804da2c55225dffc0964811fd39506d6cdab7",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/copyreg.cpython-312.pyc": {
+    "sha256": "2cf09a480285fab66d393d26e5d6ebdb5dc72959995eea67aff6956c2486dec1",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/gettext.cpython-312.pyc": {
+    "sha256": "be6401519620167e8f8c2b61d78b5f5791f51d38f1453ebdd1e7fd46968ab07c",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/warnings.cpython-312.pyc": {
+    "sha256": "55d7f4cfc431076d4ee62077c6ae5d3305354d5bf4903a31ae788b59c674931c",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/lzma.cpython-312.pyc": {
+    "sha256": "cc17187d88bc2e0a28a516a6f0b619f57dd814aa036961cf9f5afd8e93792b4a",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/keyword.cpython-312.pyc": {
+    "sha256": "e2525e414417a3b7cff90aed78ffcb986f0abd805dc9925615f3eefc60aeab36",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/token.cpython-312.pyc": {
+    "sha256": "1e428197f149cc319447ccc453c0a93c1ffb6deb87e570ba1933e96c0160a557",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/reprlib.cpython-312.pyc": {
+    "sha256": "3b29c269cb6e942471c03d579ffcc36a783c2779972ee334212c0ee209a1850c",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/shutil.cpython-312.pyc": {
+    "sha256": "1d318830cb37a04d44d1d62b5a5afd4f754769557d1bc74e032e1793c3b1ac8f",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.cpython-312.pyc": {
+    "sha256": "cdf3b4bf395a2acaebd3e5701195e19d84db017697470dc87f483a35653b18f5",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/_abc.cpython-312.pyc": {
+    "sha256": "916c1240e6511280743330458bd8b13736b19edb64a68e361d55c460c6c1c59e",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/encodings/utf_8_sig.cpython-312.pyc": {
+    "sha256": "11b937a28208d47b87167fa2227682736cb5751f5f98e4894010615a72886881",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/encodings/utf_8.cpython-312.pyc": {
+    "sha256": "ab4922a79496da41f1fe0bf5c19cd11792b8f3d3d641ff9a81b85d6100ceef16",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/encodings/aliases.cpython-312.pyc": {
+    "sha256": "03f020c631ffc97bdbc54ac57550ad14768166510a0b8ac8cede6be8378b7d65",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/encodings/__init__.cpython-312.pyc": {
+    "sha256": "0e73e68cc6941254c37a5eeec05e3e458774f9e429097061bf657afe5771150a",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/re/_parser.cpython-312.pyc": {
+    "sha256": "707eaa1547d8f01398ad145c16ebb1d732f307fb1e92dcb135a045b96218c50e",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/re/_compiler.cpython-312.pyc": {
+    "sha256": "155840380bc7c83873111756cd4aaf3620511dd3b3974a63808fe4d455585408",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/re/_constants.cpython-312.pyc": {
+    "sha256": "7b6dc3e84e7a72a6c82c3d3be8229ea91a4c8d0fe0122c693580067ac596b79c",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/re/__init__.cpython-312.pyc": {
+    "sha256": "2d4803ff0034f4f1731c7de4aadaafff764757a2055bf5adc8e5fed2c1c6c425",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/re/_casefix.cpython-312.pyc": {
+    "sha256": "5a036de174013978b4526cf69da56bf399849c93df33a35a49ccf5d38e08a6d7",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/collections/abc.cpython-312.pyc": {
+    "sha256": "0798b3fde0e2428505feb87125ca6cfdb523f57e6d929104229e8f121537d501",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/collections/__init__.cpython-312.pyc": {
+    "sha256": "47395aba82ba7de2e78fb3bb5921e17dfaadba067b307361da985e411eb47cd1",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/_distutils_hack/__init__.cpython-312.pyc": {
+    "sha256": "411bf70f74f86cd48d8a7b4d4580d1761973408201953f8bbfabdc03cfba4b8a",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/focus-005/deliverables/skills/reimbursement-ledger-rollup/scripts/rollup_ledger.cpython-312.pyc": {
+    "sha256": "3399a75c771a8de213227d72589ce84fad43ae75e68f0f1f622b486fc86f60e2",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/enum.cpython-312.pyc": {
+    "sha256": "ac8012bbb42715b30fbef38b3501ad3b6e7806fd52394ce4ba96b24910605436",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/operator.cpython-312.pyc": {
+    "sha256": "66e1dbc3cc71ee4bdd899fe94a919aa372e5fe93fe57edbd26911c02aa94e584",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/_compression.cpython-312.pyc": {
+    "sha256": "496f4efafc1791546acc8e2db3d6f0341feef3793486cfdde59acafe8ab098b3",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/traceback.cpython-312.pyc": {
+    "sha256": "fe6aca65960b97c5083b21631d578523138764c4b04423a14ca2c9d6b9569ac9",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/fnmatch.cpython-312.pyc": {
+    "sha256": "8551fdf403e709f0949e07b377fd9d61611c548cfb13b4aeab00b0b59fa1e833",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.cpython-312.pyc": {
+    "sha256": "0ab6602ffa37f81b5bcbe3a467a7f1b8508cb7eef96b1e6b611029c4ec68ffc7",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/functools.cpython-312.pyc": {
+    "sha256": "235652c2400297daf5170871e92fd4a322a77daed759dc51a471e8e3f01ca8da",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/tokenize.cpython-312.pyc": {
+    "sha256": "793105e16b0551ceca2d4f4ae5168185fbd64661e20345a8ca61c9ad0bbbec86",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/textwrap.cpython-312.pyc": {
+    "sha256": "46f284d8cef2418fa565ec60b36de785af8336dc41ef100d66415d3709e67465",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/types.cpython-312.pyc": {
+    "sha256": "9b6fcf3f41d391c5c9fb4040bf36ce235d5e0bcd0d0a0501166f6afbb9cde7eb",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/argparse.cpython-312.pyc": {
+    "sha256": "0675eabfc84f70d4083b91a98ab1c07db4c7a35e053509b7abc00a3b82741dfc",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/linecache.cpython-312.pyc": {
+    "sha256": "7ef534231d97bb898bdaf6c2c49cbc6595a875e7004e078d1913cd3f0df82123",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/bz2.cpython-312.pyc": {
+    "sha256": "098f67ab24cb41f14cf1dea0d948ec375e8f4623e6df36f184a5ada8c4f69214",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/locale.cpython-312.pyc": {
+    "sha256": "23a740e3d24c443cf2694b890f754d63c2441ee562d1cf18cbb255f4b3e74b6e",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/py_compile.cpython-312.pyc": {
+    "sha256": "c4240653e10d06bcbf7dcf355cc804da2c55225dffc0964811fd39506d6cdab7",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/copyreg.cpython-312.pyc": {
+    "sha256": "2cf09a480285fab66d393d26e5d6ebdb5dc72959995eea67aff6956c2486dec1",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/gettext.cpython-312.pyc": {
+    "sha256": "be6401519620167e8f8c2b61d78b5f5791f51d38f1453ebdd1e7fd46968ab07c",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/warnings.cpython-312.pyc": {
+    "sha256": "55d7f4cfc431076d4ee62077c6ae5d3305354d5bf4903a31ae788b59c674931c",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/lzma.cpython-312.pyc": {
+    "sha256": "cc17187d88bc2e0a28a516a6f0b619f57dd814aa036961cf9f5afd8e93792b4a",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/keyword.cpython-312.pyc": {
+    "sha256": "e2525e414417a3b7cff90aed78ffcb986f0abd805dc9925615f3eefc60aeab36",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/token.cpython-312.pyc": {
+    "sha256": "1e428197f149cc319447ccc453c0a93c1ffb6deb87e570ba1933e96c0160a557",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/reprlib.cpython-312.pyc": {
+    "sha256": "3b29c269cb6e942471c03d579ffcc36a783c2779972ee334212c0ee209a1850c",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/shutil.cpython-312.pyc": {
+    "sha256": "1d318830cb37a04d44d1d62b5a5afd4f754769557d1bc74e032e1793c3b1ac8f",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.cpython-312.pyc": {
+    "sha256": "cdf3b4bf395a2acaebd3e5701195e19d84db017697470dc87f483a35653b18f5",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/_abc.cpython-312.pyc": {
+    "sha256": "916c1240e6511280743330458bd8b13736b19edb64a68e361d55c460c6c1c59e",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/encodings/utf_8_sig.cpython-312.pyc": {
+    "sha256": "11b937a28208d47b87167fa2227682736cb5751f5f98e4894010615a72886881",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/encodings/utf_8.cpython-312.pyc": {
+    "sha256": "ab4922a79496da41f1fe0bf5c19cd11792b8f3d3d641ff9a81b85d6100ceef16",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/encodings/aliases.cpython-312.pyc": {
+    "sha256": "03f020c631ffc97bdbc54ac57550ad14768166510a0b8ac8cede6be8378b7d65",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/encodings/__init__.cpython-312.pyc": {
+    "sha256": "0e73e68cc6941254c37a5eeec05e3e458774f9e429097061bf657afe5771150a",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/re/_parser.cpython-312.pyc": {
+    "sha256": "707eaa1547d8f01398ad145c16ebb1d732f307fb1e92dcb135a045b96218c50e",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/re/_compiler.cpython-312.pyc": {
+    "sha256": "155840380bc7c83873111756cd4aaf3620511dd3b3974a63808fe4d455585408",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/re/_constants.cpython-312.pyc": {
+    "sha256": "7b6dc3e84e7a72a6c82c3d3be8229ea91a4c8d0fe0122c693580067ac596b79c",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/re/__init__.cpython-312.pyc": {
+    "sha256": "2d4803ff0034f4f1731c7de4aadaafff764757a2055bf5adc8e5fed2c1c6c425",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/re/_casefix.cpython-312.pyc": {
+    "sha256": "5a036de174013978b4526cf69da56bf399849c93df33a35a49ccf5d38e08a6d7",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/collections/abc.cpython-312.pyc": {
+    "sha256": "0798b3fde0e2428505feb87125ca6cfdb523f57e6d929104229e8f121537d501",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/collections/__init__.cpython-312.pyc": {
+    "sha256": "47395aba82ba7de2e78fb3bb5921e17dfaadba067b307361da985e411eb47cd1",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/_distutils_hack/__init__.cpython-312.pyc": {
+    "sha256": "411bf70f74f86cd48d8a7b4d4580d1761973408201953f8bbfabdc03cfba4b8a",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  },
+  "trials/focus-005/.verification/pycache-final/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/focus-005/deliverables/skills/reimbursement-ledger-rollup/scripts/rollup_ledger.cpython-312.pyc": {
+    "sha256": "3399a75c771a8de213227d72589ce84fad43ae75e68f0f1f622b486fc86f60e2",
+    "python_magic_hex": "cb0d0d0a",
+    "mode": 420,
+    "scope": "Python runtime bytecode from completed creator verification; original bytes remain local and are not claimed durably preserved"
+  }
+}

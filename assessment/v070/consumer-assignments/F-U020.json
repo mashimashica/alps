@@ -1,0 +1,57 @@
+{
+  "consumer_id": "F-U020",
+  "creator_id": "focus-010",
+  "stage": "focused",
+  "case": "S10",
+  "variant": "challenging",
+  "paired_consumer_id": "C-U136",
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "high",
+  "context": "fresh",
+  "copied_sha256": {
+    "skill/release-checkout-service/SKILL.md": "95e1889cb77b263fd1ed18e874a09c342a0632cf6cecdb1cadf90780c39f1ca3",
+    "skill/release-checkout-service/agents/openai.yaml": "0cbda773f9e868483c10af215dd10b1b78b04d77f0534a4b773c882e866516f6",
+    "input/release_tool.py": "939931810a40d9f813280ea46c95fec2c4a1ed72368937353bf5c899b8217577",
+    "input/request.md": "c8122653aa999f572673db20e40cd5cbefff20f89621b24eecbcaa66a016e1b1",
+    "input/state.json": "88113554cedb729543be2f86c47663a8a14bcd95ef9d3a9ba038242eeddcb4c2"
+  },
+  "copied_file_modes": {
+    "skill/release-checkout-service/SKILL.md": 420,
+    "skill/release-checkout-service/agents/openai.yaml": 420,
+    "input/release_tool.py": 420,
+    "input/request.md": 420,
+    "input/state.json": 420
+  },
+  "prompt_sha256": "2a4200c69c6313b529886b2c5ef2b3870163912991b463b94fe274684309bc42",
+  "artifact_freeze_manifest": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/focused-artifact-freezes/focus-010.json",
+  "artifact_freeze_sha256": "d6c1e9eb996fa837f77677d6bb864fd23682b1ca720dd973f450160c86b3e5db",
+  "initial_state_evidence_sha256": {},
+  "request_source": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S10/challenging/input/request.md",
+  "request_source_sha256": "23ca57f9b4c4d0e6c05dfe4e8799509c2de4738c1052144265b9eba3e84775b2",
+  "request_substitutions": [
+    {
+      "token": "{{STATE_PATH}}",
+      "value": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/F-U020/input/state.json",
+      "occurrences": 2
+    },
+    {
+      "token": "{{ENVIRONMENT_PATH}}",
+      "value": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/F-U020/input",
+      "occurrences": 1
+    }
+  ],
+  "case_bank_manifest_sha256": "f26be07f6cfba54aedc3068a67ae32292877f6ee005f0c190156f5786d1cbdc2",
+  "schedule_sha256": "63b92c67cac765926ee47f4c4b71e6f4ae9edb4ba1f12dc1cf71ed4a8bb3cfc3",
+  "common_authoring_aid_sha256": {
+    "SKILL.md": "6656e54755638e8efcf275a472b9672eaa8a9a1b9e59dc210e275b03b59e1e66",
+    "agents/openai.yaml": "d07d21b93fcf3d4dc8d9a3399c05fc226a49a333a96d3e1c68b451b8dd9eade6",
+    "assets/skill-creator-small.svg": "6591bf8ea9bb9435890dbdea299e0d2bd05f3aa893a335d26e4c535e93c8e7fb",
+    "assets/skill-creator.png": "a4024b0306ddb05847e1012879d37aaf1e658205199da596f5145ed7a88d9162",
+    "license.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "references/openai_yaml.md": "ffac39318e408108141d40f820968e59f70434a891694f9bf1d25be8237b150c",
+    "scripts/generate_openai_yaml.py": "ddaf9abdfb3e762ed3c82571e9c607ce964188f49f2146281beb2cb8a553a93d",
+    "scripts/init_skill.py": "bc04fae1e671aa1e5104212674e7f22c9665a791fafa2fc2b3897187a89801b2",
+    "scripts/quick_validate.py": "1fd66498c219616fd9249eacdf16c458412ea9065a9d887fd716aeef03907762"
+  },
+  "source_identities_sha256": "efd12e1f239b4554bf71158aa47cc3d13279caea64ce2c9eb892320c86ffde71"
+}

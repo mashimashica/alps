@@ -638,5 +638,105 @@
     "sql_path": "sqlite-evidence/creator-complete/trials/control-048/verification/tmpu5ashm8k/source.sqlite.sql",
     "sql_sha256": "75b4edb32643fee1db6fb2df24a5b8cdd8ef461194c0a44b8cc30c538eabd874",
     "sqlite_version": "3.53.1"
+  },
+  "trials/focus-005/.verification/demo/source.sqlite": {
+    "metadata_path": "sqlite-evidence/focused-creator-observation-01/trials/focus-005/.verification/demo/source.sqlite.json",
+    "metadata_sha256": "5fe70b6fee1316fa52ff0bee1c89d2be4f2ea3e6456b39147a14e886398cfa26",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/focus-005/.verification/demo/source.sqlite",
+    "source_sha256": "dc2fbf3e44cb5d135b61ed552cc554f13fb8c458873bc54b2e1a9742663b7fb9",
+    "sql_path": "sqlite-evidence/focused-creator-observation-01/trials/focus-005/.verification/demo/source.sqlite.sql",
+    "sql_sha256": "4ce661ac48573972ab743e9d93a88ce8ae53b9450dd7cad6b1d7abf3cfaefa6a",
+    "sqlite_version": "3.53.1"
+  },
+  "trials/focus-005/.verification/empty-ledger/source.sqlite": {
+    "metadata_path": "sqlite-evidence/focused-creator-observation-02/trials/focus-005/.verification/empty-ledger/source.sqlite.json",
+    "metadata_sha256": "77aedfce7af7e012c38d4cdb93831954a11ba21f25d800c4d8b09110552cae74",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/focus-005/.verification/empty-ledger/source.sqlite",
+    "source_sha256": "32e4481e5945c7e557ce8e87132f9c4bafa287f8d32bff927bceae4a54df3afb",
+    "sql_path": "sqlite-evidence/focused-creator-observation-02/trials/focus-005/.verification/empty-ledger/source.sqlite.sql",
+    "sql_sha256": "85988cf56b2374a06fbb212b98b3d87868704f2b75171fac68c1b14625bab2e7",
+    "sqlite_version": "3.53.1"
+  },
+  "trials/focus-005/.verification/empty-result/source.sqlite": {
+    "metadata_path": "sqlite-evidence/focused-creator-observation-03/trials/focus-005/.verification/empty-result/source.sqlite.json",
+    "metadata_sha256": "2343d07584c20977a6fccf3a59db51f6b19480793625467cb201589010bcfd06",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/focus-005/.verification/empty-result/source.sqlite",
+    "source_sha256": "dc2fbf3e44cb5d135b61ed552cc554f13fb8c458873bc54b2e1a9742663b7fb9",
+    "sql_path": "sqlite-evidence/focused-creator-observation-03/trials/focus-005/.verification/empty-result/source.sqlite.sql",
+    "sql_sha256": "4ce661ac48573972ab743e9d93a88ce8ae53b9450dd7cad6b1d7abf3cfaefa6a",
+    "sqlite_version": "3.53.1"
+  },
+  "trials/focus-005/.verification/lost-response/source.sqlite": {
+    "metadata_path": "sqlite-evidence/focused-creator-observation-03/trials/focus-005/.verification/lost-response/source.sqlite.json",
+    "metadata_sha256": "04f1053f71ba3526693e187f9355fefea582d2265fbac93218fe7e4009c91426",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/focus-005/.verification/lost-response/source.sqlite",
+    "source_sha256": "c2ebc9504d2d8939e50e17ed525bd121f5f6b9c0a9c21ddda45b4e22c21809d5",
+    "sql_path": "sqlite-evidence/focused-creator-observation-03/trials/focus-005/.verification/lost-response/source.sqlite.sql",
+    "sql_sha256": "25870fcb24fbdde1bdd8349b47f20c0430ad93f2b3a8d65cec579435e480c40c",
+    "sqlite_version": "3.53.1"
+  },
+  "trials/focus-006/verification/empty-v2/source.sqlite": {
+    "metadata_path": "sqlite-evidence/focused-creator-observation-01/trials/focus-006/verification/empty-v2/source.sqlite.json",
+    "metadata_sha256": "d474dbc6c28b15731d3a6c17035ea6c75fb2f131c524e62b5a5f5e1cdbb8887c",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/focus-006/verification/empty-v2/source.sqlite",
+    "source_sha256": "32e4481e5945c7e557ce8e87132f9c4bafa287f8d32bff927bceae4a54df3afb",
+    "sql_path": "sqlite-evidence/focused-creator-observation-01/trials/focus-006/verification/empty-v2/source.sqlite.sql",
+    "sql_sha256": "85988cf56b2374a06fbb212b98b3d87868704f2b75171fac68c1b14625bab2e7",
+    "sqlite_version": "3.53.1"
+  },
+  "trials/focus-006/verification/empty/source.sqlite": {
+    "metadata_path": "sqlite-evidence/focused-creator-observation-01/trials/focus-006/verification/empty/source.sqlite.json",
+    "metadata_sha256": "77806d5b6159f7f36c92a9f9d27d33857d25d4167dea1480e2393d72d5fae086",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/focus-006/verification/empty/source.sqlite",
+    "source_sha256": "32e4481e5945c7e557ce8e87132f9c4bafa287f8d32bff927bceae4a54df3afb",
+    "sql_path": "sqlite-evidence/focused-creator-observation-01/trials/focus-006/verification/empty/source.sqlite.sql",
+    "sql_sha256": "85988cf56b2374a06fbb212b98b3d87868704f2b75171fac68c1b14625bab2e7",
+    "sqlite_version": "3.53.1"
+  },
+  "trials/focus-006/verification/full-v2/source.sqlite": {
+    "metadata_path": "sqlite-evidence/focused-creator-observation-01/trials/focus-006/verification/full-v2/source.sqlite.json",
+    "metadata_sha256": "c68161bf28d40fb4da2245a33e34347c26d63a8260c2b554a368f76acf2f120c",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/focus-006/verification/full-v2/source.sqlite",
+    "source_sha256": "dc2fbf3e44cb5d135b61ed552cc554f13fb8c458873bc54b2e1a9742663b7fb9",
+    "sql_path": "sqlite-evidence/focused-creator-observation-01/trials/focus-006/verification/full-v2/source.sqlite.sql",
+    "sql_sha256": "4ce661ac48573972ab743e9d93a88ce8ae53b9450dd7cad6b1d7abf3cfaefa6a",
+    "sqlite_version": "3.53.1"
+  },
+  "trials/focus-006/verification/full/source.sqlite": {
+    "metadata_path": "sqlite-evidence/focused-creator-observation-01/trials/focus-006/verification/full/source.sqlite.json",
+    "metadata_sha256": "6419cdbc75903d28b25bb78c2e69d3e54cd180c8e9e5d6a69c8c8ae7d8a22ebe",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/focus-006/verification/full/source.sqlite",
+    "source_sha256": "dc2fbf3e44cb5d135b61ed552cc554f13fb8c458873bc54b2e1a9742663b7fb9",
+    "sql_path": "sqlite-evidence/focused-creator-observation-01/trials/focus-006/verification/full/source.sqlite.sql",
+    "sql_sha256": "4ce661ac48573972ab743e9d93a88ce8ae53b9450dd7cad6b1d7abf3cfaefa6a",
+    "sqlite_version": "3.53.1"
+  },
+  "trials/focus-007/verification/case-qom17ken/source.sqlite": {
+    "metadata_path": "sqlite-evidence/focused-creator-observation-01/trials/focus-007/verification/case-qom17ken/source.sqlite.json",
+    "metadata_sha256": "d4ef53d6c1f3aa1fd4f810d814b17311fd9cba6606687191d269d9f8ae7c6ec5",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/focus-007/verification/case-qom17ken/source.sqlite",
+    "source_sha256": "4720944f66f31681fc43e5b2509f441701faeabfc144b81e37e24399ba508037",
+    "sql_path": "sqlite-evidence/focused-creator-observation-01/trials/focus-007/verification/case-qom17ken/source.sqlite.sql",
+    "sql_sha256": "219e63be90b1d1eb5c8e921ba5474934bd30a8fedf2bdb687eb18f441e5397e8",
+    "sqlite_version": "3.53.1"
+  },
+  "trials/focus-008/verification/tmpzqtcyvws/source.sqlite": {
+    "metadata_path": "sqlite-evidence/focused-creator-observation-01/trials/focus-008/verification/tmpzqtcyvws/source.sqlite.json",
+    "metadata_sha256": "8b6faed6f6bae348493b8fe50eb37088329c2534263f2259511fcfa14a5f6558",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "trials/focus-008/verification/tmpzqtcyvws/source.sqlite",
+    "source_sha256": "750f7b1217622fe9d4ee416987a35adbd2be5d04c2dcb088600f8aa950d5e3ab",
+    "sql_path": "sqlite-evidence/focused-creator-observation-01/trials/focus-008/verification/tmpzqtcyvws/source.sqlite.sql",
+    "sql_sha256": "76663ce0dc1bcdd9daca679aa9f5665e38123a58a5213bab37e4a414cd1ec479",
+    "sqlite_version": "3.53.1"
   }
 }

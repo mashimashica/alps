@@ -1,25 +1,25 @@
-consumer_id	creator_id	stage	case	variant	model	effort	paired_consumer_id	execution	agent
-F-U001	focus-001	focused	S03	ordinary	gpt-5.6-sol	high	C-U037	prepared	
-F-U002	focus-001	focused	S03	challenging	gpt-5.6-sol	high	C-U038	prepared	
-F-U003	focus-002	focused	S03	ordinary	gpt-5.6-sol	high	C-U039	prepared	
-F-U004	focus-002	focused	S03	challenging	gpt-5.6-sol	high	C-U040	prepared	
-F-U005	focus-003	focused	S03	ordinary	gpt-5.6-sol	high	C-U045	prepared	
-F-U006	focus-003	focused	S03	challenging	gpt-5.6-sol	high	C-U046	prepared	
-F-U007	focus-004	focused	S03	ordinary	gpt-5.6-sol	high	C-U047	prepared	
-F-U008	focus-004	focused	S03	challenging	gpt-5.6-sol	high	C-U048	prepared	
-F-U009	focus-005	focused	S06	ordinary	gpt-5.6-sol	high	C-U085	not prepared	
-F-U010	focus-005	focused	S06	challenging	gpt-5.6-sol	high	C-U086	not prepared	
-F-U011	focus-006	focused	S06	ordinary	gpt-5.6-sol	high	C-U087	not prepared	
-F-U012	focus-006	focused	S06	challenging	gpt-5.6-sol	high	C-U088	not prepared	
-F-U013	focus-007	focused	S06	ordinary	gpt-5.6-sol	high	C-U093	not prepared	
-F-U014	focus-007	focused	S06	challenging	gpt-5.6-sol	high	C-U094	not prepared	
-F-U015	focus-008	focused	S06	ordinary	gpt-5.6-sol	high	C-U095	not prepared	
-F-U016	focus-008	focused	S06	challenging	gpt-5.6-sol	high	C-U096	not prepared	
-F-U017	focus-009	focused	S10	ordinary	gpt-5.6-sol	high	C-U133	not prepared	
-F-U018	focus-009	focused	S10	challenging	gpt-5.6-sol	high	C-U134	not prepared	
-F-U019	focus-010	focused	S10	ordinary	gpt-5.6-sol	high	C-U135	not prepared	
-F-U020	focus-010	focused	S10	challenging	gpt-5.6-sol	high	C-U136	not prepared	
-F-U021	focus-011	focused	S10	ordinary	gpt-5.6-sol	high	C-U141	not prepared	
-F-U022	focus-011	focused	S10	challenging	gpt-5.6-sol	high	C-U142	not prepared	
-F-U023	focus-012	focused	S10	ordinary	gpt-5.6-sol	high	C-U143	not prepared	
-F-U024	focus-012	focused	S10	challenging	gpt-5.6-sol	high	C-U144	not prepared	
+consumer_id	creator_id	stage	case	variant	model	effort	paired_consumer_id	execution	agent	start_recorded_utc	end_recorded_utc
+F-U001	focus-001	focused	S03	ordinary	gpt-5.6-sol	high	C-U037	completed	/root/focus_u001	2026-09-08T01:20:45.013395+00:00	2026-09-08T01:22:37.137341+00:00
+F-U002	focus-001	focused	S03	challenging	gpt-5.6-sol	high	C-U038	completed	/root/focus_u002	2026-09-08T01:21:21.180032+00:00	2026-09-08T01:23:17.292085+00:00
+F-U003	focus-002	focused	S03	ordinary	gpt-5.6-sol	high	C-U039	completed	/root/focus_u003	2026-09-08T01:22:37.705934+00:00	2026-09-08T01:23:46.336143+00:00
+F-U004	focus-002	focused	S03	challenging	gpt-5.6-sol	high	C-U040	completed	/root/focus_u004	2026-09-08T01:23:17.829740+00:00	2026-09-08T01:25:54.203661+00:00
+F-U005	focus-003	focused	S03	ordinary	gpt-5.6-sol	high	C-U045	completed	/root/focus_u005	2026-09-08T01:23:46.977209+00:00	2026-09-08T01:25:54.281789+00:00
+F-U006	focus-003	focused	S03	challenging	gpt-5.6-sol	high	C-U046	completed	/root/focus_u006	2026-09-08T01:25:54.350157+00:00	2026-09-08T01:28:19.085835+00:00
+F-U007	focus-004	focused	S03	ordinary	gpt-5.6-sol	high	C-U047	completed	/root/focus_u007	2026-09-08T01:25:54.425630+00:00	2026-09-08T01:28:19.153445+00:00
+F-U008	focus-004	focused	S03	challenging	gpt-5.6-sol	high	C-U048	completed	/root/focus_u008	2026-09-08T01:28:19.238930+00:00	2026-09-08T01:29:22.172615+00:00
+F-U009	focus-005	focused	S06	ordinary	gpt-5.6-sol	high	C-U085	prepared			
+F-U010	focus-005	focused	S06	challenging	gpt-5.6-sol	high	C-U086	prepared			
+F-U011	focus-006	focused	S06	ordinary	gpt-5.6-sol	high	C-U087	prepared			
+F-U012	focus-006	focused	S06	challenging	gpt-5.6-sol	high	C-U088	prepared			
+F-U013	focus-007	focused	S06	ordinary	gpt-5.6-sol	high	C-U093	prepared			
+F-U014	focus-007	focused	S06	challenging	gpt-5.6-sol	high	C-U094	prepared			
+F-U015	focus-008	focused	S06	ordinary	gpt-5.6-sol	high	C-U095	prepared			
+F-U016	focus-008	focused	S06	challenging	gpt-5.6-sol	high	C-U096	prepared			
+F-U017	focus-009	focused	S10	ordinary	gpt-5.6-sol	high	C-U133	prepared			
+F-U018	focus-009	focused	S10	challenging	gpt-5.6-sol	high	C-U134	prepared			
+F-U019	focus-010	focused	S10	ordinary	gpt-5.6-sol	high	C-U135	prepared			
+F-U020	focus-010	focused	S10	challenging	gpt-5.6-sol	high	C-U136	prepared			
+F-U021	focus-011	focused	S10	ordinary	gpt-5.6-sol	high	C-U141	prepared			
+F-U022	focus-011	focused	S10	challenging	gpt-5.6-sol	high	C-U142	prepared			
+F-U023	focus-012	focused	S10	ordinary	gpt-5.6-sol	high	C-U143	prepared			
+F-U024	focus-012	focused	S10	challenging	gpt-5.6-sol	high	C-U144	prepared			

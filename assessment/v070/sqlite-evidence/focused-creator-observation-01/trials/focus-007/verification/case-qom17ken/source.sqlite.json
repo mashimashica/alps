@@ -1,0 +1,8 @@
+{
+  "source_path": "trials/focus-007/verification/case-qom17ken/source.sqlite",
+  "source_sha256": "4720944f66f31681fc43e5b2509f441701faeabfc144b81e37e24399ba508037",
+  "sql_path": "sqlite-evidence/focused-creator-observation-01/trials/focus-007/verification/case-qom17ken/source.sqlite.sql",
+  "sql_sha256": "219e63be90b1d1eb5c8e921ba5474934bd30a8fedf2bdb687eb18f441e5397e8",
+  "sqlite_version": "3.53.1",
+  "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history"
+}

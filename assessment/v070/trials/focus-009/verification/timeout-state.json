@@ -1,0 +1,38 @@
+{
+  "candidate": {
+    "id": "candidate-009",
+    "digest": "sha256:009",
+    "qualification_ok": true,
+    "healthy": true,
+    "checkout_ok": false
+  },
+  "production": {
+    "id": "candidate-009",
+    "digest": "sha256:009",
+    "healthy": true,
+    "checkout_ok": false
+  },
+  "service_owner": "owner-009",
+  "qualification": {
+    "candidate": "candidate-009",
+    "digest": "sha256:009",
+    "passed": true,
+    "sequence": 1
+  },
+  "approval": {
+    "candidate": "candidate-009",
+    "digest": "sha256:009",
+    "owner": "owner-009",
+    "qualification_sequence": 1,
+    "sequence": 2
+  },
+  "sequence": 2,
+  "requests": {
+    "request-009": {
+      "candidate": "candidate-009",
+      "digest": "sha256:009",
+      "promoted": true
+    }
+  },
+  "promotion_count": 1
+}

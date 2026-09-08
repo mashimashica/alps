@@ -1,0 +1,32 @@
+{
+  "file_sha256": {
+    "SKILL.md": "569b6753cb5da5503d0a8fab30120f535d42927ffc9281063d9e6f82aaf4899e",
+    "references/command-contract.md": "fb34c032090f1631bf3c162fc6370305c0519428b728caf760d08b4c143ba803",
+    "references/configuration.md": "3c04f40064f26cbea771949b2a81df681f1dbc6d2428df4a53ce797dc4edea10"
+  },
+  "source_file_modes": {
+    "SKILL.md": 420,
+    "references/command-contract.md": 420,
+    "references/configuration.md": 420
+  },
+  "excluded_runtime_cache_sha256": {},
+  "creator_input_added_runtime_cache_sha256": {},
+  "public_completion_evidence_sha256": {
+    "trials/focus-012/execution-note.md": "8ffba341654fd3801939c6121538e7fd7dffb14284c8813a40c89875bc84f852",
+    "focused-public/focus-012/final-response.md": "1222058a38888a7a925de2b70846a433dd76de2944cc2c4a548d920a1f29da1c"
+  },
+  "trial": "focus-012",
+  "source_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/focus-012/deliverables/skills/checkout-release",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+    "validate",
+    "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/focus-012/deliverables/skills/checkout-release"
+  ],
+  "validator_source": "agentskills/agentskills@f130f348f502d9804278a617f86929846896d2e9 skills-ref",
+  "validator_entrypoint_sha256": "4fc6143320dde3e077b5af9974ecbcff2bd29a546ac1f1d968de9da86ab2dbad",
+  "exit_code": 0,
+  "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/focus-012/deliverables/skills/checkout-release\n",
+  "stderr": "",
+  "scope": "Physical format only; a failed check remains evidence and does not remove a planned comparison cell"
+}

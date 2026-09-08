@@ -1,0 +1,34 @@
+{
+  "file_sha256": {
+    "SKILL.md": "0a7c3fe9e3ece31479d4f181431267822d35241a77f9dbd4c9faae7765a2be75",
+    "references/interface.md": "4deaeffc933e0f8896ccfedbbb5f5c5f84c526aa98d43b5a7530d91bd7a88653",
+    "references/verification.md": "4c8fd36fd3778be887081712211bd3ff056753e31769d5d756598a1c6e2526d4",
+    "scripts/rollup.py": "6927602a0f5f1c3b011b94786847df9112c885adb3a913e72d8cec421ef792b6"
+  },
+  "source_file_modes": {
+    "SKILL.md": 420,
+    "references/interface.md": 420,
+    "references/verification.md": 420,
+    "scripts/rollup.py": 420
+  },
+  "excluded_runtime_cache_sha256": {},
+  "creator_input_added_runtime_cache_sha256": {},
+  "public_completion_evidence_sha256": {
+    "trials/focus-007/execution-note.md": "26f955db6dae46ae793921535751859d89c9a691b53ff883e4ebaed048a4c294",
+    "focused-public/focus-007/final-response.md": "80701f6387037cd508a3a37a0cf8e7308ba8c91c61304723caa228c553d7520f"
+  },
+  "trial": "focus-007",
+  "source_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/focus-007/deliverables/skills/rollup-reimbursements",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "/workspace/scratch/a75c3a6d9076/validation-env/bin/skills-ref",
+    "validate",
+    "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/focus-007/deliverables/skills/rollup-reimbursements"
+  ],
+  "validator_source": "agentskills/agentskills@f130f348f502d9804278a617f86929846896d2e9 skills-ref",
+  "validator_entrypoint_sha256": "4fc6143320dde3e077b5af9974ecbcff2bd29a546ac1f1d968de9da86ab2dbad",
+  "exit_code": 0,
+  "stdout": "Valid skill: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/focus-007/deliverables/skills/rollup-reimbursements\n",
+  "stderr": "",
+  "scope": "Physical format only; a failed check remains evidence and does not remove a planned comparison cell"
+}
