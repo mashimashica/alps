@@ -1,0 +1,13 @@
+creator	family	creator_model	creator_effort	material_semantic_defect	adjudication
+focus-001	S03	gpt-5.6-sol	high	F1: success can be satisfied by unresolved handover	grades/focused-S03-fidelity-adjudication.md
+focus-002	S03	gpt-5.6-sol	high	F1: checking replaces requested establishment result	grades/focused-S03-fidelity-adjudication.md
+focus-003	S03	gpt-6-astra	high	none established	grades/focused-S03-fidelity-adjudication.md
+focus-004	S03	gpt-6-astra	high	none established	grades/focused-S03-fidelity-adjudication.md
+focus-005	S06	gpt-5.6-sol	high	none established	grades/focused-S06-fidelity-adjudication.md
+focus-006	S06	gpt-5.6-sol	high	none established	grades/focused-S06-fidelity-adjudication.md
+focus-007	S06	gpt-6-astra	high	none established	grades/focused-S06-fidelity-adjudication.md
+focus-008	S06	gpt-6-astra	high	none established	grades/focused-S06-fidelity-adjudication.md
+focus-009	S10	gpt-5.6-sol	high	none established	grades/focused-S10-fidelity-adjudication.md
+focus-010	S10	gpt-5.6-sol	high	M2: unconfirmed result is asserted not achieved	grades/focused-S10-fidelity-adjudication.md
+focus-011	S10	gpt-6-astra	high	none established	grades/focused-S10-fidelity-adjudication.md
+focus-012	S10	gpt-6-astra	high	none established	grades/focused-S10-fidelity-adjudication.md

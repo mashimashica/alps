@@ -1,0 +1,18 @@
+{
+  "new_task_trials_completed": 44,
+  "independent_review_slots_completed": 15,
+  "business_adjudications": 6,
+  "fidelity_adjudications": 3,
+  "compared_skills": 24,
+  "compared_applications": 48,
+  "A_adequate": 23,
+  "C_adequate": 24,
+  "each_arm_assigned": 24,
+  "A_material_semantic_defect_skills": 3,
+  "A_semantic_reviewed": 12,
+  "C_PF_fidelity_review": "not assigned",
+  "all_answers_only_adequate": 48,
+  "evidenced_skill_corrections": 0,
+  "final_report_relative_links_checked": 13,
+  "limits": "Arithmetic and completion bookkeeping are separate from manual semantic adjudication."
+}

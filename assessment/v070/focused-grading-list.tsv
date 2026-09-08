@@ -9,8 +9,8 @@ FP04-primary	business	FP04	grades/focused-FP04-primary.md	completed	/root/focus_
 FP04-second	business	FP04	grades/focused-FP04-second.md	completed	/root/focus_fp04_second	2026-09-08T01:47:59.013902+00:00	2026-09-08T01:53:57.963789+00:00
 FP05-primary	business	FP05	grades/focused-FP05-primary.md	completed	/root/focus_fp05_primary	2026-09-08T01:48:48.390840+00:00	2026-09-08T01:52:22.019153+00:00
 FP05-second	business	FP05	grades/focused-FP05-second.md	completed	/root/focus_fp05_second	2026-09-08T01:48:48.475911+00:00	2026-09-08T01:53:38.565846+00:00
-FP06-primary	business	FP06	grades/focused-FP06-primary.md	running	/root/focus_fp06_primary	2026-09-08T01:51:43.112930+00:00	
-FP06-second	business	FP06	grades/focused-FP06-second.md	running	/root/focus_fp06_second	2026-09-08T01:51:57.300226+00:00	
-S03-fidelity	source-fidelity	S03	grades/focused-S03-fidelity.md	running	/root/focus_s03_fidelity	2026-09-08T01:52:22.116891+00:00	
-S06-fidelity	source-fidelity	S06	grades/focused-S06-fidelity.md	running	/root/focus_s06_fidelity	2026-09-08T01:53:38.638821+00:00	
-S10-fidelity	source-fidelity	S10	grades/focused-S10-fidelity.md	running	/root/focus_s10_fidelity	2026-09-08T01:53:58.041941+00:00	
+FP06-primary	business	FP06	grades/focused-FP06-primary.md	completed	/root/focus_fp06_primary	2026-09-08T01:51:43.112930+00:00	2026-09-08T01:56:43.617066+00:00
+FP06-second	business	FP06	grades/focused-FP06-second.md	completed	/root/focus_fp06_second	2026-09-08T01:51:57.300226+00:00	2026-09-08T01:56:43.617066+00:00
+S03-fidelity	source-fidelity	S03	grades/focused-S03-fidelity.md	completed	/root/focus_s03_fidelity	2026-09-08T01:52:22.116891+00:00	2026-09-08T01:56:05.551328+00:00
+S06-fidelity	source-fidelity	S06	grades/focused-S06-fidelity.md	completed	/root/focus_s06_fidelity	2026-09-08T01:53:38.638821+00:00	2026-09-08T02:02:05.434909+00:00
+S10-fidelity	source-fidelity	S10	grades/focused-S10-fidelity.md	completed	/root/focus_s10_fidelity	2026-09-08T01:53:58.041941+00:00	2026-09-08T01:59:13.496281+00:00

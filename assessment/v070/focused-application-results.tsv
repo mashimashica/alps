@@ -39,3 +39,11 @@ FP05	R28	control-067	C-U133	C	S10	gpt-5.6-sol	high	1	ordinary	adequate	adequate	
 FP05	R28	control-067	C-U134	C	S10	gpt-5.6-sol	high	1	challenging	adequate	adequate	release unmet; rehearsal completed	0	True	grades/focused-FP05-adjudication.md
 FP05	R44	focus-009	F-U017	A	S10	gpt-5.6-sol	high	1	ordinary	adequate	adequate	release achieved in simulation	0	True	grades/focused-FP05-adjudication.md
 FP05	R44	focus-009	F-U018	A	S10	gpt-5.6-sol	high	1	challenging	adequate	adequate	release unmet; rehearsal completed	0	True	grades/focused-FP05-adjudication.md
+FP06	R17	focus-011	F-U021	A	S10	gpt-6-astra	high	1	ordinary	adequate	adequate	release achieved in simulation	0	True	grades/focused-FP06-adjudication.md
+FP06	R17	focus-011	F-U022	A	S10	gpt-6-astra	high	1	challenging	adequate	adequate	release unmet; rehearsal completed	0	True	grades/focused-FP06-adjudication.md
+FP06	R63	control-071	C-U141	C	S10	gpt-6-astra	high	1	ordinary	adequate	adequate	release achieved in simulation	0	True	grades/focused-FP06-adjudication.md
+FP06	R63	control-071	C-U142	C	S10	gpt-6-astra	high	1	challenging	adequate	adequate	release unmet; rehearsal completed	0	True	grades/focused-FP06-adjudication.md
+FP06	R28	control-072	C-U143	C	S10	gpt-6-astra	high	2	ordinary	adequate	adequate	release achieved in simulation	0	True	grades/focused-FP06-adjudication.md
+FP06	R28	control-072	C-U144	C	S10	gpt-6-astra	high	2	challenging	adequate	adequate	release unmet; rehearsal completed	0	True	grades/focused-FP06-adjudication.md
+FP06	R44	focus-012	F-U023	A	S10	gpt-6-astra	high	2	ordinary	adequate	adequate	release achieved in simulation	0	True	grades/focused-FP06-adjudication.md
+FP06	R44	focus-012	F-U024	A	S10	gpt-6-astra	high	2	challenging	adequate	adequate	release unmet; rehearsal completed	0	True	grades/focused-FP06-adjudication.md

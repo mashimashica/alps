@@ -1,23 +1,5 @@
-# Focused comparison progress
+# Focused comparison complete —2026-09-08
 
-All44 fixed new task trials completed:12 A creators,24 A consumers,8 prescribed C consumers. No extra generation or retries. The comparison includes24 Skills and48 applications; cumulative historical completed task trials341. All12 A package format checks passed; business results remain separate.
+The user-authorized actual report endpoint is complete:44/44 new task trials,15/15 independent business/fidelity reviews,6 business and3 fidelity coordinator adjudications.24 Skills/48 applications are compared. All48 are gradable with their explicit evidence limits; A23/24 and C24/24 adequate, answer-only24/24 in both,0 evidenced Skill corrections in each. A-only source-fidelity review identifies3 material generated-description defects; this is not a cross-arm defect-rate comparison.
 
-All six blind packets prepared. FP01/FP02 paired business reviews and coordinator adjudications complete. Remaining business/fidelity review status:
-
-- FP01-primary: completed
-- FP01-second: completed
-- FP02-primary: completed
-- FP02-second: completed
-- FP03-primary: running
-- FP03-second: running
-- FP04-primary: running
-- FP04-second: running
-- FP05-primary: running
-- FP05-second: running
-- FP06-primary: not started
-- FP06-second: not started
-- S03-fidelity: not started
-- S06-fidelity: not started
-- S10-fidelity: not started
-
-The actual final chart report remains in progress. No broader original-program completion, example activation, core edit, PR, merge, tag or Release is claimed. Native SQL is logical state evidence, not a byte-identical database or full access/action history. Read ledgers and latest verified receipt before resuming.
+Read focused-final-report-2026-09-08.md, focused-application-results.tsv, focused-fidelity-results.tsv and the newest verified checkpoints.md receipt. The source is unchanged at dee3866d35e43db5db480fc9f85166a8dcb1ec3b. No new business trials, core edits, example phase, PR, merge, tag or Release are activated. Original broad-program and conditional example work remain unperformed; do not resume them as if this focused endpoint authorized them.

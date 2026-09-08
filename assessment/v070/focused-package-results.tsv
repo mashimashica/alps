@@ -19,3 +19,7 @@ FP05	R17	focus-010	A	S10	gpt-5.6-sol	high	2	3	3	3	3	3	3	3	3	none established	non
 FP05	R63	control-068	C	S10	gpt-5.6-sol	high	2	3	3	3	3	3	3	3	3	none established	none established	grades/focused-FP05-adjudication.md
 FP05	R28	control-067	C	S10	gpt-5.6-sol	high	1	3	3	3	3	3	3	3	3	none established	none established	grades/focused-FP05-adjudication.md
 FP05	R44	focus-009	A	S10	gpt-5.6-sol	high	1	3	3	3	3	3	3	3	3	none established	none established	grades/focused-FP05-adjudication.md
+FP06	R17	focus-011	A	S10	gpt-6-astra	high	1	3	3	3	3	3	3	3	3	none established	none established	grades/focused-FP06-adjudication.md
+FP06	R63	control-071	C	S10	gpt-6-astra	high	1	3	3	3	3	3	3	3	3	none established	none established	grades/focused-FP06-adjudication.md
+FP06	R28	control-072	C	S10	gpt-6-astra	high	2	3	3	3	3	3	3	3	3	none established	none established	grades/focused-FP06-adjudication.md
+FP06	R44	focus-012	A	S10	gpt-6-astra	high	2	3	3	3	3	3	3	3	3	none established	none established	grades/focused-FP06-adjudication.md

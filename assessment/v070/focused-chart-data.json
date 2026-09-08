@@ -1,0 +1,92 @@
+{
+  "scope": "Actual focused comparison; no hypothetical values",
+  "source": "audits/focused-final-identity-and-counts.json",
+  "charts": [
+    {
+      "chartType": "bar",
+      "meta": {
+        "title": "依頼に適切に対応できた割合",
+        "description": "各業務・各条件8適用。両条件でskill-creatorを利用可能。",
+        "footer": "保存された回答本文だけなら両条件とも24/24。引継ぎの差は最終メッセージの軽微な誤り1件。"
+      },
+      "xKey": "work",
+      "series": [
+        {
+          "dataKey": "without",
+          "label": "ALPSなし",
+          "valueFormat": "raw",
+          "valueSuffix": "%"
+        },
+        {
+          "dataKey": "with",
+          "label": "ALPSあり",
+          "valueFormat": "raw",
+          "valueSuffix": "%"
+        }
+      ],
+      "yAxisMin": 0,
+      "yAxisMax": 100,
+      "layout": "vertical",
+      "data": [
+        {
+          "work": "引継ぎ",
+          "without": 100.0,
+          "with": 87.5
+        },
+        {
+          "work": "台帳集計",
+          "without": 100.0,
+          "with": 100.0
+        },
+        {
+          "work": "リリース",
+          "without": 100.0,
+          "with": 100.0
+        }
+      ]
+    },
+    {
+      "chartType": "bar",
+      "meta": {
+        "title": "Skillの誤りを利用時に直した件数",
+        "description": "観測できた補正は、全業務で両条件とも0件。",
+        "footer": "各条件24適用。通常の判断や利用者自身のミスの修正は除く。未記録の労力は不明。"
+      },
+      "xKey": "work",
+      "series": [
+        {
+          "dataKey": "without",
+          "label": "ALPSなし",
+          "valueFormat": "integer",
+          "valueSuffix": "件"
+        },
+        {
+          "dataKey": "with",
+          "label": "ALPSあり",
+          "valueFormat": "integer",
+          "valueSuffix": "件"
+        }
+      ],
+      "yAxisMin": 0,
+      "yAxisMax": 4,
+      "layout": "vertical",
+      "data": [
+        {
+          "work": "引継ぎ",
+          "without": 0,
+          "with": 0
+        },
+        {
+          "work": "台帳集計",
+          "without": 0,
+          "with": 0
+        },
+        {
+          "work": "リリース",
+          "without": 0,
+          "with": 0
+        }
+      ]
+    }
+  ]
+}

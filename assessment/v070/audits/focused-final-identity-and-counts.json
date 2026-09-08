@@ -1,0 +1,151 @@
+{
+  "packet_readback": {
+    "FP01": {
+      "unchanged_files": 85,
+      "hashes_and_modes": "matched",
+      "added_files": 0
+    },
+    "FP02": {
+      "unchanged_files": 85,
+      "hashes_and_modes": "matched",
+      "added_files": 0
+    },
+    "FP03": {
+      "unchanged_files": 168,
+      "hashes_and_modes": "matched",
+      "added_files": 0
+    },
+    "FP04": {
+      "unchanged_files": 181,
+      "hashes_and_modes": "matched",
+      "added_files": 0
+    },
+    "FP05": {
+      "unchanged_files": 108,
+      "hashes_and_modes": "matched",
+      "added_files": 0
+    },
+    "FP06": {
+      "unchanged_files": 130,
+      "hashes_and_modes": "matched",
+      "added_files": 0
+    }
+  },
+  "frozen_A_packages": 12,
+  "frozen_ALPS_source_entries": 70,
+  "family_results": {
+    "S03": {
+      "C": {
+        "assigned": 8,
+        "adequate": 8,
+        "bounded": 0,
+        "material": 0,
+        "unconfirmed": 0,
+        "evidenced_corrections": 0,
+        "answer_only_adequate": 8,
+        "separate_public_handoffs_preserved": 0
+      },
+      "A": {
+        "assigned": 8,
+        "adequate": 7,
+        "bounded": 1,
+        "material": 0,
+        "unconfirmed": 0,
+        "evidenced_corrections": 0,
+        "answer_only_adequate": 8,
+        "separate_public_handoffs_preserved": 8
+      }
+    },
+    "S06": {
+      "C": {
+        "assigned": 8,
+        "adequate": 8,
+        "bounded": 0,
+        "material": 0,
+        "unconfirmed": 0,
+        "evidenced_corrections": 0,
+        "answer_only_adequate": 8,
+        "separate_public_handoffs_preserved": 0
+      },
+      "A": {
+        "assigned": 8,
+        "adequate": 8,
+        "bounded": 0,
+        "material": 0,
+        "unconfirmed": 0,
+        "evidenced_corrections": 0,
+        "answer_only_adequate": 8,
+        "separate_public_handoffs_preserved": 8
+      }
+    },
+    "S10": {
+      "C": {
+        "assigned": 8,
+        "adequate": 8,
+        "bounded": 0,
+        "material": 0,
+        "unconfirmed": 0,
+        "evidenced_corrections": 0,
+        "answer_only_adequate": 8,
+        "separate_public_handoffs_preserved": 8
+      },
+      "A": {
+        "assigned": 8,
+        "adequate": 8,
+        "bounded": 0,
+        "material": 0,
+        "unconfirmed": 0,
+        "evidenced_corrections": 0,
+        "answer_only_adequate": 8,
+        "separate_public_handoffs_preserved": 8
+      }
+    }
+  },
+  "model_results": {
+    "gpt-5.6-sol": {
+      "C": {
+        "assigned": 12,
+        "adequate": 12,
+        "bounded": 0,
+        "material": 0,
+        "unconfirmed": 0,
+        "evidenced_corrections": 0,
+        "answer_only_adequate": 12,
+        "separate_public_handoffs_preserved": 4
+      },
+      "A": {
+        "assigned": 12,
+        "adequate": 12,
+        "bounded": 0,
+        "material": 0,
+        "unconfirmed": 0,
+        "evidenced_corrections": 0,
+        "answer_only_adequate": 12,
+        "separate_public_handoffs_preserved": 12
+      }
+    },
+    "gpt-6-astra": {
+      "C": {
+        "assigned": 12,
+        "adequate": 12,
+        "bounded": 0,
+        "material": 0,
+        "unconfirmed": 0,
+        "evidenced_corrections": 0,
+        "answer_only_adequate": 12,
+        "separate_public_handoffs_preserved": 4
+      },
+      "A": {
+        "assigned": 12,
+        "adequate": 11,
+        "bounded": 1,
+        "material": 0,
+        "unconfirmed": 0,
+        "evidenced_corrections": 0,
+        "answer_only_adequate": 12,
+        "separate_public_handoffs_preserved": 12
+      }
+    }
+  },
+  "scope": "Identity, arithmetic and adopted-result aggregation only; no semantic judgment is inferred from these checks."
+}
