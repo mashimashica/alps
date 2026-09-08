@@ -1,0 +1,36 @@
+{
+  "consumer_id": "F-U011",
+  "state_path": "/workspace/scratch/a75c3a6d9076/F-U011-ledger-state-xopwk279/ledger.sqlite",
+  "source_packet": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S06/ordinary",
+  "fixture_sha256": "202822ea97ff2b7850d3a06eb6b3770e18936a336c0e64725c9a3c7da2709f19",
+  "interface_sha256": "4622ec041dcfe8057aed319bc0ad168f24aebf4520a68c2961cdf046483315f3",
+  "setup_verified": true,
+  "calls": [
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/F-U011/input/ledger_api.py",
+        "--state",
+        "/workspace/scratch/a75c3a6d9076/F-U011-ledger-state-xopwk279/ledger.sqlite",
+        "init",
+        "--fixture",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/control-consumer-cases/S06/ordinary/fixture.json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"state\":\"ready\",\"total_records\":6}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/F-U011/input/ledger_api.py",
+        "--state",
+        "/workspace/scratch/a75c3a6d9076/F-U011-ledger-state-xopwk279/ledger.sqlite",
+        "describe"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"calls_per_tranche\":2,\"page_size\":3,\"remaining_calls\":2,\"snapshot_id\":\"snap_c22e71aa06b43ab25395e0ce\",\"total_records\":6,\"tranche\":1}\n",
+      "stderr": ""
+    }
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "scope": "Evidence packaging for the same completed original application; no replay or new final capture",
+  "source_commit": "75c0ea9bddf379c5e1803e4c0114ba5b47c871d8",
+  "source_manifest": "recovery/consumer-evidence/provenance.json",
+  "source_manifest_sha256": "4a24e1cb17327ea2b05e11b9c8cabcd2324e6b0ec6f9a8f66bbadadd322bf35b",
+  "source_entries": [
+    {
+      "consumer_id": "C-U087",
+      "role": "answer.md",
+      "path": "recovery/consumer-evidence/C-U087/answer.md",
+      "sha256": "f9de1c04f4d8c9c8b23101e0cef3059ea270c7835e81251f980239a947186c97",
+      "source_relay": "recovery/control-use-087-relay.md",
+      "source_commit": "75c0ea9bddf379c5e1803e4c0114ba5b47c871d8",
+      "source_blob_sha": "29ee368a834bd83d0e8f5502a603d79187ff0b84",
+      "source_sha256": "fd137613b87327bb4b51dc8e430896b1b5675aa6ee3f60524aea0468419675fc",
+      "source_body_lines_inclusive": [
+        21,
+        34
+      ],
+      "scope": "Recovered public text; not current or original filesystem-byte attestation. Checkpoint rendering preserves the captured text; C-U091 is pretty-printed logical content, not original compact bytes. Original modes and uncaptured sidecars are unavailable."
+    },
+    {
+      "consumer_id": "C-U087",
+      "role": "execution-note.md",
+      "path": "recovery/consumer-evidence/C-U087/execution-note.md",
+      "sha256": "8a54aae688faea8164f27641b89d145cc63b8f4720ca52c87099a8e200690239",
+      "source_relay": "recovery/control-use-087-relay.md",
+      "source_commit": "75c0ea9bddf379c5e1803e4c0114ba5b47c871d8",
+      "source_blob_sha": "29ee368a834bd83d0e8f5502a603d79187ff0b84",
+      "source_sha256": "fd137613b87327bb4b51dc8e430896b1b5675aa6ee3f60524aea0468419675fc",
+      "source_body_lines_inclusive": [
+        40,
+        125
+      ],
+      "scope": "Recovered public text; not current or original filesystem-byte attestation. Checkpoint rendering preserves the captured text; C-U091 is pretty-printed logical content, not original compact bytes. Original modes and uncaptured sidecars are unavailable."
+    },
+    {
+      "consumer_id": "C-U087",
+      "role": "checkpoint-rendering.json",
+      "path": "recovery/consumer-evidence/C-U087/checkpoint-rendering.json",
+      "sha256": "1f4c98a70e369567e44a3683a790c37dc8bce55a005c3d0c1f2c107d3d56bd3a",
+      "source_relay": "recovery/control-use-087-relay.md",
+      "source_commit": "75c0ea9bddf379c5e1803e4c0114ba5b47c871d8",
+      "source_blob_sha": "29ee368a834bd83d0e8f5502a603d79187ff0b84",
+      "source_sha256": "fd137613b87327bb4b51dc8e430896b1b5675aa6ee3f60524aea0468419675fc",
+      "source_body_lines_inclusive": [
+        131,
+        131
+      ],
+      "scope": "Recovered public text; not current or original filesystem-byte attestation. Checkpoint rendering preserves the captured text; C-U091 is pretty-printed logical content, not original compact bytes. Original modes and uncaptured sidecars are unavailable."
+    },
+    {
+      "consumer_id": "C-U087",
+      "role": "matched-final-logical-state-supplement",
+      "path": "recovery/consumer-evidence/C-U087/matched-final-state.sql",
+      "sha256": "0c59cdc1f01c69cb8dc8899d6565287e22fc0469988613be1a04c379594ca580",
+      "source_commit": "75c0ea9bddf379c5e1803e4c0114ba5b47c871d8",
+      "source_path": "state-snapshots/C-U073/final.sql",
+      "source_blob_sha": "c78e22eb4a0b747e66ced5f0b91872d751dd4c24",
+      "historical_digest_observation": "RECOVERY-ENVIRONMENT-OFFLINE.md at the same commit, Uncommitted state evidence to recover",
+      "scope": "Content-addressed bytes matching the recorded final SQL digest. This is not recovered original per-trial final metadata, original binary identity, call history, or a new final-state capture."
+    }
+  ],
+  "source_relay_blob": "29ee368a834bd83d0e8f5502a603d79187ff0b84",
+  "files": [
+    {
+      "source": "consumers/C-U087/prompt.md",
+      "destination": "prompt.md",
+      "sha256": "76a6c03309378b3fed7c45f14d9ac8e11144b9aac515265768d4a0038fcfb793",
+      "observed_copy_source_mode": 420,
+      "role": "original prepared prompt"
+    },
+    {
+      "source": "consumers/C-U087/skill/reimbursement-ledger-rollup/SKILL.md",
+      "destination": "prepared-skill/reimbursement-ledger-rollup/SKILL.md",
+      "sha256": "4a41f0c5798a55732c1eaaec19da9aa6f1ea2e4353ac242041433daf9ca1ed67",
+      "observed_copy_source_mode": 420,
+      "role": "assignment-backed prepared resource; final inventory unavailable"
+    },
+    {
+      "source": "consumers/C-U087/skill/reimbursement-ledger-rollup/scripts/reimbursement_rollup.py",
+      "destination": "prepared-skill/reimbursement-ledger-rollup/scripts/reimbursement_rollup.py",
+      "sha256": "e9854e3779aa7e2072e72b5c4e58e29425df212ff637e2518d526a8ec5b74bc7",
+      "observed_copy_source_mode": 420,
+      "role": "assignment-backed prepared resource; final inventory unavailable"
+    },
+    {
+      "source": "consumers/C-U087/input/ledger_api.py",
+      "destination": "prepared-input/ledger_api.py",
+      "sha256": "4622ec041dcfe8057aed319bc0ad168f24aebf4520a68c2961cdf046483315f3",
+      "observed_copy_source_mode": 420,
+      "role": "assignment-backed prepared resource; final inventory unavailable"
+    },
+    {
+      "source": "consumers/C-U087/input/request.md",
+      "destination": "prepared-input/request.md",
+      "sha256": "209f20fbafafd033c17f21819275c3feebe8566f8e94551b3fb11a4fc16574cf",
+      "observed_copy_source_mode": 420,
+      "role": "assignment-backed prepared resource; final inventory unavailable"
+    },
+    {
+      "source": "consumer-setup/C-U087.json",
+      "destination": "setup-observations.json",
+      "sha256": "71b964ac523c9a4751d0843a5b3ef8dc8790a8315a1200b035a4d0330dd691d9",
+      "observed_copy_source_mode": 420,
+      "role": "original assignment-anchored initial observation"
+    },
+    {
+      "source": "state-snapshots/C-U087/initial.sql",
+      "destination": "committed-initial-state/initial.sql",
+      "sha256": "1206581aaa26d95a4831a91f82dd1b59f06cfc56195294559db2af8192f63204",
+      "observed_copy_source_mode": 420,
+      "role": "original assignment-anchored initial observation"
+    },
+    {
+      "source": "state-snapshots/C-U087/initial.json",
+      "destination": "committed-initial-state/initial.json",
+      "sha256": "9cafe591595410976405fcbe55ac51f7254dda803875fc380e14bec0a36f5d59",
+      "observed_copy_source_mode": 420,
+      "role": "original assignment-anchored initial observation"
+    },
+    {
+      "source": "recovery/control-use-087-relay.md",
+      "destination": "recovery-provenance/source-relay.md",
+      "sha256": "fd137613b87327bb4b51dc8e430896b1b5675aa6ee3f60524aea0468419675fc",
+      "observed_copy_source_mode": 420,
+      "role": "unchanged original recovery relay"
+    },
+    {
+      "source": "recovery/consumer-evidence/C-U087/answer.md",
+      "destination": "recovered-public-text/answer.md",
+      "sha256": "f9de1c04f4d8c9c8b23101e0cef3059ea270c7835e81251f980239a947186c97",
+      "observed_copy_source_mode": 420,
+      "role": "Recovered public text; not current or original filesystem-byte attestation. Checkpoint rendering preserves the captured text; C-U091 is pretty-printed logical content, not original compact bytes. Original modes and uncaptured sidecars are unavailable."
+    },
+    {
+      "source": "recovery/consumer-evidence/C-U087/execution-note.md",
+      "destination": "recovered-public-text/execution-note.md",
+      "sha256": "8a54aae688faea8164f27641b89d145cc63b8f4720ca52c87099a8e200690239",
+      "observed_copy_source_mode": 420,
+      "role": "Recovered public text; not current or original filesystem-byte attestation. Checkpoint rendering preserves the captured text; C-U091 is pretty-printed logical content, not original compact bytes. Original modes and uncaptured sidecars are unavailable."
+    },
+    {
+      "source": "recovery/consumer-evidence/C-U087/checkpoint-rendering.json",
+      "destination": "recovered-work-evidence/checkpoint-rendering.json",
+      "sha256": "1f4c98a70e369567e44a3683a790c37dc8bce55a005c3d0c1f2c107d3d56bd3a",
+      "observed_copy_source_mode": 420,
+      "role": "Recovered public text; not current or original filesystem-byte attestation. Checkpoint rendering preserves the captured text; C-U091 is pretty-printed logical content, not original compact bytes. Original modes and uncaptured sidecars are unavailable."
+    },
+    {
+      "source": "state-snapshots/C-U073/final.sql",
+      "destination": "recovery-provenance/matched-sql-source.sql",
+      "sha256": "0c59cdc1f01c69cb8dc8899d6565287e22fc0469988613be1a04c379594ca580",
+      "observed_copy_source_mode": 420,
+      "role": "committed byte source of the matching SQL; not this consumer's final capture"
+    },
+    {
+      "source": "recovery/consumer-evidence/C-U087/matched-final-state.sql",
+      "destination": "logical-state-supplement/matched-final-state.sql",
+      "sha256": "0c59cdc1f01c69cb8dc8899d6565287e22fc0469988613be1a04c379594ca580",
+      "observed_copy_source_mode": 420,
+      "role": "Content-addressed bytes matching the recorded final SQL digest. This is not recovered original per-trial final metadata, original binary identity, call history, or a new final-state capture."
+    }
+  ],
+  "unavailable": [
+    "Original per-application final API metadata, original SQLite byte identity and complete call history.",
+    "A complete post-execution resource inventory; prepared-resource hashes do not establish it.",
+    "Uncaptured locks, journals and other absent filesystem observations."
+  ],
+  "historical_capture_paragraph_sha256": "112e2dc9ab5110e0ef0dd99eb0be53c21a42e5d57978c4626832424fb296c9c4"
+}

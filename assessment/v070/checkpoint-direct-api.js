@@ -31,8 +31,13 @@ return (async () => {
   await command(`cp -a ${root}/. ${snapshot}/`);
   const details = JSON.parse(await command("python3 checkpoint.py export --cache", snapshot, 2000));
   let payload = "";
-  for (let offset = 0; offset < details.characters; offset += 16000) {
-    payload += await command(`python3 checkpoint.py slice --char-offset ${offset} --char-limit 16000`, snapshot, 32768);
+  for (let offset = 0; offset < details.characters; offset += 64000) {
+    const offsets = [offset, offset + 16000, offset + 32000, offset + 48000]
+      .filter(value => value < details.characters);
+    // Independent reads of the immutable snapshot retain their offset order.
+    const chunks = await Promise.all(offsets.map(value =>
+      command(`python3 checkpoint.py slice --char-offset ${value} --char-limit 16000`, snapshot, 32768)));
+    payload += chunks.join("");
   }
   if (Array.from(payload).length !== details.characters) throw Error("Export length mismatch");
   const entries = JSON.parse(payload);
