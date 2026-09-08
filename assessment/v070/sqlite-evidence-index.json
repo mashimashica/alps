@@ -409,6 +409,26 @@
     "sql_sha256": "76663ce0dc1bcdd9daca679aa9f5665e38123a58a5213bab37e4a414cd1ec479",
     "sqlite_version": "3.53.1"
   },
+  "grading-work/focused-FP04-primary/R63-challenging-checkpoint-copy.sqlite": {
+    "metadata_path": "sqlite-evidence/focused-review-observation-01/grading-work/focused-FP04-primary/R63-challenging-checkpoint-copy.sqlite.json",
+    "metadata_sha256": "ffc3338191e785153a8a9f90d01f41dc2fb74ef297fa7bf974011081797e77de",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "grading-work/focused-FP04-primary/R63-challenging-checkpoint-copy.sqlite",
+    "source_sha256": "ee0cc4fdb17a133bb6f57cb2fb45136ec88827e29abaf1ef759e7456d36eda39",
+    "sql_path": "sqlite-evidence/focused-review-observation-01/grading-work/focused-FP04-primary/R63-challenging-checkpoint-copy.sqlite.sql",
+    "sql_sha256": "7eb70a199454fa398d3d6a358bf0282f6f399d0ce1b977169cfdd9989cbd545c",
+    "sqlite_version": "3.53.1"
+  },
+  "grading-work/focused-FP04-second/R63-challenging-checkpoint-copy.sqlite": {
+    "metadata_path": "sqlite-evidence/focused-review-observation-02/grading-work/focused-FP04-second/R63-challenging-checkpoint-copy.sqlite.json",
+    "metadata_sha256": "8d8493a86b328b05db14eb3dd36087acba58b66ffc86ad1c7cd9192ab2b0f923",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "grading-work/focused-FP04-second/R63-challenging-checkpoint-copy.sqlite",
+    "source_sha256": "ee0cc4fdb17a133bb6f57cb2fb45136ec88827e29abaf1ef759e7456d36eda39",
+    "sql_path": "sqlite-evidence/focused-review-observation-02/grading-work/focused-FP04-second/R63-challenging-checkpoint-copy.sqlite.sql",
+    "sql_sha256": "7eb70a199454fa398d3d6a358bf0282f6f399d0ce1b977169cfdd9989cbd545c",
+    "sqlite_version": "3.53.1"
+  },
   "trials/control-037/verify1/source.sqlite": {
     "metadata_path": "sqlite-evidence/creator-complete/trials/control-037/verify1/source.sqlite.json",
     "metadata_sha256": "17fb4b88117fb3e87d85615095f749b223f860ea8467cb48d2d67b06c33d9f6a",

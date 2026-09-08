@@ -1,0 +1,9 @@
+# FP03 coordinator adjudication
+
+Both complete independent reports agree on eight adequate applications, zero evidenced corrections, and all description/configuration scores of3 within the examined ledger contract. Adopt these judgments. Ordinary exact rollups are supported; challenging full rollups remain unmet with correct authorized partial progress and usable continuation. No material package defect is established by the business review.
+
+The two audits independently checked actual implementations, API/package copies, exact prefix arithmetic, request/source binding, incorporated IDs/cursors, final frontier and available SQL. Extra metadata reads and rendering checkpoint totals perform the requested work; they do not correct Skill instructions. Processed-cursor lists, raw journals or a particular checkpoint schema are not additional requirements. The minor stdout/result-path wording and path-count slips did not obstruct an application and are not scored as material.
+
+Preserve R17/R28 recovery limits: exact public operational text and original or rendered checkpoint content are gradable, but a content-addressed source-SQL supplement is not native per-application final metadata, byte-identical SQLite or call history. R44/R63 native SQL likewise cannot prove all access or timing. Successful future continuation, generic crash recovery and untested source faults are not claimed. The coordinator reviewed both complete reports; no new target execution or correction was introduced.
+
+Evidence: [primary](focused-FP03-primary.md), [second](focused-FP03-second.md), [primary evidence audit](../grading-work/focused-FP03-primary/evidence-audit.json), [second audit](../grading-work/focused-FP03-second/audit-results.json). Source-fidelity review is separate; component/application observations do not prove every stated Outcome is well designed.

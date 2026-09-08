@@ -1,0 +1,9 @@
+# FP05 coordinator adjudication
+
+Both complete independent reviews agree: all eight applications adequately handled the authorized requests, all package description/configuration dimensions score3 in the examined scope, and zero Skill corrections are evidenced. Adopt those results. All four ordinary releases achieved the exact-revision, readiness and working-checkout conjunction in the simulator. All four challenging rehearsals recovered an already-effected promotion after timeout and truthfully reported checkout failure; the full release Outcome remains unmet.
+
+Existing valid qualification/approval pairs were retained, the supplied request IDs were used exactly once, and both matching production checks were recorded. The independent final-state audits corroborate the specified changes and unchanged qualification/approval. R44's narrower first-use request-ID wording does not require generating a different ID; the actual request supplied an unused suitable ID. It is not evidence of necessary compensation. The ancillary shell quoting correction is the consumer's own verification-command error, not a generated Skill defect or Skill correction.
+
+The coordinator reviewed both complete reports; no simulator replay or new consumer was run. Existing-CLI reuse is an appropriate supporting configuration, without requiring packaged wrappers. These file-local observations do not establish live deployment, host loading, all failure branches, complete access histories or formal release readiness. Source-fidelity review is separate from these application scores.
+
+Evidence: [primary](focused-FP05-primary.md), [second](focused-FP05-second.md), [primary state checks](../grading-work/focused-FP05-primary/check-results.json), [second state checks](../grading-work/focused-FP05-second/check-evidence.txt).

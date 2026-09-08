@@ -1,0 +1,207 @@
+{
+  "scope": "Read-only packet consistency, JSON/YAML parsing, and final-state delta checks; no simulator invocation or historical trace reconstruction.",
+  "packages": [
+    {
+      "label": "R17",
+      "files_read": [
+        "SKILL.md",
+        "agents/openai.yaml"
+      ],
+      "yaml_parse_and_identity": "passed",
+      "relative_links_exist": []
+    },
+    {
+      "label": "R28",
+      "files_read": [
+        "SKILL.md",
+        "agents/openai.yaml"
+      ],
+      "yaml_parse_and_identity": "passed",
+      "relative_links_exist": []
+    },
+    {
+      "label": "R44",
+      "files_read": [
+        "SKILL.md",
+        "agents/openai.yaml",
+        "references/release-tool.md"
+      ],
+      "yaml_parse_and_identity": "passed",
+      "relative_links_exist": [
+        "references/release-tool.md",
+        "references/release-tool.md#approval-validity"
+      ]
+    },
+    {
+      "label": "R63",
+      "files_read": [
+        "SKILL.md",
+        "agents/openai.yaml"
+      ],
+      "yaml_parse_and_identity": "passed",
+      "relative_links_exist": []
+    }
+  ],
+  "applications": [
+    {
+      "label": "R17",
+      "case": "ordinary",
+      "skill_bytes_match": true,
+      "tool_bytes_match": true,
+      "resource_hashes_match": true,
+      "only_expected_final_state_delta": true,
+      "qualification_sequence": 103,
+      "approval_sequence": 104,
+      "request_ids": [
+        "dev-linden-42-apply"
+      ],
+      "promotion_count": 1,
+      "production": {
+        "id": "rel-linden-42",
+        "digest": "linden42-content-7f3a91",
+        "healthy": true,
+        "checkout_ok": true
+      }
+    },
+    {
+      "label": "R17",
+      "case": "challenging",
+      "skill_bytes_match": true,
+      "tool_bytes_match": true,
+      "resource_hashes_match": true,
+      "only_expected_final_state_delta": true,
+      "qualification_sequence": 207,
+      "approval_sequence": 208,
+      "request_ids": [
+        "dev-onyx-27-rehearsal"
+      ],
+      "promotion_count": 1,
+      "production": {
+        "id": "rel-onyx-27",
+        "digest": "onyx27-content-c82d6e",
+        "healthy": true,
+        "checkout_ok": false
+      }
+    },
+    {
+      "label": "R28",
+      "case": "ordinary",
+      "skill_bytes_match": true,
+      "tool_bytes_match": true,
+      "resource_hashes_match": true,
+      "only_expected_final_state_delta": true,
+      "qualification_sequence": 103,
+      "approval_sequence": 104,
+      "request_ids": [
+        "dev-linden-42-apply"
+      ],
+      "promotion_count": 1,
+      "production": {
+        "id": "rel-linden-42",
+        "digest": "linden42-content-7f3a91",
+        "healthy": true,
+        "checkout_ok": true
+      }
+    },
+    {
+      "label": "R28",
+      "case": "challenging",
+      "skill_bytes_match": true,
+      "tool_bytes_match": true,
+      "resource_hashes_match": true,
+      "only_expected_final_state_delta": true,
+      "qualification_sequence": 207,
+      "approval_sequence": 208,
+      "request_ids": [
+        "dev-onyx-27-rehearsal"
+      ],
+      "promotion_count": 1,
+      "production": {
+        "id": "rel-onyx-27",
+        "digest": "onyx27-content-c82d6e",
+        "healthy": true,
+        "checkout_ok": false
+      }
+    },
+    {
+      "label": "R44",
+      "case": "ordinary",
+      "skill_bytes_match": true,
+      "tool_bytes_match": true,
+      "resource_hashes_match": true,
+      "only_expected_final_state_delta": true,
+      "qualification_sequence": 103,
+      "approval_sequence": 104,
+      "request_ids": [
+        "dev-linden-42-apply"
+      ],
+      "promotion_count": 1,
+      "production": {
+        "id": "rel-linden-42",
+        "digest": "linden42-content-7f3a91",
+        "healthy": true,
+        "checkout_ok": true
+      }
+    },
+    {
+      "label": "R44",
+      "case": "challenging",
+      "skill_bytes_match": true,
+      "tool_bytes_match": true,
+      "resource_hashes_match": true,
+      "only_expected_final_state_delta": true,
+      "qualification_sequence": 207,
+      "approval_sequence": 208,
+      "request_ids": [
+        "dev-onyx-27-rehearsal"
+      ],
+      "promotion_count": 1,
+      "production": {
+        "id": "rel-onyx-27",
+        "digest": "onyx27-content-c82d6e",
+        "healthy": true,
+        "checkout_ok": false
+      }
+    },
+    {
+      "label": "R63",
+      "case": "ordinary",
+      "skill_bytes_match": true,
+      "tool_bytes_match": true,
+      "resource_hashes_match": true,
+      "only_expected_final_state_delta": true,
+      "qualification_sequence": 103,
+      "approval_sequence": 104,
+      "request_ids": [
+        "dev-linden-42-apply"
+      ],
+      "promotion_count": 1,
+      "production": {
+        "id": "rel-linden-42",
+        "digest": "linden42-content-7f3a91",
+        "healthy": true,
+        "checkout_ok": true
+      }
+    },
+    {
+      "label": "R63",
+      "case": "challenging",
+      "skill_bytes_match": true,
+      "tool_bytes_match": true,
+      "resource_hashes_match": true,
+      "only_expected_final_state_delta": true,
+      "qualification_sequence": 207,
+      "approval_sequence": 208,
+      "request_ids": [
+        "dev-onyx-27-rehearsal"
+      ],
+      "promotion_count": 1,
+      "production": {
+        "id": "rel-onyx-27",
+        "digest": "onyx27-content-c82d6e",
+        "healthy": true,
+        "checkout_ok": false
+      }
+    }
+  ]
+}
