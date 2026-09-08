@@ -53,7 +53,7 @@ ALPS connects two lineages. The [Process Framework](skills/design-process-descri
   <img src="assets/alps-agent-onion.svg" alt="Why and What are the meaning of work, How is the available means, and the Agent provides the judgment between them" width="900">
 </p>
 
-In this picture, **Why / What** is the meaning of the work, **How** is the available means, and the **Agent** is responsible for the judgment between them. It interprets the situation, selects and composes capabilities, adapts the method, and can devise new means when existing ones are insufficient. Established calculations, transformations, checks, and stable sequences belong in tools when suitable implementations can perform them reliably.
+In this picture, **Why / What** is the meaning of the work, **How** is the available means, and the **Agent** is responsible for the judgment between them. It interprets the situation, selects and composes capabilities, adapts the method, and can devise new means when existing ones are insufficient. Established calculations, transformations, checks, and stable sequences should be handled by suitable implementations that can perform them reliably.
 
 The diagram is intentionally schematic. A Process Description can include Activities, Tasks, methods, or ordering where they are necessary. The separation is not “What only” versus “How only”; it is between the work being described and the configuration used to realize it.
 
