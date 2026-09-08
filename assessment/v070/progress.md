@@ -2,6 +2,10 @@
 
 Updated: 2026-09-07 UTC. Execution counts are coordinator observations; consult the mutable ledgers and live agents for later completions.
 
+## Current user-requested pause
+
+The user requested an interim graphical report and a continuation decision because token use is high. New trials and grading launches are stopped. The one started S09-P01 primary assessment completed and was read; its required independent second assessment remains unperformed. There are no running child agents. See interim-report-2026-09-08.md for findings and proposed, not authorized, reduced scopes. The older continuation directions below are suspended by this instruction.
+
 ## Status
 
 Frozen current main A is dee3866d35e43db5db480fc9f85166a8dcb1ec3b, VERSION 0.7.0. The product worktree remains clean at A. Calibration and all three ordinary development rounds are complete, independently reviewed and closed out. B1, B2 and B3 are rejected for progression. No qualified B exists; main A/B and dependent final/example stages remain blocked, not waived. The original C control is independently proceeding.
@@ -26,7 +30,7 @@ Additional diagnostic reserve: at most 72 starts across at most three rounds. H0
 
 All 72 C creators and consumers C-U001–123 explicitly completed: C195/216, with 21 fixed consumer slots left. All 144 consumer packets are prepared. The task-execution count is297/max2,100 (14.1%), separate from grading, accepted improvement or PR delivery. The two interrupted development originals are retained separately.
 
-Twenty-two C grading reports are complete/read. S01, S03, S05 and S06 are closed. S06 has23 adequate and1 bounded inaccurate execution-note case under the full-deliverable criterion, all12 complete ordinary results and12 correct but incomplete authorized challenge prefixes, and2 evidenced instruction-correction occurrences. Package defects and recovery limits remain separate in control-S06-closeout.md. All24 S09 consumers completed and all three fixed blind packets are prepared for their first verified save before grading. S10 consumers124–144 remain unstarted at this observation.
+Twenty-three C grading reports are complete/read; the latest S09-P01 primary is not yet independently confirmed or adjudicated. S01, S03, S05 and S06 are closed. S06 has23 adequate and1 bounded inaccurate execution-note case under the full-deliverable criterion, all12 complete ordinary results and12 correct but incomplete authorized challenge prefixes, and2 evidenced instruction-correction occurrences. Package defects and recovery limits remain separate in control-S06-closeout.md. All24 S09 consumers completed and all three fixed blind packets are prepared for their first verified save before grading. S10 consumers124–144 remain unstarted at this observation.
 
 The environment is connected and recovery is complete for available evidence. Original C094–096 contexts completed with actual new-path state captures; recovered text, matched SQL and missing original metadata retain explicit provenance. All newly completed grading databases are represented by verified native SQL. The reviewed F1/F2 helper correction is saved and was used to prepare S09 normally, with no generated-artifact edits, task replay or criterion change.
 

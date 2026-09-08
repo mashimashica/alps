@@ -1,3 +1,15 @@
+# User-requested interim decision boundary — 2026-09-08
+
+The user requested a clear interim report with graphs and decision support because token consumption is high. Stop new task and grading launches. The sole already-started S09-P01 primary report has completed, been read and recorded; its mandatory independent second assessment remains unperformed. No child is running. This latest instruction supersedes the prior automatic continuation directions below. Do not start C124–144, remaining graders, new candidates or the proposed reduced program until the user makes the continuation decision.
+
+Current totals:106 generated Skills,191 completed applications,297 task trials; two interrupted development originals separately preserved. C72 creators/123 consumers complete,21 consumers unstarted. C23 grading reports complete/read; S01/S03/S05/S06 closed. S09-P01 is primary-only and not added to the four-family finalized counts. All three S09 blind packets are prepared/saved. Current product remains unchanged frozen A.
+
+Read interim-report-2026-09-08.md for the current findings, graphs' source tables and proposed finite alternatives. The recommended44-trial comparison and conditional32-trial example phase are proposals, not an amendment already in force. They change the original comparison/stage scope and claims explicitly. protocol.md/gates.md and all prior evidence are preserved. No new product PR, merge, tag or Release occurred.
+
+Latest verified checkpoint before this boundary update:db01dc033dcb28f7f261a8d886181ed8ee233233,tree91e04747830cde4e3c361b8dbea9df1cadd5a16a,snapshot ../assessment-checkpoint-8lIxoU. The new interim report, this pause instruction, and S09-P01 primary report/ledger need the next verified save. Use any later receipt before another remote mutation.
+
+---
+
 # Current continuation status
 
 297 task trials explicitly completed: calibration36, development66, independent C195 (all72 creators and C-U001–123). The two retained interrupted development originals remain separate. Consumers124–144 are prepared and have not started. All22 completed C grading reports were read; S01/S03/S05/S06 are closed. S09-P01/P02/P03 have just been prepared from all24 completed S09 applications and await verified saving before their three primary and prespecified P01 second reviews. Next execute C124–144 in fixed fresh sol/high contexts while grading S09; then prepare and save eligible fixed S10 packets for independent grading. No original business trial is repeated.

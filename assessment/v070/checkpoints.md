@@ -107,3 +107,7 @@ Verified commit `199aa313867f51caad9c3ed92674b868c53af1e3`, tree `874bbb58667aab
 ## C110–114 batch and independent S06 component observations
 
 Verified commit `ce044c0c137048cdfff2c1b1848c3bb129c31d04`, tree `9e3fdd089cf1929474edd26eb75375944e44274b`, parent `199aa313867f51caad9c3ed92674b868c53af1e3`. Snapshot `../assessment-checkpoint-ezhX84`; 172 changed entries and 6,196 published files. Exact commit/ref/author-matching DCO and all 172 changed blob identities/modes matched. Saves five completed S09 applications, S06-P01 adjudication, the prestart S10 identity check, interruption/progress account and 11 closed S06-P03-second database observations. Its final report was still being drafted and is not credited read/complete by this snapshot.
+
+## S06 closeout and complete S09 packets
+
+Verified commit `db01dc033dcb28f7f261a8d886181ed8ee233233`, tree `91e04747830cde4e3c361b8dbea9df1cadd5a16a`, parent `ce044c0c137048cdfff2c1b1848c3bb129c31d04`. Snapshot `../assessment-checkpoint-8lIxoU`; 461 changed entries and 6,647 published files. Exact commit/ref/DCO and all 461 changed blob identities/modes matched. Saves S06-P03 second final report and root adjudication/family closeout, completed C001–123 observations, all three fixed S09 packets and refreshed continuation records. S09 grading starts only after this verification.
