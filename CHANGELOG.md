@@ -6,6 +6,8 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ### Changed
 
+- Make responsibility boundaries, proportionate Outcome counterexamples, and evidence status explicit in Process Description Design; clarify adaptation and retention of applicable evidence in Agent Work System Design.
+- Replace repeated explanatory notes in the design Skills with guidance at the relevant decisions, and extend the existing English/Japanese examples for bounded responsibility and change impacts. Foundation definitions, required Process elements, and distribution remain unchanged.
 - Focus repository tests on manifest version consistency and example tool behavior; review affected distribution layout and resources alongside existing format and link checks.
 
 ## [0.7.0] - 2026-09-06

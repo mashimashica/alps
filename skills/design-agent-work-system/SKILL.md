@@ -24,7 +24,7 @@ The following Tasks are required within the requested scope, except where stated
 ### Establishing the design basis
 
 1. Identify the target work's source description, applicable conditions, available capabilities, and the requested extent of design, implementation, and evaluation. Confirm the information needed from affected parties and identify gaps that limit dependent decisions.
-2. Determine whether the work description is sufficient for the requested design. Refer to its meaning and success conditions instead of maintaining a second copy. Identify which descriptions and Skills the configuration supports; either may be supported by different configurations. Revisit the affected description when design exposes a problem with its assumptions; preserve its meaning unless a change is within scope and justified under the Framework's change principles.
+2. Determine whether the work description is sufficient for the requested design. Refer to its meaning and success conditions instead of maintaining a second copy. Identify the descriptions and Skills supported; each may use different configurations. Distinguish an inadequate configuration or missing evidence from a problem with the work's assumptions. Where findings justify it, adapt the means or revisit the affected description; preserve its meaning unless a change is within scope and justified under the Framework's change principles.
 
 ### Configuring responsibilities and interactions
 
@@ -33,9 +33,7 @@ The following Tasks are required within the requested scope, except where stated
 3. Relate the agents, tools, and environment to the work as Enablers, and identify each information resource's role using the Framework. Explain how tool operations contribute to the Tasks and how their results support Outcome assessment. Design Task boundaries and tool interfaces for their respective responsibilities; relate Process Inputs and Outputs to arguments and returned information where needed for performance or evaluation.
 4. Relate rules and restrictions implemented by tools to their applicable Controls and Constraints, identifying their common source, scope, and how each operation applies them. Distinguish limitations of the selected tools and environment from work requirements, and assess their effects on feasibility and Outcome judgments.
 
-    > NOTE One operation can supply processing capability, apply a judgment criterion, and enforce a restriction. These roles describe different relationships to the work. The [capabilities, criteria, and limits example](references/examples.md#capabilities-criteria-and-limits) shows their correspondence in a measurement tool.
-
-5. Identify gaps requiring a new or adapted method, tool, or connection. Judge boundaries by cohesion, change effects, and ease of use, composition, and verification.
+5. Identify gaps requiring a new or adapted method, tool, or connection. Judge boundaries by cohesion, change effects, and ease of use, composition, and verification. When simplifying, consider which responsibility, meaningful choice, or evidence would be lost by removing or combining a component.
 
 ### Realizing the requested configuration
 
@@ -48,10 +46,8 @@ The following Tasks are required within the requested scope, except where stated
 
 1. Review the design's responsibilities, relationships, and conditions against the target work. Check the components and connections against their specified behavior, including relevant failures and incomplete results.
 
-    > NOTE In this design work, specifications and applicable work requirements supply the criteria. Existing command tools support component checks and integration trials. Their observations provide evidence for assessing the design; whole-system effectiveness also depends on the agent's interpretation and response during representative work.
-
 2. Evaluate representative work using the intended agent, tools, information, and environment to the extent authorized and available. Assess the work's Outcomes against evidence and applicable conditions, distinguishing them from tool completion and generated Outputs.
-3. Reconsider instructions, information supply, public operations, and allocation where evidence or changed capabilities warrants it. Preserve work-specific knowledge and conditions while reviewing guidance that compensates for capability limits. Revalidate affected behavior.
+3. Reconsider instructions, information supply, public operations, and allocation where evidence or changed capabilities warrants it. Preserve work-specific knowledge and conditions while reviewing guidance that compensates for capability limits. Identify which changed dependencies affect previous evidence and judgments; retain evidence whose basis still applies and revalidate affected behavior.
 4. Report each judgment's subject, criteria, evidence, scope, unperformed checks, and unresolved findings. In a review, assess these Outcomes in the supplied design; finding a defect does not satisfy the condition that remains unmet.
 
 ## Controls
