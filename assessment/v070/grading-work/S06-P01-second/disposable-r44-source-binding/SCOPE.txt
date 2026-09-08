@@ -1,4 +1,0 @@
-Independent component probe only, not a recorded consumer application.
-All API source writes are confined to disposable copies in this directory.
-Tests checkpoint acceptance after switching between separately initialized same-snapshot states.
-No grants, no original source-state paths, no evaluated artifact edits.

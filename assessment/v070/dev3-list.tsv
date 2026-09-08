@@ -1,7 +1,0 @@
-trial_id	case	arm	repetition	model	effort	execution	agent	start_recorded_utc	end_recorded_utc
-dev3-001	S10	A	1	gpt-5.6-luna	low	completed	/root/dev3_make_001	2026-09-07T17:35:33.200836+00:00	2026-09-07T17:36:54.494423+00:00
-dev3-002	S10	B3	1	gpt-5.6-luna	low	completed	/root/dev3_make_002	2026-09-07T17:35:33.648211+00:00	2026-09-07T17:37:10.388224+00:00
-dev3-003	S05	B3	1	gpt-5.6-luna	low	completed	/root/dev3_make_003	2026-09-07T17:35:34.073137+00:00	2026-09-07T17:38:12.810298+00:00
-dev3-004	S05	A	1	gpt-5.6-luna	low	completed	/root/dev3_make_004	2026-09-07T17:35:34.502409+00:00	2026-09-07T17:37:38.970073+00:00
-dev3-005	S10	B3	2	gpt-5.6-luna	low	completed	/root/dev3_make_005	2026-09-07T17:35:34.931037+00:00	2026-09-07T17:37:10.811245+00:00
-dev3-006	S10	A	2	gpt-5.6-luna	low	completed	/root/dev3_make_006	2026-09-07T17:35:35.361962+00:00	2026-09-07T17:37:11.242784+00:00

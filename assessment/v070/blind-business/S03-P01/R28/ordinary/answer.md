@@ -1,3 +1,0 @@
-Say: “Thanks—I’ve got it. I’ll pack Cove with its charger, test Heron’s hub by 15:00 and pack it only if it passes. Jules gives me both labels by 15:05; I’ll attach them and get each complete kit to south reception by 15:50 for the 16:10 courier. If Heron’s hub fails, I’ll hold it and call you by 15:25; only you can approve an exception. Cove can still go if complete.”
-
-Nothing material is still unsettled: Rosa and Jules explicitly confirmed this plan. The packing, hub test, and label printing are still to be done. If a label is late, the supplied rule already means that kit cannot go to reception without it.

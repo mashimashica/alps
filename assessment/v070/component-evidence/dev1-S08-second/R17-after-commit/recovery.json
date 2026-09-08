@@ -1,1 +1,0 @@
-{"durable": {"receipt": {"booking_id": "booking:durable", "party_id": "crew-cedar", "replayed": true, "request_key": "durable", "seats": 2, "slot_id": "paper-lab-am", "state": "confirmed"}, "request": {"party_id": "crew-cedar", "request_key": "durable", "seats": 2, "slot_id": "paper-lab-am"}, "state": "confirmed"}}

@@ -1,8 +1,0 @@
-{
-  "source_path": "grading-work/S06-P03-second/disposable-R28-clean-continuation/disposable-source.sqlite",
-  "source_sha256": "dc2fbf3e44cb5d135b61ed552cc554f13fb8c458873bc54b2e1a9742663b7fb9",
-  "sql_path": "sqlite-evidence/s06-p03-second-db-work-complete/grading-work/S06-P03-second/disposable-R28-clean-continuation/disposable-source.sqlite.sql",
-  "sql_sha256": "4ce661ac48573972ab743e9d93a88ce8ae53b9450dd7cad6b1d7abf3cfaefa6a",
-  "sqlite_version": "3.53.1",
-  "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history"
-}

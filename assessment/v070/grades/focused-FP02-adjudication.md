@@ -1,9 +1,0 @@
-# FP02 coordinator adjudication
-
-Both independent reviewers agree: seven adequate applications and one bounded deficiency, R44 ordinary. Adopt their judgments and zero evidenced Skill corrections for all eight. All four packages score 3 on each description dimension; separate configuration scoring is inapplicable. No material package defect is established by this business review.
-
-The coordinator compared R44's saved answer and public handoff with the supplied ordinary exchange. The public handoff changes Jules's delivery-by-15:05 commitment into Finn's attachment-by-15:05 deadline. The saved answer preserves the original milestone. The Skill explicitly distinguishes milestones and prohibits invented deadlines; this is a consumer summary error, not a generated instruction defect or a correction. The original answer remains adequate. Existing ordinary agreement remains evidenced; the assistant's new wording is not additional participant acceptance.
-
-The primary descriptive metric includes all preserved user-facing wording and therefore retains the bounded application deficiency. Report an answer-only sensitivity comparison separately, because some historical control public handoffs are unavailable. Do not infer equal observation coverage or an ALPS-caused effect from this single event. Challenging full agreement remains unestablished, despite useful adequate assistance. Zero evidenced correction is not zero hidden effort.
-
-Evidence: [primary](focused-FP02-primary.md), [second](focused-FP02-second.md), [R44 public handoff](../blind-focused/FP02/R44/ordinary/public-handoff.md), [saved answer](../blind-focused/FP02/R44/ordinary/answer.md), [ordinary exchange](../blind-focused/FP02/original-consumer-inputs/ordinary/input/handover.txt). No new execution, changed package or repaired answer was introduced. A source-fidelity review is separate from these business judgments.

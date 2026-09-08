@@ -1,1 +1,0 @@
-{"probe-after-commit": {"receipt": {"booking_id": "booking:probe-after-commit", "party_id": "crew-cedar", "request_key": "probe-after-commit", "seats": 2, "slot_id": "paper-lab-am", "state": "confirmed"}, "request": {"party_id": "crew-cedar", "request_key": "probe-after-commit", "seats": 2, "slot_id": "paper-lab-am"}, "state": "confirmed"}}

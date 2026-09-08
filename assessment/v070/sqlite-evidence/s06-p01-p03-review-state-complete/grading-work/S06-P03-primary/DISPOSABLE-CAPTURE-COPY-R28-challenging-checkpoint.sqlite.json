@@ -1,8 +1,0 @@
-{
-  "source_path": "grading-work/S06-P03-primary/DISPOSABLE-CAPTURE-COPY-R28-challenging-checkpoint.sqlite",
-  "source_sha256": "ee0cc4fdb17a133bb6f57cb2fb45136ec88827e29abaf1ef759e7456d36eda39",
-  "sql_path": "sqlite-evidence/s06-p01-p03-review-state-complete/grading-work/S06-P03-primary/DISPOSABLE-CAPTURE-COPY-R28-challenging-checkpoint.sqlite.sql",
-  "sql_sha256": "7eb70a199454fa398d3d6a358bf0282f6f399d0ce1b977169cfdd9989cbd545c",
-  "sqlite_version": "3.53.1",
-  "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history"
-}

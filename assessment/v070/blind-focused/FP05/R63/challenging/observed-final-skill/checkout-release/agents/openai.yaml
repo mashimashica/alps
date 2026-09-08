@@ -1,4 +1,0 @@
-interface:
-  display_name: "Checkout Release"
-  short_description: "Qualify, promote, and verify checkout releases"
-  default_prompt: "Use $checkout-release to assess or execute the requested synthetic checkout-service release."

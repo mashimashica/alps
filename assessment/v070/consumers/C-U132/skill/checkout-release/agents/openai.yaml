@@ -1,4 +1,0 @@
-interface:
-  display_name: "Checkout Release"
-  short_description: "Qualify and verify simulated checkout releases"
-  default_prompt: "Use $checkout-release to assess or execute this synthetic checkout-service release and verify the production checkout."

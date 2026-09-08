@@ -1,1 +1,0 @@
-{"race-1": {"receipt": {"party_id": "party-1", "reason": "insufficient_capacity", "replayed": false, "request_key": "race-1", "seats": 4, "slot_id": "paper-lab-am", "state": "rejected"}, "request": {"party_id": "party-1", "request_key": "race-1", "seats": 4, "slot_id": "paper-lab-am"}, "state": "rejected"}}

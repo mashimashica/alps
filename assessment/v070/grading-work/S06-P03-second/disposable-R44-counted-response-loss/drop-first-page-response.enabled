@@ -1,1 +1,0 @@
-Drop stdout for first successful page only, preserving exit status.

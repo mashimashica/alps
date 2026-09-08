@@ -1,4 +1,0 @@
-interface:
-  display_name: Checkout service release
-  short_description: Qualify, promote, and verify an approved checkout candidate
-  default_prompt: Release the named checkout-service candidate using the supplied release tool, then verify production health and checkout and report evidence and any unmet conditions.

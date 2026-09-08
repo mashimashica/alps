@@ -1,3 +1,0 @@
-site_id,shipment_id,sku,lot_id,review_date,supplier_release,transport_seal,traceability,restricted_part,quality_owner_approval_ref,context_ref
-NORTH,DEMO-201,00017,LOT-A,2026-08-24,cleared,intact,complete,no,,QC-401
-NORTH,DEMO-202,00024,LOT-B,2026-08-24,cleared,intact,complete,yes,,QC-402

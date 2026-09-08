@@ -1,8 +1,0 @@
-{
-  "consumer_id": "C-U076",
-  "state_path": "/workspace/scratch/a75c3a6d9076/C-U076-ledger-state-f58ax81d/ledger.sqlite",
-  "snapshot": "final",
-  "representation": "Native SQL from a consistent committed read transaction; not byte-identical SQLite",
-  "sqlite_version": "3.53.1",
-  "sql_sha256": "071ead7c2855dc57b35546ff0515c79039899eae12b921f60584232f858cb496"
-}

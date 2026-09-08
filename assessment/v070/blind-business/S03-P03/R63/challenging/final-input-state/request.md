@@ -1,3 +1,0 @@
-I’m Theo. Amira is about to leave, and I’m worried we walked away with different jobs in mind. The available conversation is in /workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U034/input/handover.txt, and my bench note is in /workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U034/input/bench-note.txt. Help me decide what I can rely on and what to say next before she goes. Also tell me how to leave things if she goes without another reply. I need conversational help, not a form.
-
-This is a fictional local exercise. The supplied excerpt is all the conversation available; there are no offscreen replies to retrieve. Do not send messages or perform any kit work or dispatch.

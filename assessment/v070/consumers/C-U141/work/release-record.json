@@ -1,8 +1,0 @@
-{
-  "request_id": "dev-linden-42-apply",
-  "target_environment": "development-linden",
-  "state_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U141/input/state.json",
-  "candidate_id": "rel-linden-42",
-  "digest": "linden42-content-7f3a91",
-  "qualification_sequence": 103
-}

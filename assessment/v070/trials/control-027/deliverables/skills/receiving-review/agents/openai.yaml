@@ -1,6 +1,0 @@
-interface:
-  display_name: "Receiving review"
-  short_description: "Review receipt evidence and draft follow-ups"
-  default_prompt: "Use $receiving-review to review this month's supplied receiving evidence and draft the required follow-ups."
-policy:
-  allow_implicit_invocation: true

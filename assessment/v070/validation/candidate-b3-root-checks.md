@@ -1,9 +1,0 @@
-# Candidate B3 root checks
-
-The root read the complete English/Japanese Skill pair, both design Skills, PF, work-system principles and the full task-owned diff. The candidate retains B2's target-core authoring clarification and adds one sentence per language to the existing evaluation Task. Both sentences refer to existing guidance and preserve the work as the review subject. No source definitions, own Purpose/Outcomes, templates, example, manifest, version, code or test changed.
-
-`python3 -m unittest discover -s tests -v` passed all nine product tests; `git diff --check` exited 0; pinned `skills-ref validate skills/design-agent-work-system` passed. The validator uses agentskills/agentskills commit f130f348f502d9804278a617f86929846896d2e9 with the existing local validation environment. These checks establish their limited format/repository/component scope, not target-generation effectiveness. Unchanged distributed-Skill form had passed in the preceding source check.
-
-`freeze_candidate.py B3` recorded the full 70-file/link candidate, mode-aware hashes and exact two-file patch. The first attempted two-language patch failed because the expected Japanese line did not match; inspection confirmed neither English nor Japanese changed. The actual complete Japanese source was read and the corrected exact patch applied successfully before freezing. No partial source edit was accepted or tested as the candidate.
-
-Independent semantic/locale/reference review is complete and read: no blocker, all 70 entries/modes and 20 local-link occurrences match, two fragments verified. Root compared the reported EN/JA digests with the frozen manifest; both match. The reviewer reports an initial filename-only scope lapse without trial-content reads. No B3 creator or main comparison has started at this update. Actual native Host sessions and final whole-package checks remain outside this source-draft check.

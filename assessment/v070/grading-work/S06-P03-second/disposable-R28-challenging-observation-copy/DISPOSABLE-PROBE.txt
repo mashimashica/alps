@@ -1,1 +1,0 @@
-Byte copy of the recorded workflow checkpoint, inspected read-only; never used to execute the helper or API.

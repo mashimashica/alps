@@ -1,3 +1,0 @@
-“Thanks—I've got it. I’ll pack Cove with its charger, test Heron’s spare hub by 15:00 and pack Heron only if it passes. Jules will give me both labels by 15:05; I’ll attach them and take the complete kits to south reception by 15:50 for the 16:10 courier. If Heron’s hub fails, I’ll hold Heron and call you before 15:25; Cove can still go if it’s complete.”
-
-Nothing important needs settling before Rosa leaves: Rosa confirmed that read-back, and Jules confirmed the labels. The only open issue is conditional—if Heron’s hub fails, Rosa must decide whether to approve any exception; until then, Heron stays put.

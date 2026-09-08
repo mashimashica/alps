@@ -1,7 +1,0 @@
-{
-  "slots": [
-    {"slot_id": "linocut-sun-am", "starts_at": "2026-11-22T09:00:00Z", "capacity": 5},
-    {"slot_id": "linocut-sun-pm", "starts_at": "2026-11-22T14:00:00Z", "capacity": 6},
-    {"slot_id": "stencil-demo-mon", "starts_at": "2026-11-23T10:30:00Z", "capacity": 2}
-  ]
-}

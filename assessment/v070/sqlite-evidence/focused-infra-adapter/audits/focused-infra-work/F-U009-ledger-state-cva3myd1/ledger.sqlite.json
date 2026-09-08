@@ -1,8 +1,0 @@
-{
-  "source_path": "audits/focused-infra-work/F-U009-ledger-state-cva3myd1/ledger.sqlite",
-  "source_sha256": "24627c1f59ddeb6d8239cc4047d0ea32477b15fc77f84baf2059ab000a28035d",
-  "sql_path": "sqlite-evidence/focused-infra-adapter/audits/focused-infra-work/F-U009-ledger-state-cva3myd1/ledger.sqlite.sql",
-  "sql_sha256": "1206581aaa26d95a4831a91f82dd1b59f06cfc56195294559db2af8192f63204",
-  "sqlite_version": "3.53.1",
-  "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history"
-}

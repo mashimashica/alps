@@ -1,8 +1,0 @@
-{
-  "consumer_id": "F-U009",
-  "state_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/audits/focused-infra-work/F-U009-ledger-state-cva3myd1/ledger.sqlite",
-  "snapshot": "initial",
-  "sqlite_version": "3.53.1",
-  "sql_sha256": "1206581aaa26d95a4831a91f82dd1b59f06cfc56195294559db2af8192f63204",
-  "representation": "Native SQL from a consistent committed read transaction; not byte-identical SQLite"
-}

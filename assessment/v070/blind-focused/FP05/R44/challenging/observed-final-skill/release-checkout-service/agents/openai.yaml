@@ -1,4 +1,0 @@
-interface:
-  display_name: "Release Checkout Service"
-  short_description: "Qualify, promote, and verify checkout releases"
-  default_prompt: "Use $release-checkout-service to assess and carry out this synthetic checkout-service release for the exact candidate and environment I provide."

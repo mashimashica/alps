@@ -1,6 +1,0 @@
-interface:
-  display_name: "Agent Work System Design"
-  short_description: "Design how agents and tools realize work"
-  icon_small: "./assets/alps.svg"
-  icon_large: "./assets/alps.svg"
-  default_prompt: "Use $design-agent-work-system to design the capabilities, interfaces, and evaluation needed for this work."

@@ -1,9 +1,0 @@
-trial_id	case	arm	repetition	model	effort	execution	agent	start_recorded_utc	end_recorded_utc
-dev2-001	S05	B2	1	gpt-5.6-luna	low	completed; not graded	/root/dev2_create_001	2026-09-07T16:23:11.499653+00:00	2026-09-07T16:24:38.890955+00:00
-dev2-002	S05	A	1	gpt-5.6-luna	low	completed; not graded	/root/dev2_create_002	2026-09-07T16:23:11.915229+00:00	2026-09-07T16:25:28.318987+00:00
-dev2-003	S10	A	1	gpt-5.6-luna	low	completed; not graded	/root/dev2_create_003	2026-09-07T16:23:12.336528+00:00	2026-09-07T16:24:39.316899+00:00
-dev2-004	S10	B2	1	gpt-5.6-luna	low	completed; not graded	/root/dev2_create_004	2026-09-07T16:23:12.752759+00:00	2026-09-07T16:24:39.735502+00:00
-dev2-005	S05	A	2	gpt-5.6-luna	low	completed; not graded	/root/dev2_create_005	2026-09-07T16:23:13.174426+00:00	2026-09-07T16:25:28.749443+00:00
-dev2-006	S05	B2	2	gpt-5.6-luna	low	completed; not graded	/root/dev2_create_006	2026-09-07T16:23:13.597034+00:00	2026-09-07T16:25:29.171918+00:00
-dev2-007	S10	B2	2	gpt-5.6-luna	low	completed; not graded	/root/dev2_create_007	2026-09-07T16:24:40.154517+00:00	2026-09-07T16:26:49.556008+00:00
-dev2-008	S10	A	2	gpt-5.6-luna	low	completed; not graded	/root/dev2_create_008	2026-09-07T16:24:40.587908+00:00	2026-09-07T16:26:49.973358+00:00

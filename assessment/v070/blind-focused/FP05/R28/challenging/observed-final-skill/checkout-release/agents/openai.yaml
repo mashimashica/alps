@@ -1,4 +1,0 @@
-interface:
-  display_name: "Checkout Release"
-  short_description: "Safely qualify, promote, and verify checkout"
-  default_prompt: "Use $checkout-release to assess or release the exact checkout candidate in the supplied synthetic environment."

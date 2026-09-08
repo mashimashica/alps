@@ -1,1 +1,0 @@
-receiving_review: error: orders[0]: supplier_contact must be a non-empty string

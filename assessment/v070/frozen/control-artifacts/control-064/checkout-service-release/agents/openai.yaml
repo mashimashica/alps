@@ -1,7 +1,0 @@
-interface:
-  display_name: "Checkout Service Release"
-  short_description: "Release and verify an approved checkout candidate"
-  default_prompt: "Use $checkout-service-release to assess and, when authorized, release an exact checkout-service candidate."
-
-policy:
-  allow_implicit_invocation: true

@@ -1,9 +1,0 @@
-trial_id	case	arm	repetition	model	effort	execution	agent
-dev1-001	S10	A	1	gpt-5.6-luna	low	completed; not graded	/root/dev1_001
-dev1-002	S10	B1	1	gpt-5.6-luna	low	completed; not graded	/root/dev1_002
-dev1-003	S10	B1	2	gpt-5.6-luna	low	completed; not graded	/root/dev1_003
-dev1-004	S10	A	2	gpt-5.6-luna	low	completed; not graded	/root/dev1_004
-dev1-005	S08	A	1	gpt-5.6-luna	low	completed; not graded	/root/dev1_005
-dev1-006	S08	B1	1	gpt-5.6-luna	low	completed; not graded	/root/dev1_006
-dev1-007	S05	B1	1	gpt-5.6-luna	low	completed; not graded	/root/dev1_007
-dev1-008	S05	A	1	gpt-5.6-luna	low	completed; not graded	/root/dev1_008

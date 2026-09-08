@@ -1,6 +1,0 @@
-event_id,site_id,shipment_id,sku,lot_id,quantity,condition,state
-E-201, north ,demo-201,00017,lot-a,11,good,posted
-E-202,NORTH,DEMO-201,00017,LOT-A,-1,good,posted
-E-203,NORTH,DEMO-202,00024,LOT-B,8,good,posted
-E-204,NORTH,DEMO-202,00024,LOT-B,1,damaged,posted
-E-205,NORTH,DEMO-202,00024,LOT-B,-1,damaged,pending

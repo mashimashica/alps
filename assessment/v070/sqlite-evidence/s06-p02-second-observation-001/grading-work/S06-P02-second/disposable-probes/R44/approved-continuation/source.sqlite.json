@@ -1,8 +1,0 @@
-{
-  "source_path": "grading-work/S06-P02-second/disposable-probes/R44/approved-continuation/source.sqlite",
-  "source_sha256": "60b3b6a17714106fbe86bed9cbdb072fa902239193a00ba0b4d5db4f3e8f3f1a",
-  "sql_path": "sqlite-evidence/s06-p02-second-observation-001/grading-work/S06-P02-second/disposable-probes/R44/approved-continuation/source.sqlite.sql",
-  "sql_sha256": "9a5b4bede86bf144f4eb1b7b9d656a510d7d7622362fdac71c9f6ee1dced735b",
-  "sqlite_version": "3.53.1",
-  "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history"
-}

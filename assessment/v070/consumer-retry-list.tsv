@@ -1,3 +1,0 @@
-consumer_id	original_slot	creator_id	case	variant	model	effort	execution	agent	start_recorded_utc	end_recorded_utc
-D2-U012-R1	D2-U012	dev2-006	S05	challenging	gpt-5.6-sol	high	completed; first valid attempt; not graded	/root/dev2_use_012_r1	2026-09-07T16:54:11.541069+00:00	2026-09-07T16:59:18.722441+00:00
-D2-U014-R1	D2-U014	dev2-007	S10	challenging	gpt-5.6-sol	high	completed; first valid attempt; not graded	/root/dev2_use_014_r1	2026-09-07T16:54:11.969695+00:00	2026-09-07T16:57:38.094905+00:00
