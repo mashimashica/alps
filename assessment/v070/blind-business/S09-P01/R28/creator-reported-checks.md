@@ -1,0 +1,3 @@
+# Execution note
+
+Used the supplied brief, source packet, common format orientation, and frozen skill-creator guidance. Created the reusable skill, decision memo, and local reproduction script. `python deliverables/reproduce_decision.py` exited 0 and reproduced the aggregate rates and $18,720/$10,827 scenario arithmetic. `python ../../frozen/skill-creator/scripts/quick_validate.py deliverables/skills/operational-intervention-decision` exited 0 (`Skill is valid!`). Initial checks before creation exited 2 and 1 respectively; those were superseded by the successful rerun. No external actions were performed.

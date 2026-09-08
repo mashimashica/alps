@@ -1,0 +1,11 @@
+# Cedar Quay measurement notes — snapshot 2026-08-03, 09:00 UTC
+
+All records are synthetic. Dates are UTC shipment dates. Standard orders contain one unit and a standard accessory set; complex orders contain multiple units or a customer-specific accessory configuration. Definitions and crews were unchanged throughout these observations.
+
+`shipment_cohorts.csv` contains mutually exclusive date/line/order-band cohorts. `shipped_orders` includes every dispatched order. `mature_orders` counts orders whose complete seven-calendar-day customer observation window has elapsed at extraction. Cohorts mature together; all mature orders have deliverable contact addresses, and no selective exclusion occurred. `confirmed_mispack_7d` is the number of distinct mature orders with a customer-confirmed wrong or missing packed item reported within that window. Multiple issues on an order count once; repaired-equipment faults are excluded. The customer reporting process and this measure did not change.
+
+July 31 cohorts are immature: their zero mature counts and outcome counts mean the window is unavailable, not that no customer errors occurred. `station_catches` counts package-content issues resolved before dispatch. Every catch was required to be logged throughout both periods and lines. These are process observations, not additional downstream mispacks; do not combine the two into an error rate.
+
+`shift_operations.csv` has one row per date and whole line, not per band. `productive_labor_hours` includes all paid hours assigned to these shipments, including overtime and training, and excludes lunch and unrelated maintenance. `overtime_hours` and `training_hours` are subsets of productive hours. Routine checking is already in productive hours. Only Harbor's three hours on July 20 are one-off introductory training. Joining the operations row to both bands must not duplicate hours.
+
+`late_dispatch_orders` counts distinct shipped orders missing the promised carrier loading cutoff. This is immediately observable, including on July 31; it requires no customer maturity window. There are no missing rows. July 6–8 and July 20–22 are ordinary full shifts. July 31 was a deliberately shorter 320-order shift, not a full-shift capacity test.

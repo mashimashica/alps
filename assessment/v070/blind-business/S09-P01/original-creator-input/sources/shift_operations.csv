@@ -1,0 +1,15 @@
+shipment_date,period,line,productive_labor_hours,overtime_hours,training_hours,late_dispatch_orders
+2026-06-01,baseline,East,68,2,0,5
+2026-06-01,baseline,West,68,2,0,6
+2026-06-02,baseline,East,69,3,0,6
+2026-06-02,baseline,West,68,2,0,6
+2026-06-03,baseline,East,70,4,0,4
+2026-06-03,baseline,West,69,3,0,5
+2026-06-15,pilot,East,82,10,4,18
+2026-06-15,pilot,West,70,4,0,8
+2026-06-16,pilot,East,78,8,0,21
+2026-06-16,pilot,West,70,4,0,7
+2026-06-17,pilot,East,78,8,0,20
+2026-06-17,pilot,West,69,3,0,7
+2026-06-26,pilot,East,31,3,0,4
+2026-06-26,pilot,West,28,2,0,2

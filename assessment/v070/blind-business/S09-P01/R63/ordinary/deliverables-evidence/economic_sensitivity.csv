@@ -1,0 +1,7 @@
+effect_scenario,benefit_per_order,incremental_hours_per_shift,avoided_outcomes,quality_value_usd,labor_cost_usd,net_value_usd,break_even_benefit_per_order
+difference_in_differences_lower_95,0.00072102,3.0,11.54,553.74,1920.0,-1366.26,0.0025
+difference_in_differences_lower_95,0.00072102,6.0,11.54,553.74,3840.0,-3286.26,0.005
+contemporaneous_lower_95,0.00487564,3.0,78.01,3744.49,1920.0,1824.49,0.0025
+contemporaneous_lower_95,0.00487564,6.0,78.01,3744.49,3840.0,-95.51,0.005
+observed_point_estimate,0.0125,3.0,200.0,9600.0,1920.0,7680.0,0.0025
+observed_point_estimate,0.0125,6.0,200.0,9600.0,3840.0,5760.0,0.005

@@ -9,7 +9,7 @@ Frozen current main A is dee3866d35e43db5db480fc9f85166a8dcb1ec3b, VERSION 0.7.0
 | Stage | Completed design | Completed consumer | Other completed | Planned task trials |
 | --- | ---: | ---: | ---: | ---: |
 | Calibration | 12 | 24 | 0 | 36 |
-| C control | 72 | 109 | 0 | 216 |
+| C control | 72 | 123 | 0 | 216 |
 | Remaining base plan | 0 | 0 | 0 | up to 1,776 |
 
 Additional diagnostic reserve: at most 72 starts across at most three rounds. H01–H03 used 68 starts: 66 complete and two retained interrupted originals. Four slots remain, but do not authorize a fourth ordinary round. Across calibration/development, 34 creators and 68 valid consumers are complete. Completed tasks, observation validity, business adequacy and achieved Outcomes are different counts.
@@ -24,13 +24,11 @@ Additional diagnostic reserve: at most 72 starts across at most three rounds. H0
 
 ## Work in progress
 
-All 72 C creators and consumers C-U001–109 explicitly completed: C181/216, with 35 fixed consumer slots left. All 144 consumer packets are prepared. Current task-execution ratio is 283/max2,100 (13.5%); this is not grading, improvement or PR completion. Recovery and grading add no task trial. See RESUME.md for the current preservation boundary, approved helper identities and next assignments.
+All 72 C creators and consumers C-U001–123 explicitly completed: C195/216, with 21 fixed consumer slots left. All 144 consumer packets are prepared. The task-execution count is297/max2,100 (14.1%), separate from grading, accepted improvement or PR delivery. The two interrupted development originals are retained separately.
 
-Twenty-one C grading reports completed. S01, S03 and S05 are closed; S06-P02 is adjudicated in audits/control-S06-P02-adjudication.md. S06-P01 primary/second and P03 primary completed, with root reading and reconciliation in progress. The P03 consequential-defect finding requires an independent second assessment against the unchanged packet. S09/S10 business grading has not started.
+Twenty-two C grading reports are complete/read. S01, S03, S05 and S06 are closed. S06 has23 adequate and1 bounded inaccurate execution-note case under the full-deliverable criterion, all12 complete ordinary results and12 correct but incomplete authorized challenge prefixes, and2 evidenced instruction-correction occurrences. Package defects and recovery limits remain separate in control-S06-closeout.md. All24 S09 consumers completed and all three fixed blind packets are prepared for their first verified save before grading. S10 consumers124–144 remain unstarted at this observation.
 
-The environment is connected. Original C094–096 contexts resumed only after reviewed new-path bindings and exact initial SQL were saved, and now completed with actual final observations. All 11 actual SQLite sources from the three newly completed graders were preserved after their explicit database-work completion notifications; audits/s06-p01-p03-review-sql-observation.json records the commands. These are component observations, not additional consumers.
-
-Recovery provenance remains explicit: creator069–072 recovery-time checks/freezes are new observations, and missing original metadata remains missing. Consumer084–093 surviving originals, recovered text and matched-SQL supplements remain distinct. C092 final API state and C093 original workflow state remain unavailable; C092's request checkpoint has an independently reviewed exact-hash recovery. No successful original trial was rerun. The older filesystem and all candidate evidence remain preserved.
+The environment is connected and recovery is complete for available evidence. Original C094–096 contexts completed with actual new-path state captures; recovered text, matched SQL and missing original metadata retain explicit provenance. All newly completed grading databases are represented by verified native SQL. The reviewed F1/F2 helper correction is saved and was used to prepare S09 normally, with no generated-artifact edits, task replay or criterion change.
 
 ## Remaining decisions and verification limits
 

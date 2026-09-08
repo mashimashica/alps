@@ -1,0 +1,15 @@
+shipment_date,period,line,productive_labor_hours,overtime_hours,training_hours,late_dispatch_orders
+2026-08-03,baseline,Alder,80,0,0,6
+2026-08-03,baseline,Birch,78,0,0,5
+2026-08-04,baseline,Alder,82,2,0,8
+2026-08-04,baseline,Birch,80,0,0,6
+2026-08-05,baseline,Alder,84,4,0,7
+2026-08-05,baseline,Birch,82,2,0,7
+2026-08-17,pilot,Alder,95,14,5,14
+2026-08-17,pilot,Birch,82,2,0,6
+2026-08-18,pilot,Alder,90,10,0,14
+2026-08-18,pilot,Birch,82,2,0,6
+2026-08-19,pilot,Alder,90,10,0,14
+2026-08-19,pilot,Birch,82,2,0,6
+2026-08-28,pilot,Alder,36,0,0,0
+2026-08-28,pilot,Birch,34,0,0,0

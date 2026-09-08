@@ -1,0 +1,15 @@
+shipment_date,period,line,productive_labor_hours,overtime_hours,training_hours,late_dispatch_orders
+2026-07-06,baseline,Harbor,62,2,0,5
+2026-07-06,baseline,Ridge,62,2,0,5
+2026-07-07,baseline,Harbor,63,3,0,4
+2026-07-07,baseline,Ridge,61,1,0,5
+2026-07-08,baseline,Harbor,61,1,0,5
+2026-07-08,baseline,Ridge,63,3,0,4
+2026-07-20,pilot,Harbor,68,5,3,4
+2026-07-20,pilot,Ridge,62,2,0,4
+2026-07-21,pilot,Harbor,65,5,0,5
+2026-07-21,pilot,Ridge,62,2,0,4
+2026-07-22,pilot,Harbor,65,5,0,4
+2026-07-22,pilot,Ridge,62,2,0,5
+2026-07-31,pilot,Harbor,27,1,0,2
+2026-07-31,pilot,Ridge,26,0,0,1

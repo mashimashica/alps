@@ -1,0 +1,210 @@
+{
+  "inputs": {
+    "cohort_file": "input/sources/shipment_cohorts.csv",
+    "operations_file": "input/sources/shift_operations.csv",
+    "target_mix": {
+      "standard": 0.7,
+      "complex": 0.3
+    },
+    "forecast_orders_per_line_shift": 1440,
+    "forecast_shifts": 20,
+    "productive_hours_cap_per_line_shift": 102,
+    "avoidable_cost_per_mispack_usd": 55,
+    "additional_labor_hour_usd": 34
+  },
+  "validation": {
+    "cohort_rows": 28,
+    "operation_rows": 14,
+    "unique_cohort_keys": 28,
+    "unique_operation_keys": 14,
+    "shipment_operation_keys_reconciled": true,
+    "two_bands_per_shift": true,
+    "immature_rows": 4,
+    "full_shift_operation_rows": 12,
+    "short_shift_operation_rows": 2
+  },
+  "quality": {
+    "stratum_rates": {
+      "baseline_alder": {
+        "standard": 0.02,
+        "complex": 0.06
+      },
+      "baseline_birch": {
+        "standard": 0.02,
+        "complex": 0.04
+      },
+      "pilot_alder": {
+        "standard": 0.01,
+        "complex": 0.1
+      },
+      "pilot_birch": {
+        "standard": 0.01,
+        "complex": 0.06
+      }
+    },
+    "stratum_counts": {
+      "baseline_alder": {
+        "standard": {
+          "mature": 2100,
+          "errors": 42
+        },
+        "complex": {
+          "mature": 1500,
+          "errors": 90
+        }
+      },
+      "baseline_birch": {
+        "standard": {
+          "mature": 2100,
+          "errors": 42
+        },
+        "complex": {
+          "mature": 1500,
+          "errors": 60
+        }
+      },
+      "pilot_alder": {
+        "standard": {
+          "mature": 3300,
+          "errors": 33
+        },
+        "complex": {
+          "mature": 300,
+          "errors": 30
+        }
+      },
+      "pilot_birch": {
+        "standard": {
+          "mature": 3300,
+          "errors": 33
+        },
+        "complex": {
+          "mature": 300,
+          "errors": 18
+        }
+      }
+    },
+    "raw_mature_rates": {
+      "baseline_alder": 0.03666666666666667,
+      "baseline_birch": 0.028333333333333332,
+      "pilot_alder": 0.0175,
+      "pilot_birch": 0.014166666666666666
+    },
+    "shipped_workload_shares": {
+      "baseline_alder": {
+        "standard": 0.5833333333333334,
+        "complex": 0.4166666666666667
+      },
+      "baseline_birch": {
+        "standard": 0.5833333333333334,
+        "complex": 0.4166666666666667
+      },
+      "pilot_alder": {
+        "standard": 0.9214285714285714,
+        "complex": 0.07857142857142857
+      },
+      "pilot_birch": {
+        "standard": 0.9214285714285714,
+        "complex": 0.07857142857142857
+      }
+    },
+    "mature_workload_shares": {
+      "baseline_alder": {
+        "standard": 0.5833333333333334,
+        "complex": 0.4166666666666667
+      },
+      "baseline_birch": {
+        "standard": 0.5833333333333334,
+        "complex": 0.4166666666666667
+      },
+      "pilot_alder": {
+        "standard": 0.9166666666666666,
+        "complex": 0.08333333333333333
+      },
+      "pilot_birch": {
+        "standard": 0.9166666666666666,
+        "complex": 0.08333333333333333
+      }
+    },
+    "target_mix_standardized_rates": {
+      "baseline_alder": 0.032,
+      "baseline_birch": 0.026,
+      "pilot_alder": 0.037,
+      "pilot_birch": 0.024999999999999998
+    },
+    "adjusted_improvement_check_minus_no_check": -0.005999999999999998,
+    "planning_no_check_alder_rate_parallel_change": 0.031
+  },
+  "full_shift_operations": {
+    "baseline_alder": {
+      "shifts": 3,
+      "shipped": 3600,
+      "productive_hours": 246,
+      "overtime_hours": 6,
+      "training_hours": 0,
+      "recurring_hours": 246,
+      "recurring_hours_per_order": 0.06833333333333333,
+      "orders_per_recurring_hour": 14.634146341463415,
+      "late_orders": 21,
+      "late_rate": 0.005833333333333334
+    },
+    "baseline_birch": {
+      "shifts": 3,
+      "shipped": 3600,
+      "productive_hours": 240,
+      "overtime_hours": 2,
+      "training_hours": 0,
+      "recurring_hours": 240,
+      "recurring_hours_per_order": 0.06666666666666667,
+      "orders_per_recurring_hour": 15.0,
+      "late_orders": 18,
+      "late_rate": 0.005
+    },
+    "pilot_alder": {
+      "shifts": 3,
+      "shipped": 3600,
+      "productive_hours": 275,
+      "overtime_hours": 34,
+      "training_hours": 5,
+      "recurring_hours": 270,
+      "recurring_hours_per_order": 0.075,
+      "orders_per_recurring_hour": 13.333333333333334,
+      "late_orders": 42,
+      "late_rate": 0.011666666666666667
+    },
+    "pilot_birch": {
+      "shifts": 3,
+      "shipped": 3600,
+      "productive_hours": 246,
+      "overtime_hours": 6,
+      "training_hours": 0,
+      "recurring_hours": 246,
+      "recurring_hours_per_order": 0.06833333333333333,
+      "orders_per_recurring_hour": 14.634146341463415,
+      "late_orders": 18,
+      "late_rate": 0.005
+    }
+  },
+  "capacity_scenarios": {
+    "checked_hours_per_order": 0.075,
+    "checked_hours_at_1440": 108.0,
+    "checked_orders_supported_at_102_hours": 1360.0,
+    "no_check_hours_per_order": 0.06833333333333333,
+    "no_check_hours_at_1440": 98.39999999999999,
+    "incremental_check_hours_at_1440": 9.600000000000009,
+    "checked_projected_late_orders_per_shift_at_observed_rate": 16.8,
+    "no_check_projected_late_orders_per_shift_at_alder_baseline_rate": 8.4,
+    "late_order_limit_per_shift": 14.4
+  },
+  "economics_check_vs_no_check_parallel_change_scenario": {
+    "forecast_alder_orders": 28800,
+    "expected_avoided_errors_from_check": -172.79999999999995,
+    "expected_added_errors_from_check": 172.79999999999995,
+    "expected_added_error_cost_usd": 9503.999999999998,
+    "recurring_incremental_check_hours": 192.00000000000017,
+    "recurring_incremental_labor_cost_usd": 6528.0000000000055,
+    "total_expected_disadvantage_usd": 16032.000000000004,
+    "quality_improvement_needed_to_offset_labor_cost": 0.0041212121212121245,
+    "one_off_pilot_training_hours_sunk": 5
+  }
+}

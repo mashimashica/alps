@@ -1,0 +1,218 @@
+{
+  "inputs": [
+    "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U119/input/sources/shipment_cohorts.csv",
+    "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U119/input/sources/shift_operations.csv"
+  ],
+  "inclusion": "Matched comparison uses ordinary full shifts 2026-07-06..08 and 2026-07-20..22. Delayed outcomes require mature_orders. 2026-07-31 is separate immediate context.",
+  "validation": "PASS: unique keys, two bands per line-date, cohort/operations reconciliation, nonnegative values, valid denominators, and labor-subset constraints.",
+  "category_full_shift": [
+    {
+      "period": "baseline",
+      "line": "Harbor",
+      "band": "complex",
+      "shipped": 600,
+      "mature": 600,
+      "mispack": 36,
+      "catches": 8,
+      "mispack_rate": 0.06,
+      "catch_rate_per_shipped": 0.013333333333333334
+    },
+    {
+      "period": "baseline",
+      "line": "Harbor",
+      "band": "standard",
+      "shipped": 1800,
+      "mature": 1800,
+      "mispack": 27,
+      "catches": 5,
+      "mispack_rate": 0.015,
+      "catch_rate_per_shipped": 0.002777777777777778
+    },
+    {
+      "period": "baseline",
+      "line": "Ridge",
+      "band": "complex",
+      "shipped": 600,
+      "mature": 600,
+      "mispack": 36,
+      "catches": 7,
+      "mispack_rate": 0.06,
+      "catch_rate_per_shipped": 0.011666666666666667
+    },
+    {
+      "period": "baseline",
+      "line": "Ridge",
+      "band": "standard",
+      "shipped": 1800,
+      "mature": 1800,
+      "mispack": 27,
+      "catches": 5,
+      "mispack_rate": 0.015,
+      "catch_rate_per_shipped": 0.002777777777777778
+    },
+    {
+      "period": "pilot",
+      "line": "Harbor",
+      "band": "complex",
+      "shipped": 600,
+      "mature": 600,
+      "mispack": 18,
+      "catches": 18,
+      "mispack_rate": 0.03,
+      "catch_rate_per_shipped": 0.03
+    },
+    {
+      "period": "pilot",
+      "line": "Harbor",
+      "band": "standard",
+      "shipped": 1800,
+      "mature": 1800,
+      "mispack": 12,
+      "catches": 20,
+      "mispack_rate": 0.006666666666666667,
+      "catch_rate_per_shipped": 0.011111111111111112
+    },
+    {
+      "period": "pilot",
+      "line": "Ridge",
+      "band": "complex",
+      "shipped": 600,
+      "mature": 600,
+      "mispack": 33,
+      "catches": 8,
+      "mispack_rate": 0.055,
+      "catch_rate_per_shipped": 0.013333333333333334
+    },
+    {
+      "period": "pilot",
+      "line": "Ridge",
+      "band": "standard",
+      "shipped": 1800,
+      "mature": 1800,
+      "mispack": 27,
+      "catches": 6,
+      "mispack_rate": 0.015,
+      "catch_rate_per_shipped": 0.0033333333333333335
+    }
+  ],
+  "line_period_full_shift": [
+    {
+      "period": "baseline",
+      "line": "Harbor",
+      "shipped": 2400,
+      "mature": 2400,
+      "mispack": 63,
+      "catches": 13,
+      "hours": 186.0,
+      "overtime": 6.0,
+      "training": 0.0,
+      "late": 14,
+      "mispack_rate": 0.02625,
+      "dispatch_rate": 0.005833333333333334,
+      "orders_per_paid_hour": 12.903225806451612,
+      "paid_hours_per_order": 0.0775,
+      "ongoing_hours_ex_training": 186.0,
+      "orders_per_ongoing_hour": 12.903225806451612,
+      "ongoing_hours_per_order": 0.0775
+    },
+    {
+      "period": "baseline",
+      "line": "Ridge",
+      "shipped": 2400,
+      "mature": 2400,
+      "mispack": 63,
+      "catches": 12,
+      "hours": 186.0,
+      "overtime": 6.0,
+      "training": 0.0,
+      "late": 14,
+      "mispack_rate": 0.02625,
+      "dispatch_rate": 0.005833333333333334,
+      "orders_per_paid_hour": 12.903225806451612,
+      "paid_hours_per_order": 0.0775,
+      "ongoing_hours_ex_training": 186.0,
+      "orders_per_ongoing_hour": 12.903225806451612,
+      "ongoing_hours_per_order": 0.0775
+    },
+    {
+      "period": "pilot",
+      "line": "Harbor",
+      "shipped": 2400,
+      "mature": 2400,
+      "mispack": 30,
+      "catches": 38,
+      "hours": 198.0,
+      "overtime": 15.0,
+      "training": 3.0,
+      "late": 13,
+      "mispack_rate": 0.0125,
+      "dispatch_rate": 0.005416666666666667,
+      "orders_per_paid_hour": 12.121212121212121,
+      "paid_hours_per_order": 0.0825,
+      "ongoing_hours_ex_training": 195.0,
+      "orders_per_ongoing_hour": 12.307692307692308,
+      "ongoing_hours_per_order": 0.08125
+    },
+    {
+      "period": "pilot",
+      "line": "Ridge",
+      "shipped": 2400,
+      "mature": 2400,
+      "mispack": 60,
+      "catches": 14,
+      "hours": 186.0,
+      "overtime": 6.0,
+      "training": 0.0,
+      "late": 13,
+      "mispack_rate": 0.025,
+      "dispatch_rate": 0.005416666666666667,
+      "orders_per_paid_hour": 12.903225806451612,
+      "paid_hours_per_order": 0.0775,
+      "ongoing_hours_ex_training": 186.0,
+      "orders_per_ongoing_hour": 12.903225806451612,
+      "ongoing_hours_per_order": 0.0775
+    }
+  ],
+  "standardized_rates_75_25": {
+    "baseline_Harbor": 0.02625,
+    "baseline_Ridge": 0.02625,
+    "pilot_Harbor": 0.0125,
+    "pilot_Ridge": 0.025
+  },
+  "harbor_change": -0.013749999999999998,
+  "ridge_change": -0.0012499999999999976,
+  "difference_in_changes": -0.0125,
+  "planning": {
+    "orders": 16000,
+    "counterfactual": "Harbor would have followed Ridge's concurrent standardized change from its own baseline.",
+    "projected_avoided_mispacks": 200.0,
+    "projected_avoided_cost": 9600.0,
+    "baseline_hours_per_shift": 62.0,
+    "pilot_ongoing_hours_per_shift": 65.0,
+    "incremental_hours_per_shift": 3.0,
+    "projected_incremental_hours": 60.0,
+    "projected_incremental_labor_cost": 1920.0,
+    "illustrative_net_cost_reduction": 7680.0,
+    "break_even_effect_rate": 0.0025,
+    "hour_limit_per_shift": 68.0,
+    "projected_hour_buffer": 3.0
+  },
+  "short_shift_2026_07_31": {
+    "Harbor": {
+      "shipped": 320,
+      "mature": 0,
+      "catches": 5,
+      "hours": 27.0,
+      "late": 2,
+      "dispatch_rate": 0.00625
+    },
+    "Ridge": {
+      "shipped": 320,
+      "mature": 0,
+      "catches": 2,
+      "hours": 26.0,
+      "late": 1,
+      "dispatch_rate": 0.003125
+    }
+  }
+}
