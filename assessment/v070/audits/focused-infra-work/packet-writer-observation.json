@@ -1,0 +1,27 @@
+{
+  "observed_utc": "2026-09-08T01:19:02.476388+00:00",
+  "scope": "One disposable low-level packet writer fixture, with two copied text sources and one generated scope file. No graded packet or business trial produced.",
+  "helper_sha256": "37c0d7c2f4771fee029e49bcfeeaeb19438a26f0aab801e1daf50e8a472eca9c",
+  "checks": [
+    {
+      "destination": "R17/evidence/fixed-identity.txt",
+      "sha256": "84dbf509cbe51525e6fecf1b110c2bde79f38a372c6b6a0545a7862cc727bb3c",
+      "mode": 292,
+      "bytes_and_modes_exact": true
+    },
+    {
+      "destination": "R17/evidence/orientation.md",
+      "sha256": "c39f8c9958cf226ae9a0f46c09b680b467968519a726f5ad56463f257ebcd8b0",
+      "mode": 420,
+      "bytes_and_modes_exact": true
+    }
+  ],
+  "rejections": {
+    "repeat_write": "Complete or partial preparation already exists; preserve it: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/audits/focused-infra-work/packet-writer/blind-focused/FP01",
+    "partial_destination": "Complete or partial preparation already exists; preserve it: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/audits/focused-infra-work/packet-writer/blind-focused/FP02",
+    "actual_incomplete_packet_preflight": "Coordinator-confirmed creator completion required: focus-002"
+  },
+  "source_and_destination_readback": true,
+  "new_native_sqlite_created": false,
+  "actual_packet_written": false
+}

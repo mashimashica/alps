@@ -1,0 +1,49 @@
+{
+  "observed_utc": "2026-09-08T01:16:21.784474+00:00",
+  "scope": "One disposable infrastructure setup/snapshot probe; zero page/grant calls, target Skills or business trials. No real task state touched.",
+  "probe_helper_sha256": "c7765c2664a1f1fadf13dbc4f5ccfbd0d145ec008eabd1b48f3943168eafabaf",
+  "source_copy_identities": {
+    "prepare_focused.py": {
+      "sha256": "c7765c2664a1f1fadf13dbc4f5ccfbd0d145ec008eabd1b48f3943168eafabaf",
+      "mode": 420
+    },
+    "frozen/main-cases/S06/ledger_api.py": {
+      "sha256": "4622ec041dcfe8057aed319bc0ad168f24aebf4520a68c2961cdf046483315f3",
+      "mode": 420
+    },
+    "control-consumer-cases/S06/ordinary/fixture.json": {
+      "sha256": "202822ea97ff2b7850d3a06eb6b3770e18936a336c0e64725c9a3c7da2709f19",
+      "mode": 420
+    }
+  },
+  "source_and_copies_unchanged_after_probe": true,
+  "sqlite_version": "3.53.1",
+  "native_state_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/audits/focused-infra-work/F-U009-ledger-state-cva3myd1/ledger.sqlite",
+  "native_database_sha256": "24627c1f59ddeb6d8239cc4047d0ea32477b15fc77f84baf2059ab000a28035d",
+  "native_database_byte_unchanged_by_snapshot_checks": true,
+  "setup_record": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/audits/focused-infra-work/assessment/consumer-setup/F-U009.json",
+  "native_source_state": [
+    [
+      "snap_c22e71aa06b43ab25395e0ce",
+      1,
+      0
+    ]
+  ],
+  "native_record_count": 6,
+  "quick_check": [
+    [
+      "ok"
+    ]
+  ],
+  "initial_equals_final_sql": true,
+  "sql_sha256": "1206581aaa26d95a4831a91f82dd1b59f06cfc56195294559db2af8192f63204",
+  "native_sql_restores_same_logical_state_in_memory": true,
+  "negative_checks": {
+    "noncompleted_creator_boundary": "Coordinator-confirmed creator completion required: focus-005",
+    "noncompleted_consumer_boundary": "Coordinator-confirmed focused S06 consumer completion required: F-U009",
+    "repeated_native_setup": "Complete or partial preparation already exists; preserve it: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/audits/focused-infra-work/assessment/consumer-setup/F-U009.json",
+    "wrong_consumer_snapshot_binding": "Native state does not match this focused consumer's verified allocation",
+    "repeated_final_snapshot": "Complete or partial preparation already exists; preserve it: /workspace/scratch/a75c3a6d9076/alps-v070-assessment/audits/focused-infra-work/assessment/state-snapshots/F-U009/final.sql"
+  },
+  "preservation": "Native SQLite retained in place; initial/final readonly SQL and metadata recorded; coordinator must register explicit preservation before checkpoint."
+}

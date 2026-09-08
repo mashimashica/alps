@@ -1,12 +1,12 @@
 consumer_id	creator_id	stage	case	variant	model	effort	paired_consumer_id	execution	agent
-F-U001	focus-001	focused	S03	ordinary	gpt-5.6-sol	high	C-U037	not prepared	
-F-U002	focus-001	focused	S03	challenging	gpt-5.6-sol	high	C-U038	not prepared	
-F-U003	focus-002	focused	S03	ordinary	gpt-5.6-sol	high	C-U039	not prepared	
-F-U004	focus-002	focused	S03	challenging	gpt-5.6-sol	high	C-U040	not prepared	
-F-U005	focus-003	focused	S03	ordinary	gpt-5.6-sol	high	C-U045	not prepared	
-F-U006	focus-003	focused	S03	challenging	gpt-5.6-sol	high	C-U046	not prepared	
-F-U007	focus-004	focused	S03	ordinary	gpt-5.6-sol	high	C-U047	not prepared	
-F-U008	focus-004	focused	S03	challenging	gpt-5.6-sol	high	C-U048	not prepared	
+F-U001	focus-001	focused	S03	ordinary	gpt-5.6-sol	high	C-U037	prepared	
+F-U002	focus-001	focused	S03	challenging	gpt-5.6-sol	high	C-U038	prepared	
+F-U003	focus-002	focused	S03	ordinary	gpt-5.6-sol	high	C-U039	prepared	
+F-U004	focus-002	focused	S03	challenging	gpt-5.6-sol	high	C-U040	prepared	
+F-U005	focus-003	focused	S03	ordinary	gpt-5.6-sol	high	C-U045	prepared	
+F-U006	focus-003	focused	S03	challenging	gpt-5.6-sol	high	C-U046	prepared	
+F-U007	focus-004	focused	S03	ordinary	gpt-5.6-sol	high	C-U047	prepared	
+F-U008	focus-004	focused	S03	challenging	gpt-5.6-sol	high	C-U048	prepared	
 F-U009	focus-005	focused	S06	ordinary	gpt-5.6-sol	high	C-U085	not prepared	
 F-U010	focus-005	focused	S06	challenging	gpt-5.6-sol	high	C-U086	not prepared	
 F-U011	focus-006	focused	S06	ordinary	gpt-5.6-sol	high	C-U087	not prepared	

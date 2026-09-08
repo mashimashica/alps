@@ -1,4 +1,14 @@
 {
+  "audits/focused-infra-work/F-U009-ledger-state-cva3myd1/ledger.sqlite": {
+    "metadata_path": "sqlite-evidence/focused-infra-adapter/audits/focused-infra-work/F-U009-ledger-state-cva3myd1/ledger.sqlite.json",
+    "metadata_sha256": "2e14e8fea9b9ab0d109f282a24cf2c7e2bf19a339f4db7bb07d64aa418dbd3d6",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "audits/focused-infra-work/F-U009-ledger-state-cva3myd1/ledger.sqlite",
+    "source_sha256": "24627c1f59ddeb6d8239cc4047d0ea32477b15fc77f84baf2059ab000a28035d",
+    "sql_path": "sqlite-evidence/focused-infra-adapter/audits/focused-infra-work/F-U009-ledger-state-cva3myd1/ledger.sqlite.sql",
+    "sql_sha256": "1206581aaa26d95a4831a91f82dd1b59f06cfc56195294559db2af8192f63204",
+    "sqlite_version": "3.53.1"
+  },
   "blind-business/S06-P03/R28/challenging/work-evidence/rollup-checkpoint.sqlite": {
     "metadata_path": "sqlite-evidence/prepared-recovery-grading/blind-business/S06-P03/R28/challenging/work-evidence/rollup-checkpoint.sqlite.json",
     "metadata_sha256": "29f7f1dc62d8c67aad79e9b006587d656198d14a5df28fdadd3f06d732a7c017",

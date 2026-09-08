@@ -1,0 +1,24 @@
+{
+  "file_sha256": {
+    "SKILL.md": "0ce738e9234c0759acc05be9b7e2bcdfabb9c80606ece5910c62806db7bbab33"
+  },
+  "source_file_modes": {
+    "SKILL.md": 420
+  },
+  "excluded_runtime_cache_sha256": {},
+  "creator_input_added_runtime_cache_sha256": {},
+  "public_completion_evidence_sha256": {
+    "trials/focus-003/execution-note.md": "d457b157a891b4801ec8e0ab81132eefe80db8c5218431577c3902c136227659",
+    "focused-public/focus-003/final-response.md": "8ad6224e03faa7a8c5cdca264cdda0f3c72094e2fe282ffbd1b7ee9a1cbe7e4d"
+  },
+  "creator_id": "focus-003",
+  "source_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/trials/focus-003/deliverables/skills/establish-handover-understanding",
+  "frozen_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/focused-artifacts/focus-003/establish-handover-understanding",
+  "paired_control_id": "control-023",
+  "cache_handling": "Regular *.pyc directly inside __pycache__ remain in their original folders; their hashes are recorded but those bytes are omitted from frozen/copied resources and durable checkpointing. No non-cache resource is silently discarded.",
+  "schedule_sha256": "9a912fe9ce9a1bc293f72330b3490554f035fbdc7fc418dcb2f2feb3d8107605",
+  "case_bank_manifest_sha256": "f26be07f6cfba54aedc3068a67ae32292877f6ee005f0c190156f5786d1cbdc2",
+  "source_identities_sha256": "efd12e1f239b4554bf71158aa47cc3d13279caea64ce2c9eb892320c86ffde71",
+  "physical_validation_sha256": "b9f4827be15edf8ae291e409549887bc20bddad35c15d0d6ad5bec58b58a5129",
+  "scope": "Resource identity; no quality judgment"
+}
