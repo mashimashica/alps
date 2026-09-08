@@ -1,0 +1,25 @@
+{
+  "trial_id": "focus-010",
+  "stage": "focused",
+  "case": "S10",
+  "arm": "A",
+  "repetition": 2,
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "high",
+  "context": "fresh",
+  "paired_control_id": "control-068",
+  "input_sha256": {
+    "input/brief.md": "284eab48172c8b996d5eb3218590fb453c1e24f5b532f9d4457bda99fb38485e",
+    "input/release_tool.py": "939931810a40d9f813280ea46c95fec2c4a1ed72368937353bf5c899b8217577"
+  },
+  "input_file_modes": {
+    "input/brief.md": 420,
+    "input/release_tool.py": 420
+  },
+  "prompt_sha256": "b981b201ba8d7a288a0977f586d830eb7319d7278f55b140c4d45df0b37bf083",
+  "original_control_assignment_sha256": "e30ddf536b59e972f86bd9e5e2272011251e2cf38ef2dcf8fe5f2b6a6de7f871",
+  "original_control_prompt_sha256": "afba534b1060ced18a2b0cb2af61f4f7a32ca3ed45a27d7ce9c8bd45c53d3b13",
+  "control_prompt_normalized_sha256": "5842bdcfd6d0b07fea93987b406c765f0ab31910742f2b046fbd2e87b355fa4d",
+  "added_alps_support": "Use the relevant guidance in /workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/alps/skills/design-process-description/SKILL.md and /workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/alps/skills/design-agent-work-system/SKILL.md, with their required sources, for the requested design subjects.",
+  "source_identities_sha256": "efd12e1f239b4554bf71158aa47cc3d13279caea64ce2c9eb892320c86ffde71"
+}

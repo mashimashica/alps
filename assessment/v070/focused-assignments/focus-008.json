@@ -1,0 +1,27 @@
+{
+  "trial_id": "focus-008",
+  "stage": "focused",
+  "case": "S06",
+  "arm": "A",
+  "repetition": 2,
+  "requested_model": "gpt-6-astra",
+  "requested_effort": "high",
+  "context": "fresh",
+  "paired_control_id": "control-048",
+  "input_sha256": {
+    "input/brief.md": "62f310f50ff7280749ada5871746d154005f82fc11aae85dff8bb31c5f7b1b1b",
+    "input/fixture.json": "d2ad6670cd561401486548b5702d1734ef280822a5651431461647a8710a675a",
+    "input/ledger_api.py": "4622ec041dcfe8057aed319bc0ad168f24aebf4520a68c2961cdf046483315f3"
+  },
+  "input_file_modes": {
+    "input/brief.md": 420,
+    "input/fixture.json": 420,
+    "input/ledger_api.py": 420
+  },
+  "prompt_sha256": "257d388fd987ef079ec866d2030113800ef888cba82213c583d2d0c67f274677",
+  "original_control_assignment_sha256": "d0327a18606122e16e772de79c3392ddf1ae33578246a298bd015b7100915062",
+  "original_control_prompt_sha256": "dbd2892b83ae417560c6b2d015cb6abb3d92ad4be9648270328730b5e16f1a45",
+  "control_prompt_normalized_sha256": "5842bdcfd6d0b07fea93987b406c765f0ab31910742f2b046fbd2e87b355fa4d",
+  "added_alps_support": "Use /workspace/scratch/a75c3a6d9076/alps-v070-assessment/frozen/alps/skills/design-agent-work-system/SKILL.md and its required sources.",
+  "source_identities_sha256": "efd12e1f239b4554bf71158aa47cc3d13279caea64ce2c9eb892320c86ffde71"
+}

@@ -5,7 +5,7 @@
   "environment_binding_evidence": "The user states that development-linden is represented only by this exact state.json path and supplies the adjacent release_tool.py command.",
   "candidate_id": "rel-linden-42",
   "requested_digest": null,
-  "observed_candidate_digest": null,
+  "observed_candidate_digest": "linden42-content-7f3a91",
   "request_id": "dev-linden-42-apply",
   "request_id_origin": "supplied by user",
   "authorization_evidence": "The request explicitly authorizes inspection, qualification, promotion, request-status, probe, checkout, and exact retries for this candidate and state file.",
