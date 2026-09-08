@@ -131,15 +131,15 @@ C-U129	control-065	control	S10	ordinary	gpt-5.6-sol	high	prepared
 C-U130	control-065	control	S10	challenging	gpt-5.6-sol	high	prepared			
 C-U131	control-066	control	S10	ordinary	gpt-5.6-sol	high	prepared			
 C-U132	control-066	control	S10	challenging	gpt-5.6-sol	high	prepared			
-C-U133	control-067	control	S10	ordinary	gpt-5.6-sol	high	prepared			
-C-U134	control-067	control	S10	challenging	gpt-5.6-sol	high	prepared			
-C-U135	control-068	control	S10	ordinary	gpt-5.6-sol	high	prepared			
-C-U136	control-068	control	S10	challenging	gpt-5.6-sol	high	prepared			
+C-U133	control-067	control	S10	ordinary	gpt-5.6-sol	high	completed	/root/focus_c133	2026-09-08T01:08:24.766999+00:00	2026-09-08T01:10:47.427730+00:00
+C-U134	control-067	control	S10	challenging	gpt-5.6-sol	high	completed	/root/focus_c134	2026-09-08T01:08:24.842578+00:00	2026-09-08T01:10:47.508580+00:00
+C-U135	control-068	control	S10	ordinary	gpt-5.6-sol	high	completed	/root/focus_c135	2026-09-08T01:08:24.922432+00:00	2026-09-08T01:10:47.597224+00:00
+C-U136	control-068	control	S10	challenging	gpt-5.6-sol	high	completed	/root/focus_c136	2026-09-08T01:08:25.000195+00:00	2026-09-08T01:10:47.673143+00:00
 C-U137	control-069	control	S10	ordinary	gpt-5.6-sol	high	prepared			
 C-U138	control-069	control	S10	challenging	gpt-5.6-sol	high	prepared			
 C-U139	control-070	control	S10	ordinary	gpt-5.6-sol	high	prepared			
 C-U140	control-070	control	S10	challenging	gpt-5.6-sol	high	prepared			
-C-U141	control-071	control	S10	ordinary	gpt-5.6-sol	high	prepared			
-C-U142	control-071	control	S10	challenging	gpt-5.6-sol	high	prepared			
-C-U143	control-072	control	S10	ordinary	gpt-5.6-sol	high	prepared			
-C-U144	control-072	control	S10	challenging	gpt-5.6-sol	high	prepared			
+C-U141	control-071	control	S10	ordinary	gpt-5.6-sol	high	running	/root/focus_c141	2026-09-08T01:10:47.749747+00:00	
+C-U142	control-071	control	S10	challenging	gpt-5.6-sol	high	running	/root/focus_c142	2026-09-08T01:10:47.829941+00:00	
+C-U143	control-072	control	S10	ordinary	gpt-5.6-sol	high	running	/root/focus_c143	2026-09-08T01:10:47.897350+00:00	
+C-U144	control-072	control	S10	challenging	gpt-5.6-sol	high	running	/root/focus_c144	2026-09-08T01:10:47.972770+00:00	

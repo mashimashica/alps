@@ -115,3 +115,5 @@ Verified commit `db01dc033dcb28f7f261a8d886181ed8ee233233`, tree `91e04747830cde
 ## User-requested interim report boundary
 
 Verified commit `68a7e41fbe7a855cca407a9365629bea6d992516`, tree `1174da73b011ade6a5db6c370da2c5b5f0145372`, parent `db01dc033dcb28f7f261a8d886181ed8ee233233`. Snapshot `../assessment-checkpoint-VAUjwW`; 6 changed entries and 6,649 published files. Exact commit/ref/author-matching DCO and full read-back of all six submitted UTF-8 files matched. Saves the interim report, explicit user-requested pause, final S09-P01 primary report and ledger, and the preceding checkpoint receipt. All children are complete; new executions await the user's continuation decision.
+
+- Verified 4edd7c6f85c2c418bc369226855478416a34f807, tree 1f0e2c6ac532b4cdf9575bbd3b0a06521a4ef5ed, parent 68a7e41fbe7a855cca407a9365629bea6d992516. Snapshot ../assessment-checkpoint-rnwqFR: 6 changed entries, 6652 published files. Commit/tree/parent/DCO/non-force ref verified; all six changed UTF-8 files fetched at the exact commit and matched in full. Activates focused44 comparison and fixed blind allocation; C133–136/141–144 unchanged prestart resources verified.

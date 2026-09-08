@@ -1,0 +1,15 @@
+{
+  "environment_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U142/input",
+  "state_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U142/input/state.json",
+  "target_environment": "development-onyx",
+  "candidate_id": "rel-onyx-27",
+  "authorized_operations": [
+    "inspect",
+    "qualify",
+    "promote",
+    "request-status",
+    "probe",
+    "checkout"
+  ],
+  "request_id": "dev-onyx-27-rehearsal"
+}
