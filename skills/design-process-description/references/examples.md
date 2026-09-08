@@ -48,6 +48,10 @@ Enable every intended participant to attend the 8 October 2026 design workshop a
 
 The date and occasion supply the necessary scope in the description. Room availability, suitability, and participants' knowledge of the location can be judged independently. Participant acknowledgments can provide evidence that the replacement location is known. An unidentified access need remains unconfirmed and limits the suitability judgment.
 
+Consider replacing the last Outcome with “A relocation notice has been sent.” Even with a confirmed suitable room, an unread notice leaves a participant unable to find it. All revised Outcomes could hold while this Purpose remains unfulfilled. Sending the notice is useful work, but it is insufficient as this success condition.
+
+Now consider a different commission: prepare an accurate notice of the confirmed replacement location and workshop time for the organizer to distribute. The notice's faithful coverage of those details is assessable; its mere existence is insufficient. Requiring every participant to know the location would extend this commission into the organizer's distribution work. The same notice can therefore support different work without giving those Processes the same success conditions. Evaluate each set of Outcomes within its own Purpose and responsibility; changing the commission is not a counterexample to the original set.
+
 ## 3. Work without a fixed artifact
 
 ```markdown

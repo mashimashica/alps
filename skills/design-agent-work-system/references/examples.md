@@ -40,3 +40,13 @@ A calendar API can combine conflict detection and event creation in one operatio
 ## Changed capabilities
 
 After a model update, a design review may find that instructions compensating for weak tool selection are unnecessary. Evaluate a simpler interaction on the affected work. Retain the domain criteria that determine which records may be changed, and retain evidence of the actual effects. A shorter prompt or fewer calls alone does not establish improvement.
+
+Changes to the [service assessment](../../../examples/assess-service-change/SKILL.md) can affect different parts of its evidence:
+
+| Hypothetical change | Design response and evidence scope |
+| --- | --- |
+| A replacement CLI accepts the same measurements and limits through renamed arguments, preserving calculations and their meanings. | Adapt invocation and check the affected interface and agent interpretation. Applicable measurement evidence remains usable; an interface change alone does not call for fresh service measurements. |
+| Within an authorized revision of the pilot conditions, the candidate p95 limit becomes 150 ms instead of 200 ms; measurement conditions are unchanged. | Identify the changed Control and its scope. Retain the applicable measured p95 of 160 ms and reassess against 150 ms: the candidate fails this criterion. Other still-applicable findings remain supported. An accurate negative assessment can satisfy the assessment work without making the candidate suitable. |
+| The intended pilot changes from one to ten concurrent clients. | Reconsider the comparability and applicability of the one-client evidence. Obtain a basis for the affected judgment; do not claim ten-client suitability from a successful calculation on the old measurements. Retain the old evidence for the conditions it actually covers. |
+
+The second and third changes concern the work's applicable conditions and follow the Framework's change principles. They are not reasons to redefine success silently to fit a tool or to repeat unaffected checks.

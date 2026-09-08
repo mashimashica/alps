@@ -25,16 +25,13 @@ The Tasks below are required within the requested scope, except where stated as 
 ### Work framing
 
 1. Identify the requested scope and the available description or information about the target work.
-2. Clarify the work's purpose and its boundary with adjacent work using the necessary information from affected parties. Confirm that information's source and applicability, and identify any gaps.
+2. Clarify the result the work undertakes to establish and its boundary with adjacent work using the necessary information from affected parties. Distinguish that responsibility from benefits or results belonging to other work. Confirm the information's source and applicability, and identify gaps.
 3. Identify uncertainties that could change the intended scope or success conditions.
 
 ### Success and work description
 
 1. Formulate observable Outcomes that are individually necessary and collectively sufficient for the Purpose. Keep independently assessable results distinguishable.
-2. Determine the detail needed to understand, apply, or evaluate the work. Where work detail is needed, organize related actions into Activities and Tasks at a useful granularity and check their contribution to the Outcomes.
-
-    > NOTE Activities group related work, while Tasks state individual actions. The [Production Release example](references/examples.md#production-release) shows this structure with explanatory notes attached to the relevant work.
-
+2. Include detail where its absence would impair understanding, application, or evaluation; remove or combine repetitions that add none of these. Where work detail is needed, organize related actions into Activities and Tasks at a useful granularity and check their contribution to the Outcomes.
 3. Describe necessary Inputs, Outputs, Controls, Constraints, Enablers, and Entry/Exit Criteria by their function. Preserve required methods and dependencies with their scope and leave other execution choices open.
 4. For Markdown, apply the Framework's writing rules. When the target is an Agent Skill, use the body for the Process Description and the frontmatter for its discovery identifier and summary of the work and when it applies. Keep the frontmatter and Host displays consistent with the description's meaning and scope.
 
@@ -49,11 +46,9 @@ The Tasks below are required within the requested scope, except where stated as 
 
 1. Evaluate the description against the Framework and applicable contextual requirements, including the coherence of its elements and the coverage of its Outcomes. Confirm that the criteria and evidence apply to the description and context being reviewed. Re-evaluate affected judgments when their supporting information or conditions change.
 
-    > NOTE In this design work, the Framework and applicable requirements supply Controls. Reading, search, and format-checking capabilities supply Enablers; format-check results provide evidence about the aspects they check. Coherence and Outcome sufficiency also depend on interpretation of the work and its conditions.
-
-2. Representative cases should be examined when they can expose ambiguity, unsupported success conditions, or limits of application.
+2. Representative cases should be examined when they can expose ambiguity, unsupported success conditions, or limits of application, with effort proportionate to consequences, uncertainty, and complexity. Hold the Purpose, responsibility, scope, and applicable conditions fixed when considering counterexamples: could all Outcomes hold without fulfilling the Purpose, or could the Purpose be fully fulfilled without one of them? Could an Output exist or processing succeed while an Outcome does not hold? A changed commission is not a counterexample within the original scope; finding none does not prove sufficiency for every case.
 3. Findings should guide further revision or review within the requested scope.
-4. Report findings with their evidence and affected scope, including remaining defects and unconfirmed matters. In a review, assess these Outcomes in the supplied description; identifying a defect does not satisfy the condition that remains unmet.
+4. Report findings with evidence and affected scope. Distinguish confirmed nonachievement from missing evidence and justified inapplicability; retain supported results and useful partial work without treating them as full success. In a review, assess these Outcomes in the supplied description; identifying a defect does not satisfy the condition that remains unmet.
 
 ## Controls
 
@@ -68,5 +63,5 @@ A review-only request must be answered with findings and any requested correctio
 This root `SKILL.md` is the English source for the [Japanese translation](references/locales/ja/SKILL.md), which carries the same meaning and normative force.
 
 - [Minimal template](references/SKILL-template.md): use when drafting an Agent Skill.
-- [Examples and review cases](references/examples.md): consult relevant cases when choosing work detail, describing shared information or views, or evaluating incomplete evidence.
+- [Examples and review cases](references/examples.md): consult relevant cases when checking success conditions, choosing work detail, describing shared information or views, or evaluating incomplete evidence.
 - [Agent Work System Design](../design-agent-work-system/SKILL.md): use when the requested work concerns the supporting configuration, its implementation, or its effectiveness. Refer to the shared work description; revisit it when configuration design reveals a problem with its assumptions.
