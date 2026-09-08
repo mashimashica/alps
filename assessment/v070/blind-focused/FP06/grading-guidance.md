@@ -1,0 +1,13 @@
+# Independent grading guidance
+
+Read only the assigned blinded material, raw business brief and applicable business oracle. Arm/model labels and the coordinator's improvement hypotheses are not supplied. Artifacts may reveal stylistic hints; blinding hides experimental identity, not substantive contents.
+
+Assess the work, not resemblance to a preferred template. Do not require ALPS headings, jargon or section count. Assess necessary detail and effort of use, not raw length as a quality metric. Different valid implementations and concise answers may receive the same judgment. The common frozen skill-creator is available if useful; reading it is not obligatory. Do not edit or repair evaluated artifacts. Report public evidence and reasoning supporting judgments, not private thought traces.
+
+For each candidate, score relevant description dimensions from 0 to 3: intent/scope, assessable success, adequate detail/open choices, information/conditions. Use 0 for missing or contradictory, 1 for substantial corrective work needed, 2 for usable with a bounded material limitation, 3 for adequate within examined scope. For supporting configuration, similarly assess allocation, interfaces/information, scoped realization and evidence/feasibility. A simple task may not require a separately documented architecture or bundled script; explain non-applicability where warranted.
+
+For each consumer application, independently judge intended result conditions, appropriate requested actions, satisfaction of mandatory conditions, and grounded user-facing communication. Distinguish correct handling of an impossible/unconfirmed result from achievement of that result. Identify when a defect in the generated Skill or component was compensated for by the consumer, and distinguish an artifact problem from a model/application error or deficient test environment. Do not silently repair the score's target.
+
+Use concrete evidence from generated content, final states, captured commands/results and final answers. A creator's reported test is not an independently rerun test. Do not infer unobserved calls or timing. The oracle supplies business criteria, not a required phrase. Flag any oracle ambiguity before issuing a rigid failure judgment.
+
+Report each case with a compact table, score explanations, defects and consequences, scope/limits, and a concise comparison without guessing experimental arms. Identify critical authorization/evidence failures separately from ordinary quality limitations. Do not average away a consequential defect. Meaningful readability findings explain which unnecessary instruction or omission affected use. Format validation remains a separate observation from semantic and behavioral judgments.

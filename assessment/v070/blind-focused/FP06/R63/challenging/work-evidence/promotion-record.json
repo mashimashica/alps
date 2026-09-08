@@ -1,0 +1,8 @@
+{
+  "request_id": "dev-onyx-27-rehearsal",
+  "target_environment": "development-onyx",
+  "state_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U142/input/state.json",
+  "candidate_id": "rel-onyx-27",
+  "digest": "onyx27-content-c82d6e",
+  "qualification_sequence": 207
+}

@@ -1,0 +1,20 @@
+{
+  "desired_environment": "development-onyx",
+  "environment_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U144/input",
+  "state_path": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/consumers/C-U144/input/state.json",
+  "environment_binding_evidence": "The user states that development-onyx is represented only by the supplied input/state.json and gives the exact release_tool.py invocation for it.",
+  "candidate_id": "rel-onyx-27",
+  "requested_digest": null,
+  "observed_candidate_digest": "onyx27-content-c82d6e",
+  "request_id": "dev-onyx-27-rehearsal",
+  "request_id_origin": "caller-supplied",
+  "authorization_evidence": "The user authorizes inspect, qualify, promote, request-status, probe, and checkout for this exact candidate and environment, including exact retries of this same logical request.",
+  "authorized_operations": [
+    "inspect",
+    "qualify",
+    "promote",
+    "request-status",
+    "probe",
+    "checkout"
+  ]
+}

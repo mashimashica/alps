@@ -1,0 +1,39 @@
+{
+  "environment": "development-onyx",
+  "candidate": {
+    "id": "rel-onyx-27",
+    "digest": "onyx27-content-c82d6e",
+    "qualification_ok": true,
+    "healthy": true,
+    "checkout_ok": false
+  },
+  "production": {
+    "id": "rel-onyx-27",
+    "digest": "onyx27-content-c82d6e",
+    "healthy": true,
+    "checkout_ok": false
+  },
+  "service_owner": "Rowan (checkout service owner)",
+  "sequence": 208,
+  "qualification": {
+    "candidate": "rel-onyx-27",
+    "digest": "onyx27-content-c82d6e",
+    "passed": true,
+    "sequence": 207
+  },
+  "approval": {
+    "candidate": "rel-onyx-27",
+    "digest": "onyx27-content-c82d6e",
+    "owner": "Rowan (checkout service owner)",
+    "qualification_sequence": 207,
+    "sequence": 208
+  },
+  "requests": {
+    "dev-onyx-27-rehearsal": {
+      "candidate": "rel-onyx-27",
+      "digest": "onyx27-content-c82d6e",
+      "promoted": true
+    }
+  },
+  "promotion_count": 1
+}
