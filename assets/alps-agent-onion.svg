@@ -1,53 +1,71 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="920" viewBox="0 0 1600 920" role="img" aria-labelledby="title desc">
-<title id="title">The agent exercises judgment between the meaning of work and available means</title>
-<desc id="desc">Hand-drawn onion diagram. Why and What are the meaning of work at the center. How is the available means in the outer ring. The Agent occupies the middle ring as judgment between them. User needs enter from the left and an outcome emerges to the right.</desc>
-<defs>
-  <filter id="rough" x="-3%" y="-3%" width="106%" height="106%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="31" result="noise"/>
-    <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.7" xChannelSelector="R" yChannelSelector="G"/>
-  </filter>
-  <style>
-    .ink{fill:none;stroke:#272828;stroke-linecap:round;stroke-linejoin:round}
-    .ghost{fill:none;stroke:#272828;stroke-linecap:round;stroke-linejoin:round;opacity:.28}
-    .label{fill:#272828;font-family:"Comic Sans MS","Segoe Print","Bradley Hand",cursive;text-anchor:middle}
-    .small{fill:#626464;font-family:"Comic Sans MS","Segoe Print","Bradley Hand",cursive;text-anchor:middle}
-  </style>
-</defs>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1600" height="920" aria-labelledby="title desc" role="img" viewBox="0 0 1600 920" xmlns="http://www.w3.org/2000/svg">
+<title>The agent exercises judgment between the meaning of work and available means</title>
+<desc>Hand-drawn onion diagram. Why and What form the center. The surrounding shaded ring is the Agent, acting Judgment. The outer ring is How, with tools, data, APIs and an environment. Needs enter from the user and an outcome emerges. The rings show roles, not execution stages.</desc>
 <rect width="1600" height="920" fill="#fff"/>
-<g filter="url(#rough)">
-  <path d="M804 69 C1014 70 1186 241 1191 450 C1196 664 1023 838 806 839 C588 840 416 666 421 451 C426 240 594 67 804 69Z" fill="#fff" stroke="#272828" stroke-width="3.2"/>
-  <path d="M804 187 C954 185 1076 307 1077 455 C1078 606 955 727 804 728 C652 728 532 606 535 454 C538 306 655 188 804 187Z" fill="#eee" stroke="#272828" stroke-width="3"/>
-  <path d="M804 303 C889 302 958 371 958 455 C958 541 890 609 804 609 C718 609 650 542 650 456 C650 371 719 304 804 303Z" fill="#fff" stroke="#272828" stroke-width="3"/>
-  <path class="ghost" stroke-width="1.2" d="M800 71 C1011 66 1189 242 1188 456 C1187 663 1017 835 807 836"/>
-  <path class="ghost" stroke-width="1.1" d="M803 190 C953 188 1073 308 1074 456 C1075 604 954 724 805 725"/>
-  <path class="ghost" stroke-width="1.1" d="M802 305 C888 303 956 371 956 455 C956 539 889 606 805 607"/>
-  <path class="ink" stroke-width="3" d="M184 456 Q287 454 397 456 M382 445 L398 456 L382 466"/>
-  <path class="ink" stroke-width="3" d="M1209 456 Q1260 454 1311 456 M1295 446 L1312 456 L1295 466"/>
-  <path class="ink" stroke-width="2.1" stroke="#626464" d="M555 457 Q593 454 631 456 M567 449 L555 457 L567 465 M619 448 L631 456 L619 464"/>
-  <path class="ink" stroke-width="2.1" stroke="#626464" d="M977 457 Q1015 454 1053 456 M989 449 L977 457 L989 465 M1041 448 L1053 456 L1041 464"/>
-  <circle cx="118" cy="436" r="25" class="ink" stroke-width="3"/>
-  <path class="ink" stroke-width="3" d="M80 536 C82 487 94 466 118 465 C143 464 155 489 158 536"/>
-  <ellipse cx="570" cy="205" rx="23" ry="9" class="ink" stroke-width="2.6"/>
-  <path class="ink" stroke-width="2.6" d="M547 205 V246 C547 258 593 258 593 246 V205 M547 219 C547 231 593 231 593 219 M547 233 C547 245 593 245 593 233"/>
-  <path class="ink" stroke-width="3" d="M1020 198 l14 14 -42 44 -16 4 4 -16 42 -44 15 14"/>
-  <path class="ink" stroke-width="2.8" d="M548 671 h32 l14 14 v49 h-46 z M580 671 v14 h14 M557 709 l8 -9 M565 718 l-8 -9 M575 700 l-5 18"/>
-  <path class="ink" stroke-width="2.8" d="M1017 677 l25 -14 25 14 v32 l-25 14 -25 -14 z M1017 677 l25 14 25 -14 M1042 691 v32"/>
+<style>.ink{fill:none;stroke-linecap:round;stroke-linejoin:round}.label{font-family:"Comic Neue","Segoe Print","Bradley Hand",cursive;fill:#262727}</style>
+<path d="m1191 456-0.2 19.01-1.18 16.84-2.39 18.85-3.44 18.69-4.35 18.46-5.81 20.26-6.79 19.93-6.97 17.62-7.81 17.26-7.7 14.98-8.39 14.59-10.24 15.91-11.01 15.39-11.68 14.86-13.7 15.92-12.94 13.77-13.54 13.21-12.57 11.16-11.43 9.28-13.58 9.96-14.08 9.2-14.55 8.42-14.97 7.64-15.28 6.92-17.51 6.99-19.73 6.9-20 6.04-20.22 5.18-18.39 3.83-18.56 2.97-18.7 2.05-18.78 1.11-18.81 0.2-20.91-0.8-18.79-1.56-20.79-2.66-18.61-3.28-18.45-4.22-16.2-4.59-15.94-5.48-15.62-6.32-17.14-8.12-14.82-8.02-16.2-9.8-17.45-11.71-15.24-11.21-16.41-13.12-14.24-12.47-13.64-13.13-11.56-12.26-12.28-14.45-10.24-13.39-10.74-15.64-9.93-16.16-9.15-16.61-8.36-17.02-7.54-17.4-5.96-15.78-5.16-16.04-4.33-16.29-3.44-16.5-2.57-16.62-1.92-18.8-0.98-18.85-0.16-20.92 0.68-20.88 1.51-20.82 2.11-18.67 2.55-16.52 3.72-18.46 4.13-16.21 5.58-18 6.52-17.68 7.41-17.33 9.17-18.83 9.06-16.54 9.81-16.13 11.81-17.34 11.5-14.98 10.91-12.77 13.04-13.68 13.75-12.94 16-13.55 16.64-12.76 18.9-13.19 17.71-11.26 18.22-10.48 18.78-9.53 15.43-6.8 15.78-6.01 18.11-5.75 16.37-4.2 16.55-3.38 18.78-2.88 18.89-1.96 18.95-1.05 18.98-0.12 16.85 0.71 18.87 1.78 16.66 2.46 18.55 3.75 18.31 4.71 18.05 5.52 19.74 6.99 19.42 7.8 19.08 8.58 18.69 9.46 16.37 9.37 15.84 10.26 13.57 9.88 13.03 10.59 14 12.66 13.3 13.38 13.99 15.57 11.94 14.58 12.5 16.77 10.53 15.6 9.76 16.1 8.93 16.58 8.07 17.01 7.21 17.39 7.06 19.69 6.73 22.01 5.24 20.29 4.34 20.54 3.31 20.77 1.96 18.86 0.82 16.86z" fill="#fff"/>
+<path d="m1077 456-0.57 11.9-1.39 13.31-2.41 14.65-3.13 14.47-4.11 15.73-4.71 15.54-4.86 13.94-5.54 13.7-5.01 10.72-5.56 10.46-6.13 10.12-6.66 9.79-8.07 10.58-7.61 9.04-8.97 9.79-9.39 9.38-9.79 8.95-10.2 8.46-10.63 7.9-11.04 7.3-11.41 6.67-11.73 6.09-13.29 6.18-14.87 6.2-16.49 6.15-13.97 4.59-12.78 3.6-12.98 2.95-13.15 2.16-11.79 1.22-13.35 0.57-11.87-0.19-13.32-0.87-13.27-1.54-14.64-2.39-13.07-2.78-12.91-3.42-11.31-3.6-12.5-4.74-10.85-4.81-11.92-6-14.15-8.1-13.71-8.79-12.13-8.5-11.77-9.01-11.32-9.61-9.69-9.23-8.11-8.69-7.58-9.18-7.01-9.6-7.22-11.25-5.86-10.32-6.69-13.19-6.05-13.46-5.45-13.68-4.83-13.9-3.73-12.69-2.77-11.42-2.26-11.53-1.93-13.07-1.34-13.12-0.9-14.63-0.33-16.14 0.25-13.22 0.77-13.23 1.24-11.75 1.84-11.67 2.48-11.58 2.74-9.99 3.73-11.23 4.94-12.37 4.91-10.76 6.72-13.14 8.04-14.11 7.85-12.5 8.42-12.15 8.13-10.55 8.68-10.11 9.22-9.64 9.74-9.13 10.18-8.64 10.56-8.18 10.91-7.73 11.25-7.25 11.6-6.71 10.63-5.4 9.54-4.25 11.16-4.22 11.38-3.53 11.57-2.86 11.68-2.23 11.74-1.69 14.72-1.48 14.72-0.9 14.73-0.35 13.24 0.21 13.22 0.79 11.72 1.24 13.08 2.06 11.53 2.42 12.82 3.33 12.65 3.93 12.47 4.45 13.63 5.55 12.04 5.56 10.46 5.43 10.19 5.97 8.64 5.65 9.52 6.98 8 6.51 8.79 7.86 9.43 9.3 10.04 10.72 10.59 12.21 10.13 12.61 7.88 10.66 6.65 9.78 6.93 11.37 5.62 10.43 5.06 10.74 5.02 12.39 4.36 12.64 4.09 14.29 3.04 13.04 2.41 13.18 1.7 13.3 0.87 11.88 0.19 13.41z" fill="#ededeb"/>
+<path d="m958.3 456-0.44 7.61-0.73 6.72-1.32 8.34-1.68 8.25-4.6 17.92-2.59 8.03-2.42 6.3-2.4 5.4-2.73 5.24-5.87 9.26-3.53 4.72-4.31 5.16-9.66 10.4-13.75 13.27-5.66 4.91-6.54 5.16-6.15 4.31-6.37 3.99-6.57 3.68-7.48 3.77-7.65 3.49-8.61 3.49-8.02 2.76-6.54 1.83-6.66 1.41-6.75 0.91-6.8 0.43-7.65-0.09-6.78-0.48-8.41-1.01-10-1.61-9.92-1.95-14.71-3.77-6.41-2.16-6.29-2.51-6.9-3.24-5.95-3.23-6.51-3.96-7-4.73-6.78-5.06-5.89-4.82-5.62-5.14-4.71-4.85-4.92-5.8-4-5.46-3.65-5.67-4.14-7.32-5.24-10.47-5.92-12.81-4.27-9.94-3.26-8.59-2.04-6.38-1.7-6.5-2.24-12.41-0.78-7.54-0.4-6.73-0.16-8.44 0.19-7.61 0.47-6.77 0.8-6.74 1.19-6.68 1.39-5.79 1.69-5.69 2.28-6.4 6.16-13.92 9.78-18.72 4.77-8.04 3.76-5.69 4.07-5.48 5-5.85 4.8-4.86 5.11-4.53 5.37-4.22 6.27-4.42 6.46-4.09 6.63-3.8 6.79-3.47 6.17-2.77 6.29-2.43 5.62-1.83 6.5-1.75 6.56-1.4 16.5-2.42 21.47-2 8.33-0.33 7.51 0.12 6.67 0.51 6.63 0.94 6.56 1.38 7.26 2 8.7 3 7.76 3.09 8.39 3.76 8.21 4.13 11.5 6.85 5.49 3.86 5.29 4.12 5.72 4.92 6.13 5.73 12.34 12.68 8.32 9.67 7 9.72 3.08 5.16 2.36 4.58 2.43 5.5 1.8 4.82 2.04 6.56 1.49 5.81 1.59 7.53 1.41 8.41 1.68 15.2 0.3 13.56z" fill="#fff"/>
+<path d="m1191 456-0.2 19.01-1.18 16.84-2.39 18.85-3.44 18.69-4.35 18.46-5.81 20.26-6.79 19.93-6.97 17.62-7.81 17.26-7.7 14.98-8.39 14.59-10.24 15.91-11.01 15.39-11.68 14.86-13.7 15.92-12.94 13.77-13.54 13.21-12.57 11.16-11.43 9.28-13.58 9.96-14.08 9.2-14.55 8.42-14.97 7.64-15.28 6.92-17.51 6.99-19.73 6.9-20 6.04-20.22 5.18-18.39 3.83-18.56 2.97-18.7 2.05-18.78 1.11-18.81 0.2-20.91-0.8-18.79-1.56-20.79-2.66-18.61-3.28-18.45-4.22-16.2-4.59-15.94-5.48-15.62-6.32-17.14-8.12-14.82-8.02-16.2-9.8-17.45-11.71-15.24-11.21-16.41-13.12-14.24-12.47-13.64-13.13-11.56-12.26-12.28-14.45-10.24-13.39-10.74-15.64-9.93-16.16-9.15-16.61-8.36-17.02-7.54-17.4-5.96-15.78-5.16-16.04-4.33-16.29-3.44-16.5-2.57-16.62-1.92-18.8-0.98-18.85-0.16-20.92 0.68-20.88 1.51-20.82 2.11-18.67 2.55-16.52 3.72-18.46 4.13-16.21 5.58-18 6.52-17.68 7.41-17.33 9.17-18.83 9.06-16.54 9.81-16.13 11.81-17.34 11.5-14.98 10.91-12.77 13.04-13.68 13.75-12.94 16-13.55 16.64-12.76 18.9-13.19 17.71-11.26 18.22-10.48 18.78-9.53 15.43-6.8 15.78-6.01 18.11-5.75 16.37-4.2 16.55-3.38 18.78-2.88 18.89-1.96 18.95-1.05 18.98-0.12 16.85 0.71 18.87 1.78 16.66 2.46 18.55 3.75 18.31 4.71 18.05 5.52 19.74 6.99 19.42 7.8 19.08 8.58 18.69 9.46 16.37 9.37 15.84 10.26 13.57 9.88 13.03 10.59 14 12.66 13.3 13.38 13.99 15.57 11.94 14.58 12.5 16.77 10.53 15.6 9.76 16.1 8.93 16.58 8.07 17.01 7.21 17.39 7.06 19.69 6.73 22.01 5.24 20.29 4.34 20.54 3.31 20.77 1.96 18.86 0.82 16.86z" fill="none" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.3"/>
+<path d="m1077 456-0.57 11.9-1.39 13.31-2.41 14.65-3.13 14.47-4.11 15.73-4.71 15.54-4.86 13.94-5.54 13.7-5.01 10.72-5.56 10.46-6.13 10.12-6.66 9.79-8.07 10.58-7.61 9.04-8.97 9.79-9.39 9.38-9.79 8.95-10.2 8.46-10.63 7.9-11.04 7.3-11.41 6.67-11.73 6.09-13.29 6.18-14.87 6.2-16.49 6.15-13.97 4.59-12.78 3.6-12.98 2.95-13.15 2.16-11.79 1.22-13.35 0.57-11.87-0.19-13.32-0.87-13.27-1.54-14.64-2.39-13.07-2.78-12.91-3.42-11.31-3.6-12.5-4.74-10.85-4.81-11.92-6-14.15-8.1-13.71-8.79-12.13-8.5-11.77-9.01-11.32-9.61-9.69-9.23-8.11-8.69-7.58-9.18-7.01-9.6-7.22-11.25-5.86-10.32-6.69-13.19-6.05-13.46-5.45-13.68-4.83-13.9-3.73-12.69-2.77-11.42-2.26-11.53-1.93-13.07-1.34-13.12-0.9-14.63-0.33-16.14 0.25-13.22 0.77-13.23 1.24-11.75 1.84-11.67 2.48-11.58 2.74-9.99 3.73-11.23 4.94-12.37 4.91-10.76 6.72-13.14 8.04-14.11 7.85-12.5 8.42-12.15 8.13-10.55 8.68-10.11 9.22-9.64 9.74-9.13 10.18-8.64 10.56-8.18 10.91-7.73 11.25-7.25 11.6-6.71 10.63-5.4 9.54-4.25 11.16-4.22 11.38-3.53 11.57-2.86 11.68-2.23 11.74-1.69 14.72-1.48 14.72-0.9 14.73-0.35 13.24 0.21 13.22 0.79 11.72 1.24 13.08 2.06 11.53 2.42 12.82 3.33 12.65 3.93 12.47 4.45 13.63 5.55 12.04 5.56 10.46 5.43 10.19 5.97 8.64 5.65 9.52 6.98 8 6.51 8.79 7.86 9.43 9.3 10.04 10.72 10.59 12.21 10.13 12.61 7.88 10.66 6.65 9.78 6.93 11.37 5.62 10.43 5.06 10.74 5.02 12.39 4.36 12.64 4.09 14.29 3.04 13.04 2.41 13.18 1.7 13.3 0.87 11.88 0.19 13.41z" fill="none" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+<path d="m958.3 456-0.44 7.61-0.73 6.72-1.32 8.34-1.68 8.25-4.6 17.92-2.59 8.03-2.42 6.3-2.4 5.4-2.73 5.24-5.87 9.26-3.53 4.72-4.31 5.16-9.66 10.4-13.75 13.27-5.66 4.91-6.54 5.16-6.15 4.31-6.37 3.99-6.57 3.68-7.48 3.77-7.65 3.49-8.61 3.49-8.02 2.76-6.54 1.83-6.66 1.41-6.75 0.91-6.8 0.43-7.65-0.09-6.78-0.48-8.41-1.01-10-1.61-9.92-1.95-14.71-3.77-6.41-2.16-6.29-2.51-6.9-3.24-5.95-3.23-6.51-3.96-7-4.73-6.78-5.06-5.89-4.82-5.62-5.14-4.71-4.85-4.92-5.8-4-5.46-3.65-5.67-4.14-7.32-5.24-10.47-5.92-12.81-4.27-9.94-3.26-8.59-2.04-6.38-1.7-6.5-2.24-12.41-0.78-7.54-0.4-6.73-0.16-8.44 0.19-7.61 0.47-6.77 0.8-6.74 1.19-6.68 1.39-5.79 1.69-5.69 2.28-6.4 6.16-13.92 9.78-18.72 4.77-8.04 3.76-5.69 4.07-5.48 5-5.85 4.8-4.86 5.11-4.53 5.37-4.22 6.27-4.42 6.46-4.09 6.63-3.8 6.79-3.47 6.17-2.77 6.29-2.43 5.62-1.83 6.5-1.75 6.56-1.4 16.5-2.42 21.47-2 8.33-0.33 7.51 0.12 6.67 0.51 6.63 0.94 6.56 1.38 7.26 2 8.7 3 7.76 3.09 8.39 3.76 8.21 4.13 11.5 6.85 5.49 3.86 5.29 4.12 5.72 4.92 6.13 5.73 12.34 12.68 8.32 9.67 7 9.72 3.08 5.16 2.36 4.58 2.43 5.5 1.8 4.82 2.04 6.56 1.49 5.81 1.59 7.53 1.41 8.41 1.68 15.2 0.3 13.56z" fill="none" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.1"/>
+<path d="m1187 525.6-3.54 15.99-2.02 7.93-4.51 15.72-2.49 7.79-5.43 15.41-6.03 15.18-6.66 14.91-7.3 14.61-7.93 14.25-4.2 7-8.84 13.7" fill="none" opacity=".45" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width=".75"/>
+<path d="m979.4 800.6-12.3 5.41-12.45 4.98-12.58 4.59-19.07 6.22-12.83 3.73-19.41 4.95-19.6 4.13-13.16 2.24" fill="none" opacity=".45" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width=".75"/>
+<path d="m598.6 784.2-9.82-6.57-14.43-10.27-9.43-7.12-13.81-11.1-8.99-7.68-13.07-12.01-8.41-8.34-8.14-8.62" fill="none" opacity=".45" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width=".75"/>
+<path d="m515.4 198.5 7.98-8.7 8.27-8.42 8.55-8.14 13.3-11.68 13.79-11.09 9.44-7.08 14.48-10.18 9.86-6.49" fill="none" opacity=".45" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width=".75"/>
+<path d="m913.6 85.55 13.45 4.65 19.88 7.69 13.07 5.58 19.28 9.06 18.85 9.96 12.26 7.2 11.98 7.67 11.65 8.18" fill="none" opacity=".45" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width=".75"/>
+<path d="m1055 562.2-5.31 12.1-2.9 5.94-6.29 11.63-6.95 11.24-7.56 10.83-8.1 10.43-13 14.91-13.9 14.04-9.78 8.83" fill="none" opacity=".45" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width=".75"/>
+<path d="m621.5 660.3-11.68-10.33-7.4-7.32-7.02-7.69-6.59-8.06-6.15-8.4-8.38-13.15-5.08-9.06-6.92-13.92" fill="none" opacity=".45" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width=".75"/>
+<path d="m741 189.6 15.38-2.32 19.28-1.92 19.29-1.01 19.31-0.04" fill="none" opacity=".45" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width=".75"/>
+<path d="m919.7 558.1-7.26 7.56-7.49 7.33-10.57 9.19-5.62 4.2-5.85 3.9-6.06 3.57-9.37 4.84" fill="none" opacity=".45" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width=".75"/>
+<path d="m665.3 522-7.6-18.48-4.14-12.72-2.93-13.11-0.99-6.66-0.97-10.07" fill="none" opacity=".45" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width=".75"/>
+<path d="m710.7 327.8 5.14-3.39 7.95-4.68 8.19-4.17 5.61-2.47 11.5-4.08 8.84-2.29 5.94-1.19" fill="none" opacity=".45" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width=".75"/>
+<text class="label" transform="rotate(-.9 804 146)" x="804" y="146" fill="#262727" font-size="63" font-weight="bold" text-anchor="middle">How</text>
+<text class="label" transform="rotate(.7 804 253)" x="804" y="253" fill="#262727" font-size="62" font-weight="bold" text-anchor="middle">Agent</text>
+<text class="label" transform="rotate(-.5 804 286)" x="804" y="286" fill="#595b5b" font-size="27" text-anchor="middle">Judgment</text>
+<text class="label" transform="rotate(-1.4 804 420)" x="804" y="420" fill="#262727" font-size="64" font-weight="bold" text-anchor="middle">Why</text>
+<text class="label" transform="rotate(.5 804 509)" x="804" y="509" fill="#262727" font-size="64" font-weight="bold" text-anchor="middle">What</text>
+<path d="m756 444q46-3 95-1" fill="none" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4"/>
+<text class="label" transform="rotate(-.3 804 554)" x="804" y="554" fill="#595b5b" font-size="26" text-anchor="middle">Meaning of work</text>
+<text class="label" transform="rotate(-.4 804 801)" x="804" y="801" fill="#595b5b" font-size="28" text-anchor="middle">Available means</text>
+<g fill="none" stroke="#595b5b" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.1">
+<path d="m555 457q38-2.7 76-1"/>
+<path d="m567 449-12 8 12 8"/>
+<path d="m619 448 12 8-12 8"/>
+<path d="m977 457q38-2.7 76-1"/>
+<path d="m989 449-12 8 12 8"/>
+<path d="m1041 448 12 8-12 8"/>
 </g>
-<text x="804" y="144" class="label" font-size="62" font-weight="700" transform="rotate(-1 804 144)">How</text>
-<text x="804" y="802" class="small" font-size="29" transform="rotate(-.6 804 802)">Available means</text>
-<text x="804" y="252" class="label" font-size="61" font-weight="700" transform="rotate(.7 804 252)">Agent</text>
-<text x="804" y="288" class="small" font-size="28" transform="rotate(-.5 804 288)">Judgment</text>
-<text x="804" y="421" class="label" font-size="63" font-weight="700" transform="rotate(-1.2 804 421)">Why</text>
-<path d="M757 445 Q803 442 851 444" class="ink" stroke-width="2.5"/>
-<text x="804" y="510" class="label" font-size="63" font-weight="700" transform="rotate(.5 804 510)">What</text>
-<text x="804" y="555" class="small" font-size="27" transform="rotate(-.3 804 555)">Meaning of work</text>
-<text x="118" y="567" class="label" font-size="35" transform="rotate(-1 118 567)">User</text>
-<text x="289" y="421" class="label" font-size="32" transform="rotate(-.5 289 421)">Needs</text>
-<text x="1440" y="468" class="label" font-size="46" transform="rotate(-1 1440 468)">Outcome</text>
-<path d="M1338 489 Q1435 491 1541 486" class="ink" stroke-width="2.3"/>
-<path d="M1500 405 L1509 390 M1528 420 L1543 410" class="ink" stroke-width="2.3"/>
-<text x="570" y="276" class="small" font-size="25" transform="rotate(-1 570 276)">Data</text>
-<text x="1025" y="276" class="small" font-size="25" transform="rotate(.8 1025 276)">Tools</text>
-<text x="570" y="760" class="small" font-size="25" transform="rotate(-.7 570 760)">APIs</text>
-<text x="1025" y="760" class="small" font-size="25" transform="rotate(.5 1025 760)">Environment</text>
+<g transform="translate(565 230) rotate(-3)" fill="none" stroke="#262727" stroke-linecap="round" stroke-linejoin="round">
+<path d="m-22-18c1-13 44-13 45 0 0 12-45 12-45 0z" stroke-width="2.8"/>
+<path d="m-22-18v37c2 14 43 14 45 0v-37" stroke-width="2.8"/>
+<path d="m-22 1c2 12 44 12 45 0" stroke-width="2.5"/>
+</g>
+<g transform="translate(1045 230) rotate(4)" fill="none" stroke="#262727" stroke-linecap="round" stroke-linejoin="round">
+<path d="m-20 26 24-34c-9-15 0-31 14-27l-7 12 8 7 10-12c6 15-4 28-17 26l-22 34q-7 8-13 1-4-3 3-7z" stroke-width="2.8"/>
+<path d="m-15 29-0.5 0.5" stroke-width="3"/>
+</g>
+<g transform="translate(560 677) rotate(-3)" fill="none" stroke="#262727" stroke-linecap="round" stroke-linejoin="round">
+<path d="m-21-29 27-1 17 17-1 43h-44z" stroke-width="2.8"/>
+<path d="m6-30v18l17-1" stroke-width="2.4"/>
+<path d="m-9 1-7 6 7 6m20-12 7 6-7 6m-6-14-6 16" stroke-width="2.2"/>
+</g>
+<g transform="translate(1037 677) rotate(3)" fill="none" stroke="#262727" stroke-linecap="round" stroke-linejoin="round">
+<path d="m-25-15 25-14 26 15-1 30-25 15-25-16z" stroke-width="2.8"/>
+<path d="m-25-15 25 15 26-14m-26 14v31" stroke-width="2.5"/>
+</g>
+<g transform="translate(116 456)" fill="none" stroke="#262727" stroke-linecap="round" stroke-linejoin="round">
+<path d="m21.94-33-0.44 3.79-1.84 5.74-1.73 3.28-2.72 3.46-2.29 2.15-2.44 1.5-5.91 2.15-3.41 0.74-4.44-0.03-3.82-0.8-2.81-1.36-3.97-2.94-2.58-2.42-1.96-2.86-1.77-4.14-0.8-3.67-0.01-6.93 0.36-3.58 1.04-3.31 2.09-4.04 2.65-3.33 4.83-3.99 2.97-1.63 3.39-0.77 4.37-0.08 3.81 0.72 5.66 2.26 3.07 2.04 3.29 3.85 2.7 4.33 1.95 5.37 0.76 4.5z" stroke-width="2.9"/>
+<path d="m-37 63c2-42 13-64 37-65 24-2 37 26 40 65" stroke-width="3"/>
+</g>
+<text class="label" transform="rotate(-1 118 564)" x="118" y="564" fill="#262727" font-size="35" text-anchor="middle">User</text>
+<text class="label" transform="rotate(-.5 289 420)" x="289" y="420" fill="#262727" font-size="32" text-anchor="middle">Needs</text>
+<path d="m184 456q103-2 213 0" fill="none" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+<path d="m382 445 16 11-16 10" fill="none" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+<path d="m1209 456q51-2 102 0" fill="none" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.1"/>
+<path d="m1295 446 17 10-17 10" fill="none" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.1"/>
+<text class="label" transform="rotate(-1 1441 466)" x="1441" y="466" fill="#262727" font-size="46" text-anchor="middle">Outcome</text>
+<path d="m1338 487q97 2 203-3" fill="none" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3"/>
+<path d="m1500 403 9-15m19 30 15-10" fill="none" stroke="#262727" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3"/>
 </svg>
