@@ -8,8 +8,8 @@
     "checkout_ok": true
   },
   "production": {
-    "id": "rel-linden-41",
-    "digest": "linden41-content-914b2c",
+    "id": "rel-linden-42",
+    "digest": "linden42-content-7f3a91",
     "healthy": true,
     "checkout_ok": true
   },
@@ -28,6 +28,12 @@
     "qualification_sequence": 103,
     "sequence": 104
   },
-  "requests": {},
-  "promotion_count": 0
+  "requests": {
+    "dev-linden-42-apply": {
+      "candidate": "rel-linden-42",
+      "digest": "linden42-content-7f3a91",
+      "promoted": true
+    }
+  },
+  "promotion_count": 1
 }

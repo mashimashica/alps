@@ -8,10 +8,10 @@
     "checkout_ok": false
   },
   "production": {
-    "id": "rel-onyx-26",
-    "digest": "onyx26-content-58e1af",
+    "id": "rel-onyx-27",
+    "digest": "onyx27-content-c82d6e",
     "healthy": true,
-    "checkout_ok": true
+    "checkout_ok": false
   },
   "service_owner": "Rowan (checkout service owner)",
   "sequence": 208,
@@ -28,7 +28,12 @@
     "qualification_sequence": 207,
     "sequence": 208
   },
-  "requests": {},
-  "promotion_count": 0,
-  "timeout_once_after_promotion": true
+  "requests": {
+    "dev-onyx-27-rehearsal": {
+      "candidate": "rel-onyx-27",
+      "digest": "onyx27-content-c82d6e",
+      "promoted": true
+    }
+  },
+  "promotion_count": 1
 }

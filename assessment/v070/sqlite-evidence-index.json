@@ -19,6 +19,16 @@
     "sql_sha256": "7eb70a199454fa398d3d6a358bf0282f6f399d0ce1b977169cfdd9989cbd545c",
     "sqlite_version": "3.53.1"
   },
+  "blind-focused/FP04/R63/challenging/work-evidence/rollup-checkpoint.sqlite": {
+    "metadata_path": "sqlite-evidence/focused-packet-observation-01/blind-focused/FP04/R63/challenging/work-evidence/rollup-checkpoint.sqlite.json",
+    "metadata_sha256": "2c11c6e46a774f051a2709dd5e7be1a0730b2d216e2815bd94efe9b930aafa3b",
+    "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history",
+    "source_path": "blind-focused/FP04/R63/challenging/work-evidence/rollup-checkpoint.sqlite",
+    "source_sha256": "ee0cc4fdb17a133bb6f57cb2fb45136ec88827e29abaf1ef759e7456d36eda39",
+    "sql_path": "sqlite-evidence/focused-packet-observation-01/blind-focused/FP04/R63/challenging/work-evidence/rollup-checkpoint.sqlite.sql",
+    "sql_sha256": "7eb70a199454fa398d3d6a358bf0282f6f399d0ce1b977169cfdd9989cbd545c",
+    "sqlite_version": "3.53.1"
+  },
   "consumers/C-U094/work/rollup-checkpoint.sqlite": {
     "metadata_path": "sqlite-evidence/consumer-complete-recovered-context/consumers/C-U094/work/rollup-checkpoint.sqlite.json",
     "metadata_sha256": "877aff4a456609d964521c8de77481cce7364a9fe8204ee5f3260d2829911bf0",

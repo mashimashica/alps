@@ -12,14 +12,14 @@ F-U010	focus-005	focused	S06	challenging	gpt-5.6-sol	high	C-U086	completed	/root
 F-U011	focus-006	focused	S06	ordinary	gpt-5.6-sol	high	C-U087	completed	/root/focus_u011	2026-09-08T01:36:46.616485+00:00	2026-09-08T01:41:55.989464+00:00
 F-U012	focus-006	focused	S06	challenging	gpt-5.6-sol	high	C-U088	completed	/root/focus_u012	2026-09-08T01:36:46.707163+00:00	2026-09-08T01:41:56.056302+00:00
 F-U013	focus-007	focused	S06	ordinary	gpt-5.6-sol	high	C-U093	completed	/root/focus_u013		2026-09-08T01:41:56.207891+00:00
-F-U014	focus-007	focused	S06	challenging	gpt-5.6-sol	high	C-U094	running	/root/focus_u014	2026-09-08T01:41:56.276022+00:00	
-F-U015	focus-008	focused	S06	ordinary	gpt-5.6-sol	high	C-U095	running	/root/focus_u015	2026-09-08T01:41:56.353174+00:00	
-F-U016	focus-008	focused	S06	challenging	gpt-5.6-sol	high	C-U096	running	/root/focus_u016	2026-09-08T01:41:56.425125+00:00	
-F-U017	focus-009	focused	S10	ordinary	gpt-5.6-sol	high	C-U133	running	/root/focus_u017	2026-09-08T01:41:56.493810+00:00	
-F-U018	focus-009	focused	S10	challenging	gpt-5.6-sol	high	C-U134	prepared			
-F-U019	focus-010	focused	S10	ordinary	gpt-5.6-sol	high	C-U135	prepared			
-F-U020	focus-010	focused	S10	challenging	gpt-5.6-sol	high	C-U136	prepared			
-F-U021	focus-011	focused	S10	ordinary	gpt-5.6-sol	high	C-U141	prepared			
+F-U014	focus-007	focused	S06	challenging	gpt-5.6-sol	high	C-U094	completed	/root/focus_u014	2026-09-08T01:41:56.276022+00:00	2026-09-08T01:43:58.619294+00:00
+F-U015	focus-008	focused	S06	ordinary	gpt-5.6-sol	high	C-U095	completed	/root/focus_u015	2026-09-08T01:41:56.353174+00:00	2026-09-08T01:43:58.697076+00:00
+F-U016	focus-008	focused	S06	challenging	gpt-5.6-sol	high	C-U096	completed	/root/focus_u016	2026-09-08T01:41:56.425125+00:00	2026-09-08T01:43:58.779166+00:00
+F-U017	focus-009	focused	S10	ordinary	gpt-5.6-sol	high	C-U133	completed	/root/focus_u017	2026-09-08T01:41:56.493810+00:00	2026-09-08T01:43:58.855826+00:00
+F-U018	focus-009	focused	S10	challenging	gpt-5.6-sol	high	C-U134	running	/root/focus_u018	2026-09-08T01:43:58.927240+00:00	
+F-U019	focus-010	focused	S10	ordinary	gpt-5.6-sol	high	C-U135	running	/root/focus_u019	2026-09-08T01:43:59.000486+00:00	
+F-U020	focus-010	focused	S10	challenging	gpt-5.6-sol	high	C-U136	running	/root/focus_u020	2026-09-08T01:43:59.078663+00:00	
+F-U021	focus-011	focused	S10	ordinary	gpt-5.6-sol	high	C-U141	running	/root/focus_u021	2026-09-08T01:43:59.173982+00:00	
 F-U022	focus-011	focused	S10	challenging	gpt-5.6-sol	high	C-U142	prepared			
 F-U023	focus-012	focused	S10	ordinary	gpt-5.6-sol	high	C-U143	prepared			
 F-U024	focus-012	focused	S10	challenging	gpt-5.6-sol	high	C-U144	prepared			

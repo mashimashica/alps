@@ -1,0 +1,15 @@
+R17: basic frontmatter/inventory PASS; description chars=424
+R17/ordinary: final Skill byte-identical; 2 final input texts MATCH (request directory normalized only)
+R17/challenging: final Skill byte-identical; 3 final input texts MATCH (request directory normalized only)
+R28: basic frontmatter/inventory PASS; description chars=351
+R28: supplied format-observation package hash MATCH
+R28/ordinary: final Skill byte-identical; 2 final input texts MATCH (request directory normalized only)
+R28/challenging: final Skill byte-identical; 3 final input texts MATCH (request directory normalized only)
+R44: basic frontmatter/inventory PASS; description chars=348
+R44: supplied format-observation package hash MATCH
+R44/ordinary: final Skill byte-identical; 2 final input texts MATCH (request directory normalized only)
+R44/challenging: final Skill byte-identical; 3 final input texts MATCH (request directory normalized only)
+R63: basic frontmatter/inventory PASS; description chars=308
+R63/ordinary: final Skill byte-identical; 2 final input texts MATCH (request directory normalized only)
+R63/challenging: final Skill byte-identical; 3 final input texts MATCH (request directory normalized only)
+Scope: static copies; narrow frontmatter checks, hashes and text equality only. No official validator, behavioral consumer or operational action.
