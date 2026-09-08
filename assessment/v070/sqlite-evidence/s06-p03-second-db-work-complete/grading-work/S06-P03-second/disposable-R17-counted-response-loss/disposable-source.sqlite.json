@@ -1,0 +1,8 @@
+{
+  "source_path": "grading-work/S06-P03-second/disposable-R17-counted-response-loss/disposable-source.sqlite",
+  "source_sha256": "b9367ee25c6c6057b8954dfe348a8f57e839e4e455a68e7d2c0c9e08687d5769",
+  "sql_path": "sqlite-evidence/s06-p03-second-db-work-complete/grading-work/S06-P03-second/disposable-R17-counted-response-loss/disposable-source.sqlite.sql",
+  "sql_sha256": "9cc1d42c7173c9c9d77a162dca1e8f0aa0eea2ab1aa10cf9ac75fcf4f28b3bae",
+  "sqlite_version": "3.53.1",
+  "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history"
+}

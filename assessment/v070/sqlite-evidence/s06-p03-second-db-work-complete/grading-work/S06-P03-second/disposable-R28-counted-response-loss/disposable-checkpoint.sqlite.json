@@ -1,0 +1,8 @@
+{
+  "source_path": "grading-work/S06-P03-second/disposable-R28-counted-response-loss/disposable-checkpoint.sqlite",
+  "source_sha256": "af063c60c80f67e2d9a92253945fbe47a7b295082655df6ca89e97d851e73fa1",
+  "sql_path": "sqlite-evidence/s06-p03-second-db-work-complete/grading-work/S06-P03-second/disposable-R28-counted-response-loss/disposable-checkpoint.sqlite.sql",
+  "sql_sha256": "d58621a0df707ab2d1d0e2a6b0d3e2fd4544c342a9b80b7c7e39874247cd20d8",
+  "sqlite_version": "3.53.1",
+  "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history"
+}

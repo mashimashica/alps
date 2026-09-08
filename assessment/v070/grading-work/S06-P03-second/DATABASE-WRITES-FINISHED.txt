@@ -1,0 +1,1 @@
+All component probe processes have exited. All SQLite connections are closed. No further database writes or copies are planned. Original packet files and original API states were never modified or executed.

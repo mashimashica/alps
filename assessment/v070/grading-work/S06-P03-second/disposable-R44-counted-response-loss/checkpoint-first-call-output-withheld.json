@@ -1,0 +1,17 @@
+{
+  "aggregates": {},
+  "complete": false,
+  "next_cursor": null,
+  "pages_incorporated": 0,
+  "request": {
+    "api": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P03-second/disposable-R44-counted-response-loss/recording_api.py",
+    "end": "2026-02-15",
+    "page_size": 3,
+    "snapshot_id": "snap_a85a9511a684a5bb7e464198",
+    "source_state": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P03-second/disposable-R44-counted-response-loss/disposable-source.sqlite",
+    "start": "2026-02-01",
+    "total_records": 17
+  },
+  "seen_entry_ids": [],
+  "version": 1
+}

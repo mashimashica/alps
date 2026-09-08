@@ -1,0 +1,8 @@
+{
+  "source_path": "grading-work/S06-P03-second/disposable-R28-clean-continuation/disposable-checkpoint.sqlite",
+  "source_sha256": "6f13452e6b1a5ebff79407b40e7554aae15375ec9040ac7a85c74b40b3f06a07",
+  "sql_path": "sqlite-evidence/s06-p03-second-db-work-complete/grading-work/S06-P03-second/disposable-R28-clean-continuation/disposable-checkpoint.sqlite.sql",
+  "sql_sha256": "74d09ee49279f46346c8525b1fbe1a039302573de307ace4f2b5912f3e46894f",
+  "sqlite_version": "3.53.1",
+  "representation": "Native SQL from a consistent committed read; logical state only, not binary identity or operation history"
+}

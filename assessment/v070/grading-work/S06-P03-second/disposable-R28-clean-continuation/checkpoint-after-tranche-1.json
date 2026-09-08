@@ -1,0 +1,56 @@
+{
+  "state": {
+    "version": 1,
+    "api": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P03-second/disposable-R28-clean-continuation/recording_api.py",
+    "source": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P03-second/disposable-R28-clean-continuation/disposable-source.sqlite",
+    "checkpoint": "/workspace/scratch/a75c3a6d9076/alps-v070-assessment/grading-work/S06-P03-second/disposable-R28-clean-continuation/disposable-checkpoint.sqlite",
+    "start": "2026-02-01",
+    "end": "2026-02-15",
+    "snapshot": "snap_a85a9511a684a5bb7e464198",
+    "total": 17,
+    "next_cursor": "p_071850dd8d9783695d966bc471a38931",
+    "complete": false
+  },
+  "entries": [
+    [
+      "e001"
+    ],
+    [
+      "e002"
+    ],
+    [
+      "e003"
+    ],
+    [
+      "e004"
+    ],
+    [
+      "e005"
+    ],
+    [
+      "e006"
+    ]
+  ],
+  "pages": [
+    [
+      "null"
+    ],
+    [
+      "\"p_7224021ce554b15e9982990dbc53ea95\""
+    ]
+  ],
+  "vendors": [
+    [
+      "alder",
+      "12000",
+      "1500",
+      2
+    ],
+    [
+      "birch",
+      "7000",
+      "0",
+      1
+    ]
+  ]
+}

@@ -99,3 +99,7 @@ Verified commit `9c55a050a8fbe9e8fee98ba6a3e4a87932020bb7`, tree `645db8dab20dcd
 ## Remaining S06 packets and grading start
 
 Verified commit `6bdc492d05be47af91a563afc85161dee9c0f40a`, tree `78960b4bf3cf025419611ee597b74ee398000d78`, parent `9c55a050a8fbe9e8fee98ba6a3e4a87932020bb7`. Snapshot `../assessment-checkpoint-H0yqzK`; 332 changed entries and 5,949 published files. Exact commit/ref/author-matching DCO and all 332 changed Git blob identities/modes matched the submitted UTF-8 payload. Saves S06-P01/P03 blind packets and the copied C094 workflow native-SQL representation, S06-P02 adjudication and C108–109 start observations. Later completion reports and the corrected recovery-helper follow-up review require the next save.
+
+## Completed S06 reviews and approved recovery packaging
+
+Verified commit `199aa313867f51caad9c3ed92674b868c53af1e3`, tree `874bbb58667aab6e543eda68d2342b91e3f2f008`, parent `6bdc492d05be47af91a563afc85161dee9c0f40a`. Snapshot `../assessment-checkpoint-1jF9xz`; 88 changed entries and 6,028 published files. Exact commit/ref/author-matching DCO and all 88 changed blob identities/modes matched the submitted UTF-8 payload. Saves all three S06 completion reports, 11 actual completed grading database SQL observations, C108–109 completion records and the independent F1/F2 approval. Subsequent consumers110–114 and S06-P03 second started only after verification.
