@@ -1,0 +1,50 @@
+{
+  "R17": {
+    "creator": "focus-010",
+    "arm": "A",
+    "case": "S10",
+    "requested_model": "gpt-5.6-sol",
+    "requested_effort": "high",
+    "repetition": "2",
+    "consumers": [
+      "F-U019",
+      "F-U020"
+    ]
+  },
+  "R63": {
+    "creator": "control-068",
+    "arm": "C",
+    "case": "S10",
+    "requested_model": "gpt-5.6-sol",
+    "requested_effort": "high",
+    "repetition": "2",
+    "consumers": [
+      "C-U135",
+      "C-U136"
+    ]
+  },
+  "R28": {
+    "creator": "control-067",
+    "arm": "C",
+    "case": "S10",
+    "requested_model": "gpt-5.6-sol",
+    "requested_effort": "high",
+    "repetition": "1",
+    "consumers": [
+      "C-U133",
+      "C-U134"
+    ]
+  },
+  "R44": {
+    "creator": "focus-009",
+    "arm": "A",
+    "case": "S10",
+    "requested_model": "gpt-5.6-sol",
+    "requested_effort": "high",
+    "repetition": "1",
+    "consumers": [
+      "F-U017",
+      "F-U018"
+    ]
+  }
+}
