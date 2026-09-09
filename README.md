@@ -45,7 +45,7 @@ The [working example](examples/README.md) shows both design responsibilities on 
 
 ## Design philosophy
 
-ALPS connects **process descriptions**, which clarify the meaning of work, with the **Unix philosophy** of composing tools. Process descriptions state the purpose, outcomes, necessary work, and applicable conditions. Tools make established operations available for composition.
+ALPS connects **process descriptions rooted in systems and software engineering** with the **Unix philosophy of composing small, clear tools**. Process descriptions state the purpose, outcomes, necessary work, and applicable conditions. Tools make established operations available for composition.
 
 <p align="center">
   <img src="assets/alps-agent-onion.svg" alt="Why and What are the meaning of work, How is the available means, and the Agent provides the judgment between them" width="900">
