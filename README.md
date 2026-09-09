@@ -45,23 +45,15 @@ The [working example](examples/README.md) shows both design responsibilities on 
 
 ## Design philosophy
 
-When an AI agent is given a job, not everything should be left to the model. Some parts of the work are established processing; others depend on context and require interpretation, selection, or composition.
-
-ALPS connects two lineages. The [Process Framework](skills/design-process-description/references/process-framework.md) follows process-description practice from systems and software engineering: the meaning of work—its purpose, observable outcomes, necessary work, and applicable conditions—can be described independently of a particular implementation. A Unix-inspired view of agentic systems addresses the other side: expose established processing through clear tools and compose those capabilities as needed. Karun Japhet describes this as [“the agent is the shell”](https://www.sahaj.ai/the-unix-philosophy-for-agentic-coding/). Anthropic similarly distinguishes [code-driven workflows from model-directed agents](https://www.anthropic.com/engineering/building-effective-agents) and recommends [tools that encapsulate stable operations](https://www.anthropic.com/engineering/writing-tools-for-agents).
+ALPS connects **process descriptions**, which clarify the meaning of work, with the **Unix philosophy** of composing tools. Process descriptions state the purpose, outcomes, necessary work, and applicable conditions. Tools make established operations available for composition.
 
 <p align="center">
   <img src="assets/alps-agent-onion.svg" alt="Why and What are the meaning of work, How is the available means, and the Agent provides the judgment between them" width="900">
 </p>
 
-In this picture, **Why / What** is the meaning of the work, **How** is the available means, and the **Agent** is responsible for the judgment between them. It interprets the situation, selects and composes capabilities, adapts the method, and can devise new means when existing ones are insufficient. Established calculations, transformations, checks, and stable sequences should be handled by suitable implementations that can perform them reliably.
+Distinguish the meaning of work (**Why / What**) from the available means (**How**), and connect them through the agent’s judgment. Tools handle established operations; the agent selects and combines the means to suit the purpose and situation, adapting the method as needed.
 
-The diagram is intentionally schematic. A Process Description can include Activities, Tasks, methods, or ordering where they are necessary. The separation is not “What only” versus “How only”; it is between the work being described and the configuration used to realize it.
-
-> **Describe the meaning of work independently of its implementation, make the available means explicit, and leave the judgment between them to the agent.**
-
-ALPS supports this through two complementary Skills: `design-process-description` clarifies the work, while `design-agent-work-system` designs the configuration that realizes it. They are not mandatory sequential phases; either can be used when its design basis is sufficient, and discoveries in one can lead to reconsideration of the other.
-
-ALPS supplies descriptions, design principles, and design support. Your environment supplies execution, storage, approval, and version management.
+Specify methods and order where the work requires them, while leaving room for judgment where context matters.
 
 ## Resources
 
