@@ -1,5 +1,8 @@
 # ALPS — エージェントライフサイクルプロセススキル
 
+[![Validate](https://github.com/mashimashica/alps/actions/workflows/validate.yml/badge.svg)](https://github.com/mashimashica/alps/actions/workflows/validate.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](../../../LICENSE)
+
 [English](../../../README.md)
 
 <p align="center">
