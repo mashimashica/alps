@@ -21,28 +21,6 @@ LINK_PATTERNS = (
 FENCE = re.compile(r"^(```|~~~).*?^\1[^\n]*$", re.DOTALL | re.MULTILINE)
 SCHEME = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
 
-# Links that leave their Skill directory, as (Skill, file within the Skill,
-# link target). PR5 removes these links from design-agent-work-system and
-# deletes this allowlist. design-process-description has no allowed entries.
-ALLOWED_EXTERNAL_LINKS = {
-    ("design-agent-work-system", "SKILL.md", "../design-process-description/SKILL.md"),
-    ("design-agent-work-system", "SKILL.md", "../design-process-description/references/process-framework.md"),
-    ("design-agent-work-system", "SKILL.md", "../design-process-description/references/SKILL-template.md"),
-    ("design-agent-work-system", "SKILL.md", "../../examples/README.md"),
-    ("design-agent-work-system", "references/examples.md", "../../design-process-description/references/SKILL-template.md"),
-    ("design-agent-work-system", "references/examples.md", "../../../examples/README.md"),
-    ("design-agent-work-system", "references/examples.md", "../../../examples/assess-service-change/SKILL.md"),
-    ("design-agent-work-system", "references/examples.md", "../../../examples/assess-service-change/references/pilot-context.md"),
-    ("design-agent-work-system", "references/locales/ja/SKILL.ja.md", "../../../../design-process-description/references/locales/ja/SKILL.ja.md"),
-    ("design-agent-work-system", "references/locales/ja/SKILL.ja.md", "../../../../design-process-description/references/locales/ja/process-framework.md"),
-    ("design-agent-work-system", "references/locales/ja/SKILL.ja.md", "../../../../design-process-description/references/locales/ja/SKILL-template.md"),
-    ("design-agent-work-system", "references/locales/ja/SKILL.ja.md", "../../../../../examples/locales/ja/README.md"),
-    ("design-agent-work-system", "references/locales/ja/examples.md", "../../../../design-process-description/references/locales/ja/SKILL-template.md"),
-    ("design-agent-work-system", "references/locales/ja/examples.md", "../../../../../examples/locales/ja/README.md"),
-    ("design-agent-work-system", "references/locales/ja/examples.md", "../../../../../examples/assess-service-change/references/locales/ja/SKILL.ja.md"),
-    ("design-agent-work-system", "references/locales/ja/examples.md", "../../../../../examples/assess-service-change/references/locales/ja/pilot-context.md"),
-}
-
 
 def walk_files(name: str):
     """Yield repository files with the given name without following symlinks."""
@@ -79,7 +57,6 @@ class DistributionLayoutTests(unittest.TestCase):
         self.assertEqual(distributed, set(DISTRIBUTED_SKILLS))
 
     def test_distributed_skill_links_stay_within_skill(self) -> None:
-        seen_allowed = set()
         for name in DISTRIBUTED_SKILLS:
             skill_directory = ROOT / "skills" / name
             for document in sorted(skill_directory.rglob("*.md")):
@@ -89,20 +66,10 @@ class DistributionLayoutTests(unittest.TestCase):
                     resolved = Path(os.path.normpath(document.parent / unquote(target)))
                     with self.subTest(skill=name, file=relative_document, link=target):
                         self.assertTrue(resolved.exists(), "link target does not exist")
-                        inside = resolved == skill_directory or skill_directory in resolved.parents
-                        key = (name, relative_document, target)
-                        if not inside:
-                            self.assertIn(
-                                key,
-                                ALLOWED_EXTERNAL_LINKS,
-                                "link leaves the Skill directory",
-                            )
-                            seen_allowed.add(key)
-        self.assertEqual(
-            ALLOWED_EXTERNAL_LINKS - seen_allowed,
-            set(),
-            "remove allowlist entries whose links no longer exist",
-        )
+                        self.assertTrue(
+                            resolved == skill_directory or skill_directory in resolved.parents,
+                            "link leaves the Skill directory",
+                        )
 
     def test_repository_skill_discovery_view(self) -> None:
         skills_view = ROOT / ".agents" / "skills"

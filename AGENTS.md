@@ -51,7 +51,8 @@ Keep the following evidence distinct:
 2. Repository validation: automated checks of Plugin manifest consistency, distribution layout, translation manifests, and relative links, and review of affected file layout, symlinks, Host resources, and distribution boundaries. After reviewing a Japanese counterpart against its English source, update its `reviewed_source_sha256` in the translation manifest of its `locales/ja/` directory.
 3. Semantic review: purpose and Outcome sufficiency, required details and obligations, references, evaluation limits, and English/Japanese meaning and normative force.
 4. Tool and connection verification against the specified behavior, including failures and incomplete results.
-5. Work-system effectiveness through representative work with an agent, information, tools, and environment, assessed against the work's Outcomes and conditions.
+5. Respect for applicable requirements, authority, and limits on effects, including those implemented by tools, assessed separately from tool behavior and effectiveness.
+6. Work-system effectiveness through representative work with an agent, information, tools, and environment, assessed against the work's Outcomes and conditions.
 
 Run the checks in `.github/workflows/validate.yml` that the environment permits. At minimum run `python3 -m unittest discover -s tests -v`, `git diff --check`, changed-link checks, and review the complete task-owned diff, including new files. Passing mechanical checks does not prove semantic validity or successful Process execution.
 

@@ -23,7 +23,7 @@ The following Tasks are required within the requested review scope.
 
 1. Identify the affected sources and inspect the complete task-owned diff, including additions and removals.
 2. Read the [Framework](../../../skills/design-process-description/references/process-framework.md) and affected Process Descriptions in full.
-3. For work-system changes, read the [design principles](../../../skills/design-agent-work-system/references/agent-work-system-design.md). Review responsibility allocation, public tool operations, information supply, execution conditions, and adaptation against the work. Verify the independent meaning of each foundation and its application in the relevant design Skill.
+3. For work-system changes, read the [design principles](../../../skills/design-agent-work-system/references/agent-work-system-design.md). Review responsibility allocation, exposed tool operations, information supply, execution conditions, and adaptation against the work. Verify the independent meaning of each foundation and its application in the relevant design Skill.
 4. Compare changed propositions by subject, modality, action or state, object, condition, quantifier, polarity, exception, and scope. Check that editorial changes preserve meaning and that intentional redefinitions have a basis in the requested design.
 5. Assess each description's Purpose and independently assessable Outcomes for relevance, individual necessity, and collective sufficiency. Check necessary detail, Activity/Task cohesion and coverage, boundary roles, and the distinction between work relationships and execution order.
 6. Review Markdown Process sections, Task lists, and note placement against the Framework, including `NOTE` in English and `注記` in Japanese. Check that notes explain the relevant content while obligations remain explicit in the main text; assess meaning separately from formatting.
@@ -42,8 +42,9 @@ The following Tasks are required within the requested review scope.
 ### Implementation and work-system assessment
 
 1. Check specified tool behavior and necessary connections, including failures, incomplete results, side effects, and retry conditions where applicable.
-2. Evaluate representative work using the intended agent, tools, information, and environment within the authorized scope. Relate results to the work's Outcomes and conditions, distinguishing this evidence from component tests.
-3. Identify the actual evaluation environment, evidence, unperformed checks, and limitations. Examine capability changes for effects on allocation, interfaces, and instructions while preserving work-specific criteria.
+2. Assess whether the configuration, including rules and restrictions implemented by tools, respects applicable requirements, authority, and limits on effects, separately from specified tool behavior and effectiveness.
+3. Evaluate representative work using the intended agent, tools, information, and environment within the authorized scope. Relate results to the work's Outcomes and conditions, distinguishing this evidence from component tests.
+4. Identify the actual evaluation environment, evidence, unperformed checks, and limitations. Examine capability changes for effects on allocation, interfaces, and instructions while preserving work-specific criteria.
 
 ### Finding synthesis
 
