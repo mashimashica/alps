@@ -17,6 +17,12 @@ from pathlib import Path
 DECIMAL = re.compile(r"[0-9]+(?:\.[0-9]+)?")
 
 
+def positive_integer(value: str) -> int:
+    if not re.fullmatch(r"[0-9]+", value):
+        raise ValueError("must be a positive integer")
+    return int(value)
+
+
 def nonnegative_number(value: str) -> float:
     if not DECIMAL.fullmatch(value):
         raise ValueError("must be a nonnegative decimal number")
@@ -46,6 +52,9 @@ def read_measurements(path: Path) -> tuple[dict, frozenset[str]]:
         if identifier != identifier.strip():
             raise ValueError(
                 f"{location}: request_id must not have leading or trailing whitespace")
+        if not identifier.isprintable():
+            raise ValueError(
+                f"{location}: request_id must contain only printable characters")
         if status not in ("ok", "error"):
             raise ValueError(f"{location}: status must be ok or error")
         try:
@@ -78,7 +87,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("baseline", type=Path, help="baseline UTF-8 request CSV")
     parser.add_argument("candidate", type=Path, help="candidate UTF-8 request CSV")
-    parser.add_argument("--min-samples", type=int, required=True,
+    parser.add_argument("--min-samples", type=positive_integer, required=True,
                         help="minimum number of requests in each snapshot")
     parser.add_argument("--max-p95-ms", type=nonnegative_number, required=True,
                         help="maximum candidate nearest-rank p95 duration in ms")

@@ -99,6 +99,19 @@ class ServiceComparisonTests(unittest.TestCase):
             self.assertEqual(evidence["input_relationship"],
                              {"identical_bytes": False, "same_request_ids": False})
             self.assertTrue(all(evidence["checks"].values()))
+            candidate.write_text(
+                HEADER + "r1,110,ok\nr2,120,ok\nr3,140,ok\n", encoding="utf-8")
+            result = self.invoke(candidate, "--min-samples", "3")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertFalse(
+                json.loads(result.stdout)["input_relationship"]["same_request_ids"])
+            candidate.write_text(
+                HEADER + "r4,160,ok\nr2,120,ok\nr1,110,ok\nr3,140,ok\n",
+                encoding="utf-8")
+            result = self.invoke(candidate)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(json.loads(result.stdout)["input_relationship"],
+                             {"identical_bytes": False, "same_request_ids": True})
 
     def test_nearest_rank_and_failed_requests_are_included(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -138,6 +151,8 @@ class ServiceComparisonTests(unittest.TestCase):
             "blank_identifier": HEADER + "  ,1,ok\n",
             "trailing_space_identifier": HEADER + "r1 ,1,ok\n",
             "leading_space_identifier": HEADER + " r1,1,ok\n",
+            "zero_width_identifier": HEADER + "r\u200b1,1,ok\n",
+            "embedded_newline_identifier": HEADER + '"r\n1",1,ok\n',
             "status": HEADER + "r1,1,unknown\n",
             "nan": HEADER + "r1,NaN,ok\n",
             "infinity": HEADER + "r1,inf,ok\n",
@@ -167,6 +182,17 @@ class ServiceComparisonTests(unittest.TestCase):
             self.assertMeasurementError(result)
             self.assertIn("leading or trailing whitespace", result.stderr)
 
+    def test_nonprintable_identifier_diagnostic(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "hidden.csv"
+            for name, content in (("zero_width", "r\u200b1,1,ok\n"),
+                                  ("embedded_newline", '"r\n1",1,ok\n')):
+                with self.subTest(case=name):
+                    path.write_text(HEADER + content, encoding="utf-8")
+                    result = self.invoke(path)
+                    self.assertMeasurementError(result)
+                    self.assertIn("printable characters", result.stderr)
+
     def test_utf8_bom_is_rejected_with_specific_diagnostic(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "bom.csv"
@@ -191,6 +217,8 @@ class ServiceComparisonTests(unittest.TestCase):
     def test_invalid_limits_do_not_produce_measurement_results(self) -> None:
         for option, value in [
             ("--min-samples", "0"), ("--min-samples", "1.5"),
+            ("--min-samples", "+1"), ("--min-samples", "1_0"),
+            ("--min-samples", " 1"), ("--min-samples", "１"),
             ("--max-error-rate", "1.1"),
             ("--max-p95-ms", "NaN"), ("--max-p95-ms", "-1"),
             ("--max-p95-ms", "1e2"), ("--max-p95-ms", "1_000"),
