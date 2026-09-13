@@ -29,6 +29,7 @@
 | `docs/locales/ja/`、各Skillの`references/locales/ja/` | 対応する英語版の翻訳。翻訳したSkill本文は`SKILL.ja.md`とし、Skillの入口ではない。 |
 | `examples/` | 実働する対象Skillを含む、同梱する参照資料。Plugin Skillの発見対象外。ガイドの翻訳は`examples/locales/ja/`、対象Skillの翻訳はその`references/locales/ja/`に置く。 |
 | `plugin.json`、`.claude-plugin/`、`.cursor-plugin/`、`.codex-plugin/` | ルートPlugin形式と、それぞれのHostアダプター。 |
+| `CLAUDE.md` | このファイルを読み込む、リポジトリ開発用のClaude Codeの入口。独自の指示は持たず、Pluginの文脈ではない。 |
 | `assets/`およびSkillの`agents/`と`assets/` | 表示資源。 |
 
 `skills/`をPlugin Skillの配布元とする。Hostは各規約とmanifestにより発見する。`.agents/skills/`はリポジトリ内の統合ビューであり、普遍的なHost規約ではない。checkoutに開発用Skillを含めても、それをPlugin Skillとして公開することにはならない。各配布Skillは単体で機能する。その相対リンクは自身のディレクトリ内で解決し、ファイルや名前によって他方のSkillに依存しない。Skillを組み合わせる場合は、仕事の記述だけを受け渡す。Pluginは両Skillを、参照資料である`examples/`とともに配布する。Skillから`examples/`へはリンクしない。開発用Skillと例のSkillは`skills/`の外に置く。

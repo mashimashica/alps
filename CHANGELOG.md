@@ -7,6 +7,7 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 ### Added
 
 - A Claude Code marketplace manifest (`.claude-plugin/marketplace.json`) with `/plugin marketplace add` installation guidance, and translation manifests that record each Japanese file's English source and its reviewed SHA-256.
+- A root `CLAUDE.md` that imports AGENTS for Claude Code repository development without adding instructions; Plugin validation excludes it.
 - Repository tests for the distribution layout, translation manifest registration and source hashes, and consistent Plugin names and descriptions, with the Plugin version kept only in Plugin manifests.
 
 ### Changed

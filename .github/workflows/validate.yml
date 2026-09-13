@@ -76,8 +76,13 @@ jobs:
       - name: Validate Claude Plugin and marketplace with Claude Code
         run: |
           # A directory with marketplace.json validates only the marketplace.
+          # The root CLAUDE.md is for repository development, not Plugin context,
+          # so the Plugin is validated strictly from a tracked copy without it.
+          plugin_copy="$(mktemp -d)"
+          git archive HEAD | tar -x -C "$plugin_copy"
+          rm "$plugin_copy/CLAUDE.md"
           npx --yes @anthropic-ai/claude-code@2.1.251 \
-            plugin validate .claude-plugin/plugin.json --strict
+            plugin validate "$plugin_copy/.claude-plugin/plugin.json" --strict
           npx --yes @anthropic-ai/claude-code@2.1.251 \
             plugin validate . --strict
 
