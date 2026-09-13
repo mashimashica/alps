@@ -51,6 +51,8 @@ class ManifestVersionTests(unittest.TestCase):
             if key in entry:
                 with self.subTest(manifest=MARKETPLACE, key=key):
                     self.assertEqual(entry[key], root[key])
+        with self.subTest(manifest=MARKETPLACE, key="metadata.description"):
+            self.assertEqual(load(MARKETPLACE)["metadata"]["description"], root["description"])
 
 
 if __name__ == "__main__":

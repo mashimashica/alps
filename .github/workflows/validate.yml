@@ -73,8 +73,11 @@ jobs:
               raise SystemExit(1)
           PY
 
-      - name: Validate Claude Plugin with Claude Code
+      - name: Validate Claude Plugin and marketplace with Claude Code
         run: |
+          # A directory with marketplace.json validates only the marketplace.
+          npx --yes @anthropic-ai/claude-code@2.1.251 \
+            plugin validate .claude-plugin/plugin.json --strict
           npx --yes @anthropic-ai/claude-code@2.1.251 \
             plugin validate . --strict
 
