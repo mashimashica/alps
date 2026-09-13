@@ -1,0 +1,25 @@
+locale: ja
+source_locale: en
+status: reviewed
+# Each key is a Japanese file and each source is its English file. Paths are
+# relative to the directory containing this manifest. Update
+# reviewed_source_sha256 after reviewing the translation against the source.
+sources:
+  AGENTS.md:
+    source: ../../../AGENTS.md
+    reviewed_source_sha256: afc788f2aa8397e82f8163b2c3e62be9f8355707849312dcb59ba589923a0719
+  CONTRIBUTING.md:
+    source: ../../../CONTRIBUTING.md
+    reviewed_source_sha256: 7ee4e7c2142ea0b966a206da7895a83a05659f75cbf9c026036d0a64fea254ed
+  README.md:
+    source: ../../../README.md
+    reviewed_source_sha256: 09d05736b5ccc0f79c1f8b9a392e620178732e50f8cd038afd699be312fce7d5
+  versioning.md:
+    source: ../../versioning.md
+    reviewed_source_sha256: 2fd119249218765a7e0ac7e1f66998c068348f45c2041ce8ec4dc827bdd5c538
+  releases/0.6.0.md:
+    source: ../../releases/0.6.0.md
+    reviewed_source_sha256: 1191210af2cfe5eea631350faed3415c14f0e3f2a4f7b2acaeaa32401a8a0db4
+  releases/0.7.0.md:
+    source: ../../releases/0.7.0.md
+    reviewed_source_sha256: 12b4705c36c096227274986cb8aeca6d4d8e21f6a7066a5652d782c54305014b
