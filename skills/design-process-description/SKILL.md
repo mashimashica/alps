@@ -60,8 +60,7 @@ A review-only request must be answered with findings and any requested correctio
 
 ## Resources
 
-This root `SKILL.md` is the English source for the [Japanese translation](references/locales/ja/SKILL.md), which carries the same meaning and normative force.
+This root `SKILL.md` is the English source for the [Japanese translation](references/locales/ja/SKILL.ja.md), which carries the same meaning and normative force.
 
 - [Minimal template](references/SKILL-template.md): use when drafting an Agent Skill.
 - [Examples and review cases](references/examples.md): consult relevant cases when checking success conditions, choosing work detail, describing shared information or views, or evaluating incomplete evidence.
-- [Agent Work System Design](../design-agent-work-system/SKILL.md): use when the requested work concerns the supporting configuration, its implementation, or its effectiveness. Refer to the shared work description; revisit it when configuration design reveals a problem with its assumptions.

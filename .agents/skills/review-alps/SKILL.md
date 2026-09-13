@@ -1,6 +1,6 @@
 ---
 name: review-alps
-description: Review ALPS repository changes for semantic consistency, source relationships, evaluation limits, and distribution integrity across specifications, design Skills, tools, examples, tests, and guidance. Repository-development Skill.
+description: Review ALPS repository changes for semantic consistency, source relationships, evaluation limits, and distribution integrity across the Process Framework, work-system design principles, design Skills, tools, examples, tests, and guidance. Repository-development Skill.
 ---
 
 # ALPS Repository Review
@@ -52,8 +52,8 @@ The following Tasks are required within the requested review scope.
 
 ## Controls
 
-The Framework governs Process meaning and Markdown presentation, the work-system principles govern supporting configurations, and the design Skills apply these sources within their work. AGENTS governs repository layout. The requested change determines the review's scope.
+The Framework governs Process meaning and Markdown presentation, the work-system principles govern supporting configurations, and the design Skills apply these sources within their work. AGENTS governs repository layout.
 
 ## Constraints
 
-Respect the user's information and authorization boundaries. A review-only request returns findings; it does not authorize editing, executing the described work, or publishing changes.
+The review must remain within the requested change's scope. Respect the user's information and authorization boundaries. A review-only request returns findings; it does not authorize editing, executing the described work, or publishing changes.

@@ -1,6 +1,6 @@
 ---
 name: sync-locales
-description: Review and synchronize English ALPS source documents—specifications, Process Descriptions, templates, examples, and guidance—with their Japanese counterparts. Report semantic mismatches and unverified pairs. Repository-development Skill.
+description: Review and synchronize English ALPS source documents—the Process Framework, work-system design principles, Process Descriptions, templates, examples, and guidance—with their Japanese counterparts. Report semantic mismatches and unverified pairs. Repository-development Skill.
 ---
 
 # Locale Synchronization
@@ -38,7 +38,8 @@ The following Tasks are required within the requested scope.
 ### Correspondence evaluation
 
 1. Recheck corrected units in context, distinguishing wording differences from added, omitted, strengthened, or weakened obligations.
-2. Report reviewed pairs, remaining mismatches and their effects, and unverified pairs. File existence, locale metadata, and format checks do not establish semantic equivalence.
+2. After confirming a counterpart's correspondence with its English source, update `reviewed_source_sha256` for that pair in the `manifest.yaml` of the counterpart's `locales/ja/` directory, registering new counterparts there.
+3. Report reviewed pairs, remaining mismatches and their effects, and unverified pairs. File existence, locale metadata, and format checks do not establish semantic equivalence.
 
 ## Controls
 

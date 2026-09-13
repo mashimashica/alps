@@ -33,8 +33,8 @@
     ],
     "websiteURL": "https://github.com/mashimashica/alps",
     "defaultPrompt": [
-      "Use design-process-description to clarify this work and its observable success conditions.",
-      "Use design-agent-work-system to design and verify the capabilities and interfaces that realize this work.",
+      "Use $design-process-description to clarify this work and its observable success conditions.",
+      "Use $design-agent-work-system to design and verify the capabilities and interfaces that realize this work.",
       "Review this work description and supporting configuration; report findings without changing them."
     ],
     "brandColor": "#4DB2FF",

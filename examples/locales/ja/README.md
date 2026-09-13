@@ -2,14 +2,14 @@
 
 [英語版](../../README.md)
 
-この参考例は、実働スクリプトを含む対象Skill一式である。Pluginが発見する`skills/`の外にある`examples/`へ参考資料として同梱する。仕事の名称、目的、成果、条件は[サービス変更の評価](../../assess-service-change/references/locales/ja/SKILL.md)を参照する。その記述を、以下の二つの設計責務に共通する参照元とする。
+この参考例は、実働スクリプトを含む対象Skill一式である。Pluginが発見する`skills/`の外にある`examples/`へ参考資料として同梱する。仕事の名称、目的、成果、条件は[サービス変更の評価](../../assess-service-change/references/locales/ja/SKILL.ja.md)を参照する。その記述が仕事の目的と成果を保持し、以下の二つの設計責務に共通する参照元となる。実現を支える設計はその記述を再掲せずに参照し、ツールの証拠は、ツールの完了を成功条件とすることなく評価に寄与する。
 
 ## 同じ仕事に対する二つの設計責務
 
 | 責務 | この例で明確にする内容 | 評価対象 |
 | --- | --- | --- |
-| [プロセス記述の設計](../../../skills/design-process-description/references/locales/ja/SKILL.md) | 観察可能な評価結果、配備との境界、適用する試行基準、必要な活動とタスク、測定と能力の役割。 | [対象の記述](../../assess-service-change/references/locales/ja/SKILL.md)の意味と関係。 |
-| [エージェント作業システムの設計](../../../skills/design-agent-work-system/references/locales/ja/SKILL.md) | エージェント、ローカルPythonツール、測定、試行文脈の相互作用と、計算に委ねる仕事、文脈判断が必要な仕事。 | 実現を支える構成、その実装、有効な評価の証拠。 |
+| [プロセス記述の設計](../../../skills/design-process-description/references/locales/ja/SKILL.ja.md) | 観察可能な評価結果、配備との境界、適用する試行基準、必要な活動とタスク、測定と能力の役割。 | [対象の記述](../../assess-service-change/references/locales/ja/SKILL.ja.md)の意味と関係。 |
+| [エージェント作業システムの設計](../../../skills/design-agent-work-system/references/locales/ja/SKILL.ja.md) | エージェント、ローカルPythonツール、測定、試行文脈の相互作用と、計算に委ねる仕事、文脈判断が必要な仕事。 | 実現を支える構成、その実装、有効な評価の証拠。 |
 
 ## 構成とインターフェース
 

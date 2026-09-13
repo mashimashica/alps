@@ -4,7 +4,17 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+### Added
+
+- A Claude Code marketplace manifest (`.claude-plugin/marketplace.json`) with `/plugin marketplace add` installation guidance, and translation manifests that record each Japanese file's English source and its reviewed SHA-256.
+- Repository tests for the distribution layout, translation manifest registration and source hashes, and consistent Plugin names, descriptions, and marketplace version.
+
 ### Changed
+
+- Make each distributed Skill self-contained: remove links from `design-process-description` to the other Skill and `examples/`, move its working-example note into the example guide, and state in AGENTS and README that the Skills combine by exchanging a description of the work.
+- Rename the Japanese Skill translations to `SKILL.ja.md` so they are not Skill entry points, and update all links.
+- Point broken links in past release notes to their release tags, and extend link checks to all release notes.
+- Clarify release-note translation in the release procedure, Framework and design-principle wording in repository guidance and development Skills, Japanese normative force in versioning and contribution guidance, and Codex display metadata.
 
 - Unify public-facing README, Plugin, and social-preview messaging around designing the meaning of work and the agent work system that realizes it, without changing the two design Skills' responsibilities.
 - Make responsibility boundaries, proportionate Outcome counterexamples, and evidence status explicit in Process Description Design; clarify adaptation and retention of applicable evidence in Agent Work System Design.

@@ -18,16 +18,23 @@ ALPSはClaude、Cursor、Codexのアダプターを持つ[Agent Plugins](https:/
 npx plugins add mashimashica/alps
 ```
 
-導入後は対象クライアントを再読込みしてください。Skill内とSkill間の必要なリンクを利用できるよう、両Skillとその参照資源、同梱する`examples/`を、Plugin全体の配置で保持します。導入先で`design-process-description`と`design-agent-work-system`が表示され、それぞれの参照リンクを開けることを確認してください。
+Claude Codeでは、このリポジトリをPluginマーケットプレイスとして追加し、そこから導入することもできます。
+
+```text
+/plugin marketplace add mashimashica/alps
+/plugin install alps@alps
+```
+
+導入後は対象クライアントを再読込みしてください。各Skillは単体で機能します。組み合わせる場合は、仕事の記述を一方から他方へ受け渡します。Pluginは、両Skillとその参照資源を、参照資料である`examples/`とともに配布します。導入先で`design-process-description`と`design-agent-work-system`が表示され、それぞれの参照リンクを開けることを確認してください。
 
 ## Skillの使い方
 
 | Skill | 設計・評価の対象 |
 | --- | --- |
-| [design-process-description](../../../skills/design-process-description/references/locales/ja/SKILL.md) | プロセス記述の意味、関係、適用条件。 |
-| [design-agent-work-system](../../../skills/design-agent-work-system/references/locales/ja/SKILL.md) | エージェント・ツール・情報資源・実行環境の構成と相互作用。依頼範囲で実装・検証も含む。 |
+| [design-process-description](../../../skills/design-process-description/references/locales/ja/SKILL.ja.md) | プロセス記述の意味、関係、適用条件。 |
+| [design-agent-work-system](../../../skills/design-agent-work-system/references/locales/ja/SKILL.ja.md) | エージェント・ツール・情報資源・実行環境の構成と相互作用。依頼範囲で実装・検証も含む。 |
 
-両Skillは作成・改訂・レビューを支援します。設計の基礎となる情報が十分であれば、どちらからでも使えます。仕事の記述には必要な方法や順序も含められます。システム設計はその共通の意味を参照し、再検討すべき前提を明らかにする場合があります。自然言語で依頼するか、Hostの仕様に応じてSkill名を明示します。
+両Skillは作成・改訂・レビューを支援し、それぞれ単体で機能します。設計の基礎となる情報が十分であれば、どちらからでも使えます。組み合わせる場合は、仕事の記述を受け渡します。プロセス記述をシステム設計の出発点にでき、システム設計はその記述の中で再検討が必要な前提を報告できます。仕事の記述には必要な方法や順序も含められます。自然言語で依頼するか、Hostの仕様に応じてSkill名を明示します。
 
 ```text
 design-process-descriptionを使い、この一度限りの作業を、目的、観察可能な成功条件、必要な境界によって記述してください。
@@ -45,7 +52,7 @@ design-agent-work-systemを使い、この仕事に必要な能力とインタ�
 
 ## 設計思想
 
-ALPSは、**システムズ／ソフトウェア工学に由来するプロセス記述**と、**小さく明確な道具を組み合わせるUnix哲学**をつなぎます。仕事の目的・成果・必要な作業や条件を記述し、確立した処理を組み合わせられる道具として整えます。
+ALPSは、**システムズ／ソフトウェア工学に由来するプロセス記述**と、**小さく明確な道具を組み合わせるUnix哲学**をつなぎます。仕事の目的・成果・必要な作業や条件はプロセス記述で示し、確立した処理は道具として組み合わせられるようにします。
 
 <p align="center">
   <img src="../../../assets/alps-agent-onion.svg" alt="Why / Whatが仕事の意味、Howが利用可能な手段、その間の判断をAgentが担う" width="900">
@@ -61,8 +68,8 @@ ALPSは、**システムズ／ソフトウェア工学に由来するプロセ�
 | --- | --- | --- |
 | プロセス記述の意味 | [Process Framework](../../../skills/design-process-description/references/process-framework.md) | [プロセスフレームワーク](../../../skills/design-process-description/references/locales/ja/process-framework.md) |
 | 作業システムの設計 | [Design principles](../../../skills/design-agent-work-system/references/agent-work-system-design.md) | [エージェント作業システムの設計原則](../../../skills/design-agent-work-system/references/locales/ja/agent-work-system-design.md) |
-| プロセス記述の設計 | [Skill](../../../skills/design-process-description/SKILL.md) | [Skill](../../../skills/design-process-description/references/locales/ja/SKILL.md) |
-| エージェント作業システムの設計 | [Skill](../../../skills/design-agent-work-system/SKILL.md) | [Skill](../../../skills/design-agent-work-system/references/locales/ja/SKILL.md) |
+| プロセス記述の設計 | [Skill](../../../skills/design-process-description/SKILL.md) | [Skill](../../../skills/design-process-description/references/locales/ja/SKILL.ja.md) |
+| エージェント作業システムの設計 | [Skill](../../../skills/design-agent-work-system/SKILL.md) | [Skill](../../../skills/design-agent-work-system/references/locales/ja/SKILL.ja.md) |
 | 貢献とリポジトリ作業 | [CONTRIBUTING](../../../CONTRIBUTING.md)、[AGENTS](../../../AGENTS.md) | [CONTRIBUTING](CONTRIBUTING.md)、[AGENTS](AGENTS.md) |
 | 版管理方針とリリースノート | [Versioning](../../../docs/versioning.md)、[0.7.0](../../../docs/releases/0.7.0.md) | [版管理](versioning.md)、[0.7.0](releases/0.7.0.md) |
 

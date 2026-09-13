@@ -52,7 +52,7 @@ The `main` branch represents ongoing development. [CHANGELOG.md](../CHANGELOG.md
 
 1. Select the version and update `VERSION`.
 2. Move completed entries from `Unreleased` into the dated release section in `CHANGELOG.md`.
-3. Prepare release notes under `docs/releases/`.
+3. Prepare release notes under `docs/releases/` and their Japanese translations under `docs/locales/ja/releases/`.
 4. Merge the release-preparation pull request into `main`.
 5. Create a tag named `vMAJOR.MINOR.PATCH` on the merge commit.
 6. Publish a GitHub Release from that tag using the prepared release notes.

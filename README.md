@@ -18,7 +18,14 @@ ALPS is an [Agent Plugins](https://agent-plugins.org/) package with Claude, Curs
 npx plugins add mashimashica/alps
 ```
 
-Reload affected clients after installation. Keep both Skills with their reference resources and the bundled `examples/` in the complete Plugin layout, so required links within and between Skills remain accessible. Check that your client exposes `design-process-description` and `design-agent-work-system` and that their reference links open.
+In Claude Code, you can also add this repository as a plugin marketplace and install from it:
+
+```text
+/plugin marketplace add mashimashica/alps
+/plugin install alps@alps
+```
+
+Reload affected clients after installation. Each Skill functions on its own; to combine them, pass the description of the work from one to the other. The Plugin distributes both Skills with their reference resources, together with the `examples/` reference material. Check that your client exposes `design-process-description` and `design-agent-work-system` and that their reference links open.
 
 ## Use the Skills
 
@@ -27,7 +34,7 @@ Reload affected clients after installation. Keep both Skills with their referenc
 | [design-process-description](skills/design-process-description/SKILL.md) | The meaning, relationships, and applicable conditions of a Process Description. |
 | [design-agent-work-system](skills/design-agent-work-system/SKILL.md) | The configuration and interaction of agents, tools, information resources, and execution environments, including implementation and verification within the request. |
 
-Both support creation, revision, and review. Use either when its design basis is sufficient. A work description may include necessary methods and order; system design refers to that shared meaning and can reveal assumptions that need reconsideration. Ask in ordinary language or name the Skill explicitly as your Host requires.
+Both support creation, revision, and review, and each works on its own. Use either when its design basis is sufficient. To combine them, pass the description of the work between them: a Process Description can be the starting point for system design, and system design can report assumptions in that description that need reconsideration. A work description may include necessary methods and order. Ask in ordinary language or name the Skill explicitly as your Host requires.
 
 ```text
 Use design-process-description to describe this one-off task through its purpose, observable success conditions, and necessary boundaries.
@@ -61,8 +68,8 @@ Specify methods and order where the work requires them, while leaving room for j
 | --- | --- | --- |
 | Meaning of Process Descriptions | [Process Framework](skills/design-process-description/references/process-framework.md) | [プロセスフレームワーク](skills/design-process-description/references/locales/ja/process-framework.md) |
 | Work-system design | [Design principles](skills/design-agent-work-system/references/agent-work-system-design.md) | [エージェント作業システムの設計原則](skills/design-agent-work-system/references/locales/ja/agent-work-system-design.md) |
-| Process Description Design | [Skill](skills/design-process-description/SKILL.md) | [Skill](skills/design-process-description/references/locales/ja/SKILL.md) |
-| Agent Work System Design | [Skill](skills/design-agent-work-system/SKILL.md) | [Skill](skills/design-agent-work-system/references/locales/ja/SKILL.md) |
+| Process Description Design | [Skill](skills/design-process-description/SKILL.md) | [Skill](skills/design-process-description/references/locales/ja/SKILL.ja.md) |
+| Agent Work System Design | [Skill](skills/design-agent-work-system/SKILL.md) | [Skill](skills/design-agent-work-system/references/locales/ja/SKILL.ja.md) |
 | Contribution and repository work | [CONTRIBUTING](CONTRIBUTING.md), [AGENTS](AGENTS.md) | [CONTRIBUTING](docs/locales/ja/CONTRIBUTING.md), [AGENTS](docs/locales/ja/AGENTS.md) |
 | Version policy and release notes | [Versioning](docs/versioning.md), [0.7.0](docs/releases/0.7.0.md) | [版管理](docs/locales/ja/versioning.md), [0.7.0](docs/locales/ja/releases/0.7.0.md) |
 
