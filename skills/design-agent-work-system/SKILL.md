@@ -1,13 +1,13 @@
 ---
 name: design-agent-work-system
-description: "Design, revise, or review how agents, tools (scripts, CLIs, APIs, MCP servers), information resources, and execution environments realize work: allocate judgment and processing, design tool interfaces, implement and connect capabilities within the request, and verify behavior and effectiveness, or review an existing configuration. Starts from a description of the work; defining what the work must achieve is outside this Skill."
+description: "Design, revise, or review how agents, tools (scripts, CLIs, APIs, MCP servers), information resources, and execution environments realize work: allocate judgment and processing, design tool interfaces, implement and connect capabilities within the request, and verify behavior and effectiveness. Starts from a description of the work; defining what the work must achieve is outside this Skill."
 ---
 
 # Agent Work System Design
 
 ## Purpose
 
-Design a configuration of agents, tools, information resources, and execution environments suited to the target work and its applicable conditions, or findings identifying why one cannot be established, and assess its feasibility and effectiveness with evidence proportionate to the request. Defining what the work must achieve is outside this Skill; it starts from a description of the work.
+Establish a configuration of agents, tools, information resources, and execution environments suited to the target work and its applicable conditions, or findings identifying why one cannot be established, and assess its feasibility and effectiveness with evidence proportionate to the request. Defining what the work must achieve is outside this Skill; it starts from a description of the work.
 
 ## Outcomes
 

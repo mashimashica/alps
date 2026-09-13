@@ -7,7 +7,7 @@ status: reviewed
 sources:
   SKILL.ja.md:
     source: ../../../SKILL.md
-    reviewed_source_sha256: 1942db38ebe3b39ed1d0443a29cd4eb3cc7ede61ce3b68ccd12d267b6c3a7d59
+    reviewed_source_sha256: 5bd3063de9ccd9c200e9e8bba4e732794c83c2a73d0062d6b95097bb3b8d83ef
   agent-work-system-design.md:
     source: ../../agent-work-system-design.md
     reviewed_source_sha256: c09ea7e2e9c11a2e30896d5c514949b4851175178998f4323c3bf660faf4fd79
