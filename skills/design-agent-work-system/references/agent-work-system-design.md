@@ -24,7 +24,7 @@ Component boundaries should group responsibilities that belong together and hide
 
 Internal module boundaries and operations exposed to an agent serve different purposes. A stable combination of internal operations should be offered as one tool operation when that reduces unnecessary selection and coordination without removing a meaningful choice. Combinations that depend on the situation should remain selectable at the point where the necessary information and judgment are available.
 
-The size of a component or public operation should be judged by the clarity of its responsibility and its ease of use, verification, change, and composition. The design may use one agent and existing tools when that is sufficient.
+The size of a component or exposed operation should be judged by the clarity of its responsibility and its ease of use, verification, change, and composition. The design may use one agent and existing tools when that is sufficient.
 
 ## 4. Information and interfaces
 
@@ -46,7 +46,7 @@ When interaction fails, the design should consider improvements to the tools, in
 
 The design must identify the execution conditions on which its claims depend, including access, dependencies, available capabilities, and any required authority or approval. Required conditions must be confirmed before the actions or claims that depend on them. A missing or unconfirmed condition must limit dependent actions and judgments; independent work may proceed under its own applicable conditions.
 
-A tool may use external services, changing state, or probabilistic processing. Its interface must communicate the guarantees and limits relevant to its use. Where determinism or reproducibility is needed, the design must identify what must be repeatable and the inputs, versions, state, and environment conditions needed to support that claim.
+A tool can use external services, changing state, or probabilistic processing. Its interface must communicate the guarantees and limits relevant to its use. Where determinism or reproducibility is needed, the design must identify what must be repeatable and the inputs, versions, state, and environment conditions needed to support that claim.
 
 Error handling must account for possible effects already produced. Before retrying a state-changing operation whose result is uncertain, the system must ascertain the resulting state or use a recovery mechanism that supports the intended retry. Evidence of successful tool processing must be interpreted against the intended result and applicable conditions.
 

@@ -46,7 +46,7 @@ An **Activity** is a cohesive set of Tasks within a Process. It organizes relate
 
 A **Task** states an individual action intended to support one or more Outcomes. Its operation, object, and normative force must be clear. The Tasks described within an Activity need not enumerate every possible action within its boundary.
 
-When Activities and Sub-processes describe the Process's work as a whole, together they must cover every Process Outcome and contribute to the Process Purpose. Activities describing only selected work must identify the Outcomes they support. Their relationship to Outcomes can be one-to-one, one-to-many, many-to-one, or many-to-many. Review must check this coverage and the contribution of the described Tasks. An Activity can be described as a **Sub-process** with its own Name, Purpose, and Outcomes when separate treatment is useful.
+When Activities and Sub-processes describe the Process's work as a whole, together they must cover every Process Outcome and contribute to the Process Purpose. Activities or Sub-processes describing only selected work must identify the Outcomes they support. Their relationship to Outcomes can be one-to-one, one-to-many, many-to-one, or many-to-many. Review must check this coverage or identification and the contribution of the described Tasks. An Activity can be described as a **Sub-process** with its own Name, Purpose, and Outcomes when separate treatment is useful.
 
 Process, Sub-process, and Activity have no universal size boundaries. Outcomes and principal Outputs usually help identify a Process boundary; intermediate Outputs do not by themselves require another Process. Work should be divided where it clarifies boundaries, responsibilities, or relationships, and a level should be omitted where it impairs understanding or use. A difference in performer or tool alone does not determine a Process boundary. Dependencies on other Processes should be reduced where practicable while keeping necessary relationships clear.
 
@@ -76,7 +76,7 @@ Controls, Constraints, and Enablers may be associated with individual elements o
 
 **Traceability** makes the relationships among Outcomes, Activities, Tasks, and information items identifiable so that their consistency and the effects of change can be examined. It should connect work and necessary Inputs and Outputs to the Outcomes they support, with enough detail for the intended use.
 
-Processes may exchange information or repeatedly consult and update the same information. A needed relationship must make the information's meaning, scope, conditions of use, and relevant change impacts clear. The relationship must identify which work reads or changes it and which decisions or results require reconsideration after a change. A handoff relates a provider's Output to a recipient's Input; shared information can also support repeated interaction among several Processes. Storage and coordination mechanisms belong to the applying environment.
+Processes can exchange information or repeatedly consult and update the same information. A needed relationship must make the information's meaning, scope, conditions of use, and relevant change impacts clear. The relationship must identify which work reads or changes it and which decisions or results require reconsideration after a change. A handoff relates a provider's Output to a recipient's Input; shared information can also support repeated interaction among several Processes. Storage and coordination mechanisms belong to the applying environment.
 
 ## 5. Applying Processes in combination
 
@@ -144,7 +144,7 @@ A successful description review must not be reported as successful execution. Ex
 
 Measures used in an evaluation should connect the information needed to defined measures, collected data, analysis, indicators, and the decisions they support. Findings and lessons should inform improvement decisions, and the effects of resulting changes should be assessed against the intended results. Execution, approval, measurement, and record-keeping arrangements are supplied by the applying environment.
 
-Unconfirmed facts, assumptions, unmet conditions, and exclusions must remain distinguishable. An exclusion must have an applicability rationale; missing evidence is not a reason to mark a requirement inapplicable. These conditions must not be silently converted into success. Findings must expose evidence gaps and their consequences.
+Unconfirmed facts, assumptions, unmet conditions, and exclusions must remain distinguishable and must not be silently converted into success. An exclusion must have an applicability rationale; missing evidence is not a reason to mark a requirement inapplicable. Findings must expose evidence gaps and their consequences.
 
 ## 9. Markdown presentation
 
