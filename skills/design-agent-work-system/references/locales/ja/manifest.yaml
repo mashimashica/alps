@@ -10,7 +10,7 @@ sources:
     reviewed_source_sha256: f303eb2bf00818ebbbd3b357da0052f3456e54b5aa0f882cc2358456dfd2cdc4
   agent-work-system-design.md:
     source: ../../agent-work-system-design.md
-    reviewed_source_sha256: 4fa9bb7ed8db69b3357b99b51485ca95ef1900635d77091255fb122df311ffbd
+    reviewed_source_sha256: 0806c1c4214a89d580611ceac1e3e498059ef5a38f4b5e2fa4661f9b805045a0
   examples.md:
     source: ../../examples.md
     reviewed_source_sha256: 128a5b3c76e1a19b8ecf2c2e7bbe4759b82ffc8f126f051e82a2ba6609faf12e

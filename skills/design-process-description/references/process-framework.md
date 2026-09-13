@@ -12,7 +12,7 @@
 
 This Framework establishes a domain-independent basis for describing and understanding work: its intent, boundaries, work content, context, relationships, application, and evaluation. It supports general and context-specific work, including work performed once, while leaving execution means open where the context permits.
 
-Within this Framework, **must** states a requirement; **must not** states a prohibition. **Should** and **should not** state recommendations. **May** states permission. **Typically** describes customary practice; **can** and **could** express possibility or capability. These last expressions carry no normative force. A description must make each statement's force and scope clear. Applicable requirements and prohibitions retain their force regardless of the assessment method or whether a claim is made.
+Within this Framework, **must** states a requirement; **must not** states a prohibition. **Should** and **should not** state recommendations. **May** states permission. **Typically** and **usually** describe customary practice; **can** and **could** express possibility or capability. These last expressions carry no normative force. A description must make each statement's force and scope clear. Applicable requirements and prohibitions retain their force regardless of the assessment method or whether a claim is made.
 
 Examples, notes, conventions, and other reference information are informative. They must not alter the meaning or normative force of the Process elements they explain.
 
@@ -24,7 +24,7 @@ Examples, notes, conventions, and other reference information are informative. T
 | **Process Description** | An account of a Process, distinct from its performance. It can describe a general Process or a particular application. |
 | **Process Instance** | One application of a Process in a particular context. Its actual results are evaluated separately from the description. |
 
-Every Process Description must contain **Name**, **Purpose**, and **one or more Outcomes**. These elements provide the semantic center and shared reference points for application and evaluation.
+Every Process Description must contain **Name**, **Purpose**, and **one or more Outcomes**. These elements provide the semantic center and shared reference points for application and evaluation; the Outcomes are the work's success conditions.
 
 | Element | Meaning |
 | --- | --- |
@@ -40,21 +40,21 @@ A Task states an action; an Outcome states a result condition. An **Output** is 
 
 ## 3. Work content and necessary detail
 
-Activities, Tasks, Inputs, Outputs, Controls, Constraints, Enablers, and Entry/Exit Criteria are included according to the purpose of the description and the detail needed to understand, apply, or evaluate the work. Their inclusion is optional; their meanings and relationships follow this Framework when they are used. A description must include necessary detail and must not contain empty optional sections or completeness-driven fields. Clarify an otherwise ambiguous scope where it matters. The applicable context and the identity of any source description can be expressed in the description or associated information.
+Activities, Tasks, Inputs, Outputs, Controls, Constraints, Enablers, and Entry/Exit Criteria are included according to the purpose of the description and the detail needed to understand, apply, or evaluate the work. Their inclusion is optional; their meanings and relationships follow this Framework when they are used. A description must include necessary detail and must not contain empty optional sections or completeness-driven fields. A description must clarify an otherwise ambiguous scope where the ambiguity affects understanding, application, or evaluation. The applicable context and the identity of any source description can be expressed in the description or associated information.
 
 An **Activity** is a cohesive set of Tasks within a Process. It organizes related actions as a continuous or iterative function narrower than the Process as a whole, so that their contribution can be understood. Tasks within an Activity should relate more closely to one another than to Tasks outside it.
 
 A **Task** states an individual action intended to support one or more Outcomes. Its operation, object, and normative force must be clear. The Tasks described within an Activity need not enumerate every possible action within its boundary.
 
-Taken together, the Activities and any Sub-processes used to describe the Process's work must cover every Process Outcome and satisfy the Process Purpose. Their relationship to Outcomes can be one-to-one, one-to-many, many-to-one, or many-to-many. Review must check this coverage and the contribution of the described Tasks. An Activity can be described as a **Sub-process** with its own Name, Purpose, and Outcomes when separate treatment is useful.
+When Activities and Sub-processes describe the Process's work as a whole, together they must cover every Process Outcome and contribute to the Process Purpose. Activities describing only selected work must identify the Outcomes they support. Their relationship to Outcomes can be one-to-one, one-to-many, many-to-one, or many-to-many. Review must check this coverage and the contribution of the described Tasks. An Activity can be described as a **Sub-process** with its own Name, Purpose, and Outcomes when separate treatment is useful.
 
-Process, Sub-process, and Activity have no universal size boundaries. Outcomes and principal Outputs usually help identify a Process boundary; intermediate Outputs do not by themselves require another Process. Divide work where it clarifies boundaries, responsibilities, or relationships, and omit a level where it impairs understanding or use. A difference in performer or tool alone does not determine a Process boundary. Dependencies on other Processes should be reduced where practicable while keeping necessary relationships clear.
+Process, Sub-process, and Activity have no universal size boundaries. Outcomes and principal Outputs usually help identify a Process boundary; intermediate Outputs do not by themselves require another Process. Work should be divided where it clarifies boundaries, responsibilities, or relationships, and a level should be omitted where it impairs understanding or use. A difference in performer or tool alone does not determine a Process boundary. Dependencies on other Processes should be reduced where practicable while keeping necessary relationships clear.
 
 A general description must avoid unnecessarily fixing performers, tools, methods, metrics, management methods, or order. It describes the functional relationships needed for performance. A method or sequence required in a particular context may be stated with its scope and force. A **Procedure** prescribes ordered steps; Activities and Tasks describe work whose document order must not be interpreted as execution order. Necessary temporal dependencies must be explicit Constraints.
 
 ## 4. Boundary elements and information
 
-Classify each occurrence of an element by its function in the work, independently of its filename, medium, or location.
+Each occurrence of an element must be classified by its function in the work, independently of its filename, medium, or location.
 
 | Element | Function |
 | --- | --- |
@@ -76,7 +76,7 @@ Controls, Constraints, and Enablers may be associated with individual elements o
 
 **Traceability** makes the relationships among Outcomes, Activities, Tasks, and information items identifiable so that their consistency and the effects of change can be examined. It should connect work and necessary Inputs and Outputs to the Outcomes they support, with enough detail for the intended use.
 
-Processes may exchange information or repeatedly consult and update the same information. A needed relationship must make the information's meaning, scope, conditions of use, and relevant change impacts clear. Identify which work reads or changes it and which decisions or results require reconsideration after a change. A handoff relates a provider's Output to a recipient's Input; shared information can also support repeated interaction among several Processes. Storage and coordination mechanisms belong to the applying environment.
+Processes may exchange information or repeatedly consult and update the same information. A needed relationship must make the information's meaning, scope, conditions of use, and relevant change impacts clear. The relationship must identify which work reads or changes it and which decisions or results require reconsideration after a change. A handoff relates a provider's Output to a recipient's Input; shared information can also support repeated interaction among several Processes. Storage and coordination mechanisms belong to the applying environment.
 
 ## 5. Applying Processes in combination
 
@@ -104,11 +104,11 @@ When application exposes questions or inconsistencies that affect intended Outco
 | **Process Reference Model** | Provides a common basis for comparison or assessment through identified Process Descriptions, their Purposes and Outcomes, and their relationships. |
 | **Process View** | Selects and explains elements across Process Descriptions around a particular concern. |
 
-These constructs can be ordinary reference materials. They must refer to source Process Descriptions and must not maintain duplicated Purpose or Outcome definitions for management. A domain framework can use a Process set and common terminology to support selection and composition. A **life cycle model** organizes Processes and Activities in relation to the life of a subject; its relationships and any ordering depend on the application.
+These constructs can be ordinary reference materials. They must refer to source Process Descriptions and must not maintain duplicated Purpose or Outcome definitions. A domain framework can use a Process set and common terminology to support selection and composition. A **life cycle model** organizes Processes and Activities in relation to the life of a subject; its relationships and any ordering depend on the application.
 
-A View must retain source identity and necessary Traceability. It can select, explain, or propose changes to source elements, with proposals and local additions clearly distinguished from source requirements. A change in presentation alone must not change obligations or success conditions. Reference material that organizes work is distinct from a Process Description; independently defined work needs its own Name, Purpose, and Outcomes.
+A View must retain source identity and necessary Traceability. It can select, explain, or propose changes to source elements; proposals and local additions must be clearly distinguished from source requirements. A change in presentation alone must not change obligations or success conditions. Reference material that organizes work is distinct from a Process Description; independently defined work needs its own Name, Purpose, and Outcomes.
 
-The description that serves as the reference point for meaning must be uniquely identifiable using ordinary links or identifying information. When reproducibility is needed, identify the applicable version, commit, digest, or equivalent alongside the reference. Each necessary reference must identify its intended target. If the target cannot be confirmed, report the missing reference and affected scope as unconfirmed; do not substitute a same-named document or another version.
+The description that serves as the reference point for meaning must be uniquely identifiable using ordinary links or identifying information. When reproducibility is needed, the applicable version, commit, digest, or equivalent must be identified alongside the reference. Each necessary reference must identify its intended target. If the target cannot be confirmed, the missing reference and affected scope must be reported as unconfirmed; a same-named document or another version must not be substituted.
 
 Summaries, translations, examples, and views must preserve the meaning and normative force of their sources. Those sources must be identifiable wherever necessary to distinguish source content from interpretation or local additions. A translation does not replace its source.
 
@@ -120,7 +120,7 @@ Summaries, translations, examples, and views must preserve the meaning and norma
 
 Instantiation makes an application concrete; Tailoring changes what applies. A tailored Process can also be instantiated. A context-specific choice already permitted by the description does not itself change that description.
 
-Distinguish a change to the description used as the reference point for meaning, a context-limited change to what applies, and a change in presentation. A change must identify the affected source and elements, scope, rationale, consequences, and necessary revalidation.
+A change must be distinguished as a change to the description used as the reference point for meaning, a context-limited change to what applies, or a change in presentation. A change must identify the affected source and elements, scope, rationale, consequences, and necessary revalidation.
 
 Process selection and changes to Process meaning must be evaluated for their ability to satisfy the Purpose under applicable conditions. The evaluation must take account of affected requirements and stakeholder needs, relevant risks and risk tolerance, available capabilities and resources, and applicable Controls and Constraints. Necessary information from affected parties must be obtained and considered, with its source and applicability clear. Existing information may be used while it remains applicable. Missing information must be reported with its effect on the judgment. The level of detail and rigor should be proportionate to the consequences, uncertainty, and complexity of the decision.
 
@@ -128,7 +128,7 @@ Authority and approval follow the applying environment's conditions. A context-l
 
 ## 8. Evaluation and improvement
 
-An evaluation must identify its subject, scope, applicable criteria, evidence, and resulting judgment. The criteria and evidence must apply to the subject and conditions at the time of judgment. If changed conditions or information affect that basis, the affected criteria, evidence, and judgments must be re-evaluated before they are relied on. Evidence supports a judgment; it is not the judgment itself. Keep these questions distinct:
+An evaluation must identify its subject, scope, applicable criteria, evidence, and resulting judgment. The criteria and evidence must apply to the subject and conditions at the time of judgment. If changed conditions or information affect that basis, the affected criteria, evidence, and judgments must be re-evaluated before they are relied on. Evidence supports a judgment; it is not the judgment itself. These questions must be kept distinct:
 
 | Subject | Question |
 | --- | --- |
@@ -144,7 +144,7 @@ A successful description review must not be reported as successful execution. Ex
 
 Measures used in an evaluation should connect the information needed to defined measures, collected data, analysis, indicators, and the decisions they support. Findings and lessons should inform improvement decisions, and the effects of resulting changes should be assessed against the intended results. Execution, approval, measurement, and record-keeping arrangements are supplied by the applying environment.
 
-Unconfirmed facts, assumptions, unmet conditions, and exclusions must remain distinguishable. An exclusion needs an applicability rationale; missing evidence is not a reason to mark a requirement inapplicable. None of these conditions may be silently converted into success. Findings must expose evidence gaps and their consequences.
+Unconfirmed facts, assumptions, unmet conditions, and exclusions must remain distinguishable. An exclusion must have an applicability rationale; missing evidence is not a reason to mark a requirement inapplicable. These conditions must not be silently converted into success. Findings must expose evidence gaps and their consequences.
 
 ## 9. Markdown presentation
 
@@ -152,6 +152,6 @@ A Process Description written in Markdown must use a title for Name and separate
 
 Work detail should use an Activities & Tasks section, with Activity subheadings and numbered Tasks under each Activity. A Tasks section may be used where grouping adds no useful distinction. Each Task's action and normative force must be clear in its statement or through an explicit statement governing the list. Numbering identifies list items; necessary execution order must be stated as Constraints. Other Process elements should use their element names, or translated equivalents, as section headings where separate treatment is useful.
 
-An explanatory note must be a Markdown blockquote beginning with `NOTE` in English or `注記` in Japanese, placed immediately after the text it explains, with its scope clear from that placement. In another language, use the equivalent label. A note attached to a list item must be indented within that item. Numbers may be added after the label to distinguish multiple notes within the relevant section; references to numbered notes must identify that section.
+An explanatory note must be a Markdown blockquote beginning with `NOTE` in English or `注記` in Japanese, placed immediately after the text it explains, with its scope clear from that placement. In another language, the equivalent label must be used. A note attached to a list item must be indented within that item. Numbers may be added after the label to distinguish multiple notes within the relevant section; references to numbered notes must identify that section.
 
 Notes may explain scope, terminology, rationale, examples, or relationships where that helps understanding or application. Requirements, prohibitions, recommendations, and permissions must be stated outside notes. A note must preserve the meaning and normative force of the content it explains.
