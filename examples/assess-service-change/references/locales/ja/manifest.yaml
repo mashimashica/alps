@@ -7,10 +7,10 @@ status: reviewed
 sources:
   SKILL.ja.md:
     source: ../../../SKILL.md
-    reviewed_source_sha256: b543d7164ae6e3327910d4b35aaa155e3e230fe26b4c87b49d2e55938fdc74d1
+    reviewed_source_sha256: 4c10f78c9ca3ce00bd3bc0beb690837c394047f83a8234a5837973b131f75fdb
   pilot-context.md:
     source: ../../pilot-context.md
-    reviewed_source_sha256: 9f8b6aa3f619b738e3654f000aa6aaf36dd588bef286b43d95595da38cd8de84
+    reviewed_source_sha256: 829e13ca1f57952d997e6b259485bfd39e7509a8c8001ff9fdbe3212d1b9b5f0
   tool-use.md:
     source: ../../tool-use.md
-    reviewed_source_sha256: ee7335e4cb33f5f13067ac91befa34d32cf34dfc3651515c886337dc4e886f10
+    reviewed_source_sha256: 08e6aad5e165dc2ddd179db94a824310e30151887f732640572809b3516b42f6

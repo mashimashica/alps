@@ -36,7 +36,8 @@ class ManifestVersionTests(unittest.TestCase):
             with self.subTest(manifest=path):
                 self.assertEqual(load(path)["version"], version)
         with self.subTest(manifest=MARKETPLACE):
-            self.assertEqual(marketplace_entry()["version"], version)
+            # plugin.json governs the version; a marketplace pin would duplicate it.
+            self.assertNotIn("version", marketplace_entry())
 
     def test_names_and_descriptions_match(self) -> None:
         root = load("plugin.json")

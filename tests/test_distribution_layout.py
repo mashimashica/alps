@@ -13,7 +13,11 @@ DISTRIBUTED_SKILLS = ("design-process-description", "design-agent-work-system")
 DEVELOPMENT_SKILLS = ("review-alps", "sync-locales")
 EXAMPLE_SKILLS = ("examples/assess-service-change",)
 
-LINK = re.compile(r"\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
+LINK_PATTERNS = (
+    re.compile(r"\[[^\]]*\]\(\s*<?([^)\s>]+)>?(?:\s+\"[^\"]*\")?\s*\)"),
+    re.compile(r"^\s*\[[^\]]+\]:\s*<?(\S+?)>?(?:\s|$)", re.MULTILINE),
+    re.compile(r"\b(?:src|href)\s*=\s*[\"']([^\"']+)[\"']", re.IGNORECASE),
+)
 FENCE = re.compile(r"^(```|~~~).*?^\1[^\n]*$", re.DOTALL | re.MULTILINE)
 SCHEME = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
 
@@ -52,14 +56,16 @@ def walk_files(name: str):
 
 
 def relative_links(text: str):
-    """Yield local Markdown link targets without anchors."""
-    for match in LINK.finditer(FENCE.sub("", text)):
-        target = match.group(1)
-        if SCHEME.match(target) or target.startswith("#"):
-            continue
-        path = target.split("#", 1)[0]
-        if path:
-            yield path
+    """Yield local inline, reference-style, and HTML link targets without anchors."""
+    text = FENCE.sub("", text)
+    for pattern in LINK_PATTERNS:
+        for match in pattern.finditer(text):
+            target = match.group(1).strip().strip("<>")
+            if SCHEME.match(target) or target.startswith("#"):
+                continue
+            path = target.split("#", 1)[0]
+            if path:
+                yield path
 
 
 class DistributionLayoutTests(unittest.TestCase):

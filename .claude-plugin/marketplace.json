@@ -8,8 +8,7 @@
     {
       "name": "alps",
       "source": "./",
-      "description": "Design the meaning of work and the agent work system that realizes it.",
-      "version": "0.7.0"
+      "description": "Design the meaning of work and the agent work system that realizes it."
     }
   ]
 }

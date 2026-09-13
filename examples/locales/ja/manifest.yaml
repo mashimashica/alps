@@ -7,4 +7,4 @@ status: reviewed
 sources:
   README.md:
     source: ../../README.md
-    reviewed_source_sha256: 0c80c77f90d984e83c2fa4163a7fc5d67a1779d94d7813c66ef321a2fc35352c
+    reviewed_source_sha256: 3e900024a66b69e0aff6687acf52078c5630c1949cb8752a12c24f98d9f6dc2c
