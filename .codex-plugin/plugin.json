@@ -1,7 +1,7 @@
 {
   "name": "alps",
   "version": "0.7.0",
-  "description": "Clarify work through Process Descriptions and design the agents, tools, information resources, and environments that realize it.",
+  "description": "Design the meaning of work and the agent work system that realizes it.",
   "author": {
     "name": "mashimashica",
     "url": "https://github.com/mashimashica"
@@ -21,7 +21,7 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "ALPS",
-    "shortDescription": "Design work and the systems that realize it",
+    "shortDescription": "Design the meaning of work and the agent work system that realizes it",
     "longDescription": "ALPS helps clarify the purpose, observable success conditions, and necessary boundaries of work, and design the agents, tools, information resources, and environments that realize it. Create, revise, or review Process Descriptions and supporting configurations. Allocate judgment and processing, implement needed capabilities within the request, and assess both tool behavior and effectiveness through representative work.",
     "developerName": "mashimashica",
     "category": "Developer Tools",
