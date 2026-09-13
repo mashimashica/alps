@@ -6,7 +6,7 @@
   <img src="assets/icon.svg" alt="ALPS icon" width="160">
 </p>
 
-ALPS helps you clarify the meaning of work and design the agent work system that realizes it. Describe why the work is done, what observable conditions count as success, and which boundaries and details are necessary. Where needed, design the agents, tools, information resources, and environment that can perform it effectively.
+ALPS helps you design the meaning of work and the agent work system that realizes it. Describe why the work is done, what observable conditions count as success, and which boundaries and details are necessary. Where needed, design the agents, tools, information resources, and environment that can perform it effectively.
 
 Use it to clarify a one-off assignment, improve an existing Skill, or describe work shared across people and Agents. Start with **Name, Purpose, and Outcomes**; add detail when it changes how the work is understood, applied, or evaluated.
 

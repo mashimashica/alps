@@ -6,6 +6,7 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ### Changed
 
+- Unify public-facing README, Plugin, and social-preview messaging around designing the meaning of work and the agent work system that realizes it, without changing the two design Skills' responsibilities.
 - Make responsibility boundaries, proportionate Outcome counterexamples, and evidence status explicit in Process Description Design; clarify adaptation and retention of applicable evidence in Agent Work System Design.
 - Replace repeated explanatory notes in the design Skills with guidance at the relevant decisions, and extend the existing English/Japanese examples for bounded responsibility and change impacts. Foundation definitions, required Process elements, and distribution remain unchanged.
 - Focus repository tests on manifest version consistency and example tool behavior; review affected distribution layout and resources alongside existing format and link checks.
