@@ -7,13 +7,13 @@ status: reviewed
 sources:
   SKILL.ja.md:
     source: ../../../SKILL.md
-    reviewed_source_sha256: b23e779e48f8999754e193e854a43b9134686b57b4955c3e64a98c4551bbb7f3
+    reviewed_source_sha256: 543b97e1f0b4fc44c0e8662203bca423f02cfafc1d3a1173dbf9e67b028a83f2
   SKILL-template.md:
     source: ../../SKILL-template.md
-    reviewed_source_sha256: b4aa9be18ea0b249d73d30d28b30a01c66d8c83c90bb51efe738e10a38f519a2
+    reviewed_source_sha256: 4055eb1c81ba2a6b1f9399cfc1adad6823ecb441521ad2213fef1224a41ae90d
   examples.md:
     source: ../../examples.md
-    reviewed_source_sha256: 33f44bc0d7a06f111262be0d7c94530ae41c88d64d8c11ed763c3b5c1ea3d243
+    reviewed_source_sha256: f5a229051da61feb66429593b367960e5526e505bbc5441c9df451f1df123fae
   process-framework.md:
     source: ../../process-framework.md
     reviewed_source_sha256: 79ecdd2ab3578ebada692b21a0869ae277c061b2cb5d90f94b79aa3d397bf57b

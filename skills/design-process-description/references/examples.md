@@ -50,7 +50,7 @@ The date and occasion supply the necessary scope in the description. Room availa
 
 Consider replacing the last Outcome with “A relocation notice has been sent.” Even with a confirmed suitable room, an unread notice leaves a participant unable to find it. All revised Outcomes could hold while this Purpose remains unfulfilled. Sending the notice is useful work, but it is insufficient as this success condition.
 
-Now consider a different commission: prepare an accurate notice of the confirmed replacement location and workshop time for the organizer to distribute. The notice's faithful coverage of those details is assessable; its mere existence is insufficient. Requiring every participant to know the location would extend this commission into the organizer's distribution work. The same notice can therefore support different work without giving those Processes the same success conditions. Evaluate each set of Outcomes within its own Purpose and responsibility; changing the commission is not a counterexample to the original set.
+Now consider work with a different responsibility: prepare an accurate notice of the confirmed replacement location and workshop time for the organizer to distribute. The notice's faithful coverage of those details is assessable; its mere existence is insufficient. Requiring every participant to know the location would extend this responsibility into the organizer's distribution work. The same notice can therefore support different work without giving those Processes the same success conditions. Evaluate each set of Outcomes within its own Purpose and responsibility; changing the responsibility is not a counterexample to the original set.
 
 ## 3. Work without a fixed artifact
 
@@ -82,12 +82,11 @@ This service's production policy requires qualification of a candidate and confi
 
 #### Purpose
 
-Make the approved change available to this service's production users with a functioning checkout.
+Make the candidate revision available to this service's production users with a functioning checkout.
 
 #### Outcomes
 
-- The approved change is available in production.
-- The production health endpoint reports ready.
+- The candidate revision serves this service's production users.
 - A test purchase completes through the user checkout path.
 
 #### Activities & Tasks
@@ -114,7 +113,7 @@ For this service, the production policy requires the service owner's approval of
 
 #### Constraints
 
-Candidate checks must precede approval; approval must precede deployment; production checks follow deployment. A candidate change invalidates the earlier check and approval basis. Deployment must not occur while approval is missing or unconfirmed.
+Candidate checks must precede approval; approval must precede deployment; production checks must follow deployment. A candidate change invalidates the earlier check and approval basis. Deployment must not occur while approval is missing or unconfirmed.
 
 #### Entry Criteria
 
@@ -122,7 +121,7 @@ The candidate and acceptance criteria are available for qualification.
 
 #### Exit Criteria
 
-Achievement of all three Outcomes is supported by production evidence, and the applicable release requirements are satisfied.
+Achievement of both Outcomes is supported by production evidence, including the ready health endpoint required by the acceptance criteria, and the applicable release requirements, including approval, are satisfied.
 
 #### Inputs
 
@@ -138,7 +137,7 @@ Checking capability and the authorized release job.
 
 A policy directs the work; its approval condition limits deployment. The release job supplies an Enabler. The Entry Criteria allow candidate qualification to begin before deployment approval, while the deployment Constraint still applies to the action it governs.
 
-The Activity headings group related work and the numbered Tasks state actions. Both Activities contribute to the Outcomes and can be revisited as the candidate or production evidence changes. The NOTEs explain the adjacent Tasks; the obligations and necessary order are stated in the main text.
+The Activity headings group related work and the numbered Tasks state actions. The two Activities describe the release work as a whole and together cover both Outcomes: Candidate qualification establishes the checked and approved candidate that is to serve production users, and Production availability deploys it and checks the production result, including the test purchase. Both contribute to the Purpose and can be revisited as the candidate or production evidence changes. The NOTEs explain the adjacent Tasks; the obligations and necessary order are stated in the main text.
 
 ## 5. Shared information updated by multiple Processes
 
@@ -173,7 +172,7 @@ Both Processes consult and update the same ordinary **change brief**. It contain
 | Requirements Clarification | Refines needs and acceptance conditions using stakeholder information and feasibility findings. | A changed need or acceptance condition requires reconsidering affected feasibility judgments. |
 | Feasibility Assessment | Adds capacity evidence, candidate limits, and questions about the current needs. | A newly exposed limit requires reconsidering affected needs or solution choices. |
 
-For this collaboration, readers must identify the revision used. Updates must distinguish confirmed needs, proposals, and unverified assumptions, and must not silently overwrite conflicting findings. Changed information must be made available to affected work before it relies on superseded judgments. The team's existing document and version tools supply storage and coordination. The two Processes can revisit the brief repeatedly. Their repeated application at the same level is Iteration; applying them separately to the service and its components is Recursion. Integration checks completeness within each level and consistency between levels. Establishing usable portions of the service change is Incremental application. These relationships can be combined according to the change being considered.
+In this fictional collaboration, the shared description requires the following: readers must identify the revision used; updates must distinguish confirmed needs, proposals, and unverified assumptions, and must not silently overwrite conflicting findings; and changed information must be made available to affected work before it relies on superseded judgments. The team's existing document and version tools supply storage and coordination. The two Processes can revisit the brief repeatedly. Their repeated application at the same level is Iteration; applying them separately to the service and its components is Recursion. Integration checks completeness within each level and consistency between levels. Establishing usable portions of the service change is Incremental application. These relationships can be combined according to the change being considered.
 
 In one application, the service owner tightens the acceptable interruption from five minutes to one minute. The brief identifies the source and scope of the request. Reassessment against the revised condition finds that the candidate's measured interruption of ninety seconds makes it unsuitable. Recovery needs from the affected support team are still missing; their implications for candidate selection remain unconfirmed. Clarification and assessment continue with the revised condition and available evidence, while the support team's input is obtained.
 
@@ -201,14 +200,14 @@ Do not substitute revision 6 or a same-named policy. Do not label the policy ina
 
 ## 8. Output exists, Outcome unmet
 
-For [Production Release](#production-release), assume the release job produced a deployment log and the intended revision is deployed. The production health endpoint reports ready, but the test purchase fails. The approval evidence has not been supplied.
+For [Production Release](#production-release), assume the release job produced a deployment log and production observation shows the intended revision serving users. The production health endpoint reports ready, but the test purchase fails. The approval evidence has not been supplied.
 
-The deployed revision and log are Outputs. Evaluate the result conditions separately:
+The deployed revision and log are Outputs. Evaluate the Outcomes, the acceptance criterion, and the approval requirement separately:
 
 | Condition | Evidence and judgment |
 | --- | --- |
-| The approved change is available in production. | The intended revision is present, but whether it is approved remains unconfirmed. |
-| The production health endpoint reports ready. | The observation supports achievement of this Outcome. |
+| The candidate revision serves this service's production users. | The production observation supports achievement of this Outcome. Whether that revision was approved is judged under the approval requirement. |
+| Acceptance criterion: the production health endpoint reports ready. | The observation supports satisfaction of this criterion; it does not by itself establish either Outcome. |
 | A test purchase completes through the user checkout path. | The failed purchase shows this Outcome is unmet. |
 | The approval requirement is satisfied. | Approval evidence is missing; satisfaction remains unconfirmed. |
 
