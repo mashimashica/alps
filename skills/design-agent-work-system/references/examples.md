@@ -20,7 +20,7 @@ Consider work that assesses whether a service change is suitable for a specified
 
 ## Capabilities, criteria, and limits
 
-In that pilot, a positive assessment requires at least four requests in each file, a candidate p95 of at most 200 ms, a candidate error proportion of at most 0.05, and a candidate p95 increase of at most 50 ms, all measured under the same stated conditions. The same measurement operation has several relationships to the work:
+In that pilot, a positive assessment requires at least four requests in each file, a candidate p95 of at most 200 ms, a candidate error proportion of at most 0.05, and a candidate p95 increase of at most 50 ms, all measured under the same stated conditions, and the tool must report the same set of request identifiers in both files. The same measurement operation has several relationships to the work:
 
 | Aspect | Relationship to the work | Design and evaluation consequence |
 | --- | --- | --- |
