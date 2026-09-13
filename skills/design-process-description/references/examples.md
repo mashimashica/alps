@@ -121,7 +121,7 @@ The candidate and acceptance criteria are available for qualification.
 
 #### Exit Criteria
 
-Achievement of both Outcomes is supported by production evidence, including the ready health endpoint required by the acceptance criteria, and the applicable release requirements, including approval, are satisfied.
+Production evidence supports achievement of both Outcomes, the production result satisfies the acceptance criteria, including the ready health endpoint, and the applicable release requirements, including approval, are satisfied.
 
 #### Inputs
 
@@ -135,7 +135,7 @@ The deployed service revision.
 
 Checking capability and the authorized release job.
 
-A policy directs the work; its approval condition limits deployment. The release job supplies an Enabler. The Entry Criteria allow candidate qualification to begin before deployment approval, while the deployment Constraint still applies to the action it governs.
+A policy directs the work; its approval condition limits deployment. The release job supplies an Enabler. The Entry Criteria allow candidate qualification to begin before deployment approval, while the deployment Constraint still applies to the action it governs. “The candidate revision” in the Outcomes is the checked and approved candidate required by the Controls and Constraints; approval itself is judged as a release requirement, not as an Outcome.
 
 The Activity headings group related work and the numbered Tasks state actions. The two Activities describe the release work as a whole and together cover both Outcomes: Candidate qualification establishes the checked and approved candidate that is to serve production users, and Production availability deploys it and checks the production result, including the test purchase. Both contribute to the Purpose and can be revisited as the candidate or production evidence changes. The NOTEs explain the adjacent Tasks; the obligations and necessary order are stated in the main text.
 
@@ -172,7 +172,7 @@ Both Processes consult and update the same ordinary **change brief**. It contain
 | Requirements Clarification | Refines needs and acceptance conditions using stakeholder information and feasibility findings. | A changed need or acceptance condition requires reconsidering affected feasibility judgments. |
 | Feasibility Assessment | Adds capacity evidence, candidate limits, and questions about the current needs. | A newly exposed limit requires reconsidering affected needs or solution choices. |
 
-In this fictional collaboration, the shared description requires the following: readers must identify the revision used; updates must distinguish confirmed needs, proposals, and unverified assumptions, and must not silently overwrite conflicting findings; and changed information must be made available to affected work before it relies on superseded judgments. The team's existing document and version tools supply storage and coordination. The two Processes can revisit the brief repeatedly. Their repeated application at the same level is Iteration; applying them separately to the service and its components is Recursion. Integration checks completeness within each level and consistency between levels. Establishing usable portions of the service change is Incremental application. These relationships can be combined according to the change being considered.
+In this fictional collaboration, the team's working agreement requires the following: readers must identify the revision used; updates must distinguish confirmed needs, proposals, and unverified assumptions, and must not silently overwrite conflicting findings; and changed information must be made available to affected work before it relies on superseded judgments. The team's existing document and version tools supply storage and coordination. The two Processes can revisit the brief repeatedly. Their repeated application at the same level is Iteration; applying them separately to the service and its components is Recursion. Integration checks completeness within each level and consistency between levels. Establishing usable portions of the service change is Incremental application. These relationships can be combined according to the change being considered.
 
 In one application, the service owner tightens the acceptable interruption from five minutes to one minute. The brief identifies the source and scope of the request. Reassessment against the revised condition finds that the candidate's measured interruption of ninety seconds makes it unsuitable. Recovery needs from the affected support team are still missing; their implications for candidate selection remain unconfirmed. Clarification and assessment continue with the revised condition and available evidence, while the support team's input is obtained.
 

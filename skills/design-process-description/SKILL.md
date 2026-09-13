@@ -7,15 +7,16 @@ description: Create, revise, or review a Process Description—the Purpose, obse
 
 ## Purpose
 
-Make the purpose and success conditions of the target work clear through a Process Description, or findings about one, that is understandable, applicable, and evaluable with necessary and sufficient boundaries and detail, distinct from designing the configuration that performs the work.
+Make the purpose and success conditions of the target work clear, as distinct from the configuration that performs it, through an understandable, applicable, and evaluable Process Description with necessary and sufficient boundaries and detail, or through findings about such a description.
 
 ## Outcomes
 
-- The target work's Purpose and applicable scope, and its boundaries where adjacent work overlaps or the boundary is otherwise ambiguous, are identified in the description or qualified by findings.
+- The target work's Purpose and applicable scope, and its boundaries where adjacent work overlaps or the boundary is otherwise ambiguous, are identified in the description, or findings identify what is not identified.
 - The description's Outcomes are observable result conditions individually necessary and collectively sufficient for the Purpose, or findings identify each unmet property.
 - The description contains the detail needed to understand, apply, and evaluate the work and no detail that serves none of these, or findings identify missing or superfluous detail.
 - Execution means remain open except where applicable conditions require them, or findings identify unnecessary fixing.
-- Where the request involves changes or Process selection, their affected elements, scope, rationale, consequences, and necessary revalidation are identified and justified against the Purpose and applicable conditions, or findings identify what remains unidentified or unjustified.
+- Where the request involves changes, their affected elements, scope, rationale, consequences, and necessary revalidation are identified, or findings identify what remains unidentified.
+- Where the request involves Process selection or changes to Process meaning, the choice is justified against the Purpose and applicable conditions, or findings identify what remains unjustified.
 - The description's consistency with the Framework and required references is established or qualified by explicit findings.
 - Unconfirmed matters and limits of application are explicit.
 
@@ -59,7 +60,7 @@ Apply the [Process Framework](references/process-framework.md) for meaning and M
 
 ## Constraints
 
-Changes must remain within the user's request and applicable environment conditions. A review-only request must be answered with findings and any requested corrections, without unsolicited changes. Drafting or assessing a description must not rely on the Framework or a required reference that has not been read in full. Performing the described work or changing external state requires the applicable authorization. An unconfirmed reference or condition must limit the dependent judgment or action; independent work may continue within its applicable conditions.
+Changes must remain within the user's request and applicable environment conditions. A review-only request must be answered with findings and any requested corrections, without unsolicited changes. In creation or revision, findings may qualify an Outcome only for a condition that cannot be met within the requested scope, available information, or authority. Performing the described work or changing external state requires the applicable authorization. An unconfirmed reference or condition, including content of the Framework or a required reference that has not been read, must limit the dependent judgment or action; independent work may continue within its applicable conditions.
 
 ## Resources
 
