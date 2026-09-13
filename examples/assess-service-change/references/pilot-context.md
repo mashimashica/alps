@@ -13,6 +13,6 @@ The pilot concerns `GET /catalog` in an isolated staging environment, one concur
 - Candidate request error proportion at most 0.05.
 - Candidate p95 increase over the baseline at most 50 ms.
 
-All criteria must hold for a positive assessment in this pilot. The nearest-rank p95 is the sorted duration at rank `ceil(0.95 × count)`, with ranks starting at one. The error proportion is the number of rows with `status=error` divided by the number of rows. Durations include both successful and failed requests.
+All criteria must hold for a positive assessment in this pilot. A positive assessment also requires `input_relationship.same_request_ids` to be `true` in the tool result; matching identifiers alone do not establish that both files measured the same fixed request set. The nearest-rank p95 is the sorted duration at rank `ceil(0.95 × count)`, with ranks starting at one. The error proportion is the number of rows with `status=error` divided by the number of rows. Durations include both successful and failed requests.
 
 The small fixture size is intended to make every calculation inspectable. It does not establish statistical confidence or production representativeness. The script cannot determine whether the described measurement context is true; the agent must establish applicability from the supplied context and identify contradictions. A different load, endpoint, environment, or sampling window needs an applicable basis for comparison before these measurements can support that judgment.

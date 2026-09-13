@@ -3,24 +3,33 @@
 from __future__ import annotations
 
 import argparse
+import codecs
 import csv
 import hashlib
 import io
 import json
 import math
+import re
 import sys
 from pathlib import Path
 
 
+DECIMAL = re.compile(r"[0-9]+(?:\.[0-9]+)?")
+
+
 def nonnegative_number(value: str) -> float:
+    if not DECIMAL.fullmatch(value):
+        raise ValueError("must be a nonnegative decimal number")
     number = float(value)
     if not math.isfinite(number) or number < 0:
         raise ValueError("must be finite and nonnegative")
     return number
 
 
-def summarize(path: Path) -> dict:
+def read_measurements(path: Path) -> tuple[dict, frozenset[str]]:
     data = path.read_bytes()
+    if data.startswith(codecs.BOM_UTF8):
+        raise ValueError(f"{path}: UTF-8 BOM is not supported")
     reader = csv.reader(io.StringIO(data.decode("utf-8"), newline=""), strict=True)
     if next(reader, None) != ["request_id", "duration_ms", "status"]:
         raise ValueError(f"{path}: expected header request_id,duration_ms,status")
@@ -34,6 +43,9 @@ def summarize(path: Path) -> dict:
         identifier, raw_duration, status = row
         if not identifier.strip() or identifier in identifiers:
             raise ValueError(f"{location}: request_id must be nonempty and unique")
+        if identifier != identifier.strip():
+            raise ValueError(
+                f"{location}: request_id must not have leading or trailing whitespace")
         if status not in ("ok", "error"):
             raise ValueError(f"{location}: status must be ok or error")
         try:
@@ -47,7 +59,7 @@ def summarize(path: Path) -> dict:
         raise ValueError(f"{path}: at least one measurement is required")
     durations.sort()
     count = len(durations)
-    return {
+    summary = {
         "path": str(path),
         "sha256": hashlib.sha256(data).hexdigest(),
         "count": count,
@@ -55,6 +67,11 @@ def summarize(path: Path) -> dict:
         "error_rate": errors / count,
         "p95_ms": durations[math.ceil(0.95 * count) - 1],
     }
+    return summary, frozenset(identifiers)
+
+
+def summarize(path: Path) -> dict:
+    return read_measurements(path)[0]
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -73,8 +90,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.min_samples < 1 or args.max_error_rate > 1:
         parser.error("min-samples must be positive and max-error-rate at most 1")
     try:
-        baseline = summarize(args.baseline)
-        candidate = summarize(args.candidate)
+        baseline, baseline_ids = read_measurements(args.baseline)
+        candidate, candidate_ids = read_measurements(args.candidate)
     except (OSError, UnicodeError, ValueError, csv.Error) as error:
         print(f"measurement error: {error}", file=sys.stderr)
         return 2
@@ -89,6 +106,10 @@ def main(argv: list[str] | None = None) -> int:
         },
         "baseline": baseline,
         "candidate": candidate,
+        "input_relationship": {
+            "identical_bytes": baseline["sha256"] == candidate["sha256"],
+            "same_request_ids": baseline_ids == candidate_ids,
+        },
         "p95_increase_ms": increase,
         "checks": {
             "baseline_sample_count": baseline["count"] >= args.min_samples,

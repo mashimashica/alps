@@ -34,7 +34,7 @@ Baseline and candidate request measurements and their measurement context.
 
 ## Controls
 
-The applicable pilot criteria in [pilot conditions](references/pilot-context.md) govern the assessment. For this Process Description, apply the [Process Framework](../../skills/design-process-description/references/process-framework.md).
+The applicable pilot criteria in [pilot conditions](references/pilot-context.md) govern the assessment.
 
 ## Constraints
 
@@ -42,8 +42,8 @@ This assessment concerns the specified pilot. Production suitability requires ev
 
 ## Enablers
 
-An agent able to inspect the context, use a command tool, and interpret results; a local Python 3.11 or later environment; and the bundled measurement script. See [tool instructions](references/tool-use.md) for its interface and limits.
+An agent able to inspect the context, use a command tool, and interpret results; a local Python 3.10 or later environment; and the bundled measurement script. See [tool instructions](references/tool-use.md) for its interface and limits.
 
 ## Resources
 
-This file is the source description for the [Japanese translation](references/locales/ja/SKILL.md). The [example guide](../README.md) explains its supporting configuration and evaluation cases.
+This Process Description follows the [Process Framework](../../skills/design-process-description/references/process-framework.md). This file is the source description for the [Japanese translation](references/locales/ja/SKILL.md). The [example guide](../README.md) explains its supporting configuration and evaluation cases.
