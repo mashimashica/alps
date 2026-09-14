@@ -16,4 +16,4 @@ sources:
     reviewed_source_sha256: 33f44bc0d7a06f111262be0d7c94530ae41c88d64d8c11ed763c3b5c1ea3d243
   process-framework.md:
     source: ../../process-framework.md
-    reviewed_source_sha256: 4f3dfb412467ec860ece1689107d4aea7cf7771993a654ec639c3e0b46037bf2
+    reviewed_source_sha256: 79ecdd2ab3578ebada692b21a0869ae277c061b2cb5d90f94b79aa3d397bf57b
