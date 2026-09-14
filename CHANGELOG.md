@@ -10,6 +10,8 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 - Make responsibility boundaries, proportionate Outcome counterexamples, and evidence status explicit in Process Description Design; clarify adaptation and retention of applicable evidence in Agent Work System Design.
 - Replace repeated explanatory notes in the design Skills with guidance at the relevant decisions, and extend the existing English/Japanese examples for bounded responsibility and change impacts. Foundation definitions, required Process elements, and distribution remain unchanged.
 - Focus repository tests on manifest version consistency and example tool behavior; review affected distribution layout and resources alongside existing format and link checks.
+- Tighten the service-change example tool: reject request identifiers that are not printable or have surrounding whitespace, non-decimal numbers and non-ASCII-digit sample counts, and UTF-8 BOM input; report `input_relationship` (identical bytes and same request identifiers); and align fixture identifiers.
+- Document the example tool's input rules and `input_relationship`, require matching identifiers for a positive pilot assessment, state Python 3.10 or later and test it in CI, and move the example's Framework reference from Controls to Resources.
 
 ## [0.7.0] - 2026-09-06
 
