@@ -23,3 +23,6 @@ sources:
   releases/0.7.0.md:
     source: ../../releases/0.7.0.md
     reviewed_source_sha256: 12b4705c36c096227274986cb8aeca6d4d8e21f6a7066a5652d782c54305014b
+  releases/0.8.0.md:
+    source: ../../releases/0.8.0.md
+    reviewed_source_sha256: 53741acf39357e06d29152bc4d262f05e3c8c0b6dca65a345f26eb6b37d4aad0
