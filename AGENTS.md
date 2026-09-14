@@ -29,6 +29,7 @@ Do not infer Process requirements from tests, templates, Host manifests, icons, 
 | `docs/locales/ja/` and each Skill's `references/locales/ja/` | Supported translations of the corresponding English source files. A translated Skill body is named `SKILL.ja.md` and is not a Skill entry point. |
 | `examples/` | Bundled reference material, including a working target Skill; outside Plugin Skill discovery. The guide's translation is in `examples/locales/ja/`, and the target Skill's translations are in its `references/locales/ja/`. |
 | `plugin.json`, `.claude-plugin/`, `.cursor-plugin/`, `.codex-plugin/` | Root Plugin format and distinct Host adapters. |
+| `CLAUDE.md` | Claude Code entry point for repository development that imports this file; it adds no instructions of its own and is not Plugin context. |
 | `assets/` and the Skill's `agents/` and `assets/` | Presentation resources. |
 
 `skills/` is the source of Plugin Skills. Hosts discover it through their applicable conventions and manifests. `.agents/skills/` is an integrated repository view, not a universal Host convention. A checkout can contain development Skills without exposing them as Plugin Skills. Each distributed Skill functions on its own: its relative links resolve within its own directory, and it does not depend on the other Skill by file or name. When the Skills are combined, they exchange only a description of the work. The Plugin distributes both Skills together with `examples/` as reference material; the Skills do not link to it. Keep development Skills and example Skills outside `skills/`.
@@ -51,7 +52,8 @@ Keep the following evidence distinct:
 2. Repository validation: automated checks of Plugin manifest consistency, distribution layout, translation manifests, and relative links, and review of affected file layout, symlinks, Host resources, and distribution boundaries. After reviewing a Japanese counterpart against its English source, update its `reviewed_source_sha256` in the translation manifest of its `locales/ja/` directory.
 3. Semantic review: purpose and Outcome sufficiency, required details and obligations, references, evaluation limits, and English/Japanese meaning and normative force.
 4. Tool and connection verification against the specified behavior, including failures and incomplete results.
-5. Work-system effectiveness through representative work with an agent, information, tools, and environment, assessed against the work's Outcomes and conditions.
+5. Respect for applicable requirements, authority, and limits on effects, including those implemented by tools, assessed separately from tool behavior and effectiveness.
+6. Work-system effectiveness through representative work with an agent, information, tools, and environment, assessed against the work's Outcomes and conditions.
 
 Run the checks in `.github/workflows/validate.yml` that the environment permits. At minimum run `python3 -m unittest discover -s tests -v`, `git diff --check`, changed-link checks, and review the complete task-owned diff, including new files. Passing mechanical checks does not prove semantic validity or successful Process execution.
 

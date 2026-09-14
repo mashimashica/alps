@@ -29,6 +29,7 @@
 | `docs/locales/ja/`、各Skillの`references/locales/ja/` | 対応する英語版の翻訳。翻訳したSkill本文は`SKILL.ja.md`とし、Skillの入口ではない。 |
 | `examples/` | 実働する対象Skillを含む、同梱する参照資料。Plugin Skillの発見対象外。ガイドの翻訳は`examples/locales/ja/`、対象Skillの翻訳はその`references/locales/ja/`に置く。 |
 | `plugin.json`、`.claude-plugin/`、`.cursor-plugin/`、`.codex-plugin/` | ルートPlugin形式と、それぞれのHostアダプター。 |
+| `CLAUDE.md` | このファイルを読み込む、リポジトリ開発用のClaude Codeの入口。独自の指示は持たず、Pluginの文脈ではない。 |
 | `assets/`およびSkillの`agents/`と`assets/` | 表示資源。 |
 
 `skills/`をPlugin Skillの配布元とする。Hostは各規約とmanifestにより発見する。`.agents/skills/`はリポジトリ内の統合ビューであり、普遍的なHost規約ではない。checkoutに開発用Skillを含めても、それをPlugin Skillとして公開することにはならない。各配布Skillは単体で機能する。その相対リンクは自身のディレクトリ内で解決し、ファイルや名前によって他方のSkillに依存しない。Skillを組み合わせる場合は、仕事の記述だけを受け渡す。Pluginは両Skillを、参照資料である`examples/`とともに配布する。Skillから`examples/`へはリンクしない。開発用Skillと例のSkillは`skills/`の外に置く。
@@ -51,7 +52,8 @@
 2. リポジトリの検証：Plugin manifestの整合、配布配置、翻訳manifest、相対リンクの自動検査、および変更の影響を受けるファイル配置、symlink、Host資源、配布境界のレビュー。日本語版を英語版に照らしてレビューした後は、その`locales/ja/`ディレクトリにある翻訳manifestの`reviewed_source_sha256`を更新する。
 3. 目的と成果の十分性、必要な詳細と義務、参照、評価の限界、日英の意味と規範強度の意味レビュー。
 4. 失敗と不完全な結果を含め、定められた動作に照らしたツールと接続の検証。
-5. エージェント・情報・ツール・環境を用いた代表的な仕事を通じ、仕事の成果と条件に照らした作業システムの有効性の評価。
+5. ツールが実装するものを含め、適用される要求、権限、影響の制限が守られていることについての、ツールの動作や有効性とは区別した評価。
+6. エージェント・情報・ツール・環境を用いた代表的な仕事を通じ、仕事の成果と条件に照らした作業システムの有効性の評価。
 
 `.github/workflows/validate.yml`の検証のうち環境で可能なものを実行する。最低限、`python3 -m unittest discover -s tests -v`、`git diff --check`、変更したリンクの検査、新規ファイルを含む作業対象差分全体のレビューを行う。機械検証の成功は意味の妥当性やプロセス実行の成功を証明しない。
 

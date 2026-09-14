@@ -7,6 +7,7 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 ### Added
 
 - A Claude Code marketplace manifest (`.claude-plugin/marketplace.json`) with `/plugin marketplace add` installation guidance, and translation manifests that record each Japanese file's English source and its reviewed SHA-256.
+- A root `CLAUDE.md` that imports AGENTS for Claude Code repository development without adding instructions; Plugin validation excludes it.
 - Repository tests for the distribution layout, translation manifest registration and source hashes, and consistent Plugin names and descriptions, with the Plugin version kept only in Plugin manifests.
 
 ### Changed
@@ -18,12 +19,13 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 - Extend the work-system design principles with non-normative *can*/*could*, *can* for tool possibilities, consistent exposed-operation terminology, a definition of tool users, allocation considering authority, information trustworthiness, cost, and latency, least access and authority, untrusted information not treated as instructions or authorization, and a separate evaluation of whether the configuration respects applicable requirements, authority, and effect limits; correct the Japanese term for component and operation size.
 - Point broken links in past release notes to their release tags, and extend link checks to all release notes.
 - Clarify release-note translation in the release procedure, Framework and design-principle wording in repository guidance and development Skills, Japanese normative force in versioning and contribution guidance, and Codex display metadata.
-- Unify public-facing README, Plugin, and social-preview messaging around designing the meaning of work and the agent work system that realizes it, without changing the two design Skills' responsibilities.
+- Unify public-facing README, Plugin, and social-preview messaging around designing the meaning of work and the agent work system that realizes it.
 - Make responsibility boundaries, proportionate Outcome counterexamples, and evidence status explicit in Process Description Design; clarify adaptation and retention of applicable evidence in Agent Work System Design.
-- Replace repeated explanatory notes in the design Skills with guidance at the relevant decisions, and extend the existing English/Japanese examples for bounded responsibility and change impacts. Foundation definitions, required Process elements, and distribution remain unchanged.
+- Replace repeated explanatory notes in the design Skills with guidance at the relevant decisions, and extend the existing English/Japanese examples for bounded responsibility and change impacts.
 - Focus repository tests on manifest consistency, distribution layout, translation manifests, and example tool behavior; review affected distribution resources alongside existing format and link checks.
 - Tighten the service-change example tool: reject request identifiers that are not printable or have surrounding whitespace, non-decimal numbers and non-ASCII-digit sample counts, and UTF-8 BOM input; report `input_relationship` (identical bytes and same request identifiers); and align fixture identifiers.
 - Document the example tool's input rules and `input_relationship`, require matching identifiers for a positive pilot assessment, state Python 3.10 or later and test it in CI, and move the example's Framework reference from Controls to Resources.
+- Make Agent Work System Design independent of the other Skill and `examples/`: it starts from a description of the work in any form, states that defining what the work must achieve is outside its scope, applies only the design principles and Agent Skills sources, and uses self-contained design examples. Its Purpose allows findings when no suitable configuration can be established, and its Outcomes separately cover respect for applicable requirements, authority, and limits on effects, allowing findings to qualify a result only where it cannot be met within the request's scope, information, capabilities, or authority; Tasks add allocation criteria, least access and authority, untrusted information handling, and reproducibility, and use exposed-operation terminology. Repository guidance, development Skills, contribution guidance, the pull request template, and the working example's evaluation cases assess requirement respect separately from tool behavior and effectiveness, and the distribution test no longer allows links outside a Skill.
 
 ## [0.7.0] - 2026-09-06
 

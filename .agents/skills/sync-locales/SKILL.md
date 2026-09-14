@@ -30,7 +30,7 @@ The following Tasks are required within the requested scope.
 
 1. Compare complete semantic units by subject, modality, action or state, object, condition, quantifier, polarity, exceptions, and scope. Assess relationships between elements as well as individual statements.
 2. Check that work structure, Outcome judgments, contextual conditions, source identity, change effects, and uncertainty have the same meaning.
-3. Check work-system responsibilities, judgment and processing allocation, interfaces, effects, and the distinctions between design review, component checks, and whole-system effectiveness. Preserve each source's independence and its application in the design Skills.
+3. Check work-system responsibilities, judgment and processing allocation, interfaces, effects, and the distinctions between design review, component checks, respect for applicable requirements, authority, and limits on effects, and whole-system effectiveness. Preserve each source's independence and its application in the design Skills.
 4. Use `NOTE` in English and `注記` in Japanese, preserving the note's attachment, scope, and informative role under the Framework's Markdown rules.
 5. Preserve canonical paths, identifiers, and code literals. Localized links may target the corresponding translation when its English source remains identifiable.
 6. Correct affected translations when synchronization is requested, preserving unrelated work. Keep changes to the English source within the requested scope.

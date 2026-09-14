@@ -45,7 +45,7 @@ Maintainers may request license evidence, written permission, or replacement of 
 2. Update the paired English or Japanese asset when required.
 3. Designate one description as the reference point for each information item and use relative links from other documents.
 4. Run the applicable checks in the [validation Workflow](.github/workflows/validate.yml). Use `review-alps` and `sync-locales` for separate semantic and locale review.
-   For tools or work-system changes, verify specified behavior and connections, then assess representative work within the authorized scope. Report these forms of evidence and their limits separately.
+   For tools or work-system changes, verify specified behavior and connections, assess whether applicable requirements, authority, and limits on effects are respected, then assess representative work within the authorized scope. Report these forms of evidence and their limits separately.
 5. Run `git diff --check`, verify changed relative links, and inspect the final diff, including affected distribution paths and resources.
 6. Submit a pull request describing the change and its validation results, with the required sign-off on each commit.
 
