@@ -4,6 +4,8 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-14
+
 ### Added
 
 - A Claude Code marketplace manifest (`.claude-plugin/marketplace.json`) with `/plugin marketplace add` installation guidance, and translation manifests that record each Japanese file's English source and its reviewed SHA-256.
@@ -26,6 +28,8 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 - Tighten the service-change example tool: reject request identifiers that are not printable or have surrounding whitespace, non-decimal numbers and non-ASCII-digit sample counts, and UTF-8 BOM input; report `input_relationship` (identical bytes and same request identifiers); and align fixture identifiers.
 - Document the example tool's input rules and `input_relationship`, require matching identifiers for a positive pilot assessment, state Python 3.10 or later and test it in CI, and move the example's Framework reference from Controls to Resources.
 - Make Agent Work System Design independent of the other Skill and `examples/`: it starts from a description of the work in any form, states that defining what the work must achieve is outside its scope, applies only the design principles and Agent Skills sources, and uses self-contained design examples. Its Purpose allows findings when no suitable configuration can be established, and its Outcomes separately cover respect for applicable requirements, authority, and limits on effects, allowing findings to qualify a result only where it cannot be met within the request's scope, information, capabilities, or authority; Tasks add allocation criteria, least access and authority, untrusted information handling, and reproducibility, and use exposed-operation terminology. Repository guidance, development Skills, contribution guidance, the pull request template, and the working example's evaluation cases assess requirement respect separately from tool behavior and effectiveness, and the distribution test no longer allows links outside a Skill.
+
+See the [release notes](docs/releases/0.8.0.md) ([Japanese](docs/locales/ja/releases/0.8.0.md)) for the scope and update guidance.
 
 ## [0.7.0] - 2026-09-06
 
