@@ -1,6 +1,6 @@
 interface:
   display_name: "Process Description Design"
-  short_description: "Clarify work purpose and observable success"
+  short_description: "Create, revise, or review work purpose and success"
   icon_small: "./assets/alps.svg"
   icon_large: "./assets/alps.svg"
   brand_color: "#4DB2FF"
