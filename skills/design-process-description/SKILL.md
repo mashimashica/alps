@@ -7,7 +7,7 @@ description: Create, revise, or review a Process Description—the Purpose, obse
 
 ## Purpose
 
-Make the purpose and success conditions of the target work clear, as distinct from the configuration that performs it, through an understandable, applicable, and evaluable Process Description with necessary and sufficient boundaries and detail, or through findings about such a description.
+Establish the adequacy of an understandable, applicable, and evaluable Process Description that makes the target work's purpose and success conditions clear with necessary and sufficient boundaries and detail, or make the description's deficiencies and limits explicit. This concerns work meaning, not the configuration that performs the work.
 
 ## Outcomes
 
