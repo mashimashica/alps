@@ -135,7 +135,7 @@ The deployed service revision.
 
 Checking capability and the authorized release job.
 
-A policy directs the work; its approval condition limits deployment. The release job supplies an Enabler. The Entry Criteria allow candidate qualification to begin before deployment approval, while the deployment Constraint still applies to the action it governs. “The candidate revision” in the Outcomes is the checked and approved candidate required by the Controls and Constraints; approval itself is judged as a release requirement, not as an Outcome.
+A policy directs the work; its approval condition limits deployment. The release job supplies an Enabler. The Entry Criteria allow candidate qualification to begin before deployment approval, while the deployment Constraint still applies to the action it governs. “The candidate revision” in the Outcomes identifies the specific revision intended for this release; it does not imply that qualification or approval has been completed. Qualification and approval remain mandatory under the Tasks, Controls, and Constraints, and the Exit Criteria require their satisfaction.
 
 The Activity headings group related work and the numbered Tasks state actions. The two Activities describe the release work as a whole and together cover both Outcomes: Candidate qualification establishes the checked and approved candidate that is to serve production users, and Production availability deploys it and checks the production result, including the test purchase. Both contribute to the Purpose and can be revisited as the candidate or production evidence changes. The NOTEs explain the adjacent Tasks; the obligations and necessary order are stated in the main text.
 
