@@ -60,7 +60,7 @@ A review-only request must return findings and any requested corrections without
 
 ## Resources
 
-This root `SKILL.md` is the English source for the [Japanese translation](references/locales/ja/SKILL.md), which preserves its meaning and normative force.
+This root `SKILL.md` is the English source for the [Japanese translation](references/locales/ja/SKILL.ja.md), which preserves its meaning and normative force.
 
 - [Design prompts and examples](references/examples.md): use relevant prompts and cases to develop or review a configuration.
 - [Working example](../../examples/README.md): inspect a target Skill with a processing script, conditions, and evaluation cases.

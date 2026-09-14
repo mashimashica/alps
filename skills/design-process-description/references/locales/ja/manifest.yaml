@@ -1,3 +1,19 @@
 locale: ja
 source_locale: en
 status: reviewed
+# Each key is a Japanese file and each source is its English file. Paths are
+# relative to the directory containing this manifest. Update
+# reviewed_source_sha256 after reviewing the translation against the source.
+sources:
+  SKILL.ja.md:
+    source: ../../../SKILL.md
+    reviewed_source_sha256: b23e779e48f8999754e193e854a43b9134686b57b4955c3e64a98c4551bbb7f3
+  SKILL-template.md:
+    source: ../../SKILL-template.md
+    reviewed_source_sha256: b4aa9be18ea0b249d73d30d28b30a01c66d8c83c90bb51efe738e10a38f519a2
+  examples.md:
+    source: ../../examples.md
+    reviewed_source_sha256: 33f44bc0d7a06f111262be0d7c94530ae41c88d64d8c11ed763c3b5c1ea3d243
+  process-framework.md:
+    source: ../../process-framework.md
+    reviewed_source_sha256: 4f3dfb412467ec860ece1689107d4aea7cf7771993a654ec639c3e0b46037bf2

@@ -23,6 +23,6 @@ Each Outcome describes a result state needed for the Purpose; together, the Outc
 
 The [Production Release example](examples.md#production-release) shows how to add Activity headings, numbered Tasks, and attached NOTEs while keeping obligations in the main text.
 
-When supporting tools need to be described, use the [system design examples](../../design-agent-work-system/references/examples.md) to add the necessary responsibilities, interfaces, and conditions to the target Skill or its resources.
+Descriptions of supporting tools and configurations are outside this template's scope.
 
 [Japanese translation](locales/ja/SKILL-template.md)

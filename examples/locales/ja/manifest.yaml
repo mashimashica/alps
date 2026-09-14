@@ -1,0 +1,10 @@
+locale: ja
+source_locale: en
+status: reviewed
+# Each key is a Japanese file and each source is its English file. Paths are
+# relative to the directory containing this manifest. Update
+# reviewed_source_sha256 after reviewing the translation against the source.
+sources:
+  README.md:
+    source: ../../README.md
+    reviewed_source_sha256: 3e900024a66b69e0aff6687acf52078c5630c1949cb8752a12c24f98d9f6dc2c

@@ -1,0 +1,17 @@
+{
+  "name": "alps",
+  "owner": {
+    "name": "mashimashica",
+    "url": "https://github.com/mashimashica"
+  },
+  "metadata": {
+    "description": "Design the meaning of work and the agent work system that realizes it."
+  },
+  "plugins": [
+    {
+      "name": "alps",
+      "source": "./",
+      "description": "Design the meaning of work and the agent work system that realizes it."
+    }
+  ]
+}

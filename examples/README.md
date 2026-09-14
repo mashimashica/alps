@@ -2,7 +2,7 @@
 
 [Japanese translation](locales/ja/README.md)
 
-This informative example is a complete target Skill with a working script. It is bundled as reference material under `examples/`, outside the Plugin's discovered `skills/` directory. Read [Service Change Assessment](assess-service-change/SKILL.md) for the work's Name, Purpose, Outcomes, and conditions. That description is the common source for both design responsibilities below.
+This informative example is a complete target Skill with a working script. It is bundled as reference material under `examples/`, outside the Plugin's discovered `skills/` directory. Read [Service Change Assessment](assess-service-change/SKILL.md) for the work's Name, Purpose, Outcomes, and conditions. That description holds the work's Purpose and Outcomes and is the common source for both design responsibilities below. The supporting design refers to it rather than restating it, and tool evidence contributes to the assessment without making tool completion its success condition.
 
 ## Two design responsibilities on the same work
 
