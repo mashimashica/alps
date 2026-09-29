@@ -11,7 +11,7 @@ language: ja
 #   製品やサービスの実体がワークスペースの外にある場合は、その版かダイジェストを書いた参照の記録をここに置く。
 artifacts:
   関係者の情報: { kind: information, paths: [docs/changes/*/stakeholders.md] }
-  変更概要: { kind: information, paths: [docs/changes/*/change-summary.md] }
+  変更概要: { kind: information, paths: [docs/changes/*/change-brief.md] }
   改善提案: { kind: information, paths: [docs/improvements/*.md] }
   設計記述: { kind: information, paths: [docs/changes/*/design/] }
   候補版: { kind: product, paths: [releases/*/candidate.json] }

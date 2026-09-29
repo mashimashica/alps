@@ -21,6 +21,7 @@ import {
   readStructured,
   type ParseYaml,
 } from "./files.ts";
+import { normalizeLocations } from "./patterns.ts";
 
 export const DEFAULT_SKILL_ROOTS = ["skills", ".claude/skills", ".agents/skills", ".codex/skills"];
 export const DEFAULT_PORT = 4830;
@@ -43,10 +44,6 @@ export interface LoadOptions {
   config?: string;
 }
 
-/** `<case>` (and `{case}` from the block form) is read as `*`; locations use only `*` and `**`. */
-const normalizePaths = (paths: string[]): string[] =>
-  paths.map((p) => p.replace(/<case>|\{case\}/g, "*"));
-
 export function loadWorkspace(root: string, options: LoadOptions): LoadedWorkspace {
   const { parseYaml } = options;
   let configPath: string | null;
@@ -67,7 +64,9 @@ export function loadWorkspace(root: string, options: LoadOptions): LoadedWorkspa
     const raw = readStructured(configPath, parseYaml) ?? {};
     const parsed = harnessConfigSchema.safeParse(raw);
     if (!parsed.success)
-      throw new ModelError("no-model", formatIssues(path.basename(configPath), parsed.error));
+      throw new ModelError("no-model", formatIssues(path.basename(configPath), parsed.error), [
+        configPath,
+      ]);
     config = parsed.data;
   }
 
@@ -88,11 +87,16 @@ export function loadWorkspace(root: string, options: LoadOptions): LoadedWorkspa
   const rawModel = readStructured(modelPath, parseYaml);
   const parsedModel = processModelFileSchema.safeParse(rawModel);
   if (!parsedModel.success) {
-    throw new ModelError("no-model", formatIssues(path.basename(modelPath), parsedModel.error));
+    throw new ModelError("no-model", formatIssues(path.basename(modelPath), parsedModel.error), [
+      modelPath,
+    ]);
   }
 
-  const model = normalizeModel(parsedModel.data, path.basename(modelPath));
-  applyConfig(model, config, configPath ? path.basename(configPath) : "configuration");
+  const files = [modelPath, ...(configPath ? [configPath] : [])];
+  const model = withFiles(files, () => normalizeModel(parsedModel.data, path.basename(modelPath)));
+  withFiles(files, () =>
+    applyConfig(model, config, configPath ? path.basename(configPath) : "configuration"),
+  );
 
   return {
     root,
@@ -107,6 +111,17 @@ export function loadWorkspace(root: string, options: LoadOptions): LoadedWorkspa
       idleMinutes: config.server?.idleMinutes ?? DEFAULT_IDLE_MINUTES,
     },
   };
+}
+
+/** Adds the files looked at to a ModelError that names none. */
+function withFiles<T>(files: string[], read: () => T): T {
+  try {
+    return read();
+  } catch (error) {
+    if (error instanceof ModelError && error.files.length === 0)
+      throw new ModelError(error.code, error.message, files);
+    throw error;
+  }
 }
 
 function normalizeModel(raw: ProcessModelFile, file: string): ProcessModel {
@@ -129,7 +144,7 @@ function normalizeModel(raw: ProcessModelFile, file: string): ProcessModel {
     add(id, name, {
       description: entry.description ?? "",
       kind: entry.kind ?? null,
-      paths: normalizePaths(entry.paths),
+      paths: normalizeLocations(entry.paths),
     });
   }
   // A process may refer to a type that artifacts does not list; it is still a type of the model.
@@ -177,7 +192,7 @@ function applyConfig(model: ProcessModel, config: HarnessConfig, file: string): 
         `${file}: artifacts.${key} is not an artifact type of the process model.`,
       );
     if (spec.kind !== undefined) artifact.kind = spec.kind;
-    if (spec.paths !== undefined) artifact.paths = normalizePaths(spec.paths);
+    if (spec.paths !== undefined) artifact.paths = normalizeLocations(spec.paths);
   }
   for (const [key, location] of Object.entries(config.skills ?? {})) {
     const process = find(model.processes, key);

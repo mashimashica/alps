@@ -1,9 +1,21 @@
 /*
- * zod schemas for the files the harness reads. Each schema validates the file and
- * normalizes YAML scalars, so the loader works with one shape per file.
+ * zod schemas for the files the harness reads and the requests its API accepts. The schemas of
+ * the configuration and the model normalize YAML scalars, so the loader works with one shape per
+ * file; the schemas of the records are typed against shared/types.ts, which defines their shapes.
  */
 
 import { z } from "zod";
+import type {
+  Instance,
+  Judge,
+  Run,
+  RunOutput,
+  RunSummary,
+  RunTarget,
+  StateFile,
+  StateFileV1,
+  Usage,
+} from "./types.ts";
 
 /** A YAML scalar read as text: strings are trimmed and numbers are stringified. */
 const text = z.union([z.string(), z.number()]).transform((value) => String(value).trim());
@@ -123,6 +135,298 @@ export const harnessConfigSchema = z.looseObject({
 });
 
 export type HarnessConfig = z.output<typeof harnessConfigSchema>;
+
+/* ---------- .alps-harness records ---------- */
+
+const epochMs = z.number().nonnegative();
+const runStatus = z.enum(["running", "succeeded", "failed", "canceled", "interrupted"]);
+const judgment = z.enum(["achieved", "not-achieved", "unverified"]);
+const judge: z.ZodType<Judge> = z.union([
+  z.object({ kind: z.literal("user") }),
+  z.object({ kind: z.literal("agent"), id: z.string().min(1), self: z.boolean().optional() }),
+]);
+
+const usage: z.ZodType<Usage> = z.object({
+  costUsd: z.number().nullable(),
+  turns: z.number().nullable(),
+  inputTokens: z.number().nullable(),
+  outputTokens: z.number().nullable(),
+});
+const runTarget: z.ZodType<RunTarget> = z.object({
+  type: z.string(),
+  path: z.string().nullable(),
+  concrete: z.boolean(),
+});
+const runOutput: z.ZodType<RunOutput> = z.object({
+  type: z.string(),
+  path: z.string(),
+  change: z.enum(["created", "modified"]),
+});
+const gitInfo = z.object({ head: z.string(), dirty: z.boolean() }).nullable();
+const skillUsed = z.object({ path: z.string(), sha256: z.string().nullable() }).nullable();
+
+const instance: z.ZodType<Instance> = z.object({
+  id: z.string(),
+  process: z.string(),
+  inputs: z.record(z.string(), z.array(z.string())),
+  outputs: z.record(z.string(), z.string().nullable()),
+  criteria: z.array(
+    z.object({ outcome: z.int().min(0), statement: z.string(), checks: z.string().optional() }),
+  ),
+  notes: z.string(),
+  runs: z.array(z.string()),
+  evaluation: z
+    .object({
+      runId: z.string(),
+      judgments: z.array(
+        z.object({
+          outcome: z.int().min(0),
+          judgment,
+          evidence: z.string(),
+          limits: z.string().optional(),
+        }),
+      ),
+      note: z.string().optional(),
+      by: judge,
+      at: epochMs,
+    })
+    .nullable(),
+});
+
+const runSummary: z.ZodType<RunSummary> = z.object({
+  id: z.string(),
+  kind: z.enum(["process", "wake"]),
+  instance: z.string().nullable(),
+  status: runStatus,
+  startedAt: epochMs,
+  endedAt: epochMs.nullable(),
+});
+
+/** `.alps-harness/state.json`, version 2. */
+export const stateFileSchema: z.ZodType<StateFile> = z.object({
+  schemaVersion: z.literal(2),
+  instances: z.record(z.string(), instance),
+  provenance: z.record(z.string(), z.string()),
+  seq: z.int().min(0),
+  lastWakeAt: epochMs.nullable(),
+  runs: z.record(z.string(), runSummary),
+});
+
+/** `.alps-harness/runs/<id>.json`. */
+export const runRecordSchema: z.ZodType<Run> = z.object({
+  id: z.string(),
+  kind: z.enum(["process", "wake"]),
+  instance: z.string().nullable(),
+  process: z.string().nullable(),
+  agent: z.string(),
+  status: runStatus,
+  createdAt: epochMs,
+  startedAt: epochMs,
+  endedAt: epochMs.nullable(),
+  exitCode: z.number().nullable(),
+  error: z.string().nullable(),
+  agentError: z.string().nullable(),
+  inputs: z.array(
+    z.object({
+      type: z.string(),
+      role: z.enum(["input", "control"]),
+      paths: z.array(z.string()),
+      missing: z.array(z.string()),
+    }),
+  ),
+  targets: z.array(runTarget),
+  outputs: z.array(runOutput),
+  usage: usage.nullable(),
+  report: z.string(),
+  events: z.int().min(0),
+  command: z.string().nullable(),
+  client: z.object({ name: z.string(), version: z.string() }).nullable(),
+  prompt: z.string(),
+  git: gitInfo,
+  skill: skillUsed,
+  started: z.array(z.string()).optional(),
+});
+
+/**
+ * A state.json without schemaVersion (harness 0.8 and earlier). Only what the conversion reads is
+ * checked; missing optional values get the defaults the old harness used.
+ */
+export const stateFileV1Schema: z.ZodType<StateFileV1, unknown> = z.object({
+  seq: z.int().min(0).default(0),
+  runs: z
+    .record(
+      z.string(),
+      z.object({
+        id: z.string(),
+        process: z.string(),
+        case: z.string().nullish().default(null),
+        agent: z.string(),
+        workItem: z.string().nullish().default(null),
+        status: runStatus,
+        createdAt: epochMs,
+        startedAt: epochMs,
+        endedAt: epochMs.nullish().default(null),
+        exitCode: z.number().nullish().default(null),
+        error: z.string().nullish().default(null),
+        agentError: z.string().nullish().default(null),
+        usage: usage.nullish().default(null),
+        summary: z
+          .string()
+          .nullish()
+          .transform((value) => value ?? ""),
+        inputs: z
+          .array(
+            z.object({
+              type: z.string(),
+              role: z.enum(["input", "control"]),
+              paths: z.array(z.string()),
+            }),
+          )
+          .default([]),
+        targets: z.array(runTarget).default([]),
+        outputs: z.array(runOutput).default([]),
+        events: z.int().min(0).default(0),
+        command: z.string().nullish().default(null),
+        prompt: z.string().default(""),
+        git: gitInfo.optional().default(null),
+        skill: skillUsed.optional().default(null),
+      }),
+    )
+    .default({}),
+  workItems: z
+    .record(
+      z.string(),
+      z.object({
+        id: z.string(),
+        process: z.string(),
+        case: z.string().nullish().default(null),
+        agent: z.string().nullish().default(null),
+        plannedStart: epochMs.nullish().default(null),
+        plannedEnd: epochMs.nullish().default(null),
+        createdAt: epochMs.default(0),
+        runs: z.array(z.string()).default([]),
+        review: z
+          .object({
+            runId: z.string(),
+            judgments: z.array(z.string()),
+            note: z.string().default(""),
+            at: epochMs,
+          })
+          .nullish()
+          .default(null),
+      }),
+    )
+    .default({}),
+  provenance: z.record(z.string(), z.string()).default({}),
+});
+
+/* ---------- HTTP API requests (and the arguments of the MCP tools that relay them) ---------- */
+
+/** One path or a list of paths. */
+const pathList = z
+  .union([z.string(), z.array(z.string())])
+  .transform((value) => (Array.isArray(value) ? value : [value]));
+const freeText = z.string().trim();
+
+const criterion = z.strictObject({
+  outcome: z.int().min(0),
+  statement: freeText.min(1, { error: "a criterion needs a statement" }),
+  checks: freeText.optional(),
+});
+
+/** `instantiate` of a new instance. Types and the Process are named by id or name. */
+export const createInstanceRequest = z.strictObject({
+  process: z.string().min(1),
+  inputs: z.record(z.string(), pathList).default({}),
+  outputs: z.record(z.string(), z.string().nullable()).default({}),
+  criteria: z.array(criterion).default([]),
+  notes: z.string().default(""),
+});
+
+/** `instantiate` with an existing `instance`: new criteria and notes for it. */
+export const updateInstanceRequest = z.strictObject({
+  instance: z.string().min(1),
+  criteria: z.array(criterion).optional(),
+  notes: z.string().optional(),
+});
+
+/** `POST /api/instances` (`instantiate`): a new instance of `process`, or, with `instance`, an update. */
+export const instantiateRequest = z.union([updateInstanceRequest, createInstanceRequest]);
+export type InstantiateRequest = z.output<typeof instantiateRequest>;
+
+/** `POST /api/instances/:id/run` (`run`). */
+export const runRequest = z.strictObject({
+  agent: z.string().min(1),
+  /** `self` runs: the MCP client that performs the run. */
+  client: z.strictObject({ name: z.string(), version: z.string() }).optional(),
+});
+export type RunRequest = z.output<typeof runRequest>;
+
+/** `POST /api/instances/:id/evaluate` (`evaluate`). Problems with `judgments` are `invalid-judgment`. */
+export const evaluateRequest = z.strictObject({
+  judgments: z
+    .array(
+      z.strictObject({
+        outcome: z.int().min(0),
+        judgment,
+        evidence: freeText.min(1, { error: "evidence cannot be empty" }),
+        limits: freeText.optional(),
+      }),
+    )
+    .min(1, { error: "judge at least one Outcome" }),
+  note: z.string().optional(),
+  by: judge.default({ kind: "user" }),
+});
+export type EvaluateRequest = z.output<typeof evaluateRequest>;
+
+/** `POST /api/runs/:id/finish` (`finish_run`). */
+export const finishRequest = z.strictObject({
+  report: freeText.min(1, { error: "the report cannot be empty" }),
+  status: z.enum(["succeeded", "failed"]),
+});
+export type FinishRequest = z.output<typeof finishRequest>;
+
+/** A query parameter as a non-negative integer. */
+const count = z.coerce.number().int().min(0);
+
+/** `GET /api/instances` (`list_instances`). */
+export const instancesQuery = z.object({
+  process: z.string().min(1).optional(),
+  /** A part of an input or output path. */
+  path: z.string().min(1).optional(),
+  limit: count.min(1).max(200).default(50),
+  cursor: z
+    .string()
+    .regex(/^\d+$/, { error: "use the next value of the previous page" })
+    .optional(),
+});
+
+/** `GET /api/artifacts` (`list_artifacts`). `changedSince` is epoch milliseconds or an ISO 8601 date. */
+export const artifactsQuery = z.object({
+  type: z.string().min(1).optional(),
+  changedSince: z
+    .string()
+    .transform((value, context) => {
+      const ms = /^\d+$/.test(value) ? Number(value) : Date.parse(value);
+      if (Number.isNaN(ms))
+        context.addIssue({ code: "custom", message: "use epoch milliseconds or an ISO 8601 date" });
+      return ms;
+    })
+    .optional(),
+});
+
+/** `GET /api/runs/:id` (`get_run`). */
+export const runQuery = z.object({
+  /** How many of the last events to return. */
+  tail: count.max(1000).default(50),
+  /** Seconds to wait for a running run to end. */
+  wait: count.max(300).default(0),
+});
+
+/** `GET /api/assessment` (`get_assessment`). The Markdown form comes with the statistics. */
+export const assessmentQuery = z.object({
+  format: z.enum(["json"], { error: "only format=json is available" }).default("json"),
+});
 
 /** One line per issue: `<file>: <path>: <message>`. */
 export function formatIssues(file: string, error: z.ZodError): string {

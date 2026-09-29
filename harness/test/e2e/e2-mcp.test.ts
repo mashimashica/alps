@@ -1,13 +1,21 @@
 /*
  * E2 (MCP, data): over MCP, get_model returns the example model, and instantiate → run(demo) →
- * get_run(wait) succeeds with the outputs recorded in provenance (stage 3).
+ * get_run(wait) succeeds with the outputs recorded in provenance (stage 3, when the MCP server
+ * relays to the daemon; e2-http.test.ts runs the same scenario on the HTTP API).
  */
 
 import { SUPPORTED_PROTOCOL_VERSIONS } from "@modelcontextprotocol/client";
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import pkg from "../../package.json" with { type: "json" };
-import type { ModelDescription } from "../../src/shared/types.ts";
-import { mcpClient, type McpSession } from "../helpers/mcp.ts";
+import type {
+  ArtifactsResponse,
+  InstanceResponse,
+  ModelDescription,
+  RunDetailResponse,
+  RunStartResponse,
+} from "../../src/shared/types.ts";
+import { stopWorkspaceDaemon } from "../helpers/daemon.ts";
+import { callTool, mcpClient, type McpSession } from "../helpers/mcp.ts";
 import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
 
 let ws: TmpWorkspace;
@@ -110,5 +118,42 @@ describe("E2 MCP over stdio", () => {
     }
   });
 
-  test.todo("E2 instantiate → run(demo) → get_run(wait) succeeds and the outputs are recorded in provenance", () => {});
+  test.todo(
+    "E2 instantiate → run(demo) → get_run(wait) succeeds and the outputs are recorded in provenance",
+    async () => {
+      // The MCP server relays to the workspace's daemon, which it starts when there is none.
+      const work = tmpWorkspace();
+      const relay = await mcpClient({ workspace: work.root });
+      try {
+        const output = "docs/changes/CHG-002/change-brief.md";
+        const { instance } = await callTool<InstanceResponse>(relay, "instantiate", {
+          process: "Requirements Clarification",
+          inputs: { "Stakeholder information": ["docs/changes/CHG-002/stakeholders.md"] },
+          outputs: { "Change brief": output },
+        });
+        const { run } = await callTool<RunStartResponse>(relay, "run", {
+          instance: instance.id,
+          agent: "demo",
+        });
+        expect(run.status).toBe("running");
+        const detail = await callTool<RunDetailResponse>(relay, "get_run", {
+          run: run.id,
+          wait: 30,
+        });
+        expect(detail.run.status).toBe("succeeded");
+        expect(detail.run.outputs).toEqual([
+          { type: "Change brief", path: output, change: "created" },
+        ]);
+        const { artifacts } = await callTool<ArtifactsResponse>(relay, "list_artifacts", {
+          type: "Change brief",
+        });
+        expect(artifacts.find((artifact) => artifact.path === output)?.producedBy).toBe(run.id);
+      } finally {
+        await relay.close();
+        await stopWorkspaceDaemon(work.root);
+        work.dispose();
+      }
+    },
+    { timeout: 60_000 },
+  );
 });

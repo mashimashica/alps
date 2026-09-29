@@ -138,6 +138,14 @@ describe("E10 WebUI", () => {
     { timeout: 60_000 },
   );
 
-  test.todo("E10 the ring draws 11 processes and 15 pills; a pill opens the focus view and a blank click returns", () => {});
-  test.todo("E10 starting a run changes the ring marks through SSE", () => {});
+  // The screens come in stage 4, which writes these scenarios against them. Until then, running
+  // them with --todo reports them as not written instead of letting an empty body pass.
+  test.todo("E10 the ring draws 11 processes and 15 pills; a pill opens the focus view and a blank click returns", () => {
+    throw new Error(
+      "Not written yet: the ring and the focus view come with the screens (stage 4).",
+    );
+  });
+  test.todo("E10 starting a run changes the ring marks through SSE", () => {
+    throw new Error("Not written yet: the ring marks come with the screens (stage 4).");
+  });
 });

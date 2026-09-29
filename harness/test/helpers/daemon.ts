@@ -49,6 +49,14 @@ export async function startDaemon(
   };
 }
 
+/**
+ * Stops the daemon of a workspace however it was started; the MCP server starts one when it has
+ * none to relay to.
+ */
+export async function stopWorkspaceDaemon(workspace: string): Promise<void> {
+  if (fs.existsSync(serverJson(workspace))) await cli(["stop", workspace]);
+}
+
 /** Kills daemons a failed test left behind. */
 export function killStrayDaemons(): void {
   for (const pid of started) {

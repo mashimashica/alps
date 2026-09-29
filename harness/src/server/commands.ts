@@ -1,9 +1,11 @@
 /* The `serve` and `stop` commands. */
 
+import { Harness, StateError } from "../harness/index.ts";
 import { ModelError, findWorkspace, loadWorkspace, type LoadedWorkspace } from "../model/index.ts";
 import type { ServerInfo } from "../shared/types.ts";
 import { openBrowser } from "./browser.ts";
 import { DaemonError, startDaemon, stopServer } from "./daemon.ts";
+import { checkVersion, gitInfo } from "./host.ts";
 import { startServer } from "./http.ts";
 import { liveServer, serverUrl, uiUrl } from "./info.ts";
 import { UiBuildError } from "./ui.ts";
@@ -90,9 +92,10 @@ export async function serve(args: ServeArgs, version: string): Promise<number> {
       development: args.dev,
       version,
       log,
+      openHarness: () => new Harness(root, { parseYaml, gitInfo, checkVersion, log }),
     });
   } catch (error) {
-    if (error instanceof UiBuildError) {
+    if (error instanceof UiBuildError || error instanceof StateError) {
       log(error.message);
       return 1;
     }

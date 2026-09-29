@@ -83,12 +83,31 @@ export interface ModelDescription {
   artifacts: ArtifactType[];
 }
 
-/** What `get_model` and `GET /api/model` return once agent detection is available. */
+/** What `get_model` and `GET /api/model` return: the model with the agents that can run its Processes. */
 export interface ModelView extends ModelDescription {
   agents: AgentInfo[];
 }
 
-/* ---------- instances, runs, and evaluations ---------- */
+/* ---------- artifacts ---------- */
+
+/** A file or directory of the workspace that matches a location pattern of an Artifact type. */
+export interface Artifact {
+  /** The Artifact type id. */
+  type: string;
+  /** Relative to the workspace, with forward slashes and no trailing slash. */
+  path: string;
+  dir: boolean;
+  /** Bytes, for a file. */
+  size: number | null;
+  /** The number of files inside, for a directory. */
+  items: number | null;
+  /** The latest modification time; for a directory, that of its newest file. */
+  mtime: number;
+  /** The run that last created or modified it, from provenance. */
+  producedBy: string | null;
+}
+
+/* ---------- instances and evaluations ---------- */
 
 /** The three-valued judgment of one Outcome. Only these are counted by the dashboard. */
 export type Judgment = "achieved" | "not-achieved" | "unverified";
@@ -102,9 +121,13 @@ export interface OutcomeCriterion {
 }
 
 export interface OutcomeJudgment {
+  /** Index into the Process's outcomes. */
   outcome: number;
   judgment: Judgment;
-  /** Never empty. */
+  /**
+   * Never empty in a judgment recorded by `evaluate`. Empty only in a judgment converted from a
+   * version 1 state.json, which recorded judgments without evidence.
+   */
   evidence: string;
   limits?: string;
 }
@@ -113,8 +136,10 @@ export interface OutcomeJudgment {
 export type Judge = { kind: "user" } | { kind: "agent"; id: string; self?: boolean };
 
 export interface Evaluation {
+  /** The run whose results were judged. */
   runId: string;
   judgments: OutcomeJudgment[];
+  /** Markdown. */
   note?: string;
   by: Judge;
   at: number;
@@ -128,15 +153,18 @@ export interface Evaluation {
 export interface Instance {
   id: string;
   process: string;
-  /** Concrete paths per Artifact type. An empty list means the Artifact does not exist yet. */
+  /** Concrete paths per Artifact type (inputs and controls). An empty list means the Artifact does not exist yet. */
   inputs: Record<string, string[]>;
-  /** Location per Artifact type. `null` means the running agent decides and reports it. */
+  /** Location per output Artifact type. `null` means the running agent decides and reports it. */
   outputs: Record<string, string | null>;
   criteria: OutcomeCriterion[];
   notes: string;
+  /** Run ids, oldest first. */
   runs: string[];
   evaluation: Evaluation | null;
 }
+
+/* ---------- runs ---------- */
 
 export type RunKind = "process" | "wake";
 
@@ -146,11 +174,15 @@ export interface RunInput {
   type: string;
   role: "input" | "control";
   paths: string[];
+  /** The paths that did not exist when the run started. */
+  missing: string[];
 }
 
 export interface RunTarget {
   type: string;
+  /** The instance's output location, or else the type's first location pattern. */
   path: string | null;
+  /** Whether `path` names one file or directory rather than a pattern. */
   concrete: boolean;
 }
 
@@ -186,16 +218,22 @@ export interface Run {
   startedAt: number;
   endedAt: number | null;
   exitCode: number | null;
+  /** Why the harness considers the run failed or stopped. */
   error: string | null;
+  /** The failure the agent itself reported. */
   agentError: string | null;
   inputs: RunInput[];
   targets: RunTarget[];
+  /** The Artifacts that the run created or modified, found by comparing the output locations before and after it. */
   outputs: RunOutput[];
   usage: Usage | null;
+  /** The agent's final report. */
   report: string;
+  /** The number of events in runs/<id>.jsonl. */
   events: number;
-  /** `null` for `self` runs, which have `client` instead. */
+  /** The command line that was started, with the prompt left out; `null` when no process is started (demo, self). */
   command: string | null;
+  /** `self` runs only: the MCP client that performs the run. */
   client: ClientInfo | null;
   prompt: string;
   git: { head: string; dirty: boolean } | null;
@@ -203,6 +241,9 @@ export interface Run {
   /** Wake runs only: the runs this wake started. */
   started?: string[];
 }
+
+/** A run as the API lists it: the record without its prompt. */
+export type RunView = Omit<Run, "prompt">;
 
 /** A normalized event of a run (`.alps-harness/runs/<id>.jsonl`). */
 export interface RunEvent {
@@ -237,9 +278,86 @@ export interface StateFile {
   instances: Record<string, Instance>;
   /** Artifact path to the id of the run that last created or modified it. */
   provenance: Record<string, string>;
+  /** The last number used for an instance or run id. */
   seq: number;
   lastWakeAt: number | null;
   runs: Record<string, RunSummary>;
+}
+
+/* ---------- version 1 records (read only to convert them) ---------- */
+
+/** A run in a state.json without schemaVersion (harness 0.8 and earlier). */
+export interface RunV1 {
+  id: string;
+  process: string;
+  case: string | null;
+  agent: string;
+  workItem: string | null;
+  status: RunStatus;
+  createdAt: number;
+  startedAt: number;
+  endedAt: number | null;
+  exitCode: number | null;
+  error: string | null;
+  agentError: string | null;
+  usage: Usage | null;
+  summary: string;
+  inputs: { type: string; role: "input" | "control"; paths: string[] }[];
+  targets: RunTarget[];
+  outputs: RunOutput[];
+  events: number;
+  command: string | null;
+  prompt: string;
+  git: { head: string; dirty: boolean } | null;
+  skill: { path: string; sha256: string | null } | null;
+}
+
+/** A work item: planned or repeated runs of a Process for a case, judged per Outcome without evidence. */
+export interface WorkItemV1 {
+  id: string;
+  process: string;
+  case: string | null;
+  agent: string | null;
+  plannedStart: number | null;
+  plannedEnd: number | null;
+  createdAt: number;
+  runs: string[];
+  review: { runId: string; judgments: string[]; note: string; at: number } | null;
+}
+
+/** A state.json without schemaVersion. Runs are kept inline. */
+export interface StateFileV1 {
+  seq: number;
+  runs: Record<string, RunV1>;
+  workItems: Record<string, WorkItemV1>;
+  provenance: Record<string, string>;
+}
+
+/* ---------- facts about instances ---------- */
+
+/** Why an evaluation no longer rests on what the workspace holds now. */
+export type StaleReason =
+  /** An input path changed after the judgment: modified or created after it, or removed since the judged run. */
+  | { kind: "input"; type: string; path: string; change: "modified" | "created" | "removed" }
+  /** The Process's SKILL.md differs from the one the judged run used (`path` is the current one, if any). */
+  | { kind: "skill"; path: string | null };
+
+/** The facts of one instance, as `list_instances` and the assessment report them. */
+export interface InstanceFacts {
+  instance: string;
+  process: string;
+  latestRun: RunSummary | null;
+  /** The judgments of the evaluation, or `null` before any. They are about `evaluatedRun`, which may precede `latestRun`. */
+  judgments: OutcomeJudgment[] | null;
+  evaluatedRun: string | null;
+  /** Whether an input or the SKILL.md changed after the judgment. */
+  stale: boolean;
+  staleness: StaleReason[];
+}
+
+/** An instance with its facts. */
+export interface InstanceView extends Instance {
+  facts: InstanceFacts;
 }
 
 /* ---------- server ---------- */
@@ -265,7 +383,15 @@ export interface HealthInfo {
 }
 
 /** Messages on `GET /api/events` (server-sent events). */
-export type ServerEvent = { type: "hello"; startedAt: number } | { type: "shutdown" };
+export type ServerEvent =
+  | { type: "hello"; startedAt: number }
+  | { type: "shutdown" }
+  /** An instance was created, updated, run, or evaluated. */
+  | { type: "instance"; instance: InstanceView }
+  /** A run started or ended. */
+  | { type: "run"; run: RunSummary }
+  /** Artifacts may have changed (a run ended); list them again. */
+  | { type: "artifacts" };
 
 /** Error codes of the MCP tools, also used by the HTTP API. */
 export type ErrorCode =
@@ -276,18 +402,22 @@ export type ErrorCode =
   | "invalid-judgment"
   | "server-unreachable";
 
-/** Rejections by the HTTP layer's safety checks. */
+/** Rejections by the HTTP layer: its safety checks, and requests that do not fit the API. */
 export type HttpErrorCode =
   | "forbidden-host"
   | "cross-site"
   | "unauthorized"
   | "unsupported-media-type"
+  /** The body or query does not fit the endpoint, or names what the Process does not have. */
+  | "invalid-request"
+  /** An instance's input or output path lies outside the workspace. */
+  | "outside-workspace"
   | "internal";
 
 export interface ErrorInfo {
   code: ErrorCode | HttpErrorCode;
   message: string;
-  /** `no-model`: where the missing file can be placed. */
+  /** `no-model`: the files looked at, or where a missing one can be placed. */
   files?: string[];
 }
 
@@ -295,6 +425,77 @@ export interface ErrorInfo {
 export interface Failure {
   ok: false;
   error: ErrorInfo;
+}
+
+/* ---------- HTTP API responses (the MCP tools return the same) ---------- */
+
+/** `GET /api/model` (`get_model`). */
+export interface ModelResponse {
+  ok: true;
+  model: ModelView;
+}
+
+/** `GET /api/artifacts` (`list_artifacts`): newest first. */
+export interface ArtifactsResponse {
+  ok: true;
+  artifacts: Artifact[];
+  /** Whether a location had more matches than the scan reads. */
+  truncated: boolean;
+}
+
+/** `GET /api/instances` (`list_instances`): newest first; `next` is the cursor of the next page. */
+export interface InstancesResponse {
+  ok: true;
+  instances: InstanceView[];
+  next: string | null;
+}
+
+/** `POST /api/instances` (`instantiate`) and `POST /api/instances/:id/evaluate` (`evaluate`). */
+export interface InstanceResponse {
+  ok: true;
+  instance: InstanceView;
+  /** `instantiate` only: whether a new instance was created rather than an existing one updated. */
+  created?: boolean;
+}
+
+/** `POST /api/instances/:id/run` (`run`). Success means that the run started, not that any Outcome is achieved. */
+export interface RunStartResponse {
+  ok: true;
+  run: RunView;
+  /** `self` runs only: what the calling session is to do. */
+  prompt?: string;
+}
+
+/** `GET /api/runs/:id` (`get_run`). */
+export interface RunDetailResponse {
+  ok: true;
+  run: Run;
+  /** The last events, oldest first. */
+  events: RunEvent[];
+  /** Whether earlier events were left out. */
+  truncated: boolean;
+}
+
+/** `POST /api/runs/:id/cancel` (`cancel_run`). */
+export interface CancelResponse {
+  ok: true;
+  run: RunView;
+  /** Whether this request stopped the run; `false` when it had already ended. */
+  canceled: boolean;
+}
+
+/** `POST /api/runs/:id/finish` (`finish_run`). */
+export interface FinishResponse {
+  ok: true;
+  run: RunView;
+  /** The output changes found by comparing the output locations with their state when the run started. */
+  outputs: RunOutput[];
+}
+
+/** `GET /api/assessment` (`get_assessment`, JSON form). */
+export interface AssessmentResponse {
+  ok: true;
+  assessment: Assessment;
 }
 
 /* ---------- dashboard and assessment ---------- */
@@ -404,18 +605,10 @@ export interface Finding {
   evidence: string[];
 }
 
-/** The facts of one instance, as `list_instances` and the assessment report them. */
-export interface InstanceFacts {
-  instance: string;
-  process: string;
-  latestRun: { id: string; status: RunStatus } | null;
-  judgments: OutcomeJudgment[] | null;
-  stale: boolean;
-}
-
 /** `GET /api/assessment` and the `get_assessment` tool (JSON form). */
 export interface Assessment {
-  stats: Stats;
+  /** The dashboard's statistics; `null` until they are computed (assess.ts). */
+  stats: Stats | null;
   findings: Finding[];
   instances: InstanceFacts[];
 }

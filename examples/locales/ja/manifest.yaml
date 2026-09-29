@@ -10,12 +10,12 @@ sources:
     reviewed_source_sha256: ac9e9e98580a6059b0f36044b4ac04806ac93d9243e9aaf1846570de7a0e1a73
   service-change/alps-harness.yaml:
     source: ../../service-change/alps-harness.yaml
-    reviewed_source_sha256: b5d322bb56e78fba27c939ca2db4d50152481be58147af83ce4f1ff6a4e5267e
+    reviewed_source_sha256: e9ec6d2b4b4ba9aa04cfb608e6a90312005ca6da2ed594650f8759848cdce582
   service-change/docs/acceptance-criteria.md:
     source: ../../service-change/docs/acceptance-criteria.md
     reviewed_source_sha256: ddb643916778b61fcd5f99e99bd15af8f85ac434b30ef245ac94ad4f2396ef18
-  service-change/docs/changes/CHG-001/change-summary.md:
-    source: ../../service-change/docs/changes/CHG-001/change-summary.md
+  service-change/docs/changes/CHG-001/change-brief.md:
+    source: ../../service-change/docs/changes/CHG-001/change-brief.md
     reviewed_source_sha256: 0bec16089e6e45752493ca51d5fe12bcc19ab2595118dd7fba834f16386fe8ac
   service-change/docs/changes/CHG-001/design/README.md:
     source: ../../service-change/docs/changes/CHG-001/design/README.md

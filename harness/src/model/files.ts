@@ -26,7 +26,7 @@ export class ModelError extends Error {
   constructor(
     readonly code: ModelErrorCode,
     message: string,
-    /** Where the files that would make a workspace can be placed. */
+    /** The files looked at, or where the files that would make a workspace can be placed. */
     readonly files: string[] = [],
   ) {
     super(message);
@@ -64,12 +64,12 @@ export function readStructured(file: string, parseYaml: ParseYaml): unknown {
   try {
     text = fs.readFileSync(file, "utf8").replace(/^﻿/, "");
   } catch (error) {
-    throw new ModelError("no-model", `Cannot read ${file}: ${(error as Error).message}`);
+    throw new ModelError("no-model", `Cannot read ${file}: ${(error as Error).message}`, [file]);
   }
   try {
     return /\.json$/i.test(file) ? JSON.parse(text) : parseYaml(text);
   } catch (error) {
-    throw new ModelError("no-model", `Cannot parse ${file}: ${(error as Error).message}`);
+    throw new ModelError("no-model", `Cannot parse ${file}: ${(error as Error).message}`, [file]);
   }
 }
 

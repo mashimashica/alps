@@ -9,6 +9,7 @@
 
 import type { Server } from "bun";
 import crypto from "node:crypto";
+import type { Harness } from "../harness/index.ts";
 import type {
   Failure,
   HealthInfo,
@@ -17,6 +18,7 @@ import type {
   ServerEvent,
   ServerInfo,
 } from "../shared/types.ts";
+import { createApi } from "./api.ts";
 import { IdleTracker } from "./idle.ts";
 import { probe, readServerInfo, removeServerInfo, serverUrl, writeServerInfo } from "./info.ts";
 import { bundleUi, type UiBundle } from "./ui.ts";
@@ -36,6 +38,11 @@ export interface ServeOptions {
   development: boolean;
   version: string;
   log: (line: string) => void;
+  /**
+   * Reads the workspace's records (it may throw a StateError). It is called before the server
+   * listens; the harness writes nothing until the server owns the workspace.
+   */
+  openHarness: () => Harness;
 }
 
 export interface HarnessServer {
@@ -87,8 +94,8 @@ function listen(port: number, serve: (port: number) => Server<undefined>): Serve
 }
 
 /**
- * Starts the server for the workspace. Rejects with a UiBuildError, before listening, when the
- * WebUI does not bundle.
+ * Starts the server for the workspace. Rejects, before listening, with a UiBuildError when the
+ * WebUI does not bundle and with a StateError when the records cannot be read.
  */
 export async function startServer(options: ServeOptions): Promise<StartResult> {
   const { root, log } = options;
@@ -106,6 +113,9 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
       `bundled the WebUI in ${Math.round(ui.ms)} ms (${ui.assets.size} files, ${formatSize(ui.bytes)})`,
     );
   }
+
+  const harness = options.openHarness();
+  const api = createApi(harness);
 
   const token = crypto.randomBytes(24).toString("hex");
   const startedAt = Date.now();
@@ -187,7 +197,11 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
     });
   };
 
-  const handleApi = (request: Request, url: URL, srv: Server<undefined>): Response => {
+  const handleApi = async (
+    request: Request,
+    url: URL,
+    srv: Server<undefined>,
+  ): Promise<Response> => {
     // Browsers say where a request comes from. Only the harness's own page (same-origin), the
     // address bar (none), and clients that are not browsers (no header) may use the API. A page
     // on another port of 127.0.0.1 is same-site and is refused too.
@@ -218,9 +232,11 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
       case "POST /api/shutdown":
         setTimeout(() => void stop("stop"), 20);
         return json(200, { ok: true });
-      default:
-        return fail(404, "not-found", `${request.method} ${url.pathname} does not exist.`);
     }
+    const reply = await api(request, url, () => srv.timeout(request, 0));
+    return reply
+      ? json(reply.status, reply.body)
+      : fail(404, "not-found", `${request.method} ${url.pathname} does not exist.`);
   };
 
   /** The bundled page and its chunks, from memory. */
@@ -261,6 +277,12 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
   async function stop(reason: string): Promise<void> {
     stopping ??= (async () => {
       idle.stop();
+      // The records are complete before server.json goes, so a server started next reads them whole.
+      try {
+        harness.close();
+      } catch (error) {
+        log(`cannot write the records: ${(error as Error).message}`);
+      }
       for (const stream of streams) {
         stream.send({ type: "shutdown" });
         stream.close();
@@ -283,6 +305,18 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
     writeServerInfo(root, info, false);
   }
   process.once("exit", () => removeServerInfo(root, info));
+  try {
+    harness.start({
+      broadcast: (event) => {
+        for (const stream of streams) stream.send(event);
+      },
+      hold: () => idle.hold(),
+    });
+  } catch (error) {
+    removeServerInfo(root, info);
+    await server.stop(true);
+    throw error;
+  }
   idle.start();
   // The token stays out of the log: it is in server.json and in the URL that `serve` prints.
   log(`listening on ${serverUrl(info)} for ${root}${options.development ? " (development)" : ""}`);

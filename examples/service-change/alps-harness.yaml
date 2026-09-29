@@ -11,7 +11,7 @@ language: en
 #   When a product or service lives outside the workspace, keep a reference record here that names its version or digest.
 artifacts:
   Stakeholder information: { kind: information, paths: [docs/changes/*/stakeholders.md] }
-  Change brief: { kind: information, paths: [docs/changes/*/change-summary.md] }
+  Change brief: { kind: information, paths: [docs/changes/*/change-brief.md] }
   Improvement proposal: { kind: information, paths: [docs/improvements/*.md] }
   Design description: { kind: information, paths: [docs/changes/*/design/] }
   Release candidate: { kind: product, paths: [releases/*/candidate.json] }

@@ -12,6 +12,8 @@ import net from "node:net";
 import os from "node:os";
 import path from "node:path";
 import { chromium } from "playwright";
+import type { Failure, InstanceResponse, InstancesResponse } from "../../src/shared/types.ts";
+import { apiClient } from "../helpers/api.ts";
 import { killStrayDaemons, startDaemon, type Daemon } from "../helpers/daemon.ts";
 import { isAlive, waitFor } from "../helpers/process.ts";
 import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
@@ -21,6 +23,16 @@ const ROUTES = [
   { method: "GET", path: "/api/health" },
   { method: "GET", path: "/api/events" },
   { method: "POST", path: "/api/shutdown" },
+  { method: "GET", path: "/api/model" },
+  { method: "GET", path: "/api/artifacts" },
+  { method: "GET", path: "/api/instances" },
+  { method: "POST", path: "/api/instances" },
+  { method: "POST", path: "/api/instances/i1/run" },
+  { method: "POST", path: "/api/instances/i1/evaluate" },
+  { method: "GET", path: "/api/runs/r1" },
+  { method: "POST", path: "/api/runs/r1/cancel" },
+  { method: "POST", path: "/api/runs/r1/finish" },
+  { method: "GET", path: "/api/assessment" },
   { method: "GET", path: "/api/unknown" },
 ] as const;
 
@@ -361,5 +373,50 @@ describe("E8 safety", () => {
     );
   });
 
-  test.todo("E8 paths outside the workspace are rejected as instance inputs and outputs", () => {});
+  test("E8 paths outside the workspace are rejected as instance inputs and outputs", async () => {
+    const api = apiClient(daemon);
+    // A directory beside the workspace, a symlink in the workspace that leads to it, and a symlink
+    // to a file there that does not exist yet.
+    const outside = path.join(ws.base, "outside");
+    fs.mkdirSync(outside, { recursive: true });
+    fs.writeFileSync(path.join(outside, "notes.md"), "Not the workspace's.\n");
+    fs.symlinkSync(outside, path.join(ws.root, "docs", "elsewhere"));
+    fs.symlinkSync(path.join(outside, "later.md"), path.join(ws.root, "docs", "later.md"));
+    const refused = [
+      "../outside/notes.md",
+      "docs/../../outside/notes.md",
+      path.join(outside, "notes.md"),
+      "/etc/hosts",
+      "docs/elsewhere/notes.md",
+      "docs/elsewhere/new.md",
+      "docs/later.md",
+    ];
+    for (const given of refused) {
+      for (const body of [
+        { process: "Requirements Clarification", inputs: { "Stakeholder information": [given] } },
+        { process: "Requirements Clarification", outputs: { "Change brief": given } },
+      ]) {
+        const sent = await api.post("/api/instances", body);
+        expect(sent.status, JSON.stringify(body)).toBe(403);
+        expect((sent.body as Failure).error.code).toBe("outside-workspace");
+      }
+    }
+    expect((await api.ok<InstancesResponse>("GET", "/api/instances")).instances).toEqual([]);
+
+    // A path inside, relative or absolute, is kept relative to the workspace.
+    const inside = await api.post<InstanceResponse>("/api/instances", {
+      process: "Requirements Clarification",
+      inputs: {
+        "Stakeholder information": [
+          path.join(ws.root, "docs", "changes", "CHG-002", "stakeholders.md"),
+        ],
+      },
+      outputs: { "Change brief": "./docs/changes/CHG-002/change-brief.md" },
+    });
+    expect(inside.status).toBe(201);
+    expect((inside.body as InstanceResponse).instance).toMatchObject({
+      inputs: { "Stakeholder information": ["docs/changes/CHG-002/stakeholders.md"] },
+      outputs: { "Change brief": "docs/changes/CHG-002/change-brief.md" },
+    });
+  });
 });

@@ -42,3 +42,20 @@ export async function mcpClient(
   await client.connect(transport);
   return { client, transport, stderr: () => stderr, close: () => client.close() };
 }
+
+/**
+ * Calls a tool and returns its structured result (`{ ok: true, … }`, the HTTP API's answer). A
+ * failed call throws with the error it reported.
+ */
+export async function callTool<T>(
+  session: McpSession,
+  name: string,
+  args: Record<string, unknown> = {},
+): Promise<T> {
+  const result = await session.client.callTool({ name, arguments: args });
+  if (result.isError)
+    throw new Error(
+      `${name} failed: ${JSON.stringify(result.structuredContent ?? result.content)}`,
+    );
+  return result.structuredContent as T;
+}

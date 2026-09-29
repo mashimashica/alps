@@ -4,10 +4,30 @@ export {
   HARNESS_DIR,
   MODEL_FILES,
   ModelError,
+  SKIP_DIRS,
   findWorkspace,
   isDir,
   isFile,
+  rel,
+  toPosix,
   type ParseYaml,
 } from "./files.ts";
 export { DEFAULT_IDLE_MINUTES, DEFAULT_PORT, loadWorkspace, type LoadedWorkspace } from "./load.ts";
+export {
+  compilePattern,
+  isConcrete,
+  matchesPattern,
+  normalizeLocations,
+  type LocationPattern,
+} from "./patterns.ts";
+export {
+  SCAN_LIMIT,
+  dirStat,
+  fileState,
+  scanLocations,
+  scanPattern,
+  signature,
+  type FileState,
+  type ScannedArtifact,
+} from "./scan.ts";
 export { describeSkill, findSkills, skillFor, splitFrontmatter } from "./skills.ts";

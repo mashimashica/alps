@@ -5,8 +5,15 @@
 
 import { afterAll, describe, expect, test } from "bun:test";
 import fs from "node:fs";
-import type { HealthInfo } from "../../src/shared/types.ts";
+import type {
+  HealthInfo,
+  InstanceResponse,
+  InstancesResponse,
+  ModelResponse,
+  ServerInfo,
+} from "../../src/shared/types.ts";
 import { killStrayDaemons, startDaemon } from "../helpers/daemon.ts";
+import { callTool, mcpClient } from "../helpers/mcp.ts";
 import { serverJson } from "../helpers/paths.ts";
 import { cli, isAlive, waitFor } from "../helpers/process.ts";
 import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
@@ -22,6 +29,9 @@ afterAll(() => {
   killStrayDaemons();
   for (const ws of workspaces) ws.dispose();
 });
+
+const readServerJson = (root: string): ServerInfo =>
+  JSON.parse(fs.readFileSync(serverJson(root), "utf8")) as ServerInfo;
 
 /** The process group of a pid (macOS and Linux). */
 function processGroup(pid: number): number {
@@ -84,5 +94,32 @@ describe("E1 serve --daemon", () => {
     { timeout: 30_000 },
   );
 
-  test.todo("E1 a second mcp process connects to the existing daemon", () => {});
+  test.todo(
+    "E1 a second mcp process connects to the existing daemon",
+    async () => {
+      const ws = workspace({ server: { idleMinutes: 5 } });
+      const daemon = await startDaemon(ws.root);
+      const first = await mcpClient({ workspace: ws.root });
+      const second = await mcpClient({ workspace: ws.root });
+      try {
+        for (const session of [first, second]) {
+          const { model } = await callTool<ModelResponse>(session, "get_model");
+          // The daemon answers: only it checks which agents are available.
+          expect(model.agents.map((agent) => agent.id)).toContain("demo");
+        }
+        // No second daemon was started, and both sessions see the same records.
+        expect(readServerJson(ws.root).pid).toBe(daemon.info.pid);
+        const { instance } = await callTool<InstanceResponse>(first, "instantiate", {
+          process: "Solution Design",
+        });
+        const { instances } = await callTool<InstancesResponse>(second, "list_instances");
+        expect(instances.map((i) => i.id)).toContain(instance.id);
+      } finally {
+        await first.close();
+        await second.close();
+        await daemon.stop();
+      }
+    },
+    { timeout: 60_000 },
+  );
 });

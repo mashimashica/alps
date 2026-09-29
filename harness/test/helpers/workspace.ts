@@ -15,6 +15,10 @@ export interface WorkspaceOverrides {
   /** `ja` copies the Japanese counterpart, examples/locales/ja/service-change (`language: ja`). */
   locale?: "ja";
   server?: { port?: number; idleMinutes?: number };
+  /** Merged into `agents` of alps-harness.yaml, over the stand-ins for the real agents. */
+  agents?: Record<string, unknown>;
+  /** Other top-level keys of alps-harness.yaml to set; `null` removes a key. */
+  config?: Record<string, unknown>;
 }
 
 /** Records of earlier runs and Python caches are not part of the example. */
@@ -22,7 +26,9 @@ const NOT_COPIED = new Set([".alps-harness", "__pycache__"]);
 
 /**
  * Copies examples/ into a temporary directory and rewrites the example workspace's
- * alps-harness.yaml for tests: `server.port: 0` and a small `server.idleMinutes`.
+ * alps-harness.yaml for tests: `server.port: 0`, a small `server.idleMinutes`, and commands for
+ * Claude Code and Codex that do not exist, so no test starts the real agents (not even with
+ * `--version`). A test that needs an agent gives its command in `agents`.
  * The whole directory is copied because the workspaces refer to their Skills by relative paths:
  * the English workspace declares `../assess-service-change`, and the Japanese counterpart uses
  * the English workspace's Skills through `skillRoots` and the translated headings.
@@ -41,6 +47,16 @@ export function tmpWorkspace(overrides: WorkspaceOverrides = {}): TmpWorkspace {
   const file = path.join(root, "alps-harness.yaml");
   const config = Bun.YAML.parse(fs.readFileSync(file, "utf8")) as Record<string, unknown>;
   config.server = { port: 0, idleMinutes: 0.5, ...overrides.server };
+  config.agents = {
+    "claude-code": { command: path.join(base, "no-claude-in-tests") },
+    codex: { command: path.join(base, "no-codex-in-tests") },
+    ...(config.agents as Record<string, unknown> | undefined),
+    ...overrides.agents,
+  };
+  for (const [key, value] of Object.entries(overrides.config ?? {})) {
+    if (value === null) delete config[key];
+    else config[key] = value;
+  }
   // JSON is YAML, so the rewritten file is still a valid alps-harness.yaml.
   fs.writeFileSync(file, `${JSON.stringify(config, null, 2)}\n`);
 

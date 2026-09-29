@@ -85,3 +85,17 @@ export async function waitFor(
   }
   return Date.now() - started;
 }
+
+/** Polls an asynchronous condition until it holds. */
+export async function until(
+  condition: () => Promise<boolean>,
+  timeoutMs: number,
+  what: string,
+): Promise<void> {
+  const started = Date.now();
+  while (!(await condition())) {
+    if (Date.now() - started > timeoutMs)
+      throw new Error(`Timed out after ${timeoutMs} ms waiting for ${what}`);
+    await Bun.sleep(100);
+  }
+}
