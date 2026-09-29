@@ -11,11 +11,15 @@ Commands:
         WebUI's URL. The URL carries the per-start token after #; keep it to yourself.
         --daemon  start it detached and return once .alps-harness/server.json is written
         --port    the port to try first (default: server.port in alps-harness.yaml, or 4830)
-        --dev     Bun's development mode (the UI is bundled on each request, with HMR)
-        --open    open the URL in a browser (BROWSER=<command> picks it, BROWSER=none opens none)
+        --dev     Bun's development mode (the UI is bundled on each request, with HMR); its
+                  page and assets bypass the server's Host check and security headers
+        --open    open the WebUI in a browser (BROWSER=<command> picks it, BROWSER=none opens
+                  none) through .alps-harness/open.html, which only you can read, so the token
+                  never appears on a command line
   stop [workspace]
-        Stop the harness server of the workspace.
-  mcp   Serve MCP on stdio for the workspace in ALPS_WORKSPACE or the current directory.
+        Stop the harness server of the workspace, and the agents it is running.
+  mcp   Serve MCP on stdio for the workspace in ALPS_WORKSPACE or the current directory. It
+        relays to the workspace's harness server and starts one (detached) when none runs.
   wake [workspace]
         Not implemented yet.
   assess [workspace]

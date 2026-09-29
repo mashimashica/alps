@@ -1,8 +1,16 @@
-export { HTTP_STATUS, HarnessError, type HarnessErrorCode } from "./errors.ts";
-export { Harness, seqOf, type HarnessDeps, type HarnessHooks } from "./harness.ts";
+export { HTTP_STATUS, HarnessError, refuse, type HarnessErrorCode } from "./errors.ts";
+export {
+  Harness,
+  SESSION_CLOSED_ERROR,
+  seqOf,
+  type Caller,
+  type HarnessDeps,
+  type HarnessHooks,
+} from "./harness.ts";
 export { instanceIdOf, migrateStateV1 } from "./migrate.ts";
 export { artifactPath, workspacePath, type WorkspacePath } from "./paths.ts";
 export { buildPrompt, type PromptInput } from "./prompt.ts";
 export { diffOutputs, type OutputSnapshot } from "./provenance.ts";
+export { assessmentMarkdown } from "./report.ts";
 export { staleness, type CurrentState } from "./stale.ts";
 export { StateError, loadRecords, recordPaths } from "./store.ts";

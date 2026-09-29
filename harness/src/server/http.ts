@@ -5,22 +5,29 @@
  * (`/#token=…`), which browsers never send to servers. The API requires the token, rejects
  * requests that browsers mark as coming from other sites, and accepts only JSON bodies for
  * writes. No response may be shown in a frame (clickjacking).
+ *
+ * An MCP server holds a session with the harness server while its client is connected
+ * (`GET /api/session`, a stream like the event stream). The session names the self runs that the
+ * client performs; when it closes (the MCP server ends, or says so), those runs are interrupted.
  */
 
 import type { Server } from "bun";
 import crypto from "node:crypto";
 import type { Harness } from "../harness/index.ts";
+import { say, type MessageArgs, type MessageKey } from "../shared/strings.ts";
 import type {
+  ErrorCode,
   Failure,
   HealthInfo,
   HttpErrorCode,
-  ErrorCode,
   ServerEvent,
   ServerInfo,
+  SessionEvent,
 } from "../shared/types.ts";
 import { createApi } from "./api.ts";
 import { IdleTracker } from "./idle.ts";
 import { probe, readServerInfo, removeServerInfo, serverUrl, writeServerInfo } from "./info.ts";
+import { openUi, removeOpenPage } from "./open.ts";
 import { bundleUi, type UiBundle } from "./ui.ts";
 
 /** Consecutive ports tried when the configured one is in use. */
@@ -69,8 +76,23 @@ const HEADERS = {
 
 const json = (status: number, body: unknown): Response =>
   Response.json(body, { status, headers: HEADERS });
-const fail = (status: number, code: ErrorCode | HttpErrorCode, message: string): Response =>
-  json(status, { ok: false, error: { code, message } } satisfies Failure);
+
+function fail<K extends MessageKey>(
+  status: number,
+  code: ErrorCode | HttpErrorCode,
+  key: K,
+  args: MessageArgs<K>,
+): Response {
+  return json(status, {
+    ok: false,
+    error: {
+      code,
+      message: say("en", key, args),
+      key,
+      args: args as Record<string, string | number | boolean>,
+    },
+  } satisfies Failure);
+}
 
 function tokenMatches(given: string | null, token: string): boolean {
   if (!given) return false;
@@ -91,6 +113,12 @@ function listen(port: number, serve: (port: number) => Server<undefined>): Serve
       if ((error as NodeJS.ErrnoException).code !== "EADDRINUSE" || i + 1 >= attempts) throw error;
     }
   }
+}
+
+/** An open stream of server-sent events. */
+interface Stream<T> {
+  send(event: T): void;
+  close(): void;
 }
 
 /**
@@ -115,12 +143,11 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
   }
 
   const harness = options.openHarness();
-  const api = createApi(harness);
-
   const token = crypto.randomBytes(24).toString("hex");
   const startedAt = Date.now();
   const encoder = new TextEncoder();
-  const streams = new Set<{ send(event: ServerEvent): void; close(): void }>();
+  const streams = new Set<Stream<ServerEvent>>();
+  const sessions = new Map<string, Stream<SessionEvent>>();
   let stopping: Promise<void> | null = null;
   let resolveClosed: (reason: string) => void = () => {};
   const closed = new Promise<string>((resolve) => (resolveClosed = resolve));
@@ -128,6 +155,10 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
     options.idleMinutes === null ? null : options.idleMinutes * 60_000,
     () => void stop("idle"),
   );
+
+  const api = createApi(harness, {
+    openUi: (open) => openUi(root, { port: server.port ?? 0, token }, open),
+  });
 
   const health = (): HealthInfo => ({
     ok: true,
@@ -145,19 +176,28 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
     return host === `127.0.0.1:${server.port}` || host === `localhost:${server.port}`;
   };
 
-  /** Server-sent events. An open stream keeps the server from stopping when idle. */
-  const openEvents = (request: Request, srv: Server<undefined>): Response => {
+  /**
+   * A stream of server-sent events. An open stream counts as a connection: it keeps the server
+   * from stopping when idle. `onClose` runs once, however the stream ends.
+   */
+  function openStream<T>(
+    request: Request,
+    srv: Server<undefined>,
+    first: T,
+    onOpen: (stream: Stream<T>) => void,
+    onClose: (stream: Stream<T>) => void,
+  ): Response {
     srv.timeout(request, 0);
     const release = idle.hold();
     let ping: ReturnType<typeof setInterval> | undefined;
     let done = false;
-    let stream: { send(event: ServerEvent): void; close(): void } | undefined;
+    let stream: Stream<T> | undefined;
     const finish = (): void => {
       if (done) return;
       done = true;
       clearInterval(ping);
-      if (stream) streams.delete(stream);
       release();
+      if (stream) onClose(stream);
     };
     const body = new ReadableStream<Uint8Array>({
       start(controller) {
@@ -180,11 +220,11 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
             }
           },
         };
-        streams.add(stream);
+        onOpen(stream);
         ping = setInterval(() => write(": ping\n\n"), PING_MS);
         request.signal.addEventListener("abort", finish, { once: true });
         write("retry: 2000\n\n");
-        stream.send({ type: "hello", startedAt });
+        stream.send(first);
       },
       cancel: finish,
     });
@@ -195,6 +235,29 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
         Connection: "keep-alive",
       },
     });
+  }
+
+  const openEvents = (request: Request, srv: Server<undefined>): Response =>
+    openStream<ServerEvent>(
+      request,
+      srv,
+      { type: "hello", startedAt },
+      (stream) => streams.add(stream),
+      (stream) => streams.delete(stream),
+    );
+
+  const openSession = (request: Request, srv: Server<undefined>): Response => {
+    const id = `s${crypto.randomBytes(8).toString("hex")}`;
+    return openStream<SessionEvent>(
+      request,
+      srv,
+      { type: "session", id },
+      (stream) => sessions.set(id, stream),
+      () => {
+        sessions.delete(id);
+        harness.sessionClosed(id);
+      },
+    );
   };
 
   const handleApi = async (
@@ -207,21 +270,16 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
     // on another port of 127.0.0.1 is same-site and is refused too.
     const site = request.headers.get("sec-fetch-site");
     if (site !== null && site !== "same-origin" && site !== "none")
-      return fail(403, "cross-site", "The API accepts requests only from the harness's own page.");
+      return fail(403, "cross-site", "error.crossSite", {});
     // EventSource cannot send headers, so the event stream also accepts the token as a query parameter.
     const given =
       request.headers.get("x-harness-token") ??
       (url.pathname === "/api/events" ? url.searchParams.get("token") : null);
-    if (!tokenMatches(given, token))
-      return fail(
-        401,
-        "unauthorized",
-        "The token is missing or wrong. Open the URL that alps-harness serve printed (…/#token=…).",
-      );
+    if (!tokenMatches(given, token)) return fail(401, "unauthorized", "error.token", {});
     if (request.method !== "GET" && request.method !== "HEAD") {
       const type = (request.headers.get("content-type") ?? "").toLowerCase();
       if (!type.startsWith("application/json"))
-        return fail(415, "unsupported-media-type", "Send the request body as JSON.");
+        return fail(415, "unsupported-media-type", "error.mediaType", {});
     }
 
     switch (`${request.method} ${url.pathname}`) {
@@ -229,14 +287,22 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
         return json(200, health());
       case "GET /api/events":
         return openEvents(request, srv);
+      case "GET /api/session":
+        return openSession(request, srv);
       case "POST /api/shutdown":
         setTimeout(() => void stop("stop"), 20);
         return json(200, { ok: true });
     }
+    const closing = /^\/api\/sessions\/([A-Za-z0-9]+)\/close$/.exec(url.pathname);
+    if (closing && request.method === "POST") {
+      await request.text();
+      sessions.get(closing[1] ?? "")?.close();
+      return json(200, { ok: true });
+    }
     const reply = await api(request, url, () => srv.timeout(request, 0));
     return reply
       ? json(reply.status, reply.body)
-      : fail(404, "not-found", `${request.method} ${url.pathname} does not exist.`);
+      : fail(404, "not-found", "error.route", { method: request.method, path: url.pathname });
   };
 
   /** The bundled page and its chunks, from memory. */
@@ -245,7 +311,8 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
       request.method === "GET" || request.method === "HEAD"
         ? ui?.assets.get(url.pathname)
         : undefined;
-    if (!asset) return fail(404, "not-found", `${url.pathname} does not exist.`);
+    if (!asset)
+      return fail(404, "not-found", "error.route", { method: request.method, path: url.pathname });
     return new Response(asset.body, { headers: { ...HEADERS, "Content-Type": asset.type } });
   };
 
@@ -258,8 +325,7 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
       routes: devPage ? { "/": devPage } : undefined,
       fetch(request, srv) {
         idle.touch();
-        if (!hostAllowed(request))
-          return fail(403, "forbidden-host", "This host name is not accepted.");
+        if (!hostAllowed(request)) return fail(403, "forbidden-host", "error.host", {});
         const url = new URL(request.url);
         return url.pathname.startsWith("/api/")
           ? handleApi(request, url, srv)
@@ -267,7 +333,7 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
       },
       error(error) {
         log(`error: ${error.stack ?? error.message}`);
-        return fail(500, "internal", "The server failed to handle the request.");
+        return fail(500, "internal", "error.internal", {});
       },
     }),
   );
@@ -277,9 +343,10 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
   async function stop(reason: string): Promise<void> {
     stopping ??= (async () => {
       idle.stop();
-      // The records are complete before server.json goes, so a server started next reads them whole.
+      // The records are complete before server.json goes, so a server started next reads them
+      // whole. Running agents are stopped with their process groups first.
       try {
-        harness.close();
+        await harness.close();
       } catch (error) {
         log(`cannot write the records: ${(error as Error).message}`);
       }
@@ -287,7 +354,13 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
         stream.send({ type: "shutdown" });
         stream.close();
       }
+      // Closing a session deletes its entry, which iterating the map allows.
+      for (const session of sessions.values()) {
+        session.send({ type: "shutdown" });
+        session.close();
+      }
       removeServerInfo(root, info);
+      removeOpenPage(root);
       await server.stop(true);
       log(`stopped (${reason})`);
       resolveClosed(reason);

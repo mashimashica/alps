@@ -42,19 +42,54 @@ export async function startDaemon(
       if (isAlive(info.pid)) {
         const result = await cli(["stop", workspace]);
         if (result.code !== 0) throw new Error(`stop exited with ${result.code}: ${result.stderr}`);
-        await waitFor(() => !isAlive(info.pid), 10_000, `daemon ${info.pid} to stop`);
+        await waitFor(() => !isAlive(info.pid), 20_000, `daemon ${info.pid} to stop`);
       }
       started.delete(info.pid);
     },
   };
 }
 
+/** The daemon that server.json names, if any. */
+export function readServerInfo(workspace: string): ServerInfo | null {
+  try {
+    return JSON.parse(fs.readFileSync(serverJson(workspace), "utf8")) as ServerInfo;
+  } catch {
+    return null;
+  }
+}
+
+/** The daemons serving `workspace` (`… cli.ts serve <workspace>`), from ps. */
+function serveProcesses(workspace: string): number[] {
+  const ps = Bun.spawnSync(["ps", "-ax", "-o", "pid=,command="]);
+  return ps.stdout
+    .toString()
+    .split("\n")
+    .flatMap((line) => {
+      const match = /^\s*(\d+)\s+(.*)$/.exec(line);
+      return match?.[2]?.includes(` serve ${workspace}`) ? [Number(match[1])] : [];
+    });
+}
+
 /**
  * Stops the daemon of a workspace however it was started; the MCP server starts one when it has
- * none to relay to.
+ * none to relay to. A daemon still starting is waited for, and whatever does not stop is killed,
+ * so no daemon outlives the test.
  */
 export async function stopWorkspaceDaemon(workspace: string): Promise<void> {
+  if (!fs.existsSync(serverJson(workspace)) && serveProcesses(workspace).length > 0)
+    await waitFor(
+      () => fs.existsSync(serverJson(workspace)) || serveProcesses(workspace).length === 0,
+      20_000,
+      "a starting daemon to write server.json",
+    ).catch(() => {});
   if (fs.existsSync(serverJson(workspace))) await cli(["stop", workspace]);
+  for (const pid of serveProcesses(workspace)) {
+    try {
+      process.kill(pid, "SIGKILL");
+    } catch {
+      // Already gone.
+    }
+  }
 }
 
 /** Kills daemons a failed test left behind. */

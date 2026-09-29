@@ -11,18 +11,26 @@ import { compilePattern, matchesPattern, type LocationPattern } from "./patterns
 /** Directory levels read below a pattern's prefix when the pattern has `**`. */
 const MAX_DEEP_LEVELS = 12;
 /** Directory levels read inside a directory Artifact. */
-const MAX_DIR_LEVELS = 4;
+export const MAX_DIR_LEVELS = 4;
 /** Files counted inside a directory Artifact. */
-const MAX_DIR_FILES = 500;
+export const MAX_DIR_FILES = 500;
 /** Matches read per pattern. */
 export const SCAN_LIMIT = 2000;
 
-/** The state of a file or directory Artifact. A directory is one unit: its newest file and its file count. */
+/**
+ * The state of a file or directory Artifact. A directory is one unit: its newest file and its file
+ * count. The modification time and the size can be kept by a write (`cp -p`, `touch -r`); the
+ * status-change time cannot, and a file put in the place of another has another inode.
+ */
 export interface FileState {
   dir: boolean;
   size: number | null;
   items: number | null;
   mtime: number;
+  /** The latest status change (ctimeMs): of the file, or of the directory and the files in it. */
+  ctime: number;
+  /** The inode of the file or directory. */
+  ino: number;
 }
 
 export interface ScannedArtifact extends FileState {
@@ -31,10 +39,11 @@ export interface ScannedArtifact extends FileState {
 
 /** Two states are the same when their signatures are. */
 export const signature = (state: FileState): string =>
-  `${state.dir ? "d" : "f"}:${state.mtime}:${state.dir ? state.items : state.size}`;
+  `${state.dir ? "d" : "f"}:${state.mtime}:${state.dir ? state.items : state.size}:${state.ctime}:${state.ino}`;
 
-export function dirStat(abs: string): { latest: number; count: number } {
+export function dirStat(abs: string): { latest: number; changed: number; count: number } {
   let latest = 0;
+  let changed = 0;
   let count = 0;
   const walk = (dir: string, depth: number): void => {
     let entries: fs.Dirent[];
@@ -49,7 +58,9 @@ export function dirStat(abs: string): { latest: number; count: number } {
       if (entry.isFile()) {
         count += 1;
         try {
-          latest = Math.max(latest, fs.statSync(p).mtimeMs);
+          const stat = fs.statSync(p);
+          latest = Math.max(latest, stat.mtimeMs);
+          changed = Math.max(changed, stat.ctimeMs);
         } catch {
           // A file removed while reading is not counted.
         }
@@ -57,17 +68,27 @@ export function dirStat(abs: string): { latest: number; count: number } {
     }
   };
   walk(abs, 0);
-  return { latest, count };
+  return { latest, changed, count };
 }
 
 function stateOf(abs: string, stat: fs.Stats): FileState {
-  if (!stat.isDirectory()) return { dir: false, size: stat.size, items: null, mtime: stat.mtimeMs };
+  if (!stat.isDirectory())
+    return {
+      dir: false,
+      size: stat.size,
+      items: null,
+      mtime: stat.mtimeMs,
+      ctime: stat.ctimeMs,
+      ino: stat.ino,
+    };
   const inside = dirStat(abs);
   return {
     dir: true,
     size: null,
     items: inside.count,
     mtime: Math.max(stat.mtimeMs, inside.latest),
+    ctime: Math.max(stat.ctimeMs, inside.changed),
+    ino: stat.ino,
   };
 }
 

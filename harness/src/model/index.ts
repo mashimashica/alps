@@ -21,6 +21,8 @@ export {
   type LocationPattern,
 } from "./patterns.ts";
 export {
+  MAX_DIR_FILES,
+  MAX_DIR_LEVELS,
   SCAN_LIMIT,
   dirStat,
   fileState,

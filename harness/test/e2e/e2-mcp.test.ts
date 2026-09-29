@@ -1,25 +1,50 @@
 /*
  * E2 (MCP, data): over MCP, get_model returns the example model, and instantiate → run(demo) →
- * get_run(wait) succeeds with the outputs recorded in provenance (stage 3, when the MCP server
- * relays to the daemon; e2-http.test.ts runs the same scenario on the HTTP API).
+ * get_run(wait) succeeds with the outputs recorded in provenance. The MCP server relays to the
+ * workspace's daemon, which it starts when there is none; e2-http.test.ts runs the same scenario
+ * on the HTTP API. With it: the twelve tools and five resources, the failures that the MCP server
+ * answers itself (no workspace, no server), and responses in the workspace's language.
  */
 
 import { SUPPORTED_PROTOCOL_VERSIONS } from "@modelcontextprotocol/client";
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import pkg from "../../package.json" with { type: "json" };
 import type {
   ArtifactsResponse,
+  AssessmentMarkdownResponse,
   InstanceResponse,
   ModelDescription,
   RunDetailResponse,
   RunStartResponse,
 } from "../../src/shared/types.ts";
-import { stopWorkspaceDaemon } from "../helpers/daemon.ts";
-import { callTool, mcpClient, type McpSession } from "../helpers/mcp.ts";
+import { copyOf } from "../helpers/copy.ts";
+import { readServerInfo, stopWorkspaceDaemon } from "../helpers/daemon.ts";
+import { callTool, mcpClient, toolFailure, type McpSession } from "../helpers/mcp.ts";
+import { records } from "../helpers/paths.ts";
 import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
+
+const TOOLS = [
+  "get_model",
+  "list_artifacts",
+  "list_instances",
+  "instantiate",
+  "run",
+  "get_run",
+  "cancel_run",
+  "finish_run",
+  "evaluate",
+  "get_assessment",
+  "wake",
+  "open_ui",
+];
 
 let ws: TmpWorkspace;
 let session: McpSession;
+const others: TmpWorkspace[] = [];
+const dirs: string[] = [];
 
 beforeAll(async () => {
   ws = tmpWorkspace();
@@ -28,7 +53,9 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await session?.close();
-  ws?.dispose();
+  for (const workspace of [ws, ...others]) if (workspace) await stopWorkspaceDaemon(workspace.root);
+  for (const workspace of [ws, ...others]) workspace?.dispose();
+  for (const dir of dirs) fs.rmSync(dir, { recursive: true, force: true });
 });
 
 /** The Skill path of each Process that has one, by Process name. */
@@ -36,6 +63,10 @@ const skillPaths = (model: ModelDescription): Record<string, string> =>
   Object.fromEntries(
     model.processes.flatMap((p) => (p.skill && "path" in p.skill ? [[p.name, p.skill.path]] : [])),
   );
+
+/** The text blocks of a tool result: the JSON, then the sentence in the workspace's language. */
+const texts = (result: { content?: unknown }): string[] =>
+  ((result.content ?? []) as { type: string; text?: string }[]).map((part) => part.text ?? "");
 
 describe("E2 MCP over stdio", () => {
   test("E2 mcp completes the handshake over stdio at the newest revision the client supports", () => {
@@ -58,20 +89,40 @@ describe("E2 MCP over stdio", () => {
       version: pkg.version,
     });
     expect(client.getServerCapabilities()?.tools).toBeDefined();
+    expect(client.getServerCapabilities()?.resources).toBeDefined();
   });
 
-  test("E2 get_model returns the example model", async () => {
+  test("E2 the MCP server lists the twelve tools, each with a description of its results", async () => {
     const { tools } = await session.client.listTools();
-    expect(tools.map((tool) => tool.name)).toContain("get_model");
+    expect(tools.map((tool) => tool.name).sort()).toEqual([...TOOLS].sort());
+    for (const tool of tools) {
+      // Success, failure, and incomplete results are told apart in every description.
+      expect(tool.description, tool.name).toContain("ok: true");
+      expect(tool.description, tool.name).toContain("error.code");
+    }
+    const described = Object.fromEntries(tools.map((tool) => [tool.name, tool.description ?? ""]));
+    expect(described.run).toContain("Success means only that the run started");
+    expect(described.evaluate).toContain("cannot be empty");
+    for (const name of ["instantiate", "run", "finish_run"])
+      expect(described[name], name).toMatch(/look with (get_run|list_instances)/);
+    expect(described.list_artifacts).toContain("truncated");
+  });
 
+  test("E2 get_model returns the example model, answered by the daemon", async () => {
     const result = await session.client.callTool({ name: "get_model", arguments: {} });
     expect(result.isError).toBeFalsy();
-    const { ok, model } = result.structuredContent as { ok: boolean; model: ModelDescription };
+    const { ok, model } = result.structuredContent as {
+      ok: boolean;
+      model: ModelDescription & { agents: { id: string }[] };
+    };
     expect(ok).toBe(true);
     expect(model.processes).toHaveLength(11);
     expect(model.artifacts).toHaveLength(15);
     expect(model.workspace).toBe(ws.root);
     expect(model.language).toBe("en");
+    // Only the daemon checks the agents; the MCP server started it, as server.json says.
+    expect(model.agents.map((agent) => agent.id)).toEqual(["claude-code", "codex", "demo", "self"]);
+    expect(readServerInfo(ws.root)?.pid).toEqual(expect.any(Number));
     // The declared location wins; the other Skills are found by their headings.
     expect(skillPaths(model)).toEqual({
       "Requirements Clarification": "skills/clarify-requirements/SKILL.md",
@@ -79,13 +130,16 @@ describe("E2 MCP over stdio", () => {
       "Service Change Assessment": "../assess-service-change/SKILL.md",
       "Production Release": "skills/release-to-production/SKILL.md",
     });
-    // The text content carries the same result for clients that ignore structuredContent.
-    const [first] = result.content as { type: string; text: string }[];
-    expect(JSON.parse(first?.text ?? "null")).toEqual(result.structuredContent);
+    // The first text block carries the same result for clients that ignore structuredContent;
+    // the second says what happened, in the workspace's language (English here).
+    const [json, said] = texts(result);
+    expect(JSON.parse(json ?? "null")).toEqual(result.structuredContent);
+    expect(said).toContain("has 11 Processes and 15 Artifact types");
   });
 
-  test("E2 get_model returns the Japanese example model, whose Processes find the same Skills through the headings of their SKILL.ja.md", async () => {
+  test("E2 get_model returns the Japanese example model, whose Processes find the same Skills through the headings of their SKILL.ja.md, and says so in Japanese", async () => {
     const ja = tmpWorkspace({ locale: "ja" });
+    others.push(ja);
     const jaSession = await mcpClient({ workspace: ja.root });
     try {
       const result = await jaSession.client.callTool({ name: "get_model", arguments: {} });
@@ -112,46 +166,178 @@ describe("E2 MCP over stdio", () => {
           },
         ],
       });
+      // The MCP server's responses follow `language: ja`, successes and failures alike.
+      expect(texts(result)[1]).toContain("11 のプロセスと 15 のアーティファクトの型がある");
+      const missing = await toolFailure(jaSession, "get_run", { run: "r999" });
+      expect(missing.error.code).toBe("not-found");
+      expect(missing.error.message).toBe("実行 r999 はない。");
+      expect(missing.texts[1]).toBe("実行 r999 はない。");
     } finally {
       await jaSession.close();
-      ja.dispose();
     }
   });
 
-  test.todo(
+  test(
     "E2 instantiate → run(demo) → get_run(wait) succeeds and the outputs are recorded in provenance",
     async () => {
-      // The MCP server relays to the workspace's daemon, which it starts when there is none.
-      const work = tmpWorkspace();
-      const relay = await mcpClient({ workspace: work.root });
-      try {
-        const output = "docs/changes/CHG-002/change-brief.md";
-        const { instance } = await callTool<InstanceResponse>(relay, "instantiate", {
-          process: "Requirements Clarification",
-          inputs: { "Stakeholder information": ["docs/changes/CHG-002/stakeholders.md"] },
-          outputs: { "Change brief": output },
+      const output = "docs/changes/CHG-002/change-brief.md";
+      const { instance } = await callTool<InstanceResponse>(session, "instantiate", {
+        process: "Requirements Clarification",
+        inputs: { "Stakeholder information": ["docs/changes/CHG-002/stakeholders.md"] },
+        outputs: { "Change brief": output },
+      });
+      const started = await session.client.callTool({
+        name: "run",
+        arguments: { instance: instance.id, agent: "demo" },
+      });
+      const { run } = started.structuredContent as RunStartResponse;
+      expect(run.status).toBe("running");
+      // Starting is all that the success of run means.
+      expect(texts(started)[1]).toContain("starting achieves no Outcome");
+      const detail = await callTool<RunDetailResponse>(session, "get_run", {
+        run: run.id,
+        wait: 30,
+      });
+      expect(detail.run.status).toBe("succeeded");
+      expect(detail.run.outputs).toEqual([
+        { type: "Change brief", path: output, change: "created" },
+      ]);
+      const { artifacts } = await callTool<ArtifactsResponse>(session, "list_artifacts", {
+        type: "Change brief",
+      });
+      expect(artifacts.find((artifact) => artifact.path === output)?.producedBy).toBe(run.id);
+    },
+    { timeout: 60_000 },
+  );
+
+  test(
+    "E2 the five resources read the model, a Process, an instance, a run's log, and the assessment, with ttlMs and cacheScope",
+    async () => {
+      const { instance } = await callTool<InstanceResponse>(session, "instantiate", {
+        process: "Solution Design",
+        inputs: { "Change brief": ["docs/changes/CHG-001/change-brief.md"] },
+      });
+      const { run } = await callTool<RunStartResponse>(session, "run", {
+        instance: instance.id,
+        agent: "demo",
+      });
+      await callTool<RunDetailResponse>(session, "get_run", { run: run.id, wait: 30 });
+
+      const { resources } = await session.client.listResources();
+      const uris = resources.map((resource) => resource.uri);
+      expect(uris).toContain("alps://model");
+      expect(uris).toContain("alps://assessment");
+      expect(uris).toContain(`alps://process/${encodeURIComponent("Solution Design")}`);
+      expect(uris).toContain(`alps://instance/${instance.id}`);
+      expect(uris).toContain(`alps://run/${run.id}/log`);
+      const { resourceTemplates } = await session.client.listResourceTemplates();
+      expect(resourceTemplates.map((template) => template.uriTemplate).sort()).toEqual([
+        "alps://instance/{id}",
+        "alps://process/{id}",
+        "alps://run/{id}/log",
+      ]);
+
+      const read = async (uri: string) => {
+        const result = (await session.client.readResource({ uri })) as {
+          contents: { uri: string; mimeType?: string; text?: string }[];
+          ttlMs?: number;
+          cacheScope?: string;
+        };
+        return { ...result, text: result.contents[0]?.text ?? "" };
+      };
+      const model = await read("alps://model");
+      expect((JSON.parse(model.text) as ModelDescription).processes).toHaveLength(11);
+      const process = await read(`alps://process/${encodeURIComponent("Solution Design")}`);
+      expect(JSON.parse(process.text)).toMatchObject({
+        process: {
+          name: "Solution Design",
+          skill: { path: "skills/design-solution/SKILL.md" },
+        },
+        artifacts: [{ name: "Change brief" }, { name: "Design description" }],
+      });
+      const one = await read(`alps://instance/${instance.id}`);
+      expect(JSON.parse(one.text)).toMatchObject({ id: instance.id, runs: [run.id] });
+      const log = await read(`alps://run/${run.id}/log`);
+      expect(log.contents[0]?.mimeType).toBe("text/plain");
+      expect(log.text).toContain(`Log of run ${run.id} (demo, succeeded)`);
+      expect(log.text).toMatch(/\] \S+ end\s+Succeeded/);
+      const assessment = await read("alps://assessment");
+      expect(assessment.contents[0]?.mimeType).toBe("text/markdown");
+      expect(assessment.text).toContain("## Findings");
+      expect(assessment.text).toContain(
+        `| ${instance.id} | Solution Design | ${run.id} (succeeded) |`,
+      );
+      // get_assessment answers the same Markdown.
+      const markdown = await callTool<AssessmentMarkdownResponse>(session, "get_assessment", {
+        format: "markdown",
+      });
+      expect(markdown.markdown).toBe(assessment.text);
+
+      // Records change with every run: nothing is cached, and nothing is shared. An ended run's
+      // log no longer changes and may be kept for an hour.
+      if (session.client.getProtocolEra() === "modern") {
+        for (const result of [model, process, one, assessment])
+          expect(copyOf({ ttlMs: result.ttlMs, cacheScope: result.cacheScope })).toEqual({
+            ttlMs: 0,
+            cacheScope: "private",
+          });
+        expect(copyOf({ ttlMs: log.ttlMs, cacheScope: log.cacheScope })).toEqual({
+          ttlMs: 3_600_000,
+          cacheScope: "private",
         });
-        const { run } = await callTool<RunStartResponse>(relay, "run", {
-          instance: instance.id,
-          agent: "demo",
-        });
-        expect(run.status).toBe("running");
-        const detail = await callTool<RunDetailResponse>(relay, "get_run", {
-          run: run.id,
-          wait: 30,
-        });
-        expect(detail.run.status).toBe("succeeded");
-        expect(detail.run.outputs).toEqual([
-          { type: "Change brief", path: output, change: "created" },
+      }
+
+      // A resource that does not exist is an MCP error, not an empty resource.
+      await expect(session.client.readResource({ uri: "alps://instance/i999" })).rejects.toThrow();
+    },
+    { timeout: 60_000 },
+  );
+
+  test("E2 wake answers not-implemented until the scheduled runs arrive, and changes nothing", async () => {
+    const failed = await toolFailure(session, "wake", { agent: "claude-code" });
+    expect(failed.error.code).toBe("not-implemented");
+  });
+
+  test("E2 without a workspace, the tools answer no-model and say where to put the files", async () => {
+    const empty = fs.mkdtempSync(path.join(os.tmpdir(), "alps-harness-e2-empty-"));
+    dirs.push(empty);
+    const lost = await mcpClient({ workspace: empty });
+    try {
+      for (const name of ["get_model", "list_instances"]) {
+        const { error } = await toolFailure(lost, name);
+        expect(error.code, name).toBe("no-model");
+        expect(error.files, name).toEqual([
+          path.join(empty, "alps-harness.yaml"),
+          path.join(empty, "process-model.yaml"),
         ]);
-        const { artifacts } = await callTool<ArtifactsResponse>(relay, "list_artifacts", {
-          type: "Change brief",
-        });
-        expect(artifacts.find((artifact) => artifact.path === output)?.producedBy).toBe(run.id);
+      }
+      // No daemon was started for a directory that is not a workspace.
+      expect(fs.existsSync(records(empty))).toBe(false);
+    } finally {
+      await lost.close();
+    }
+  });
+
+  test(
+    "E2 when the harness server cannot start, the tools answer server-unreachable with the port and server.json",
+    async () => {
+      const broken = tmpWorkspace();
+      others.push(broken);
+      fs.mkdirSync(records(broken.root), { recursive: true });
+      fs.writeFileSync(records(broken.root, "state.json"), "{ not json");
+      const relay = await mcpClient({ workspace: broken.root });
+      try {
+        const { error } = await toolFailure(relay, "get_model");
+        expect(error.code).toBe("server-unreachable");
+        expect(error.message).toContain(records(broken.root, "server.json"));
+        expect(error.message).toContain("port 0");
+        expect(error.message).toContain("not valid JSON");
+        expect(error.files).toEqual([
+          records(broken.root, "server.json"),
+          records(broken.root, "server.log"),
+        ]);
       } finally {
         await relay.close();
-        await stopWorkspaceDaemon(work.root);
-        work.dispose();
       }
     },
     { timeout: 60_000 },

@@ -7,29 +7,39 @@
  *   list_artifacts  GET  /api/artifacts?type&changedSince
  *   list_instances  GET  /api/instances?process&path&limit&cursor
  *   instantiate     POST /api/instances
+ *   (resource)      GET  /api/instances/:id
  *   run             POST /api/instances/:id/run
+ *   (resource)      GET  /api/runs?limit&cursor
  *   get_run         GET  /api/runs/:id?tail&wait
  *   cancel_run      POST /api/runs/:id/cancel
  *   finish_run      POST /api/runs/:id/finish
  *   evaluate        POST /api/instances/:id/evaluate
- *   get_assessment  GET  /api/assessment?format
+ *   get_assessment  GET  /api/assessment?format&since
+ *   open_ui         POST /api/open
+ *
+ * Who calls is not in any body. The MCP server names its client in X-Harness-Client (and the
+ * session it holds in X-Harness-Session); a request without it comes from a person (the WebUI).
  */
 
 import type { z } from "zod";
-import { HTTP_STATUS, HarnessError, type Harness } from "../harness/index.ts";
+import { HTTP_STATUS, HarnessError, refuse, type Caller, type Harness } from "../harness/index.ts";
 import {
   artifactsQuery,
   assessmentQuery,
+  clientHeader,
   createInstanceRequest,
   evaluateRequest,
   finishRequest,
   instancesQuery,
+  openRequest,
   runQuery,
   runRequest,
+  runsQuery,
   updateInstanceRequest,
 } from "../shared/schema.ts";
 import type {
   ArtifactsResponse,
+  AssessmentMarkdownResponse,
   AssessmentResponse,
   CancelResponse,
   Failure,
@@ -37,8 +47,10 @@ import type {
   InstanceResponse,
   InstancesResponse,
   ModelResponse,
+  OpenResponse,
   RunDetailResponse,
   RunStartResponse,
+  RunsResponse,
 } from "../shared/types.ts";
 
 export interface ApiReply {
@@ -46,12 +58,19 @@ export interface ApiReply {
   body: { ok: true } | Failure;
 }
 
+/** What the API needs from the server around it. */
+export interface ApiHost {
+  /** The WebUI's URL with the token in the fragment, opened in a browser when asked. */
+  openUi(options: { view?: string; open: boolean }): Promise<{ url: string; opened: boolean }>;
+}
+
 interface RouteContext {
   request: Request;
   url: URL;
   /** The route's id. */
   id: string;
-  /** Lets the request stay open longer than the server's idle timeout (a waiting get_run). */
+  caller: Caller;
+  /** Lets the request stay open longer than the server's idle timeout (a waiting get_run, a cancel). */
   keepOpen(): void;
 }
 
@@ -72,9 +91,14 @@ async function body(request: Request): Promise<unknown> {
   try {
     return JSON.parse(text) as unknown;
   } catch (error) {
-    throw new HarnessError("invalid-request", `The body is not JSON: ${(error as Error).message}`);
+    throw refuse("invalid-request", "error.notJson", { detail: (error as Error).message });
   }
 }
+
+const describeIssues = (issues: readonly z.core.$ZodIssue[]): string =>
+  issues
+    .map((issue) => `${issue.path.length > 0 ? issue.path.join(".") : "(body)"}: ${issue.message}`)
+    .join("; ");
 
 /** Validates a body or query. With `judgments`, problems with the judgments are `invalid-judgment`. */
 function parse<T extends z.ZodType>(
@@ -85,14 +109,36 @@ function parse<T extends z.ZodType>(
   const parsed = schema.safeParse(value);
   if (parsed.success) return parsed.data;
   const issues = parsed.error.issues;
-  const message = issues
-    .map((issue) => `${issue.path.length > 0 ? issue.path.join(".") : "(body)"}: ${issue.message}`)
-    .join("; ");
+  const detail = describeIssues(issues);
   const judgments = options.judgments && issues.some((issue) => issue.path[0] === "judgments");
-  throw new HarnessError(judgments ? "invalid-judgment" : "invalid-request", message);
+  throw judgments
+    ? refuse("invalid-judgment", "error.judgment", { detail })
+    : refuse("invalid-request", "error.request", { detail });
 }
 
-function routes(harness: Harness): Route[] {
+/** Who calls: the MCP client that X-Harness-Client names, or a person. */
+export function callerOf(request: Request): Caller {
+  const header = request.headers.get("x-harness-client");
+  if (header === null) return { kind: "user" };
+  let value: unknown;
+  try {
+    value = JSON.parse(decodeURIComponent(header));
+  } catch (error) {
+    throw refuse("invalid-request", "error.client", { detail: (error as Error).message });
+  }
+  const parsed = clientHeader.safeParse(value);
+  if (!parsed.success)
+    throw refuse("invalid-request", "error.client", {
+      detail: describeIssues(parsed.error.issues),
+    });
+  return {
+    kind: "agent",
+    client: parsed.data,
+    session: request.headers.get("x-harness-session") || null,
+  };
+}
+
+function routes(harness: Harness, host: ApiHost): Route[] {
   const id = "([A-Za-z0-9_-]+)";
   return [
     {
@@ -132,13 +178,19 @@ function routes(harness: Harness): Route[] {
       },
     },
     {
+      method: "GET",
+      pattern: new RegExp(`^/api/instances/${id}$`),
+      handle: ({ id: instance }) =>
+        ok({ ok: true, instance: harness.instance(instance) } satisfies InstanceResponse),
+    },
+    {
       method: "POST",
       pattern: new RegExp(`^/api/instances/${id}/run$`),
-      handle: async ({ request, id: instance }) =>
+      handle: async ({ request, id: instance, caller }) =>
         ok(
           {
             ok: true,
-            ...harness.startRun(instance, parse(runRequest, await body(request))),
+            ...(await harness.startRun(instance, parse(runRequest, await body(request)), caller)),
           } satisfies RunStartResponse,
           201,
         ),
@@ -146,14 +198,21 @@ function routes(harness: Harness): Route[] {
     {
       method: "POST",
       pattern: new RegExp(`^/api/instances/${id}/evaluate$`),
-      handle: async ({ request, id: instance }) =>
+      handle: async ({ request, id: instance, caller }) =>
         ok({
           ok: true,
           ...harness.evaluate(
             instance,
             parse(evaluateRequest, await body(request), { judgments: true }),
+            caller,
           ),
         } satisfies InstanceResponse),
+    },
+    {
+      method: "GET",
+      pattern: /^\/api\/runs$/,
+      handle: ({ url }) =>
+        ok({ ok: true, ...harness.runs(parse(runsQuery, query(url))) } satisfies RunsResponse),
     },
     {
       method: "GET",
@@ -170,9 +229,10 @@ function routes(harness: Harness): Route[] {
     {
       method: "POST",
       pattern: new RegExp(`^/api/runs/${id}/cancel$`),
-      handle: async ({ request, id: run }) => {
+      handle: async ({ request, id: run, keepOpen }) => {
         await body(request);
-        return ok({ ok: true, ...harness.cancelRun(run) } satisfies CancelResponse);
+        keepOpen();
+        return ok({ ok: true, ...(await harness.cancelRun(run)) } satisfies CancelResponse);
       },
     },
     {
@@ -188,8 +248,25 @@ function routes(harness: Harness): Route[] {
       method: "GET",
       pattern: /^\/api\/assessment$/,
       handle: ({ url }) => {
-        parse(assessmentQuery, query(url));
-        return ok({ ok: true, assessment: harness.assessment() } satisfies AssessmentResponse);
+        const { format } = parse(assessmentQuery, query(url));
+        return format === "markdown"
+          ? ok({
+              ok: true,
+              markdown: harness.assessmentMarkdown(),
+            } satisfies AssessmentMarkdownResponse)
+          : ok({ ok: true, assessment: harness.assessment() } satisfies AssessmentResponse);
+      },
+    },
+    {
+      method: "POST",
+      pattern: /^\/api\/open$/,
+      handle: async ({ request }) => {
+        const options = parse(openRequest, await body(request));
+        const opened = await host.openUi({
+          open: options.open,
+          ...(options.view ? { view: options.view } : {}),
+        });
+        return ok({ ok: true, ...opened } satisfies OpenResponse);
       },
     },
   ];
@@ -197,26 +274,29 @@ function routes(harness: Harness): Route[] {
 
 export type Api = (request: Request, url: URL, keepOpen: () => void) => Promise<ApiReply | null>;
 
+const failure = (error: HarnessError): ApiReply => ({
+  status: HTTP_STATUS[error.code],
+  body: { ok: false, error: error.info } satisfies Failure,
+});
+
 /** The API over a harness. It answers `null` for a path it does not have. */
-export function createApi(harness: Harness): Api {
-  const table = routes(harness);
+export function createApi(harness: Harness, host: ApiHost): Api {
+  const table = routes(harness, host);
   return async (request, url, keepOpen) => {
     for (const route of table) {
       const match = route.pattern.exec(url.pathname);
       if (!match || route.method !== request.method) continue;
       try {
-        return await route.handle({ request, url, id: match[1] ?? "", keepOpen });
+        return await route.handle({
+          request,
+          url,
+          id: match[1] ?? "",
+          caller: callerOf(request),
+          keepOpen,
+        });
       } catch (error) {
-        if (!(error instanceof HarnessError)) throw error;
-        const failure: Failure = {
-          ok: false,
-          error: {
-            code: error.code,
-            message: error.message,
-            ...(error.files ? { files: error.files } : {}),
-          },
-        };
-        return { status: HTTP_STATUS[error.code], body: failure };
+        if (error instanceof HarnessError) return failure(error);
+        throw error;
       }
     }
     return null;

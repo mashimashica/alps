@@ -33,6 +33,7 @@ jobs:
         run: |
           skills-ref validate skills/design-process-description
           skills-ref validate skills/design-agent-work-system
+          skills-ref validate skills/run-process
           skills-ref validate examples/assess-service-change
           skills-ref validate examples/service-change/skills/clarify-requirements
           skills-ref validate examples/service-change/skills/design-solution

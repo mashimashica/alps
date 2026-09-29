@@ -11,14 +11,16 @@ import type { HealthInfo, ServerInfo } from "../shared/types.ts";
 export const harnessDir = (root: string): string => path.join(root, HARNESS_DIR);
 export const serverJsonPath = (root: string): string => path.join(root, HARNESS_DIR, "server.json");
 export const serverLogPath = (root: string): string => path.join(root, HARNESS_DIR, "server.log");
+/** The page that hands the WebUI's URL, token and all, to a browser (see open.ts). */
+export const openPagePath = (root: string): string => path.join(root, HARNESS_DIR, "open.html");
 export const serverUrl = (info: Pick<ServerInfo, "port">): string =>
   `http://127.0.0.1:${info.port}/`;
 /**
  * The WebUI's address with the token in the fragment, which browsers never send to servers.
- * The page reads it once and removes it from the address bar.
+ * The page reads it once and removes it from the address bar. `view` names the screen to show.
  */
-export const uiUrl = (info: Pick<ServerInfo, "port" | "token">): string =>
-  `${serverUrl(info)}#token=${info.token}`;
+export const uiUrl = (info: Pick<ServerInfo, "port" | "token">, view?: string): string =>
+  `${serverUrl(info)}#token=${info.token}${view ? `&view=${encodeURIComponent(view)}` : ""}`;
 
 function isServerInfo(value: unknown): value is ServerInfo {
   const v = value as Partial<ServerInfo> | null;

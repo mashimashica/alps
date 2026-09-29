@@ -1,6 +1,7 @@
 /*
  * E1 (Plugin structure): `serve --daemon` writes server.json, /api/health answers, and the
- * daemon exits when idle. A second `mcp` process connects to the existing daemon (stage 3).
+ * daemon exits when idle. A second `mcp` process connects to the existing daemon, which answers
+ * get_model: the MCP server is a thin relay with no state of its own.
  */
 
 import { afterAll, describe, expect, test } from "bun:test";
@@ -94,8 +95,8 @@ describe("E1 serve --daemon", () => {
     { timeout: 30_000 },
   );
 
-  test.todo(
-    "E1 a second mcp process connects to the existing daemon",
+  test(
+    "E1 a second mcp process connects to the existing daemon, and get_model is answered by the daemon",
     async () => {
       const ws = workspace({ server: { idleMinutes: 5 } });
       const daemon = await startDaemon(ws.root);
@@ -106,7 +107,11 @@ describe("E1 serve --daemon", () => {
           const { model } = await callTool<ModelResponse>(session, "get_model");
           // The daemon answers: only it checks which agents are available.
           expect(model.agents.map((agent) => agent.id)).toContain("demo");
+          expect(model.workspace).toBe(ws.root);
         }
+        // Only one daemon ever listened for the workspace: both MCP servers relay to it.
+        const log = fs.readFileSync(`${ws.root}/.alps-harness/server.log`, "utf8");
+        expect(log.match(/listening on/g)).toHaveLength(1);
         // No second daemon was started, and both sessions see the same records.
         expect(readServerJson(ws.root).pid).toBe(daemon.info.pid);
         const { instance } = await callTool<InstanceResponse>(first, "instantiate", {

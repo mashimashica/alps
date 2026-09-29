@@ -4,8 +4,11 @@ import { describe, expect, test } from "bun:test";
 import { diffOutputs, type OutputSnapshot } from "../../src/harness/index.ts";
 import { signature } from "../../src/model/index.ts";
 
-const file = (mtime: number, size: number) => signature({ dir: false, size, items: null, mtime });
-const dir = (mtime: number, items: number) => signature({ dir: true, size: null, items, mtime });
+// A write changes the status-change time with the modification time; the inode stays.
+const file = (mtime: number, size: number) =>
+  signature({ dir: false, size, items: null, mtime, ctime: mtime, ino: 1 });
+const dir = (mtime: number, items: number) =>
+  signature({ dir: true, size: null, items, mtime, ctime: mtime, ino: 2 });
 
 const snapshot = (entries: [string, string, string][]): OutputSnapshot =>
   new Map(entries.map(([path, type, sig]) => [path, { type, signature: sig }]));

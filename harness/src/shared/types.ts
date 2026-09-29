@@ -176,6 +176,13 @@ export interface RunInput {
   paths: string[];
   /** The paths that did not exist when the run started. */
   missing: string[];
+  /**
+   * The SHA-256 of each path's content as the run used it: taken when the run started, and again
+   * when it ended for a path that the run itself created or modified (an input that is also an
+   * output). A directory's digest covers its files. An evaluation of the run is stale once the
+   * content differs (StaleReason).
+   */
+  sha256: Record<string, string>;
 }
 
 export interface RunTarget {
@@ -199,10 +206,19 @@ export interface Usage {
   outputTokens: number | null;
 }
 
-/** The MCP client that performs a `self` run. */
+/** An MCP client, as its MCP server names it to the harness server (the X-Harness-Client header). */
 export interface ClientInfo {
   name: string;
   version: string;
+}
+
+/** Who performs a `self` run: the MCP client, and the session through which it started the run. */
+export interface RunClient extends ClientInfo {
+  /**
+   * The session that the client's MCP server held with the harness server (`GET /api/session`);
+   * `null` when it could not open one, and in records written before sessions were kept.
+   */
+  session: string | null;
 }
 
 /** One attempt by an agent (`.alps-harness/runs/<id>.json`, prompt included). */
@@ -233,8 +249,8 @@ export interface Run {
   events: number;
   /** The command line that was started, with the prompt left out; `null` when no process is started (demo, self). */
   command: string | null;
-  /** `self` runs only: the MCP client that performs the run. */
-  client: ClientInfo | null;
+  /** `self` runs only: the MCP client and session that perform the run. */
+  client: RunClient | null;
   prompt: string;
   git: { head: string; dirty: boolean } | null;
   skill: { path: string; sha256: string | null } | null;
@@ -337,7 +353,10 @@ export interface StateFileV1 {
 
 /** Why an evaluation no longer rests on what the workspace holds now. */
 export type StaleReason =
-  /** An input path changed after the judgment: modified or created after it, or removed since the judged run. */
+  /**
+   * An input's content differs from what the judged run used (by SHA-256): modified, created
+   * although it was missing then, or removed although it was there.
+   */
   | { kind: "input"; type: string; path: string; change: "modified" | "created" | "removed" }
   /** The Process's SKILL.md differs from the one the judged run used (`path` is the current one, if any). */
   | { kind: "skill"; path: string | null };
@@ -350,7 +369,7 @@ export interface InstanceFacts {
   /** The judgments of the evaluation, or `null` before any. They are about `evaluatedRun`, which may precede `latestRun`. */
   judgments: OutcomeJudgment[] | null;
   evaluatedRun: string | null;
-  /** Whether an input or the SKILL.md changed after the judgment. */
+  /** Whether an input or the SKILL.md differs from what the judged run used. */
   stale: boolean;
   staleness: StaleReason[];
 }
@@ -381,6 +400,9 @@ export interface HealthInfo {
   workspace: string;
   development: boolean;
 }
+
+/** Messages on `GET /api/session`, the connection that an MCP server holds while its client is connected. */
+export type SessionEvent = { type: "session"; id: string } | { type: "shutdown" };
 
 /** Messages on `GET /api/events` (server-sent events). */
 export type ServerEvent =
@@ -414,10 +436,19 @@ export type HttpErrorCode =
   | "outside-workspace"
   | "internal";
 
+/** Failures of the MCP server itself that no HTTP route answers. */
+export type RelayErrorCode =
+  /** `wake`, until the scheduled runs arrive. */
+  "not-implemented";
+
 export interface ErrorInfo {
-  code: ErrorCode | HttpErrorCode;
+  code: ErrorCode | HttpErrorCode | RelayErrorCode;
+  /** In English. */
   message: string;
-  /** `no-model`: the files looked at, or where a missing one can be placed. */
+  /** The message's key and arguments in shared/strings.ts, for a client that shows it in another language. */
+  key?: string;
+  args?: Record<string, string | number | boolean>;
+  /** `no-model`: the files looked at, or where a missing one can be placed; `server-unreachable`: server.json and server.log. */
   files?: string[];
 }
 
@@ -450,7 +481,17 @@ export interface InstancesResponse {
   next: string | null;
 }
 
-/** `POST /api/instances` (`instantiate`) and `POST /api/instances/:id/evaluate` (`evaluate`). */
+/** `GET /api/runs`: run summaries, newest first; `next` is the cursor of the next page. */
+export interface RunsResponse {
+  ok: true;
+  runs: RunSummary[];
+  next: string | null;
+}
+
+/**
+ * `POST /api/instances` (`instantiate`), `GET /api/instances/:id`, and
+ * `POST /api/instances/:id/evaluate` (`evaluate`).
+ */
 export interface InstanceResponse {
   ok: true;
   instance: InstanceView;
@@ -476,7 +517,7 @@ export interface RunDetailResponse {
   truncated: boolean;
 }
 
-/** `POST /api/runs/:id/cancel` (`cancel_run`). */
+/** `POST /api/runs/:id/cancel` (`cancel_run`). It answers once the run has ended. */
 export interface CancelResponse {
   ok: true;
   run: RunView;
@@ -496,6 +537,24 @@ export interface FinishResponse {
 export interface AssessmentResponse {
   ok: true;
   assessment: Assessment;
+}
+
+/** `GET /api/assessment?format=markdown` (`get_assessment`, Markdown form, in the workspace's language). */
+export interface AssessmentMarkdownResponse {
+  ok: true;
+  markdown: string;
+}
+
+/** The screens of the WebUI that `open_ui` can open. */
+export type UiView = "network" | "dashboard" | "instances";
+
+/** `POST /api/open` (`open_ui`). */
+export interface OpenResponse {
+  ok: true;
+  /** The WebUI's URL with the token in its fragment. */
+  url: string;
+  /** Whether the server opened it in a browser. */
+  opened: boolean;
 }
 
 /* ---------- dashboard and assessment ---------- */
@@ -601,7 +660,11 @@ export type FindingKind = "description" | "configuration" | "unverified";
 export interface Finding {
   kind: FindingKind;
   subject: { process?: string; outcome?: number; artifact?: string; instance?: string };
+  /** In English. */
   message: string;
+  /** The message's key and arguments in shared/strings.ts, for a client that shows it in another language. */
+  key?: string;
+  args?: Record<string, string | number | boolean>;
   evidence: string[];
 }
 

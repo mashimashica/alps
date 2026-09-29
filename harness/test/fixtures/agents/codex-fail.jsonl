@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"{{SESSION}}"}
+{"type":"turn.started"}
+{"type":"error","message":"stream error: unexpected status 401 Unauthorized"}
+{"type":"turn.failed","error":{"message":"unexpected status 401 Unauthorized"}}

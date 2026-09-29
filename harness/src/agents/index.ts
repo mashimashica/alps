@@ -94,6 +94,39 @@ export function resolveAgents(
 export const startsProcess = (spec: AgentSpec): boolean =>
   spec.format !== "demo" && spec.format !== "self";
 
+/** What starting an agent's process takes. src/server/ starts it (Bun.spawn). */
+export interface AgentLaunch {
+  command: string;
+  args: string[];
+  cwd: string;
+  /** Added to the environment of the harness server. */
+  env: Record<string, string>;
+  /** Written to standard input, which is then closed; `null` gives the agent an empty standard input. */
+  stdin: string | null;
+}
+
+/** Receives an agent's output one line at a time, without the line end. */
+export interface AgentOutput {
+  stdout(line: string): void;
+  stderr(line: string): void;
+}
+
+/** A started agent process, in a process group of its own (on Windows, a process tree). */
+export interface AgentHandle {
+  pid: number;
+  /**
+   * Stops the agent and every process it started: SIGTERM to its process group, then SIGKILL to
+   * what is left after 5 seconds (on Windows, taskkill of its process tree). Calling it again
+   * changes nothing.
+   */
+  stop(): void;
+  /**
+   * Resolves once the agent has exited and its output has been read. Output that processes it
+   * left behind keep open ends the wait after a short grace period, and those processes are stopped.
+   */
+  done: Promise<{ exitCode: number | null; signal: string | null }>;
+}
+
 /** The arguments for a prompt. With `stdin`, the prompt is left out (codex reads it from `-`). */
 export function argsFor(spec: AgentSpec, prompt: string): string[] {
   if (!spec.stdin) return spec.args.map((arg) => arg.split("{prompt}").join(prompt));

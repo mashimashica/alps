@@ -1,0 +1,283 @@
+/*
+ * What the harness says, in English and Japanese. The server answers a failure with the key and
+ * arguments of its message besides the English text, so each client puts it in its own language:
+ * the MCP server in the workspace's `language` (alps-harness.yaml), the WebUI in the person's.
+ * The MCP server's own texts (the summary that follows each tool result) are here too.
+ */
+
+import type { Language, RunStatus } from "./types.ts";
+
+/** A value in a message. */
+export type MessageArg = string | number | boolean;
+
+const plural = (count: number, one: string, many = `${one}s`): string =>
+  `${count} ${count === 1 ? one : many}`;
+
+const STATUS_EN: Record<RunStatus, string> = {
+  running: "has not ended yet (running)",
+  succeeded: "succeeded",
+  failed: "failed",
+  canceled: "was canceled",
+  interrupted: "was interrupted",
+};
+
+const STATUS_JA: Record<RunStatus, string> = {
+  running: "まだ終わっていない（running）",
+  succeeded: "正常に終了した（succeeded）",
+  failed: "異常終了した（failed）",
+  canceled: "中止された（canceled）",
+  interrupted: "中断された（interrupted）",
+};
+
+const statusOf = (status: string, words: Record<RunStatus, string>): string =>
+  words[status as RunStatus] ?? status;
+
+const TOKEN_NOTE_EN =
+  "The part after # is the access token: give the URL only to the person who asked for it.";
+const TOKEN_NOTE_JA = "# の後ろは合い言葉なので、URL は求めた本人にだけ渡すこと。";
+
+const en = {
+  /* ---------- failures of the harness ---------- */
+  "error.model": (a: { detail: string }) => a.detail,
+  "error.stopping": () => "The harness server is stopping. Call again once it has restarted.",
+  "error.noProcess": (a: { name: string; processes: string }) =>
+    `No Process "${a.name}" in the model. Its Processes are: ${a.processes}.`,
+  "error.noType": (a: { name: string; types: string }) =>
+    `No Artifact type "${a.name}" in the model. Its types are: ${a.types}.`,
+  "error.noInstance": (a: { id: string }) => `No instance ${a.id}.`,
+  "error.noRun": (a: { id: string }) => `No run ${a.id}.`,
+  "error.runRecord": (a: { id: string }) =>
+    `The record of run ${a.id} (runs/${a.id}.json) is missing or unreadable.`,
+  "error.emptyPath": (a: { where: string; path: string }) =>
+    `${a.where}: "${a.path}" names no file or directory in the workspace.`,
+  "error.outside": (a: { where: string; path: string; root: string }) =>
+    `${a.where}: ${a.path} is outside the workspace (${a.root}). Instances name only paths inside it.`,
+  "error.records": (a: { where: string; path: string }) =>
+    `${a.where}: ${a.path} is in .alps-harness/, the harness's own records. Instances name only the workspace's Artifacts.`,
+  "error.pattern": (a: { where: string; path: string }) =>
+    `${a.where}: ${a.path} is a pattern. The inputs of an instance are concrete paths: name each file or directory (list_artifacts lists the candidates).`,
+  "error.notInput": (a: { type: string; process: string; allowed: string }) =>
+    `inputs: ${a.type} is not an input or control of ${a.process}. They are: ${a.allowed || "none"}.`,
+  "error.notOutput": (a: { type: string; process: string; outputs: string }) =>
+    `outputs: ${a.type} is not an output of ${a.process}. Its outputs are: ${a.outputs || "none"}.`,
+  "error.noOutcome": (a: { where: string; process: string; count: number; outcome: number }) =>
+    `${a.where}${a.process} has ${plural(a.count, "Outcome")} (numbered from 0); there is no Outcome ${a.outcome}.`,
+  "error.judgedTwice": (a: { outcome: number }) => `Outcome ${a.outcome} is judged twice.`,
+  "error.noAgent": (a: { agent: string; agents: string }) =>
+    `No agent "${a.agent}" in this workspace. Its agents are: ${a.agents}.`,
+  "error.selfDisabled": (a: { agents: string }) =>
+    `The self mode is off in this workspace (agents.self is false in alps-harness.yaml). Its agents are: ${a.agents}.`,
+  "error.agentUnavailable": (a: { agent: string; reason: string }) =>
+    `${a.agent} cannot be started: ${a.reason}.`,
+  "error.running": (a: { run: string; instance: string }) =>
+    `Run ${a.run} of instance ${a.instance} has not ended. Wait for it (get_run with wait) or cancel it (cancel_run).`,
+  "error.notSelf": (a: { run: string; agent: string }) =>
+    `Run ${a.run} is a ${a.agent} run. finish_run ends only the self and wake runs that the calling session performs.`,
+  "error.ended": (a: { run: string; status: string }) =>
+    `Run ${a.run} has already ended (${a.status}). See it with get_run.`,
+  "error.nothingToJudge": (a: { instance: string }) =>
+    `Instance ${a.instance} has no run to evaluate. Run it first.`,
+  "error.judgeRunning": (a: { run: string; instance: string }) =>
+    `Run ${a.run} of instance ${a.instance} has not ended. Evaluate its results once it has (get_run with wait).`,
+  "error.notJson": (a: { detail: string }) => `The body is not JSON: ${a.detail}`,
+  "error.request": (a: { detail: string }) => `The request does not fit: ${a.detail}`,
+  "error.judgment": (a: { detail: string }) => `The judgments do not fit: ${a.detail}`,
+  "error.client": (a: { detail: string }) =>
+    `The X-Harness-Client header is not {name, version} as JSON: ${a.detail}`,
+
+  /* ---------- rejections of the HTTP layer ---------- */
+  "error.host": () => "This host name is not accepted.",
+  "error.crossSite": () => "The API accepts requests only from the harness's own page.",
+  "error.token": () =>
+    "The token is missing or wrong. Open the URL that alps-harness serve printed (…/#token=…).",
+  "error.mediaType": () => "Send the request body as JSON.",
+  "error.route": (a: { method: string; path: string }) => `${a.method} ${a.path} does not exist.`,
+  "error.internal": () => "The server failed to handle the request.",
+
+  /* ---------- failures of the MCP server ---------- */
+  "error.noWorkspace": (a: { start: string }) =>
+    `No alps-harness.yaml or process-model.yaml in ${a.start} or its parent directories. Place one of them (error.files) to make it a workspace.`,
+  "error.unreachable": (a: { port: number; serverJson: string; detail: string }) =>
+    `The harness server could not be reached or started (port ${a.port}, ${a.serverJson}): ${a.detail}`,
+  "error.notImplemented": (a: { tool: string }) =>
+    `${a.tool} is not implemented in this version of the harness. Nothing was changed.`,
+
+  /* ---------- findings of the assessment ---------- */
+  "finding.skillMissing": (a: { process: string; location: string }) =>
+    `The Skill declared for ${a.process} (${a.location}) is not a readable SKILL.md.`,
+  "finding.awaiting": (a: { run: string; status: string }) =>
+    `Run ${a.run} ended (${a.status}) and its results have no judgment yet.`,
+  "finding.stale": (a: { run: string; paths: string }) =>
+    `The judgment of run ${a.run} no longer rests on the workspace: ${a.paths} changed since the run used them.`,
+
+  /* ---------- what the MCP tools report on success ---------- */
+  "done.model": (a: { name: string; processes: number; types: number }) =>
+    `The model "${a.name}" has ${plural(a.processes, "Process", "Processes")} and ${plural(a.types, "Artifact type")}. Read each SKILL.md and Artifact with your own file tools.`,
+  "done.artifacts": (a: { count: number; truncated: boolean }) =>
+    `${plural(a.count, "Artifact")}.${a.truncated ? " A location had more matches than one scan reads (truncated), so the list is incomplete." : ""}`,
+  "done.instances": (a: { count: number; next: string }) =>
+    `${plural(a.count, "instance")}.${a.next ? ` More with cursor ${a.next}.` : ""}`,
+  "done.created": (a: { id: string; process: string }) =>
+    `Created instance ${a.id} of ${a.process}. Nothing has run yet: start it with run.`,
+  "done.updated": (a: { id: string }) =>
+    `Replaced the criteria and notes of instance ${a.id} as given; its inputs and outputs are unchanged.`,
+  "done.started": (a: { run: string; agent: string }) =>
+    `Started run ${a.run} (${a.agent}). That is all this success means: starting achieves no Outcome. Wait with get_run (wait), then judge the outputs with evaluate.`,
+  "done.self": (a: { run: string }) =>
+    `Run ${a.run} is yours to perform: follow the prompt, then end it with finish_run. If this MCP connection closes first, the run is recorded as interrupted.`,
+  "done.run": (a: { run: string; status: string; truncated: boolean }) =>
+    `Run ${a.run} ${statusOf(a.status, STATUS_EN)}.${a.status === "running" ? " Call get_run again to wait further." : ""}${a.status === "succeeded" ? " That the agent ended normally does not mean that any Outcome is achieved." : ""}${a.truncated ? " Earlier events were left out (truncated)." : ""}`,
+  "done.canceled": (a: { run: string; canceled: boolean; status: string }) =>
+    a.canceled
+      ? a.status === "running"
+        ? `Run ${a.run} is being stopped; its agent has not ended yet. Check with get_run.`
+        : `Canceled run ${a.run}.`
+      : `Run ${a.run} had already ended (${a.status}); nothing was changed.`,
+  "done.finished": (a: { run: string; status: string; outputs: number }) =>
+    `Run ${a.run} ended (${a.status}); ${plural(a.outputs, "output change")} recorded as its outputs.`,
+  "done.evaluated": (a: { instance: string; run: string; self: boolean }) =>
+    `Recorded the evaluation of run ${a.run} for instance ${a.instance}.${a.self ? " This MCP session also performed that run, so the evaluation is marked self: true." : ""}`,
+  "done.assessment": (a: { findings: number; instances: number }) =>
+    `${plural(a.findings, "finding")} about ${plural(a.instances, "instance")}.`,
+  "done.ui": (a: { url: string; open: boolean; opened: boolean }) =>
+    `The WebUI is at ${a.url}.${a.opened ? " It was opened in the browser." : a.open ? " No browser could be started; open the URL yourself." : ""} ${TOKEN_NOTE_EN}`,
+} satisfies Record<string, (args: never) => string>;
+
+export type MessageKey = keyof typeof en;
+/** The arguments of a message; `{}` for one that has none. */
+export type MessageArgs<K extends MessageKey> =
+  Parameters<(typeof en)[K]> extends [infer A] ? A : Record<string, never>;
+
+const ja: { [K in MessageKey]: (typeof en)[K] } = {
+  "error.model": (a) => `プロセスモデルか設定を読めない。${a.detail}`,
+  "error.stopping": () =>
+    "ハーネスサーバーが停止しているところである。再起動してから呼び直すこと。",
+  "error.noProcess": (a) =>
+    `モデルにプロセス「${a.name}」はない。プロセスは次のとおり: ${a.processes}。`,
+  "error.noType": (a) =>
+    `モデルにアーティファクトの型「${a.name}」はない。型は次のとおり: ${a.types}。`,
+  "error.noInstance": (a) => `インスタンス ${a.id} はない。`,
+  "error.noRun": (a) => `実行 ${a.id} はない。`,
+  "error.runRecord": (a) => `実行 ${a.id} の記録（runs/${a.id}.json）がないか、読めない。`,
+  "error.emptyPath": (a) =>
+    `${a.where}: 「${a.path}」はワークスペースのファイルもディレクトリも指していない。`,
+  "error.outside": (a) =>
+    `${a.where}: ${a.path} はワークスペース（${a.root}）の外にある。インスタンスが指せるのはその中のパスだけである。`,
+  "error.records": (a) =>
+    `${a.where}: ${a.path} はハーネス自身の記録（.alps-harness/）の中にある。インスタンスが指せるのはワークスペースのアーティファクトだけである。`,
+  "error.pattern": (a) =>
+    `${a.where}: ${a.path} はパターンである。インスタンスの入力は具体的なパスにし、ファイルかディレクトリを一つずつ挙げること（候補は list_artifacts で得られる）。`,
+  "error.notInput": (a) =>
+    `inputs: ${a.type} は ${a.process} の入力でも統制事項でもない。入力と統制事項は次のとおり: ${a.allowed || "なし"}。`,
+  "error.notOutput": (a) =>
+    `outputs: ${a.type} は ${a.process} の出力ではない。出力は次のとおり: ${a.outputs || "なし"}。`,
+  "error.noOutcome": (a) =>
+    `${a.where}${a.process} の成果は ${a.count} 件（番号は 0 から）で、成果 ${a.outcome} はない。`,
+  "error.judgedTwice": (a) => `成果 ${a.outcome} を二度判断している。`,
+  "error.noAgent": (a) =>
+    `このワークスペースにエージェント「${a.agent}」はない。エージェントは次のとおり: ${a.agents}。`,
+  "error.selfDisabled": (a) =>
+    `このワークスペースでは self モードを使えない（alps-harness.yaml の agents.self が false）。エージェントは次のとおり: ${a.agents}。`,
+  "error.agentUnavailable": (a) => `${a.agent} を起動できない（${a.reason}）。`,
+  "error.running": (a) =>
+    `インスタンス ${a.instance} の実行 ${a.run} がまだ終わっていない。get_run（wait）で待つか、cancel_run で中止すること。`,
+  "error.notSelf": (a) =>
+    `実行 ${a.run} は ${a.agent} の実行である。finish_run で終えられるのは、呼び出し元のセッションが行う self と目覚めの実行だけである。`,
+  "error.ended": (a) =>
+    `実行 ${a.run} はすでに終わっている（${a.status}）。get_run で確かめること。`,
+  "error.nothingToJudge": (a) =>
+    `インスタンス ${a.instance} には評価する実行がない。先に実行すること。`,
+  "error.judgeRunning": (a) =>
+    `インスタンス ${a.instance} の実行 ${a.run} がまだ終わっていない。終わってから（get_run の wait で待つ）評価すること。`,
+  "error.notJson": (a) => `本文が JSON ではない: ${a.detail}`,
+  "error.request": (a) => `要求の形が合わない: ${a.detail}`,
+  "error.judgment": (a) => `判断の形が合わない: ${a.detail}`,
+  "error.client": (a) =>
+    `X-Harness-Client ヘッダーが {name, version} の JSON ではない: ${a.detail}`,
+
+  "error.host": () => "このホスト名は受け付けない。",
+  "error.crossSite": () => "API はハーネス自身のページからの要求だけを受け付ける。",
+  "error.token": () =>
+    "合い言葉がないか、違う。alps-harness serve が印字した URL（…/#token=…）を開くこと。",
+  "error.mediaType": () => "要求の本文は JSON で送ること。",
+  "error.route": (a) => `${a.method} ${a.path} はない。`,
+  "error.internal": () => "サーバーが要求を処理できなかった。",
+
+  "error.noWorkspace": (a) =>
+    `${a.start} とその親ディレクトリに alps-harness.yaml も process-model.yaml もない。ワークスペースにするには、どちらかを置くこと（error.files）。`,
+  "error.unreachable": (a) =>
+    `ハーネスサーバーに接続も起動もできなかった（ポート ${a.port}、${a.serverJson}）: ${a.detail}`,
+  "error.notImplemented": (a) =>
+    `このハーネスの版では ${a.tool} はまだ実装していない。何も変えていない。`,
+
+  "finding.skillMissing": (a) =>
+    `${a.process} に指定されたスキル（${a.location}）は、読める SKILL.md ではない。`,
+  "finding.awaiting": (a) =>
+    `実行 ${a.run} は終わった（${a.status}）が、その結果はまだ判断されていない。`,
+  "finding.stale": (a) =>
+    `実行 ${a.run} についての判断は、今のワークスペースに基づかなくなった。実行が使った後に変わったもの: ${a.paths}。`,
+
+  "done.model": (a) =>
+    `モデル「${a.name}」には ${a.processes} のプロセスと ${a.types} のアーティファクトの型がある。SKILL.md とアーティファクトは自分のファイルツールで読むこと。`,
+  "done.artifacts": (a) =>
+    `アーティファクトは ${a.count} 件。${a.truncated ? "一回の走査で読める数を超えた置き場所があるため（truncated）、一覧は不完全である。" : ""}`,
+  "done.instances": (a) =>
+    `インスタンスは ${a.count} 件。${a.next ? `続きは cursor ${a.next} で得られる。` : ""}`,
+  "done.created": (a) =>
+    `${a.process} のインスタンス ${a.id} を作った。まだ何も実行していないので、run で実行すること。`,
+  "done.updated": (a) =>
+    `インスタンス ${a.id} の基準と注記を指定どおりに置き換えた。入力と出力は変わらない。`,
+  "done.started": (a) =>
+    `実行 ${a.run}（${a.agent}）を開始した。この成功の意味はそれだけで、開始によって成果が達成されたわけではない。get_run（wait）で待ち、出力を見て evaluate で判断すること。`,
+  "done.self": (a) =>
+    `実行 ${a.run} はあなた自身が行う。プロンプトに従って作業し、finish_run で終えること。先にこの MCP の接続が切れると、実行は中断として記録される。`,
+  "done.run": (a) =>
+    `実行 ${a.run} は${statusOf(a.status, STATUS_JA)}。${a.status === "running" ? "さらに待つには get_run を呼び直すこと。" : ""}${a.status === "succeeded" ? "エージェントが正常に終わったことは、成果の達成を意味しない。" : ""}${a.truncated ? "それより前のイベントは省いた（truncated）。" : ""}`,
+  "done.canceled": (a) =>
+    a.canceled
+      ? a.status === "running"
+        ? `実行 ${a.run} を止めているところで、エージェントはまだ終わっていない。get_run で確かめること。`
+        : `実行 ${a.run} を中止した。`
+      : `実行 ${a.run} はすでに終わっていた（${a.status}）。何も変えていない。`,
+  "done.finished": (a) =>
+    `実行 ${a.run} を終えた（${a.status}）。出力の変化 ${a.outputs} 件をこの実行の出力として記録した。`,
+  "done.evaluated": (a) =>
+    `インスタンス ${a.instance} について、実行 ${a.run} の評価を記録した。${a.self ? "その実行もこの MCP セッションが行ったので、評価には self: true が付く。" : ""}`,
+  "done.assessment": (a) => `所見は ${a.findings} 件、インスタンスは ${a.instances} 件。`,
+  "done.ui": (a) =>
+    `WebUI は ${a.url} にある。${a.opened ? "ブラウザで開いた。" : a.open ? "ブラウザを起動できなかったので、URL を自分で開くこと。" : ""}${TOKEN_NOTE_JA}`,
+};
+
+const CATALOG: Record<Language, { [K in MessageKey]: (typeof en)[K] }> = { en, ja };
+
+/** A message in the given language. */
+export function say<K extends MessageKey>(
+  language: Language,
+  key: K,
+  args: MessageArgs<K>,
+): string {
+  const message = CATALOG[language][key] as (args: MessageArgs<K>) => string;
+  return message(args);
+}
+
+export const isMessageKey = (key: unknown): key is MessageKey =>
+  typeof key === "string" && Object.hasOwn(en, key);
+
+/**
+ * A message that arrived as a key and arguments (from the harness server), in the given language;
+ * `fallback` when the key is unknown or its arguments do not fit.
+ */
+export function sayReceived(
+  language: Language,
+  key: unknown,
+  args: unknown,
+  fallback: string,
+): string {
+  if (!isMessageKey(key) || args === null || typeof args !== "object") return fallback;
+  try {
+    const text = (CATALOG[language][key] as (args: unknown) => string)(args);
+    return text.includes("undefined") ? fallback : text;
+  } catch {
+    return fallback;
+  }
+}

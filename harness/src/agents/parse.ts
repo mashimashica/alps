@@ -184,7 +184,11 @@ function parseCodex(line: Json): ParsedLine {
   }
 }
 
-/** Reads one line of an agent's standard output. */
+/**
+ * Reads one line of an agent's standard output. It does not throw: a line that cannot be read
+ * as the format says (not JSON, or JSON of a shape that cannot be read, such as an object where
+ * text belongs) is output.
+ */
 export function parseOutputLine(format: AgentFormat, line: string): ParsedLine {
   if ((format === "claude" || format === "codex") && line.startsWith("{")) {
     let parsed: unknown;
@@ -193,7 +197,12 @@ export function parseOutputLine(format: AgentFormat, line: string): ParsedLine {
     } catch {
       parsed = undefined;
     }
-    if (isJson(parsed)) return format === "claude" ? parseClaude(parsed) : parseCodex(parsed);
+    if (isJson(parsed))
+      try {
+        return format === "claude" ? parseClaude(parsed) : parseCodex(parsed);
+      } catch {
+        // String() of an object whose toString is not a function throws; the line is output.
+      }
   }
   return { events: [{ kind: "output", text: line }] };
 }

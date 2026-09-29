@@ -1,7 +1,7 @@
 /*
  * E6 (scheduled runs): wake starts a fake agent with this workspace's harness MCP server; when the
  * agent calls instantiate and run, the runs are listed in the wake record's started[]. A second
- * wake while the first still runs is skipped (stage 5).
+ * wake while the first still runs is skipped, and the skip is recorded (stage 5).
  *
  * What the fake wake agent does (test/fakes/wake-agent.ts, written in stage 5): it is started as
  * claude-code is, with the MCP configuration the harness gives it; it connects with
@@ -90,14 +90,27 @@ describe("E6 wake", () => {
   );
 
   test.todo(
-    "E6 a wake while the previous wake still runs is skipped",
+    "E6 a wake while the previous wake still runs is skipped, and the skip is recorded",
     async () => {
-      const { mcp } = await withWakeAgent("slow");
+      const { ws, mcp } = await withWakeAgent("slow");
       const first = await callTool<WakeResponse>(mcp, "wake", { agent: "claude-code" });
       expect(first.run?.status).toBe("running");
       const second = await callTool<WakeResponse>(mcp, "wake", { agent: "claude-code" });
       expect(copyOf(second)).toMatchObject({ skipped: true, running: first.run?.id });
       expect(second.run).toBeUndefined();
+      // The skip is recorded without a run of its own: the running wake's events say that a
+      // wake was skipped, and the records hold one wake run only.
+      const wake = await callTool<RunDetailResponse>(mcp, "get_run", {
+        run: first.run?.id,
+        tail: 1000,
+      });
+      expect(
+        wake.events.some((event) => event.kind === "system" && /skipped/i.test(event.text)),
+      ).toBe(true);
+      const state = JSON.parse(
+        fs.readFileSync(records(ws.root, "state.json"), "utf8"),
+      ) as StateFile;
+      expect(Object.values(state.runs).filter((run) => run.kind === "wake")).toHaveLength(1);
       await callTool(mcp, "cancel_run", { run: first.run?.id });
     },
     { timeout: 120_000 },

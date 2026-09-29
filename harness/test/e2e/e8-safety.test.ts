@@ -1,9 +1,10 @@
 /*
  * E8 (Plugin structure, safety): requests with another Host header, without the token, with a
- * path outside the workspace, or with a body that is not JSON are rejected. With them, what makes
- * the WebUI safe to open: the token reaches the browser only in the URL fragment, the page and its
- * chunks hold no secret, no other site can use the API or frame the page, and the server listens
- * on 127.0.0.1 only.
+ * path outside the workspace (or in its .alps-harness/), or with a body that is not JSON are
+ * rejected. With them, what makes the WebUI safe to open: the token reaches the browser only in
+ * the URL fragment, never on a command line (serve --open and open_ui hand the browser a page
+ * that only the owner can read), the page and its chunks hold no secret, no other site can use
+ * the API or frame the page, and the server listens on 127.0.0.1 only.
  */
 
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
@@ -12,9 +13,16 @@ import net from "node:net";
 import os from "node:os";
 import path from "node:path";
 import { chromium } from "playwright";
-import type { Failure, InstanceResponse, InstancesResponse } from "../../src/shared/types.ts";
+import type {
+  Failure,
+  InstanceResponse,
+  InstancesResponse,
+  OpenResponse,
+} from "../../src/shared/types.ts";
 import { apiClient } from "../helpers/api.ts";
 import { killStrayDaemons, startDaemon, type Daemon } from "../helpers/daemon.ts";
+import { callTool, mcpClient, toolFailure } from "../helpers/mcp.ts";
+import { records } from "../helpers/paths.ts";
 import { isAlive, waitFor } from "../helpers/process.ts";
 import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
 
@@ -25,14 +33,19 @@ const ROUTES = [
   { method: "POST", path: "/api/shutdown" },
   { method: "GET", path: "/api/model" },
   { method: "GET", path: "/api/artifacts" },
+  { method: "GET", path: "/api/session" },
+  { method: "POST", path: "/api/sessions/s1/close" },
   { method: "GET", path: "/api/instances" },
   { method: "POST", path: "/api/instances" },
+  { method: "GET", path: "/api/instances/i1" },
   { method: "POST", path: "/api/instances/i1/run" },
   { method: "POST", path: "/api/instances/i1/evaluate" },
+  { method: "GET", path: "/api/runs" },
   { method: "GET", path: "/api/runs/r1" },
   { method: "POST", path: "/api/runs/r1/cancel" },
   { method: "POST", path: "/api/runs/r1/finish" },
   { method: "GET", path: "/api/assessment" },
+  { method: "POST", path: "/api/open" },
   { method: "GET", path: "/api/unknown" },
 ] as const;
 
@@ -176,15 +189,52 @@ const assetPaths = (html: string): string[] =>
   [...html.matchAll(/<(?:script|link)\b[^>]*?\b(?:src|href)="(\/[^"]*)"/g)].map((m) => m[1] ?? "");
 
 describe("E8 safety", () => {
-  test("E8 serve prints and --open opens the URL with the token in its fragment, and server.log does not hold the token", async () => {
+  test("E8 serve prints the URL with the token in its fragment, --open hands the browser a page only the owner can read, and server.log does not hold the token", async () => {
     const { port, token } = daemon.info;
     // Browsers never send the fragment: not in the request line, not in Referer.
     expect(daemon.uiUrl).toBe(`http://127.0.0.1:${port}/#token=${token}`);
     await waitFor(() => fs.existsSync(opened), 10_000, "serve --open to start the browser");
-    expect(fs.readFileSync(opened, "utf8")).toBe(daemon.uiUrl);
+    // The browser's command line, which ps shows to every user, names a page, not the URL.
+    const page = fs.readFileSync(opened, "utf8");
+    expect(page).toBe(records(ws.root, "open.html"));
+    expect(page).not.toContain(token);
+    expect(fs.statSync(page).mode & 0o777).toBe(0o600);
+    // The page sends the browser on to the URL, token and all.
+    const html = fs.readFileSync(page, "utf8");
+    expect(html).toContain(`location.replace(${JSON.stringify(daemon.uiUrl)})`);
+    expect(html).toContain(`content="0; url=${daemon.uiUrl}"`);
     expect(
       fs.readFileSync(path.join(ws.root, ".alps-harness", "server.log"), "utf8"),
     ).not.toContain(token);
+  });
+
+  test("E8 open_ui returns the URL with the token in its fragment, and with open: true the daemon opens it through the same page", async () => {
+    const { port, token } = daemon.info;
+    const mcp = await mcpClient({ workspace: ws.root });
+    try {
+      const shown = await callTool<OpenResponse>(mcp, "open_ui", { view: "instances" });
+      expect(shown).toEqual({
+        ok: true,
+        url: `http://127.0.0.1:${port}/#token=${token}&view=instances`,
+        opened: false,
+      });
+      fs.rmSync(opened, { force: true });
+      const result = await callTool<OpenResponse>(mcp, "open_ui", { open: true });
+      expect(result).toEqual({ ok: true, url: daemon.uiUrl, opened: true });
+      await waitFor(() => fs.existsSync(opened), 10_000, "open_ui to start the browser");
+      const page = fs.readFileSync(opened, "utf8");
+      expect(page).toBe(records(ws.root, "open.html"));
+      expect(fs.statSync(page).mode & 0o777).toBe(0o600);
+      expect(fs.readFileSync(page, "utf8")).toContain(JSON.stringify(daemon.uiUrl));
+      // A screen the WebUI does not have is refused before it reaches the daemon.
+      const unknown = await mcp.client.callTool({
+        name: "open_ui",
+        arguments: { view: "timeline" },
+      });
+      expect(unknown.isError).toBe(true);
+    } finally {
+      await mcp.close();
+    }
   });
 
   test("E8 every /api/* route answers 403 to another Host header", async () => {
@@ -323,6 +373,11 @@ describe("E8 safety", () => {
         const sent = await send({ ...route, token: given, type: "application/json" });
         expect(sent.status, `${route.method} ${route.path} with ${given}`).toBe(401);
         expect(sent.code).toBe("unauthorized");
+        // No answer of the API may be framed by another page.
+        expect(sent.headers.get("x-frame-options"), route.path).toBe("DENY");
+        expect(sent.headers.get("content-security-policy"), route.path).toBe(
+          "frame-ancestors 'none'",
+        );
       }
     }
     // EventSource cannot send headers, so the event stream, and only it, reads the token from the query.
@@ -343,17 +398,18 @@ describe("E8 safety", () => {
 
   test("E8 a POST that is not JSON answers 415", async () => {
     const { token } = daemon.info;
-    // No type, and the three that another site can send without a CORS preflight.
-    for (const type of [
-      undefined,
-      "text/plain",
-      "application/x-www-form-urlencoded",
-      "multipart/form-data; boundary=x",
-    ]) {
-      const sent = await send({ method: "POST", path: "/api/shutdown", token, type });
-      expect(sent.status, String(type)).toBe(415);
-      expect(sent.code).toBe("unsupported-media-type");
-    }
+    // No type, and the three that another site can send without a CORS preflight, to every POST route.
+    for (const route of ROUTES.filter((r) => r.method === "POST"))
+      for (const type of [
+        undefined,
+        "text/plain",
+        "application/x-www-form-urlencoded",
+        "multipart/form-data; boundary=x",
+      ]) {
+        const sent = await send({ ...route, token, type });
+        expect(sent.status, `${route.path} ${String(type)}`).toBe(415);
+        expect(sent.code).toBe("unsupported-media-type");
+      }
     expect(isAlive(daemon.info.pid)).toBe(true);
     expect((await send({ path: "/api/health", token })).status).toBe(200);
   });
@@ -373,7 +429,7 @@ describe("E8 safety", () => {
     );
   });
 
-  test("E8 paths outside the workspace are rejected as instance inputs and outputs", async () => {
+  test("E8 paths outside the workspace or in its .alps-harness/ are rejected as instance inputs and outputs", async () => {
     const api = apiClient(daemon);
     // A directory beside the workspace, a symlink in the workspace that leads to it, and a symlink
     // to a file there that does not exist yet.
@@ -382,6 +438,8 @@ describe("E8 safety", () => {
     fs.writeFileSync(path.join(outside, "notes.md"), "Not the workspace's.\n");
     fs.symlinkSync(outside, path.join(ws.root, "docs", "elsewhere"));
     fs.symlinkSync(path.join(outside, "later.md"), path.join(ws.root, "docs", "later.md"));
+    // The harness's own records, directly and through a symlink.
+    fs.symlinkSync(path.join(ws.root, ".alps-harness"), path.join(ws.root, "docs", "records"));
     const refused = [
       "../outside/notes.md",
       "docs/../../outside/notes.md",
@@ -390,6 +448,12 @@ describe("E8 safety", () => {
       "docs/elsewhere/notes.md",
       "docs/elsewhere/new.md",
       "docs/later.md",
+      ".alps-harness/state.json",
+      "./.alps-harness/runs/r1.jsonl",
+      "docs/../.alps-harness/server.json",
+      ".ALPS-HARNESS/state.json",
+      path.join(ws.root, ".alps-harness", "notes.md"),
+      "docs/records/state.json",
     ];
     for (const given of refused) {
       for (const body of [
@@ -402,6 +466,38 @@ describe("E8 safety", () => {
       }
     }
     expect((await api.ok<InstancesResponse>("GET", "/api/instances")).instances).toEqual([]);
+
+    // The MCP server relays the same refusal.
+    const mcp = await mcpClient({ workspace: ws.root });
+    try {
+      const { error } = await toolFailure(mcp, "instantiate", {
+        process: "Requirements Clarification",
+        inputs: { "Stakeholder information": [".alps-harness/state.json"] },
+      });
+      expect(error.code).toBe("outside-workspace");
+    } finally {
+      await mcp.close();
+    }
+
+    // An input is a concrete path, not a pattern.
+    const pattern = await api.post("/api/instances", {
+      process: "Requirements Clarification",
+      inputs: { "Stakeholder information": ["docs/changes/*/stakeholders.md"] },
+    });
+    expect([pattern.status, (pattern.body as Failure).error.code]).toEqual([
+      400,
+      "invalid-request",
+    ]);
+
+    // A name that merely starts with two dots stays inside.
+    const dotted = await api.post<InstanceResponse>("/api/instances", {
+      process: "Requirements Clarification",
+      inputs: { "Stakeholder information": ["..notes.md", "docs/..draft.md"] },
+    });
+    expect(dotted.status).toBe(201);
+    expect((dotted.body as InstanceResponse).instance.inputs).toEqual({
+      "Stakeholder information": ["..notes.md", "docs/..draft.md"],
+    });
 
     // A path inside, relative or absolute, is kept relative to the workspace.
     const inside = await api.post<InstanceResponse>("/api/instances", {

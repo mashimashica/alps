@@ -94,8 +94,8 @@ function runOf(run: RunV1, now: number): Run {
     exitCode: run.exitCode,
     error: interrupted ? (run.error ?? INTERRUPTED_ERROR) : run.error,
     agentError: run.agentError,
-    // Version 1 listed only inputs that it had found, so none was missing.
-    inputs: run.inputs.map((input) => ({ ...input, missing: [] })),
+    // Version 1 listed only inputs that it had found, so none was missing; it kept no digests.
+    inputs: run.inputs.map((input) => ({ ...input, missing: [], sha256: {} })),
     targets: run.targets,
     outputs: run.outputs,
     usage: run.usage,

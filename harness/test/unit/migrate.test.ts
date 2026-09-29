@@ -89,12 +89,14 @@ describe("version 1 records", () => {
       report: v1.runs.r5?.summary,
       client: null,
     });
+    // Version 1 kept no digests of the inputs.
     expect(r5?.inputs).toEqual([
       {
         type: "変更概要",
         role: "input",
         paths: ["docs/changes/CHG-001/change-summary.md"],
         missing: [],
+        sha256: {},
       },
     ]);
     for (const key of ["case", "workItem", "summary"]) expect(r5).not.toHaveProperty(key);

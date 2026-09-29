@@ -1,6 +1,7 @@
 /*
  * E5 (dashboard): after evaluate, changing an input or the SKILL.md makes the instance's evidence
- * stale, and get_assessment and /api/stats count the same (stage 4).
+ * stale, and get_assessment and /api/stats count the same (stage 4). What "changing" means is
+ * settled already: the content differs (SHA-256) from what the judged run used.
  */
 
 import { afterAll, describe, expect, test } from "bun:test";
@@ -25,12 +26,15 @@ import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
 
 let ws: TmpWorkspace | undefined;
 let mcp: McpSession | undefined;
+const workspaces: TmpWorkspace[] = [];
+const sessions: McpSession[] = [];
 
 afterAll(async () => {
-  await mcp?.close().catch(() => {});
-  if (ws) await stopWorkspaceDaemon(ws.root).catch(() => {});
+  for (const session of [mcp, ...sessions]) await session?.close().catch(() => {});
+  for (const workspace of [ws, ...workspaces])
+    if (workspace) await stopWorkspaceDaemon(workspace.root).catch(() => {});
   killStrayDaemons();
-  ws?.dispose();
+  for (const workspace of [ws, ...workspaces]) workspace?.dispose();
 });
 
 /** Instantiates a Process, runs it with the demo, and judges each of its Outcomes with evidence. */
@@ -70,6 +74,55 @@ async function evaluated(
 }
 
 describe("E5 dashboard", () => {
+  test(
+    "E5 the evidence is stale once an input or the SKILL.md no longer holds what the judged run used, and touching them changes nothing",
+    async () => {
+      const work = tmpWorkspace();
+      workspaces.push(work);
+      const session = await mcpClient({ workspace: work.root });
+      sessions.push(session);
+      const brief = path.join(work.root, "docs/changes/CHG-001/change-brief.md");
+      const skill = path.join(work.root, "skills/design-solution/SKILL.md");
+      const design = await evaluated(
+        session,
+        "Solution Design",
+        { "Change brief": ["docs/changes/CHG-001/change-brief.md"] },
+        { "Design description": "docs/changes/CHG-001/design/" },
+      );
+      const facts = async (): Promise<InstanceView["facts"]> =>
+        (await callTool<InstancesResponse>(session, "list_instances")).instances.find(
+          (i) => i.id === design.id,
+        )!.facts;
+      expect((await facts()).stale).toBe(false);
+
+      // Newer modification times with the same content: still current.
+      const later = new Date(Date.now() + 60_000);
+      fs.utimesSync(brief, later, later);
+      fs.utimesSync(skill, later, later);
+      expect(copyOf(await facts())).toMatchObject({ stale: false, staleness: [] });
+
+      // Another content: stale, until the content is what the judged run used again.
+      const original = fs.readFileSync(brief, "utf8");
+      fs.appendFileSync(brief, "\n- Search results show the stock level.\n");
+      expect(copyOf(await facts())).toMatchObject({
+        stale: true,
+        staleness: [
+          { kind: "input", path: "docs/changes/CHG-001/change-brief.md", change: "modified" },
+        ],
+      });
+      fs.writeFileSync(brief, original);
+      expect((await facts()).stale).toBe(false);
+
+      // The SKILL.md is compared the same way.
+      fs.appendFileSync(skill, "\n");
+      expect(copyOf(await facts())).toMatchObject({
+        stale: true,
+        staleness: [{ kind: "skill", path: "skills/design-solution/SKILL.md" }],
+      });
+    },
+    { timeout: 90_000 },
+  );
+
   test.todo(
     "E5 after evaluate, changing an input or the SKILL.md makes the evidence stale, and get_assessment and /api/stats count the same",
     async () => {

@@ -1,17 +1,22 @@
 /*
  * The harness of one workspace: instances, runs, provenance, and evaluations. While its server
  * runs it is the only writer of .alps-harness/. It reads the model and the configuration again
- * whenever their files change, and it never writes them. Runtime-agnostic: reading YAML,
- * `git`, and agent version checks are passed in by src/server/.
+ * whenever their files change, and it never writes them. Runtime-agnostic: reading YAML, `git`,
+ * agent version checks, and starting agent processes are passed in by src/server/.
  */
 
-import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import {
   agentInfo,
+  argsFor,
+  commandLine,
+  parseOutputLine,
   resolveAgents,
   startsProcess,
+  type AgentHandle,
+  type AgentLaunch,
+  type AgentOutput,
   type AgentSpec,
   type EventDraft,
   type VersionCheck,
@@ -35,15 +40,18 @@ import type {
   InstantiateRequest,
   RunRequest,
 } from "../shared/schema.ts";
+import { say, type MessageArgs, type MessageKey } from "../shared/strings.ts";
 import type {
   AgentInfo,
   Artifact,
   ArtifactType,
   Assessment,
+  ClientInfo,
   Finding,
   Instance,
   InstanceFacts,
   InstanceView,
+  Judge,
   ModelDescription,
   ModelView,
   OutcomeCriterion,
@@ -51,28 +59,32 @@ import type {
   ProcessModel,
   ProcessView,
   Run,
+  RunClient,
   RunEvent,
   RunInput,
   RunOutput,
   RunStatus,
+  RunSummary,
   RunTarget,
   RunView,
   ServerEvent,
-  StaleReason,
   StateFile,
 } from "../shared/types.ts";
 import { demoFile, demoReport, demoSteps } from "./demo.ts";
-import { HarnessError } from "./errors.ts";
+import { DigestCache } from "./digest.ts";
+import { refuse } from "./errors.ts";
 import { INTERRUPTED_ERROR } from "./migrate.ts";
 import { artifactPath, workspacePath } from "./paths.ts";
 import { buildPrompt } from "./prompt.ts";
 import { diffOutputs, type OutputSnapshot } from "./provenance.ts";
+import { assessmentMarkdown } from "./report.ts";
 import { staleness, type CurrentState } from "./stale.ts";
 import {
   appendEvent,
   loadRecords,
   persist,
   readEvents,
+  recordPaths,
   stateSignature,
   summaryOf,
   writeRun,
@@ -84,8 +96,15 @@ import {
 const DEMO_STEP_MS = 250;
 /** Events are cut to this length. */
 const MAX_EVENT_TEXT = 8000;
+/** The report of an agent that prints plain text is the end of its output, up to this length. */
+const MAX_TEXT_REPORT = 6000;
 /** How long agent version checks are reused. */
 const AGENT_CHECK_TTL_MS = 5 * 60_000;
+/** How long cancel_run and a stopping server wait for an agent's process group to end (it gets SIGKILL after 5 s). */
+const STOP_WAIT_MS = 8000;
+
+export const SESSION_CLOSED_ERROR =
+  "The MCP connection of the session that performs the run closed before finish_run.";
 
 const END_LABEL: Record<Exclude<RunStatus, "running">, string> = {
   succeeded: "Succeeded",
@@ -100,6 +119,8 @@ export interface HarnessDeps {
   gitInfo(root: string): { head: string; dirty: boolean } | null;
   /** Runs `<command> --version` for an agent that starts a process. Never rejects. */
   checkVersion(spec: AgentSpec): Promise<VersionCheck>;
+  /** Starts an agent's process in a process group of its own; throws when it cannot be started. */
+  startAgent(launch: AgentLaunch, output: AgentOutput): AgentHandle;
   log(line: string): void;
 }
 
@@ -110,6 +131,21 @@ export interface HarnessHooks {
   hold(): () => void;
 }
 
+/**
+ * Who makes a request: a person (the WebUI, or an HTTP client that names no MCP client), or an
+ * agent through the MCP server, which names its client and the session it holds with the server.
+ */
+export type Caller =
+  | { kind: "user" }
+  | { kind: "agent"; client: ClientInfo; session: string | null };
+
+/** How a run ends. */
+interface RunEnd {
+  status: Exclude<RunStatus, "running">;
+  exitCode?: number | null;
+  error?: string | null;
+}
+
 /** A run that has not ended. */
 interface ActiveRun {
   /** The output locations: each output type's patterns and the instance's concrete location. */
@@ -117,6 +153,10 @@ interface ActiveRun {
   before: OutputSnapshot;
   release: () => void;
   timer: ReturnType<typeof setTimeout> | null;
+  /** The agent's process, for an agent that starts one. */
+  agent: AgentHandle | null;
+  /** How the run ends once its agent's process has: set when it is canceled or the server stops. */
+  stopping: "canceled" | "interrupted" | null;
 }
 
 /** The number in an id (`i12` → 12), which orders instances and runs by creation. */
@@ -130,20 +170,71 @@ const viewOf = (run: Run): RunView => {
 const byKey = <T extends { id: string; name: string }>(list: T[], key: string): T | undefined =>
   list.find((item) => item.id === key) ?? list.find((item) => item.name === key);
 
-function sha256(file: string): string | null {
-  try {
-    return crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex");
-  } catch {
-    return null;
+/**
+ * Whether the agent that calls performed a self run: through the same MCP session. A record
+ * without a session (none could be opened, or it predates sessions) is matched by the client's
+ * name and version instead.
+ */
+const performedBy = (
+  performer: RunClient | null,
+  caller: Extract<Caller, { kind: "agent" }>,
+): boolean => {
+  if (performer === null) return false;
+  if (performer.session !== null) return performer.session === caller.session;
+  return performer.name === caller.client.name && performer.version === caller.client.version;
+};
+
+/** A message in English with its key and arguments, for a finding. */
+const said = <K extends MessageKey>(key: K, args: MessageArgs<K>) => ({
+  message: say("en", key, args),
+  key,
+  args: args as Record<string, string | number | boolean>,
+});
+
+/** The end of a text, kept to a length. */
+class Tail {
+  #text = "";
+  push(line: string): void {
+    this.#text = `${this.#text}${line}\n`.slice(-MAX_TEXT_REPORT);
+  }
+  get value(): string {
+    return this.#text.trim();
   }
 }
 
-const describeReason = (reason: StaleReason): string =>
-  reason.kind === "input"
-    ? `${reason.path} was ${reason.change}`
-    : reason.path
-      ? `${reason.path} changed`
-      : "the Skill is no longer found";
+/** runs/<id>.raw.log: the agent's own output, stdout lines as they came and stderr lines marked. */
+class RawLog {
+  #fd: number | null;
+  readonly #log: (line: string) => void;
+  constructor(file: string, log: (line: string) => void) {
+    this.#log = log;
+    try {
+      fs.mkdirSync(path.dirname(file), { recursive: true });
+      this.#fd = fs.openSync(file, "a");
+    } catch (error) {
+      this.#fd = null;
+      log(`cannot open ${file}: ${(error as Error).message}`);
+    }
+  }
+  write(line: string): void {
+    if (this.#fd === null) return;
+    try {
+      fs.writeSync(this.#fd, `${line}\n`);
+    } catch (error) {
+      this.#log(`cannot write the raw log: ${(error as Error).message}`);
+      this.close();
+    }
+  }
+  close(): void {
+    if (this.#fd === null) return;
+    try {
+      fs.closeSync(this.#fd);
+    } catch {
+      // Already closed.
+    }
+    this.#fd = null;
+  }
+}
 
 export class Harness {
   readonly root: string;
@@ -156,13 +247,14 @@ export class Harness {
   readonly #waiters = new Map<string, Set<() => void>>();
   #workspace: { loaded: LoadedWorkspace; signature: string } | null = null;
   #agentChecks: { key: string; at: number; info: Promise<AgentInfo[]> } | null = null;
-  readonly #skillHashes = new Map<string, { signature: string; sha256: string | null }>();
-  #closed = false;
+  readonly #digests: DigestCache;
+  #closing: Promise<void> | null = null;
 
   /** Reads the records; throws a StateError when state.json cannot be used. Nothing is written yet. */
   constructor(root: string, deps: HarnessDeps) {
     this.root = root;
     this.#deps = deps;
+    this.#digests = new DigestCache(root);
     this.#readSignature = stateSignature(root);
     this.#records = loadRecords(root);
     for (const { id, reason } of this.#records.unreadable)
@@ -181,14 +273,50 @@ export class Harness {
     persist(this.root, this.#records);
   }
 
-  /** Interrupts the runs that have not ended and writes the records. */
-  close(): void {
-    if (this.#closed) return;
-    this.#closed = true;
-    // #finish deletes the entry being visited, which Map iteration allows.
+  /**
+   * Stops the agents of the runs that have not ended, records those runs as interrupted, and
+   * writes the records. Resolves once every agent's process group has ended (they get SIGKILL
+   * after 5 seconds), or after a few seconds more.
+   */
+  close(): Promise<void> {
+    this.#closing ??= (async () => {
+      const waits: Promise<void>[] = [];
+      // Ending a run deletes its entry, which iterating the map allows.
+      for (const id of this.#active.keys()) {
+        const active = this.#active.get(id);
+        const run = this.#records.runs.get(id);
+        if (!active || !run) continue;
+        if (active.agent) {
+          active.stopping = "interrupted";
+          active.agent.stop();
+          waits.push(this.#waitForEnd(id, STOP_WAIT_MS));
+        } else this.#end(run, { status: "interrupted", error: INTERRUPTED_ERROR });
+      }
+      await Promise.all(waits);
+      // What did not end in time is recorded as interrupted all the same.
+      for (const id of this.#active.keys()) {
+        const run = this.#records.runs.get(id);
+        if (run) this.#end(run, { status: "interrupted", error: INTERRUPTED_ERROR });
+      }
+    })();
+    return this.#closing;
+  }
+
+  /** Ends a run as #finish does, logging what cannot be written instead of throwing. */
+  #end(run: Run, end: RunEnd): void {
+    try {
+      this.#finish(run, end);
+    } catch (error) {
+      this.#deps.log(`cannot record the end of run ${run.id}: ${(error as Error).message}`);
+    }
+  }
+
+  /** The MCP session `session` closed: the self runs it performs are interrupted. */
+  sessionClosed(session: string): void {
     for (const id of this.#active.keys()) {
       const run = this.#records.runs.get(id);
-      if (run) this.#finish(run, { status: "interrupted", error: INTERRUPTED_ERROR });
+      if (run?.client?.session === session)
+        this.#end(run, { status: "interrupted", error: SESSION_CLOSED_ERROR });
     }
   }
 
@@ -224,7 +352,7 @@ export class Harness {
       return loaded;
     } catch (error) {
       if (error instanceof ModelError)
-        throw new HarnessError("no-model", error.message, error.files);
+        throw refuse("no-model", "error.model", { detail: error.message }, error.files);
       throw error;
     }
   }
@@ -252,6 +380,18 @@ export class Harness {
     return info;
   }
 
+  /**
+   * Whether an agent can be started now. An agent that the last check found unavailable is checked
+   * again, since its command may have been installed since.
+   */
+  async #availability(spec: AgentSpec, specs: AgentSpec[]): Promise<AgentInfo> {
+    const known = (await this.#checkAgents(specs)).find((info) => info.id === spec.id);
+    if (known?.available) return known;
+    const fresh = agentInfo(spec, await this.#deps.checkVersion(spec).catch(() => null));
+    if (fresh.available) this.#agentChecks = null;
+    return fresh;
+  }
+
   /** `GET /api/model`: the model as the workspace realizes it, with the agents and their availability. */
   async model(): Promise<ModelView> {
     const { loaded, description } = this.#describe();
@@ -261,10 +401,10 @@ export class Harness {
   #process(model: ProcessModel, key: string): Process {
     const process = byKey(model.processes, key);
     if (!process)
-      throw new HarnessError(
-        "not-found",
-        `No Process "${key}" in the model. Its Processes are: ${model.processes.map((p) => p.name).join(", ")}.`,
-      );
+      throw refuse("not-found", "error.noProcess", {
+        name: key,
+        processes: model.processes.map((p) => p.name).join(", "),
+      });
     return process;
   }
 
@@ -284,10 +424,10 @@ export class Harness {
     if (query.type) {
       const type = this.#type(model, query.type);
       if (!type)
-        throw new HarnessError(
-          "not-found",
-          `No Artifact type "${query.type}" in the model. Its types are: ${model.artifacts.map((a) => a.name).join(", ")}.`,
-        );
+        throw refuse("not-found", "error.noType", {
+          name: query.type,
+          types: model.artifacts.map((a) => a.name).join(", "),
+        });
       types = [type];
     }
     const artifacts: Artifact[] = [];
@@ -316,7 +456,7 @@ export class Harness {
 
   #instance(id: string): Instance {
     const instance = this.#state.instances[id];
-    if (!instance) throw new HarnessError("not-found", `No instance ${id}.`);
+    if (!instance) throw refuse("not-found", "error.noInstance", { id });
     return instance;
   }
 
@@ -333,30 +473,19 @@ export class Harness {
     writeState(this.root, this.#state);
   }
 
-  /** The SKILL.md at a workspace-relative path now, with its SHA-256 (cached while the file is unchanged). */
-  #skillNow(relPath: string): { path: string; sha256: string | null; mtime: number } | null {
-    const file = path.resolve(this.root, relPath);
-    let stat: fs.Stats;
-    try {
-      stat = fs.statSync(file);
-    } catch {
-      return null;
-    }
-    const sig = `${stat.mtimeMs}:${stat.size}`;
-    let known = this.#skillHashes.get(file);
-    if (known?.signature !== sig) {
-      known = { signature: sig, sha256: sha256(file) };
-      this.#skillHashes.set(file, known);
-    }
-    return { path: relPath, sha256: known.sha256, mtime: stat.mtimeMs };
-  }
-
+  /** The digests of an instance's inputs and of the Process's SKILL.md now. */
   #current(instance: Instance, processes: ProcessView[]): CurrentState {
     const inputs = Object.entries(instance.inputs).flatMap(([type, paths]) =>
-      paths.map((p) => ({ type, path: p, state: fileState(this.root, artifactPath(p)) })),
+      paths.map((p) => ({ type, path: p, sha256: this.#digests.of(artifactPath(p)) })),
     );
     const skill = processes.find((p) => p.id === instance.process)?.skill;
-    return { inputs, skill: skill && "path" in skill ? this.#skillNow(skill.path) : null };
+    return {
+      inputs,
+      skill:
+        skill && "path" in skill
+          ? { path: skill.path, sha256: this.#digests.of(skill.path) }
+          : null,
+    };
   }
 
   #facts(instance: Instance, description: ModelDescription): InstanceFacts {
@@ -411,19 +540,21 @@ export class Harness {
     };
   }
 
-  /** An instance path: inside the workspace, relative to it. */
+  /** `GET /api/instances/:id`: one instance with its facts. */
+  instance(id: string): InstanceView {
+    const instance = this.#instance(id);
+    return this.#view(instance, this.#describe().description);
+  }
+
+  /** An instance path: inside the workspace and outside its records, relative to the workspace. */
   #pathIn(given: string, where: string): string {
     const result = workspacePath(this.root, given);
     if (result.ok) return result.path;
     if (result.reason === "empty")
-      throw new HarnessError(
-        "invalid-request",
-        `${where}: "${given}" names no file or directory in the workspace.`,
-      );
-    throw new HarnessError(
-      "outside-workspace",
-      `${where}: ${given} is outside the workspace (${this.root}). Instances name only paths inside it.`,
-    );
+      throw refuse("invalid-request", "error.emptyPath", { where, path: given });
+    if (result.reason === "records")
+      throw refuse("outside-workspace", "error.records", { where, path: given });
+    throw refuse("outside-workspace", "error.outside", { where, path: given, root: this.root });
   }
 
   #inputs(
@@ -436,14 +567,20 @@ export class Harness {
     for (const [key, paths] of Object.entries(given)) {
       const type = this.#type(model, key);
       if (!type || !allowed.includes(type.id))
-        throw new HarnessError(
-          "invalid-request",
-          `inputs: ${key} is not an input or control of ${process.name}. They are: ${allowed.join(", ") || "none"}.`,
-        );
-      const list = [
-        ...(inputs[type.id] ?? []),
-        ...paths.map((p) => this.#pathIn(p, `inputs.${key}`)),
-      ];
+        throw refuse("invalid-request", "error.notInput", {
+          type: key,
+          process: process.name,
+          allowed: allowed.join(", "),
+        });
+      const list = [...(inputs[type.id] ?? [])];
+      for (const given of paths) {
+        const where = `inputs.${key}`;
+        const inside = this.#pathIn(given, where);
+        // An input is what the evaluation rests on, so it names one file or directory.
+        if (!isConcrete(inside))
+          throw refuse("invalid-request", "error.pattern", { where, path: given });
+        list.push(inside);
+      }
       inputs[type.id] = [...new Set(list)];
     }
     return inputs;
@@ -460,10 +597,11 @@ export class Harness {
     for (const [key, location] of Object.entries(given)) {
       const type = this.#type(model, key);
       if (!type || !process.outputs.includes(type.id))
-        throw new HarnessError(
-          "invalid-request",
-          `outputs: ${key} is not an output of ${process.name}. Its outputs are: ${process.outputs.join(", ") || "none"}.`,
-        );
+        throw refuse("invalid-request", "error.notOutput", {
+          type: key,
+          process: process.name,
+          outputs: process.outputs.join(", "),
+        });
       outputs[type.id] = location === null ? null : this.#pathIn(location, `outputs.${key}`);
     }
     return outputs;
@@ -473,10 +611,12 @@ export class Harness {
     const count = process.outcomes.length;
     for (const criterion of criteria)
       if (criterion.outcome >= count)
-        throw new HarnessError(
-          "invalid-request",
-          `criteria: ${process.name} has ${count} Outcome${count === 1 ? "" : "s"} (numbered from 0); there is no Outcome ${criterion.outcome}.`,
-        );
+        throw refuse("invalid-request", "error.noOutcome", {
+          where: "criteria: ",
+          process: process.name,
+          count,
+          outcome: criterion.outcome,
+        });
     return criteria.map((c) => ({
       outcome: c.outcome,
       statement: c.statement,
@@ -531,12 +671,23 @@ export class Harness {
   #run(id: string): Run {
     const run = this.#records.runs.get(id);
     if (run) return run;
-    throw new HarnessError(
-      "not-found",
-      this.#state.runs[id]
-        ? `The record of run ${id} (runs/${id}.json) is missing or unreadable.`
-        : `No run ${id}.`,
-    );
+    throw this.#state.runs[id]
+      ? refuse("not-found", "error.runRecord", { id })
+      : refuse("not-found", "error.noRun", { id });
+  }
+
+  /** `GET /api/runs`: run summaries, newest first, a page at a time. */
+  runs(query: { limit: number; cursor?: string }): { runs: RunSummary[]; next: string | null } {
+    const before = query.cursor === undefined ? Number.POSITIVE_INFINITY : Number(query.cursor);
+    const matching = Object.values(this.#state.runs)
+      .filter((run) => seqOf(run.id) < before)
+      .sort((a, b) => seqOf(b.id) - seqOf(a.id));
+    const page = matching.slice(0, query.limit);
+    const last = page.at(-1);
+    return {
+      runs: page,
+      next: matching.length > page.length && last ? String(seqOf(last.id)) : null,
+    };
   }
 
   #emit(run: Run, draft: EventDraft): void {
@@ -585,47 +736,67 @@ export class Harness {
 
   /**
    * `POST /api/instances/:id/run`: records a run and starts its agent. Starting is all that
-   * success means. This version starts the demo and the calling session (self); starting Claude
-   * Code, Codex, and other commands comes with the agent runner.
+   * success means. An agent that starts a process is checked first (`<command> --version`); the
+   * demo starts none, and a self run is performed by the calling session, which the result's prompt
+   * instructs and which ends it with finish_run.
    */
-  startRun(instanceId: string, request: RunRequest): { run: RunView; prompt?: string } {
+  async startRun(
+    instanceId: string,
+    request: RunRequest,
+    caller: Caller,
+  ): Promise<{ run: RunView; prompt?: string }> {
+    if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
+    this.#instance(instanceId);
+    const agentSpec = (loaded: LoadedWorkspace): { spec: AgentSpec; specs: AgentSpec[] } => {
+      const specs = resolveAgents(loaded.config.agents);
+      const spec = specs.find((s) => s.id === request.agent);
+      if (spec) return { spec, specs };
+      const agents = specs.map((s) => s.id).join(", ");
+      throw request.agent === "self"
+        ? refuse("agent-unavailable", "error.selfDisabled", { agents })
+        : refuse("agent-unavailable", "error.noAgent", { agent: request.agent, agents });
+    };
+    let info: AgentInfo | null = null;
+    {
+      const { spec, specs } = agentSpec(this.#loaded());
+      if (startsProcess(spec)) {
+        info = await this.#availability(spec, specs);
+        if (!info.available)
+          throw refuse("agent-unavailable", "error.agentUnavailable", {
+            agent: spec.label,
+            reason: info.reason ?? "it is not available",
+          });
+      }
+    }
+    // From here on nothing waits, so no other request comes between the checks and the record.
+    if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
     const instance = this.#instance(instanceId);
     const { loaded, description } = this.#describe();
     const { model } = loaded;
+    const { spec } = agentSpec(loaded);
     const process = this.#process(model, instance.process);
     const skill = description.processes.find((p) => p.id === process.id)?.skill ?? null;
-
-    const specs = resolveAgents(loaded.config.agents);
-    const spec = specs.find((s) => s.id === request.agent);
-    if (!spec)
-      throw new HarnessError(
-        "agent-unavailable",
-        `No agent "${request.agent}" in this workspace${request.agent === "self" ? " (agents.self is false in alps-harness.yaml)" : ""}. Its agents are: ${specs.map((s) => s.id).join(", ")}.`,
-      );
-    if (startsProcess(spec))
-      throw new HarnessError(
-        "agent-unavailable",
-        `This harness does not start ${spec.label} yet; it runs the demo and self agents.`,
-      );
     const running = instance.runs
       .map((id) => this.#state.runs[id])
       .find((r) => r?.status === "running");
     if (running)
-      throw new HarnessError(
-        "already-running",
-        `Run ${running.id} of instance ${instance.id} has not ended. Wait for it (get_run with wait) or cancel it (cancel_run).`,
-      );
+      throw refuse("already-running", "error.running", { run: running.id, instance: instance.id });
 
     const typeOf = (id: string): ArtifactType | undefined =>
       model.artifacts.find((a) => a.id === id);
     const runInput = (type: string, role: RunInput["role"]): RunInput => {
       const paths = instance.inputs[type] ?? [];
-      return {
-        type,
-        role,
-        paths,
-        missing: paths.filter((p) => !fileState(this.root, artifactPath(p))),
-      };
+      const sha256: Record<string, string> = {};
+      const missing: string[] = [];
+      for (const p of paths) {
+        if (!fileState(this.root, artifactPath(p))) {
+          missing.push(p);
+          continue;
+        }
+        const digest = this.#digests.of(artifactPath(p));
+        if (digest) sha256[p] = digest;
+      }
+      return { type, role, paths, missing, sha256 };
     };
     const inputs = [
       ...process.inputs.map((type) => runInput(type, "input")),
@@ -650,6 +821,7 @@ export class Harness {
       notes: instance.notes,
       ...(self ? { finishRun: id } : {}),
     });
+    const args = startsProcess(spec) ? argsFor(spec, prompt) : [];
     const run: Run = {
       id,
       kind: "process",
@@ -669,21 +841,25 @@ export class Harness {
       usage: null,
       report: "",
       events: 0,
-      command: null,
-      client: self ? (request.client ?? null) : null,
+      command: startsProcess(spec) ? commandLine(spec, args, prompt) : null,
+      // The session tells who performs the run: it is interrupted when the session closes, and an
+      // evaluation through the same session is marked self.
+      client:
+        self && caller.kind === "agent" ? { ...caller.client, session: caller.session } : null,
       prompt,
       git: this.#deps.gitInfo(this.root),
       skill:
         skill && "path" in skill
-          ? { path: skill.path, sha256: this.#skillNow(skill.path)?.sha256 ?? null }
+          ? { path: skill.path, sha256: this.#digests.of(skill.path) }
           : null,
     };
     const locations = process.outputs.map((type) => {
       const location = instance.outputs[type];
+      const concrete = location !== null && location !== undefined && isConcrete(location);
       return {
         type,
-        patterns: typeOf(type)?.paths ?? [],
-        paths: location && isConcrete(location) ? [artifactPath(location)] : [],
+        patterns: [...(typeOf(type)?.paths ?? []), ...(location && !concrete ? [location] : [])],
+        paths: location && concrete ? [artifactPath(location)] : [],
       };
     });
     const active: ActiveRun = {
@@ -691,6 +867,8 @@ export class Harness {
       before: this.#snapshot(locations),
       release: this.#hooks.hold(),
       timer: null,
+      agent: null,
+      stopping: null,
     };
     this.#active.set(id, active);
     this.#records.runs.set(id, run);
@@ -704,9 +882,99 @@ export class Harness {
         kind: "system",
         text: "The calling session performs the run (self). It ends with finish_run.",
       });
-    else this.#runDemo(run, active, loaded, process);
+    else if (spec.format === "demo") this.#runDemo(run, active, loaded, process);
+    else this.#runAgent(run, active, spec, info, args);
     this.#announce(run);
     return { run: viewOf(run), ...(self ? { prompt } : {}) };
+  }
+
+  /** Starts an agent's process and reads its output as the run's events, usage, and report. */
+  #runAgent(
+    run: Run,
+    active: ActiveRun,
+    spec: AgentSpec,
+    info: AgentInfo | null,
+    args: string[],
+  ): void {
+    const raw = new RawLog(recordPaths(this.root).raw(run.id), this.#deps.log);
+    const text = spec.format === "text" ? new Tail() : null;
+    this.#emit(run, {
+      kind: "system",
+      text: `Started ${spec.label}${info?.version ? ` (${info.version})` : ""}`,
+    });
+    let handle: AgentHandle;
+    try {
+      handle = this.#deps.startAgent(
+        {
+          command: spec.command ?? "",
+          args,
+          cwd: this.root,
+          env: {
+            ...spec.env,
+            ALPS_RUN_ID: run.id,
+            ALPS_INSTANCE: run.instance ?? "",
+            ALPS_PROCESS: run.process ?? "",
+          },
+          stdin: spec.stdin ? run.prompt : null,
+        },
+        {
+          stdout: (line) => {
+            raw.write(line);
+            if (run.status !== "running") return;
+            const parsed = parseOutputLine(spec.format, line);
+            for (const event of parsed.events) this.#emit(run, event);
+            if (parsed.usage) run.usage = parsed.usage;
+            if (parsed.report !== undefined) run.report = parsed.report;
+            if (parsed.agentError !== undefined) run.agentError = parsed.agentError;
+            text?.push(line);
+          },
+          stderr: (line) => {
+            raw.write(`[stderr] ${line}`);
+            if (run.status === "running") this.#emit(run, { kind: "stderr", text: line });
+          },
+        },
+      );
+    } catch (error) {
+      raw.close();
+      const message = `${spec.label} could not be started: ${(error as Error).message}`;
+      this.#emit(run, { kind: "error", text: message });
+      this.#end(run, { status: "failed", error: message });
+      return;
+    }
+    active.agent = handle;
+    handle.done.then(
+      ({ exitCode, signal }) => {
+        raw.close();
+        if (text && !run.report) run.report = text.value;
+        if (active.stopping) {
+          this.#end(run, {
+            status: active.stopping,
+            exitCode,
+            error: active.stopping === "interrupted" ? INTERRUPTED_ERROR : null,
+          });
+          return;
+        }
+        const succeeded = exitCode === 0 && !run.agentError;
+        this.#end(run, {
+          status: succeeded ? "succeeded" : "failed",
+          exitCode,
+          error:
+            succeeded || run.agentError
+              ? null
+              : exitCode !== null
+                ? `${spec.label} exited with code ${exitCode}.`
+                : `${spec.label} was stopped by ${signal ?? "a signal"}.`,
+        });
+      },
+      (error: unknown) => {
+        raw.close();
+        this.#deps.log(`run ${run.id}: ${(error as Error).stack ?? String(error)}`);
+        this.#end(run, {
+          status: "failed",
+          error: `The harness lost ${spec.label}: ${(error as Error).message}`,
+        });
+      },
+    );
   }
 
   #runDemo(run: Run, active: ActiveRun, loaded: LoadedWorkspace, process: Process): void {
@@ -744,11 +1012,7 @@ export class Harness {
       } catch (error) {
         const message = (error as Error).message;
         this.#deps.log(`demo run ${run.id}: ${(error as Error).stack ?? message}`);
-        try {
-          this.#finish(run, { status: "failed", error: `The demo stopped: ${message}` });
-        } catch {
-          // The records cannot be written; the log has the reason.
-        }
+        this.#end(run, { status: "failed", error: `The demo stopped: ${message}` });
       }
     };
     active.timer = setTimeout(tick, DEMO_STEP_MS);
@@ -789,11 +1053,12 @@ export class Harness {
     }
   }
 
-  /** Ends a run: its outputs are what changed in the output locations since it started. */
-  #finish(
-    run: Run,
-    end: { status: Exclude<RunStatus, "running">; exitCode?: number | null; error?: string | null },
-  ): void {
+  /**
+   * Ends a run: its outputs are what changed in the output locations since it started. An input
+   * that the run itself created or modified is kept with the digest it left, so the evaluation of
+   * the run rests on what the run made of it.
+   */
+  #finish(run: Run, end: RunEnd): void {
     if (run.status !== "running") return;
     const active = this.#active.get(run.id);
     this.#active.delete(run.id);
@@ -805,6 +1070,13 @@ export class Harness {
     if (active) {
       run.outputs = diffOutputs(active.before, this.#snapshot(active.locations));
       for (const output of run.outputs) this.#state.provenance[output.path] = run.id;
+      const produced = new Set(run.outputs.map((output) => output.path));
+      for (const input of run.inputs)
+        for (const p of input.paths) {
+          if (!produced.has(artifactPath(p))) continue;
+          const digest = this.#digests.of(artifactPath(p));
+          if (digest) input.sha256[p] = digest;
+        }
     }
     const seconds = Math.round((run.endedAt - run.startedAt) / 1000);
     this.#emit(run, { kind: "end", text: `${END_LABEL[end.status]} (${seconds} s)` });
@@ -823,6 +1095,10 @@ export class Harness {
 
   #waitForEnd(id: string, ms: number, signal?: AbortSignal): Promise<void> {
     return new Promise((resolve) => {
+      if (this.#records.runs.get(id)?.status !== "running") {
+        resolve();
+        return;
+      }
       const waiters = this.#waiters.get(id) ?? new Set<() => void>();
       this.#waiters.set(id, waiters);
       const done = (): void => {
@@ -850,11 +1126,19 @@ export class Harness {
     return { run, events, truncated: total > events.length };
   }
 
-  /** `POST /api/runs/:id/cancel`. A run that has already ended is left as it is. */
-  cancelRun(id: string): { run: RunView; canceled: boolean } {
+  /**
+   * `POST /api/runs/:id/cancel`. An agent's process group is stopped (SIGTERM, then SIGKILL after
+   * 5 s) and the answer comes once it has ended; a run that has already ended is left as it is.
+   */
+  async cancelRun(id: string): Promise<{ run: RunView; canceled: boolean }> {
     const run = this.#run(id);
     if (run.status !== "running") return { run: viewOf(run), canceled: false };
-    this.#finish(run, { status: "canceled" });
+    const active = this.#active.get(id);
+    if (active?.agent) {
+      active.stopping ??= "canceled";
+      active.agent.stop();
+      await this.#waitForEnd(id, STOP_WAIT_MS);
+    } else this.#finish(run, { status: "canceled" });
     return { run: viewOf(run), canceled: true };
   }
 
@@ -862,15 +1146,9 @@ export class Harness {
   finishRun(id: string, request: FinishRequest): { run: RunView; outputs: RunOutput[] } {
     const run = this.#run(id);
     if (run.agent !== "self" && run.kind !== "wake")
-      throw new HarnessError(
-        "invalid-request",
-        `Run ${id} is a ${run.agent} run. finish_run ends only the self and wake runs that the calling session performs.`,
-      );
+      throw refuse("invalid-request", "error.notSelf", { run: id, agent: run.agent });
     if (run.status !== "running")
-      throw new HarnessError(
-        "invalid-request",
-        `Run ${id} has already ended (${run.status}). See it with get_run.`,
-      );
+      throw refuse("invalid-request", "error.ended", { run: id, status: run.status });
     run.report = request.report;
     this.#finish(run, { status: request.status });
     return { run: viewOf(run), outputs: run.outputs };
@@ -880,35 +1158,47 @@ export class Harness {
 
   /**
    * `POST /api/instances/:id/evaluate`: judgments of the latest run's results, per Outcome, with
-   * evidence. It replaces the instance's evaluation.
+   * evidence. It replaces the instance's evaluation. Who judged comes from the caller, not the
+   * request: a user, or an agent by its MCP client's name, marked self when the judged run is a
+   * self run that the same MCP session performed (performedBy).
    */
-  evaluate(instanceId: string, request: EvaluateRequest): { instance: InstanceView } {
+  evaluate(
+    instanceId: string,
+    request: EvaluateRequest,
+    caller: Caller,
+  ): { instance: InstanceView } {
     const instance = this.#instance(instanceId);
     const { loaded, description } = this.#describe();
     const process = this.#process(loaded.model, instance.process);
     const latestId = instance.runs.at(-1);
     const latest = latestId ? this.#state.runs[latestId] : undefined;
-    if (!latest)
-      throw new HarnessError(
-        "not-found",
-        `Instance ${instance.id} has no run to evaluate. Run it first.`,
-      );
+    if (!latest) throw refuse("not-found", "error.nothingToJudge", { instance: instance.id });
     if (latest.status === "running")
-      throw new HarnessError(
-        "already-running",
-        `Run ${latest.id} of instance ${instance.id} has not ended. Evaluate its results once it has (get_run with wait).`,
-      );
+      throw refuse("already-running", "error.judgeRunning", {
+        run: latest.id,
+        instance: instance.id,
+      });
     const count = process.outcomes.length;
     const judged = new Set<number>();
     for (const { outcome } of request.judgments) {
       if (outcome >= count)
-        throw new HarnessError(
-          "invalid-judgment",
-          `${process.name} has ${count} Outcome${count === 1 ? "" : "s"} (numbered from 0); there is no Outcome ${outcome}.`,
-        );
-      if (judged.has(outcome))
-        throw new HarnessError("invalid-judgment", `Outcome ${outcome} is judged twice.`);
+        throw refuse("invalid-judgment", "error.noOutcome", {
+          where: "",
+          process: process.name,
+          count,
+          outcome,
+        });
+      if (judged.has(outcome)) throw refuse("invalid-judgment", "error.judgedTwice", { outcome });
       judged.add(outcome);
+    }
+    let by: Judge = { kind: "user" };
+    if (caller.kind === "agent") {
+      const performer = this.#records.runs.get(latest.id)?.client ?? null;
+      by = {
+        kind: "agent",
+        id: caller.client.name,
+        ...(performedBy(performer, caller) ? { self: true } : {}),
+      };
     }
     instance.evaluation = {
       runId: latest.id,
@@ -921,7 +1211,7 @@ export class Harness {
           ...(j.limits ? { limits: j.limits } : {}),
         })),
       ...(request.note?.trim() ? { note: request.note } : {}),
-      by: request.by,
+      by,
       at: Date.now(),
     };
     this.#saveState();
@@ -947,7 +1237,10 @@ export class Harness {
         findings.push({
           kind: "configuration",
           subject: { process: process.id },
-          message: `The Skill declared for ${process.name} (${process.skill.missing}) is not a readable SKILL.md.`,
+          ...said("finding.skillMissing", {
+            process: process.name,
+            location: process.skill.missing,
+          }),
           evidence: [process.skill.missing],
         });
     for (const fact of facts) {
@@ -961,17 +1254,30 @@ export class Harness {
         findings.push({
           kind: "unverified",
           subject,
-          message: `Run ${latest.id} ended (${latest.status}) and its results have no judgment yet.`,
+          ...said("finding.awaiting", { run: latest.id, status: latest.status }),
           evidence: [latest.id],
         });
-      if (fact.stale)
+      if (fact.stale) {
+        const paths = fact.staleness.map((reason) => reason.path ?? "SKILL.md");
         findings.push({
           kind: "unverified",
           subject,
-          message: `The judgment of run ${fact.evaluatedRun} no longer rests on the workspace: ${fact.staleness.map(describeReason).join("; ")}.`,
-          evidence: fact.staleness.map((reason) => reason.path ?? "SKILL.md"),
+          ...said("finding.stale", { run: fact.evaluatedRun ?? "", paths: paths.join(", ") }),
+          evidence: paths,
         });
+      }
     }
     return { stats: null, findings, instances: facts };
+  }
+
+  /** `GET /api/assessment?format=markdown`: the assessment as Markdown, in the workspace's language. */
+  assessmentMarkdown(): string {
+    const assessment = this.assessment();
+    const { loaded, description } = this.#describe();
+    return assessmentMarkdown(assessment, {
+      language: loaded.language,
+      model: description.name,
+      processName: (id) => description.processes.find((p) => p.id === id)?.name ?? id,
+    });
   }
 }

@@ -46,13 +46,13 @@ Controls (they direct the work and are the basis for judging its results):
 Outputs (create or update them):
 {outputs}
 
-What the Outcomes mean for this application:
+What the Outcomes mean for this application (Outcomes are numbered from 0, in the order of the Process Description):
 {criteria}
 
 Notes:
 {notes}
 
-When you have finished, report for each Outcome the evidence that it is achieved and what remains unverified, and list the paths of the outputs you created or updated.`,
+When you have finished, report for each Outcome (by its number) the evidence that it is achieved and what remains unverified, and list the paths of the outputs you created or updated.`,
   ja: `あなたはプロセス「{process}」を実行するエージェントです。
 
 {skill}
@@ -66,13 +66,13 @@ When you have finished, report for each Outcome the evidence that it is achieved
 出力（作成または更新するもの）:
 {outputs}
 
-この適用での成果の読み方:
+この適用での成果の読み方（成果の番号は、プロセス記述の順に 0 から数える）:
 {criteria}
 
 注記:
 {notes}
 
-作業を終えたら、各成果について達成したと考える根拠と未確認の点を報告し、作成または更新した出力のパスを列挙してください。`,
+作業を終えたら、各成果について（番号を添えて）達成したと考える根拠と未確認の点を報告し、作成または更新した出力のパスを列挙してください。`,
 };
 
 const WORDS = {
@@ -84,7 +84,7 @@ const WORDS = {
     missingSkill: (location: string) =>
       `The Skill declared for this Process (${location}) was not found. Its Process Description says:`,
     purpose: "Purpose",
-    outcomes: "Outcomes",
+    outcomes: "Outcomes (numbered from 0)",
     constraints: "Constraints",
     none: "None.",
     notYet: "none yet",
@@ -105,7 +105,7 @@ const WORDS = {
     missingSkill: (location: string) =>
       `このプロセスに指定されたスキル（${location}）は見つかりません。プロセス記述の要点は次のとおりです。`,
     purpose: "目的",
-    outcomes: "成果",
+    outcomes: "成果（番号は 0 から）",
     constraints: "制約",
     none: "なし",
     notYet: "まだない",
@@ -122,6 +122,7 @@ const WORDS = {
 } as const;
 
 const bullets = (items: string[]): string => items.map((item) => `- ${item}`).join("\n");
+const numbered = (items: string[]): string => items.map((item, n) => `- ${n}: ${item}`).join("\n");
 
 export function buildPrompt(input: PromptInput): string {
   const words = WORDS[input.language];
@@ -141,7 +142,7 @@ export function buildPrompt(input: PromptInput): string {
     skillText = [
       skill ? words.missingSkill(skill.missing) : words.noSkill,
       process.purpose && `${words.purpose}: ${process.purpose}`,
-      process.outcomes.length > 0 && `${words.outcomes}:\n${bullets(process.outcomes)}`,
+      process.outcomes.length > 0 && `${words.outcomes}:\n${numbered(process.outcomes)}`,
       process.constraints.length > 0 && `${words.constraints}:\n${bullets(process.constraints)}`,
     ]
       .filter(Boolean)
@@ -182,7 +183,7 @@ export function buildPrompt(input: PromptInput): string {
       : input.criteria
           .map((criterion) =>
             [
-              words.outcome(criterion.outcome + 1, process.outcomes[criterion.outcome] ?? ""),
+              words.outcome(criterion.outcome, process.outcomes[criterion.outcome] ?? ""),
               words.statement(criterion.statement),
               ...(criterion.checks ? [words.checks(criterion.checks)] : []),
             ].join("\n"),

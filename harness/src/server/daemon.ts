@@ -105,8 +105,11 @@ export async function startDaemon(
   );
 }
 
-/** Asks the workspace's server to stop and waits for its process to end. */
-export async function stopServer(root: string, timeoutMs = 10_000): Promise<ServerInfo | null> {
+/**
+ * Asks the workspace's server to stop and waits for its process to end. A server with running
+ * agents stops their process groups first, which takes up to about 8 seconds.
+ */
+export async function stopServer(root: string, timeoutMs = 20_000): Promise<ServerInfo | null> {
   const running = await liveServer(root);
   if (!running) return null;
   const { info } = running;

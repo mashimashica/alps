@@ -13,7 +13,9 @@ import { afterAll, describe, expect, test } from "bun:test";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { mcpClient } from "../helpers/mcp.ts";
+import type { ModelResponse } from "../../src/shared/types.ts";
+import { stopWorkspaceDaemon } from "../helpers/daemon.ts";
+import { callTool, mcpClient } from "../helpers/mcp.ts";
 import { REPO_ROOT } from "../helpers/paths.ts";
 import { exec } from "../helpers/process.ts";
 
@@ -28,7 +30,7 @@ async function git(args: string[], cwd: string): Promise<string> {
   return result.stdout;
 }
 
-/** Copies what `git add -A` would commit on top of the clone. */
+/** Copies what `git add -A` would commit on top of the clone; a symlink stays a symlink, as git keeps it. */
 async function overlayWorkingTree(clone: string): Promise<void> {
   const changed = (
     await git(["ls-files", "-z", "--modified", "--others", "--exclude-standard"], REPO_ROOT)
@@ -38,12 +40,17 @@ async function overlayWorkingTree(clone: string): Promise<void> {
   for (const file of changed) {
     const source = path.join(REPO_ROOT, file);
     const target = path.join(clone, file);
-    if (fs.existsSync(source)) {
-      fs.mkdirSync(path.dirname(target), { recursive: true });
-      fs.copyFileSync(source, target);
-    } else {
+    let link = false;
+    try {
+      link = fs.lstatSync(source).isSymbolicLink();
+    } catch {
       fs.rmSync(target, { force: true });
+      continue;
     }
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.rmSync(target, { force: true });
+    if (link) fs.symlinkSync(fs.readlinkSync(source), target);
+    else fs.copyFileSync(source, target);
   }
 }
 
@@ -79,10 +86,11 @@ describe("E11 fresh clone", () => {
 
       // The 2025 initialize handshake, at the newest 2025-era version the client offers
       // (E2 covers the newest revision through server/discover).
+      const workspace = path.join(clone, "examples", "service-change");
       const session = await mcpClient({
         cli: path.join(clone, "harness", "src", "cli.ts"),
         cwd: clone,
-        workspace: path.join(clone, "examples", "service-change"),
+        workspace,
         negotiation: "legacy",
       });
       try {
@@ -91,8 +99,12 @@ describe("E11 fresh clone", () => {
         expect(SUPPORTED_PROTOCOL_VERSIONS).toContain(
           String(session.client.getNegotiatedProtocolVersion()),
         );
+        // The clone's MCP server relays to a daemon of its own, which it started.
+        const { model } = await callTool<ModelResponse>(session, "get_model");
+        expect(model.workspace).toBe(workspace);
       } finally {
         await session.close();
+        await stopWorkspaceDaemon(workspace);
       }
     },
     { timeout: 180_000 },

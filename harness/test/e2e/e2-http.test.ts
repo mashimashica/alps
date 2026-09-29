@@ -119,11 +119,13 @@ describe("E2 HTTP API", () => {
       expect(detail.run.outputs).toEqual([
         { type: "Change brief", path: output, change: "created" },
       ]);
+      // The run keeps the content of its inputs as it started (SHA-256), for "stale evidence".
       expect(detail.run.inputs).toContainEqual({
         type: "Stakeholder information",
         role: "input",
         paths: [input],
         missing: [],
+        sha256: { [input]: expect.stringMatching(/^[0-9a-f]{64}$/) },
       });
       expect(detail.run.skill).toEqual({
         path: "skills/clarify-requirements/SKILL.md",
@@ -224,10 +226,13 @@ describe("E2 HTTP API", () => {
         stale: false,
         staleness: [],
       });
+      // The message comes in English with its key and arguments, for a client in another language.
       expect(assessment.findings).toContainEqual({
         kind: "unverified",
         subject: { instance: instance.id, process: "Requirements Clarification" },
         message: expect.stringContaining(`Run ${run.id} ended (succeeded)`),
+        key: "finding.awaiting",
+        args: { run: run.id, status: "succeeded" },
         evidence: [run.id],
       });
     },
@@ -300,12 +305,15 @@ describe("E2 HTTP API", () => {
         ),
       ).toBe("invalid-request");
 
-      // agent-unavailable: an agent the workspace does not have, or one this harness does not start yet.
+      // agent-unavailable: an agent the workspace does not have, or one whose command is not found
+      // (the tests' claude-code names a command that does not exist).
       const unknownAgent = await api.post(`/api/instances/${instance.id}/run`, { agent: "nobody" });
       expect([unknownAgent.status, code(unknownAgent)]).toEqual([409, "agent-unavailable"]);
-      expect(
-        code(await api.post(`/api/instances/${instance.id}/run`, { agent: "claude-code" })),
-      ).toBe("agent-unavailable");
+      const noClaude = await api.post(`/api/instances/${instance.id}/run`, {
+        agent: "claude-code",
+      });
+      expect([noClaude.status, code(noClaude)]).toEqual([409, "agent-unavailable"]);
+      expect((noClaude.body as Failure).error.message).toContain("was not found");
 
       // already-running: a second run, or an evaluation, while a run of the instance has not ended.
       const self = (
@@ -351,7 +359,13 @@ describe("E2 HTTP API", () => {
           "invalid-judgment",
         ]);
       }
-      // A judgment with evidence is recorded, by a user unless an agent says otherwise.
+      // Who judged is not the body's to say: the harness records it (a user, when no MCP client is named).
+      const claimed = await api.post(`/api/instances/${instance.id}/evaluate`, {
+        judgments: [{ outcome: 1, judgment: "achieved", evidence: "x" }],
+        by: { kind: "agent", id: "someone-else", self: true },
+      });
+      expect([claimed.status, code(claimed)]).toEqual([400, "invalid-request"]);
+      // A judgment with evidence is recorded, by a user.
       const judged = await evaluate([
         {
           outcome: 1,

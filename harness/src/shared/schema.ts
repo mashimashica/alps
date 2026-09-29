@@ -213,7 +213,7 @@ export const stateFileSchema: z.ZodType<StateFile> = z.object({
 });
 
 /** `.alps-harness/runs/<id>.json`. */
-export const runRecordSchema: z.ZodType<Run> = z.object({
+export const runRecordSchema: z.ZodType<Run, unknown> = z.object({
   id: z.string(),
   kind: z.enum(["process", "wake"]),
   instance: z.string().nullable(),
@@ -232,6 +232,8 @@ export const runRecordSchema: z.ZodType<Run> = z.object({
       role: z.enum(["input", "control"]),
       paths: z.array(z.string()),
       missing: z.array(z.string()),
+      // Records written before the harness kept the content of inputs have none.
+      sha256: z.record(z.string(), z.string()).default({}),
     }),
   ),
   targets: z.array(runTarget),
@@ -240,7 +242,14 @@ export const runRecordSchema: z.ZodType<Run> = z.object({
   report: z.string(),
   events: z.int().min(0),
   command: z.string().nullable(),
-  client: z.object({ name: z.string(), version: z.string() }).nullable(),
+  client: z
+    .object({
+      name: z.string(),
+      version: z.string(),
+      // Records written before the harness kept the session have none.
+      session: z.string().nullable().default(null),
+    })
+    .nullable(),
   prompt: z.string(),
   git: gitInfo,
   skill: skillUsed,
@@ -354,15 +363,20 @@ export const updateInstanceRequest = z.strictObject({
 export const instantiateRequest = z.union([updateInstanceRequest, createInstanceRequest]);
 export type InstantiateRequest = z.output<typeof instantiateRequest>;
 
-/** `POST /api/instances/:id/run` (`run`). */
+/**
+ * `POST /api/instances/:id/run` (`run`). Who starts the run is not part of the body: the MCP server
+ * names its client in the X-Harness-Client header (clientHeader).
+ */
 export const runRequest = z.strictObject({
   agent: z.string().min(1),
-  /** `self` runs: the MCP client that performs the run. */
-  client: z.strictObject({ name: z.string(), version: z.string() }).optional(),
 });
 export type RunRequest = z.output<typeof runRequest>;
 
-/** `POST /api/instances/:id/evaluate` (`evaluate`). Problems with `judgments` are `invalid-judgment`. */
+/**
+ * `POST /api/instances/:id/evaluate` (`evaluate`). Problems with `judgments` are
+ * `invalid-judgment`. Who judged is not part of the body: the harness records the MCP client that
+ * the X-Harness-Client header names, or a user when there is none (the WebUI).
+ */
 export const evaluateRequest = z.strictObject({
   judgments: z
     .array(
@@ -375,9 +389,24 @@ export const evaluateRequest = z.strictObject({
     )
     .min(1, { error: "judge at least one Outcome" }),
   note: z.string().optional(),
-  by: judge.default({ kind: "user" }),
 });
 export type EvaluateRequest = z.output<typeof evaluateRequest>;
+
+/**
+ * The X-Harness-Client header, which the MCP server sends with every request it relays: its
+ * client's name and version as JSON, percent-encoded.
+ */
+export const clientHeader = z.strictObject({
+  name: z.string().trim().min(1).max(200),
+  version: z.string().max(100),
+});
+
+/** `POST /api/open` (`open_ui`). */
+export const openRequest = z.strictObject({
+  view: z.enum(["network", "dashboard", "instances"]).optional(),
+  /** Open the WebUI in a browser on the machine that runs the harness server. */
+  open: z.boolean().default(false),
+});
 
 /** `POST /api/runs/:id/finish` (`finish_run`). */
 export const finishRequest = z.strictObject({
@@ -401,18 +430,18 @@ export const instancesQuery = z.object({
     .optional(),
 });
 
-/** `GET /api/artifacts` (`list_artifacts`). `changedSince` is epoch milliseconds or an ISO 8601 date. */
+/** Epoch milliseconds or an ISO 8601 date. */
+const instant = z.string().transform((value, context) => {
+  const ms = /^\d+$/.test(value) ? Number(value) : Date.parse(value);
+  if (Number.isNaN(ms))
+    context.addIssue({ code: "custom", message: "use epoch milliseconds or an ISO 8601 date" });
+  return ms;
+});
+
+/** `GET /api/artifacts` (`list_artifacts`). */
 export const artifactsQuery = z.object({
   type: z.string().min(1).optional(),
-  changedSince: z
-    .string()
-    .transform((value, context) => {
-      const ms = /^\d+$/.test(value) ? Number(value) : Date.parse(value);
-      if (Number.isNaN(ms))
-        context.addIssue({ code: "custom", message: "use epoch milliseconds or an ISO 8601 date" });
-      return ms;
-    })
-    .optional(),
+  changedSince: instant.optional(),
 });
 
 /** `GET /api/runs/:id` (`get_run`). */
@@ -423,9 +452,22 @@ export const runQuery = z.object({
   wait: count.max(300).default(0),
 });
 
-/** `GET /api/assessment` (`get_assessment`). The Markdown form comes with the statistics. */
+/** `GET /api/runs`: newest first, a page at a time. */
+export const runsQuery = z.object({
+  limit: count.min(1).max(200).default(50),
+  cursor: z
+    .string()
+    .regex(/^\d+$/, { error: "use the next value of the previous page" })
+    .optional(),
+});
+
+/**
+ * `GET /api/assessment` (`get_assessment`). `since` limits the statistics to runs and judgments
+ * since then; until the statistics are computed (stats is null) it has no effect.
+ */
 export const assessmentQuery = z.object({
-  format: z.enum(["json"], { error: "only format=json is available" }).default("json"),
+  format: z.enum(["json", "markdown"]).default("json"),
+  since: instant.optional(),
 });
 
 /** One line per issue: `<file>: <path>: <message>`. */

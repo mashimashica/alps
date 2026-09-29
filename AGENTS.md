@@ -21,7 +21,7 @@ Do not infer Process requirements from tests, templates, Host manifests, icons, 
 
 | Path | Role |
 | --- | --- |
-| `skills/design-process-description/`, `skills/design-agent-work-system/` | Distributed Skills; each root English `SKILL.md` is the source for its Process. |
+| `skills/design-process-description/`, `skills/design-agent-work-system/`, `skills/run-process/` | Distributed Skills; each root English `SKILL.md` is the source for its Process. |
 | `.agents/skills/<distributed-skill>` | Relative symlink to `../../skills/<distributed-skill>` for repository discovery. |
 | `.agents/skills/review-alps/` | Real directory for repository semantic and distribution review; not a Plugin Skill. |
 | `.agents/skills/sync-locales/` | Real directory for English/Japanese review; not a Plugin Skill. |
@@ -33,7 +33,7 @@ Do not infer Process requirements from tests, templates, Host manifests, icons, 
 | `CLAUDE.md` | Claude Code entry point for repository development that imports this file; it adds no instructions of its own and is not Plugin context. |
 | `assets/` and the Skill's `agents/` and `assets/` | Presentation resources. |
 
-`skills/` is the source of Plugin Skills. Hosts discover it through their applicable conventions and manifests. `.agents/skills/` is an integrated repository view, not a universal Host convention. A checkout can contain development Skills without exposing them as Plugin Skills. Each distributed Skill functions on its own: its relative links resolve within its own directory, and it does not depend on the other Skill by file or name. When the Skills are combined, they exchange only a description of the work. The Plugin distributes both Skills together with `examples/` as reference material; the Skills do not link to it. Keep development Skills and example Skills outside `skills/`.
+`skills/` is the source of Plugin Skills. Hosts discover it through their applicable conventions and manifests. `.agents/skills/` is an integrated repository view, not a universal Host convention. A checkout can contain development Skills without exposing them as Plugin Skills. Each distributed Skill functions on its own: its relative links resolve within its own directory, and it does not depend on another Skill by file or name. When the design Skills are combined, they exchange only a description of the work. `run-process` performs a harness run through the harness's MCP tools. The Plugin distributes the Skills together with `examples/` as reference material; the Skills do not link to it. Keep development Skills and example Skills outside `skills/`.
 
 ## Change and review
 
