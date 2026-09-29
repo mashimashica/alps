@@ -1,0 +1,48 @@
+# 仕事の意味は process-model.yaml にある。このファイルには、このワークスペースでの実現だけを書く。
+model: process-model.yaml
+
+# エージェントに渡すプロンプトと MCP の応答の言語（en か ja。既定は en）。
+# このワークスペースは ../../../service-change（language: en）の日本語版である。
+language: ja
+
+# アーティファクトの型ごとの種類と置き場所。
+#   kind: information | product | service
+#   paths: * は一階層の中で、** は任意の数の階層にわたって一致し、末尾の / はディレクトリを一つのアーティファクトにする。
+#   製品やサービスの実体がワークスペースの外にある場合は、その版かダイジェストを書いた参照の記録をここに置く。
+artifacts:
+  関係者の情報: { kind: information, paths: [docs/changes/*/stakeholders.md] }
+  変更概要: { kind: information, paths: [docs/changes/*/change-summary.md] }
+  改善提案: { kind: information, paths: [docs/improvements/*.md] }
+  設計記述: { kind: information, paths: [docs/changes/*/design/] }
+  候補版: { kind: product, paths: [releases/*/candidate.json] }
+  試行条件: { kind: information, paths: [docs/pilot-context.md] }
+  リクエスト測定値: { kind: information, paths: [measurements/*/] }
+  試行評価: { kind: information, paths: [docs/changes/*/pilot-assessment.md] }
+  受入基準: { kind: information, paths: [docs/acceptance-criteria.md] }
+  変更要求: { kind: information, paths: [docs/changes/*/change-request.md] }
+  本番運用方針: { kind: information, paths: [docs/policies/production.md] }
+  デプロイされたサービスの版: { kind: service, paths: [releases/*/deployment.json] }
+  サービス水準目標: { kind: information, paths: [docs/slo.md] }
+  本番の観測結果: { kind: information, paths: [observations/*.md] }
+  インシデント記録: { kind: information, paths: [incidents/*.md] }
+
+# スキルは skillRoots の下で、frontmatter の name、ディレクトリ名、見出しによって探す。
+# 見出しには references/locales/<言語>/SKILL.<言語>.md にある訳の見出しも含む。
+# このワークスペースは英語版のワークスペースのスキルを使う。プロセス名は、各スキルの SKILL.ja.md の見出しと一致させている。
+skillRoots: [../../../service-change/skills]
+
+# 明示した置き場所が優先する。評価のスキルは、リポジトリの例のスキルである。
+skills:
+  サービス変更の評価: ../../../assess-service-change
+
+# ハーネスのサーバー（デーモン）。接続も実行中の実行もない状態が idleMinutes 続くと終了する。
+# server:
+#   port: 4830
+#   idleMinutes: 30
+
+# エージェントの起動方法を変えるとき（既定値を上書きする）。
+# agents:
+#   claude-code:
+#     args: ["-p", "{prompt}", "--output-format", "stream-json", "--verbose", "--permission-mode", "acceptEdits", "--max-turns", "30"]
+#   codex:
+#     args: ["exec", "--json", "--sandbox", "workspace-write", "--skip-git-repo-check", "{prompt}"]

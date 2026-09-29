@@ -1,0 +1,45 @@
+# The meaning of the work lives in process-model.yaml. This file only says how this workspace realizes it.
+model: process-model.yaml
+
+# The language of the prompts given to agents and of the MCP responses (en or ja; the default is en).
+# The Japanese counterpart of this workspace is ../locales/ja/service-change, with language: ja.
+language: en
+
+# The kind and location of each Artifact type.
+#   kind: information | product | service
+#   paths: * matches within one directory level, ** matches any number of levels, and a trailing / makes a directory one Artifact.
+#   When a product or service lives outside the workspace, keep a reference record here that names its version or digest.
+artifacts:
+  Stakeholder information: { kind: information, paths: [docs/changes/*/stakeholders.md] }
+  Change brief: { kind: information, paths: [docs/changes/*/change-summary.md] }
+  Improvement proposal: { kind: information, paths: [docs/improvements/*.md] }
+  Design description: { kind: information, paths: [docs/changes/*/design/] }
+  Release candidate: { kind: product, paths: [releases/*/candidate.json] }
+  Pilot conditions: { kind: information, paths: [docs/pilot-context.md] }
+  Request measurements: { kind: information, paths: [measurements/*/] }
+  Pilot assessment: { kind: information, paths: [docs/changes/*/pilot-assessment.md] }
+  Acceptance criteria: { kind: information, paths: [docs/acceptance-criteria.md] }
+  Change request: { kind: information, paths: [docs/changes/*/change-request.md] }
+  Production policy: { kind: information, paths: [docs/policies/production.md] }
+  Deployed service revision: { kind: service, paths: [releases/*/deployment.json] }
+  Service level objectives: { kind: information, paths: [docs/slo.md] }
+  Production observations: { kind: information, paths: [observations/*.md] }
+  Incident record: { kind: information, paths: [incidents/*.md] }
+
+# Skills are found under skills/ (and the other Skill roots) by frontmatter name, directory name, or heading,
+# including the headings of translations in references/locales/<lang>/SKILL.<lang>.md.
+# A declared location wins. The assessment Skill is the repository's example Skill, next to this workspace.
+skills:
+  Service Change Assessment: ../assess-service-change
+
+# The harness server (daemon). It exits after idleMinutes without connections or running runs.
+# server:
+#   port: 4830
+#   idleMinutes: 30
+
+# To change how an agent is started (overrides the defaults):
+# agents:
+#   claude-code:
+#     args: ["-p", "{prompt}", "--output-format", "stream-json", "--verbose", "--permission-mode", "acceptEdits", "--max-turns", "30"]
+#   codex:
+#     args: ["exec", "--json", "--sandbox", "workspace-write", "--skip-git-repo-check", "{prompt}"]

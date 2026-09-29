@@ -1,0 +1,365 @@
+/*
+ * E8 (Plugin structure, safety): requests with another Host header, without the token, with a
+ * path outside the workspace, or with a body that is not JSON are rejected. With them, what makes
+ * the WebUI safe to open: the token reaches the browser only in the URL fragment, the page and its
+ * chunks hold no secret, no other site can use the API or frame the page, and the server listens
+ * on 127.0.0.1 only.
+ */
+
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import fs from "node:fs";
+import net from "node:net";
+import os from "node:os";
+import path from "node:path";
+import { chromium } from "playwright";
+import { killStrayDaemons, startDaemon, type Daemon } from "../helpers/daemon.ts";
+import { isAlive, waitFor } from "../helpers/process.ts";
+import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
+
+/** Every route of the API, and one that does not exist: the checks come before routing. */
+const ROUTES = [
+  { method: "GET", path: "/api/health" },
+  { method: "GET", path: "/api/events" },
+  { method: "POST", path: "/api/shutdown" },
+  { method: "GET", path: "/api/unknown" },
+] as const;
+
+let ws: TmpWorkspace;
+let daemon: Daemon;
+/** Where the stand-in browser writes the URL it was asked to open. */
+let opened: string;
+
+beforeAll(async () => {
+  ws = tmpWorkspace({ server: { idleMinutes: 5 } });
+  opened = path.join(ws.base, "opened.txt");
+  // A stand-in for the browser: it records the URL that serve --open hands to $BROWSER.
+  const browser = path.join(ws.base, "browser.sh");
+  const script = `#!/bin/sh\nprintf '%s' "$1" > '${opened}.part' && mv '${opened}.part' '${opened}'\n`;
+  fs.writeFileSync(browser, script, { mode: 0o755 });
+  daemon = await startDaemon(ws.root, ["--open"], { env: { BROWSER: browser } });
+});
+
+afterAll(async () => {
+  await daemon?.stop().catch(() => {});
+  killStrayDaemons();
+  ws?.dispose();
+});
+
+interface Sent {
+  status: number;
+  headers: Headers;
+  body: string;
+  /** `error.code` of a JSON failure. */
+  code: string | undefined;
+}
+
+/** Reads an open event stream until it has sent `needle`, then closes it. */
+async function readUntil(response: Response, needle: string, timeoutMs = 5000): Promise<string> {
+  const reader = response.body!.getReader();
+  const decoder = new TextDecoder();
+  const timer = setTimeout(() => void reader.cancel(), timeoutMs);
+  let text = "";
+  try {
+    while (!text.includes(needle)) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      text += decoder.decode(value, { stream: true });
+    }
+  } finally {
+    clearTimeout(timer);
+    await reader.cancel().catch(() => {});
+  }
+  return text;
+}
+
+/**
+ * Sends one request to the daemon as a client that is not a browser, which may set any header.
+ * The body is bytes, so no Content-Type is added unless `type` is given.
+ */
+async function send(request: {
+  method?: string;
+  path: string;
+  host?: string;
+  token?: string | null;
+  site?: string;
+  type?: string;
+}): Promise<Sent> {
+  const method = request.method ?? "GET";
+  const headers: Record<string, string> = {};
+  if (request.host) headers.Host = request.host;
+  if (request.token) headers["X-Harness-Token"] = request.token;
+  if (request.site) headers["Sec-Fetch-Site"] = request.site;
+  if (request.type) headers["Content-Type"] = request.type;
+  const response = await fetch(new URL(request.path, daemon.url), {
+    method,
+    headers,
+    body: method === "POST" ? new TextEncoder().encode("{}") : undefined,
+    redirect: "manual",
+  });
+  const stream = response.headers.get("content-type")?.startsWith("text/event-stream");
+  const body = stream ? await readUntil(response, '"type":"hello"') : await response.text();
+  let code: string | undefined;
+  try {
+    code = (JSON.parse(body) as { error?: { code?: string } }).error?.code;
+  } catch {
+    code = undefined;
+  }
+  return { status: response.status, headers: response.headers, body, code };
+}
+
+/**
+ * Whether the daemon answers /api/health at `address`. A VPN tunnel may accept a connection on
+ * any port of its own address and never reply, so being connected is not enough: the answer
+ * must come from this daemon.
+ */
+async function answersAt(address: string): Promise<boolean> {
+  const { port, token, pid } = daemon.info;
+  const host = net.isIPv6(address) ? `[${address}]` : address;
+  try {
+    const response = await fetch(`http://${host}:${port}/api/health`, {
+      headers: { Host: `127.0.0.1:${port}`, "X-Harness-Token": token },
+      signal: AbortSignal.timeout(1500),
+    });
+    return ((await response.json()) as { pid?: number }).pid === pid;
+  } catch {
+    return false;
+  }
+}
+
+/** This machine's addresses other than 127.0.0.1 (link-local IPv6 needs a scope and is left out). */
+function otherAddresses(): string[] {
+  const addresses = Object.values(os.networkInterfaces())
+    .flat()
+    .map((entry) => entry?.address ?? "")
+    .filter((address) => address && address !== "127.0.0.1" && !/^fe80:/i.test(address));
+  return [...new Set([...addresses, "::1"])];
+}
+
+/** The addresses a process listens on for TCP, from lsof (macOS, Linux), or null without lsof. */
+function listeningAddresses(pid: number): string[] | null {
+  try {
+    const lsof = Bun.spawnSync([
+      "lsof",
+      "-nP",
+      "-a",
+      "-p",
+      String(pid),
+      "-iTCP",
+      "-sTCP:LISTEN",
+      "-Fn",
+    ]);
+    if (!lsof.success) return null;
+    return lsof.stdout
+      .toString()
+      .split("\n")
+      .filter((line) => line.startsWith("n"))
+      .map((line) => line.slice(1));
+  } catch {
+    return null;
+  }
+}
+
+/** The same-origin scripts and stylesheets a page loads. */
+const assetPaths = (html: string): string[] =>
+  [...html.matchAll(/<(?:script|link)\b[^>]*?\b(?:src|href)="(\/[^"]*)"/g)].map((m) => m[1] ?? "");
+
+describe("E8 safety", () => {
+  test("E8 serve prints and --open opens the URL with the token in its fragment, and server.log does not hold the token", async () => {
+    const { port, token } = daemon.info;
+    // Browsers never send the fragment: not in the request line, not in Referer.
+    expect(daemon.uiUrl).toBe(`http://127.0.0.1:${port}/#token=${token}`);
+    await waitFor(() => fs.existsSync(opened), 10_000, "serve --open to start the browser");
+    expect(fs.readFileSync(opened, "utf8")).toBe(daemon.uiUrl);
+    expect(
+      fs.readFileSync(path.join(ws.root, ".alps-harness", "server.log"), "utf8"),
+    ).not.toContain(token);
+  });
+
+  test("E8 every /api/* route answers 403 to another Host header", async () => {
+    const { port, token } = daemon.info;
+    const hosts = [
+      `attacker.example:${port}`,
+      "attacker.example",
+      `127.0.0.1.attacker.example:${port}`,
+      `127.0.0.1:${port + 1}`,
+    ];
+    for (const route of ROUTES) {
+      for (const host of hosts) {
+        const sent = await send({ ...route, host, token, type: "application/json" });
+        expect(sent.status, `${route.method} ${route.path} for ${host}`).toBe(403);
+        expect(sent.code).toBe("forbidden-host");
+      }
+    }
+    // The server's own names pass, and the rejected shutdowns did not stop it.
+    for (const host of [`127.0.0.1:${port}`, `localhost:${port}`])
+      expect((await send({ path: "/api/health", host, token })).status).toBe(200);
+    expect(isAlive(daemon.info.pid)).toBe(true);
+  });
+
+  test("E8 / and its chunks hold no secret, and another Host header gets none of them", async () => {
+    const { port, token } = daemon.info;
+    const page = await send({ path: "/" });
+    expect(page.status).toBe(200);
+    expect(page.headers.get("content-type")).toContain("text/html");
+    const assets = assetPaths(page.body);
+    expect(assets.length).toBeGreaterThan(0);
+    for (const target of ["/", ...assets]) {
+      const own = await send({ path: target });
+      expect(own.status, target).toBe(200);
+      expect(own.body, target).not.toContain(token);
+      expect(own.headers.get("x-frame-options"), target).toBe("DENY");
+      expect(own.headers.get("content-security-policy"), target).toBe("frame-ancestors 'none'");
+      expect(own.headers.get("x-content-type-options"), target).toBe("nosniff");
+
+      const other = await send({ path: target, host: `attacker.example:${port}` });
+      expect(other.status, target).toBe(403);
+      expect(other.body, target).not.toContain(token);
+    }
+    // Only the bundle is served: not the sources, and not the workspace's server.json.
+    for (const target of [
+      "/main.tsx",
+      "/src/ui/main.tsx",
+      "/package.json",
+      "/.alps-harness/server.json",
+    ])
+      expect((await send({ path: target })).status, target).toBe(404);
+  });
+
+  test("E8 /api/* answers 403 when Sec-Fetch-Site is cross-site or same-site", async () => {
+    const { token } = daemon.info;
+    for (const route of ROUTES) {
+      for (const site of ["cross-site", "same-site"]) {
+        const sent = await send({ ...route, site, token, type: "application/json" });
+        expect(sent.status, `${route.method} ${route.path} from ${site}`).toBe(403);
+        expect(sent.code).toBe("cross-site");
+      }
+    }
+    // The harness's own page, the address bar, and clients that are not browsers pass.
+    for (const site of ["same-origin", "none", undefined])
+      expect((await send({ path: "/api/health", site, token })).status, String(site)).toBe(200);
+    expect(isAlive(daemon.info.pid)).toBe(true);
+  });
+
+  test(
+    "E8 the WebUI does not work in a frame of another origin",
+    async () => {
+      // Another site (localhost is not the same site as 127.0.0.1) frames the WebUI, token and all.
+      const other = Bun.serve({
+        hostname: "127.0.0.1",
+        port: 0,
+        fetch: () =>
+          new Response(
+            `<!doctype html><title>Another site</title><iframe id="ui" src="${daemon.uiUrl}" width="800" height="300"></iframe>`,
+            { headers: { "Content-Type": "text/html; charset=utf-8" } },
+          ),
+      });
+      const otherUrl = `http://localhost:${other.port}/`;
+      const origin = new URL(daemon.url).origin;
+      const browser = await chromium.launch();
+      try {
+        const page = await browser.newPage();
+        const api: string[] = [];
+        const documents: { status: number; frameOptions: string | undefined }[] = [];
+        page.on("request", (request) => {
+          const url = new URL(request.url());
+          if (url.origin === origin && url.pathname.startsWith("/api/")) api.push(url.pathname);
+        });
+        page.on("response", (response) => {
+          if (response.request().resourceType() === "document" && response.url().startsWith(origin))
+            documents.push({
+              status: response.status(),
+              frameOptions: response.headers()["x-frame-options"],
+            });
+        });
+        const framed = page.frameLocator("#ui");
+
+        // Control: with the two headers taken off the page, the framed UI gets the token and works.
+        const isPage = (url: URL): boolean => url.origin === origin && url.pathname === "/";
+        await page.route(isPage, async (route) => {
+          const response = await route.fetch();
+          const headers = { ...response.headers() };
+          delete headers["x-frame-options"];
+          delete headers["content-security-policy"];
+          await route.fulfill({ response, headers });
+        });
+        await page.goto(otherUrl);
+        await framed
+          .locator('[data-testid="health"][data-status="ok"]')
+          .waitFor({ timeout: 10_000 });
+        expect(api).toContain("/api/health");
+        await page.unroute(isPage);
+
+        // As served, the browser refuses to show the page in the frame: it never runs or calls the API.
+        api.length = 0;
+        documents.length = 0;
+        await page.goto(otherUrl, { waitUntil: "networkidle" });
+        expect(documents).toEqual([{ status: 200, frameOptions: "DENY" }]);
+        expect(api).toEqual([]);
+        expect(await framed.getByTestId("health").count()).toBe(0);
+      } finally {
+        await browser.close();
+        await other.stop(true);
+      }
+    },
+    { timeout: 60_000 },
+  );
+
+  test("E8 /api/* answers 401 without the token, and only /api/events takes it from the query", async () => {
+    const { token } = daemon.info;
+    for (const route of ROUTES) {
+      for (const given of [null, "0".repeat(token.length), token.slice(1)]) {
+        const sent = await send({ ...route, token: given, type: "application/json" });
+        expect(sent.status, `${route.method} ${route.path} with ${given}`).toBe(401);
+        expect(sent.code).toBe("unauthorized");
+      }
+    }
+    // EventSource cannot send headers, so the event stream, and only it, reads the token from the query.
+    for (const route of ROUTES.filter((r) => r.path !== "/api/events")) {
+      const sent = await send({
+        ...route,
+        path: `${route.path}?token=${token}`,
+        type: "application/json",
+      });
+      expect(sent.status, `${route.method} ${route.path}?token=`).toBe(401);
+    }
+    const events = await send({ path: `/api/events?token=${token}` });
+    expect(events.status).toBe(200);
+    expect(events.headers.get("content-type")).toContain("text/event-stream");
+    expect(events.body).toContain('"type":"hello"');
+    expect(isAlive(daemon.info.pid)).toBe(true);
+  });
+
+  test("E8 a POST that is not JSON answers 415", async () => {
+    const { token } = daemon.info;
+    // No type, and the three that another site can send without a CORS preflight.
+    for (const type of [
+      undefined,
+      "text/plain",
+      "application/x-www-form-urlencoded",
+      "multipart/form-data; boundary=x",
+    ]) {
+      const sent = await send({ method: "POST", path: "/api/shutdown", token, type });
+      expect(sent.status, String(type)).toBe(415);
+      expect(sent.code).toBe("unsupported-media-type");
+    }
+    expect(isAlive(daemon.info.pid)).toBe(true);
+    expect((await send({ path: "/api/health", token })).status).toBe(200);
+  });
+
+  test("E8 the server listens on 127.0.0.1 only", async () => {
+    const { port, pid } = daemon.info;
+    const listening = listeningAddresses(pid);
+    if (listening !== null) expect(listening).toEqual([`127.0.0.1:${port}`]);
+
+    // It answers on 127.0.0.1, and on no other address of this machine.
+    expect(await answersAt("127.0.0.1")).toBe(true);
+    const others = otherAddresses();
+    expect(others.length).toBeGreaterThan(0);
+    const answered = await Promise.all(others.map((address) => answersAt(address)));
+    expect(Object.fromEntries(others.map((address, i) => [address, answered[i]]))).toEqual(
+      Object.fromEntries(others.map((address) => [address, false])),
+    );
+  });
+
+  test.todo("E8 paths outside the workspace are rejected as instance inputs and outputs", () => {});
+});

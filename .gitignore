@@ -5,6 +5,10 @@
 .worktrees/
 .venv/
 
+# Bun and the harness's per-workspace records
+node_modules/
+.alps-harness/
+
 # Python
 __pycache__/
 *.py[cod]

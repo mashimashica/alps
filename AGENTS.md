@@ -28,6 +28,7 @@ Do not infer Process requirements from tests, templates, Host manifests, icons, 
 | Each Skill's `references/` | Principles and supporting material used by that Skill; each document's role determines its normative force. |
 | `docs/locales/ja/` and each Skill's `references/locales/ja/` | Supported translations of the corresponding English source files. A translated Skill body is named `SKILL.ja.md` and is not a Skill entry point. |
 | `examples/` | Bundled reference material, including a working target Skill; outside Plugin Skill discovery. The guide's translation is in `examples/locales/ja/`, and the target Skill's translations are in its `references/locales/ja/`. |
+| `examples/service-change/` | Example harness workspace with a process model, its realization in `alps-harness.yaml`, sample Artifacts, and example Skills under its `skills/`, which are also outside Plugin Skill discovery. Its Japanese counterpart is `examples/locales/ja/service-change/`, and each Skill's translation is in its `references/locales/ja/`. |
 | `plugin.json`, `.claude-plugin/`, `.cursor-plugin/`, `.codex-plugin/` | Root Plugin format and distinct Host adapters. |
 | `CLAUDE.md` | Claude Code entry point for repository development that imports this file; it adds no instructions of its own and is not Plugin context. |
 | `assets/` and the Skill's `agents/` and `assets/` | Presentation resources. |

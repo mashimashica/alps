@@ -28,6 +28,7 @@
 | 各Skillの`references/` | そのSkillが用いる原則と付属資料。各文書の役割によって規範強度が決まる。 |
 | `docs/locales/ja/`、各Skillの`references/locales/ja/` | 対応する英語版の翻訳。翻訳したSkill本文は`SKILL.ja.md`とし、Skillの入口ではない。 |
 | `examples/` | 実働する対象Skillを含む、同梱する参照資料。Plugin Skillの発見対象外。ガイドの翻訳は`examples/locales/ja/`、対象Skillの翻訳はその`references/locales/ja/`に置く。 |
+| `examples/service-change/` | プロセスモデル、`alps-harness.yaml`による実現、アーティファクトの例、その`skills/`にある例のSkillを含む、ハーネスの例のワークスペース。これらのSkillもPlugin Skillの発見対象外。日本語版は`examples/locales/ja/service-change/`、各Skillの翻訳はその`references/locales/ja/`に置く。 |
 | `plugin.json`、`.claude-plugin/`、`.cursor-plugin/`、`.codex-plugin/` | ルートPlugin形式と、それぞれのHostアダプター。 |
 | `CLAUDE.md` | このファイルを読み込む、リポジトリ開発用のClaude Codeの入口。独自の指示は持たず、Pluginの文脈ではない。 |
 | `assets/`およびSkillの`agents/`と`assets/` | 表示資源。 |

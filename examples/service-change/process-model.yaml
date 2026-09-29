@@ -1,0 +1,128 @@
+name: Service change process model
+description: A fictional model based on the ALPS examples. Processes connect to one another only through Artifact types.
+processes:
+  - name: Requirements Clarification
+    purpose: Make the needs for the service change precise enough to guide solution choices.
+    outcomes:
+      - The needs have observable acceptance conditions.
+      - Material ambiguities and conflicts are resolved or identified with their consequences for solution choice.
+    inputs: [Stakeholder information, Change brief, Improvement proposal]
+    outputs: [Change brief]
+  - name: Feasibility Assessment
+    purpose: Determine whether candidate solutions can satisfy the clarified needs within the available capacity.
+    outcomes:
+      - The feasibility judgment for each considered candidate is supported by evidence against the needs and available capacity.
+      - Unverified assumptions and their effect on the feasibility judgment are explicit.
+    inputs: [Change brief, Production observations]
+    controls: [Change brief]
+    outputs: [Change brief]
+  - name: Solution Design
+    purpose: Make the chosen solution concrete as a configuration that implementation and checking can use.
+    outcomes:
+      - Each design component can be traced to the needs in the change brief.
+      - Design decisions that affect implementation and checking are identified with their rationale.
+    inputs: [Change brief]
+    outputs: [Design description]
+  - name: Change Implementation
+    purpose: Prepare a release candidate that can be checked, in accordance with the design description.
+    outcomes:
+      - The release candidate realizes the components of the design description.
+      - The release candidate is uniquely identifiable by a version or digest.
+    inputs: [Design description]
+    outputs: [Release candidate]
+  - name: Pilot Measurement
+    purpose: Obtain request measurements that allow the baseline and candidate to be compared under the pilot conditions.
+    outcomes:
+      - The baseline and candidate measurements are obtained under the same pilot conditions.
+      - The load, duration, and environment of each measurement are identifiable.
+    inputs: [Release candidate]
+    controls: [Pilot conditions]
+    outputs: [Request measurements]
+  - name: Service Change Assessment
+    purpose: Support a justified decision about a service change's suitability for the specified pilot conditions.
+    outcomes:
+      - A judgment against each applicable pilot criterion is supported by comparable measurements and traceable calculations.
+      - The scope and limits of the judgment, including their effects on the pilot decision, are explicit.
+    inputs: [Request measurements, Pilot conditions]
+    controls: [Pilot conditions]
+    outputs: [Pilot assessment]
+    constraints:
+      - This assessment concerns the specified pilot. Production suitability requires evidence for production conditions.
+    enablers:
+      - An agent able to inspect the context, use a command tool, and interpret results
+      - A local Python 3.10 or later environment
+  - name: Production Release Decision
+    purpose: Decide whether to apply the release candidate to production in light of the pilot evidence and the acceptance criteria.
+    outcomes:
+      - The decision on whether to proceed to production is justified in light of the pilot assessment and the acceptance criteria.
+      - The change request identifies the target release candidate and the scope of the change.
+    inputs: [Pilot assessment, Change brief, Release candidate]
+    controls: [Acceptance criteria]
+    outputs: [Change request]
+  - name: Production Release
+    purpose: Make the candidate revision available to this service's production users with a functioning checkout.
+    outcomes:
+      - The candidate revision serves this service's production users.
+      - A test purchase completes through the user checkout path.
+    inputs: [Release candidate, Change request]
+    controls: [Production policy, Acceptance criteria]
+    outputs: [Deployed service revision]
+    constraints:
+      - Candidate checks must precede approval; approval must precede deployment; production checks must follow deployment.
+      - A candidate change invalidates the earlier check and approval basis.
+      - Deployment must not occur while approval is missing or unconfirmed.
+    enablers: [Checking capability, The authorized release job]
+  - name: Production Monitoring
+    purpose: Observe the production service state so that effects on users can be identified early.
+    outcomes:
+      - Production responsiveness and reliability are observed through the indicators of the service level objectives.
+      - Deviations from the objectives are identified with their scope of impact.
+    inputs: [Deployed service revision]
+    controls: [Service level objectives]
+    outputs: [Production observations]
+  - name: Incident Response
+    purpose: Restore the service to an acceptable state from a failure that affects users.
+    outcomes:
+      - The service has recovered to an acceptable state.
+      - The impact and hypotheses about the cause are recorded with the recovery decision.
+    inputs: [Production observations]
+    controls: [Production policy, Service level objectives]
+    outputs: [Incident record]
+  - name: Change Retrospective
+    purpose: Make what was learned from applying the change usable for decisions about the next change.
+    outcomes:
+      - The achievement or nonachievement of each Outcome is identified with evidence.
+      - Improvements are identified with the Processes and information they affect.
+    inputs: [Pilot assessment, Production observations, Incident record]
+    outputs: [Improvement proposal]
+artifacts:
+  - name: Stakeholder information
+    description: Needs, concerns, and constraints obtained from stakeholders.
+  - name: Change brief
+    description: The needs, candidate assumptions, acceptance conditions, and supporting observations for this service change. Its needs and observations serve as Inputs, and its acceptance conditions act as Controls for judging a candidate.
+  - name: Improvement proposal
+    description: Improvements identified in a retrospective, and the Processes and information they affect.
+  - name: Design description
+    description: The components of the solution, and the design decisions with their rationale.
+  - name: Release candidate
+    description: The specific revision intended for this release. It is identified by a version or digest.
+  - name: Pilot conditions
+    description: The pilot's subject, load, duration, and environment, and the applicable pilot criteria.
+  - name: Request measurements
+    description: Baseline and candidate request measurements and their measurement context.
+  - name: Pilot assessment
+    description: The judgment against each pilot criterion, and its scope and limits.
+  - name: Acceptance criteria
+    description: The service's acceptance criteria. They require a ready health endpoint and a completed test purchase.
+  - name: Change request
+    description: The release candidate to apply to production, and the scope of the change.
+  - name: Production policy
+    description: A policy that requires the service owner's approval of the exact checked candidate and use of the authorized release job.
+  - name: Deployed service revision
+    description: The revision that serves production users.
+  - name: Service level objectives
+    description: Target values for production responsiveness and reliability.
+  - name: Production observations
+    description: Observations of production responsiveness, reliability, and capacity.
+  - name: Incident record
+    description: The impact, the response, the recovery decision, and hypotheses about the cause.

@@ -7,7 +7,7 @@ status: reviewed
 sources:
   AGENTS.md:
     source: ../../../AGENTS.md
-    reviewed_source_sha256: 8d02dec29693f208ce23f6178fcc751434ff30dc471048c00ff688b6e3022255
+    reviewed_source_sha256: c302d57cd05e75e35c98b91b8b2dd14225caad798721ba2d9e0b48c23620ef9b
   CONTRIBUTING.md:
     source: ../../../CONTRIBUTING.md
     reviewed_source_sha256: 9d46703b960c9f27e8269c5dabd96d55d01519b67564f5f68454998aedf140e2
