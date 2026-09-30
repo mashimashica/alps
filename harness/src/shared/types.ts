@@ -254,7 +254,7 @@ export interface Run {
   prompt: string;
   git: { head: string; dirty: boolean } | null;
   skill: { path: string; sha256: string | null } | null;
-  /** Wake runs only: the runs this wake started. */
+  /** Wake runs only: the runs that its agent started through the harness's MCP server, oldest first. */
   started?: string[];
 }
 
@@ -438,13 +438,8 @@ export type HttpErrorCode =
   | "outside-workspace"
   | "internal";
 
-/** Failures of the MCP server itself that no HTTP route answers. */
-export type RelayErrorCode =
-  /** `wake`, until the scheduled runs arrive. */
-  "not-implemented";
-
 export interface ErrorInfo {
-  code: ErrorCode | HttpErrorCode | RelayErrorCode;
+  code: ErrorCode | HttpErrorCode;
   /** In English. */
   message: string;
   /** The message's key and arguments in shared/strings.ts, for a client that shows it in another language. */
@@ -533,6 +528,19 @@ export interface FinishResponse {
   run: RunView;
   /** The output changes found by comparing the output locations with their state when the run started. */
   outputs: RunOutput[];
+}
+
+/**
+ * `POST /api/wake` (`wake`): the wake run that started, or, while an earlier wake still runs, that
+ * none was (the skip is recorded in the running wake's events).
+ */
+export interface WakeResponse {
+  ok: true;
+  /** The wake run that started; absent when the wake was skipped. */
+  run?: RunView;
+  skipped: boolean;
+  /** When skipped: the wake run that still runs. */
+  running?: string;
 }
 
 /** `GET /api/assessment` (`get_assessment`, JSON form). */

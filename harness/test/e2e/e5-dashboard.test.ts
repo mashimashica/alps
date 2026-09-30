@@ -1,13 +1,14 @@
 /*
  * E5 (dashboard): after evaluate, changing an input or the SKILL.md makes the instance's evidence
  * stale, and get_assessment and /api/stats count the same. "Changing" means that the content
- * differs (SHA-256) from what the judged run used.
+ * differs (SHA-256) from what the judged run used. The command line's assess prints the same.
  */
 
 import { afterAll, describe, expect, test } from "bun:test";
 import fs from "node:fs";
 import path from "node:path";
 import type {
+  Assessment,
   AssessmentMarkdownResponse,
   AssessmentResponse,
   InstanceResponse,
@@ -23,6 +24,7 @@ import { copyOf } from "../helpers/copy.ts";
 import { killStrayDaemons, stopWorkspaceDaemon } from "../helpers/daemon.ts";
 import { callTool, mcpClient, type McpSession } from "../helpers/mcp.ts";
 import { serverJson } from "../helpers/paths.ts";
+import { cli } from "../helpers/process.ts";
 import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
 
 let ws: TmpWorkspace | undefined;
@@ -236,6 +238,22 @@ describe("E5 dashboard", () => {
       });
       expect(since.markdown).toContain("Stale evaluations are counted as they are now.");
       expect(since.markdown).toContain("| Stale evaluations | 2 |");
+
+      // alps-harness assess asks the daemon that runs and prints the same assessment.
+      const printed = await cli(["assess", ws.root]);
+      expect(printed.code, printed.stderr).toBe(0);
+      expect(printed.stdout).toContain("## Statistics");
+      expect(printed.stdout).toContain("| Stale evaluations | 2 |");
+      expect(printed.stdout).toContain("| Achievement | 50% (2 of 4 judged Outcomes) |");
+      const json = await cli(["assess", ws.root, "--format", "json"]);
+      expect(json.code, json.stderr).toBe(0);
+      const printedJson = JSON.parse(json.stdout) as Assessment;
+      expect(printedJson.stats.metrics.staleEvaluations).toBe(2);
+      expect(printedJson.stats.metrics.achievement).toMatchObject({ numerator: 2, denominator: 4 });
+      expect(printedJson.findings).toEqual(assessment.findings);
+      const wrong = await cli(["assess", ws.root, "--format", "html"]);
+      expect(wrong.code).toBe(2);
+      expect(wrong.stderr).toContain("--format must be markdown or json.");
     },
     { timeout: 90_000 },
   );

@@ -18,12 +18,21 @@ Commands:
                   never appears on a command line
   stop [workspace]
         Stop the harness server of the workspace, and the agents it is running.
-  mcp   Serve MCP on stdio for the workspace in ALPS_WORKSPACE or the current directory. It
+  mcp [--wake <run>]
+        Serve MCP on stdio for the workspace in ALPS_WORKSPACE or the current directory. It
         relays to the workspace's harness server and starts one (detached) when none runs.
-  wake [workspace]
-        Not implemented yet.
-  assess [workspace]
-        Not implemented yet.
+        --wake  the wake run whose agent this server serves; the harness passes it to the
+                agents it wakes, so the runs they start are listed in that wake run
+  wake [workspace] [--agent <agent>]
+        Wake an agent, as the schedules in alps-harness.yaml and the MCP tool wake do: it is
+        started with the harness's MCP server and decides which Processes to run. For an
+        external scheduler (launchd, cron, CI). It returns once the agent has started; while
+        another wake runs, none is started (skipped).
+        --agent  claude-code (the default) or codex
+  assess [workspace] [--format markdown|json]
+        Print the assessment: the statistics, the findings, and the facts of every instance,
+        as the MCP tool get_assessment returns it (Markdown by default, in the workspace's
+        language).
 
 The workspace is the first of the given directory, ALPS_WORKSPACE, and the current directory,
 or the nearest parent of it that has alps-harness.yaml or process-model.yaml.
@@ -89,18 +98,36 @@ async function main(argv: string[]): Promise<number> {
       return stop(workspace ?? defaultStart());
     }
     case "mcp": {
-      parse(rest, { boolean: [], value: [] });
+      const { workspace, options } = parse(rest, { boolean: [], value: ["wake"] });
+      if (workspace !== undefined) throw new UsageError(`Unexpected argument: ${workspace}`);
       const [{ runMcp }, { parseYaml }] = await Promise.all([
         import("./mcp.ts"),
         import("./server/yaml.ts"),
       ]);
-      await runMcp({ start: defaultStart(), parseYaml, version: pkg.version });
+      await runMcp({
+        start: defaultStart(),
+        parseYaml,
+        version: pkg.version,
+        wake: typeof options.wake === "string" ? options.wake : null,
+      });
       return 0;
     }
-    case "wake":
-    case "assess":
-      console.error(`alps-harness ${command} is not implemented yet.`);
-      return 2;
+    case "wake": {
+      const { workspace, options } = parse(rest, { boolean: [], value: ["agent"] });
+      const { wake } = await import("./server/commands.ts");
+      return wake(
+        workspace ?? defaultStart(),
+        typeof options.agent === "string" ? options.agent : undefined,
+      );
+    }
+    case "assess": {
+      const { workspace, options } = parse(rest, { boolean: [], value: ["format"] });
+      const format = options.format ?? "markdown";
+      if (format !== "markdown" && format !== "json")
+        throw new UsageError("--format must be markdown or json.");
+      const { assess } = await import("./server/commands.ts");
+      return assess(workspace ?? defaultStart(), format);
+    }
     case "-h":
     case "--help":
       console.log(USAGE);

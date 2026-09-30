@@ -11,14 +11,18 @@ import {
   agentInfo,
   argsFor,
   commandLine,
+  mcpArgs,
+  mcpConfigFile,
   parseOutputLine,
   resolveAgents,
   startsProcess,
+  takesMcpServer,
   type AgentHandle,
   type AgentLaunch,
   type AgentOutput,
   type AgentSpec,
   type EventDraft,
+  type McpServerLaunch,
   type VersionCheck,
 } from "../agents/index.ts";
 import {
@@ -39,6 +43,7 @@ import type {
   FinishRequest,
   InstantiateRequest,
   RunRequest,
+  WakeRequest,
 } from "../shared/schema.ts";
 import { computeStats, findingsOf, type FindingsInput, type StatsInput } from "../assess.ts";
 import type {
@@ -75,7 +80,7 @@ import type {
 } from "../shared/types.ts";
 import { demoFile, demoReport, demoSteps } from "./demo.ts";
 import { DigestCache } from "./digest.ts";
-import { refuse } from "./errors.ts";
+import { HarnessError, refuse } from "./errors.ts";
 import { INTERRUPTED_ERROR } from "./migrate.ts";
 import { artifactPath, workspacePath } from "./paths.ts";
 import { buildPrompt } from "./prompt.ts";
@@ -94,6 +99,7 @@ import {
   writeState,
   type LoadedRecords,
 } from "./store.ts";
+import { buildWakePrompt, WAKE_LISTED } from "./wake-prompt.ts";
 
 /** The pause between the steps of a demo run. */
 const DEMO_STEP_MS = 250;
@@ -107,6 +113,10 @@ const AGENT_CHECK_TTL_MS = 5 * 60_000;
 const STOP_WAIT_MS = 8000;
 /** The WebUI is given at most this much of a SKILL.md. */
 const MAX_SKILL_BYTES = 1024 * 1024;
+/** The agent that a wake starts when none is named. */
+const WAKE_AGENT = "claude-code";
+/** The name of the harness's MCP server in the configuration of the agent that a wake starts. */
+const WAKE_MCP_SERVER = "alps_harness";
 
 export const SESSION_CLOSED_ERROR =
   "The MCP connection of the session that performs the run closed before finish_run.";
@@ -126,6 +136,11 @@ export interface HarnessDeps {
   checkVersion(spec: AgentSpec): Promise<VersionCheck>;
   /** Starts an agent's process in a process group of its own; throws when it cannot be started. */
   startAgent(launch: AgentLaunch, output: AgentOutput): AgentHandle;
+  /**
+   * How an agent starts this harness's MCP server (`bun <harness>/src/cli.ts mcp`), which a wake
+   * gives the agent it starts.
+   */
+  mcpServer: { command: string; args: string[] };
   log(line: string): void;
 }
 
@@ -138,11 +153,22 @@ export interface HarnessHooks {
 
 /**
  * Who makes a request: a person (the WebUI, or an HTTP client that names no MCP client), or an
- * agent through the MCP server, which names its client and the session it holds with the server.
+ * agent through the MCP server, which names its client and the session it holds with the server,
+ * and, for the agent that a wake started, that wake run.
  */
 export type Caller =
   | { kind: "user" }
-  | { kind: "agent"; client: ClientInfo; session: string | null };
+  | { kind: "agent"; client: ClientInfo; session: string | null; wake: string | null };
+
+/** What woke an agent: a schedule of alps-harness.yaml, or a request (the MCP tool, the CLI, the API). */
+export type WakeTrigger = { kind: "schedule"; cron: string } | { kind: "request"; caller: Caller };
+
+const wokenBy = (trigger: WakeTrigger): string =>
+  trigger.kind === "schedule"
+    ? `by the schedule "${trigger.cron}"`
+    : trigger.caller.kind === "agent"
+      ? `on request of ${trigger.caller.client.name}`
+      : "on request";
 
 /** How a run ends. */
 interface RunEnd {
@@ -162,6 +188,11 @@ interface ActiveRun {
   agent: AgentHandle | null;
   /** How the run ends once its agent's process has: set when it is canceled or the server stops. */
   stopping: "canceled" | "interrupted" | null;
+  /**
+   * A wake run: the status that its agent gave with finish_run. The run ends when the agent's
+   * process does, so the usage it reports last is kept.
+   */
+  reported: FinishRequest["status"] | null;
 }
 
 /** The number in an id (`i12` → 12), which orders instances and runs by creation. */
@@ -874,6 +905,7 @@ export class Harness {
       timer: null,
       agent: null,
       stopping: null,
+      reported: null,
     };
     this.#active.set(id, active);
     this.#records.runs.set(id, run);
@@ -881,6 +913,7 @@ export class Harness {
     instance.runs.push(id);
     writeRun(this.root, run);
     this.#saveState();
+    if (caller.kind === "agent" && caller.wake) this.#attach(caller.wake, run);
 
     if (self)
       this.#emit(run, {
@@ -929,7 +962,8 @@ export class Harness {
             const parsed = parseOutputLine(spec.format, line);
             for (const event of parsed.events) this.#emit(run, event);
             if (parsed.usage) run.usage = parsed.usage;
-            if (parsed.report !== undefined) run.report = parsed.report;
+            // A wake's agent that reported with finish_run keeps that report.
+            if (parsed.report !== undefined && active.reported === null) run.report = parsed.report;
             if (parsed.agentError !== undefined) run.agentError = parsed.agentError;
             text?.push(line);
           },
@@ -959,12 +993,14 @@ export class Harness {
           });
           return;
         }
-        const succeeded = exitCode === 0 && !run.agentError;
+        // A wake's agent may have said with finish_run that it could not do what it decided.
+        const reportedFailure = active.reported === "failed";
+        const succeeded = exitCode === 0 && !run.agentError && !reportedFailure;
         this.#end(run, {
           status: succeeded ? "succeeded" : "failed",
           exitCode,
           error:
-            succeeded || run.agentError
+            succeeded || run.agentError || reportedFailure
               ? null
               : exitCode !== null
                 ? `${spec.label} exited with code ${exitCode}.`
@@ -1083,6 +1119,14 @@ export class Harness {
           if (digest) input.sha256[p] = digest;
         }
     }
+    if (run.kind === "wake")
+      try {
+        fs.rmSync(recordPaths(this.root).mcpConfig(run.id), { force: true });
+      } catch (error) {
+        this.#deps.log(
+          `cannot remove the MCP configuration of run ${run.id}: ${(error as Error).message}`,
+        );
+      }
     const seconds = Math.round((run.endedAt - run.startedAt) / 1000);
     this.#emit(run, { kind: "end", text: `${END_LABEL[end.status]} (${seconds} s)` });
     this.#state.runs[run.id] = summaryOf(run);
@@ -1147,7 +1191,10 @@ export class Harness {
     return { run: viewOf(run), canceled: true };
   }
 
-  /** `POST /api/runs/:id/finish`: ends a self (or wake) run with the session's report. */
+  /**
+   * `POST /api/runs/:id/finish`: ends a self run with the session's report. A wake run's agent
+   * reports the same way, and its run ends when the agent's process does, right after.
+   */
   finishRun(id: string, request: FinishRequest): { run: RunView; outputs: RunOutput[] } {
     const run = this.#run(id);
     if (run.agent !== "self" && run.kind !== "wake")
@@ -1155,8 +1202,238 @@ export class Harness {
     if (run.status !== "running")
       throw refuse("invalid-request", "error.ended", { run: id, status: run.status });
     run.report = request.report;
+    const active = this.#active.get(id);
+    if (run.kind === "wake" && active?.agent) {
+      active.reported = request.status;
+      this.#emit(run, {
+        kind: "system",
+        text: `The agent reported with finish_run (${request.status}); the run ends when its process exits.`,
+      });
+      writeRun(this.root, run);
+      return { run: viewOf(run), outputs: [] };
+    }
     this.#finish(run, { status: request.status });
     return { run: viewOf(run), outputs: run.outputs };
+  }
+
+  /* ---------- wakes ---------- */
+
+  /** The schedules of alps-harness.yaml; `null` while the model or the configuration cannot be read. */
+  schedules(): { cron: string; agent: string }[] | null {
+    try {
+      return (this.#loaded().config.schedules ?? []).map(({ cron, agent }) => ({ cron, agent }));
+    } catch (error) {
+      if (error instanceof HarnessError) return null;
+      throw error;
+    }
+  }
+
+  /** The wake run that has not ended; there is at most one. */
+  #runningWake(): Run | undefined {
+    for (const id of this.#active.keys()) {
+      const run = this.#records.runs.get(id);
+      if (run?.kind === "wake") return run;
+    }
+    return undefined;
+  }
+
+  /** A wake while another runs is skipped; the events of the one that runs record it. */
+  #skip(running: Run, trigger: WakeTrigger): { skipped: true; running: string } {
+    this.#emit(running, {
+      kind: "system",
+      text: `Skipped a wake ${wokenBy(trigger)}: this wake still runs.`,
+    });
+    try {
+      writeRun(this.root, running);
+    } catch (error) {
+      this.#deps.log(`cannot write run ${running.id}: ${(error as Error).message}`);
+    }
+    this.#deps.log(`skipped a wake ${wokenBy(trigger)}: wake run ${running.id} still runs`);
+    return { skipped: true, running: running.id };
+  }
+
+  /** Lists a run in the wake run whose agent started it, through the MCP server the wake gave it. */
+  #attach(wakeId: string, run: Run): void {
+    const wake = this.#records.runs.get(wakeId);
+    if (wake?.kind !== "wake" || wake.status !== "running") return;
+    wake.started = [...(wake.started ?? []), run.id];
+    this.#emit(wake, {
+      kind: "system",
+      text: `Started run ${run.id} (${run.agent}) of instance ${run.instance ?? ""}.`,
+    });
+    try {
+      writeRun(this.root, wake);
+    } catch (error) {
+      this.#deps.log(`cannot write run ${wake.id}: ${(error as Error).message}`);
+    }
+  }
+
+  /** What a wake's agent is told: where the model and the guidance are, and the state now. */
+  #wakePrompt(
+    run: string,
+    since: number | null,
+    loaded: LoadedWorkspace,
+    description: ModelDescription,
+    agents: AgentInfo[],
+  ): string {
+    const changed = this.artifacts(since === null ? {} : { changedSince: since });
+    const instances = Object.values(this.#state.instances).sort(
+      (a, b) => seqOf(b.id) - seqOf(a.id),
+    );
+    const facts = instances.map((instance) => this.#facts(instance, description));
+    const findings = findingsOf({
+      processes: description.processes,
+      artifacts: description.artifacts,
+      agents,
+      facts: [...facts].reverse(),
+      ...this.#skillUse(description.processes),
+    });
+    const { model } = loaded;
+    return buildWakePrompt({
+      language: loaded.language,
+      root: this.root,
+      run,
+      server: WAKE_MCP_SERVER,
+      modelPath: description.modelPath,
+      guidance: (loaded.config.guidance ?? []).map((file) => ({
+        path: file,
+        found: fs.existsSync(path.resolve(this.root, file)),
+      })),
+      since,
+      changed: {
+        listed: changed.artifacts.slice(0, WAKE_LISTED),
+        total: changed.artifacts.length,
+        truncated: changed.truncated,
+      },
+      instances: {
+        listed: instances
+          .slice(0, WAKE_LISTED)
+          .map((instance, i) => ({ ...instance, facts: facts[i] as InstanceFacts })),
+        total: instances.length,
+      },
+      findings: { listed: findings.slice(0, WAKE_LISTED), total: findings.length },
+      agents: agents.filter((agent) => agent.available).map((agent) => agent.id),
+      typeName: (type) => model.artifacts.find((a) => a.id === type)?.name ?? type,
+      processName: (id) => model.processes.find((p) => p.id === id)?.name ?? id,
+    });
+  }
+
+  /**
+   * `POST /api/wake` and the schedules: records a wake run (no instance) and starts its agent with
+   * this harness's MCP server, through which it instantiates, runs, waits, evaluates, and reports.
+   * The harness decides nothing about what runs. Only one wake runs at a time: while one runs,
+   * another is skipped, and the events of the one that runs record the skip.
+   */
+  async wake(
+    request: WakeRequest,
+    trigger: WakeTrigger,
+  ): Promise<{ run: RunView; skipped: false } | { skipped: true; running: string }> {
+    if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
+    const earlier = this.#runningWake();
+    if (earlier) return this.#skip(earlier, trigger);
+    const name = request.agent ?? WAKE_AGENT;
+    const agentSpec = (loaded: LoadedWorkspace): { spec: AgentSpec; specs: AgentSpec[] } => {
+      const specs = resolveAgents(loaded.config.agents);
+      const spec = specs.find((s) => s.id === name);
+      if (!spec)
+        throw refuse("agent-unavailable", "error.noAgent", {
+          agent: name,
+          agents: specs.map((s) => s.id).join(", "),
+        });
+      if (!takesMcpServer(spec))
+        throw refuse("agent-unavailable", "error.wakeAgent", {
+          agent: spec.label,
+          agents: specs
+            .filter(takesMcpServer)
+            .map((s) => s.id)
+            .join(", "),
+        });
+      return { spec, specs };
+    };
+    const checked = agentSpec(this.#loaded());
+    const info = await this.#availability(checked.spec, checked.specs);
+    if (!info.available)
+      throw refuse("agent-unavailable", "error.agentUnavailable", {
+        agent: checked.spec.label,
+        reason: info.reason ?? "it is not available",
+      });
+    const agents = await this.#checkAgents(checked.specs);
+    // From here on nothing waits, so no other wake comes between the checks and the record.
+    if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
+    const other = this.#runningWake();
+    if (other) return this.#skip(other, trigger);
+    const { loaded, description } = this.#describe();
+    const { spec } = agentSpec(loaded);
+    const now = Date.now();
+    const id = this.#nextId("r");
+    const since = this.#state.lastWakeAt;
+    const prompt = this.#wakePrompt(id, since, loaded, description, agents);
+    // The agent's MCP server names this wake, so the runs it starts are listed in started.
+    const server: McpServerLaunch = {
+      name: WAKE_MCP_SERVER,
+      command: this.#deps.mcpServer.command,
+      args: [...this.#deps.mcpServer.args, "--wake", id],
+      env: { ALPS_WORKSPACE: this.root },
+    };
+    const configFile = recordPaths(this.root).mcpConfig(id);
+    const args = argsFor(
+      { ...spec, args: [...spec.args, ...mcpArgs(spec, server, configFile)] },
+      prompt,
+    );
+    const run: Run = {
+      id,
+      kind: "wake",
+      instance: null,
+      process: null,
+      agent: spec.id,
+      status: "running",
+      createdAt: now,
+      startedAt: now,
+      endedAt: null,
+      exitCode: null,
+      error: null,
+      agentError: null,
+      inputs: [],
+      targets: [],
+      outputs: [],
+      usage: null,
+      report: "",
+      events: 0,
+      command: commandLine(spec, args, prompt),
+      client: null,
+      prompt,
+      git: this.#deps.gitInfo(this.root),
+      skill: null,
+      started: [],
+    };
+    const active: ActiveRun = {
+      locations: [],
+      before: new Map(),
+      release: this.#hooks.hold(),
+      timer: null,
+      agent: null,
+      stopping: null,
+      reported: null,
+    };
+    this.#active.set(id, active);
+    this.#records.runs.set(id, run);
+    this.#state.runs[id] = summaryOf(run);
+    this.#state.lastWakeAt = now;
+    writeRun(this.root, run);
+    this.#saveState();
+    this.#emit(run, { kind: "system", text: `Woken ${wokenBy(trigger)}.` });
+    if (spec.format === "claude")
+      try {
+        fs.writeFileSync(configFile, mcpConfigFile(server));
+      } catch (error) {
+        const message = `The MCP configuration for ${spec.label} could not be written: ${(error as Error).message}`;
+        this.#emit(run, { kind: "error", text: message });
+        this.#end(run, { status: "failed", error: message });
+        return { run: viewOf(run), skipped: false };
+      }
+    this.#runAgent(run, active, spec, info, args);
+    this.#announce(run);
+    return { run: viewOf(run), skipped: false };
   }
 
   /* ---------- evaluations ---------- */

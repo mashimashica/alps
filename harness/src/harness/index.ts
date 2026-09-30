@@ -6,6 +6,7 @@ export {
   type Caller,
   type HarnessDeps,
   type HarnessHooks,
+  type WakeTrigger,
 } from "./harness.ts";
 export { instanceIdOf, migrateStateV1 } from "./migrate.ts";
 export { artifactPath, workspacePath, type WorkspacePath } from "./paths.ts";

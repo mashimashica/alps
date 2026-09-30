@@ -135,6 +135,56 @@ export function argsFor(spec: AgentSpec, prompt: string): string[] {
   return args;
 }
 
+/** An MCP server that an agent starts on stdio: here, the harness's own for the agent a wake starts. */
+export interface McpServerLaunch {
+  /** The server's name, which prefixes its tools for the agent (Claude Code: `mcp__<name>__<tool>`). */
+  name: string;
+  command: string;
+  args: string[];
+  env: Record<string, string>;
+}
+
+/** Whether the harness can give the agent an MCP server: Claude Code and Codex, by their formats. */
+export const takesMcpServer = (spec: AgentSpec): boolean =>
+  spec.format === "claude" || spec.format === "codex";
+
+/** The file for Claude Code's `--mcp-config`: the server as `.mcp.json` names one. */
+export const mcpConfigFile = (server: McpServerLaunch): string =>
+  `${JSON.stringify(
+    {
+      mcpServers: {
+        [server.name]: {
+          type: "stdio",
+          command: server.command,
+          args: server.args,
+          env: server.env,
+        },
+      },
+    },
+    null,
+    2,
+  )}\n`;
+
+/**
+ * The arguments that give an agent an MCP server and let it call that server's tools without
+ * asking; everything else follows the agent's own defaults. Claude Code reads the server from
+ * `configFile` (--mcp-config, written with mcpConfigFile) and is allowed its tools (--allowedTools
+ * mcp__<name>). Codex takes it as configuration overrides (-c, dotted keys with TOML values, which
+ * JSON strings and arrays of strings are), with its tools approved, since `codex exec` cannot ask.
+ */
+export function mcpArgs(spec: AgentSpec, server: McpServerLaunch, configFile: string): string[] {
+  if (spec.format === "claude")
+    return ["--mcp-config", configFile, "--allowedTools", `mcp__${server.name}`];
+  if (spec.format !== "codex") return [];
+  const key = `mcp_servers.${server.name}`;
+  return [
+    ["command", JSON.stringify(server.command)],
+    ["args", JSON.stringify(server.args)],
+    ...Object.entries(server.env).map(([name, value]) => [`env.${name}`, JSON.stringify(value)]),
+    ["default_tools_approval_mode", JSON.stringify("approve")],
+  ].flatMap(([name, value]) => ["-c", `${key}.${name}=${value}`]);
+}
+
 /** The command line as recorded in the run, with the prompt left out. */
 export function commandLine(spec: AgentSpec, args: string[], prompt: string): string | null {
   if (!spec.command) return null;

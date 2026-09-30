@@ -35,6 +35,17 @@ skillRoots: [../../../service-change/skills]
 skills:
   サービス変更の評価: ../../../assess-service-change
 
+# 目覚めたエージェントが読む案内。何を先にするか、何を優先するか、どんなときにプロセスを走らせないかを文章で書く。
+# ハーネスはエージェントに場所を示すだけで、中身を解釈しない。
+guidance: [docs/operations.md]
+
+# ハーネスのサーバーがエージェントを起こす時刻。起こされたエージェントはモデル・案内・現状を読み、何を走らせるかを判断する。
+# cron には crontab の五つの欄（分、時、日、月、曜日）を、サーバーを動かすマシンの現地時刻で書く。
+# schedules があるあいだ、サーバーはアイドルで終了しない。外部のスケジューラからは alps-harness wake で起こせる。
+# schedules:
+#   - cron: "0 9 * * 1-5"
+#     agent: claude-code
+
 # ハーネスのサーバー（デーモン）。接続も実行中の実行もない状態が idleMinutes 続くと終了する。
 # server:
 #   port: 4830

@@ -18,7 +18,8 @@ import {
   serverLogPath,
 } from "./info.ts";
 
-const CLI_PATH = fileURLToPath(new URL("../cli.ts", import.meta.url));
+/** The harness's command line, which the daemon and the MCP server that a wake gives its agent run. */
+export const CLI_PATH = fileURLToPath(new URL("../cli.ts", import.meta.url));
 /** How many of the lines a failed start wrote to server.log are quoted in the error. */
 const LOG_LINES_QUOTED = 20;
 

@@ -19,11 +19,12 @@ import type {
   ModelDescription,
   RunDetailResponse,
   RunStartResponse,
+  WakeResponse,
 } from "../../src/shared/types.ts";
 import { copyOf } from "../helpers/copy.ts";
 import { readServerInfo, stopWorkspaceDaemon } from "../helpers/daemon.ts";
 import { callTool, mcpClient, toolFailure, type McpSession } from "../helpers/mcp.ts";
-import { records } from "../helpers/paths.ts";
+import { FAKES, records } from "../helpers/paths.ts";
 import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
 
 const TOOLS = [
@@ -293,10 +294,48 @@ describe("E2 MCP over stdio", () => {
     { timeout: 60_000 },
   );
 
-  test("E2 wake answers not-implemented until the scheduled runs arrive, and changes nothing", async () => {
-    const failed = await toolFailure(session, "wake", { agent: "claude-code" });
-    expect(failed.error.code).toBe("not-implemented");
-  });
+  test(
+    "E2 wake relays to the harness server, which starts a wake run: no instance, an agent given its MCP server",
+    async () => {
+      // The shared workspace has no Claude Code; this one has the fake, which ends as it does
+      // for a Process (E6 has the fake that uses the MCP server it is given).
+      const woken = tmpWorkspace({
+        agents: { "claude-code": { command: path.join(FAKES, "claude.ts") } },
+      });
+      others.push(woken);
+      const relay = await mcpClient({ workspace: woken.root });
+      try {
+        const result = await relay.client.callTool({ name: "wake", arguments: {} });
+        expect(result.isError).toBeFalsy();
+        const { run, skipped } = result.structuredContent as WakeResponse;
+        expect(skipped).toBe(false);
+        expect(copyOf(run)).toMatchObject({
+          kind: "wake",
+          instance: null,
+          process: null,
+          agent: "claude-code",
+          status: "running",
+        });
+        expect(run?.command).toContain("--mcp-config");
+        expect(texts(result)[1]).toContain(`Started wake run ${run?.id} (claude-code)`);
+        const ended = await callTool<RunDetailResponse>(relay, "get_run", {
+          run: run?.id,
+          wait: 30,
+        });
+        expect(ended.run.status).toBe("succeeded");
+        expect(ended.run.started).toEqual([]);
+      } finally {
+        await relay.close();
+      }
+      // Here claude-code cannot be started, and the demo is no agent that can be woken.
+      const unavailable = await toolFailure(session, "wake", {});
+      expect(unavailable.error.code).toBe("agent-unavailable");
+      const demo = await toolFailure(session, "wake", { agent: "demo" });
+      expect(demo.error.code).toBe("agent-unavailable");
+      expect(demo.error.message).toContain("Demo cannot be woken");
+    },
+    { timeout: 60_000 },
+  );
 
   test("E2 without a workspace, the tools answer no-model and say where to put the files", async () => {
     const empty = fs.mkdtempSync(path.join(os.tmpdir(), "alps-harness-e2-empty-"));

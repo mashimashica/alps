@@ -5,6 +5,7 @@
  */
 
 import path from "node:path";
+import { resolveAgents, takesMcpServer } from "../agents/index.ts";
 import {
   formatIssues,
   harnessConfigSchema,
@@ -68,6 +69,9 @@ export function loadWorkspace(root: string, options: LoadOptions): LoadedWorkspa
         configPath,
       ]);
     config = parsed.data;
+    // Like an unreadable cron expression, a schedule that cannot wake its agent is an error of the file.
+    const problems = scheduleProblems(config, path.basename(configPath));
+    if (problems) throw new ModelError("no-model", problems, [configPath]);
   }
 
   const modelPath = config.model
@@ -111,6 +115,29 @@ export function loadWorkspace(root: string, options: LoadOptions): LoadedWorkspa
       idleMinutes: config.server?.idleMinutes ?? DEFAULT_IDLE_MINUTES,
     },
   };
+}
+
+/**
+ * What is wrong with the agents that `schedules` wake, one line for each wrong schedule in the
+ * words of formatIssues, or `null`. A schedule names an agent of the workspace (the defaults as
+ * `agents` changes them) that the harness can give its MCP server: of the claude or codex format.
+ */
+function scheduleProblems(config: HarnessConfig, file: string): string | null {
+  const schedules = config.schedules ?? [];
+  if (schedules.length === 0) return null;
+  const agents = resolveAgents(config.agents);
+  const wakeable = agents.filter(takesMcpServer).map((agent) => agent.id);
+  const problems = schedules.flatMap(({ agent: id }, i) => {
+    const agent = agents.find((spec) => spec.id === id);
+    if (agent && takesMcpServer(agent)) return [];
+    const problem = agent
+      ? `"${id}" cannot be woken: a wake gives its agent the harness's MCP server, which only agents of the claude and codex formats take`
+      : `"${id}" is not an agent of this workspace`;
+    return [
+      `${file}: schedules.${i}.agent: ${problem}; the agents that can be woken: ${wakeable.join(", ") || "none"}`,
+    ];
+  });
+  return problems.length > 0 ? problems.join("\n") : null;
 }
 
 /** Adds the files looked at to a ModelError that names none. */

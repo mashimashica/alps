@@ -1,4 +1,7 @@
-/* The `serve` and `stop` commands. */
+/*
+ * The `serve`, `stop`, `wake`, and `assess` commands. `wake` and `assess` ask the workspace's
+ * harness server as the MCP server does (DaemonLink), which starts one when none runs.
+ */
 
 import { Harness, StateError } from "../harness/index.ts";
 import {
@@ -8,13 +11,20 @@ import {
   findWorkspace,
   loadWorkspace,
 } from "../model/index.ts";
-import type { ServerInfo } from "../shared/types.ts";
+import type {
+  AssessmentMarkdownResponse,
+  AssessmentResponse,
+  Failure,
+  ServerInfo,
+  WakeResponse,
+} from "../shared/types.ts";
 import { startAgent } from "./agent-process.ts";
-import { DaemonError, startDaemon, stopServer } from "./daemon.ts";
+import { CLI_PATH, DaemonError, startDaemon, stopServer } from "./daemon.ts";
 import { checkVersion, gitInfo } from "./host.ts";
 import { startServer } from "./http.ts";
 import { liveServer, serverUrl, uiUrl } from "./info.ts";
 import { openUi } from "./open.ts";
+import { DaemonLink, RelayError } from "./relay.ts";
 import { UiBuildError } from "./ui.ts";
 import { parseYaml } from "./yaml.ts";
 
@@ -43,12 +53,9 @@ function workspaceOrReport(start: string): string | null {
  * server still starts, with the default settings: it answers no-model with the reason until the
  * files are fixed, and it reads them again on every request.
  */
-function serverSettings(root: string): { port: number; idleMinutes: number | null } {
+function serverSettings(root: string): { port: number; idleMinutes: number } {
   try {
-    const workspace = loadWorkspace(root, { parseYaml });
-    // The daemon never stops by itself while schedules are configured.
-    const idleMinutes = workspace.config.schedules?.length ? null : workspace.server.idleMinutes;
-    return { port: workspace.server.port, idleMinutes };
+    return loadWorkspace(root, { parseYaml }).server;
   } catch (error) {
     if (!(error instanceof ModelError)) throw error;
     err(`${error.message}\nThe harness answers no-model until this is fixed.`);
@@ -115,7 +122,15 @@ export async function serve(args: ServeArgs, version: string): Promise<number> {
       development: args.dev,
       version,
       log,
-      openHarness: () => new Harness(root, { parseYaml, gitInfo, checkVersion, startAgent, log }),
+      openHarness: () =>
+        new Harness(root, {
+          parseYaml,
+          gitInfo,
+          checkVersion,
+          startAgent,
+          mcpServer: { command: process.execPath, args: [CLI_PATH, "mcp"] },
+          log,
+        }),
     });
   } catch (error) {
     if (error instanceof UiBuildError || error instanceof StateError) {
@@ -157,4 +172,68 @@ export async function stop(start: string): Promise<number> {
     }
     throw error;
   }
+}
+
+/**
+ * Sends one request to the workspace's harness server, starting it when none runs, as a person
+ * (no MCP client is named). A failure is printed; the result is `null` then.
+ */
+async function ask<T extends { ok: true }>(
+  root: string,
+  method: "GET" | "POST",
+  route: string,
+  body?: unknown,
+): Promise<T | null> {
+  const link = new DaemonLink(root, parseYaml);
+  try {
+    const reply = await link.request(method, route, { body });
+    const answer = reply.body as T | Failure | null;
+    if (answer && typeof answer === "object" && "ok" in answer) {
+      if (answer.ok) return answer;
+      err(answer.error.message);
+      if (answer.error.files?.length) err(`See ${answer.error.files.join(" and ")}.`);
+      return null;
+    }
+    err(`The harness server answered ${reply.status} without a result.`);
+    return null;
+  } catch (error) {
+    if (!(error instanceof RelayError)) throw error;
+    err(`${error.message}\nSee ${error.files.join(" and ")}.`);
+    return null;
+  } finally {
+    await link.close();
+  }
+}
+
+/**
+ * Starts a wake run, as the MCP tool wake does: for an external scheduler (launchd, cron, CI).
+ * It returns once the agent has started, or once the wake was skipped because another runs.
+ */
+export async function wake(start: string, agent: string | undefined): Promise<number> {
+  const root = workspaceOrReport(start);
+  if (!root) return 1;
+  const result = await ask<WakeResponse>(root, "POST", "/api/wake", agent ? { agent } : {});
+  if (!result) return 1;
+  out(
+    result.run
+      ? `Woke ${result.run.agent}  wake run ${result.run.id}`
+      : `Skipped  wake run ${result.running ?? ""} still runs`,
+  );
+  return 0;
+}
+
+/** Prints the assessment (the statistics, the findings, the facts of the instances), as get_assessment returns it. */
+export async function assess(start: string, format: "markdown" | "json"): Promise<number> {
+  const root = workspaceOrReport(start);
+  if (!root) return 1;
+  const result = await ask<AssessmentMarkdownResponse | AssessmentResponse>(
+    root,
+    "GET",
+    `/api/assessment?format=${format}`,
+  );
+  if (!result) return 1;
+  const text = "markdown" in result ? result.markdown : JSON.stringify(result.assessment, null, 2);
+  // Written whole before the process exits, however long it is.
+  await Bun.write(Bun.stdout, text.endsWith("\n") ? text : `${text}\n`);
+  return 0;
 }

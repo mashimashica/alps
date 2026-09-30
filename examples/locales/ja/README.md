@@ -51,6 +51,6 @@ python3 scripts/compare_measurements.py assets/baseline.csv assets/candidate.csv
 
 ## ハーネスのワークスペース
 
-`examples/service-change/`は、ALPSハーネスの例のワークスペースである。その[プロセスモデル](service-change/process-model.yaml)は、架空の11のプロセスを15のアーティファクトの型だけを介してつなぎ、[alps-harness.yaml](service-change/alps-harness.yaml)は、それらのアーティファクトの置き場所と適用するSkillを示す。三つのプロセスには`examples/service-change/skills/`に例のSkillがあり、サービス変更の評価には上記のSkillを用いる。変更CHG-001とCHG-002のアーティファクトは合成データである。
+`examples/service-change/`は、ALPSハーネスの例のワークスペースである。その[プロセスモデル](service-change/process-model.yaml)は、架空の11のプロセスを15のアーティファクトの型だけを介してつなぎ、[alps-harness.yaml](service-change/alps-harness.yaml)は、それらのアーティファクトの置き場所と適用するSkillを示す。三つのプロセスには`examples/service-change/skills/`に例のSkillがあり、サービス変更の評価には上記のSkillを用いる。変更CHG-001とCHG-002のアーティファクトは合成データである。`guidance`で指す[運用の案内](service-change/docs/operations.md)は、何を先にするか、何を優先するか、どんなときにプロセスを走らせないかを文章で書く。ハーネスが起こすエージェントはそれを読み、ハーネスはそれを解釈しない。
 
 [日本語版](service-change/alps-harness.yaml)の`examples/locales/ja/service-change/`は`language: ja`とし、同じSkillを用いる。ハーネスは、Skillのname、ディレクトリ名、見出しによってプロセスのSkillを探し、見出しには`references/locales/<言語>/SKILL.<言語>.md`にある訳の見出しも含む。このため、日本語版のプロセス名はそれらの見出しと一致させている。

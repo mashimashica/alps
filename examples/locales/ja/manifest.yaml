@@ -7,10 +7,10 @@ status: reviewed
 sources:
   README.md:
     source: ../../README.md
-    reviewed_source_sha256: ac9e9e98580a6059b0f36044b4ac04806ac93d9243e9aaf1846570de7a0e1a73
+    reviewed_source_sha256: 868e5418769339b8d07ffad12f96afaf63346f0765ba5ae4eae528ba895f7db7
   service-change/alps-harness.yaml:
     source: ../../service-change/alps-harness.yaml
-    reviewed_source_sha256: e9ec6d2b4b4ba9aa04cfb608e6a90312005ca6da2ed594650f8759848cdce582
+    reviewed_source_sha256: 9cfa3d3a705f43a9026d28d899d44ebe6dfe51953999da0e05a7db7e33fb0685
   service-change/docs/acceptance-criteria.md:
     source: ../../service-change/docs/acceptance-criteria.md
     reviewed_source_sha256: ddb643916778b61fcd5f99e99bd15af8f85ac434b30ef245ac94ad4f2396ef18
@@ -29,6 +29,9 @@ sources:
   service-change/docs/changes/CHG-002/stakeholders.md:
     source: ../../service-change/docs/changes/CHG-002/stakeholders.md
     reviewed_source_sha256: 57c1c7fa60ad84d8d504d60380427464b3608c72ef26d8c0d6c06ca5cb190208
+  service-change/docs/operations.md:
+    source: ../../service-change/docs/operations.md
+    reviewed_source_sha256: f717e1c7d88b7c97d9ec4df451bf64d39e521b98ca13165e94c5898f9df151f6
   service-change/docs/pilot-context.md:
     source: ../../service-change/docs/pilot-context.md
     reviewed_source_sha256: e53d8cf1bb1623a9864894a5a723e93001cf96336af7b2b798128f7713b113eb

@@ -5,6 +5,7 @@
  */
 
 import { z } from "zod";
+import { cronProblem } from "./cron.ts";
 import type {
   Instance,
   Judge,
@@ -130,8 +131,22 @@ export const harnessConfigSchema = z.looseObject({
       idleMinutes: z.number().positive().optional(),
     })
     .optional(),
+  /** Markdown files, relative to the workspace, that a woken agent reads; the harness never interprets them. */
   guidance: textList.optional(),
-  schedules: z.array(z.looseObject({ cron: text, agent: text })).optional(),
+  /** When the daemon wakes an agent (crontab's five fields, local time); none keeps it from stopping when idle. */
+  schedules: z
+    .array(
+      z.looseObject({
+        cron: text.check((context) => {
+          const problem = cronProblem(context.value);
+          if (problem)
+            context.issues.push({ code: "custom", message: problem, input: context.value });
+        }),
+        // Whether it names an agent that can be woken depends on `agents`: loading checks it (model/load.ts).
+        agent: text.pipe(z.string().min(1, { error: "name the agent to wake" })),
+      }),
+    )
+    .optional(),
 });
 
 export type HarnessConfig = z.output<typeof harnessConfigSchema>;
@@ -400,6 +415,12 @@ export const clientHeader = z.strictObject({
   name: z.string().trim().min(1).max(200),
   version: z.string().max(100),
 });
+
+/** `POST /api/wake` (`wake`): the agent to wake, claude-code when none is given. */
+export const wakeRequest = z.strictObject({
+  agent: z.string().min(1).optional(),
+});
+export type WakeRequest = z.output<typeof wakeRequest>;
 
 /** `POST /api/open` (`open_ui`). */
 export const openRequest = z.strictObject({

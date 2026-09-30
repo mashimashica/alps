@@ -3,18 +3,17 @@ const MAX_DELAY_MS = 2 ** 31 - 1;
 
 /**
  * Calls `onIdle` once nothing has happened for `idleMs`. Every request resets the wait;
- * a hold (an open event stream, a running run) suspends it until released.
- * With `idleMs` null the tracker never fires (the daemon has schedules).
+ * a hold (an open event stream, a running run, configured schedules) suspends it until released.
  */
 export class IdleTracker {
   #holds = 0;
   #timer: ReturnType<typeof setTimeout> | null = null;
   #stopped = false;
-  readonly #idleMs: number | null;
+  readonly #idleMs: number;
   readonly #onIdle: () => void;
 
-  constructor(idleMs: number | null, onIdle: () => void) {
-    this.#idleMs = idleMs === null ? null : Math.min(Math.max(1, Math.round(idleMs)), MAX_DELAY_MS);
+  constructor(idleMs: number, onIdle: () => void) {
+    this.#idleMs = Math.min(Math.max(1, Math.round(idleMs)), MAX_DELAY_MS);
     this.#onIdle = onIdle;
   }
 
@@ -46,7 +45,7 @@ export class IdleTracker {
 
   #arm(): void {
     this.#disarm();
-    if (this.#stopped || this.#idleMs === null) return;
+    if (this.#stopped) return;
     this.#timer = setTimeout(() => {
       this.#timer = null;
       if (!this.#stopped && this.#holds === 0) this.#onIdle();

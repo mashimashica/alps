@@ -43,6 +43,7 @@ import type {
   RunDetailResponse,
   RunStartResponse,
   RunsResponse,
+  WakeResponse,
 } from "./shared/types.ts";
 
 export interface McpOptions {
@@ -50,6 +51,8 @@ export interface McpOptions {
   start: string;
   parseYaml: ParseYaml;
   version: string;
+  /** The wake run whose agent this server serves (`mcp --wake <run>`, which a wake gives its agent). */
+  wake?: string | null;
 }
 
 /* ---------- what the tools and resources say about themselves ---------- */
@@ -89,8 +92,8 @@ ${RESULTS} Success: {ok: true, run, events, truncated}; truncated: true means ea
   cancel_run: `Stop a running run. The harness stops the agent's whole process group (SIGTERM, then SIGKILL after 5 seconds) and records the run as canceled; a demo or self run is canceled at once. It answers once the run has ended.
 Effect: the agent stops; what it has written stays, and the changes at its output locations are recorded as its outputs. ${RESULTS} Success: {ok: true, run, canceled}; canceled: false means the run had already ended and nothing changed (run.status says how). If run.status is still running, the agent has not stopped yet: look again with get_run. error.code: not-found, server-unreachable. Calling it again is safe.`,
 
-  finish_run: `End a self run (or a wake run) that you performed. report: for each Outcome (by number), the evidence that it is achieved and what remains unverified, and the paths you created or updated. status: succeeded when you did the work, failed when you could not; neither says whether an Outcome is achieved.
-Effect: the harness compares the run's output locations with their state when it started, records the changes as the run's outputs and in provenance, and ends the run. ${RESULTS} Success: {ok: true, run, outputs}. error.code: not-found, invalid-request (not a self or wake run, the run has already ended, or the report is empty), server-unreachable. When a call ends without a result, look with get_run: if the run has ended, do not call again.`,
+  finish_run: `End a self run that you performed, or report as the agent of a wake run. report: for a self run, for each Outcome (by number), the evidence that it is achieved and what remains unverified, and the paths you created or updated; for a wake run, what you read, what you decided and why, the runs you started, and what you left for later. status: succeeded when you did the work, failed when you could not; neither says whether an Outcome is achieved.
+Effect: for a self run, the harness compares the run's output locations with their state when it started, records the changes as the run's outputs and in provenance, and ends the run. A wake run keeps the report and status and ends when your process exits, right after this call (run.status is still running in the result). ${RESULTS} Success: {ok: true, run, outputs}. error.code: not-found, invalid-request (not a self or wake run, the run has already ended, or the report is empty), server-unreachable. When a call ends without a result, look with get_run: if the run has ended, do not call again.`,
 
   evaluate: `Record the evaluation of an instance's latest run: one judgment per Outcome you judge (outcome numbers from 0, as get_model lists them), each achieved, not-achieved, or unverified, with evidence, which cannot be empty: what you read or checked that supports the judgment. limits says what the evidence does not cover; note is Markdown.
 The harness records who judged: you, by your MCP client's name, and self: true when this MCP session (this connection) also performed the judged run (a self run), which the dashboard counts apart; another session is not self, even of a client with the same name. Only the three values are counted: a run that ended, an output that exists, or an agent's report is not an achievement.
@@ -99,8 +102,8 @@ Effect: replaces the instance's evaluation in .alps-harness/state.json. ${RESULT
   get_assessment: `Return the assessment, as JSON or as Markdown (format; json by default): the dashboard's statistics (stats: the achievement and unverified rates among judged Outcomes, stale evaluations, run success, durations, usage and cost, with trends by week and breakdowns by Process, agent, Outcome, and judge), the findings that follow from the records, the model, and the configuration ({kind: description, configuration, or unverified; subject; message; evidence}: a SKILL.md that is not found or changed after the last run, a type without a location, a type that no Process produces or reads, an agent that cannot be started, results that await a judgment, stale evidence), and the facts of every instance (latest run, judgments, whether the evidence is stale). The statistics cover all time, or the process runs that started and the judgments made since since (epoch milliseconds or an ISO 8601 date); stale evaluations are counted as they are now, whatever since; wake runs are never counted. Only recorded judgments are counted: a run that ended or an output that exists is not an achievement.
 ${RESULTS} Success: {ok: true, assessment} for json, {ok: true, markdown} for markdown. error.code: invalid-request, no-model, server-unreachable. No effects.`,
 
-  wake: `Start a wake run: an agent that reads the model, the guidance, and the current state, decides which Processes to run for which inputs, and reports what it judged and started (scheduled runs).
-${RESULTS} Not implemented in this version: every call answers error.code not-implemented and changes nothing.`,
+  wake: `Start a wake run (scheduled runs, on demand): an agent, claude-code by default or codex, started in this workspace with this harness's MCP server. It reads the model, the guidance (the Markdown files that guidance in alps-harness.yaml names), and the state the harness puts in its prompt (the Artifacts changed since the last wake, the facts of the instances, the findings); it decides which Processes to run for which inputs, starts them with instantiate and run, waits with get_run, evaluates where it has evidence, and reports with finish_run. The harness does not interpret the guidance and orders no Process. Only one wake runs at a time.
+Effect: records a wake run (kind wake, no instance) in .alps-harness/runs/<id>.json and starts the agent, which may start runs and write evaluations; the runs it starts are listed in the wake run's started (get_run), and each can be stopped with cancel_run. Wake runs are never counted in the statistics. ${RESULTS} Success: {ok: true, run, skipped: false} with run.status running, which says only that the agent started; {ok: true, skipped: true, running} when an earlier wake still runs: none was started, and the skip is recorded in the events of the one that runs. error.code: agent-unavailable (no such agent, an agent the harness cannot give its MCP server, or its command cannot be started; error.message says why), no-model, server-unreachable. When a call ends without a result, call it again: while the wake that started runs, the call is skipped and names it (running); look at it with get_run.`,
 
   open_ui: `Return the URL of this workspace's WebUI, where a person sees the network of Processes, the dashboard, and the instances; the harness server is started if it is not running. The URL carries the access token after #: give it only to the person who asked. view picks the screen (network, dashboard, or instances). With open: true the harness server opens the WebUI in the default browser, through a page in .alps-harness/ that only you can read, so the token never appears on a command line.
 ${RESULTS} Success: {ok: true, url, opened}; opened: false with open: true means that no browser could be started. error.code: invalid-request, server-unreachable. Effect: with open: true, a browser window opens; nothing else changes.`,
@@ -194,7 +197,7 @@ const ARGS = {
     format: z.enum(["json", "markdown"]).optional(),
   }),
   wake: z.strictObject({
-    agent: z.string().optional().describe("claude-code or codex."),
+    agent: z.string().optional().describe("claude-code (the default) or codex."),
   }),
   open_ui: z.strictObject({
     view: z.enum(["network", "dashboard", "instances"]).optional(),
@@ -590,11 +593,13 @@ export function createMcpServer(options: McpOptions, link: DaemonLink | null): M
         `/api/runs/${segment(args.run)}/finish`,
         { report: args.report, status: args.status },
         ({ run, outputs }, language) =>
-          say(language, "done.finished", {
-            run: run.id,
-            status: run.status,
-            outputs: outputs.length,
-          }),
+          run.kind === "wake" && run.status === "running"
+            ? say(language, "done.wakeReported", { run: run.id, status: args.status })
+            : say(language, "done.finished", {
+                run: run.id,
+                status: run.status,
+                outputs: outputs.length,
+              }),
       ),
   );
 
@@ -666,12 +671,17 @@ export function createMcpServer(options: McpOptions, link: DaemonLink | null): M
         openWorldHint: true,
       },
     },
-    () => {
-      const failure = ownFailure("not-implemented", relay.language, "error.notImplemented", {
-        tool: "wake",
-      });
-      return toolResult(failure, failure.error.message, true);
-    },
+    (args, ctx) =>
+      relay.tool<WakeResponse>(
+        ctx,
+        "POST",
+        "/api/wake",
+        given({ agent: args.agent }),
+        ({ run, running }, language) =>
+          run
+            ? say(language, "done.woke", { run: run.id, agent: run.agent })
+            : say(language, "done.wakeSkipped", { running: running ?? "" }),
+      ),
   );
 
   server.registerTool(
@@ -855,7 +865,9 @@ export function createMcpServer(options: McpOptions, link: DaemonLink | null): M
 export async function runMcp(options: McpOptions): Promise<void> {
   const start = path.resolve(options.start);
   const root = findWorkspace(start);
-  const link = root ? new DaemonLink(root, options.parseYaml) : null;
+  const link = root
+    ? new DaemonLink(root, options.parseYaml, { wake: options.wake ?? null })
+    : null;
   link?.warmUp();
   await new Promise<void>((resolve) => {
     const handle = serveStdio(

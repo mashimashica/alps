@@ -1,10 +1,11 @@
 /*
  * The records in .alps-harness/: state.json (instances, provenance, the sequence, run summaries),
- * runs/<id>.json (each run in full, prompt included), runs/<id>.jsonl (its events), and
- * runs/<id>.raw.log (the agent's own output). Files are replaced atomically (written aside, then
- * renamed). Reading never writes: what loading changes (a conversion from version 1, runs that
- * were running when the last server stopped) is written by persist() once the server owns the
- * workspace.
+ * runs/<id>.json (each run in full, prompt included), runs/<id>.jsonl (its events),
+ * runs/<id>.raw.log (the agent's own output), and, while a wake run of Claude Code runs,
+ * runs/<id>.mcp.json (the harness's MCP server for it). Files are replaced atomically (written
+ * aside, then renamed). Reading never writes: what loading changes (a conversion from version 1,
+ * runs that were running when the last server stopped) is written by persist() once the server
+ * owns the workspace.
  */
 
 import fs from "node:fs";
@@ -40,6 +41,8 @@ export const recordPaths = (root: string) => {
     run: (id: string) => path.join(dir, "runs", `${id}.json`),
     events: (id: string) => path.join(dir, "runs", `${id}.jsonl`),
     raw: (id: string) => path.join(dir, "runs", `${id}.raw.log`),
+    /** A wake run's --mcp-config for Claude Code, while the run runs. */
+    mcpConfig: (id: string) => path.join(dir, "runs", `${id}.mcp.json`),
   };
 };
 

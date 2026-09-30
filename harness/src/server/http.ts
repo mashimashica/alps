@@ -9,6 +9,7 @@
  * An MCP server holds a session with the harness server while its client is connected
  * (`GET /api/session`, a stream like the event stream). The session names the self runs that the
  * client performs; when it closes (the MCP server ends, or says so), those runs are interrupted.
+ * The server also wakes agents on the schedules of alps-harness.yaml (schedule.ts).
  */
 
 import type { Server } from "bun";
@@ -28,6 +29,7 @@ import { createApi } from "./api.ts";
 import { IdleTracker } from "./idle.ts";
 import { probe, readServerInfo, removeServerInfo, serverUrl, writeServerInfo } from "./info.ts";
 import { openUi, removeOpenPage } from "./open.ts";
+import { startSchedules, type Schedules } from "./schedule.ts";
 import { bundleUi, type UiBundle } from "./ui.ts";
 
 /** Consecutive ports tried when the configured one is in use. */
@@ -41,8 +43,8 @@ export interface ServeOptions {
   root: string;
   /** 0 lets the system choose a free port. */
   port: number;
-  /** Minutes without connections before the server stops; `null` never stops (schedules are configured). */
-  idleMinutes: number | null;
+  /** Minutes without connections, running runs, or schedules before the server stops. */
+  idleMinutes: number;
   /** Bun's development mode: the UI is an HTML import, bundled on request with HMR. */
   development: boolean;
   version: string;
@@ -169,10 +171,8 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
   let stopping: Promise<void> | null = null;
   let resolveClosed: (reason: string) => void = () => {};
   const closed = new Promise<string>((resolve) => (resolveClosed = resolve));
-  const idle = new IdleTracker(
-    options.idleMinutes === null ? null : options.idleMinutes * 60_000,
-    () => void stop("idle"),
-  );
+  const idle = new IdleTracker(options.idleMinutes * 60_000, () => void stop("idle"));
+  let schedules: Schedules | null = null;
 
   const api = createApi(harness, {
     openUi: (open) => openUi(root, { port: server.port ?? 0, token }, open),
@@ -381,6 +381,7 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
   async function stop(reason: string): Promise<void> {
     stopping ??= (async () => {
       idle.stop();
+      schedules?.stop();
       if (poller) clearInterval(poller);
       poller = null;
       // The records are complete before server.json goes, so a server started next reads them
@@ -430,6 +431,7 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
     await server.stop(true);
     throw error;
   }
+  schedules = startSchedules({ harness, hold: () => idle.hold(), log });
   idle.start();
   // The token stays out of the log: it is in server.json and in the URL that `serve` prints.
   log(`listening on ${serverUrl(info)} for ${root}${options.development ? " (development)" : ""}`);

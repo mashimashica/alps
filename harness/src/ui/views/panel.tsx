@@ -3,7 +3,8 @@
  * inputs, controls, outputs, and SKILL.md), an Artifact type (its locations, the Artifacts found
  * there, and the run that made each), a run (its record and its log, followed while it runs), an
  * instance (its inputs, criteria, runs, and evaluation, with the actions on it), or what a number
- * of the dashboard counts. With nothing selected, the model.
+ * of the dashboard counts. With nothing selected, the model and the record of wakes. A wake run
+ * lists the runs that its agent started.
  */
 
 import { Fragment } from "preact";
@@ -50,6 +51,34 @@ export const summaryOf = (run: RunView): RunSummary => ({
   endedAt: run.endedAt,
 });
 
+/** How many wake runs the overview lists, newest first. */
+const WAKES_LISTED = 10;
+
+/** The record of wakes: the latest wake runs, each a link to its record and the runs it started. */
+function Wakes() {
+  const { runs, t, language } = useUi();
+  const wakes = [...runs.values()]
+    .filter((run) => run.kind === "wake")
+    .sort((a, b) => b.startedAt - a.startedAt)
+    .slice(0, WAKES_LISTED);
+  return (
+    <Section title={t("overview.wakes")}>
+      {wakes.length === 0 ? (
+        <p class="muted small">{t("overview.noWakes")}</p>
+      ) : (
+        <ul class="plain" data-testid="wakes">
+          {wakes.map((run) => (
+            <li key={run.id}>
+              <RunLink id={run.id} /> <StatusText status={run.status} />{" "}
+              <span class="muted small">{dateTime(run.startedAt, language)}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Section>
+  );
+}
+
 function Overview({ modelError }: { modelError: unknown }) {
   const { model, t, select } = useUi();
   if (!model)
@@ -86,6 +115,7 @@ function Overview({ modelError }: { modelError: unknown }) {
           ))}
         </ul>
       </Section>
+      <Wakes />
       <p class="muted small">{t("overview.hint")}</p>
       <button type="button" class="primary" onClick={() => select({ kind: "new" })}>
         {t("process.newInstance")}
@@ -319,7 +349,7 @@ function TypePanel({ id }: { id: string }) {
 }
 
 function RunPanel({ id }: { id: string }) {
-  const { client, t, language, version, fail, putRun, instances, model } = useUi();
+  const { client, t, language, version, fail, putRun, instances, model, runs } = useUi();
   const [detail, setDetail] = useState<RunDetailResponse | null>(null);
   const [canceling, setCanceling] = useState(false);
   useEffect(() => {
@@ -418,22 +448,44 @@ function RunPanel({ id }: { id: string }) {
       <Section title={t("run.report")}>
         {run.report ? <Markdown source={run.report} /> : <p class="muted">{t("run.noReport")}</p>}
       </Section>
-      <Section title={t("run.outputs")}>
-        {run.outputs.length === 0 ? (
-          <p class="muted">{t("run.noOutputs")}</p>
-        ) : (
-          <ul class="plain">
-            {run.outputs.map((output) => (
-              <li key={output.path}>
-                <span class="mono small">{output.path}</span>{" "}
-                <span class="muted small">
-                  {typeName(model, output.type)} · {t(`run.${output.change}`)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Section>
+      {run.kind === "wake" && (
+        <Section title={t("run.startedRuns")}>
+          {(run.started ?? []).length === 0 ? (
+            <p class="muted">{t("run.noStartedRuns")}</p>
+          ) : (
+            <ul class="plain" data-testid="started-runs">
+              {(run.started ?? []).map((started) => {
+                const known = runs.get(started);
+                const instance = known?.instance ? instances.get(known.instance) : undefined;
+                return (
+                  <li key={started}>
+                    <RunLink id={started} /> {known && <StatusText status={known.status} />}{" "}
+                    {instance && <InstanceLink instance={instance} />}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </Section>
+      )}
+      {run.kind === "process" && (
+        <Section title={t("run.outputs")}>
+          {run.outputs.length === 0 ? (
+            <p class="muted">{t("run.noOutputs")}</p>
+          ) : (
+            <ul class="plain">
+              {run.outputs.map((output) => (
+                <li key={output.path}>
+                  <span class="mono small">{output.path}</span>{" "}
+                  <span class="muted small">
+                    {typeName(model, output.type)} · {t(`run.${output.change}`)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Section>
+      )}
       {run.inputs.length > 0 && (
         <Section title={t("run.inputs")}>
           <ul class="plain">

@@ -64,6 +64,9 @@ const en = {
   "overview.agents": "Agents",
   "overview.available": "available",
   "overview.unavailable": (a: { reason: string }) => `unavailable: ${a.reason}`,
+  "overview.wakes": "Wakes",
+  "overview.noWakes":
+    "No agent has been woken yet. The schedules in alps-harness.yaml, alps-harness wake, and the MCP tool wake wake one, which decides what to run.",
   "overview.hint":
     "Choose a Process or a type in the network, a number on the dashboard, or an instance to see it here.",
   "model.error": "The model cannot be read.",
@@ -132,6 +135,8 @@ const en = {
   "run.cancel": "Cancel run",
   "run.canceling": "Canceling…",
   "run.wake": "Wake run",
+  "run.startedRuns": "Runs it started",
+  "run.noStartedRuns": "Its agent started no run.",
   "run.self": "performed by the calling session",
 
   "instance.inputs": "Inputs",
@@ -345,6 +350,9 @@ const ja: { [K in UiKey]: (typeof en)[K] } = {
   "overview.agents": "エージェント",
   "overview.available": "使える",
   "overview.unavailable": (a) => `使えない: ${a.reason}`,
+  "overview.wakes": "目覚めの記録",
+  "overview.noWakes":
+    "まだ目覚めたエージェントはない。alps-harness.yaml の schedules、alps-harness wake、MCP の wake がエージェントを起こし、エージェントが何を走らせるかを判断する。",
   "overview.hint":
     "ネットワークのプロセスや型、ダッシュボードの数字、インスタンスを選ぶと、ここに詳細が出る。",
   "model.error": "モデルを読めない。",
@@ -411,6 +419,8 @@ const ja: { [K in UiKey]: (typeof en)[K] } = {
   "run.cancel": "実行を中止",
   "run.canceling": "中止している…",
   "run.wake": "目覚めの実行",
+  "run.startedRuns": "起動した実行",
+  "run.noStartedRuns": "起動した実行はない。",
   "run.self": "呼び出し元のセッションが実行",
 
   "instance.inputs": "入力",

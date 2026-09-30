@@ -47,6 +47,7 @@ const ROUTES = [
   { method: "GET", path: "/api/assessment" },
   { method: "GET", path: "/api/stats" },
   { method: "GET", path: "/api/skill" },
+  { method: "POST", path: "/api/wake" },
   { method: "POST", path: "/api/open" },
   { method: "GET", path: "/api/unknown" },
 ] as const;

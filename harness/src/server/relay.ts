@@ -4,7 +4,8 @@
  * the HTTP API; when no server answers, it starts one (`serve` detached, as `serve --daemon`
  * does) and waits for server.json. While its client is connected it holds a session with the
  * server (GET /api/session) and names the session and the client in every request, so the server
- * knows who calls and which self runs to interrupt when the connection closes.
+ * knows who calls and which self runs to interrupt when the connection closes. The MCP server that
+ * a wake gives its agent also names that wake run (X-Harness-Wake).
  */
 
 import fs from "node:fs";
@@ -85,14 +86,17 @@ const refused = (error: unknown): boolean =>
 export class DaemonLink {
   readonly root: string;
   readonly #parseYaml: ParseYaml;
+  /** The wake run whose agent this link serves, if any. */
+  readonly #wake: string | null;
   #link: Link | null = null;
   #connecting: Promise<Link> | null = null;
   #closed = false;
   #settings: { signature: string; value: RelaySettings } | null = null;
 
-  constructor(root: string, parseYaml: ParseYaml) {
+  constructor(root: string, parseYaml: ParseYaml, options: { wake?: string | null } = {}) {
     this.root = root;
     this.#parseYaml = parseYaml;
+    this.#wake = options.wake ?? null;
   }
 
   /** The workspace's language and port; the defaults when alps-harness.yaml cannot be read. */
@@ -229,6 +233,7 @@ export class DaemonLink {
             ...(options.client
               ? { "X-Harness-Client": encodeURIComponent(JSON.stringify(options.client)) }
               : {}),
+            ...(this.#wake ? { "X-Harness-Wake": this.#wake } : {}),
             ...(method === "POST" ? { "Content-Type": "application/json" } : {}),
           },
           body: method === "POST" ? JSON.stringify(options.body ?? {}) : undefined,

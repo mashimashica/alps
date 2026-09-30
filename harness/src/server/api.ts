@@ -15,12 +15,15 @@
  *   finish_run      POST /api/runs/:id/finish
  *   evaluate        POST /api/instances/:id/evaluate
  *   get_assessment  GET  /api/assessment?format&since
+ *   wake            POST /api/wake
  *   open_ui         POST /api/open
  *   (WebUI)         GET  /api/stats?period&granularity&process&agent&tz
  *   (WebUI)         GET  /api/skill?process
  *
  * Who calls is not in any body. The MCP server names its client in X-Harness-Client (and the
  * session it holds in X-Harness-Session); a request without it comes from a person (the WebUI).
+ * The MCP server that a wake gives its agent also names the wake run in X-Harness-Wake, so the
+ * runs that the agent starts are listed in that wake's started.
  */
 
 import type { z } from "zod";
@@ -40,6 +43,7 @@ import {
   skillQuery,
   statsQuery,
   updateInstanceRequest,
+  wakeRequest,
 } from "../shared/schema.ts";
 import type {
   ArtifactsResponse,
@@ -57,6 +61,7 @@ import type {
   RunsResponse,
   SkillResponse,
   StatsResponse,
+  WakeResponse,
 } from "../shared/types.ts";
 
 export interface ApiReply {
@@ -141,6 +146,7 @@ export function callerOf(request: Request): Caller {
     kind: "agent",
     client: parsed.data,
     session: request.headers.get("x-harness-session") || null,
+    wake: request.headers.get("x-harness-wake") || null,
   };
 }
 
@@ -282,6 +288,17 @@ function routes(harness: Harness, host: ApiHost): Route[] {
           ok: true,
           ...harness.skill(parse(skillQuery, query(url)).process),
         } satisfies SkillResponse),
+    },
+    {
+      method: "POST",
+      pattern: /^\/api\/wake$/,
+      handle: async ({ request, caller }) => {
+        const result = await harness.wake(parse(wakeRequest, await body(request)), {
+          kind: "request",
+          caller,
+        });
+        return ok({ ok: true, ...result } satisfies WakeResponse, result.skipped ? 200 : 201);
+      },
     },
     {
       method: "POST",

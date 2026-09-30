@@ -69,6 +69,8 @@ const en = {
     `The self mode is off in this workspace (agents.self is false in alps-harness.yaml). Its agents are: ${a.agents}.`,
   "error.agentUnavailable": (a: { agent: string; reason: string }) =>
     `${a.agent} cannot be started: ${a.reason}.`,
+  "error.wakeAgent": (a: { agent: string; agents: string }) =>
+    `${a.agent} cannot be woken: a wake needs the harness's MCP server, which the harness can give to Claude Code (--mcp-config) and Codex (-c mcp_servers) only. The agents that can be woken here: ${a.agents || "none"}.`,
   "error.running": (a: { run: string; instance: string }) =>
     `Run ${a.run} of instance ${a.instance} has not ended. Wait for it (get_run with wait) or cancel it (cancel_run).`,
   "error.notSelf": (a: { run: string; agent: string }) =>
@@ -100,8 +102,6 @@ const en = {
     `No alps-harness.yaml or process-model.yaml in ${a.start} or its parent directories. Place one of them (error.files) to make it a workspace.`,
   "error.unreachable": (a: { port: number; serverJson: string; detail: string }) =>
     `The harness server could not be reached or started (port ${a.port}, ${a.serverJson}): ${a.detail}`,
-  "error.notImplemented": (a: { tool: string }) =>
-    `${a.tool} is not implemented in this version of the harness. Nothing was changed.`,
 
   /* ---------- findings of the assessment ---------- */
   "finding.skillMissing": (a: { process: string; location: string }) =>
@@ -149,6 +149,8 @@ const en = {
       : `Run ${a.run} had already ended (${a.status}); nothing was changed.`,
   "done.finished": (a: { run: string; status: string; outputs: number }) =>
     `Run ${a.run} ended (${a.status}); ${plural(a.outputs, "output change")} recorded as its outputs.`,
+  "done.wakeReported": (a: { run: string; status: string }) =>
+    `Recorded your report for wake run ${a.run} (${a.status}). The run ends when your process exits: end now.`,
   "done.evaluated": (a: { instance: string; run: string; self: boolean }) =>
     `Recorded the evaluation of run ${a.run} for instance ${a.instance}.${a.self ? " This MCP session also performed that run, so the evaluation is marked self: true." : ""}`,
   "done.assessment": (a: {
@@ -159,6 +161,10 @@ const en = {
     stale: number;
   }) =>
     `${plural(a.findings, "finding")} about ${plural(a.instances, "instance")}. ${a.achieved} of ${plural(a.judged, "judged Outcome")} achieved; ${plural(a.stale, "evaluation")} on stale evidence.`,
+  "done.woke": (a: { run: string; agent: string }) =>
+    `Started wake run ${a.run} (${a.agent}): the agent reads the model, the guidance, and the state, and decides what to run. Starting achieves nothing by itself; the runs it starts are listed in the wake run's started (get_run).`,
+  "done.wakeSkipped": (a: { running: string }) =>
+    `No wake was started: wake run ${a.running} still runs. The skip is recorded in its events.`,
   "done.ui": (a: { url: string; open: boolean; opened: boolean }) =>
     `The WebUI is at ${a.url}.${a.opened ? " It was opened in the browser." : a.open ? " No browser could be started; open the URL yourself." : ""} ${TOKEN_NOTE_EN}`,
 } satisfies Record<string, (args: never) => string>;
@@ -199,6 +205,8 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
   "error.selfDisabled": (a) =>
     `このワークスペースでは self モードを使えない（alps-harness.yaml の agents.self が false）。エージェントは次のとおり: ${a.agents}。`,
   "error.agentUnavailable": (a) => `${a.agent} を起動できない（${a.reason}）。`,
+  "error.wakeAgent": (a) =>
+    `${a.agent} は目覚めに使えない。目覚めにはハーネスの MCP サーバーが要り、ハーネスがそれを渡せるのは Claude Code（--mcp-config）と Codex（-c mcp_servers）だけである。ここで目覚めに使えるエージェント: ${a.agents || "なし"}。`,
   "error.running": (a) =>
     `インスタンス ${a.instance} の実行 ${a.run} がまだ終わっていない。get_run（wait）で待つか、cancel_run で中止すること。`,
   "error.notSelf": (a) =>
@@ -228,8 +236,6 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
     `${a.start} とその親ディレクトリに alps-harness.yaml も process-model.yaml もない。ワークスペースにするには、どちらかを置くこと（error.files）。`,
   "error.unreachable": (a) =>
     `ハーネスサーバーに接続も起動もできなかった（ポート ${a.port}、${a.serverJson}）: ${a.detail}`,
-  "error.notImplemented": (a) =>
-    `このハーネスの版では ${a.tool} はまだ実装していない。何も変えていない。`,
 
   "finding.skillMissing": (a) =>
     `${a.process} に指定されたスキル（${a.location}）は、読める SKILL.md ではない。`,
@@ -273,10 +279,16 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
       : `実行 ${a.run} はすでに終わっていた（${a.status}）。何も変えていない。`,
   "done.finished": (a) =>
     `実行 ${a.run} を終えた（${a.status}）。出力の変化 ${a.outputs} 件をこの実行の出力として記録した。`,
+  "done.wakeReported": (a) =>
+    `目覚めの実行 ${a.run} の報告を記録した（${a.status}）。実行はあなたのプロセスが終わった時点で終わるので、このまま終了すること。`,
   "done.evaluated": (a) =>
     `インスタンス ${a.instance} について、実行 ${a.run} の評価を記録した。${a.self ? "その実行もこの MCP セッションが行ったので、評価には self: true が付く。" : ""}`,
   "done.assessment": (a) =>
     `所見は ${a.findings} 件、インスタンスは ${a.instances} 件。判断された成果 ${a.judged} 件のうち達成は ${a.achieved} 件、根拠が古い評価は ${a.stale} 件。`,
+  "done.woke": (a) =>
+    `目覚めの実行 ${a.run}（${a.agent}）を開始した。エージェントがモデル・案内・現状を読み、何を走らせるかを判断する。開始しただけでは何も達成されない。起動された実行は目覚めの実行の started に並ぶ（get_run）。`,
+  "done.wakeSkipped": (a) =>
+    `目覚めは開始しなかった。目覚めの実行 ${a.running} がまだ動いている。見送りはその実行のイベントに記録した。`,
   "done.ui": (a) =>
     `WebUI は ${a.url} にある。${a.opened ? "ブラウザで開いた。" : a.open ? "ブラウザを起動できなかったので、URL を自分で開くこと。" : ""}${TOKEN_NOTE_JA}`,
 };
