@@ -1,12 +1,19 @@
 /*
  * The network: the whole model as the ring (R1a), or, once a Process or a type is clicked, only
- * what surrounds it (the focus view, G4). A click on the background returns to the ring. A
- * Process with a running run has a dashed ring around its dot; one with stale evidence, an amber
- * ring. The layout is computed by the pure functions of ../graph/.
+ * what surrounds it (the focus view, G4). A click on the background, Esc, or the "Whole model"
+ * crumb returns to the ring. A Process with a running run has a dashed ring around its dot; one
+ * with stale evidence, an amber ring. The lines are the relationships of Artifact types (which
+ * Processes produce and read each), not an order of execution, and the legend says so. The
+ * layout is computed by the pure functions of ../graph/.
  */
 
-import { useEffect, useMemo } from "preact/hooks";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "preact/hooks";
 import type { InstanceView, ModelView, RunSummary } from "../../shared/types.ts";
+import { Badge } from "../components/badge.tsx";
+import { Button } from "../components/button.tsx";
+import { Card } from "../components/card.tsx";
+import { Skeleton } from "../components/feedback.tsx";
+import { Icon } from "../components/icons.tsx";
 import { useUi } from "../context.ts";
 import { FOCUS, focusLayout, type FocusLayout, type FocusNode } from "../graph/focus.ts";
 import {
@@ -17,10 +24,11 @@ import {
   type TextStyle,
 } from "../graph/geometry.ts";
 import { RING, ringLayout, type RingLayout } from "../graph/ring.ts";
-import { ModelProblem } from "./common.tsx";
+import { ModelProblem, processName, typeName } from "./common.tsx";
 
+/** The page's sans-serif stack (tokens.css), which the labels are measured and drawn in. */
 const FAMILY =
-  '"IBM Plex Sans JP", "IBM Plex Sans", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, system-ui, sans-serif';
+  'Inter, "IBM Plex Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic UI", sans-serif';
 const FONTS: Record<TextStyle, string> = {
   process: `500 13px ${FAMILY}`,
   type: `400 12px ${FAMILY}`,
@@ -86,12 +94,12 @@ function Edges({ edges }: { edges: readonly Edge[] }) {
     <>
       <g class="edges">
         {edges.map((edge, i) => (
-          <path key={`e${i}`} class={`edge ${edge.role}`} d={edge.d} />
+          <path key={`e${i}`} class={`edge edge-${edge.role}`} d={edge.d} />
         ))}
       </g>
       <g class="heads">
         {edges.map((edge, i) => (
-          <path key={`h${i}`} class={`head ${edge.role}`} d={edge.head} />
+          <path key={`h${i}`} class={`head head-${edge.role}`} d={edge.head} />
         ))}
       </g>
     </>
@@ -163,11 +171,12 @@ function Ring({
             onKeyDown={onKeys(pick)}
           >
             <rect
-              class="hit"
-              x={left - 4}
+              class="hit label-bg"
+              x={left - 6}
               y={p.label.y - 12}
-              width={p.label.width + 8}
+              width={p.label.width + 12}
               height={24}
+              rx={7}
             />
             <circle class="hit" cx={p.x} cy={p.y} r={16} />
             {mark.stale && <circle class="mark stale" cx={p.x} cy={p.y} r={11.5} />}
@@ -243,7 +252,7 @@ function FocusNodeView({ node, sub }: { node: FocusNode; sub: string }) {
         y={node.y - node.height / 2}
         width={node.width}
         height={node.height}
-        rx={node.kind === "type" ? node.height / 2 : 8}
+        rx={node.kind === "type" ? node.height / 2 : 9}
       />
       {note ? (
         <>
@@ -269,6 +278,33 @@ function FocusNodeView({ node, sub }: { node: FocusNode; sub: string }) {
   );
 }
 
+/**
+ * The part of a focus layout to show: its columns and nodes with a margin, and the column titles
+ * just above the nodes (the layout leaves room for many nodes, which a few do not fill).
+ */
+function focusFrame(layout: FocusLayout): {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  titleY: number;
+} {
+  const margin = 24;
+  const top = Math.min(...layout.nodes.map((n) => n.y - n.height / 2));
+  const bottom = Math.max(...layout.nodes.map((n) => n.y + n.height / 2));
+  const left = Math.min(...layout.columns.map((c) => c.x));
+  const right = Math.max(...layout.columns.map((c) => c.x + c.width));
+  const titleY = Math.max(FOCUS.titleY, top - 30);
+  const y = titleY - 22 - margin / 2;
+  return {
+    x: left - margin,
+    y,
+    width: right - left + margin * 2,
+    height: bottom + margin * 1.5 - y,
+    titleY,
+  };
+}
+
 function Focus({ layout, onBlank }: { layout: FocusLayout; onBlank: () => void }) {
   const { t } = useUi();
   const producers = layout.nodes.filter((n) => n.column === 0).length;
@@ -279,13 +315,14 @@ function Focus({ layout, onBlank }: { layout: FocusLayout; onBlank: () => void }
         ? t("focus.typeSub", { producers, consumers })
         : t("focus.givenSub", { consumers })
       : "";
+  const frame = focusFrame(layout);
   return (
     <svg
       class="graph"
       data-testid="focus"
       data-focus-kind={layout.target.kind}
       data-focus-id={layout.target.id}
-      viewBox={`0 0 ${layout.width} ${layout.height}`}
+      viewBox={`${frame.x} ${frame.y} ${frame.width} ${frame.height}`}
       preserveAspectRatio="xMidYMid meet"
       role="group"
       aria-label={layout.target.id}
@@ -293,14 +330,14 @@ function Focus({ layout, onBlank }: { layout: FocusLayout; onBlank: () => void }
       <rect
         class="backdrop"
         data-testid="backdrop"
-        x={0}
-        y={0}
-        width={layout.width}
-        height={layout.height}
+        x={frame.x}
+        y={frame.y}
+        width={frame.width}
+        height={frame.height}
         onClick={onBlank}
       />
       {layout.columns.map((column) => (
-        <text key={column.title} class="column-title" x={column.x} y={FOCUS.titleY}>
+        <text key={column.title} class="column-title" x={column.x} y={frame.titleY}>
           {t(`focus.${column.title}`)}
         </text>
       ))}
@@ -316,27 +353,37 @@ function Legend({ focused }: { focused: boolean }) {
   const { t } = useUi();
   return (
     <div class="legend">
-      <span>
-        <span class="line output" />
-        {t("legend.output")}
-      </span>
-      <span>
-        <span class="line input" />
-        {t("legend.input")}
-      </span>
-      <span>
-        <span class="line control" />
-        {t("legend.control")}
-      </span>
-      <span>
-        <span class="mark-running" />
-        {t("legend.running")}
-      </span>
-      <span>
-        <span class="mark-stale-ring" />
-        {t("legend.stale")}
-      </span>
-      <span class="hint">{focused ? t("legend.focusHint") : t("legend.ringHint")}</span>
+      <div class="legend-group">
+        <span class="legend-title">{t("legend.relations")}</span>
+        <span>
+          <span class="legend-line line-output" aria-hidden="true" />
+          {t("legend.output")}
+        </span>
+        <span>
+          <span class="legend-line line-input" aria-hidden="true" />
+          {t("legend.input")}
+        </span>
+        <span>
+          <span class="legend-line line-control" aria-hidden="true" />
+          {t("legend.control")}
+        </span>
+      </div>
+      <div class="legend-group">
+        <span class="legend-title">{t("legend.marks")}</span>
+        <span>
+          <span class="mark-running" aria-hidden="true" />
+          {t("legend.running")}
+        </span>
+        <span>
+          <span class="mark-stale-ring" aria-hidden="true" />
+          {t("legend.stale")}
+        </span>
+      </div>
+      <p class="legend-note">{t("legend.notOrder")}</p>
+      <p class="legend-hint">
+        <Icon name="info" size={14} />
+        {focused ? t("legend.focusHint") : t("legend.ringHint")}
+      </p>
     </div>
   );
 }
@@ -350,6 +397,13 @@ export function NetworkView({ modelError }: { modelError: unknown }) {
     [graph, focus],
   );
   const marks = useMemo(() => marksOf(instances, runs), [instances, runs]);
+  // Where the graph is wider than its box (narrow windows), it opens at its middle.
+  const canvasBox = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const box = canvasBox.current;
+    if (box && box.scrollWidth > box.clientWidth)
+      box.scrollLeft = (box.scrollWidth - box.clientWidth) / 2;
+  }, [focused, ring]);
   const back = (): void => {
     setFocus(null);
     select(null);
@@ -357,7 +411,13 @@ export function NetworkView({ modelError }: { modelError: unknown }) {
   useEffect(() => {
     if (!focused) return;
     const onKey = (event: KeyboardEvent): void => {
-      if (event.key === "Escape") back();
+      // A dialog or a list that is open takes its own Esc.
+      if (
+        event.key === "Escape" &&
+        !event.defaultPrevented &&
+        !document.querySelector("dialog[open]")
+      )
+        back();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
@@ -367,21 +427,60 @@ export function NetworkView({ modelError }: { modelError: unknown }) {
     return modelError ? (
       <ModelProblem error={modelError} />
     ) : (
-      <p class="muted pad">{t("loading")}</p>
+      <Card class="network-card">
+        <div class="network-canvas network-loading" role="status">
+          <span class="sr-only">{t("loading")}</span>
+          <Skeleton class="ring-skeleton" />
+        </div>
+      </Card>
     );
+  const focusName = !focus
+    ? ""
+    : focus.kind === "process"
+      ? processName(model, focus.id)
+      : typeName(model, focus.id);
   return (
-    <div class="stage">
-      {focused && (
-        <button type="button" class="back" onClick={back}>
-          ← {t("network.back")}
-        </button>
-      )}
-      {focused ? (
-        <Focus layout={focused} onBlank={back} />
-      ) : (
-        ring && <Ring layout={ring} marks={marks} label={t("network.label")} onBlank={back} />
-      )}
+    <Card class="network-card" data-mode={focused ? "focus" : "ring"}>
+      <div class="network-toolbar">
+        <nav class="crumbs" aria-label={t("tab.network")}>
+          {focused ? (
+            <Button variant="ghost" size="sm" class="crumb" onClick={back}>
+              <Icon name="network" />
+              {t("network.whole")}
+            </Button>
+          ) : (
+            <span class="crumb crumb-current" aria-current="location">
+              <Icon name="network" />
+              {t("network.whole")}
+            </span>
+          )}
+          {focused && focus && (
+            <>
+              <Icon name="chevronRight" class="crumb-separator" size={14} />
+              <span class="crumb crumb-current" aria-current="location">
+                <span class="crumb-name">{focusName}</span>
+                <Badge tone="brand">
+                  {focus.kind === "process" ? t("panel.process") : t("panel.type")}
+                </Badge>
+              </span>
+            </>
+          )}
+        </nav>
+        <Badge tone="outline" class="network-counts">
+          {t("overview.counts", {
+            processes: model.processes.length,
+            types: model.artifacts.length,
+          })}
+        </Badge>
+      </div>
+      <div class="network-canvas" ref={canvasBox}>
+        {focused ? (
+          <Focus layout={focused} onBlank={back} />
+        ) : (
+          ring && <Ring layout={ring} marks={marks} label={t("network.label")} onBlank={back} />
+        )}
+      </div>
       <Legend focused={focused !== null} />
-    </div>
+    </Card>
   );
 }

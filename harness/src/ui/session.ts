@@ -3,7 +3,8 @@
  * (`#token=…&view=…`), which the browser never sends to the server. They are read once and removed
  * from the address bar and the history; the token is kept in sessionStorage so that the page
  * survives a reload (it goes when the tab closes). The API gets the token in the X-Harness-Token
- * header; the event stream, which cannot send headers, in `?token=`.
+ * header; the event stream, which cannot send headers, in `?token=`. The page's language, theme,
+ * and transparency are the viewer's choices, kept in localStorage.
  */
 
 import type { Language, UiView } from "../shared/types.ts";
@@ -11,6 +12,8 @@ import type { Language, UiView } from "../shared/types.ts";
 const TOKEN_KEY = "alps-harness:token";
 const VIEW_KEY = "alps-harness:view";
 const LANGUAGE_KEY = "alps-harness:language";
+const THEME_KEY = "alps-harness:theme";
+const GLASS_KEY = "alps-harness:transparency";
 const VIEWS: readonly UiView[] = ["network", "dashboard", "instances"];
 
 /** Storage that may be missing (a private window, blocked site data): reads and writes never throw. */
@@ -83,3 +86,34 @@ export function keptLanguage(): Language | null {
 }
 
 export const keepLanguage = (language: Language): void => local.write(LANGUAGE_KEY, language);
+
+/** The colour theme: the system's (prefers-color-scheme), or light or dark whatever it says. */
+export type Theme = "system" | "light" | "dark";
+
+export function keptTheme(): Theme {
+  const value = local.read(THEME_KEY);
+  return value === "light" || value === "dark" ? value : "system";
+}
+
+export const keepTheme = (theme: Theme): void => local.write(THEME_KEY, theme);
+
+/** Whether surfaces are translucent: `null` until chosen (prefers-reduced-transparency decides). */
+export function keptTransparency(): boolean | null {
+  const value = local.read(GLASS_KEY);
+  return value === "on" ? true : value === "off" ? false : null;
+}
+
+export const keepTransparency = (on: boolean): void => local.write(GLASS_KEY, on ? "on" : "off");
+
+/**
+ * Puts the theme and the transparency on the root element, where the tokens of tokens.css read
+ * them: `data-theme` only when a theme is chosen (otherwise the system's applies through the
+ * media query), and `data-glass` only when the transparency is chosen.
+ */
+export function applyDisplay(theme: Theme, transparency: boolean | null): void {
+  const root = document.documentElement;
+  if (theme === "system") delete root.dataset.theme;
+  else root.dataset.theme = theme;
+  if (transparency === null) delete root.dataset.glass;
+  else root.dataset.glass = transparency ? "on" : "off";
+}

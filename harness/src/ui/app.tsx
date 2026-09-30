@@ -1,10 +1,14 @@
 /*
- * The WebUI: three screens (the network, the dashboard, the instances), the counts of running runs
- * and stale evidence at the top right, and a panel on the right for what is selected. The records
- * are read once and kept current through the event stream; the page only draws them.
+ * The WebUI: a sidebar with the three screens (the network, the dashboard, the instances) and the
+ * display settings; a header with the counts of running runs and stale evidence at the top right,
+ * the state of the event stream, the language, and the theme; and a panel on the right for what
+ * is selected, which is a Sheet over the page in narrow windows (where the sidebar is a drawer).
+ * In the network, a narrow window keeps the panel in the page below the diagram instead: a Sheet
+ * would cover the focus view and the background whose click returns to the whole ring.
+ * The records are read once and kept current through the event stream; the page only draws them.
  */
 
-import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
+import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
 import type {
   HealthInfo,
   InstanceView,
@@ -17,23 +21,89 @@ import type {
   UiView,
 } from "../shared/types.ts";
 import { createClient, describeError, query, type StreamState } from "./api.ts";
-import { UiContext, type Selection, type Ui } from "./context.ts";
+import { Button } from "./components/button.tsx";
+import { Switch } from "./components/checkbox.tsx";
+import { Sheet } from "./components/dialog.tsx";
+import { Alert } from "./components/feedback.tsx";
+import { Icon, type IconName } from "./components/icons.tsx";
+import { Select } from "./components/select.tsx";
+import { tabPanel, Tabs } from "./components/tabs.tsx";
+import { Tooltip } from "./components/tooltip.tsx";
+import { cx, useMedia } from "./components/util.ts";
+import {
+  NO_FILTER,
+  UiContext,
+  useUi,
+  type Form,
+  type InstanceFilter,
+  type Selection,
+  type Ui,
+} from "./context.ts";
 import type { FocusTarget } from "./graph/focus.ts";
-import { keepLanguage, keepView, keptLanguage, type Session } from "./session.ts";
+import {
+  applyDisplay,
+  keepLanguage,
+  keepTheme,
+  keepTransparency,
+  keepView,
+  keptLanguage,
+  keptTheme,
+  keptTransparency,
+  type Session,
+  type Theme,
+} from "./session.ts";
 import { browserLanguage, translator } from "./strings.ts";
 import { DashboardView } from "./views/dashboard.tsx";
+import { FormDialog } from "./views/forms.tsx";
 import { InstancesView } from "./views/instances.tsx";
 import { NetworkView } from "./views/network.tsx";
-import { Panel } from "./views/panel.tsx";
+import { Panel, selectionLabel } from "./views/panel.tsx";
 
 const VIEWS: readonly UiView[] = ["network", "dashboard", "instances"];
+const VIEW_ICONS: Record<UiView, IconName> = {
+  network: "network",
+  dashboard: "dashboard",
+  instances: "layers",
+};
+const THEME_ICONS: Record<Theme, IconName> = { system: "monitor", light: "sun", dark: "moon" };
 /** How many pages of runs (200 each) the page keeps; older runs are read when they are opened. */
 const RUN_PAGES = 5;
+/** From this width the panel is a column; narrower, a Sheet (in the network, under the diagram). */
+const WIDE = "(min-width: 1180px)";
+/** Up to this width the sidebar is a drawer. */
+const NARROW = "(max-width: 760px)";
+/** Between the drawer and this width, the sidebar is a rail of icons. */
+const RAIL = "(min-width: 761px) and (max-width: 1439px)";
 
 type Health =
   | { status: "loading" }
   | { status: "ok"; health: HealthInfo }
   | { status: "error"; error: unknown };
+
+type Stream = StreamState | "connecting" | "shutdown";
+
+/** The state of the event stream at the top right; once it is lost for good, a way to reconnect. */
+function Connection({ stream, onReconnect }: { stream: Stream; onReconnect: () => void }) {
+  const { t } = useUi();
+  if (stream === "closed" || stream === "shutdown")
+    return (
+      <Button variant="outline" size="sm" class="connection is-offline" onClick={onReconnect}>
+        <Icon name="refresh" />
+        <span class="connection-text">{t("events.reconnect")}</span>
+      </Button>
+    );
+  const live = stream === "open";
+  return (
+    <span
+      class={cx("connection", live ? "is-live" : "is-connecting")}
+      role="status"
+      title={live ? t("events.liveHint") : t("events.connecting")}
+    >
+      <span class="connection-dot" aria-hidden="true" />
+      <span class="connection-text">{live ? t("events.live") : t("events.connecting")}</span>
+    </span>
+  );
+}
 
 export function App({ session }: { session: Session }) {
   const client = useMemo(() => createClient(session.token), [session.token]);
@@ -47,15 +117,51 @@ export function App({ session }: { session: Session }) {
   const [modelError, setModelError] = useState<unknown>(null);
   const [instances, setInstances] = useState<ReadonlyMap<string, InstanceView>>(new Map());
   const [runs, setRuns] = useState<ReadonlyMap<string, RunSummary>>(new Map());
+  const [recordsLoaded, setRecordsLoaded] = useState(false);
   const [version, setVersion] = useState(0);
   const [selection, setSelection] = useState<Selection | null>(null);
   const [focus, setFocus] = useState<FocusTarget | null>(null);
-  const [stream, setStream] = useState<StreamState | "connecting" | "shutdown">("connecting");
-  const [failure, setFailure] = useState<unknown>(null);
+  const [stream, setStream] = useState<Stream>("connecting");
+  const [connection, setConnection] = useState(0);
+  const [form, setForm] = useState<Form | null>(null);
+  const [instanceFilter, setInstanceFilter] = useState<InstanceFilter>(NO_FILTER);
+  /** In a Sheet, the model's overview shows only when asked for. */
+  const [overview, setOverview] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const [theme, setTheme] = useState<Theme>(keptTheme);
+  const [transparency, setTransparency] = useState<boolean | null>(keptTransparency);
+  const wide = useMedia(WIDE);
+  const narrow = useMedia(NARROW);
+  const rail = useMedia(RAIL);
+  const systemOpaque = useMedia("(prefers-reduced-transparency: reduce)");
+  /** The network in a narrow window: the panel follows the diagram in the page. */
+  const below = !wide && view === "network";
+  const sheet = !wide && !below;
+  const menuButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
+  useEffect(() => applyDisplay(theme, transparency), [theme, transparency]);
+  useEffect(() => {
+    if (!narrow) setDrawer(false);
+  }, [narrow]);
+  // The drawer takes the focus when it opens and gives it back to the menu button when it closes.
+  const drawerWasOpen = useRef(false);
+  useEffect(() => {
+    if (drawer) {
+      document.getElementById(`view-tab-${view}`)?.focus();
+      const onKey = (event: KeyboardEvent): void => {
+        if (event.key === "Escape") setDrawer(false);
+      };
+      document.addEventListener("keydown", onKey);
+      drawerWasOpen.current = true;
+      return () => document.removeEventListener("keydown", onKey);
+    }
+    if (drawerWasOpen.current) menuButton.current?.focus();
+    drawerWasOpen.current = false;
+    return undefined;
+  }, [drawer]);
 
   const bump = useCallback(() => setVersion((v) => v + 1), []);
 
@@ -89,6 +195,7 @@ export function App({ session }: { session: Session }) {
         cursor = page.next;
       }
       setRuns(recent);
+      setRecordsLoaded(true);
       bump();
     } catch (error) {
       // Without a model there are no instances to list; the views say why.
@@ -137,8 +244,19 @@ export function App({ session }: { session: Session }) {
       },
       (state) => setStream((known) => (known === "shutdown" ? known : state)),
     );
-  }, [client, loadModel, loadRecords, bump]);
+  }, [client, loadModel, loadRecords, bump, connection]);
 
+  const closePanel = (): void => {
+    setSelection(null);
+    setOverview(false);
+  };
+  const setView = (next: UiView): void => {
+    setViewState(next);
+    keepView(next);
+    // In a narrow window the panel belongs to the screen it was opened on: the next screen does
+    // not open with a Sheet over it (the network's panel below the diagram lets the page be used).
+    if (!wide) closePanel();
+  };
   const ui: Ui = {
     language,
     t,
@@ -146,23 +264,26 @@ export function App({ session }: { session: Session }) {
     model,
     instances,
     runs,
+    recordsLoaded,
     version,
     view,
-    setView: (next) => {
-      setViewState(next);
-      keepView(next);
-    },
+    setView,
     selection,
     select: (next) => {
       setSelection(next);
       if (next && (next.kind === "process" || next.kind === "type"))
         setFocus({ kind: next.kind, id: next.id });
     },
+    sheet,
+    closePanel,
+    form,
+    openForm: setForm,
+    instanceFilter,
+    setInstanceFilter: (next) => setInstanceFilter((known) => ({ ...known, ...next })),
     focus,
     setFocus,
     putInstance: (instance) => setInstances((known) => new Map(known).set(instance.id, instance)),
     putRun: (run) => setRuns((known) => new Map(known).set(run.id, run)),
-    fail: setFailure,
   };
 
   const running = [...runs.values()].filter((run) => run.status === "running").length;
@@ -172,6 +293,16 @@ export function App({ session }: { session: Session }) {
     setLanguage(next);
     keepLanguage(next);
   };
+  const showInstances = (filter: Partial<InstanceFilter>): void => {
+    setInstanceFilter({ ...NO_FILTER, ...filter });
+    setView("instances");
+  };
+  const reconnect = (): void => {
+    setStream("connecting");
+    setHealth({ status: "loading" });
+    setConnection((n) => n + 1);
+  };
+  const opaque = transparency === null ? systemOpaque : !transparency;
 
   const notice = !client.token
     ? t("token.missing")
@@ -180,91 +311,287 @@ export function App({ session }: { session: Session }) {
       : stream === "closed"
         ? t("token.missing")
         : null;
+  const panelOpen = selection !== null || overview;
 
   return (
     <UiContext.Provider value={ui}>
-      <div class="app">
-        <header class="top">
+      <div class={cx("app", wide && "has-column", narrow && "is-narrow")}>
+        <aside
+          class={cx("sidebar", drawer && "is-open")}
+          id="sidebar"
+          aria-label={t("tabs.label")}
+          inert={narrow && !drawer ? true : undefined}
+        >
           <div class="brand">
-            <h1>{t("app.title")}</h1>
-            <nav class="tabs" role="tablist" aria-label={t("tabs.label")}>
-              {VIEWS.map((name) => (
+            <span class="brand-mark" aria-hidden="true">
+              <Icon name="network" size={17} />
+            </span>
+            <h1 class="brand-title">{t("app.title")}</h1>
+            {narrow && (
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                class="drawer-close"
+                aria-label={t("nav.close")}
+                onClick={() => setDrawer(false)}
+              >
+                <Icon name="x" />
+              </Button>
+            )}
+          </div>
+          <div
+            class="workspace-card"
+            title={model ? `${model.name}\n${model.workspace}` : undefined}
+          >
+            <span class="workspace-icon" aria-hidden="true">
+              <Icon name="folder" />
+            </span>
+            <span class="workspace-text">
+              <span class="workspace-label">{t("workspace.label")}</span>
+              <strong>{model?.name ?? "—"}</strong>
+              <span class="workspace-path mono">{model?.workspace ?? ""}</span>
+            </span>
+          </div>
+          <p class="nav-label" id="nav-label">
+            {t("tabs.label")}
+          </p>
+          <nav aria-labelledby="nav-label">
+            <Tabs
+              value={view}
+              onChange={(next) => {
+                setView(next);
+                setDrawer(false);
+              }}
+              items={VIEWS.map((name) => ({
+                value: name,
+                label: t(`tab.${name}`),
+                title: rail ? t(`tab.${name}`) : undefined,
+                icon: <Icon name={VIEW_ICONS[name]} size={17} />,
+                attrs: { "data-view": name },
+              }))}
+              label={t("tabs.label")}
+              base="view"
+              orientation="vertical"
+              variant="nav"
+            />
+          </nav>
+          <div class="sidebar-spacer" />
+          <div class="sidebar-section">
+            <p class="nav-label">{t("display.title")}</p>
+            <Switch
+              checked={opaque}
+              onChange={(off) => {
+                setTransparency(!off);
+                keepTransparency(!off);
+                applyDisplay(theme, !off);
+              }}
+              label={t("display.transparency")}
+              description={t("display.transparencyHint")}
+              title={rail ? t("display.transparency") : undefined}
+            />
+          </div>
+        </aside>
+        {narrow && drawer && (
+          <div class="drawer-overlay" aria-hidden="true" onClick={() => setDrawer(false)} />
+        )}
+        <div class="shell" inert={narrow && drawer ? true : undefined}>
+          <header class="topbar">
+            <div class="topbar-start">
+              {narrow && (
                 <button
+                  ref={menuButton}
                   type="button"
-                  role="tab"
-                  key={name}
-                  data-view={name}
-                  aria-selected={view === name}
-                  onClick={() => ui.setView(name)}
+                  class="btn btn-ghost btn-icon menu-button"
+                  aria-label={t("nav.menu")}
+                  aria-expanded={drawer}
+                  aria-controls="sidebar"
+                  onClick={() => setDrawer(true)}
                 >
-                  {t(`tab.${name}`)}
+                  <Icon name="menu" size={18} />
                 </button>
-              ))}
-            </nav>
+              )}
+              <p class="breadcrumb">
+                <span class="breadcrumb-root">{model?.name ?? t("app.title")}</span>
+                <Icon name="chevronRight" size={13} class="breadcrumb-separator" />
+                <span class="breadcrumb-current">{t(`tab.${view}`)}</span>
+              </p>
+            </div>
+            <div class="topbar-end">
+              <div class="counts">
+                <Tooltip content={t("count.showRunning")}>
+                  {(tip) => (
+                    <button
+                      type="button"
+                      class="count"
+                      data-testid="running-count"
+                      data-count={running}
+                      onClick={() => showInstances({ status: "running" })}
+                      {...tip}
+                    >
+                      <span class="mark-running" aria-hidden="true" />
+                      <span class="count-text">{t("count.running", { n: running })}</span>
+                      <span class="count-n" aria-hidden="true">
+                        {running}
+                      </span>
+                    </button>
+                  )}
+                </Tooltip>
+                <Tooltip content={t("count.showStale")}>
+                  {(tip) => (
+                    <button
+                      type="button"
+                      class={cx("count", stale > 0 && "has-stale")}
+                      data-testid="stale-count"
+                      data-count={stale}
+                      onClick={() => showInstances({ judgment: "stale" })}
+                      {...tip}
+                    >
+                      <span class="mark-stale" aria-hidden="true" />
+                      <span class="count-text">{t("count.stale", { n: stale })}</span>
+                      <span class="count-n" aria-hidden="true">
+                        {stale}
+                      </span>
+                    </button>
+                  )}
+                </Tooltip>
+              </div>
+              {client.token && <Connection stream={stream} onReconnect={reconnect} />}
+              <button
+                type="button"
+                class="language btn btn-outline btn-sm"
+                onClick={switchLanguage}
+                aria-label={t("language.label")}
+                lang={language === "en" ? "ja" : "en"}
+              >
+                <Icon name="languages" />
+                <span class="language-text">{t("language.switch")}</span>
+              </button>
+              <Select
+                label={t("theme.label")}
+                value={theme}
+                size="sm"
+                compact={narrow}
+                class="theme-select"
+                options={(["system", "light", "dark"] as const).map((value) => ({
+                  value,
+                  label: t(`theme.${value}`),
+                  icon: <Icon name={THEME_ICONS[value]} />,
+                }))}
+                onChange={(next) => {
+                  setTheme(next);
+                  keepTheme(next);
+                  applyDisplay(next, transparency);
+                }}
+              />
+              {sheet && (
+                <Tooltip content={t("panel.open")}>
+                  {(tip) => (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={t("panel.open")}
+                      onClick={() => {
+                        setSelection(null);
+                        setOverview(true);
+                      }}
+                      {...tip}
+                    >
+                      <Icon name="panel" />
+                    </Button>
+                  )}
+                </Tooltip>
+              )}
+            </div>
+          </header>
+          <div class="banners">
+            {notice && (
+              <Alert
+                tone="warning"
+                action={
+                  client.token ? (
+                    <Button variant="outline" size="sm" onClick={reconnect}>
+                      <Icon name="refresh" />
+                      {t("events.reconnect")}
+                    </Button>
+                  ) : undefined
+                }
+              >
+                {notice}
+              </Alert>
+            )}
+            {stream === "retrying" && client.token && (
+              <Alert
+                tone="info"
+                action={
+                  <Button variant="outline" size="sm" onClick={reconnect}>
+                    <Icon name="refresh" />
+                    {t("events.reconnect")}
+                  </Button>
+                }
+              >
+                {t("events.retrying")}
+              </Alert>
+            )}
           </div>
-          <div class="counts">
-            <span data-testid="running-count" data-count={running}>
-              <span class="mark-running" aria-hidden="true" />
-              {t("count.running", { n: running })}
-            </span>
-            <span data-testid="stale-count" data-count={stale}>
-              <span class="mark-stale" aria-hidden="true" />
-              {t("count.stale", { n: stale })}
-            </span>
-            <button
-              type="button"
-              class="language"
-              onClick={switchLanguage}
-              aria-label={t("language.label")}
-              lang={language === "en" ? "ja" : "en"}
-            >
-              {t("language.switch")}
-            </button>
+          <div class="workarea">
+            <main class="main" id="main">
+              <div class="page-head">
+                <div class="page-title">
+                  {model && <p class="eyebrow">{model.name}</p>}
+                  <h2>{t(`tab.${view}`)}</h2>
+                  <p class="page-sub">{t(`screen.${view}`)}</p>
+                </div>
+                <Button onClick={() => setForm({ kind: "new" })} disabled={!model}>
+                  <Icon name="plus" />
+                  {t("process.newInstance")}
+                </Button>
+              </div>
+              <section class="view" data-view={view} {...tabPanel("view", view)} tabIndex={-1}>
+                {view === "network" && <NetworkView modelError={modelError} />}
+                {view === "dashboard" && <DashboardView modelError={modelError} />}
+                {view === "instances" && <InstancesView modelError={modelError} />}
+              </section>
+              {below && (
+                <aside class="panel panel-below" aria-label={t("panel.label")}>
+                  <Panel modelError={modelError} />
+                </aside>
+              )}
+              <footer class="status-bar">
+                <span
+                  class="health"
+                  data-testid="health"
+                  data-status={client.token ? health.status : "error"}
+                >
+                  {!client.token && t("token.missing")}
+                  {client.token && health.status === "loading" && t("health.loading")}
+                  {health.status === "ok" &&
+                    t("health.ok", {
+                      version: health.health.version,
+                      pid: health.health.pid,
+                      port: health.health.port,
+                      workspace: health.health.workspace,
+                    })}
+                  {health.status === "error" &&
+                    t("health.error", { message: describeError(health.error, language) })}
+                </span>
+              </footer>
+            </main>
+            {wide && (
+              <aside class="panel" aria-label={t("panel.label")}>
+                <Panel modelError={modelError} />
+              </aside>
+            )}
           </div>
-        </header>
-        {notice && (
-          <p class="notice" role="status">
-            {notice}
-          </p>
-        )}
-        {stream === "retrying" && client.token && health.status === "ok" && (
-          <p class="notice subtle" role="status">
-            {t("events.retrying")}
-          </p>
-        )}
-        {failure !== null && (
-          <div class="notice error" role="alert">
-            <span>{describeError(failure, language)}</span>
-            <button type="button" class="link" onClick={() => setFailure(null)}>
-              {t("error.dismiss")}
-            </button>
-          </div>
-        )}
-        <main class="body">
-          <section class="view" data-view={view}>
-            {view === "network" && <NetworkView modelError={modelError} />}
-            {view === "dashboard" && <DashboardView modelError={modelError} />}
-            {view === "instances" && <InstancesView />}
-          </section>
-          <aside class="panel" aria-live="polite">
+        </div>
+        {sheet && panelOpen && (
+          <Sheet label={t("panel.label")} onClose={closePanel}>
             <Panel modelError={modelError} />
-          </aside>
-        </main>
-        <footer class="status">
-          <span data-testid="health" data-status={client.token ? health.status : "error"}>
-            {!client.token && t("token.missing")}
-            {client.token && health.status === "loading" && t("health.loading")}
-            {health.status === "ok" &&
-              t("health.ok", {
-                version: health.health.version,
-                pid: health.health.pid,
-                port: health.health.port,
-                workspace: health.health.workspace,
-              })}
-            {health.status === "error" &&
-              t("health.error", { message: describeError(health.error, language) })}
-          </span>
-        </footer>
+          </Sheet>
+        )}
+        <p class="sr-only" aria-live="polite">
+          {selectionLabel(ui, selection)}
+        </p>
+        <FormDialog />
       </div>
     </UiContext.Provider>
   );

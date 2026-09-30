@@ -8,6 +8,10 @@ import type {
   OutcomeJudgment,
   RunStatus,
 } from "../../shared/types.ts";
+import { Badge, type Tone } from "../components/badge.tsx";
+import { Button } from "../components/button.tsx";
+import { Alert } from "../components/feedback.tsx";
+import { Icon } from "../components/icons.tsx";
 import { useUi } from "../context.ts";
 import { renderMarkdown } from "../markdown.ts";
 
@@ -45,20 +49,18 @@ export function Glyphs({
   outcomes: number;
 }) {
   const { t } = useUi();
-  if (!judgments) return <span class="muted">{t("none")}</span>;
+  if (!judgments) return <span class="faint">{t("none")}</span>;
   const count = Math.max(outcomes, ...judgments.map((j) => j.outcome + 1));
   const marks = Array.from({ length: count }, (_, outcome) =>
     judgments.find((j) => j.outcome === outcome),
   );
+  const described = marks
+    .map((j, i) => `${i + 1}: ${j ? t(`judgment.${j.judgment}`) : t("evaluate.skip")}`)
+    .join(", ");
   return (
-    <span
-      class="glyphs"
-      title={marks
-        .map((j, i) => `${i + 1}: ${j ? t(`judgment.${j.judgment}`) : t("evaluate.skip")}`)
-        .join(", ")}
-    >
+    <span class="glyphs" role="img" aria-label={described} title={described}>
       {marks.map((j, i) => (
-        <span key={i} class={j ? `g-${j.judgment}` : "g-none"}>
+        <span key={i} class={j ? `g-${j.judgment}` : "g-none"} aria-hidden="true">
           {j ? GLYPH[j.judgment] : "·"}
         </span>
       ))}
@@ -66,15 +68,45 @@ export function Glyphs({
   );
 }
 
+const STATUS_TONE: Record<RunStatus, Tone> = {
+  running: "info",
+  succeeded: "success",
+  failed: "danger",
+  canceled: "neutral",
+  interrupted: "outline",
+};
+
+/** A run's status. Its colours are not those of the judgments: a run that ended is not an achievement. */
 export function StatusText({ status }: { status: RunStatus }) {
   const { t } = useUi();
-  return <span class={`status s-${status}`}>{t(`status.${status}`)}</span>;
+  return (
+    <Badge
+      tone={STATUS_TONE[status]}
+      dot
+      pulse={status === "running"}
+      class="status"
+      data-status={status}
+    >
+      {t(`status.${status}`)}
+    </Badge>
+  );
 }
 
-export function Section({ title, children }: { title: string; children: ComponentChildren }) {
+export function Section({
+  title,
+  actions,
+  children,
+}: {
+  title: ComponentChildren;
+  actions?: ComponentChildren;
+  children: ComponentChildren;
+}) {
   return (
     <section class="section">
-      <h3>{title}</h3>
+      <div class="section-head">
+        <h3>{title}</h3>
+        {actions}
+      </div>
       {children}
     </section>
   );
@@ -89,7 +121,7 @@ export function Markdown({ source }: { source: string }) {
 export function TypeLink({ id }: { id: string }) {
   const { model, select } = useUi();
   return (
-    <button type="button" class="chip" onClick={() => select({ kind: "type", id })}>
+    <button type="button" class="chip chip-type" onClick={() => select({ kind: "type", id })}>
       {typeName(model, id)}
     </button>
   );
@@ -98,7 +130,7 @@ export function TypeLink({ id }: { id: string }) {
 export function ProcessLink({ id }: { id: string }) {
   const { model, select } = useUi();
   return (
-    <button type="button" class="link" onClick={() => select({ kind: "process", id })}>
+    <button type="button" class="chip chip-process" onClick={() => select({ kind: "process", id })}>
       {processName(model, id)}
     </button>
   );
@@ -118,11 +150,13 @@ export function InstanceLink({ instance }: { instance: InstanceView }) {
   return (
     <button
       type="button"
-      class="link"
+      class="link instance-link"
       onClick={() => select({ kind: "instance", id: instance.id })}
     >
-      {processName(model, instance.process)}{" "}
-      <span class="mono muted">{firstInput(model, instance) ?? instance.id}</span>
+      <span class="instance-link-name">{processName(model, instance.process)}</span>
+      <span class="mono faint instance-link-path">
+        {firstInput(model, instance) ?? instance.id}
+      </span>
     </button>
   );
 }
@@ -132,28 +166,33 @@ export function PanelHead({
   kicker,
   title,
   sub,
+  closable = true,
 }: {
-  kicker: string;
+  kicker: ComponentChildren;
   title: ComponentChildren;
   sub?: ComponentChildren;
+  closable?: boolean;
 }) {
-  const { t, select } = useUi();
+  const { t, closePanel } = useUi();
   return (
     <div class="panel-head">
-      <div>
-        <div class="kicker">{kicker}</div>
+      <div class="panel-head-text">
+        <p class="kicker">{kicker}</p>
         <h2>{title}</h2>
         {sub && <div class="sub">{sub}</div>}
       </div>
-      <button
-        type="button"
-        class="close"
-        aria-label={t("panel.close")}
-        title={t("panel.close")}
-        onClick={() => select(null)}
-      >
-        ×
-      </button>
+      {closable && (
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          class="panel-close"
+          aria-label={t("panel.close")}
+          title={t("panel.close")}
+          onClick={closePanel}
+        >
+          <Icon name="x" />
+        </Button>
+      )}
     </div>
   );
 }
@@ -170,19 +209,18 @@ export function ModelProblem({ error }: { error: unknown }) {
       ? (error as { describe(l: typeof language): string }).describe(language)
       : String(error);
   return (
-    <div class="problem" role="alert">
-      <h2>{t("model.error")}</h2>
+    <Alert tone="danger" title={t("model.error")} class="problem">
       <p>{message}</p>
       {files.length > 0 && (
         <>
-          <h3>{t("model.files")}</h3>
-          <ul class="mono">
+          <p class="problem-files-title">{t("model.files")}</p>
+          <ul class="mono small problem-files">
             {files.map((file) => (
               <li key={file}>{file}</li>
             ))}
           </ul>
         </>
       )}
-    </div>
+    </Alert>
   );
 }
