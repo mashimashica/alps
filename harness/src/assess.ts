@@ -288,6 +288,7 @@ export function computeStats(
     usage: {
       costUsd: cost,
       inputTokens: sumKnown(runs.map((r) => r.usage?.inputTokens)),
+      cachedInputTokens: sumKnown(runs.map((r) => r.usage?.cachedInputTokens)),
       outputTokens: sumKnown(runs.map((r) => r.usage?.outputTokens)),
       costPerAchievedOutcome: perAchieved(cost, achieved),
     },

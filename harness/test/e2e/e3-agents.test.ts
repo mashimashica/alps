@@ -103,11 +103,13 @@ describe("E3 agents", () => {
       });
       expect(detail.run.command).toContain("--output-format stream-json");
       expect(detail.run.command).not.toContain("Solution Design");
-      // The usage and the report come from the result line.
+      // The usage and the report come from the result line. The input tokens are all of them
+      // (6120 uncached, 2310 written to the prompt cache, 7040 read from it), as Codex counts.
       expect(detail.run.usage).toEqual({
         costUsd: 0.0421,
         turns: 4,
-        inputTokens: 6120,
+        inputTokens: 15470,
+        cachedInputTokens: 7040,
         outputTokens: 418,
       });
       expect(detail.run.report).toStartWith("Outcome 0:");
@@ -149,18 +151,29 @@ describe("E3 agents", () => {
       });
       expect(copyOf(detail.run)).toMatchObject({ status: "succeeded", exitCode: 0 });
       expect(detail.run.command).toMatch(/codex\.ts exec --json .*<prompt>$/);
-      // Codex reports tokens but no cost.
+      // Codex reports tokens but no cost; its input tokens include the cached ones.
       expect(detail.run.usage).toEqual({
         costUsd: null,
         turns: null,
-        inputTokens: 24763,
-        outputTokens: 122,
+        inputTokens: 96428,
+        cachedInputTokens: 81152,
+        outputTokens: 1729,
       });
       expect(detail.run.report).toStartWith("Outcome 0:");
       const texts = detail.events.map((event) => event.text);
       expect(texts).toContain("Thread started");
-      expect(texts).toContain("$ bash -lc 'cat skills/design-solution/SKILL.md'");
-      expect(texts).toContain("Changed docs/changes/CHG-001/design/fake-agent.md");
+      // A command that failed says so (rg exits with 1 when it matches nothing).
+      expect(texts).toContain(
+        `$ /bin/zsh -lc "cat skills/design-solution/SKILL.md; cat docs/changes/CHG-001/change-brief.md; rg --files -g 'AGENTS.md' -g '*template*' -g '*requirements*'" (exit code 1)`,
+      );
+      // Codex names the files it changed by their absolute paths.
+      expect(
+        texts.some(
+          (text) =>
+            text.startsWith("Changed /") &&
+            text.endsWith("/docs/changes/CHG-001/design/fake-agent.md"),
+        ),
+      ).toBe(true);
       expect(detail.run.outputs.map((output) => output.type)).toEqual(["Design description"]);
     },
     { timeout: 90_000 },
@@ -172,16 +185,19 @@ describe("E3 agents", () => {
       const { mcp } = await withFake("claude-code", { env: { ALPS_FAKE_SCENARIO: "fail" } });
       const { run } = await startDesign(mcp);
       const detail = await callTool<RunDetailResponse>(mcp, "get_run", { run: run.id, wait: 60 });
+      // Claude Code not logged in: its result says "success" and is_error, and its result text
+      // tells the failure.
       expect(copyOf(detail.run)).toMatchObject({
         status: "failed",
         exitCode: 1,
-        agentError: "error_during_execution",
-        usage: { costUsd: 0.0102, turns: 2 },
+        agentError: "Not logged in · Please run /login",
+        usage: { costUsd: 0, turns: 1, inputTokens: 0, cachedInputTokens: 0, outputTokens: 0 },
       });
-      const kinds = detail.events.map((event) => event.kind);
-      expect(kinds).toContain("error");
+      expect(detail.events).toContainEqual(
+        expect.objectContaining({ kind: "error", text: "Not logged in · Please run /login" }),
+      );
       expect(detail.events.map((event) => event.text)).toContain(
-        "The agent reported a failure (error_during_execution)",
+        "The agent reported a failure (Not logged in · Please run /login)",
       );
     },
     { timeout: 90_000 },

@@ -100,9 +100,15 @@ describe("version 1 records", () => {
       },
     ]);
     for (const key of ["case", "workItem", "summary"]) expect(r5).not.toHaveProperty(key);
-    expect(runs.find((run) => run.id === "r3")).toMatchObject({
-      status: "interrupted",
-      endedAt: NOW,
+    const r3 = runs.find((run) => run.id === "r3");
+    expect(r3).toMatchObject({ status: "interrupted", endedAt: NOW });
+    // Harness 0.8 left out of a Codex run's usage the turns that Codex does not report.
+    expect(r3?.usage).toEqual({
+      costUsd: null,
+      turns: null,
+      inputTokens: 48213,
+      cachedInputTokens: null,
+      outputTokens: 1502,
     });
     expect(state.runs.r3).toEqual({
       id: "r3",

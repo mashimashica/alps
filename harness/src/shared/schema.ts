@@ -165,6 +165,8 @@ const usage: z.ZodType<Usage> = z.object({
   costUsd: z.number().nullable(),
   turns: z.number().nullable(),
   inputTokens: z.number().nullable(),
+  // Runs recorded before the harness read the cached tokens have none.
+  cachedInputTokens: z.number().nullable().default(null),
   outputTokens: z.number().nullable(),
 });
 const runTarget: z.ZodType<RunTarget> = z.object({
@@ -274,6 +276,15 @@ export const runRecordSchema: z.ZodType<Run, unknown> = z.object({
   started: z.array(z.string()).optional(),
 });
 
+/** A run's usage in harness 0.8, which left out what an agent did not report (Codex's turns). */
+const usageV1: z.ZodType<Usage, unknown> = z.object({
+  costUsd: z.number().nullish().default(null),
+  turns: z.number().nullish().default(null),
+  inputTokens: z.number().nullish().default(null),
+  cachedInputTokens: z.number().nullish().default(null),
+  outputTokens: z.number().nullish().default(null),
+});
+
 /**
  * A state.json without schemaVersion (harness 0.8 and earlier). Only what the conversion reads is
  * checked; missing optional values get the defaults the old harness used.
@@ -296,7 +307,7 @@ export const stateFileV1Schema: z.ZodType<StateFileV1, unknown> = z.object({
         exitCode: z.number().nullish().default(null),
         error: z.string().nullish().default(null),
         agentError: z.string().nullish().default(null),
-        usage: usage.nullish().default(null),
+        usage: usageV1.nullish().default(null),
         summary: z
           .string()
           .nullish()
@@ -468,12 +479,15 @@ export const artifactsQuery = z.object({
   changedSince: instant.optional(),
 });
 
+/** The longest that `get_run` waits for a running run to end, in seconds. */
+export const MAX_WAIT_SECONDS = 300;
+
 /** `GET /api/runs/:id` (`get_run`). */
 export const runQuery = z.object({
   /** How many of the last events to return. */
   tail: count.max(1000).default(50),
   /** Seconds to wait for a running run to end. */
-  wait: count.max(300).default(0),
+  wait: count.max(MAX_WAIT_SECONDS).default(0),
 });
 
 /** `GET /api/runs`: newest first, a page at a time. */

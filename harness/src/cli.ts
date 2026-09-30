@@ -1,7 +1,9 @@
 #!/usr/bin/env bun
 /* alps-harness: the harness's command line. */
 
+import fs from "node:fs";
 import pkg from "../package.json" with { type: "json" };
+import { startDirectory } from "./model/files.ts";
 
 const USAGE = `Usage: alps-harness <command> [options]
 
@@ -44,7 +46,13 @@ Options:
 
 class UsageError extends Error {}
 
-const defaultStart = (): string => process.env.ALPS_WORKSPACE || process.cwd();
+/**
+ * ALPS_WORKSPACE, or the current directory. The plugin's .mcp.json sets ALPS_WORKSPACE to
+ * ${CLAUDE_PROJECT_DIR}; a value left unexpanded names no directory, and the current directory,
+ * where Claude Code starts the server (the project directory), is used (startDirectory).
+ */
+const defaultStart = (): string =>
+  startDirectory(process.env.ALPS_WORKSPACE, process.cwd(), fs.existsSync);
 
 /** Parses `[workspace]` and the given flags. Flags with a value take it as the next argument or after `=`. */
 function parse(args: string[], flags: { boolean: string[]; value: string[] }) {

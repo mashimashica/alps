@@ -147,8 +147,8 @@ const en = {
   "run.ended": "Ended",
   "run.duration": "Duration",
   "run.usage": "Usage",
-  "run.usageValue": (a: { cost: string; input: string; output: string }) =>
-    `${a.cost} · ${a.input} input · ${a.output} output tokens`,
+  "run.usageValue": (a: { cost: string; input: string; cached: string | null; output: string }) =>
+    `${a.cost} · ${a.input} input${a.cached === null ? "" : ` (${a.cached} cached)`} · ${a.output} output tokens`,
   "run.report": "Report",
   "run.noReport": "No report.",
   "run.outputs": "Output changes",
@@ -279,8 +279,8 @@ const en = {
   "metric.ended": (a: { n: number; d: number }) => `${a.n} of ${a.d} ended runs`,
   "metric.p90": (a: { p90: string }) => `p90 ${a.p90}`,
   "metric.perAchieved": (a: { cost: string }) => `${a.cost} per achieved Outcome`,
-  "metric.tokens": (a: { input: string; output: string }) =>
-    `${a.input} in · ${a.output} out tokens`,
+  "metric.tokens": (a: { input: string; cached: string | null; output: string }) =>
+    `${a.input} in${a.cached === null ? "" : ` (${a.cached} cached)`} · ${a.output} out tokens`,
   "metric.noUsage": "The agents reported no usage.",
   "unit.items": "",
   "trend.runs": "Runs and results",
@@ -491,7 +491,8 @@ const ja: { [K in UiKey]: (typeof en)[K] } = {
   "run.ended": "終了",
   "run.duration": "所要時間",
   "run.usage": "使用量",
-  "run.usageValue": (a) => `${a.cost} · 入力 ${a.input} · 出力 ${a.output} トークン`,
+  "run.usageValue": (a) =>
+    `${a.cost} · 入力 ${a.input}${a.cached === null ? "" : `（キャッシュ ${a.cached}）`} · 出力 ${a.output} トークン`,
   "run.report": "報告",
   "run.noReport": "報告はない。",
   "run.outputs": "出力の変化",
@@ -618,7 +619,8 @@ const ja: { [K in UiKey]: (typeof en)[K] } = {
   "metric.ended": (a) => `終わった実行 ${a.d} 件のうち ${a.n}`,
   "metric.p90": (a) => `p90 ${a.p90}`,
   "metric.perAchieved": (a) => `達成 1 件あたり ${a.cost}`,
-  "metric.tokens": (a) => `トークン 入力 ${a.input} · 出力 ${a.output}`,
+  "metric.tokens": (a) =>
+    `トークン 入力 ${a.input}${a.cached === null ? "" : `（キャッシュ ${a.cached}）`} · 出力 ${a.output}`,
   "metric.noUsage": "エージェントが使用量を報告していない。",
   "unit.items": "件",
   "trend.runs": "実行数と結果",

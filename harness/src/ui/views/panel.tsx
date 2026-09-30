@@ -602,6 +602,10 @@ function RunPanel({ id }: { id: string }) {
               {t("run.usageValue", {
                 cost: money(run.usage.costUsd),
                 input: count(run.usage.inputTokens, language),
+                cached:
+                  run.usage.cachedInputTokens === null
+                    ? null
+                    : count(run.usage.cachedInputTokens, language),
                 output: count(run.usage.outputTokens, language),
               })}
             </dd>

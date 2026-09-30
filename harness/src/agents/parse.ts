@@ -30,6 +30,11 @@ const num = (value: unknown): number | null => (typeof value === "number" ? valu
 const firstLine = (value: unknown, length = 200): string =>
   (String(value ?? "").split("\n")[0] ?? "").slice(0, length);
 const list = (value: unknown): unknown[] => (Array.isArray(value) ? value : []);
+/** The sum of the numbers among the values; `null` when there is none. */
+const total = (...values: unknown[]): number | null => {
+  const known = values.filter((value): value is number => typeof value === "number");
+  return known.length ? known.reduce((sum, value) => sum + value, 0) : null;
+};
 
 function toolText(name: unknown, input: unknown): string {
   const i = isJson(input) ? input : {};
@@ -62,16 +67,21 @@ function parseClaude(line: Json): ParsedLine {
             : [],
       };
     case "assistant": {
+      // A message that Claude Code writes itself when it cannot use the model (model
+      // "<synthetic>", with `error` such as "authentication_failed") tells why: it is an error.
+      const failure = text(line.error);
       const events: EventDraft[] = [];
       for (const part of list(message.content)) {
         if (!isJson(part)) continue;
         if (part.type === "text" && text(part.text))
-          events.push({ kind: "message", text: text(part.text) });
+          events.push({ kind: failure ? "error" : "message", text: text(part.text) });
         else if (part.type === "tool_use")
           events.push({ kind: "tool", text: toolText(part.name, part.input) });
         else if (part.type === "thinking" && text(part.thinking))
           events.push({ kind: "thinking", text: text(part.thinking) });
       }
+      if (failure && !events.some((event) => event.kind === "error"))
+        events.push({ kind: "error", text: failure });
       return { events };
     }
     case "user": {
@@ -88,32 +98,64 @@ function parseClaude(line: Json): ParsedLine {
     }
     case "result": {
       const tokens = isJson(line.usage) ? line.usage : {};
-      const failed =
-        line.is_error === true || (line.subtype !== undefined && line.subtype !== "success");
-      const subtype = text(line.subtype) || "error";
+      const subtype = text(line.subtype);
+      const failed = line.is_error === true || (subtype !== "" && subtype !== "success");
+      // The subtype names the failure (error_max_turns, error_during_execution); a failure whose
+      // subtype is still "success", as when Claude Code is not logged in, is told by its result.
+      const reason = !failed
+        ? ""
+        : (subtype !== "success" && subtype) || firstLine(text(line.result)) || "error";
       return {
         events: [
           {
             kind: "result",
             text: failed
-              ? `The agent reported a failure (${subtype})`
+              ? `The agent reported a failure (${reason})`
               : "The agent reported the end of its work",
           },
         ],
+        // Input tokens are counted as Codex counts them: those written to and read from the
+        // prompt cache included.
         usage: {
           costUsd: num(line.total_cost_usd),
           turns: num(line.num_turns),
-          inputTokens: num(tokens.input_tokens),
+          inputTokens: total(
+            tokens.input_tokens,
+            tokens.cache_creation_input_tokens,
+            tokens.cache_read_input_tokens,
+          ),
+          cachedInputTokens: num(tokens.cache_read_input_tokens),
           outputTokens: num(tokens.output_tokens),
         },
         ...(line.result === undefined || line.result === null
           ? {}
           : { report: String(line.result).slice(0, MAX_REPORT_LENGTH) }),
-        ...(failed ? { agentError: subtype } : {}),
+        ...(failed ? { agentError: reason } : {}),
       };
     }
     default:
       return { events: [] };
+  }
+}
+
+/**
+ * A Codex error message. When the model's API refused the request, Codex puts the API's error,
+ * as JSON, in the message (`{"type":"error","status":400,"error":{"message":…}}`); its message
+ * says what went wrong.
+ */
+function codexMessage(value: unknown): string {
+  const said = text(value);
+  if (!said.startsWith("{")) return said;
+  try {
+    const parsed: unknown = JSON.parse(said);
+    const inner = isJson(parsed)
+      ? isJson(parsed.error)
+        ? parsed.error.message
+        : parsed.message
+      : undefined;
+    return text(inner) || said;
+  } catch {
+    return said;
   }
 }
 
@@ -124,22 +166,24 @@ function parseCodex(line: Json): ParsedLine {
       return { events: [{ kind: "system", text: "Thread started" }] };
     case "turn.completed": {
       if (!isJson(line.usage)) return { events: [] };
+      // Codex's input tokens include those read from the prompt cache.
       return {
         events: [],
         usage: {
           costUsd: null,
           turns: null,
           inputTokens: num(line.usage.input_tokens),
+          cachedInputTokens: num(line.usage.cached_input_tokens),
           outputTokens: num(line.usage.output_tokens),
         },
       };
     }
     case "turn.failed": {
-      const error = (isJson(line.error) && text(line.error.message)) || "turn.failed";
+      const error = (isJson(line.error) && codexMessage(line.error.message)) || "turn.failed";
       return { events: [{ kind: "error", text: error }], agentError: error };
     }
     case "error":
-      return { events: [{ kind: "error", text: text(line.message) || "error" }] };
+      return { events: [{ kind: "error", text: codexMessage(line.message) || "error" }] };
     case "item.completed": {
       const item = isJson(line.item) ? line.item : {};
       const type = item.type ?? item.item_type;
@@ -166,14 +210,16 @@ function parseCodex(line: Json): ParsedLine {
           events: [
             {
               kind: "tool",
-              text: `MCP ${[text(item.server), text(item.tool)].filter(Boolean).join(" ")}`,
+              text: `MCP ${[text(item.server), text(item.tool)].filter(Boolean).join(" ")}${
+                item.status === "failed" ? " (failed)" : ""
+              }`,
             },
           ],
         };
       if (type === "web_search")
         return { events: [{ kind: "tool", text: `Web search ${text(item.query)}`.trim() }] };
       if (type === "error")
-        return { events: [{ kind: "error", text: text(item.message) || "error" }] };
+        return { events: [{ kind: "error", text: codexMessage(item.message) || "error" }] };
       return { events: [] };
     }
     default:

@@ -76,7 +76,13 @@
       "status": "succeeded",
       "startedAt": "2026-09-29T01:00:00Z",
       "endedAt": "2026-09-29T01:01:00Z",
-      "usage": { "costUsd": 0.3, "turns": 4, "inputTokens": 1000, "outputTokens": 200 }
+      "usage": {
+        "costUsd": 0.3,
+        "turns": 4,
+        "inputTokens": 1000,
+        "cachedInputTokens": 600,
+        "outputTokens": 200
+      }
     },
     {
       "id": "r2",

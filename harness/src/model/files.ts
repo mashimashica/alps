@@ -74,6 +74,21 @@ export function readStructured(file: string, parseYaml: ParseYaml): unknown {
 }
 
 /**
+ * Where to look for the workspace when no directory is given: `given` (ALPS_WORKSPACE), or `cwd`.
+ * A client can pass a variable unexpanded (Claude Code 2.1.96 passed the Plugin's ALPS_WORKSPACE as
+ * `${CLAUDE_PROJECT_DIR}`), so a value that holds `${` and names no existing path is none; an
+ * existing path is used whatever its name.
+ */
+export function startDirectory(
+  given: string | undefined,
+  cwd: string,
+  exists: (p: string) => boolean,
+): string {
+  if (!given || (given.includes("${") && !exists(path.resolve(cwd, given)))) return cwd;
+  return given;
+}
+
+/**
  * The workspace for a start directory: the start directory or the nearest parent
  * that has alps-harness.yaml or process-model.yaml.
  */

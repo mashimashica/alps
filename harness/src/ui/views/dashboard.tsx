@@ -267,7 +267,7 @@ function Tiles({ answer }: { answer: StatsResponse }) {
         sub={
           usage.costUsd === null && usage.inputTokens === null
             ? t("metric.noUsage")
-            : `${t("metric.perAchieved", { cost: money(usage.costPerAchievedOutcome) })} · ${t("metric.tokens", { input: count(usage.inputTokens, language), output: count(usage.outputTokens, language) })}`
+            : `${t("metric.perAchieved", { cost: money(usage.costPerAchievedOutcome) })} · ${t("metric.tokens", { input: count(usage.inputTokens, language), cached: usage.cachedInputTokens === null ? null : count(usage.cachedInputTokens, language), output: count(usage.outputTokens, language) })}`
         }
         spark={
           <Sparkline

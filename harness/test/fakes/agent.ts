@@ -2,9 +2,16 @@
  * A stand-in for Claude Code and Codex in the E2E tests; no model is called. It answers
  * --version, takes the prompt from its arguments or standard input as the real agent does, prints
  * the output lines of test/fixtures/agents/<agent>-<ok|fail>.jsonl, and writes a file at each
- * output location that the prompt names. The lines follow the documented formats
- * (`claude -p --output-format stream-json --verbose`, `codex exec --json`); stage 7 replaces them
- * with output recorded from the real agents.
+ * output location that the prompt names. The lines were recorded from the real agents (stage 7,
+ * 2026-09-30), with this machine's paths, ids, and file contents made placeholders:
+ *   codex-ok     `codex exec --json` (codex-cli 0.158.0) running Requirements Clarification
+ *   codex-fail   the same with a model the API refuses
+ *   claude-fail  `claude -p --output-format stream-json --verbose` (Claude Code 2.1.96), not
+ *                logged in
+ *   claude-ok    written by hand after the documented format, its first and last lines in the
+ *                shape of the recorded ones (no logged-in Claude Code was at hand to record one)
+ * The warnings that Codex printed about the user's own config.toml are left out, and so is what
+ * the real agents print on standard error (Codex: "Reading additional input from stdin...").
  *
  * ALPS_FAKE_SCENARIO picks what it does:
  *   ok    (the default) the work, then exit code 0

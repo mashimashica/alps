@@ -113,9 +113,11 @@ describe("dashboard statistics", () => {
       runSuccess: { numerator: 3, denominator: 4, value: 0.75 },
       // r2 30 s, r1 60 s, r7 90 s, r3 120 s.
       duration: { medianMs: 75 * SECOND, p90Ms: 111 * SECOND },
+      // r7 was recorded before the cached tokens were read, so only r1's count.
       usage: {
         costUsd: expect.closeTo(0.6, 10),
         inputTokens: 1500,
+        cachedInputTokens: 600,
         outputTokens: 300,
         costPerAchievedOutcome: expect.closeTo(0.3, 10),
       },

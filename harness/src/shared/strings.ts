@@ -134,7 +134,7 @@ const en = {
 
   /* ---------- failures of the MCP server ---------- */
   "error.noWorkspace": (a: { start: string }) =>
-    `No alps-harness.yaml or process-model.yaml in ${a.start} or its parent directories. Place one of them (error.files) to make it a workspace.`,
+    `No alps-harness.yaml or process-model.yaml in ${a.start} or its parent directories. Pass the project's directory in ALPS_WORKSPACE, or start the harness in that directory; the workspace is the directory that holds one of these files.`,
   "error.unreachable": (a: { port: number; serverJson: string; detail: string }) =>
     `The harness server could not be reached or started (port ${a.port}, ${a.serverJson}): ${a.detail}`,
 
@@ -315,7 +315,7 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
   "error.internal": () => "サーバーが要求を処理できなかった。",
 
   "error.noWorkspace": (a) =>
-    `${a.start} とその親ディレクトリに alps-harness.yaml も process-model.yaml もない。ワークスペースにするには、どちらかを置くこと（error.files）。`,
+    `${a.start} とその親ディレクトリに alps-harness.yaml も process-model.yaml もない。ALPS_WORKSPACE にプロジェクトのディレクトリを渡すか、そのディレクトリで起動すること。ワークスペースは、どちらかがあるディレクトリになる。`,
   "error.unreachable": (a) =>
     `ハーネスサーバーに接続も起動もできなかった（ポート ${a.port}、${a.serverJson}）: ${a.detail}`,
 

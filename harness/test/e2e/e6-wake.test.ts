@@ -169,6 +169,8 @@ describe("E6 wake", () => {
       expect(wake.run.command).toContain(
         String.raw`mcp_servers.alps_harness.default_tools_approval_mode=\"approve\"`,
       );
+      // Codex waits for a tool call longer than get_run's longest wait (300 s); its own limit is 60 s.
+      expect(wake.run.command).toContain("mcp_servers.alps_harness.tool_timeout_sec=330");
       expect(wake.run.usage?.inputTokens).toBe(1200);
       expect(wake.events.some((event) => event.text === "Woken on request.")).toBe(true);
       // An agent that the harness cannot give its MCP server is refused, and nothing is recorded.

@@ -28,4 +28,4 @@ sources:
     reviewed_source_sha256: 53741acf39357e06d29152bc4d262f05e3c8c0b6dca65a345f26eb6b37d4aad0
   releases/0.9.0.md:
     source: ../../releases/0.9.0.md
-    reviewed_source_sha256: 17a83fa0d0b62af813ebdbe1277e6a48fc673f461a483e5618de37451ee874d5
+    reviewed_source_sha256: 794e4375414edcfd819ece6dc1950cceb879a1878e0d3d5de0b312de58ae9bf6

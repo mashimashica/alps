@@ -350,6 +350,9 @@ describe("E2 MCP over stdio", () => {
           path.join(empty, "alps-harness.yaml"),
           path.join(empty, "process-model.yaml"),
         ]);
+        // The server may have started outside the project (in a Plugin's root): the message says
+        // how to give it the project's directory.
+        expect(error.message, name).toContain("ALPS_WORKSPACE");
       }
       // No daemon was started for a directory that is not a workspace.
       expect(fs.existsSync(records(empty))).toBe(false);

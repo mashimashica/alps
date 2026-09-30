@@ -4,7 +4,7 @@
  * starts the processes.
  */
 
-import type { HarnessConfig } from "../shared/schema.ts";
+import { MAX_WAIT_SECONDS, type HarnessConfig } from "../shared/schema.ts";
 import type { AgentInfo } from "../shared/types.ts";
 
 export { parseOutputLine, type EventDraft, type ParsedLine } from "./parse.ts";
@@ -170,7 +170,8 @@ export const mcpConfigFile = (server: McpServerLaunch): string =>
  * asking; everything else follows the agent's own defaults. Claude Code reads the server from
  * `configFile` (--mcp-config, written with mcpConfigFile) and is allowed its tools (--allowedTools
  * mcp__<name>). Codex takes it as configuration overrides (-c, dotted keys with TOML values, which
- * JSON strings and arrays of strings are), with its tools approved, since `codex exec` cannot ask.
+ * JSON strings and arrays of strings are), with its tools approved, since `codex exec` cannot ask,
+ * and with a tool timeout longer than get_run's longest wait (Codex's own is 60 s).
  */
 export function mcpArgs(spec: AgentSpec, server: McpServerLaunch, configFile: string): string[] {
   if (spec.format === "claude")
@@ -182,6 +183,7 @@ export function mcpArgs(spec: AgentSpec, server: McpServerLaunch, configFile: st
     ["args", JSON.stringify(server.args)],
     ...Object.entries(server.env).map(([name, value]) => [`env.${name}`, JSON.stringify(value)]),
     ["default_tools_approval_mode", JSON.stringify("approve")],
+    ["tool_timeout_sec", String(MAX_WAIT_SECONDS + 30)],
   ].flatMap(([name, value]) => ["-c", `${key}.${name}=${value}`]);
 }
 

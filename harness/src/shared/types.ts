@@ -199,10 +199,17 @@ export interface RunOutput {
   change: "created" | "modified";
 }
 
+/**
+ * What an agent's output says it used; `null` where it says nothing (Codex reports no cost or
+ * turns). Tokens are counted alike for every agent: the input tokens include those written to and
+ * read from the prompt cache.
+ */
 export interface Usage {
   costUsd: number | null;
   turns: number | null;
   inputTokens: number | null;
+  /** Of the input tokens, those read from the prompt cache. */
+  cachedInputTokens: number | null;
   outputTokens: number | null;
 }
 
@@ -640,6 +647,7 @@ export interface StatsMetrics {
   usage: {
     costUsd: number | null;
     inputTokens: number | null;
+    cachedInputTokens: number | null;
     outputTokens: number | null;
     costPerAchievedOutcome: number | null;
   };

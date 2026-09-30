@@ -52,8 +52,8 @@ const WORDS = {
     ended: (share: Ratio) =>
       `${percent(share)} (${share.numerator} of ${share.denominator} ended runs)`,
     durationValue: (median: string, p90: string) => `median ${median}, p90 ${p90}`,
-    usageValue: (cost: string, input: string, output: string, per: string) =>
-      `${cost}; ${input} input and ${output} output tokens; ${per} per achieved Outcome`,
+    usageValue: (cost: string, input: string, cached: string | null, output: string, per: string) =>
+      `${cost}; ${input} input${cached === null ? "" : ` (${cached} cached)`} and ${output} output tokens; ${per} per achieved Outcome`,
     byProcess: "By Process",
     processHeader:
       "| Process | Instances | Runs | Run success | Median duration | Achievement | Unverified | Cost |",
@@ -101,8 +101,8 @@ const WORDS = {
     ended: (share: Ratio) =>
       `${percent(share)}（終わった実行 ${share.denominator} 件のうち ${share.numerator} 件）`,
     durationValue: (median: string, p90: string) => `中央値 ${median}、p90 ${p90}`,
-    usageValue: (cost: string, input: string, output: string, per: string) =>
-      `${cost}。入力 ${input}・出力 ${output} トークン。達成 1 件あたり ${per}`,
+    usageValue: (cost: string, input: string, cached: string | null, output: string, per: string) =>
+      `${cost}。入力 ${input}${cached === null ? "" : `（キャッシュ ${cached}）`}・出力 ${output} トークン。達成 1 件あたり ${per}`,
     byProcess: "プロセス別",
     processHeader:
       "| プロセス | インスタンス | 実行 | 正常終了率 | 所要時間の中央値 | 達成率 | 未確認率 | 費用 |",
@@ -178,6 +178,7 @@ function statisticsLines(stats: Stats, words: Words, options: ReportOptions): st
       words.usageValue(
         money(metrics.usage.costUsd),
         count(metrics.usage.inputTokens),
+        metrics.usage.cachedInputTokens === null ? null : count(metrics.usage.cachedInputTokens),
         count(metrics.usage.outputTokens),
         money(metrics.usage.costPerAchievedOutcome),
       ),

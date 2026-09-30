@@ -9,6 +9,7 @@ export {
   isDir,
   isFile,
   rel,
+  startDirectory,
   toPosix,
   type ParseYaml,
 } from "./files.ts";
