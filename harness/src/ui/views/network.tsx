@@ -29,21 +29,33 @@ import { ModelProblem, processName, typeName } from "./common.tsx";
 /** The page's sans-serif stack (tokens.css), which the labels are measured and drawn in. */
 const FAMILY =
   'Inter, "IBM Plex Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic UI", sans-serif';
-const FONTS: Record<TextStyle, string> = {
-  process: `500 13px ${FAMILY}`,
-  type: `400 12px ${FAMILY}`,
-  focus: `600 14px ${FAMILY}`,
-  note: `400 11.5px ${FAMILY}`,
+/** The weight and the size in pixels of each style, as views.css draws them in the focus view. */
+const FONTS: Record<TextStyle, readonly [number, number]> = {
+  process: [500, 13],
+  type: [400, 12],
+  focus: [600, 14],
+  note: [400, 11.5],
 };
+/**
+ * The ring's names are a size up (views.css draws them so): the ring is scaled down to fit its
+ * box, and there they keep a legible size.
+ */
+const RING_SIZES: Partial<Record<TextStyle, number>> = { process: 14, type: 13 };
 
 let canvas: CanvasRenderingContext2D | null | undefined;
-/** Text widths in the page's fonts, measured on a canvas. */
-const measure: Measure = (text, style) => {
-  if (canvas === undefined) canvas = document.createElement("canvas").getContext("2d");
-  if (!canvas) return estimateWidth(text, style);
-  canvas.font = FONTS[style];
-  return canvas.measureText(text).width;
-};
+/** Text widths in the page's fonts, measured on a canvas, in the styles' sizes or in `sizes`. */
+const measureIn =
+  (sizes: Partial<Record<TextStyle, number>> = {}): Measure =>
+  (text, style) => {
+    const [weight, size] = FONTS[style];
+    const px = sizes[style] ?? size;
+    if (canvas === undefined) canvas = document.createElement("canvas").getContext("2d");
+    if (!canvas) return (estimateWidth(text, style) * px) / size;
+    canvas.font = `${weight} ${px}px ${FAMILY}`;
+    return canvas.measureText(text).width;
+  };
+const measure = measureIn();
+const measureRing = measureIn(RING_SIZES);
 
 export const graphOf = (model: ModelView): GraphModel => ({
   processes: model.processes.map((p) => ({
@@ -172,11 +184,11 @@ function Ring({
           >
             <rect
               class="hit label-bg"
-              x={left - 6}
-              y={p.label.y - 12}
-              width={p.label.width + 12}
-              height={24}
-              rx={7}
+              x={left - 10}
+              y={p.label.y - 16}
+              width={p.label.width + 20}
+              height={32}
+              rx={10}
             />
             <circle class="hit" cx={p.x} cy={p.y} r={16} />
             {mark.stale && <circle class="mark stale" cx={p.x} cy={p.y} r={11.5} />}
@@ -391,7 +403,7 @@ function Legend({ focused }: { focused: boolean }) {
 export function NetworkView({ modelError }: { modelError: unknown }) {
   const { model, instances, runs, focus, setFocus, select, t } = useUi();
   const graph = useMemo(() => (model ? graphOf(model) : null), [model]);
-  const ring = useMemo(() => (graph ? ringLayout(graph, measure) : null), [graph]);
+  const ring = useMemo(() => (graph ? ringLayout(graph, measureRing) : null), [graph]);
   const focused = useMemo(
     () => (graph && focus ? focusLayout(graph, focus, measure) : null),
     [graph, focus],
@@ -441,37 +453,46 @@ export function NetworkView({ modelError }: { modelError: unknown }) {
       : typeName(model, focus.id);
   return (
     <Card class="network-card" data-mode={focused ? "focus" : "ring"}>
-      <div class="network-toolbar">
-        <nav class="crumbs" aria-label={t("tab.network")}>
-          {focused ? (
-            <Button variant="ghost" size="sm" class="crumb" onClick={back}>
-              <Icon name="network" />
-              {t("network.whole")}
-            </Button>
-          ) : (
-            <span class="crumb crumb-current" aria-current="location">
-              <Icon name="network" />
-              {t("network.whole")}
-            </span>
-          )}
-          {focused && focus && (
-            <>
-              <Icon name="chevronRight" class="crumb-separator" size={14} />
+      {/* The heading and the toolbar share a row where they fit, to leave the height to the ring. */}
+      <div class="network-head">
+        <div class="network-heading">
+          <p class="eyebrow" aria-hidden="true">
+            {t("network.eyebrow")}
+          </p>
+          <h3>{t("network.heading")}</h3>
+        </div>
+        <div class="network-toolbar">
+          <nav class="crumbs" aria-label={t("tab.network")}>
+            {focused ? (
+              <Button variant="ghost" size="sm" class="crumb" onClick={back}>
+                <Icon name="network" />
+                {t("network.whole")}
+              </Button>
+            ) : (
               <span class="crumb crumb-current" aria-current="location">
-                <span class="crumb-name">{focusName}</span>
-                <Badge tone="brand">
-                  {focus.kind === "process" ? t("panel.process") : t("panel.type")}
-                </Badge>
+                <Icon name="network" />
+                {t("network.whole")}
               </span>
-            </>
-          )}
-        </nav>
-        <Badge tone="outline" class="network-counts">
-          {t("overview.counts", {
-            processes: model.processes.length,
-            types: model.artifacts.length,
-          })}
-        </Badge>
+            )}
+            {focused && focus && (
+              <>
+                <Icon name="chevronRight" class="crumb-separator" size={14} />
+                <span class="crumb crumb-current" aria-current="location">
+                  <span class="crumb-name">{focusName}</span>
+                  <Badge tone="brand">
+                    {focus.kind === "process" ? t("panel.process") : t("panel.type")}
+                  </Badge>
+                </span>
+              </>
+            )}
+          </nav>
+          <Badge tone="outline" class="network-counts">
+            {t("overview.counts", {
+              processes: model.processes.length,
+              types: model.artifacts.length,
+            })}
+          </Badge>
+        </div>
       </div>
       <div class="network-canvas" ref={canvasBox}>
         {focused ? (

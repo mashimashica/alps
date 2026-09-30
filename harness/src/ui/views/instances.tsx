@@ -77,7 +77,7 @@ export function InstancesView({ modelError }: { modelError: unknown }) {
               value={filter.process}
               icon={<Icon name="network" />}
               options={[
-                { value: "", label: t("filter.all") },
+                { value: "", label: t("filter.allProcesses") },
                 ...(model?.processes ?? []).map((p) => ({ value: p.id, label: p.name })),
               ]}
               onChange={(process) => setFilter({ process })}

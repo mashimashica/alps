@@ -1,10 +1,13 @@
 /*
- * The WebUI: a sidebar with the three screens (the network, the dashboard, the instances) and the
- * display settings; a header with the counts of running runs and stale evidence at the top right,
- * the state of the event stream, the language, and the theme; and a panel on the right for what
- * is selected, which is a Sheet over the page in narrow windows (where the sidebar is a drawer).
- * In the network, a narrow window keeps the panel in the page below the diagram instead: a Sheet
- * would cover the focus view and the background whose click returns to the whole ring.
+ * The WebUI: a sidebar with the three screens (the dashboard, the network, the instances), the
+ * activity counts, and the display settings; a header with the counts of running runs and stale
+ * evidence at the top right, the state of the event stream, the language, and the theme; and a
+ * panel on the right for what is selected. In wide windows the panel is a column: the network
+ * keeps it (the model's overview until something is picked), and the dashboard and the instances
+ * open it for what is picked, so that their screens keep the whole width until then. In narrow
+ * windows it is a Sheet over the page, and the sidebar is a drawer. In the network, a narrow
+ * window keeps the panel in the page below the diagram instead: a Sheet would cover the focus
+ * view and the background whose click returns to the whole ring.
  * The records are read once and kept current through the event stream; the page only draws them.
  */
 
@@ -59,7 +62,7 @@ import { InstancesView } from "./views/instances.tsx";
 import { NetworkView } from "./views/network.tsx";
 import { Panel, selectionLabel } from "./views/panel.tsx";
 
-const VIEWS: readonly UiView[] = ["network", "dashboard", "instances"];
+const VIEWS: readonly UiView[] = ["dashboard", "network", "instances"];
 const VIEW_ICONS: Record<UiView, IconName> = {
   network: "network",
   dashboard: "dashboard",
@@ -73,7 +76,7 @@ const WIDE = "(min-width: 1180px)";
 /** Up to this width the sidebar is a drawer. */
 const NARROW = "(max-width: 760px)";
 /** Between the drawer and this width, the sidebar is a rail of icons. */
-const RAIL = "(min-width: 761px) and (max-width: 1439px)";
+const RAIL = "(min-width: 761px) and (max-width: 1059px)";
 
 type Health =
   | { status: "loading" }
@@ -105,6 +108,66 @@ function Connection({ stream, onReconnect }: { stream: Stream; onReconnect: () =
   );
 }
 
+/**
+ * The counts of running runs and of stale evidence; each lists its instances. The header's are
+ * the ones the tests read (`testids`); the sidebar repeats them next to the screens.
+ */
+function Counts({
+  running,
+  stale,
+  show,
+  testids = false,
+  class: className,
+}: {
+  running: number;
+  stale: number;
+  show: (filter: Partial<InstanceFilter>) => void;
+  testids?: boolean;
+  class?: string;
+}) {
+  const { t } = useUi();
+  return (
+    <div class={cx("counts", className)}>
+      <Tooltip content={t("count.showRunning")}>
+        {(tip) => (
+          <button
+            type="button"
+            class="count"
+            data-testid={testids ? "running-count" : undefined}
+            data-count={running}
+            onClick={() => show({ status: "running" })}
+            {...tip}
+          >
+            <span class="mark-running" aria-hidden="true" />
+            <span class="count-text">{t("count.running", { n: running })}</span>
+            <span class="count-n" aria-hidden="true">
+              {running}
+            </span>
+          </button>
+        )}
+      </Tooltip>
+      <Tooltip content={t("count.showStale")}>
+        {(tip) => (
+          <button
+            type="button"
+            class={cx("count", stale > 0 && "has-stale")}
+            data-testid={testids ? "stale-count" : undefined}
+            data-count={stale}
+            onClick={() => show({ judgment: "stale" })}
+            {...tip}
+          >
+            <span class="mark-stale" aria-hidden="true" />
+            <span class="count-text">{t("count.stale", { n: stale })}</span>
+            <span class="count-n" aria-hidden="true">
+              {stale}
+            </span>
+          </button>
+        )}
+      </Tooltip>
+    </div>
+  );
+}
+
 export function App({ session }: { session: Session }) {
   const client = useMemo(() => createClient(session.token), [session.token]);
   const [language, setLanguage] = useState<Language>(
@@ -125,18 +188,23 @@ export function App({ session }: { session: Session }) {
   const [connection, setConnection] = useState(0);
   const [form, setForm] = useState<Form | null>(null);
   const [instanceFilter, setInstanceFilter] = useState<InstanceFilter>(NO_FILTER);
-  /** In a Sheet, the model's overview shows only when asked for. */
+  /** Where the panel shows only on demand, the model's overview shows only when asked for. */
   const [overview, setOverview] = useState(false);
   const [drawer, setDrawer] = useState(false);
   const [theme, setTheme] = useState<Theme>(keptTheme);
   const [transparency, setTransparency] = useState<boolean | null>(keptTransparency);
-  const wide = useMedia(WIDE);
+  const wideWindow = useMedia(WIDE);
   const narrow = useMedia(NARROW);
   const rail = useMedia(RAIL);
   const systemOpaque = useMedia("(prefers-reduced-transparency: reduce)");
+  const panelOpen = selection !== null || overview;
+  /** The dashboard and the instances show the panel for what is picked; the network, always. */
+  const onDemand = view !== "network";
+  /** The panel as a column: in a wide window, while it has something to show. */
+  const wide = wideWindow && (!onDemand || panelOpen);
   /** The network in a narrow window: the panel follows the diagram in the page. */
-  const below = !wide && view === "network";
-  const sheet = !wide && !below;
+  const below = !wideWindow && !onDemand;
+  const sheet = !wideWindow && onDemand;
   const menuButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -253,9 +321,9 @@ export function App({ session }: { session: Session }) {
   const setView = (next: UiView): void => {
     setViewState(next);
     keepView(next);
-    // In a narrow window the panel belongs to the screen it was opened on: the next screen does
-    // not open with a Sheet over it (the network's panel below the diagram lets the page be used).
-    if (!wide) closePanel();
+    // A selection belongs to the screen it was opened on. Do not cover the next screen with it.
+    closePanel();
+    window.scrollTo({ top: 0, behavior: "instant" });
   };
   const ui: Ui = {
     language,
@@ -274,7 +342,7 @@ export function App({ session }: { session: Session }) {
       if (next && (next.kind === "process" || next.kind === "type"))
         setFocus({ kind: next.kind, id: next.id });
     },
-    sheet,
+    onDemand,
     closePanel,
     form,
     openForm: setForm,
@@ -294,6 +362,7 @@ export function App({ session }: { session: Session }) {
     keepLanguage(next);
   };
   const showInstances = (filter: Partial<InstanceFilter>): void => {
+    setDrawer(false);
     setInstanceFilter({ ...NO_FILTER, ...filter });
     setView("instances");
   };
@@ -311,7 +380,6 @@ export function App({ session }: { session: Session }) {
       : stream === "closed"
         ? t("token.missing")
         : null;
-  const panelOpen = selection !== null || overview;
 
   return (
     <UiContext.Provider value={ui}>
@@ -323,10 +391,12 @@ export function App({ session }: { session: Session }) {
           inert={narrow && !drawer ? true : undefined}
         >
           <div class="brand">
-            <span class="brand-mark" aria-hidden="true">
-              <Icon name="network" size={17} />
-            </span>
-            <h1 class="brand-title">{t("app.title")}</h1>
+            <span class="brand-mark" aria-hidden="true" />
+            {/* The title's text is the name; its dot and capitals are drawn by the stylesheet. */}
+            <h1 class="brand-title" aria-label={t("app.title")}>
+              <span class="brand-name">{t("brand.name")}</span>{" "}
+              <span class="brand-caption">{t("brand.product")}</span>
+            </h1>
             {narrow && (
               <Button
                 variant="ghost"
@@ -339,19 +409,26 @@ export function App({ session }: { session: Session }) {
               </Button>
             )}
           </div>
-          <div
+          <button
+            type="button"
+            onClick={() => {
+              setSelection(null);
+              setOverview(true);
+              setDrawer(false);
+            }}
+            aria-label={t("panel.open")}
             class="workspace-card"
             title={model ? `${model.name}\n${model.workspace}` : undefined}
           >
             <span class="workspace-icon" aria-hidden="true">
-              <Icon name="folder" />
+              <Icon name="layers" />
             </span>
             <span class="workspace-text">
               <span class="workspace-label">{t("workspace.label")}</span>
               <strong>{model?.name ?? "—"}</strong>
               <span class="workspace-path mono">{model?.workspace ?? ""}</span>
             </span>
-          </div>
+          </button>
           <p class="nav-label" id="nav-label">
             {t("tabs.label")}
           </p>
@@ -375,6 +452,10 @@ export function App({ session }: { session: Session }) {
               variant="nav"
             />
           </nav>
+          <div class="sidebar-activity">
+            <p class="nav-label">{t("sidebar.activity")}</p>
+            <Counts running={running} stale={stale} show={showInstances} class="sidebar-counts" />
+          </div>
           <div class="sidebar-spacer" />
           <div class="sidebar-section">
             <p class="nav-label">{t("display.title")}</p>
@@ -417,48 +498,11 @@ export function App({ session }: { session: Session }) {
               </p>
             </div>
             <div class="topbar-end">
-              <div class="counts">
-                <Tooltip content={t("count.showRunning")}>
-                  {(tip) => (
-                    <button
-                      type="button"
-                      class="count"
-                      data-testid="running-count"
-                      data-count={running}
-                      onClick={() => showInstances({ status: "running" })}
-                      {...tip}
-                    >
-                      <span class="mark-running" aria-hidden="true" />
-                      <span class="count-text">{t("count.running", { n: running })}</span>
-                      <span class="count-n" aria-hidden="true">
-                        {running}
-                      </span>
-                    </button>
-                  )}
-                </Tooltip>
-                <Tooltip content={t("count.showStale")}>
-                  {(tip) => (
-                    <button
-                      type="button"
-                      class={cx("count", stale > 0 && "has-stale")}
-                      data-testid="stale-count"
-                      data-count={stale}
-                      onClick={() => showInstances({ judgment: "stale" })}
-                      {...tip}
-                    >
-                      <span class="mark-stale" aria-hidden="true" />
-                      <span class="count-text">{t("count.stale", { n: stale })}</span>
-                      <span class="count-n" aria-hidden="true">
-                        {stale}
-                      </span>
-                    </button>
-                  )}
-                </Tooltip>
-              </div>
+              <Counts running={running} stale={stale} show={showInstances} testids />
               {client.token && <Connection stream={stream} onReconnect={reconnect} />}
               <button
                 type="button"
-                class="language btn btn-outline btn-sm"
+                class="language btn btn-ghost btn-sm"
                 onClick={switchLanguage}
                 aria-label={t("language.label")}
                 lang={language === "en" ? "ja" : "en"}
@@ -470,7 +514,7 @@ export function App({ session }: { session: Session }) {
                 label={t("theme.label")}
                 value={theme}
                 size="sm"
-                compact={narrow}
+                compact
                 class="theme-select"
                 options={(["system", "light", "dark"] as const).map((value) => ({
                   value,
@@ -483,7 +527,7 @@ export function App({ session }: { session: Session }) {
                   applyDisplay(next, transparency);
                 }}
               />
-              {sheet && (
+              {onDemand && (
                 <Tooltip content={t("panel.open")}>
                   {(tip) => (
                     <Button
@@ -537,7 +581,9 @@ export function App({ session }: { session: Session }) {
             <main class="main" id="main">
               <div class="page-head">
                 <div class="page-title">
-                  {model && <p class="eyebrow">{model.name}</p>}
+                  <p class="eyebrow" aria-hidden="true">
+                    {t(`eyebrow.${view}`)}
+                  </p>
                   <h2>{t(`tab.${view}`)}</h2>
                   <p class="page-sub">{t(`screen.${view}`)}</p>
                 </div>

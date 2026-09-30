@@ -23,9 +23,9 @@
   --radius-xl: 18px;
   --radius-2xl: 22px;
 
-  --sidebar-width: 232px;
-  --panel-width: 368px;
-  --header-height: 64px;
+  --sidebar-width: 228px;
+  --panel-width: 298px;
+  --header-height: 69px;
 
   /* light */
   --background: #eef2f7;
@@ -48,7 +48,7 @@
   --destructive-foreground: #ffffff;
   --border: rgba(110, 132, 170, 0.16);
   --border-strong: rgba(110, 132, 170, 0.28);
-  --input: rgba(96, 116, 154, 0.34);
+  --input: rgba(110, 132, 170, 0.22);
   --ring: #6f7fd3;
   --brand: #5564bb;
 
@@ -64,8 +64,8 @@
   --shadow-popover: 0 15px 40px -12px rgba(44, 70, 98, 0.28), 0 0 0 1px var(--border);
   --shadow-dialog: 0 28px 90px -25px rgba(25, 42, 75, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.4);
   --overlay: rgba(33, 48, 78, 0.23);
-  --ambient-a: rgba(204, 212, 244, 0.85);
-  --ambient-b: rgba(196, 226, 223, 0.75);
+  --ambient-a: rgba(202, 203, 233, 0.6);
+  --ambient-b: rgba(196, 226, 223, 0.48);
 
   --success: #2e7769;
   --success-soft: rgba(55, 142, 125, 0.1);
@@ -277,8 +277,8 @@ body {
   background-color: var(--background);
   /* Two soft lights behind the glass, drawn as gradients (no blurred elements to repaint). */
   background-image:
-    radial-gradient(52rem 38rem at 100% -12%, var(--ambient-a), transparent 70%),
-    radial-gradient(48rem 44rem at 12% 115%, var(--ambient-b), transparent 70%);
+    radial-gradient(45rem 38rem at 96% -8%, var(--ambient-a), transparent 70%),
+    radial-gradient(48rem 44rem at 16% 115%, var(--ambient-b), transparent 70%);
   background-attachment: fixed;
   font-synthesis: none;
   text-rendering: optimizeLegibility;

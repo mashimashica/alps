@@ -9,6 +9,9 @@ import type { Language } from "../shared/types.ts";
 
 const en = {
   "app.title": "ALPS Harness",
+  // The sidebar's heading: the name, then the product in small capitals; together, the title.
+  "brand.name": "ALPS",
+  "brand.product": "Harness",
   "tab.network": "Network",
   "tab.dashboard": "Dashboard",
   "tab.instances": "Instances",
@@ -30,6 +33,14 @@ const en = {
   "nav.menu": "Open the menu",
   "nav.close": "Close the menu",
   "workspace.label": "Workspace",
+  "sidebar.activity": "At a glance",
+  "network.eyebrow": "Process atlas",
+  "network.heading": "See the work, connected.",
+  "filter.allProcesses": "All processes",
+  "filter.allAgents": "All agents",
+  "eyebrow.network": "Process network",
+  "eyebrow.dashboard": "Overview",
+  "eyebrow.instances": "Instances",
   "screen.network":
     "How the Processes and the Artifact types relate. The lines are not an order of execution.",
   "screen.dashboard":
@@ -370,6 +381,8 @@ export type UiKey = keyof typeof en;
 
 const ja: { [K in UiKey]: (typeof en)[K] } = {
   "app.title": "ALPS Harness",
+  "brand.name": "ALPS",
+  "brand.product": "Harness",
   "tab.network": "ネットワーク",
   "tab.dashboard": "ダッシュボード",
   "tab.instances": "インスタンス",
@@ -390,6 +403,14 @@ const ja: { [K in UiKey]: (typeof en)[K] } = {
   "nav.menu": "メニューを開く",
   "nav.close": "メニューを閉じる",
   "workspace.label": "ワークスペース",
+  "sidebar.activity": "概況",
+  "network.eyebrow": "プロセスの地図",
+  "network.heading": "つながりから、全体を捉える。",
+  "filter.allProcesses": "すべてのプロセス",
+  "filter.allAgents": "すべてのエージェント",
+  "eyebrow.network": "プロセスのネットワーク",
+  "eyebrow.dashboard": "概要",
+  "eyebrow.instances": "インスタンス",
   "screen.network": "プロセスとアーティファクトの型の関係。線は実行の順序を表さない。",
   "screen.dashboard": "期間内の実行と判断の集計。画面は数えるだけで、判断はしない。",
   "screen.instances": "プロセスを具体的な入力に適用した一つひとつと、その実行と評価。",

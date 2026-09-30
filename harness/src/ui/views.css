@@ -19,7 +19,7 @@
   display: flex;
   flex-direction: column;
   width: var(--sidebar-width);
-  padding: 22px 16px 18px;
+  padding: 30px 19px 18px;
   overflow-y: auto;
   background: var(--sidebar);
   border-right: 1px solid var(--sidebar-border);
@@ -35,8 +35,8 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 8px 22px;
+  gap: 8px;
+  padding: 0 12px 30px;
 }
 
 .brand-mark {
@@ -52,9 +52,10 @@
 
 .brand-title {
   flex: 1;
-  font-size: 16px;
+  font-size: 26px;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -1.6px;
+  line-height: 1;
 }
 
 .drawer-close {
@@ -65,8 +66,10 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 11px;
-  margin-bottom: 24px;
+  padding: 13px 10px;
+  margin-bottom: 30px;
+  text-align: left;
+  cursor: pointer;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   background: var(--card);
@@ -369,15 +372,16 @@
   flex-direction: column;
   min-width: 0;
   min-height: calc(100dvh - var(--header-height));
-  padding: 26px 28px 0;
+  padding: 32px 36px 0;
 }
 
 .page-head {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 20px;
+  min-height: 84px;
+  margin-bottom: 26px;
 }
 
 .page-title {
@@ -385,26 +389,26 @@
 }
 
 .eyebrow {
-  margin-bottom: 4px;
-  font-size: 11px;
+  margin-bottom: 10px;
+  font-size: 9px;
   font-weight: 500;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--faint-foreground);
   overflow-wrap: anywhere;
 }
 
 .page-title h2 {
-  font-size: 24px;
+  font-size: 25px;
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.035em;
   line-height: 1.35;
 }
 
 .page-sub {
-  margin-top: 4px;
+  margin-top: 9px;
   max-width: 72ch;
-  font-size: 12.5px;
+  font-size: 11.5px;
   color: var(--muted-foreground);
 }
 
@@ -436,8 +440,8 @@
   position: sticky;
   top: calc(var(--header-height) + 16px);
   max-height: calc(100dvh - var(--header-height) - 32px);
-  margin: 16px 20px 16px 0;
-  padding: 20px 20px 24px;
+  margin: 142px 36px 24px 0;
+  padding: 26px 22px;
   overflow-y: auto;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
@@ -513,7 +517,7 @@
 
 .tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -522,8 +526,8 @@
   flex-direction: column;
   gap: 4px;
   min-width: 0;
-  min-height: 138px;
-  padding: 15px 16px 13px;
+  min-height: 150px;
+  padding: 20px 20px 17px;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
   background: var(--card);
@@ -600,8 +604,8 @@
   align-items: baseline;
   gap: 4px;
   min-width: 0;
-  font-size: 30px;
-  font-weight: 500;
+  font-size: 36px;
+  font-weight: 450;
   letter-spacing: -0.03em;
   line-height: 1.2;
   font-variant-numeric: tabular-nums;
@@ -1103,9 +1107,14 @@ svg.chart:focus-visible {
   font-weight: 400;
 }
 
+/*
+ * The ring takes the height that the page leaves under the heading, down to the legend's first
+ * row, and the whole width (its drawing keeps a margin): at 1280 × 800 the lowest name and the
+ * legend are in the window, and the names keep a legible size.
+ */
 .network-canvas {
   position: relative;
-  height: clamp(480px, calc(100dvh - 280px), 900px);
+  height: clamp(420px, calc(100dvh - 310px), 900px);
   min-height: 0;
 }
 
@@ -1151,7 +1160,7 @@ svg.graph {
 
 .graph .edge {
   fill: none;
-  stroke-width: 1.2;
+  stroke-width: 1;
   opacity: 0.55;
 }
 
@@ -1210,9 +1219,10 @@ svg.graph {
   stroke-width: 3;
 }
 
+/* The ring's names are a size up from the focus view's (network.tsx measures them so). */
 .graph .proc text {
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   fill: var(--foreground);
 }
@@ -1253,7 +1263,7 @@ svg.graph {
 
 .graph .pill text {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 13px;
   fill: var(--muted-foreground);
 }
 
@@ -2176,16 +2186,455 @@ dl.front dd {
   gap: 10px;
 }
 
-/* ---------- widths ---------- */
-
-@media (max-width: 1440px) {
-  :root {
-    --panel-width: 344px;
-  }
+/* The preview's proportions: breathing room around the work, quiet glass surfaces. */
+/* The title's text is the name and the product; the dot and the capitals are drawn. */
+.brand-title {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.brand-name::after {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-left: 2px;
+  border-radius: 50%;
+  background: #7082bb;
+}
+.brand-caption {
+  padding-bottom: 4px;
+  color: var(--faint-foreground);
+  font-size: 7px;
+  font-weight: 400;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+}
+.brand-mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  /* The ALPS mark, a copy of the repository's assets/icon.svg: the harness bundles on its own. */
+  background: url("./icon.svg") center / contain no-repeat;
+  box-shadow: none;
+}
+.workspace-text strong {
+  font-size: 12px;
+  line-height: 1.65;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.workspace-label {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+.workspace-path {
+  max-width: 125px;
+  margin-top: 3px;
+  font-size: 9px;
+}
+.nav-label {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+.tabs-nav {
+  gap: 6px;
+}
+.tabs-nav .tab {
+  position: relative;
+  min-height: 44px;
+  font-size: 12px;
+}
+.tabs-nav .tab[aria-selected="true"]::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  margin-left: auto;
+  border-radius: 50%;
+  background: currentColor;
+}
+.sidebar-activity {
+  margin-top: 28px;
+  padding: 24px 2px 0;
+  border-top: 1px solid var(--border);
+}
+.sidebar-counts {
+  align-items: stretch;
+  flex-direction: column;
+  gap: 3px;
+}
+.sidebar-counts .count {
+  height: auto;
+  min-height: 36px;
+  padding: 7px 12px;
+  font-size: 11px;
+  gap: 11px;
+  text-align: left;
+}
+.sidebar-counts .mark-running {
+  width: 6px;
+  height: 6px;
+  border: 0;
+  background: var(--chart-succeeded);
+  box-shadow: 0 0 0 3px var(--success-soft);
+}
+.sidebar-counts .mark-stale {
+  width: 6px;
+  height: 6px;
+}
+.sidebar-section {
+  padding-top: 18px;
+}
+.sidebar-section .check-label {
+  font-size: 11px;
+}
+.sidebar-section .check-description {
+  font-size: 10px;
+}
+.topbar {
+  padding: 10px 36px;
+  background: transparent;
+}
+.breadcrumb {
+  font-size: 11px;
+  gap: 14px;
+}
+.connection {
+  border-color: var(--glass-border);
+  font-size: 10px;
+  height: 27px;
+  padding: 0 9px;
+}
+.theme-select .select-trigger {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+.theme-select .select-chevron {
+  display: none;
+}
+.theme-select .select-trigger {
+  width: 30px;
+  justify-content: center;
+}
+.app.has-column .main {
+  padding-right: 18px;
+}
+.app.has-column .page-head {
+  width: calc(100% + var(--panel-width) - 18px);
+}
+.tile-label {
+  font-size: 11.5px;
+  font-weight: 400;
+}
+.tile-sub {
+  font-size: 10.5px;
+}
+.tile-middle {
+  min-height: 50px;
+}
+.tile-icon {
+  border-color: var(--border);
+  opacity: 0.78;
+}
+.tile .spark {
+  opacity: 0.48;
+  width: 66px;
+}
+.tile-primary .tile-icon {
+  color: var(--brand);
+}
+.tile-stale .tile-value {
+  color: var(--foreground);
+}
+.tiles-secondary {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.tiles-secondary .tile {
+  min-height: 104px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 5px 18px;
+  padding: 17px 22px;
+}
+.tiles-secondary .tile-top {
+  align-items: center;
+}
+.tiles-secondary .tile-icon {
+  display: none;
+}
+.tiles-secondary .tile-middle {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  min-height: 0;
+  align-items: center;
+}
+.tiles-secondary .tile-value {
+  font-size: 25px;
+}
+.tiles-secondary .spark,
+.tiles-secondary .tile-arrow {
+  display: none;
+}
+.tiles-secondary .tile-sub {
+  max-width: 30em;
+}
+.dashboard-filters .field-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+.dashboard-filters .field {
+  flex-basis: 196px;
+  min-width: 0;
+}
+.dashboard-filters .filter-period {
+  margin-left: auto;
+  flex-basis: 126px;
+}
+.dashboard-filters .filter-granularity {
+  flex-basis: 88px;
+}
+.dashboard-filters .select-trigger {
+  font-size: 12px;
+}
+.dashboard-body {
+  gap: 18px;
+}
+.summary-charts {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+  gap: 18px;
+}
+.summary-trend .card-body {
+  position: relative;
+  padding-top: 12px;
+}
+.summary-trend .chart-frame {
+  margin-top: 52px;
+}
+.summary-trend .chart-legend {
+  margin: 8px 0 0;
+}
+.summary-trend .series-line {
+  stroke-width: 2;
+}
+.series-area {
+  stroke: none;
+  opacity: 0.1;
+}
+.summary-trend .series-dot {
+  r: 0;
+}
+.summary-trend .series-line.a1 {
+  stroke-dasharray: 4 4;
+  opacity: 0.8;
+}
+.summary-trend .chart-empty-note {
+  position: absolute;
+  inset: 90px 25px auto;
+  z-index: 1;
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.summary-donut .card-body {
+  padding-top: 18px;
+}
+.donut-wrap {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  margin: 0 auto 20px;
+}
+.donut-wrap svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.donut-track {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 8;
+}
+.donut-segment {
+  fill: none;
+  stroke-width: 8;
+}
+.donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.donut-center strong {
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+.donut-center small {
+  font-size: 9px;
+  color: var(--muted-foreground);
+  margin-top: 2px;
+}
+.donut-legend {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  gap: 8px;
+}
+.donut-legend div {
+  text-align: center;
+}
+.donut-legend dt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+.donut-legend dd {
+  margin: 4px 0 0;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.donut-legend .swatch {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+/* The heading on the left and the toolbar on the right; the toolbar wraps under it if need be. */
+.network-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px 20px;
+  padding: 18px 24px 6px;
+}
+.network-heading {
+  min-width: 0;
+}
+.network-heading h3 {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+}
+.network-heading .eyebrow {
+  margin-bottom: 8px;
+}
+.network-toolbar {
+  border-bottom: 0;
+  padding: 0;
+}
+.network-toolbar .crumb {
+  font-size: 11px;
+}
+.network-counts {
+  font-size: 9px;
+  border-color: var(--border);
+}
+.graph .proc .dot {
+  opacity: 0.38;
+}
+.graph .orbit {
+  opacity: 0.5;
+}
+.overview-symbol {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  color: var(--brand);
+  background: var(--secondary);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  margin-bottom: 10px;
+}
+[data-testid="panel-overview"] {
+  gap: 20px;
+}
+[data-testid="panel-overview"] .panel-text {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  line-height: 1.9;
+}
+[data-testid="panel-overview"] .section {
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+[data-testid="panel-overview"] .list-row {
+  border-bottom: 0;
+  padding: 8px 0;
+}
+[data-testid="panel-overview"] .strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+[data-testid="panel-overview"] .list-row .small {
+  font-size: 10px;
+}
+.overview-counts {
+  display: flex;
+  gap: 26px;
+  padding: 0 0 4px;
+}
+.overview-counts div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.overview-counts strong {
+  font-weight: 450;
+  font-size: 29px;
+}
+.overview-counts span {
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+.panel-head h2 {
+  font-size: 16px;
+  font-weight: 550;
+  line-height: 1.6;
+}
+.panel-head .kicker {
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  margin-bottom: 7px;
+}
+.panel .path-block {
+  font-size: 10px;
+}
+.instances .table-card > .empty {
+  min-height: 340px;
+  justify-content: center;
+}
+.instances .filters .field {
+  flex: 1 1 160px;
+}
+.instances .filters .field-grow {
+  flex-basis: 240px;
+}
+.instances .toolbar-end {
+  width: 100%;
+  justify-content: space-between;
+  margin-top: 4px;
 }
 
+/* ---------- widths ---------- */
+
 /* Between the drawer and the full sidebar, the sidebar is a rail of icons (names in titles). */
-@media (min-width: 761px) and (max-width: 1439px) {
+@media (min-width: 761px) and (max-width: 1059px) {
   :root {
     --sidebar-width: 72px;
   }
@@ -2200,6 +2649,7 @@ dl.front dd {
     padding: 0 0 18px;
   }
 
+  .sidebar .brand-caption,
   .sidebar .brand-title,
   .sidebar .workspace-text,
   .sidebar .nav-label,
@@ -2519,5 +2969,75 @@ dl.front dd {
 
   .tile-sub {
     font-size: 11px;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1059px) {
+  .sidebar-activity {
+    width: 100%;
+    padding: 18px 0 0;
+  }
+  .sidebar-counts .count {
+    padding: 8px 0;
+    justify-content: center;
+    gap: 6px;
+  }
+  .sidebar-counts .count-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+  .sidebar-counts .count-n {
+    display: inline;
+  }
+  .tabs-nav .tab[aria-selected="true"]::after {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .page-head {
+    min-height: 0;
+    margin-bottom: 24px;
+  }
+  .page-sub {
+    max-width: 40ch;
+  }
+  .sidebar-counts .count-text {
+    position: static;
+    width: auto;
+    height: auto;
+    clip: auto;
+    overflow: visible;
+    white-space: normal;
+  }
+  .sidebar-counts .count-n {
+    display: none;
+  }
+  .tiles-secondary {
+    grid-template-columns: 1fr;
+  }
+  .summary-charts {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-filters .filter-period {
+    margin-left: 0;
+  }
+  .dashboard-filters .filter-period,
+  .dashboard-filters .filter-granularity {
+    flex: 1 1 calc(50% - 6px);
+  }
+  .summary-trend .chart-frame {
+    margin-top: 26px;
+  }
+  .network-head {
+    padding: 20px 18px 8px;
+  }
+  .network-canvas {
+    padding: 8px 0;
+  }
+  .sheet-surface {
+    padding: 24px 18px;
   }
 }

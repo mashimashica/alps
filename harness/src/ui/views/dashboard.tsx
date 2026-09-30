@@ -48,7 +48,7 @@ type Cut = "process" | "agent" | "outcome" | "judge";
 
 /** The filter and the cut stay as they were while the page is open. */
 let kept: { filter: Filter; cut: Cut } = {
-  filter: { period: "30d", granularity: "week", process: "", agent: "" },
+  filter: { period: "30d", granularity: "day", process: "", agent: "" },
   cut: "process",
 };
 
@@ -149,7 +149,7 @@ const judgedTotal = (b: TrendBucket): number =>
 const endedTotal = (b: TrendBucket): number =>
   b.runs.succeeded + b.runs.failed + b.runs.canceled + b.runs.interrupted;
 
-function Tiles({ answer }: { answer: StatsResponse }) {
+function Tiles({ answer, secondary = false }: { answer: StatsResponse; secondary?: boolean }) {
   const ui = useUi();
   const { t, language } = ui;
   const { metrics, trends } = answer.stats;
@@ -160,133 +160,260 @@ function Tiles({ answer }: { answer: StatsResponse }) {
   );
   const usage = metrics.usage;
   return (
-    <div class="tiles">
-      <Tile
-        testid="metric-achievement"
-        tone="primary"
-        icon="target"
-        label={t("metric.achievement")}
-        value={percent(metrics.achievement.value)}
-        unit="%"
-        sub={t("metric.judged", {
-          n: metrics.achievement.numerator,
-          d: metrics.achievement.denominator,
-        })}
-        spark={<Sparkline values={trends.map((b) => b.achievementRate)} tone="spark-achieved" />}
-        onPick={() => members(ui, t("metric.achievement"), within, judged, [])}
-      />
-      <Tile
-        testid="metric-unverified"
-        icon="help"
-        label={t("metric.unverified")}
-        value={percent(metrics.unverified.value)}
-        unit="%"
-        sub={t("metric.awaiting", { n: metrics.unverified.awaitingJudgment })}
-        spark={
-          <Sparkline
-            values={trends.map((b) =>
-              judgedTotal(b) ? b.judgments.unverified / judgedTotal(b) : null,
+    <div class={secondary ? "tiles tiles-secondary" : "tiles"}>
+      {[
+        <Tile
+          key="metric-achievement"
+          testid="metric-achievement"
+          tone="primary"
+          icon="target"
+          label={t("metric.achievement")}
+          value={percent(metrics.achievement.value)}
+          unit="%"
+          sub={t("metric.judged", {
+            n: metrics.achievement.numerator,
+            d: metrics.achievement.denominator,
+          })}
+          spark={<Sparkline values={trends.map((b) => b.achievementRate)} tone="spark-achieved" />}
+          onPick={() => members(ui, t("metric.achievement"), within, judged, [])}
+        />,
+        <Tile
+          key="metric-run-success"
+          testid="metric-run-success"
+          icon="activity"
+          label={t("metric.runSuccess")}
+          value={percent(metrics.runSuccess.value)}
+          unit="%"
+          sub={t("metric.ended", {
+            n: metrics.runSuccess.numerator,
+            d: metrics.runSuccess.denominator,
+          })}
+          spark={
+            <Sparkline
+              values={trends.map((b) => (endedTotal(b) ? b.runs.succeeded / endedTotal(b) : null))}
+              tone="spark-succeeded"
+            />
+          }
+          onPick={() => members(ui, t("metric.runSuccess"), within, [], answer.members.runs)}
+        />,
+        <Tile
+          key="metric-unverified"
+          testid="metric-unverified"
+          icon="help"
+          label={t("metric.unverified")}
+          value={percent(metrics.unverified.value)}
+          unit="%"
+          sub={t("metric.awaiting", { n: metrics.unverified.awaitingJudgment })}
+          spark={
+            <Sparkline
+              values={trends.map((b) =>
+                judgedTotal(b) ? b.judgments.unverified / judgedTotal(b) : null,
+              )}
+              tone="spark-unverified"
+            />
+          }
+          onPick={() =>
+            members(
+              ui,
+              t("metric.unverified"),
+              within,
+              answer.members.instances
+                .filter(
+                  (i) =>
+                    i.awaiting ||
+                    (i.judged &&
+                      ui.instances
+                        .get(i.id)
+                        ?.evaluation?.judgments.some((j) => j.judgment === "unverified")),
+                )
+                .map((i) => i.id),
+              [],
+            )
+          }
+        />,
+        <Tile
+          key="metric-stale"
+          testid="metric-stale"
+          tone={metrics.staleEvaluations > 0 ? "stale" : undefined}
+          icon="history"
+          label={t("metric.stale")}
+          value={String(metrics.staleEvaluations)}
+          unit={t("unit.items")}
+          sub={t("metric.staleSub")}
+          spark={
+            <Badge tone="warning" class="tile-now">
+              {t("metric.now")}
+            </Badge>
+          }
+          onPick={() =>
+            members(
+              ui,
+              t("metric.stale"),
+              t("members.now"),
+              answer.members.instances.filter((i) => i.stale).map((i) => i.id),
+              [],
+            )
+          }
+        />,
+        <Tile
+          key="metric-duration"
+          testid="metric-duration"
+          icon="clock"
+          label={t("metric.duration")}
+          value={duration(metrics.duration.medianMs, language)}
+          sub={t("metric.p90", { p90: duration(metrics.duration.p90Ms, language) })}
+          spark={<Sparkline values={trends.map((b) => b.duration.medianMs)} />}
+          onPick={() => members(ui, t("metric.duration"), within, [], ended)}
+        />,
+        <Tile
+          key="metric-cost"
+          testid="metric-cost"
+          icon="coins"
+          label={t("metric.cost")}
+          value={money(usage.costUsd)}
+          sub={
+            usage.costUsd === null && usage.inputTokens === null
+              ? t("metric.noUsage")
+              : `${t("metric.perAchieved", { cost: money(usage.costPerAchievedOutcome) })} · ${t("metric.tokens", { input: count(usage.inputTokens, language), cached: usage.cachedInputTokens === null ? null : count(usage.cachedInputTokens, language), output: count(usage.outputTokens, language) })}`
+          }
+          spark={
+            <Sparkline
+              values={trends.map((b) => {
+                const costs = Object.values(b.costByAgent);
+                return costs.length ? costs.reduce((a, c) => a + c, 0) : null;
+              })}
+            />
+          }
+          onPick={() =>
+            members(
+              ui,
+              t("metric.cost"),
+              within,
+              [],
+              answer.members.runs.filter((r) => r.costUsd !== null),
+            )
+          }
+        />,
+      ].slice(secondary ? 4 : 0, secondary ? 6 : 4)}
+    </div>
+  );
+}
+
+/** Overview graphics use the same server buckets and judgments as the detailed charts. */
+function SummaryCharts({ answer }: { answer: StatsResponse }) {
+  const ui = useUi();
+  const { t, language } = ui;
+  const { trends, metrics } = answer.stats;
+  const labels = trends.map((b) => shortDate(b.start, language));
+  const runTotals = trends.map((bucket, i) => {
+    const end = trends[i + 1]?.start ?? Number.POSITIVE_INFINITY;
+    return answer.members.runs.filter((run) => run.startedAt >= bucket.start && run.startedAt < end)
+      .length;
+  });
+  const successes = trends.map((b) => b.runs.succeeded);
+  const totals = trends.reduce(
+    (n, b) => [
+      n[0]! + b.judgments.achieved,
+      n[1]! + b.judgments["not-achieved"],
+      n[2]! + b.judgments.unverified,
+    ],
+    [0, 0, 0],
+  );
+  const total = totals.reduce((a, b) => a + b, 0);
+  const colors = ["var(--chart-achieved)", "var(--chart-not-achieved)", "var(--chart-unverified)"];
+  const names = [t("judgment.achieved"), t("judgment.not-achieved"), t("judgment.unverified")];
+  const circumference = 2 * Math.PI * 66;
+  let offset = 0;
+  const series = [
+    { label: t("col.runs"), className: "a0" },
+    { label: t("status.succeeded"), className: "a1" },
+  ];
+  return (
+    <div class="summary-charts">
+      <Card class="summary-trend">
+        <CardHeader
+          title={t("trend.runs")}
+          actions={
+            <Badge tone="outline">
+              {runTotals.reduce((a, b) => a + b, 0)} {t("col.runs")}
+            </Badge>
+          }
+        />
+        <div class="card-body">
+          <Legend series={series} />
+          {runTotals.every((n) => n === 0) && <p class="chart-empty-note">{t("trend.noData")}</p>}
+          <Lines
+            label={`${t("trend.runs")}. ${t("chart.keys")}`}
+            labels={labels}
+            titles={labels.map(
+              (label, i) =>
+                `${label}: ${series[0]!.label} ${runTotals[i]}, ${series[1]!.label} ${successes[i]}`,
             )}
-            tone="spark-unverified"
+            series={series}
+            values={[runTotals, successes]}
+            area
+            format={String}
+            onPick={(i) => {
+              const start = trends[i]?.start;
+              if (start === undefined) return;
+              const end = trends[i + 1]?.start ?? Number.POSITIVE_INFINITY;
+              members(
+                ui,
+                t("trend.runs"),
+                labels[i] ?? "",
+                [],
+                answer.members.runs.filter((r) => r.startedAt >= start && r.startedAt < end),
+              );
+            }}
           />
-        }
-        onPick={() =>
-          members(
-            ui,
-            t("metric.unverified"),
-            within,
-            answer.members.instances
-              .filter(
-                (i) =>
-                  i.awaiting ||
-                  (i.judged &&
-                    ui.instances
-                      .get(i.id)
-                      ?.evaluation?.judgments.some((j) => j.judgment === "unverified")),
-              )
-              .map((i) => i.id),
-            [],
-          )
-        }
-      />
-      <Tile
-        testid="metric-stale"
-        tone={metrics.staleEvaluations > 0 ? "stale" : undefined}
-        icon="history"
-        label={t("metric.stale")}
-        value={String(metrics.staleEvaluations)}
-        unit={t("unit.items")}
-        sub={t("metric.staleSub")}
-        spark={
-          <Badge tone="warning" class="tile-now">
-            {t("metric.now")}
-          </Badge>
-        }
-        onPick={() =>
-          members(
-            ui,
-            t("metric.stale"),
-            t("members.now"),
-            answer.members.instances.filter((i) => i.stale).map((i) => i.id),
-            [],
-          )
-        }
-      />
-      <Tile
-        testid="metric-run-success"
-        icon="activity"
-        label={t("metric.runSuccess")}
-        value={percent(metrics.runSuccess.value)}
-        unit="%"
-        sub={t("metric.ended", {
-          n: metrics.runSuccess.numerator,
-          d: metrics.runSuccess.denominator,
-        })}
-        spark={
-          <Sparkline
-            values={trends.map((b) => (endedTotal(b) ? b.runs.succeeded / endedTotal(b) : null))}
-            tone="spark-succeeded"
-          />
-        }
-        onPick={() => members(ui, t("metric.runSuccess"), within, [], answer.members.runs)}
-      />
-      <Tile
-        testid="metric-duration"
-        icon="clock"
-        label={t("metric.duration")}
-        value={duration(metrics.duration.medianMs, language)}
-        sub={t("metric.p90", { p90: duration(metrics.duration.p90Ms, language) })}
-        spark={<Sparkline values={trends.map((b) => b.duration.medianMs)} />}
-        onPick={() => members(ui, t("metric.duration"), within, [], ended)}
-      />
-      <Tile
-        testid="metric-cost"
-        icon="coins"
-        label={t("metric.cost")}
-        value={money(usage.costUsd)}
-        sub={
-          usage.costUsd === null && usage.inputTokens === null
-            ? t("metric.noUsage")
-            : `${t("metric.perAchieved", { cost: money(usage.costPerAchievedOutcome) })} · ${t("metric.tokens", { input: count(usage.inputTokens, language), cached: usage.cachedInputTokens === null ? null : count(usage.cachedInputTokens, language), output: count(usage.outputTokens, language) })}`
-        }
-        spark={
-          <Sparkline
-            values={trends.map((b) => {
-              const costs = Object.values(b.costByAgent);
-              return costs.length ? costs.reduce((a, c) => a + c, 0) : null;
-            })}
-          />
-        }
-        onPick={() =>
-          members(
-            ui,
-            t("metric.cost"),
-            within,
-            [],
-            answer.members.runs.filter((r) => r.costUsd !== null),
-          )
-        }
-      />
+        </div>
+      </Card>
+      <Card class="summary-donut">
+        <CardHeader title={t("trend.judgments")} />
+        <div class="card-body">
+          <div class="donut-wrap">
+            <svg viewBox="0 0 160 160" aria-hidden="true">
+              <circle class="donut-track" cx="80" cy="80" r="66" />
+              {totals.map((n, i) => {
+                const length = total ? (n / total) * circumference : 0;
+                const start = offset;
+                offset += length;
+                return (
+                  <circle
+                    key={i}
+                    class="donut-segment"
+                    cx="80"
+                    cy="80"
+                    r="66"
+                    stroke={colors[i]}
+                    stroke-dasharray={`${length} ${circumference}`}
+                    stroke-dashoffset={-start}
+                  />
+                );
+              })}
+            </svg>
+            <div class="donut-center">
+              <strong>
+                {metrics.achievement.value === null
+                  ? "—"
+                  : `${percent(metrics.achievement.value)}%`}
+              </strong>
+              <small>{t("metric.achievement")}</small>
+            </div>
+          </div>
+          <dl class="donut-legend">
+            {totals.map((n, i) => (
+              <div key={i}>
+                <dt>
+                  <span class="swatch" style={{ background: colors[i] }} />
+                  {names[i]}
+                </dt>
+                <dd>{n}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </Card>
     </div>
   );
 }
@@ -351,12 +478,7 @@ function Trends({ answer }: { answer: StatsResponse }) {
       Object.values(b.runs).every((n) => n === 0) &&
       Object.values(b.judgments).every((n) => n === 0),
   );
-  if (empty)
-    return (
-      <Card class="trends-empty">
-        <Empty icon="dashboard" title={t("trend.noData")} />
-      </Card>
-    );
+  if (empty) return null;
   return (
     <div class="trends">
       <ChartCard title={t("trend.runs")} legend={<Legend series={runSeries} />}>
@@ -896,7 +1018,6 @@ export function DashboardView({ modelError }: { modelError: unknown }) {
     ) : (
       <DashboardSkeleton label={t("loading")} />
     );
-  const all = { value: "", label: t("filter.all") };
   const updating = answer !== null && !sameFilter(answer.stats, filter);
   const retry = (
     <Button variant="outline" size="sm" onClick={() => setAttempt((n) => n + 1)}>
@@ -906,8 +1027,38 @@ export function DashboardView({ modelError }: { modelError: unknown }) {
   );
   return (
     <div class="dashboard" data-testid="dashboard">
-      <div class="toolbar filters">
-        <Field label={t("filter.period")}>
+      <div class="toolbar filters dashboard-filters">
+        <Field label={t("filter.process")}>
+          {(control) => (
+            <Select
+              id={control.id}
+              labelledBy={control.labelId}
+              value={filter.process}
+              icon={<Icon name="network" />}
+              options={[
+                { value: "", label: t("filter.allProcesses") },
+                ...model.processes.map((p) => ({ value: p.id, label: p.name })),
+              ]}
+              onChange={(process) => setFilter({ process })}
+            />
+          )}
+        </Field>
+        <Field label={t("filter.agent")}>
+          {(control) => (
+            <Select
+              id={control.id}
+              labelledBy={control.labelId}
+              value={filter.agent}
+              icon={<Icon name="terminal" />}
+              options={[
+                { value: "", label: t("filter.allAgents") },
+                ...model.agents.map((a) => ({ value: a.id, label: a.label })),
+              ]}
+              onChange={(agent) => setFilter({ agent })}
+            />
+          )}
+        </Field>
+        <Field class="filter-period" label={t("filter.period")}>
           {(control) => (
             <Select
               id={control.id}
@@ -919,7 +1070,7 @@ export function DashboardView({ modelError }: { modelError: unknown }) {
             />
           )}
         </Field>
-        <Field label={t("filter.granularity")}>
+        <Field class="filter-granularity" label={t("filter.granularity")}>
           {(control) => (
             <Select
               id={control.id}
@@ -927,29 +1078,6 @@ export function DashboardView({ modelError }: { modelError: unknown }) {
               value={filter.granularity}
               options={GRANULARITIES.map((g) => ({ value: g, label: t(`granularity.${g}`) }))}
               onChange={(granularity) => setFilter({ granularity })}
-            />
-          )}
-        </Field>
-        <Field label={t("filter.process")}>
-          {(control) => (
-            <Select
-              id={control.id}
-              labelledBy={control.labelId}
-              value={filter.process}
-              icon={<Icon name="network" />}
-              options={[all, ...model.processes.map((p) => ({ value: p.id, label: p.name }))]}
-              onChange={(process) => setFilter({ process })}
-            />
-          )}
-        </Field>
-        <Field label={t("filter.agent")}>
-          {(control) => (
-            <Select
-              id={control.id}
-              labelledBy={control.labelId}
-              value={filter.agent}
-              options={[all, ...model.agents.map((a) => ({ value: a.id, label: a.label }))]}
-              onChange={(agent) => setFilter({ agent })}
             />
           )}
         </Field>
@@ -962,6 +1090,8 @@ export function DashboardView({ modelError }: { modelError: unknown }) {
       {answer ? (
         <div class={cx("dashboard-body", updating && "is-updating")} aria-busy={updating}>
           <Tiles answer={answer} />
+          <SummaryCharts answer={answer} />
+          <Tiles answer={answer} secondary />
           <Trends answer={answer} />
           <div class="dashboard-lower">
             <Breakdown answer={answer} cut={cut} setCut={setCut} />

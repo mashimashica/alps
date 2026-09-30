@@ -70,11 +70,12 @@ export interface Ui {
   /** Shows something in the right panel; a Process or a type also becomes the network's focus. */
   select(selection: Selection | null): void;
   /**
-   * Whether the panel is a Sheet over the page (narrow windows), rather than a column or, in the
-   * network of a narrow window, a part of the page under the diagram.
+   * Whether the panel shows only what is asked for (the dashboard and the instances: a column in
+   * wide windows, a Sheet over the page in narrow ones), rather than always (the network: a column,
+   * or in a narrow window a part of the page under the diagram, with the model's overview).
    */
-  sheet: boolean;
-  /** Closes the panel: nothing is selected (in a column, the model's overview shows). */
+  onDemand: boolean;
+  /** Closes the panel: nothing is selected (in the network, the model's overview shows). */
   closePanel(): void;
   form: Form | null;
   openForm(form: Form | null): void;

@@ -323,11 +323,14 @@ export function StackedBars({
 export function Lines({
   series,
   values,
+  area = false,
   format,
   ...frame
 }: Frame & {
   series: readonly SeriesStyle[];
   values: readonly (readonly (number | null)[])[];
+  /** A filled first series, only when its buckets have no missing values. */
+  area?: boolean;
   format: (v: number) => string;
 }) {
   const max = niceMax(Math.max(0, ...values.flat().map((v) => v ?? 0)));
@@ -351,6 +354,15 @@ export function Lines({
               .join("");
             return (
               <g key={s.label}>
+                {area &&
+                  k === 0 &&
+                  (values[k]?.length ?? 0) > 0 &&
+                  values[k]!.every((v) => v !== null) && (
+                    <path
+                      class={`series-area ${s.className}`}
+                      d={`${d}L${fx(centerOf(g, values[k]!.length - 1))} ${fx(yOf(g, 0, max))}L${fx(centerOf(g, 0))} ${fx(yOf(g, 0, max))}Z`}
+                    />
+                  )}
                 <path class={`series-line ${s.className}`} d={d} />
                 {(values[k] ?? []).map((value, i) =>
                   value === null ? null : (

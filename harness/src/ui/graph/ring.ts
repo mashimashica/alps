@@ -32,7 +32,7 @@ export const RING = {
   gap: 0.34,
   pillHeight: 26,
   /** The pill's width beyond its name. */
-  pillPadding: 22,
+  pillPadding: 18,
   /** Pixels between a Process's dot and its name. */
   labelGap: 16,
   labelHeight: 18,
@@ -41,9 +41,13 @@ export const RING = {
   lineInset: 9,
   /** Pixels between the lines of one Process and one type, for each role they have. */
   roleSpacing: 3,
-  margin: 24,
+  /**
+   * Around everything. The drawing is scaled down to its box, and what it holds besides the names
+   * shrinks the names with it: enough for the names' backgrounds and the focus ring.
+   */
+  margin: 16,
   /** Pixels kept between pills, and between a pill and the ring of the Processes. */
-  pillClearance: 4,
+  pillClearance: 2,
   /** How far apart overlapping pills move at a time, and how many times at most. */
   separateStep: 0.01,
   separateIterations: 400,

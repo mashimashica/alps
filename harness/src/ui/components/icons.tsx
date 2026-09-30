@@ -14,11 +14,10 @@ const PATHS = {
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,
   network: (
     <>
-      <circle cx="12" cy="12" r="7.5" />
-      <circle cx="12" cy="4.5" r="1.8" />
-      <circle cx="18.5" cy="15.8" r="1.8" />
-      <circle cx="5.5" cy="15.8" r="1.8" />
-      <circle cx="12" cy="12" r="1.6" />
+      <rect x="9" y="2.5" width="6" height="6" rx="1.3" />
+      <rect x="2.5" y="15.5" width="6" height="6" rx="1.3" />
+      <rect x="15.5" y="15.5" width="6" height="6" rx="1.3" />
+      <path d="M12 8.5v4M5.5 15.5v-3h13v3" />
     </>
   ),
   dashboard: (
@@ -47,6 +46,7 @@ const PATHS = {
       <path d="M8.5 20.5h7M12 16.5v4" />
     </>
   ),
+  terminal: <path d="m5 6 5 5-5 5M13 17h6" />,
   plus: <path d="M12 5v14M5 12h14" />,
   play: <path d="M8 5.5v13l10-6.5z" />,
   stop: <rect x="6.5" y="6.5" width="11" height="11" rx="2" />,

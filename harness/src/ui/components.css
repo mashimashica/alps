@@ -71,7 +71,7 @@
 .btn-outline {
   color: var(--foreground);
   background: var(--card);
-  border-color: var(--input);
+  border-color: var(--glass-border);
   box-shadow: 0 1px 2px rgba(41, 65, 108, 0.05);
 }
 
@@ -240,7 +240,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px 16px;
-  padding: 18px 20px 0;
+  padding: 23px 24px 0;
   flex-wrap: wrap;
 }
 
@@ -277,7 +277,7 @@
 }
 
 .card-body {
-  padding: 16px 20px 20px;
+  padding: 18px 24px 24px;
 }
 
 /* ---------- alert, skeleton, empty ---------- */
@@ -1219,4 +1219,58 @@
 
 .table tr[data-selected="true"] {
   background: var(--info-soft);
+}
+
+/* Quiet surfaces and a clear focus ring, shared by all screens. */
+.btn-default {
+  border-color: rgba(255, 255, 255, 0.26);
+}
+.btn-default:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+.filters .select-trigger {
+  border-color: var(--glass-border);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+.filters .select-trigger:hover,
+.filters .select-trigger[data-state="open"] {
+  border-color: var(--ring);
+}
+.select-list {
+  padding: 8px;
+  border-radius: 14px;
+}
+.select-option {
+  min-height: 37px;
+  font-size: 12px;
+}
+.card-title {
+  font-weight: 550;
+}
+.card-description {
+  margin-top: 7px;
+  font-size: 11.5px;
+  line-height: 1.7;
+}
+.table td {
+  padding-top: 17px;
+  padding-bottom: 17px;
+}
+.table th {
+  font-size: 11px;
+  font-weight: 500;
+}
+.sheet {
+  width: min(520px, 100vw);
+}
+.sheet-surface {
+  padding: 30px 28px;
+}
+.dialog-header {
+  padding-top: 30px;
+}
+.dialog-body {
+  padding-top: 24px;
+  gap: 22px;
 }

@@ -115,21 +115,26 @@ function Wakes() {
 }
 
 function Overview({ modelError }: { modelError: unknown }) {
-  const { model, t, openForm, sheet } = useUi();
+  const { model, t, openForm, onDemand } = useUi();
   if (!model)
     return modelError ? <ModelProblem error={modelError} /> : <Loading label={t("loading")} />;
   return (
     <div data-testid="panel-overview">
-      <PanelHead
-        kicker={t("panel.model")}
-        title={model.name}
-        sub={t("overview.counts", {
-          processes: model.processes.length,
-          types: model.artifacts.length,
-        })}
-        closable={sheet}
-      />
+      <div class="overview-symbol" aria-hidden="true">
+        <Icon name="network" size={28} />
+      </div>
+      <PanelHead kicker={t("panel.model")} title={model.name} closable={onDemand} />
       {model.description && <p class="panel-text">{model.description}</p>}
+      <div class="overview-counts">
+        <div>
+          <strong>{model.processes.length}</strong>
+          <span>{t("panel.process")}</span>
+        </div>
+        <div>
+          <strong>{model.artifacts.length}</strong>
+          <span>{t("panel.type")}</span>
+        </div>
+      </div>
       <Section title={t("overview.workspace")}>
         <p class="mono small path-block" title={model.workspace}>
           {model.workspace}
