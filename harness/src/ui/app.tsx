@@ -66,7 +66,7 @@ const VIEWS: readonly UiView[] = ["dashboard", "network", "instances"];
 const VIEW_ICONS: Record<UiView, IconName> = {
   network: "network",
   dashboard: "dashboard",
-  instances: "layers",
+  instances: "board",
 };
 const THEME_ICONS: Record<Theme, IconName> = { system: "monitor", light: "sun", dark: "moon" };
 /** How many pages of runs (200 each) the page keeps; older runs are read when they are opened. */

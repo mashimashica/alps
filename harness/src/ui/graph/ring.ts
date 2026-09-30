@@ -1,16 +1,14 @@
 /*
  * The ring of the network view (R1a): the Processes on the outer ring in the order of the flow,
  * and the Artifact types inside as horizontal pills, each at the centroid of the Processes it
- * connects, neighbours on alternating radii so that their names do not overlap. Lines run only
- * between the two rings. The order is for reading the picture: the model has no order.
+ * connects, neighbours on alternating radii so that their names do not overlap. The lines bow
+ * gently towards the centre. The order is for reading the picture: the model has no order.
  */
 
 import {
   TAU,
   arrowHead,
-  band,
-  offsetPoints,
-  toPath,
+  fx,
   usesOf,
   wrapAngle,
   type Edge,
@@ -316,23 +314,27 @@ export function ringLayout(model: GraphModel, measure: Measure): RingLayout {
       const pill = pillOf.get(type);
       if (!pill) continue;
       list.sort((a, b) => order.indexOf(a) - order.indexOf(b));
-      const end = pill.radius + pillReach(pill.angle, pill.width, pill.height) + 1;
-      const base = band(angle, pill.angle, radius - RING.lineInset, end);
+      const end = pill.radius - pillReach(pill.angle, pill.width, pill.height) - 1;
+      const from: Point = [
+        (radius - RING.lineInset) * Math.cos(angle),
+        (radius - RING.lineInset) * Math.sin(angle),
+      ];
+      const to: Point = [end * Math.cos(pill.angle), end * Math.sin(pill.angle)];
+      const dx = to[0] - from[0];
+      const dy = to[1] - from[1];
+      const length = Math.hypot(dx, dy) || 1;
       list.forEach((role, j) => {
-        const offset = (j - (list.length - 1) / 2) * RING.roleSpacing;
+        // Separate roles at the middle of the curve while keeping their node anchors together.
+        const offset = (j - (list.length - 1) / 2) * RING.roleSpacing * 2;
+        const control: Point = [(-dy / length) * offset, (dx / length) * offset];
         // An output flows from the Process to the type; an input or a control the other way.
-        const points: Point[] =
-          role === "output"
-            ? offsetPoints(base, offset)
-            : offsetPoints([...base].reverse(), -offset);
-        const last = points[points.length - 1] ?? [0, 0];
-        const before = points[points.length - 2] ?? last;
+        const [start, finish] = role === "output" ? [from, to] : [to, from];
         edges.push({
           role,
           process: process.id,
           type,
-          d: toPath(points),
-          head: arrowHead(before, last),
+          d: `M${fx(start[0])} ${fx(start[1])}Q${fx(control[0])} ${fx(control[1])} ${fx(finish[0])} ${fx(finish[1])}`,
+          head: arrowHead(control, finish),
         });
       });
     }

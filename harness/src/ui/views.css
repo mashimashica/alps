@@ -1127,6 +1127,58 @@ svg.chart:focus-visible {
   height: auto;
 }
 
+/* Keep the card's change in height continuous while both graph layouts crossfade. */
+html[data-network-transition] .network-card {
+  view-transition-name: network-card;
+}
+
+html[data-network-transition] .network-canvas {
+  view-transition-name: network-graph;
+}
+
+html[data-network-transition]::view-transition {
+  pointer-events: none;
+}
+
+html[data-network-transition]::view-transition-group(network-card),
+html[data-network-transition]::view-transition-group(network-graph) {
+  animation-duration: 360ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html[data-network-transition]::view-transition-old(network-graph) {
+  animation: network-leave 180ms ease-out both;
+}
+
+html[data-network-transition]::view-transition-new(network-graph) {
+  animation: network-enter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+html[data-network-transition="focus"] {
+  --network-enter-scale: 0.97;
+}
+
+html[data-network-transition="ring"] {
+  --network-enter-scale: 1.03;
+}
+
+@keyframes network-leave {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes network-enter {
+  from {
+    opacity: 0;
+    transform: scale(var(--network-enter-scale));
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .network-loading {
   display: grid;
   place-items: center;
@@ -1158,36 +1210,43 @@ svg.graph {
   stroke-dasharray: 3 6;
 }
 
+.graph .edges {
+  pointer-events: none;
+}
+
 .graph .edge {
   fill: none;
+  stroke: var(--edge-line);
   stroke-width: 1;
-  opacity: 0.55;
-}
-
-.graph .edge-output {
-  stroke: var(--edge-output);
-}
-
-.graph .edge-input,
-.graph .edge-control {
-  stroke: var(--edge-input);
+  opacity: 0.28;
+  transition:
+    opacity 160ms ease,
+    stroke 160ms ease;
 }
 
 .graph .edge-control {
-  stroke-dasharray: 3 3;
+  stroke-dasharray: 4 4;
 }
 
-.graph .head {
-  opacity: 0.7;
+.graph .edge[data-emphasis="muted"] {
+  opacity: 0.08;
 }
 
-.graph .head-output {
-  fill: var(--edge-output);
+.graph .edge[data-emphasis="active"],
+.network-card[data-mode="focus"] .edge {
+  stroke: var(--edge-highlight);
+  stroke-width: 1.6;
+  opacity: 0.8;
 }
 
-.graph .head-input,
-.graph .head-control {
-  fill: var(--edge-input);
+.network-card[data-mode="focus"] .edge-control {
+  stroke-dasharray: 5 5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .graph .edge {
+    transition: none;
+  }
 }
 
 .graph .proc,
@@ -1380,15 +1439,15 @@ svg.graph {
 .legend-line {
   display: inline-block;
   width: 26px;
-  border-top: 1.6px solid var(--edge-output);
+  border-top: 1.6px solid var(--edge-highlight);
 }
 
 .legend-line.line-input {
-  border-top-color: var(--edge-input);
+  border-top-color: var(--edge-highlight);
 }
 
 .legend-line.line-control {
-  border-top: 1.6px dashed var(--edge-input);
+  border-top: 1.6px dashed var(--edge-highlight);
 }
 
 .legend-note {
@@ -1407,42 +1466,337 @@ svg.graph {
 
 /* ---------- instances ---------- */
 
-.table-card {
-  overflow: hidden;
+/* The board follows run facts; Outcome judgments remain visible inside each card. */
+.instances .filters {
+  padding: 16px 18px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  backdrop-filter: var(--glass-filter);
 }
 
-.table-card .table th {
-  border-top: 0;
+.instance-board-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  margin: 24px 2px 18px;
 }
 
-.table-loading {
+.instance-board-view {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.instance-board-heading p {
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+.instance-board-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.instance-board-order {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--faint-foreground);
+}
+
+.instance-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(224px, 1fr));
+  gap: 16px;
+  overflow-x: auto;
+  padding: 2px 2px 20px;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+
+.instance-lane {
+  --lane-ink: var(--muted-foreground);
+  --lane-tint: var(--accent);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: clamp(380px, calc(100dvh - 360px), 720px);
+  padding: 14px 11px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  scroll-snap-align: start;
+}
+
+.instance-lane[data-lane="running"] {
+  --lane-ink: var(--info);
+  --lane-tint: var(--info-soft);
+}
+
+.instance-lane[data-lane="succeeded"] {
+  --lane-ink: var(--success);
+  --lane-tint: var(--success-soft);
+}
+
+.instance-lane[data-lane="stopped"] {
+  --lane-ink: var(--warning);
+  --lane-tint: var(--warning-soft);
+}
+
+.instance-lane-heading {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 9px;
+  min-height: 34px;
+  margin: 0 3px 16px;
+}
+
+.instance-lane-icon {
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  color: var(--lane-ink);
+  background: var(--lane-tint);
+}
+
+.instance-lane-heading h3 {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.015em;
+}
+
+.instance-lane-count {
+  display: grid;
+  place-items: center;
+  min-width: 23px;
+  height: 23px;
+  margin-left: auto;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+
+.instance-lane-cards,
+.instance-lane-loading {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  margin: -2px;
+  padding: 2px;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  list-style: none;
+}
+
+.instance-card,
+.instance-card-skeleton {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 20px;
+  width: 100%;
+  min-width: 0;
+  padding: 16px 14px 12px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface-raised);
+  box-shadow: 0 5px 14px -10px rgba(31, 49, 82, 0.2);
 }
 
-.instance-table td {
-  font-size: 12.5px;
+.instance-card {
+  color: var(--foreground);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 160ms,
+    box-shadow 160ms,
+    transform 160ms;
 }
 
-.cell-title {
-  display: block;
-  font-weight: 500;
-  white-space: nowrap;
+.instance-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
 }
 
-.cell-id {
-  display: block;
-  font-size: 11px;
+.instance-card:focus-visible,
+.instance-card[data-selected="true"] {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 
-.cell-path {
-  max-width: 240px;
+.instance-card-meta,
+.instance-card-fact,
+.instance-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.instance-card-id {
+  color: var(--faint-foreground);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+.instance-card .badge {
+  padding: 3px 7px;
+  font-size: 9px;
+}
+
+.instance-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.instance-card-path {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  min-height: 50px;
+  padding: 9px 8px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--muted-foreground);
+}
+
+.instance-card-path .icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.instance-card-path .mono {
+  display: -webkit-box;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 12px;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow-wrap: anywhere;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.instance-card-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+
+.instance-card-unjudged {
+  color: var(--faint-foreground);
+}
+
+.instance-card-current {
+  color: var(--muted-foreground);
+}
+
+.instance-card-footer {
+  padding-top: 11px;
+  border-top: 1px solid var(--border);
+  font-size: 9px;
+  color: var(--faint-foreground);
+}
+
+.instance-card-footer > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.instance-card-footer .icon {
+  flex-shrink: 0;
+}
+
+.instance-lane-empty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 215px;
+  padding: 24px 14px;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  color: var(--muted-foreground);
+}
+
+.instance-lane-empty > span {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--accent);
+}
+
+.instance-lane-empty p {
+  max-width: 18em;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.instance-board-empty {
+  margin-bottom: 18px;
+}
+
+.instance-board-empty .empty {
+  min-height: 0;
+  padding: 24px;
+}
+
+@media (max-width: 600px) {
+  .instance-board {
+    grid-template-columns: repeat(4, minmax(264px, 84%));
+    gap: 12px;
+  }
+
+  .instance-board-heading {
+    gap: 8px 12px;
+  }
+
+  .instance-board-heading p {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .instances .filters {
+    padding: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .instance-card {
+    transition: none;
+  }
+
+  .instance-card:hover {
+    transform: none;
+  }
 }
 
 .glyphs {
@@ -2615,20 +2969,11 @@ dl.front dd {
 .panel .path-block {
   font-size: 10px;
 }
-.instances .table-card > .empty {
-  min-height: 340px;
-  justify-content: center;
-}
 .instances .filters .field {
   flex: 1 1 160px;
 }
 .instances .filters .field-grow {
   flex-basis: 240px;
-}
-.instances .toolbar-end {
-  width: 100%;
-  justify-content: space-between;
-  margin-top: 4px;
 }
 
 /* ---------- widths ---------- */
@@ -2858,77 +3203,6 @@ dl.front dd {
     padding: 10px 14px 12px;
   }
 
-  /* The instances as cards: the Process and the latest run, the path, then the judgments. */
-  .instance-table,
-  .instance-table tbody {
-    display: block;
-  }
-
-  .instance-table thead {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-  }
-
-  .instance-table tr {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    grid-template-areas:
-      "name name status"
-      "path path path"
-      "judgments evidence updated";
-    align-items: center;
-    gap: 6px 10px;
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .instance-table tbody tr:last-child {
-    border-bottom: 0;
-  }
-
-  .instance-table td,
-  .instance-table td:first-child,
-  .instance-table td:last-child {
-    display: block;
-    padding: 0;
-    border: 0;
-  }
-
-  .instance-table .cell-name {
-    grid-area: name;
-    min-width: 0;
-  }
-
-  .instance-table .cell-name .cell-title {
-    white-space: normal;
-  }
-
-  .instance-table .cell-status {
-    grid-area: status;
-    justify-self: end;
-  }
-
-  .instance-table .cell-path {
-    grid-area: path;
-    max-width: none;
-  }
-
-  .instance-table .cell-judgments {
-    grid-area: judgments;
-  }
-
-  .instance-table .cell-evidence {
-    grid-area: evidence;
-  }
-
-  .instance-table .cell-updated {
-    grid-area: updated;
-    font-size: 11.5px;
-  }
-
   .dialog-header {
     padding: 20px 52px 2px 18px;
   }
@@ -3040,4 +3314,18 @@ dl.front dd {
   .sheet-surface {
     padding: 24px 18px;
   }
+}
+
+/* Keep the board within reach on small screens, with a two-row filter bar. */
+@media (max-width: 600px) {
+  .instances .filters .field {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+  }
+}
+
+.instance-board:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-xl);
 }

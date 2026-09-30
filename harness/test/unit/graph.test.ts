@@ -181,13 +181,17 @@ describe("the ring (R1a)", () => {
       expect(p.label.y).toBeGreaterThanOrEqual(y);
       expect(p.label.y).toBeLessThanOrEqual(y + height);
     }
-    // An output's arrowhead is outside its pill, on the side of the outer ring.
+    // The inward-bowing curve reaches the pill's boundary from the centre of the diagram.
     const edge = layout.edges.find((e) => e.role === "output" && e.type === "Design description")!;
     const pill = layout.pills.find((p) => p.id === "Design description")!;
     const tip = /L(-?[\d.]+) (-?[\d.]+)L/.exec(edge.head)!;
     const distance = Math.hypot(Number(tip[1]), Number(tip[2]));
-    expect(distance).toBeGreaterThan(pill.radius);
-    expect(distance).toBeLessThan(layout.radius);
+    expect(distance).toBeLessThan(pill.radius);
+    expect(distance).toBeGreaterThan(pill.radius - Math.hypot(pill.width, pill.height) / 2 - 2);
+    const [tipX, tipY] = [Number(tip[1]), Number(tip[2])];
+    expect(
+      Math.abs(tipX - pill.x) >= pill.width / 2 || Math.abs(tipY - pill.y) >= pill.height / 2,
+    ).toBe(true);
   });
 });
 

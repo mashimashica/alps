@@ -359,7 +359,7 @@ describe("E10 WebUI", () => {
         // The browser's language is English, so the page starts in English.
         const { tab, problems } = await openPage(browser, daemon.uiUrl, "en-US");
         await tab.locator('[role="tab"][data-view="instances"]').click();
-        await tab.locator(`tr[data-instance="${instance.id}"]`).click();
+        await tab.locator(`button[data-instance="${instance.id}"]`).click();
         await tab
           .getByTestId("panel-instance")
           .getByRole("button", { name: run.id, exact: true })
@@ -381,7 +381,7 @@ describe("E10 WebUI", () => {
         expect(await log.textContent()).not.toContain("Failed (");
         expect(await error.textContent()).toBe("Codex は終了コード 3 で終わった。");
         expect(await tab.locator('[role="tab"][data-view="instances"]').textContent()).toBe(
-          "インスタンス",
+          "ボード",
         );
         expect(problems).toEqual([]);
       } finally {

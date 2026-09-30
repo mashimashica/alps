@@ -26,6 +26,12 @@ const PATHS = {
       <path d="M8.5 16v-4M12.5 16V8M16.5 16v-6" />
     </>
   ),
+  board: (
+    <>
+      <rect x="3" y="4" width="18" height="16" rx="2.5" />
+      <path d="M9 4v16M15 4v16M5.5 8h1M11.5 8h1M17.5 8h1" />
+    </>
+  ),
   layers: (
     <>
       <path d="m12 3.5 8.5 4.5-8.5 4.5L3.5 8z" />

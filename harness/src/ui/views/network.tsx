@@ -7,7 +7,8 @@
  * layout is computed by the pure functions of ../graph/.
  */
 
-import { useEffect, useLayoutEffect, useMemo, useRef } from "preact/hooks";
+import { flushSync } from "preact/compat";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "preact/hooks";
 import type { InstanceView, ModelView, RunSummary } from "../../shared/types.ts";
 import { Badge } from "../components/badge.tsx";
 import { Button } from "../components/button.tsx";
@@ -101,21 +102,44 @@ export function marksOf(
   return marks;
 }
 
-function Edges({ edges }: { edges: readonly Edge[] }) {
+type EdgeHighlight = { kind: "process" | "type"; id: string };
+
+function Edges({ edges, highlight }: { edges: readonly Edge[]; highlight?: EdgeHighlight | null }) {
   return (
-    <>
-      <g class="edges">
-        {edges.map((edge, i) => (
-          <path key={`e${i}`} class={`edge edge-${edge.role}`} d={edge.d} />
-        ))}
-      </g>
-      <g class="heads">
-        {edges.map((edge, i) => (
-          <path key={`h${i}`} class={`head head-${edge.role}`} d={edge.head} />
-        ))}
-      </g>
-    </>
+    <g class="edges">
+      {edges.map((edge, i) => (
+        <path
+          key={`e${i}`}
+          class={`edge edge-${edge.role}`}
+          data-emphasis={
+            highlight ? (edge[highlight.kind] === highlight.id ? "active" : "muted") : undefined
+          }
+          d={edge.d}
+        />
+      ))}
+    </g>
   );
+}
+
+let networkTransition: ViewTransition | null = null;
+
+/** Capture both layouts so the graph and its card can crossfade and resize together. */
+function transitionNetwork(mode: "ring" | "focus", update: () => void): void {
+  networkTransition?.skipTransition();
+  if (!document.startViewTransition || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    update();
+    return;
+  }
+  document.documentElement.dataset.networkTransition = mode;
+  const transition = document.startViewTransition(() => flushSync(update));
+  networkTransition = transition;
+  void transition.finished
+    .catch(() => {})
+    .finally(() => {
+      if (networkTransition !== transition) return;
+      networkTransition = null;
+      delete document.documentElement.dataset.networkTransition;
+    });
 }
 
 /** Keyboard use of a node: Enter or Space picks it. */
@@ -140,6 +164,8 @@ function Ring({
 }) {
   const { select } = useUi();
   const { x, y, width, height } = layout.viewBox;
+  const [hovered, setHovered] = useState<EdgeHighlight | null>(null);
+  const [keyboardFocus, setKeyboardFocus] = useState<EdgeHighlight | null>(null);
   return (
     <svg
       class="graph"
@@ -159,10 +185,11 @@ function Ring({
         onClick={onBlank}
       />
       <circle class="orbit" cx={0} cy={0} r={layout.radius} />
-      <Edges edges={layout.edges} />
+      <Edges edges={layout.edges} highlight={hovered ?? keyboardFocus} />
       {layout.processes.map((p) => {
         const mark = marks.get(p.id) ?? { running: false, stale: false };
-        const pick = (): void => select({ kind: "process", id: p.id });
+        const pick = (): void =>
+          transitionNetwork("focus", () => select({ kind: "process", id: p.id }));
         const left =
           p.label.anchor === "start"
             ? p.label.x
@@ -179,6 +206,10 @@ function Ring({
             role="button"
             tabindex={0}
             aria-label={p.name}
+            onMouseEnter={() => setHovered({ kind: "process", id: p.id })}
+            onMouseLeave={() => setHovered(null)}
+            onFocus={() => setKeyboardFocus({ kind: "process", id: p.id })}
+            onBlur={() => setKeyboardFocus(null)}
             onClick={pick}
             onKeyDown={onKeys(pick)}
           >
@@ -208,7 +239,8 @@ function Ring({
         );
       })}
       {layout.pills.map((pill) => {
-        const pick = (): void => select({ kind: "type", id: pill.id });
+        const pick = (): void =>
+          transitionNetwork("focus", () => select({ kind: "type", id: pill.id }));
         return (
           <g
             key={pill.id}
@@ -217,6 +249,10 @@ function Ring({
             role="button"
             tabindex={0}
             aria-label={pill.name}
+            onMouseEnter={() => setHovered({ kind: "type", id: pill.id })}
+            onMouseLeave={() => setHovered(null)}
+            onFocus={() => setKeyboardFocus({ kind: "type", id: pill.id })}
+            onBlur={() => setKeyboardFocus(null)}
             onClick={pick}
             onKeyDown={onKeys(pick)}
           >
@@ -239,7 +275,8 @@ function Ring({
 
 function FocusNodeView({ node, sub }: { node: FocusNode; sub: string }) {
   const { select } = useUi();
-  const pick = (): void => select({ kind: node.kind, id: node.id });
+  const pick = (): void =>
+    transitionNetwork("focus", () => select({ kind: node.kind, id: node.id }));
   const cx = node.x + node.width / 2;
   const note = node.note || (node.focused ? sub : "");
   const classes = [
@@ -416,10 +453,11 @@ export function NetworkView({ modelError }: { modelError: unknown }) {
     if (box && box.scrollWidth > box.clientWidth)
       box.scrollLeft = (box.scrollWidth - box.clientWidth) / 2;
   }, [focused, ring]);
-  const back = (): void => {
-    setFocus(null);
-    select(null);
-  };
+  const back = (): void =>
+    transitionNetwork("ring", () => {
+      setFocus(null);
+      select(null);
+    });
   useEffect(() => {
     if (!focused) return;
     const onKey = (event: KeyboardEvent): void => {

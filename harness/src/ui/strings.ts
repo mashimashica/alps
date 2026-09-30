@@ -13,8 +13,8 @@ const en = {
   "brand.name": "ALPS",
   "brand.product": "Harness",
   "tab.network": "Network",
-  "tab.dashboard": "Dashboard",
-  "tab.instances": "Instances",
+  "tab.dashboard": "Analysis",
+  "tab.instances": "Board",
   "tabs.label": "Screens",
   "count.running": (a: { n: number }) => `Running ${a.n}`,
   "count.stale": (a: { n: number }) => `Stale evidence ${a.n}`,
@@ -40,7 +40,7 @@ const en = {
   "filter.allAgents": "All agents",
   "eyebrow.network": "Process network",
   "eyebrow.dashboard": "Overview",
-  "eyebrow.instances": "Instances",
+  "eyebrow.instances": "Board",
   "screen.network":
     "How the Processes and the Artifact types relate. The lines are not an order of execution.",
   "screen.dashboard":
@@ -111,7 +111,7 @@ const en = {
   "overview.noWakes":
     "No agent has been woken yet. The schedules in alps-harness.yaml, alps-harness wake, and the MCP tool wake wake one, which decides what to run.",
   "overview.hint":
-    "Choose a Process or a type in the network, a number on the dashboard, or an instance to see it here.",
+    "Choose a Process or a type in the network, a number in Analysis, or an instance to see it here.",
   "model.error": "The model cannot be read.",
   "model.files": "Files looked at",
 
@@ -360,6 +360,12 @@ const en = {
   "members.now": "As it is now, whatever the period",
   "members.bucket": (a: { from: string }) => `From ${a.from}`,
 
+  "board.label": "Board",
+  "board.hint": "Grouped by the latest run. Outcome judgments stay on each card.",
+  "board.order": "Recently updated first",
+  "board.stopped": "Stopped / failed",
+  "board.emptyLane": "No instances in this state.",
+  "board.open": (a: { process: string; id: string }) => `Open ${a.process} · ${a.id}`,
   "instances.status": "Latest run",
   "instances.judgment": "Judgment",
   "instances.path": "Path contains",
@@ -384,8 +390,8 @@ const ja: { [K in UiKey]: (typeof en)[K] } = {
   "brand.name": "ALPS",
   "brand.product": "Harness",
   "tab.network": "ネットワーク",
-  "tab.dashboard": "ダッシュボード",
-  "tab.instances": "インスタンス",
+  "tab.dashboard": "アナリシス",
+  "tab.instances": "ボード",
   "tabs.label": "画面",
   "count.running": (a) => `実行中 ${a.n}`,
   "count.stale": (a) => `根拠が古い ${a.n}`,
@@ -410,7 +416,7 @@ const ja: { [K in UiKey]: (typeof en)[K] } = {
   "filter.allAgents": "すべてのエージェント",
   "eyebrow.network": "プロセスのネットワーク",
   "eyebrow.dashboard": "概要",
-  "eyebrow.instances": "インスタンス",
+  "eyebrow.instances": "ボード",
   "screen.network": "プロセスとアーティファクトの型の関係。線は実行の順序を表さない。",
   "screen.dashboard": "期間内の実行と判断の集計。画面は数えるだけで、判断はしない。",
   "screen.instances": "プロセスを具体的な入力に適用した一つひとつと、その実行と評価。",
@@ -474,7 +480,7 @@ const ja: { [K in UiKey]: (typeof en)[K] } = {
   "overview.noWakes":
     "まだ目覚めたエージェントはない。alps-harness.yaml の schedules、alps-harness wake、MCP の wake がエージェントを起こし、エージェントが何を走らせるかを判断する。",
   "overview.hint":
-    "ネットワークのプロセスや型、ダッシュボードの数字、インスタンスを選ぶと、ここに詳細が出る。",
+    "ネットワークのプロセスや型、アナリシスの数字、インスタンスを選ぶと、ここに詳細が出る。",
   "model.error": "モデルを読めない。",
   "model.files": "見たファイル",
 
@@ -710,6 +716,12 @@ const ja: { [K in UiKey]: (typeof en)[K] } = {
   "members.now": "期間に関わらず今の状態",
   "members.bucket": (a) => `${a.from} から`,
 
+  "board.label": "ボード",
+  "board.hint": "最新の実行状態で整理。成果の判断は、各カードに。",
+  "board.order": "更新が新しい順",
+  "board.stopped": "停止・異常終了",
+  "board.emptyLane": "この状態のインスタンスはありません。",
+  "board.open": (a) => `${a.process} · ${a.id} の詳細を開く`,
   "instances.status": "最新の実行",
   "instances.judgment": "判断",
   "instances.path": "パスの一部",

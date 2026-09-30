@@ -98,9 +98,9 @@ export function arrowHead(from: Point, to: Point): string {
   const length = Math.hypot(dx, dy) || 1;
   const ux = dx / length;
   const uy = dy / length;
-  const bx = to[0] - 8 * ux;
-  const by = to[1] - 8 * uy;
-  return `M${fx(bx - 4 * uy)} ${fx(by + 4 * ux)}L${fx(to[0])} ${fx(to[1])}L${fx(bx + 4 * uy)} ${fx(by - 4 * ux)}Z`;
+  const bx = to[0] - 5 * ux;
+  const by = to[1] - 5 * uy;
+  return `M${fx(bx - 2.5 * uy)} ${fx(by + 2.5 * ux)}L${fx(to[0])} ${fx(to[1])}L${fx(bx + 2.5 * uy)} ${fx(by - 2.5 * ux)}Z`;
 }
 
 /** A horizontal S-curve from one column to the next. */
@@ -110,8 +110,7 @@ export function curve(x1: number, y1: number, x2: number, y2: number): string {
 }
 
 /** An arrowhead pointing right, with its tip at (x, y). */
-export const rightHead = (x: number, y: number): string =>
-  `M${fx(x - 8)} ${fx(y - 4)}L${fx(x)} ${fx(y)}L${fx(x - 8)} ${fx(y + 4)}Z`;
+export const rightHead = (x: number, y: number): string => arrowHead([x - 1, y], [x, y]);
 
 /** A text cut to a width, with an ellipsis when it was cut. */
 export function fitText(text: string, style: TextStyle, width: number, measure: Measure): string {

@@ -97,8 +97,8 @@
   --chart-5: #8aa0bf;
   --chart-grid: rgba(110, 132, 170, 0.18);
 
-  --edge-output: #6a7aa6;
-  --edge-input: #8c9ae0;
+  --edge-line: #8195bf;
+  --edge-highlight: #7d8bc7;
   --node-fill: rgba(251, 253, 255, 0.97);
   --pill-fill: #f5f8fc;
 
@@ -164,8 +164,8 @@
     --chart-4: #b79ce0;
     --chart-5: #8ea3c4;
     --chart-grid: rgba(157, 180, 220, 0.16);
-    --edge-output: #8f9dc4;
-    --edge-input: #8d99e6;
+    --edge-line: #8195bf;
+    --edge-highlight: #9ba9df;
     --node-fill: rgba(36, 48, 73, 0.97);
     --pill-fill: #202b41;
     color-scheme: dark;
@@ -230,8 +230,8 @@
   --chart-4: #b79ce0;
   --chart-5: #8ea3c4;
   --chart-grid: rgba(157, 180, 220, 0.16);
-  --edge-output: #8f9dc4;
-  --edge-input: #8d99e6;
+  --edge-line: #8195bf;
+  --edge-highlight: #9ba9df;
   --node-fill: rgba(36, 48, 73, 0.97);
   --pill-fill: #202b41;
   color-scheme: dark;
