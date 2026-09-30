@@ -75,10 +75,11 @@ describe("E6 wake", () => {
         process: null,
         status: "running",
       });
-      // Claude Code is given the harness's MCP server in a file and allowed its tools only.
+      // Claude Code is given the harness's MCP server in a file, and no other MCP server (none of
+      // the user's own, such as the claude.ai connectors), and is allowed its tools only.
       const id = woke.run?.id ?? "";
       expect(woke.run?.command).toContain(
-        `--mcp-config ${records(ws.root, "runs", `${id}.mcp.json`)}`,
+        `--mcp-config ${records(ws.root, "runs", `${id}.mcp.json`)} --strict-mcp-config`,
       );
       expect(woke.run?.command).toContain("--allowedTools mcp__alps_harness");
       const wake = await callTool<RunDetailResponse>(mcp, "get_run", {

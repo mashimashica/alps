@@ -426,6 +426,7 @@ describe("assessment findings", () => {
     ],
     lastSkillUse: new Map([["Design", { run: "r2", path: "skills/design/SKILL.md", sha256: "a" }]]),
     skillNow: new Map([["Design", "b"]]),
+    sharedOrigins: [{ path: "docs/Design doc.md", type: "Design doc", runs: ["r4", "r3"] }],
   };
 
   test("the findings name configuration problems, then description problems, then what is unverified", () => {
@@ -442,6 +443,7 @@ describe("assessment findings", () => {
       "unverified finding.skillChanged",
       "unverified finding.awaiting",
       "unverified finding.stale",
+      "unverified finding.sharedOrigin",
     ]);
     expect(findings.find((f) => f.key === "finding.notRead")).toMatchObject({
       subject: { artifact: "Build log" },
@@ -457,6 +459,13 @@ describe("assessment findings", () => {
       subject: { agent: "claude-code" },
       message: "claude-code cannot be started: the command was not found.",
       evidence: ["claude-code"],
+    });
+    // Runs that ran at the same time both hold the change: the origin is not verified.
+    expect(findings.find((f) => f.key === "finding.sharedOrigin")).toMatchObject({
+      subject: { artifact: "Design doc" },
+      message:
+        "Which run made docs/Design doc.md cannot be told: runs r4, r3 ran at the same time, and each holds its change as an output.",
+      evidence: ["docs/Design doc.md", "r4", "r3"],
     });
   });
 

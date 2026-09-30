@@ -11,6 +11,7 @@ import {
   agentInfo,
   argsFor,
   commandLine,
+  envLeftOut,
   mcpArgs,
   mcpConfigFile,
   parseOutputLine,
@@ -85,7 +86,13 @@ import { HarnessError, refuse } from "./errors.ts";
 import { INTERRUPTED_ERROR, runError } from "./migrate.ts";
 import { artifactPath, workspacePath } from "./paths.ts";
 import { buildPrompt } from "./prompt.ts";
-import { diffOutputs, type OutputSnapshot } from "./provenance.ts";
+import {
+  attributeOutputs,
+  diffOutputs,
+  shareOutputs,
+  type OutputLocation,
+  type OutputSnapshot,
+} from "./provenance.ts";
 import { assessmentMarkdown } from "./report.ts";
 import { staleness, type CurrentState } from "./stale.ts";
 import {
@@ -175,9 +182,14 @@ interface RunEnd {
 
 /** A run that has not ended. */
 interface ActiveRun {
-  /** The output locations: each output type's patterns and the instance's concrete location. */
-  locations: { type: string; patterns: string[]; paths: string[] }[];
+  /** The output locations: each output type's concrete location, or the patterns to decide within. */
+  locations: OutputLocation[];
   before: OutputSnapshot;
+  /**
+   * The process runs that ran at some time while this one did (each started while the other was
+   * running): what they changed in the same locations is told apart from this run's outputs.
+   */
+  overlapping: Set<string>;
   release: () => void;
   timer: ReturnType<typeof setTimeout> | null;
   /** The agent's process, for an agent that starts one. */
@@ -886,24 +898,33 @@ export class Harness {
           ? { path: skill.path, sha256: this.#digests.of(skill.path) }
           : null,
     };
-    const locations = process.outputs.map((type) => {
-      const location = instance.outputs[type];
-      const concrete = location !== null && location !== undefined && isConcrete(location);
+    // A concrete location is the only place of the run's outputs of its type; without one, the run
+    // decides within the instance's pattern, or else within the type's location patterns.
+    const locations: OutputLocation[] = process.outputs.map((type) => {
+      const location = instance.outputs[type] ?? null;
+      if (location !== null && isConcrete(location))
+        return { type, patterns: [], paths: [artifactPath(location)] };
       return {
         type,
-        patterns: [...(typeOf(type)?.paths ?? []), ...(location && !concrete ? [location] : [])],
-        paths: location && concrete ? [artifactPath(location)] : [],
+        patterns: location !== null ? [location] : [...(typeOf(type)?.paths ?? [])],
+        paths: [],
       };
     });
     const active: ActiveRun = {
       locations,
       before: this.#snapshot(locations),
+      overlapping: new Set(),
       release: this.#hooks.hold(),
       timer: null,
       agent: null,
       stopping: null,
       reported: null,
     };
+    for (const [other, running] of this.#active) {
+      if (this.#records.runs.get(other)?.kind !== "process") continue;
+      running.overlapping.add(id);
+      active.overlapping.add(other);
+    }
     this.#active.set(id, active);
     this.#records.runs.set(id, run);
     this.#state.runs[id] = summaryOf(run);
@@ -940,6 +961,7 @@ export class Harness {
           command: spec.command ?? "",
           args,
           cwd: this.root,
+          unset: envLeftOut(spec),
           env: {
             ...spec.env,
             ALPS_RUN_ID: run.id,
@@ -1093,9 +1115,11 @@ export class Harness {
   }
 
   /**
-   * Ends a run: its outputs are what changed in the output locations since it started. An input
-   * that the run itself created or modified is kept with the digest it left, so the evaluation of
-   * the run rests on what the run made of it.
+   * Ends a run: its outputs are what changed in the output locations since it started. When runs
+   * ran at the same time, what they can be told to have changed is left out (attributeOutputs),
+   * and a change that the run holds with one of them that has ended is marked in both records. An
+   * input that the run itself created or modified is kept with the digest it left, so the
+   * evaluation of the run rests on what the run made of it.
    */
   #finish(run: Run, end: RunEnd): void {
     if (run.status !== "running") return;
@@ -1107,7 +1131,37 @@ export class Harness {
     run.exitCode = end.exitCode ?? null;
     if (end.error) Object.assign(run, runError(end.error));
     if (active) {
-      run.outputs = diffOutputs(active.before, this.#snapshot(active.locations));
+      const others = [...active.overlapping].flatMap((id) => {
+        const other = this.#records.runs.get(id);
+        return other ? [other] : [];
+      });
+      const found = attributeOutputs({
+        locations: active.locations,
+        changes: diffOutputs(active.before, this.#snapshot(active.locations)),
+        inputs: run.inputs.flatMap((input) => input.paths.map(artifactPath)),
+        claimed: others.flatMap((other) =>
+          other.targets.flatMap((target) =>
+            target.concrete && target.path !== null ? [artifactPath(target.path)] : [],
+          ),
+        ),
+        alone: others.length === 0,
+      });
+      // A run that is still running compares its outputs with this one's when it ends.
+      const shared = shareOutputs(
+        { id: run.id, outputs: found },
+        others.filter((other) => other.status !== "running"),
+      );
+      run.outputs = shared.outputs;
+      for (const [id, outputs] of shared.others) {
+        const other = this.#records.runs.get(id);
+        if (!other) continue;
+        other.outputs = outputs;
+        try {
+          writeRun(this.root, other);
+        } catch (error) {
+          this.#deps.log(`cannot write run ${id}: ${(error as Error).message}`);
+        }
+      }
       for (const output of run.outputs) this.#state.provenance[output.path] = run.id;
       const produced = new Set(run.outputs.map((output) => output.path));
       for (const input of run.inputs)
@@ -1283,6 +1337,7 @@ export class Harness {
       agents,
       facts: [...facts].reverse(),
       ...this.#skillUse(description.processes),
+      sharedOrigins: this.#sharedOrigins(),
     });
     const { model } = loaded;
     return buildWakePrompt({
@@ -1405,6 +1460,7 @@ export class Harness {
     const active: ActiveRun = {
       locations: [],
       before: new Map(),
+      overlapping: new Set(),
       release: this.#hooks.hold(),
       timer: null,
       agent: null,
@@ -1539,6 +1595,20 @@ export class Harness {
     });
   }
 
+  /**
+   * The Artifacts whose latest change, as provenance names it, the run holds together with runs
+   * that ran at the same time (RunOutput.sharedWith).
+   */
+  #sharedOrigins(): FindingsInput["sharedOrigins"] {
+    const shared: { path: string; type: string; runs: string[] }[] = [];
+    for (const [artifact, id] of Object.entries(this.#state.provenance)) {
+      const output = this.#records.runs.get(id)?.outputs.find((o) => o.path === artifact);
+      if (output?.sharedWith?.length)
+        shared.push({ path: artifact, type: output.type, runs: [id, ...output.sharedWith] });
+    }
+    return shared;
+  }
+
   /** The SKILL.md that the latest process run of each Process used, and each SKILL.md's digest now. */
   #skillUse(processes: readonly ProcessView[]): Pick<FindingsInput, "lastSkillUse" | "skillNow"> {
     const lastSkillUse = new Map<string, { run: string; path: string; sha256: string | null }>();
@@ -1572,6 +1642,7 @@ export class Harness {
       agents,
       facts,
       ...this.#skillUse(description.processes),
+      sharedOrigins: this.#sharedOrigins(),
     });
     const { stats } = computeStats(
       this.#statsInput(description, facts),

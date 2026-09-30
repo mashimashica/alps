@@ -8,8 +8,9 @@
  *   codex-fail   the same with a model the API refuses
  *   claude-fail  `claude -p --output-format stream-json --verbose` (Claude Code 2.1.96), not
  *                logged in
- *   claude-ok    written by hand after the documented format, its first and last lines in the
- *                shape of the recorded ones (no logged-in Claude Code was at hand to record one)
+ *   claude-ok    the same, logged in, running Requirements Clarification (stage 7b): every line
+ *                of the run in its order, its texts neutral sentences, and the tools, MCP servers,
+ *                Skills, and commands of the user's account and Plugins left out of its first line
  * The warnings that Codex printed about the user's own config.toml are left out, and so is what
  * the real agents print on standard error (Codex: "Reading additional input from stdin...").
  *
@@ -20,7 +21,10 @@
  *   hang  prints its first line, starts a child process, writes its own pid and the child's to
  *         the file ALPS_FAKE_PIDS names (one per line), ignores SIGTERM, and waits to be killed
  *   exit  prints nothing and exits with code 3, so only the harness can say why the run failed
- * ALPS_FAKE_PROMPT names a file to write the prompt it received to.
+ * ALPS_FAKE_PROMPT names a file to write the prompt it received to. ALPS_FAKE_ENV_DUMP names a
+ * file to which each start, --version included, adds a line of JSON: `start` (version or run),
+ * the `names` of the variables in its environment, and the `values` of those named ALPS_* (the
+ * tests' own; the others may hold the user's credentials).
  */
 
 import fs from "node:fs";
@@ -41,6 +45,17 @@ function writeWhole(file: string, text: string): void {
   const aside = `${file}.${process.pid}.tmp`;
   fs.writeFileSync(aside, text);
   fs.renameSync(aside, file);
+}
+
+/** Adds this start's environment to the file ALPS_FAKE_ENV_DUMP names: the names, and the ALPS_* values. */
+function dumpEnv(start: "version" | "run"): void {
+  const file = process.env.ALPS_FAKE_ENV_DUMP;
+  if (!file) return;
+  const names = Object.keys(process.env).sort();
+  const values = Object.fromEntries(
+    names.filter((name) => name.startsWith("ALPS_")).map((name) => [name, process.env[name]]),
+  );
+  fs.appendFileSync(file, `${JSON.stringify({ start, names, values })}\n`);
 }
 
 async function readStdin(): Promise<string> {
@@ -169,9 +184,11 @@ const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout
 export async function runFake(agent: FakeAgent): Promise<void> {
   const args = process.argv.slice(2);
   if (args.includes("--version")) {
+    dumpEnv("version");
     console.log(VERSIONS[agent]);
     return;
   }
+  dumpEnv("run");
   const { prompt, format } = await invocation(agent, args);
   if (process.env.ALPS_FAKE_PROMPT) writeWhole(process.env.ALPS_FAKE_PROMPT, prompt);
   const scenario = process.env.ALPS_FAKE_SCENARIO ?? "ok";

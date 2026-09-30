@@ -52,6 +52,44 @@ const DEFAULTS: Record<string, Defaults> = {
   self: { label: "The calling session", format: "self", command: null, args: [], stdin: false },
 };
 
+/**
+ * The variables by which a Claude Code session marks the processes it starts, or ties them to
+ * itself. A harness server started from inside a session (by the Plugin's MCP server, or from a
+ * shell of the session) inherits them, and a `claude` started with them takes itself for a part
+ * of that session: it refuses to start as a nested session (CLAUDECODE), reports the session's
+ * entry point, joins the session's IDE (CLAUDE_CODE_SSE_PORT) and its desktop app's channel and
+ * host, and takes over its effort. A Claude Code agent does not inherit them: of the variables
+ * that the user's settings and the running session put in the server's environment, only these
+ * marks are left out. Any variable not listed here is passed on: the user's credentials
+ * (ANTHROPIC_API_KEY and the like) and PATH, and also the other variables that a session sets
+ * (other CLAUDE_CODE_* variables and ANTHROPIC_BASE_URL among them). How a `claude` started with
+ * those behaves is not verified: the real runs were made from a server started without the
+ * desktop session's variables. The agent's `env` in alps-harness.yaml is added after, and can
+ * still set any variable.
+ */
+export const CLAUDE_SESSION_VARIABLES: readonly string[] = [
+  "CLAUDECODE",
+  "CLAUDE_CODE_ENTRYPOINT",
+  "CLAUDE_CODE_SSE_PORT",
+  "CLAUDE_EFFORT",
+  "CLAUDE_CODE_SESSION_ID",
+  "CLAUDE_CODE_HOST_SESSION_ID",
+  "CLAUDE_CODE_CHILD_SESSION",
+  "CLAUDE_CODE_SESSION_ATTENDED",
+  "CLAUDE_CODE_MESSAGING_SOCKET",
+  "CLAUDE_CODE_MESSAGING_TOKEN",
+  "CLAUDE_CODE_TERMINAL_MCP_TOOLS",
+  "CLAUDE_CODE_SDK_HAS_HOST_AUTH_REFRESH",
+  "CLAUDE_CODE_DESKTOP_APP_VERSION",
+  "CLAUDE_AGENT_SDK_VERSION",
+  "CLAUDE_CODE_EXECPATH",
+  "CLAUDE_PID",
+];
+
+/** The variables of the harness server's environment that an agent's process does not inherit. */
+export const envLeftOut = (spec: AgentSpec): readonly string[] =>
+  spec.format === "claude" ? CLAUDE_SESSION_VARIABLES : [];
+
 /** The agents of a workspace: the defaults, changed or removed by `agents` in alps-harness.yaml. */
 export function resolveAgents(
   overrides: HarnessConfig["agents"],
@@ -99,6 +137,8 @@ export interface AgentLaunch {
   command: string;
   args: string[];
   cwd: string;
+  /** Left out of the environment of the harness server (envLeftOut), before `env` is added. */
+  unset: readonly string[];
   /** Added to the environment of the harness server. */
   env: Record<string, string>;
   /** Written to standard input, which is then closed; `null` gives the agent an empty standard input. */
@@ -168,14 +208,22 @@ export const mcpConfigFile = (server: McpServerLaunch): string =>
 /**
  * The arguments that give an agent an MCP server and let it call that server's tools without
  * asking; everything else follows the agent's own defaults. Claude Code reads the server from
- * `configFile` (--mcp-config, written with mcpConfigFile) and is allowed its tools (--allowedTools
- * mcp__<name>). Codex takes it as configuration overrides (-c, dotted keys with TOML values, which
- * JSON strings and arrays of strings are), with its tools approved, since `codex exec` cannot ask,
- * and with a tool timeout longer than get_run's longest wait (Codex's own is 60 s).
+ * `configFile` (--mcp-config, written with mcpConfigFile) and from nowhere else (--strict-mcp-config:
+ * the user's other MCP servers, such as the claude.ai connectors, are not loaded), and is allowed
+ * its tools (--allowedTools mcp__<name>). Codex takes it as configuration overrides (-c, dotted
+ * keys with TOML values, which JSON strings and arrays of strings are), with its tools approved,
+ * since `codex exec` cannot ask, and with a tool timeout longer than get_run's longest wait
+ * (Codex's own is 60 s).
  */
 export function mcpArgs(spec: AgentSpec, server: McpServerLaunch, configFile: string): string[] {
   if (spec.format === "claude")
-    return ["--mcp-config", configFile, "--allowedTools", `mcp__${server.name}`];
+    return [
+      "--mcp-config",
+      configFile,
+      "--strict-mcp-config",
+      "--allowedTools",
+      `mcp__${server.name}`,
+    ];
   if (spec.format !== "codex") return [];
   const key = `mcp_servers.${server.name}`;
   return [

@@ -178,6 +178,8 @@ const runOutput: z.ZodType<RunOutput> = z.object({
   type: z.string(),
   path: z.string(),
   change: z.enum(["created", "modified"]),
+  // Records written before the harness told concurrent runs apart have none.
+  sharedWith: z.array(z.string()).optional(),
 });
 const gitInfo = z.object({ head: z.string(), dirty: z.boolean() }).nullable();
 const skillUsed = z.object({ path: z.string(), sha256: z.string().nullable() }).nullable();

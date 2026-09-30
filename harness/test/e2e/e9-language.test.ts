@@ -249,7 +249,7 @@ describe("E9 language", () => {
           claude.events.some(
             (event) =>
               event.kind === "system" &&
-              event.text === "Session started (claude-sonnet-4-5)" &&
+              event.text === "Session started (claude-opus-4-6[1m])" &&
               event.key === undefined,
           ),
         ).toBe(true);

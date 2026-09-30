@@ -21,26 +21,69 @@ type Json = Record<string, unknown>;
 
 const MAX_REPORT_LENGTH = 6000;
 const MAX_TOOL_ERROR_LENGTH = 600;
+/** The longest line of a tool call, and of one argument value of an MCP tool call. */
+const MAX_TOOL_LENGTH = 200;
+const MAX_VALUE_LENGTH = 40;
 
 const isJson = (value: unknown): value is Json =>
   value !== null && typeof value === "object" && !Array.isArray(value);
 const text = (value: unknown): string =>
   typeof value === "string" ? value.trim() : typeof value === "number" ? String(value) : "";
 const num = (value: unknown): number | null => (typeof value === "number" ? value : null);
-const firstLine = (value: unknown, length = 200): string =>
+const firstLine = (value: unknown, length = MAX_TOOL_LENGTH): string =>
   (String(value ?? "").split("\n")[0] ?? "").slice(0, length);
+/** The first line, cut at its end when it is longer. */
+const head = (value: unknown, length: number): string => {
+  const line = firstLine(value, Number.POSITIVE_INFINITY);
+  return line.length > length ? `${line.slice(0, length - 1)}…` : line;
+};
+/** The first line, cut at its start when it is longer: the end of a path is its file's name. */
+const tail = (value: unknown, length = MAX_TOOL_LENGTH): string => {
+  const line = firstLine(value, Number.POSITIVE_INFINITY);
+  return line.length > length ? `…${line.slice(line.length - length + 1)}` : line;
+};
 const list = (value: unknown): unknown[] => (Array.isArray(value) ? value : []);
+const plural = (count: number, one: string): string => `${count} ${one}${count === 1 ? "" : "s"}`;
 /** The sum of the numbers among the values; `null` when there is none. */
 const total = (...values: unknown[]): number | null => {
   const known = values.filter((value): value is number => typeof value === "number");
   return known.length ? known.reduce((sum, value) => sum + value, 0) : null;
 };
 
+/** An argument of an MCP tool call, shortly: a string's first line, a list's length, `{…}` for an object. */
+function gist(value: unknown): string {
+  if (typeof value === "string") return JSON.stringify(head(value, MAX_VALUE_LENGTH));
+  if (typeof value === "number" || typeof value === "boolean" || value === null)
+    return String(value);
+  if (Array.isArray(value)) return value.length ? `[${plural(value.length, "item")}]` : "[]";
+  return isJson(value) && Object.keys(value).length === 0 ? "{}" : "{…}";
+}
+
+/**
+ * A tool call in one line: the tool and what it works on. A path (Claude Code gives absolute ones)
+ * keeps its end; Glob and Grep show their pattern and where they look; an MCP tool
+ * (`mcp__<server>__<tool>`) shows each argument's name and a short value.
+ */
 function toolText(name: unknown, input: unknown): string {
+  const tool = text(name);
   const i = isJson(input) ? input : {};
-  const arg =
-    i.file_path ?? i.path ?? i.command ?? i.pattern ?? i.url ?? i.query ?? i.description ?? "";
-  return `${text(name)}${arg ? ` ${firstLine(arg)}` : ""}`;
+  if (tool.startsWith("mcp__")) {
+    const [, server = "", ...rest] = tool.split("__");
+    const args = Object.entries(i).map(([key, value]) => `${key}=${gist(value)}`);
+    return head(
+      `MCP ${server} ${rest.join("__")}${args.length ? ` ${args.join(", ")}` : ""}`,
+      MAX_TOOL_LENGTH,
+    );
+  }
+  const where = i.file_path ?? i.notebook_path ?? i.path;
+  const place = where === undefined || where === null || where === "" ? "" : tail(where);
+  if (tool === "Glob" || tool === "Grep") {
+    const pattern = i.pattern === undefined || i.pattern === null ? "" : firstLine(i.pattern);
+    return [tool, pattern, place && `in ${place}`].filter(Boolean).join(" ");
+  }
+  if (place) return `${tool} ${place}`;
+  const arg = i.command ?? i.pattern ?? i.url ?? i.query ?? i.description ?? "";
+  return `${tool}${arg ? ` ${firstLine(arg)}` : ""}`;
 }
 
 const contentText = (content: unknown): string =>
@@ -54,18 +97,37 @@ const contentText = (content: unknown): string =>
 function parseClaude(line: Json): ParsedLine {
   const message = isJson(line.message) ? line.message : {};
   switch (line.type) {
-    case "system":
+    case "system": {
+      if (line.subtype !== "init") return { events: [] };
+      const events: EventDraft[] = [
+        { kind: "system", text: `Session started${line.model ? ` (${text(line.model)})` : ""}` },
+      ];
+      // Whether each MCP server could be reached (connected, failed, needs-auth, …).
+      const servers = list(line.mcp_servers).flatMap((server) =>
+        isJson(server) && text(server.name)
+          ? [`${text(server.name)} (${text(server.status) || "status unknown"})`]
+          : [],
+      );
+      if (servers.length)
+        events.push({ kind: "system", text: `MCP servers: ${servers.join(", ")}` });
+      return { events };
+    }
+    case "rate_limit_event": {
+      const info = isJson(line.rate_limit_info) ? line.rate_limit_info : {};
+      const status = text(info.status);
+      if (!status) return { events: [] };
+      const window = text(info.rateLimitType);
+      // resetsAt is in seconds since the epoch.
+      const resets = new Date((num(info.resetsAt) ?? Number.NaN) * 1000);
+      const at = Number.isNaN(resets.getTime())
+        ? ""
+        : `, resets at ${resets.toISOString().replace(/\.\d{3}Z$/, "Z")}`;
       return {
-        events:
-          line.subtype === "init"
-            ? [
-                {
-                  kind: "system",
-                  text: `Session started${line.model ? ` (${text(line.model)})` : ""}`,
-                },
-              ]
-            : [],
+        events: [
+          { kind: "system", text: `Rate limit${window ? ` (${window})` : ""}: ${status}${at}` },
+        ],
       };
+    }
     case "assistant": {
       // A message that Claude Code writes itself when it cannot use the model (model
       // "<synthetic>", with `error` such as "authentication_failed") tells why: it is an error.
@@ -105,20 +167,48 @@ function parseClaude(line: Json): ParsedLine {
       const reason = !failed
         ? ""
         : (subtype !== "success" && subtype) || firstLine(text(line.result)) || "error";
+      // How the agent's session ended by its own account: why it stopped (terminal_reason), how
+      // long it took, how many turns (Claude Code's num_turns is its tool round trips plus one, a
+      // different unit from --max-turns), and the tool uses that its permissions denied.
+      const ending = text(line.terminal_reason);
+      const ms = num(line.duration_ms);
+      const turns = num(line.num_turns);
+      const denials = list(line.permission_denials);
+      const firstDenied = denials.map((d) => (isJson(d) ? text(d.tool_name) : "")).find(Boolean);
+      const denied = denials.length
+        ? `${plural(denials.length, "tool use")} denied${firstDenied ? `, the first ${firstDenied}` : ""}`
+        : "";
+      const spent = [
+        ms === null ? "" : ms < 1000 ? `${ms} ms` : `${Math.round(ms / 1000)} s`,
+        turns === null ? "" : `${plural(turns, "turn")} (tool round trips + 1)`,
+      ].filter(Boolean);
+      const events: EventDraft[] = [
+        {
+          kind: "result",
+          text: failed
+            ? `The agent reported a failure (${reason})`
+            : "The agent reported the end of its work",
+        },
+      ];
+      if (ending || spent.length || denied)
+        events.push({
+          kind: "system",
+          text: `The agent ended${ending ? ` (${ending})` : ""}${
+            spent.length ? ` after ${spent.join(" and ")}` : ""
+          }${denied ? `; ${denied}` : ""}`,
+        });
+      const agentError = !failed
+        ? undefined
+        : `${reason}${ending && ending !== "completed" && !reason.includes(ending) ? ` (${ending})` : ""}${
+            denied ? `; ${denied}` : ""
+          }`;
       return {
-        events: [
-          {
-            kind: "result",
-            text: failed
-              ? `The agent reported a failure (${reason})`
-              : "The agent reported the end of its work",
-          },
-        ],
+        events,
         // Input tokens are counted as Codex counts them: those written to and read from the
         // prompt cache included.
         usage: {
           costUsd: num(line.total_cost_usd),
-          turns: num(line.num_turns),
+          turns,
           inputTokens: total(
             tokens.input_tokens,
             tokens.cache_creation_input_tokens,
@@ -130,7 +220,7 @@ function parseClaude(line: Json): ParsedLine {
         ...(line.result === undefined || line.result === null
           ? {}
           : { report: String(line.result).slice(0, MAX_REPORT_LENGTH) }),
-        ...(failed ? { agentError: reason } : {}),
+        ...(agentError === undefined ? {} : { agentError }),
       };
     }
     default:

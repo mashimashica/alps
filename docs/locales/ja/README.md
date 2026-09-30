@@ -147,7 +147,7 @@ bun harness/src/cli.ts serve examples/service-change --open
 - 起動ごとに合い言葉が変わります。合い言葉はURLのfragment（`#token=…`）で渡り、サーバーには届きません。ページはそれを一度だけ読み、sessionStorageに保持します。合い言葉を示すのは、`.alps-harness/server.json`（権限0600）と、サーバーを起動した端末だけです。`--open`と`open_ui`は、`.alps-harness/`にある権限0600のページを通じてブラウザを開くため、合い言葉がコマンドラインに現れることはありません。
 - APIは、cross-siteとsame-siteの要求（`Sec-Fetch-Site`）と、JSONでない要求本文を拒否します。ほかのオリジンは応答を読み込めません（`Cross-Origin-Resource-Policy: same-origin`）。ページはフレームに埋め込めず（`X-Frame-Options: DENY`と`frame-ancestors 'none'`）、Content Security Policyはサーバー自身の資源だけを許し（`default-src 'self'`）、表示するMarkdownは無害化します。
 - インスタンスの入力と出力は、ワークスペースの中で、かつ`.alps-harness/`の外になければなりません。
-- エージェントは、ワークスペースで、そのコマンドラインが与える権限で動きます。Claude Codeは`--permission-mode acceptEdits`、Codexは`--sandbox workspace-write`です。目覚めたエージェントには、ハーネスのMCPツールも許可します。プロンプトは、入力アーティファクトの内容を指示ではなくデータとして扱うようエージェントに伝えます。既定は`agents`で変えられます。
+- エージェントは、ワークスペースで、そのコマンドラインが与える権限で動きます。Claude Codeは`--permission-mode acceptEdits`、Codexは`--sandbox workspace-write`です。目覚めたエージェントには、ハーネスのMCPツールも許可し、目覚めたClaude Codeには他のMCPサーバーを読み込ませません（`--strict-mcp-config`）。Claude Codeのエージェントは、Claude Codeのセッションが起動するプロセスに付ける印の変数（`CLAUDECODE`など）を受け継がないので、セッションの中から起動したハーネスも、端末から起動したときと同じようにエージェントを起動します。プロンプトは、入力アーティファクトの内容を指示ではなくデータとして扱うようエージェントに伝えます。既定は`agents`で変えられます。
 
 ハーネスの開発については[harness/README.md](../../../harness/README.md)（英語）を参照してください。
 

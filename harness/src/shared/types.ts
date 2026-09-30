@@ -197,6 +197,12 @@ export interface RunOutput {
   type: string;
   path: string;
   change: "created" | "modified";
+  /**
+   * The runs that ran at the same time and whose outputs hold the same change: which of them made
+   * it cannot be told, and the assessment says so. Absent for a change that only this run holds,
+   * and in records written before the harness looked.
+   */
+  sharedWith?: string[];
 }
 
 /**
@@ -206,6 +212,11 @@ export interface RunOutput {
  */
 export interface Usage {
   costUsd: number | null;
+  /**
+   * As the agent counts them. Claude Code's num_turns is its tool round trips plus one, a
+   * different unit from its --max-turns, which counts the requests to the model (one request can
+   * call several tools).
+   */
   turns: number | null;
   inputTokens: number | null;
   /** Of the input tokens, those read from the prompt cache. */

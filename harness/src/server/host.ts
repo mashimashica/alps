@@ -1,17 +1,21 @@
 /* What the harness core needs from the machine: agent version checks and the git state, through Bun. */
 
-import type { AgentSpec, VersionCheck } from "../agents/index.ts";
+import { envLeftOut, type AgentSpec, type VersionCheck } from "../agents/index.ts";
+import { agentEnv } from "./agent-process.ts";
 
 const VERSION_TIMEOUT_MS = 8000;
 const GIT_TIMEOUT_MS = 5000;
 
-/** Runs `<command> --version` with the agent's environment and a time limit. Never rejects. */
+/**
+ * Runs `<command> --version` with a time limit, in the environment that the agent is started in
+ * (agentEnv). Never rejects.
+ */
 export async function checkVersion(spec: AgentSpec): Promise<VersionCheck> {
   if (!spec.command) return { exitCode: null, stdout: "", notFound: true, timedOut: false };
   let child: Bun.Subprocess<"ignore", "pipe", "ignore">;
   try {
     child = Bun.spawn([spec.command, "--version"], {
-      env: { ...process.env, ...spec.env },
+      env: agentEnv(process.env, { unset: envLeftOut(spec), env: spec.env }),
       stdin: "ignore",
       stdout: "pipe",
       stderr: "ignore",

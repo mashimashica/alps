@@ -158,6 +158,8 @@ const en = {
   "finding.unused": (a: { type: string }) => `No Process produces or reads ${a.type}.`,
   "finding.agentUnavailable": (a: { agent: string; reason: string }) =>
     `${a.agent} cannot be started: ${a.reason}.`,
+  "finding.sharedOrigin": (a: { path: string; runs: string }) =>
+    `Which run made ${a.path} cannot be told: runs ${a.runs} ran at the same time, and each holds its change as an output.`,
 
   /* ---------- what the MCP tools report on success ---------- */
   "done.model": (a: { name: string; processes: number; types: number }) =>
@@ -336,6 +338,8 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
   "finding.notRead": (a) => `${a.type} を読むプロセスはない（作るプロセス: ${a.producers}）。`,
   "finding.unused": (a) => `${a.type} を作るプロセスも読むプロセスもない。`,
   "finding.agentUnavailable": (a) => `${a.agent} を起動できない（${a.reason}）。`,
+  "finding.sharedOrigin": (a) =>
+    `${a.path} をどの実行が作ったかは分からない。同時に動いた実行 ${a.runs} のそれぞれが、その変化を出力として持つ。`,
 
   "done.model": (a) =>
     `モデル「${a.name}」には ${a.processes} のプロセスと ${a.types} のアーティファクトの型がある。SKILL.md とアーティファクトは自分のファイルツールで読むこと。`,

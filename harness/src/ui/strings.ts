@@ -147,14 +147,22 @@ const en = {
   "run.ended": "Ended",
   "run.duration": "Duration",
   "run.usage": "Usage",
-  "run.usageValue": (a: { cost: string; input: string; cached: string | null; output: string }) =>
-    `${a.cost} · ${a.input} input${a.cached === null ? "" : ` (${a.cached} cached)`} · ${a.output} output tokens`,
+  "run.usageValue": (a: {
+    cost: string;
+    input: string;
+    cached: string | null;
+    output: string;
+    turns: string | null;
+  }) =>
+    `${a.cost} · ${a.input} input${a.cached === null ? "" : ` (${a.cached} cached)`} · ${a.output} output tokens${a.turns === null ? "" : ` · ${a.turns} turns (tool round trips + 1)`}`,
   "run.report": "Report",
   "run.noReport": "No report.",
   "run.outputs": "Output changes",
   "run.noOutputs": "No output changes were found.",
   "run.created": "created",
   "run.modified": "modified",
+  "run.sharedWith": (a: { runs: string }) =>
+    `also an output of ${a.runs}, which ran at the same time: which run made it is not known`,
   "run.inputs": "Inputs it used",
   "run.missing": "missing",
   "run.log": "Log",
@@ -492,13 +500,14 @@ const ja: { [K in UiKey]: (typeof en)[K] } = {
   "run.duration": "所要時間",
   "run.usage": "使用量",
   "run.usageValue": (a) =>
-    `${a.cost} · 入力 ${a.input}${a.cached === null ? "" : `（キャッシュ ${a.cached}）`} · 出力 ${a.output} トークン`,
+    `${a.cost} · 入力 ${a.input}${a.cached === null ? "" : `（キャッシュ ${a.cached}）`} · 出力 ${a.output} トークン${a.turns === null ? "" : ` · ターン ${a.turns}（ツールの往復＋1）`}`,
   "run.report": "報告",
   "run.noReport": "報告はない。",
   "run.outputs": "出力の変化",
   "run.noOutputs": "出力の変化は見つからなかった。",
   "run.created": "作成",
   "run.modified": "更新",
+  "run.sharedWith": (a) => `同時に動いた ${a.runs} の出力でもあり、どの実行が作ったかは分からない`,
   "run.inputs": "使った入力",
   "run.missing": "なかった",
   "run.log": "ログ",

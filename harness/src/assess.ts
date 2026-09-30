@@ -478,6 +478,11 @@ export interface FindingsInput {
   lastSkillUse: ReadonlyMap<string, { run: string; path: string; sha256: string | null }>;
   /** The digest of each Process's SKILL.md now, by Process id (`null`: it cannot be read). */
   skillNow: ReadonlyMap<string, string | null>;
+  /**
+   * The Artifacts whose latest change runs that ran at the same time all hold as an output
+   * (RunOutput.sharedWith), with those runs, the one that provenance names first.
+   */
+  sharedOrigins: readonly { path: string; type: string; runs: readonly string[] }[];
 }
 
 /** A message in English with its key and arguments. */
@@ -491,7 +496,8 @@ const said = <K extends MessageKey>(key: K, args: MessageArgs<K>) => ({
  * The findings: problems of the configuration (a Skill that is not found, a type without a
  * location, an agent that cannot be started), of the description (a type that no Process produces
  * or reads), and what is unverified (a SKILL.md that changed after the last run, results that
- * await a judgment, judgments whose evidence is stale).
+ * await a judgment, judgments whose evidence is stale, an Artifact that runs at the same time
+ * all hold as an output).
  */
 export function findingsOf(input: FindingsInput): Finding[] {
   const configuration: Finding[] = [];
@@ -604,5 +610,13 @@ export function findingsOf(input: FindingsInput): Finding[] {
       });
     }
   }
+
+  for (const shared of input.sharedOrigins)
+    unverified.push({
+      kind: "unverified",
+      subject: { artifact: shared.type },
+      ...said("finding.sharedOrigin", { path: shared.path, runs: shared.runs.join(", ") }),
+      evidence: [shared.path, ...shared.runs],
+    });
   return [...configuration, ...description, ...unverified];
 }

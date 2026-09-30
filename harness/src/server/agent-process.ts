@@ -59,11 +59,24 @@ async function readLines(
   flush(true);
 }
 
+/**
+ * The agent's environment: the harness server's, without the variables that the agent must not
+ * inherit (launch.unset), and with launch.env added.
+ */
+export function agentEnv(
+  inherited: Record<string, string | undefined>,
+  launch: Pick<AgentLaunch, "unset" | "env">,
+): Record<string, string | undefined> {
+  const env = { ...inherited };
+  for (const name of launch.unset) delete env[name];
+  return { ...env, ...launch.env };
+}
+
 /** Starts an agent. Throws when the process cannot be started (for example, the command does not exist). */
 export function startAgent(launch: AgentLaunch, output: AgentOutput): AgentHandle {
   const child = Bun.spawn([launch.command, ...launch.args], {
     cwd: launch.cwd,
-    env: { ...process.env, ...launch.env },
+    env: agentEnv(process.env, launch),
     detached: !WINDOWS,
     stdin: launch.stdin === null ? "ignore" : "pipe",
     stdout: "pipe",

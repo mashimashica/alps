@@ -607,6 +607,7 @@ function RunPanel({ id }: { id: string }) {
                     ? null
                     : count(run.usage.cachedInputTokens, language),
                 output: count(run.usage.outputTokens, language),
+                turns: run.usage.turns === null ? null : count(run.usage.turns, language),
               })}
             </dd>
           </>
@@ -686,6 +687,9 @@ function RunPanel({ id }: { id: string }) {
                   </span>
                   <span class="faint small">
                     {typeName(model, output.type)} · {t(`run.${output.change}`)}
+                    {output.sharedWith?.length
+                      ? ` · ${t("run.sharedWith", { runs: output.sharedWith.join(", ") })}`
+                      : ""}
                   </span>
                 </li>
               ))}
