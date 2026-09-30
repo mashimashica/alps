@@ -8,6 +8,8 @@
  * windows it is a Sheet over the page, and the sidebar is a drawer. In the network, a narrow
  * window keeps the panel in the page below the diagram instead: a Sheet would cover the focus
  * view and the background whose click returns to the whole ring.
+ * Each screen's heading carries the main action, Request: a person says what is needed, and a
+ * woken agent plans, instantiates, and runs the Processes that serve it (views/forms.tsx).
  * The records are read once and kept current through the event stream; the page only draws them.
  */
 
@@ -587,9 +589,14 @@ export function App({ session }: { session: Session }) {
                   <h2>{t(`tab.${view}`)}</h2>
                   <p class="page-sub">{t(`screen.${view}`)}</p>
                 </div>
-                <Button onClick={() => setForm({ kind: "new" })} disabled={!model}>
-                  <Icon name="plus" />
-                  {t("process.newInstance")}
+                {/* The main action on every screen: a request, which a woken agent turns into instances. */}
+                <Button
+                  onClick={() => setForm({ kind: "request" })}
+                  disabled={!model}
+                  data-testid="request-open"
+                >
+                  <Icon name="send" />
+                  {t("request.open")}
                 </Button>
               </div>
               <section class="view" data-view={view} {...tabPanel("view", view)} tabIndex={-1}>

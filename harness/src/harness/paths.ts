@@ -40,22 +40,24 @@ export type WorkspacePath =
  * slashes (a trailing slash, which marks a directory, is kept). It is refused when it leaves the
  * workspace (through `..`, as an absolute path elsewhere, or through a symlink that points out of
  * it, also one whose target does not exist yet), and when it lies in .alps-harness/, the harness's
- * own records, directly or through a symlink.
+ * own records, directly or through a symlink. An absolute path may name the workspace by its real
+ * path (a shell's current directory on macOS is /private/var/… for a workspace under /var/…).
  */
 export function workspacePath(root: string, given: string): WorkspacePath {
   const trimmed = given.trim();
   const directory = /[\\/]$/.test(trimmed);
-  const abs = path.resolve(root, trimmed);
-  const relative = path.relative(root, abs);
-  if (!isInside(relative)) return { ok: false, reason: "outside" };
-  if (relative === "") return { ok: false, reason: "empty" };
-  if (isRecords(relative)) return { ok: false, reason: "records" };
   let realRoot: string;
   try {
     realRoot = fs.realpathSync(root);
   } catch {
     realRoot = root;
   }
+  const abs = path.resolve(root, trimmed);
+  const named = path.relative(root, abs);
+  const relative = isInside(named) ? named : path.relative(realRoot, abs);
+  if (!isInside(relative)) return { ok: false, reason: "outside" };
+  if (relative === "") return { ok: false, reason: "empty" };
+  if (isRecords(relative)) return { ok: false, reason: "records" };
   try {
     const real = path.relative(realRoot, fs.realpathSync(existingAncestor(abs)));
     if (!isInside(real)) return { ok: false, reason: "outside" };

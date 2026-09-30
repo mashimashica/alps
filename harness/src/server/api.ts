@@ -1,7 +1,8 @@
 /*
  * The routes of the HTTP API. Each answers one tool of the MCP server, which relays to it, and the
  * WebUI uses the same routes. The safety checks (Host, token, Sec-Fetch-Site, JSON bodies) run in
- * http.ts before a route is chosen.
+ * http.ts before a route is chosen. The one body that is not JSON is that of the attachments a
+ * person uploads with a request (multipart/form-data); the MCP server has no such tool.
  *
  *   get_model       GET  /api/model
  *   list_artifacts  GET  /api/artifacts?type&changedSince
@@ -19,6 +20,7 @@
  *   open_ui         POST /api/open
  *   (WebUI)         GET  /api/stats?period&granularity&process&agent&tz
  *   (WebUI)         GET  /api/skill?process
+ *   (WebUI)         POST /api/attachments  (multipart/form-data)
  *
  * Who calls is not in any body. The MCP server names its client in X-Harness-Client (and the
  * session it holds in X-Harness-Session); a request without it comes from a person (the WebUI).
@@ -27,7 +29,20 @@
  */
 
 import type { z } from "zod";
-import { HTTP_STATUS, HarnessError, refuse, type Caller, type Harness } from "../harness/index.ts";
+import {
+  HTTP_STATUS,
+  HarnessError,
+  refuse,
+  type AttachedFile,
+  type Caller,
+  type Harness,
+} from "../harness/index.ts";
+import {
+  MAX_ATTACHMENT_BYTES,
+  MAX_ATTACHMENT_SIZE,
+  MAX_ATTACHMENTS,
+  safeFileName,
+} from "../shared/requests.ts";
 import {
   artifactsQuery,
   assessmentQuery,
@@ -47,6 +62,7 @@ import {
 } from "../shared/schema.ts";
 import type {
   ArtifactsResponse,
+  AttachmentsResponse,
   AssessmentMarkdownResponse,
   AssessmentResponse,
   CancelResponse,
@@ -95,15 +111,103 @@ const ok = <T extends { ok: true }>(body: T, status = 200): ApiReply => ({ statu
 
 const query = (url: URL): Record<string, string> => Object.fromEntries(url.searchParams);
 
+/** The most that a JSON body may be. */
+export const MAX_JSON_BYTES = 1024 * 1024;
+/**
+ * The most that the body of an upload may be: one attachment at its limit, and the form around
+ * it. The WebUI sends the files of a request one at a time.
+ */
+export const MAX_UPLOAD_BYTES = MAX_ATTACHMENT_BYTES + MAX_JSON_BYTES;
+
+/** A limit as the messages say it. */
+export const mebibytes = (bytes: number): string => `${Math.round(bytes / 1024 / 1024)} MiB`;
+
+/**
+ * The request's body, refused when it is longer than `limit`. A body that says it is longer is
+ * refused unread (http.ts). One that does not say its length (chunked) is read to its end with no
+ * more than the limit kept, and refused then: a client that stops sending on an early answer and
+ * sends its next request on the same connection would have that request taken for the rest.
+ */
+async function bytesOf(request: Request, limit: number): Promise<Uint8Array<ArrayBuffer>> {
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  if (request.body) {
+    const reader = request.body.getReader();
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size <= limit) chunks.push(value);
+    }
+  }
+  if (size > limit) throw refuse("too-large", "error.bodySize", { limit: mebibytes(limit) });
+  const bytes = new Uint8Array(size);
+  let at = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, at);
+    at += chunk.byteLength;
+  }
+  return bytes;
+}
+
+/** The request's body as text, refused when it is longer than a JSON body may be (1 MiB). */
+export async function textOf(request: Request): Promise<string> {
+  const bytes = await bytesOf(request, MAX_JSON_BYTES);
+  return Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength).toString("utf8");
+}
+
 /** The request's JSON body; an empty body is `{}`. */
 async function body(request: Request): Promise<unknown> {
-  const text = await request.text();
+  const text = await textOf(request);
   if (!text.trim()) return {};
   try {
     return JSON.parse(text) as unknown;
   } catch (error) {
     throw refuse("invalid-request", "error.notJson", { detail: (error as Error).message });
   }
+}
+
+/** A file's name as the form gives it: a part whose filename is empty comes without one. */
+const nameOf = (file: Blob): string =>
+  "name" in file && typeof file.name === "string" ? file.name : "";
+
+/**
+ * The files of an upload (multipart/form-data), read once all of them are within the limits: a
+ * body of at most 21 MiB (no more of it is kept), with at most ten files, none larger than 20 MB.
+ * The form's other fields are ignored.
+ */
+async function attachedFiles(request: Request): Promise<AttachedFile[]> {
+  const bytes = await bytesOf(request, MAX_UPLOAD_BYTES);
+  let form: FormData;
+  try {
+    form = await new Response(bytes, {
+      headers: { "Content-Type": request.headers.get("content-type") ?? "" },
+    }).formData();
+  } catch (error) {
+    throw refuse("invalid-request", "error.multipart", { detail: (error as Error).message });
+  }
+  const files: Blob[] = [];
+  form.forEach((value) => {
+    if (typeof value !== "string") files.push(value);
+  });
+  if (files.length === 0) throw refuse("invalid-request", "error.noFiles", {});
+  if (files.length > MAX_ATTACHMENTS)
+    throw refuse("invalid-request", "error.attachmentCount", {
+      count: files.length,
+      limit: MAX_ATTACHMENTS,
+    });
+  const large = files.find((file) => file.size > MAX_ATTACHMENT_BYTES);
+  if (large)
+    throw refuse("too-large", "error.attachmentSize", {
+      name: safeFileName(nameOf(large)),
+      limit: MAX_ATTACHMENT_SIZE,
+    });
+  return Promise.all(
+    files.map(async (file) => ({
+      name: nameOf(file),
+      data: new Uint8Array(await file.arrayBuffer()),
+    })),
+  );
 }
 
 const describeIssues = (issues: readonly z.core.$ZodIssue[]): string =>
@@ -179,12 +283,13 @@ function routes(harness: Harness, host: ApiHost): Route[] {
     {
       method: "POST",
       pattern: /^\/api\/instances$/,
-      handle: async ({ request }) => {
+      handle: async ({ request, caller }) => {
         const given = await body(request);
         // One of two shapes; checking against the one meant gives the useful messages.
         const update = given !== null && typeof given === "object" && "instance" in given;
         const result = harness.instantiate(
           parse(update ? updateInstanceRequest : createInstanceRequest, given),
+          caller,
         );
         return ok({ ok: true, ...result } satisfies InstanceResponse, result.created ? 201 : 200);
       },
@@ -299,6 +404,18 @@ function routes(harness: Harness, host: ApiHost): Route[] {
         });
         return ok({ ok: true, ...result } satisfies WakeResponse, result.skipped ? 200 : 201);
       },
+    },
+    {
+      method: "POST",
+      pattern: /^\/api\/attachments$/,
+      handle: async ({ request }) =>
+        ok(
+          {
+            ok: true,
+            paths: harness.attach(await attachedFiles(request)),
+          } satisfies AttachmentsResponse,
+          201,
+        ),
     },
     {
       method: "POST",

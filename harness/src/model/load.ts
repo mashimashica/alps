@@ -4,8 +4,10 @@
  * it never changes the model's meaning.
  */
 
+import fs from "node:fs";
 import path from "node:path";
 import { resolveAgents, takesMcpServer } from "../agents/index.ts";
+import { DEFAULT_ATTACHMENTS } from "../shared/requests.ts";
 import {
   formatIssues,
   harnessConfigSchema,
@@ -16,10 +18,13 @@ import {
 import type { ArtifactType, Language, Process, ProcessModel } from "../shared/types.ts";
 import {
   CONFIG_FILES,
+  HARNESS_DIR,
   MODEL_FILES,
   ModelError,
+  isDir,
   isFile,
   readStructured,
+  toPosix,
   type ParseYaml,
 } from "./files.ts";
 import { normalizeLocations } from "./patterns.ts";
@@ -37,6 +42,46 @@ export interface LoadedWorkspace {
   skillRoots: string[];
   language: Language;
   server: { port: number; idleMinutes: number };
+  /**
+   * Where the WebUI saves the files attached to a request (`attachments`, inbox/ by default):
+   * relative to the workspace, with forward slashes and a trailing slash.
+   */
+  attachments: string;
+}
+
+/**
+ * The attachments directory that alps-harness.yaml names (inbox/ when it names none), relative to
+ * the workspace with forward slashes and a trailing slash (empty for the workspace itself), or
+ * why it cannot be used: it leaves the workspace, or it lies in .alps-harness/ (compared without
+ * case, as macOS and Windows compare names). Only the names are compared; the server looks where
+ * symlinks lead when it saves a file.
+ */
+export function attachmentsLocation(
+  root: string,
+  configured: string | undefined,
+): { ok: true; dir: string } | { ok: false; reason: "outside" | "records" } {
+  const relative = path.relative(root, path.resolve(root, configured || DEFAULT_ATTACHMENTS));
+  if (relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative))
+    return { ok: false, reason: "outside" };
+  if (relative.split(path.sep)[0]?.toLowerCase() === HARNESS_DIR)
+    return { ok: false, reason: "records" };
+  return { ok: true, dir: relative === "" ? "" : `${toPosix(relative)}/` };
+}
+
+/**
+ * The first part of an attachments directory (relative to the workspace, with a trailing slash)
+ * that is there as something other than a directory: a file, or a symlink that leads nowhere;
+ * `null` when each part is a directory or is not there yet (it is made when a file is saved).
+ */
+function notDirectory(root: string, dir: string): string | null {
+  let relative = "";
+  for (const part of dir.split("/").filter(Boolean)) {
+    relative = relative ? `${relative}/${part}` : part;
+    const absolute = path.join(root, relative);
+    if (fs.lstatSync(absolute, { throwIfNoEntry: false }) === undefined) return null;
+    if (!isDir(absolute)) return relative;
+  }
+  return null;
 }
 
 export interface LoadOptions {
@@ -73,6 +118,26 @@ export function loadWorkspace(root: string, options: LoadOptions): LoadedWorkspa
     const problems = scheduleProblems(config, path.basename(configPath));
     if (problems) throw new ModelError("no-model", problems, [configPath]);
   }
+  // Without a configuration the default, inbox/, is always inside the workspace.
+  const attachments = attachmentsLocation(root, config.attachments);
+  if (!attachments.ok)
+    throw new ModelError(
+      "no-model",
+      `${path.basename(configPath ?? CONFIG_FILES[0])}: attachments: ${config.attachments} ${
+        attachments.reason === "outside"
+          ? `is outside the workspace (${root})`
+          : "is in .alps-harness/, the harness's own records"
+      }; the files attached to requests are saved inside the workspace and outside .alps-harness/.`,
+      configPath ? [configPath] : [],
+    );
+  // The directory that alps-harness.yaml names holds a directory for each day: it cannot be a file.
+  const blocked = config.attachments ? notDirectory(root, attachments.dir) : null;
+  if (blocked !== null)
+    throw new ModelError(
+      "no-model",
+      `${path.basename(configPath ?? CONFIG_FILES[0])}: attachments: ${config.attachments} cannot hold the files attached to requests: ${blocked} is not a directory (a file, or a symlink that leads nowhere). Name a directory, or one that does not exist yet.`,
+      configPath ? [configPath] : [],
+    );
 
   const modelPath = config.model
     ? path.resolve(root, config.model)
@@ -114,6 +179,7 @@ export function loadWorkspace(root: string, options: LoadOptions): LoadedWorkspa
       port: config.server?.port ?? DEFAULT_PORT,
       idleMinutes: config.server?.idleMinutes ?? DEFAULT_IDLE_MINUTES,
     },
+    attachments: attachments.dir,
   };
 }
 

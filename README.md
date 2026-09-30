@@ -55,7 +55,7 @@ The [working example](examples/README.md) shows both design responsibilities on 
 
 ## Harness
 
-The harness applies a process model to concrete work. It instantiates a Process for concrete inputs, runs it with an agent, records the run and which run produced each output, and records an evaluation of each Outcome with its evidence. It reads the process model and the Skills and never changes them. A person uses its WebUI, which shows the network of Processes, a dashboard, and the instances; an agent uses its MCP server. The dashboard counts judged Outcomes, runs, durations, and cost, and shows which evaluations rest on inputs or a `SKILL.md` that have changed since the judged run. A run that ended, an output that exists, or an agent's report is never counted as an achieved Outcome: Outcomes are judged by a person or a named agent, with evidence. The `run-process` Skill guides a session that performs a run itself (the agent `self`).
+The harness applies a process model to concrete work. It instantiates a Process for concrete inputs, runs it with an agent, records the run and which run produced each output, and records an evaluation of each Outcome with its evidence. It reads the process model and the Skills and never changes them. A person uses its WebUI, which shows the network of Processes, a dashboard, and the instances, and takes [requests](#requests); an agent uses its MCP server. The dashboard counts judged Outcomes, runs, durations, and cost, and shows which evaluations rest on inputs or a `SKILL.md` that have changed since the judged run. A run that ended, an output that exists, or an agent's report is never counted as an achieved Outcome: Outcomes are judged by a person or a named agent, with evidence. The `run-process` Skill guides a session that performs a run itself (the agent `self`), or that turns a request into instances itself.
 
 ### Requirements
 
@@ -90,7 +90,7 @@ bun harness/src/cli.ts serve examples/service-change --open
 | --- | --- |
 | `serve [workspace] [--daemon] [--port <port>] [--open] [--dev]` | Starts the harness server and prints the WebUI's URL, which carries the access token after `#`. `--daemon` detaches it; `--open` opens a browser. |
 | `stop [workspace]` | Stops the harness server and the agents it runs. |
-| `wake [workspace] [--agent claude-code\|codex]` | Wakes an agent, as a schedule does, for an external scheduler such as launchd, cron, or CI. |
+| `wake [workspace] [--agent claude-code\|codex] [--request <text>] [--attach <path>]… [--process <process>]… [--plan]` | Wakes an agent, as a schedule does, for an external scheduler such as launchd, cron, or CI, or with a [request](#requests): its text, the workspace paths it attaches, the Processes that the plan must include, and `--plan` to only instantiate. |
 | `assess [workspace] [--format markdown\|json]` | Prints the statistics, the findings, and the facts of every instance. |
 | `mcp` | Serves MCP on stdio for the workspace in `ALPS_WORKSPACE` or the current directory. |
 
@@ -119,8 +119,13 @@ The workspace is the nearest directory, from the given one (the project director
 | `server` | `port` (4830 by default) and `idleMinutes` (30). |
 | `guidance` | Markdown files that a woken agent reads, in prose: what comes first, what takes priority, when not to run a Process. The harness does not interpret them. |
 | `schedules` | When the daemon wakes an agent: `cron` (five fields, local time) and `agent` (`claude-code` or `codex`). The woken agent reads the model, the guidance, and the state, and decides which Processes to run. |
+| `attachments` | Where the WebUI saves the files attached to a request: `inbox/` by default, in a directory for each day (`inbox/2026-10-01/notes.md`, then `notes-2.md` for the same name). It must lie inside the workspace and outside `.alps-harness/`. A saved file that matches a type's `paths` is an Artifact too; whether to keep the directory in version control is the workspace's choice. |
 
 The [example workspace](examples/service-change/alps-harness.yaml) describes each key in comments.
+
+### Requests
+
+A request asks for work in the requester's own words; roughly is enough. In the WebUI, **Request** on every screen takes the text, attachments (files dropped or chosen, which are saved in the workspace when the request is sent, or Artifacts already there), the Processes that the plan must include, the agent, and whether to run the plan or only instantiate it. Sending it wakes the agent with the request. The agent reads the model and the guidance, chooses the Processes that serve the request, and instantiates each with concrete inputs, output locations, criteria derived from the request, and its assumptions in the notes; it runs them unless asked for a plan only, and reports what it planned and why, what it ran, its assumptions, and what the requester needs to confirm. The wake's record shows the request, the attachments, that report, and the runs it started, and the board shows each instance as it is made, with a link back to the wake (`createdBy`). The MCP tool `wake` and the command `wake --request` take the same request. A session can instead tailor a request itself, as the `run-process` Skill describes. The harness decides nothing about the plan: the request is the requester's instruction, and what the attachments say is data. The runs that a request starts are counted in the statistics; the wake itself is not.
 
 ### MCP tools
 
@@ -136,7 +141,7 @@ The [example workspace](examples/service-change/alps-harness.yaml) describes eac
 | `finish_run` | Ends a self run with its report, or takes the report of a woken agent. |
 | `evaluate` | Records one judgment per Outcome (`achieved`, `not-achieved`, or `unverified`) with evidence, which cannot be empty. |
 | `get_assessment` | Returns the statistics and the findings, as JSON or Markdown. |
-| `wake` | Wakes an agent that decides which Processes to run. |
+| `wake` | Wakes an agent that decides which Processes to run, or that serves a request (`request`, `attachments`, `processes`, and `runs`: `run` or `plan`). Success means only that it started; the plan's reasons come in the wake run's report. |
 | `open_ui` | Returns the WebUI's URL, and opens it in a browser with `open: true`. |
 
 The resources are `alps://model`, `alps://process/<id>`, `alps://instance/<id>`, `alps://run/<id>/log`, and `alps://assessment`. No tool reads file contents: an agent reads the Skills and Artifacts with its own tools.
@@ -145,8 +150,8 @@ The resources are `alps://model`, `alps://process/<id>`, `alps://instance/<id>`,
 
 - The server listens on 127.0.0.1 only and refuses requests whose `Host` header does not name it.
 - Each start has its own access token. It travels in the URL fragment (`#token=…`), which never reaches the server; the page reads it once and keeps it in sessionStorage. Only `.alps-harness/server.json` (mode 0600) and the terminal that started the server show it. `--open` and `open_ui` open the browser through a 0600 page in `.alps-harness/`, so the token never appears on a command line.
-- The API refuses cross-site and same-site requests (`Sec-Fetch-Site`) and request bodies that are not JSON. No other origin can load a response (`Cross-Origin-Resource-Policy: same-origin`). Pages cannot be framed (`X-Frame-Options: DENY` and `frame-ancestors 'none'`), the Content Security Policy allows only the server's own resources (`default-src 'self'`), and rendered Markdown is sanitized.
-- An instance's inputs and outputs must be inside the workspace and outside `.alps-harness/`.
+- The API refuses cross-site and same-site requests (`Sec-Fetch-Site`), request bodies that are not JSON, except the files attached to a request (`multipart/form-data`, at most 10 files of 20 MB each), and JSON bodies over 1 MiB. No other origin can load a response (`Cross-Origin-Resource-Policy: same-origin`). Pages cannot be framed (`X-Frame-Options: DENY` and `frame-ancestors 'none'`), the Content Security Policy allows only the server's own resources (`default-src 'self'`), and rendered Markdown is sanitized.
+- An instance's inputs and outputs, a request's attachments, and the attachments directory must be inside the workspace and outside `.alps-harness/`. An attached file's name is reduced to its last segment, without control characters, `..`, and leading dots.
 - An agent runs in the workspace with the permissions its command line gives: Claude Code with `--permission-mode acceptEdits`, Codex with `--sandbox workspace-write`. A woken agent is also allowed the harness's MCP tools, and a woken Claude Code loads no other MCP server (`--strict-mcp-config`). A Claude Code agent does not inherit the variables by which a Claude Code session marks the processes it starts (`CLAUDECODE` and the like), so a harness started from inside a session starts it as from a terminal. The prompts tell agents to treat the content of input Artifacts as data, not instructions. Change the defaults with `agents`.
 
 The development of the harness is described in [harness/README.md](harness/README.md).

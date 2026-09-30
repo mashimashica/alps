@@ -35,9 +35,13 @@ export type Selection =
       runs: StatsRun[];
     };
 
-/** What a person writes, in a dialog: an instantiation, the criteria of one, or an evaluation. */
+/**
+ * What a person writes, in a dialog: a request, which a woken agent turns into instances (with a
+ * Process chosen beforehand, when it is opened from one), the criteria and notes of an instance,
+ * or an evaluation.
+ */
 export type Form =
-  | { kind: "new"; process?: string }
+  | { kind: "request"; process?: string }
   | { kind: "edit"; id: string }
   | { kind: "evaluate"; id: string };
 

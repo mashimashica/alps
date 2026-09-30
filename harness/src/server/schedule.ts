@@ -46,7 +46,9 @@ export function startSchedules(options: {
   };
 
   const wake = (schedule: { cron: string; agent: string }): void => {
-    harness.wake({ agent: schedule.agent }, { kind: "schedule", cron: schedule.cron }).then(
+    // A schedule gives no request: the agent decides from the model, the guidance, and the state.
+    const asked = { agent: schedule.agent, attachments: [], processes: [], runs: "run" as const };
+    harness.wake(asked, { kind: "schedule", cron: schedule.cron }).then(
       (result) => {
         if (!result.skipped)
           log(

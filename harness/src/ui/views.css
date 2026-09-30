@@ -1729,6 +1729,69 @@ svg.graph {
   flex-shrink: 0;
 }
 
+/*
+ * The wake that made a card, for a request: a button beside the card's own (a button cannot hold
+ * another), laid on the card's footer. It rises with the card, and the card rises with it.
+ */
+.instance-lane-cards > li {
+  position: relative;
+}
+
+/* Keeps the footer's time clear of the chip, which lies over this place. */
+.instance-card-origin-space {
+  flex: 0 0 60px;
+  margin-left: auto;
+}
+
+.instance-card-origin {
+  position: absolute;
+  right: 36px;
+  bottom: 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: calc(100% - 150px);
+  padding: 2px 7px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.5;
+  cursor: pointer;
+  transition:
+    border-color 160ms,
+    color 160ms,
+    transform 160ms;
+}
+
+.instance-card-origin .mono {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.instance-card-origin:hover {
+  border-color: var(--border-strong);
+  color: var(--foreground);
+}
+
+.instance-card-origin:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.instance-card:hover + .instance-card-origin,
+.instance-card-origin:hover {
+  transform: translateY(-2px);
+}
+
+.instance-lane-cards > li:has(> .instance-card-origin:hover) > .instance-card {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
 .instance-lane-empty {
   display: flex;
   flex: 1;
@@ -1790,11 +1853,15 @@ svg.graph {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .instance-card {
+  .instance-card,
+  .instance-card-origin {
     transition: none;
   }
 
-  .instance-card:hover {
+  .instance-card:hover,
+  .instance-card:hover + .instance-card-origin,
+  .instance-card-origin:hover,
+  .instance-lane-cards > li:has(> .instance-card-origin:hover) > .instance-card {
     transform: none;
   }
 }
@@ -1991,10 +2058,6 @@ svg.graph {
   overflow-wrap: anywhere;
 }
 
-.warning-text {
-  color: var(--warning);
-}
-
 .path-block,
 .path-cell {
   overflow-wrap: anywhere;
@@ -2102,12 +2165,6 @@ dl.summary dd {
 
 .chip-process {
   border-radius: var(--radius-sm);
-}
-
-.chip-path {
-  border-radius: var(--radius-xs);
-  font-size: 11px;
-  color: var(--muted-foreground);
 }
 
 .link {
@@ -2454,55 +2511,89 @@ dl.front dd {
   line-height: 1.6;
 }
 
-.choice {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
-}
-
-.choice:last-child {
-  padding-bottom: 0;
-  border-bottom: 0;
-}
-
-.choice-head {
+/* The request box: files are dropped anywhere on it, and the zone says so while they are over it. */
+.dropzone {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px 8px;
+  justify-content: center;
+  gap: 10px 12px;
+  padding: 18px 16px;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--muted) 35%, transparent);
+  color: var(--muted-foreground);
+  text-align: center;
+  transition:
+    border-color 160ms,
+    background-color 160ms;
 }
 
-.choice-pattern {
+.dropzone.is-over {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 9%, transparent);
+  color: var(--foreground);
+}
+
+.dropzone-text {
+  font-size: 12.5px;
+}
+
+.attachment-list .list-row {
+  padding: 6px 0;
+}
+
+.attachment-name {
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.attachment-name .icon {
+  flex-shrink: 0;
+  color: var(--faint-foreground);
+}
+
+.request-processes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px 16px;
+}
+
+.request-options {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 560px) {
+  .request-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* What a wake was asked, in its record: the request as its requester wrote it, then the rest. */
+.request-part {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.request-text {
+  padding: 10px 12px;
+  border-left: 3px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+  background: color-mix(in srgb, var(--muted) 40%, transparent);
+  font-size: 12.5px;
+  line-height: 1.7;
   overflow-wrap: anywhere;
 }
 
-.choice-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.inline {
-  display: flex;
-  gap: 8px;
-}
-
-.inline .input {
-  flex: 1;
-}
-
-.output-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.suggestions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
+@media (prefers-reduced-motion: reduce) {
+  .dropzone {
+    transition: none;
+  }
 }
 
 .criterion {

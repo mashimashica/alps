@@ -205,20 +205,49 @@ async function ask<T extends { ok: true }>(
   }
 }
 
+/** What `wake` asks: the agent, and a request with its attachments, Processes, and whether to run. */
+export interface WakeArgs {
+  agent?: string | undefined;
+  request?: string | undefined;
+  /** Absolute paths, or relative to the workspace. */
+  attachments: string[];
+  processes: string[];
+  /** Only instantiate what is planned (`runs: plan`). */
+  plan: boolean;
+}
+
 /**
- * Starts a wake run, as the MCP tool wake does: for an external scheduler (launchd, cron, CI).
- * It returns once the agent has started, or once the wake was skipped because another runs.
+ * Starts a wake run, as the MCP tool wake does: for an external scheduler (launchd, cron, CI), or
+ * with a request. It returns once the agent has started, or once the wake was skipped because
+ * another runs; what the agent planned and why comes later, in the wake run's report.
  */
-export async function wake(start: string, agent: string | undefined): Promise<number> {
+export async function wake(start: string, args: WakeArgs): Promise<number> {
   const root = workspaceOrReport(start);
   if (!root) return 1;
-  const result = await ask<WakeResponse>(root, "POST", "/api/wake", agent ? { agent } : {});
+  const requested =
+    args.request !== undefined ||
+    args.attachments.length > 0 ||
+    args.processes.length > 0 ||
+    args.plan;
+  const result = await ask<WakeResponse>(root, "POST", "/api/wake", {
+    ...(args.agent ? { agent: args.agent } : {}),
+    ...(args.request !== undefined ? { request: args.request } : {}),
+    ...(args.attachments.length > 0 ? { attachments: args.attachments } : {}),
+    ...(args.processes.length > 0 ? { processes: args.processes } : {}),
+    ...(args.plan ? { runs: "plan" } : {}),
+  });
   if (!result) return 1;
   out(
     result.run
       ? `Woke ${result.run.agent}  wake run ${result.run.id}`
-      : `Skipped  wake run ${result.running ?? ""} still runs`,
+      : `Skipped  wake run ${result.running ?? ""} still runs${requested ? "; the request was not taken" : ""}`,
   );
+  if (result.run && requested)
+    out(
+      result.run.runs === "plan"
+        ? "It plans only: it instantiates what it plans and starts no run. Its report says what it planned and why."
+        : "It plans and runs what the request calls for. Its report says what it planned and why.",
+    );
   return 0;
 }
 

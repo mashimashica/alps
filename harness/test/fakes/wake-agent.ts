@@ -9,10 +9,20 @@
  * run (ALPS_RUN_ID). Last it prints a final line as the agent would (stream-json, or codex --json)
  * with a message other than its report, and exits.
  *
+ * A wake given a request (its record, read with get_run, has a request, attachments, Processes, or
+ * runs: plan) is served as a tailoring agent would, without judging anything: the fake plans the
+ * Processes that the request names (Requirements Clarification when it names none), instantiates
+ * each with the attachments as the inputs of its first input type, a criterion taken from the
+ * request, and its assumption in the notes, leaves the output locations to the run, starts each
+ * with the demo agent and waits for it unless the request asks for a plan only, and reports what
+ * it planned and why, its assumption, and what to confirm.
+ *
  * ALPS_FAKE_SCENARIO picks what it does:
  *   ok    (the default) the calls above, then exit code 0
  *   slow  waits 30 s before it starts, so that the wake still runs
- * ALPS_FAKE_PROMPT names a file to write the prompt it received to.
+ * ALPS_FAKE_PROMPT names a file to write the prompt it received to. With ALPS_FAKE_TRY_RUN set, a
+ * request for a plan only is disobeyed: the fake also calls run (demo) for the first instance it
+ * made, and wake, and its report says how each was answered.
  */
 
 import { Client } from "@modelcontextprotocol/client";
@@ -34,6 +44,27 @@ const WAKE_INSTANCE = {
 
 /** What the fake reports with finish_run; its final output line says something else. */
 const WAKE_REPORT = "Read the model and the guidance; started one run with the demo agent.";
+
+/** What the fake plans when a request names no Process. */
+const DEFAULT_PROCESS = "Requirements Clarification";
+/** The assumption that the fake writes in the notes of the instances it makes for a request. */
+const REQUEST_ASSUMPTION = "Assumed that the attachments are the inputs of the first input type.";
+
+/** The part of a wake run's record that says what the wake was asked. */
+interface WakeRecord {
+  id: string;
+  request?: string | null;
+  attachments?: string[];
+  processes?: string[];
+  runs?: "run" | "plan";
+}
+
+interface ModelProcess {
+  id: string;
+  name: string;
+  inputs: string[];
+  controls: string[];
+}
 
 const args = process.argv.slice(2);
 
@@ -91,6 +122,79 @@ async function call<T>(client: Client, name: string, input: Record<string, unkno
   return result.structuredContent as T;
 }
 
+/** How a call that may be refused was answered: `refused (<code>)`, `skipped`, or `started`. */
+async function attempt(
+  client: Client,
+  name: string,
+  input: Record<string, unknown>,
+): Promise<string> {
+  const result = await client.callTool({ name, arguments: input }, { timeout: 80_000 });
+  const body = result.structuredContent as { skipped?: boolean; error?: { code?: string } };
+  if (result.isError) return `refused (${body.error?.code ?? "no code"})`;
+  return body.skipped ? "skipped" : "started";
+}
+
+/** Serves the request of wake run `wake`: plans, instantiates, runs unless asked for a plan only, and reports. */
+async function serveRequest(
+  client: Client,
+  wake: string,
+  asked: WakeRecord,
+  processes: ModelProcess[],
+): Promise<void> {
+  const named = asked.processes ?? [];
+  const planned = (named.length > 0 ? named : [DEFAULT_PROCESS]).map((key) => {
+    const process = processes.find((p) => p.id === key || p.name === key);
+    if (!process) throw new Error(`no Process ${key} in the model`);
+    return process;
+  });
+  const attachments = asked.attachments ?? [];
+  const firstLine = (asked.request ?? "").split("\n")[0]?.trim() || "the attachments";
+  const made: { id: string; process: string }[] = [];
+  for (const process of planned) {
+    const type = process.inputs[0] ?? process.controls[0];
+    const { instance } = await call<{ instance: { id: string } }>(client, "instantiate", {
+      process: process.id,
+      inputs: type && attachments.length > 0 ? { [type]: attachments } : {},
+      criteria: [{ outcome: 0, statement: `For this request: ${firstLine}` }],
+      notes: REQUEST_ASSUMPTION,
+    });
+    made.push({ id: instance.id, process: process.name });
+  }
+  const ran: string[] = [];
+  if (asked.runs !== "plan")
+    for (const instance of made) {
+      const { run } = await call<{ run: { id: string } }>(client, "run", {
+        instance: instance.id,
+        agent: "demo",
+      });
+      const ended = await call<{ run: { id: string; status: string } }>(client, "get_run", {
+        run: run.id,
+        wait: 30,
+      });
+      ran.push(`${ended.run.id} (${ended.run.status})`);
+    }
+  // An agent that does not keep to a plan only tries the run and the wake it was not to start.
+  const [first] = made;
+  const tried =
+    asked.runs === "plan" && process.env.ALPS_FAKE_TRY_RUN && first
+      ? [
+          `run ${await attempt(client, "run", { instance: first.id, agent: "demo" })}`,
+          `wake ${await attempt(client, "wake", { request: "Run the plan." })}`,
+        ]
+      : [];
+  const why = named.length > 0 ? "the request names it" : "it serves the request";
+  const report = [
+    `Planned ${made.map((m) => `${m.process} as ${m.id}`).join(", ")} because ${why}.`,
+    asked.runs === "plan"
+      ? "Started no run: the request asks for a plan only."
+      : `Ran ${ran.join(", ")} with the demo agent.`,
+    ...(tried.length > 0 ? [`Tried anyway: ${tried.join("; ")}.`] : []),
+    `Assumption: ${REQUEST_ASSUMPTION}`,
+    "To confirm: the criteria that were derived from the request.",
+  ].join(" ");
+  await call(client, "finish_run", { run: wake, report, status: "succeeded" });
+}
+
 async function main(): Promise<number> {
   if (args.includes("--version")) {
     console.log("0.0.0 (fake wake agent)");
@@ -117,18 +221,27 @@ async function main(): Promise<number> {
     }),
   );
   try {
-    await call(client, "get_model", {});
-    const { instance } = await call<{ instance: { id: string } }>(
-      client,
-      "instantiate",
-      WAKE_INSTANCE,
-    );
-    const { run } = await call<{ run: { id: string } }>(client, "run", {
-      instance: instance.id,
-      agent: "demo",
-    });
-    await call(client, "get_run", { run: run.id, wait: 30 });
-    await call(client, "finish_run", { run: wake, report: WAKE_REPORT, status: "succeeded" });
+    const { model } = await call<{ model: { processes: ModelProcess[] } }>(client, "get_model", {});
+    const { run: self } = await call<{ run: WakeRecord }>(client, "get_run", { run: wake });
+    const requested =
+      Boolean(self.request) ||
+      (self.attachments ?? []).length > 0 ||
+      (self.processes ?? []).length > 0 ||
+      self.runs === "plan";
+    if (requested) await serveRequest(client, wake, self, model.processes);
+    else {
+      const { instance } = await call<{ instance: { id: string } }>(
+        client,
+        "instantiate",
+        WAKE_INSTANCE,
+      );
+      const { run } = await call<{ run: { id: string } }>(client, "run", {
+        instance: instance.id,
+        agent: "demo",
+      });
+      await call(client, "get_run", { run: run.id, wait: 30 });
+      await call(client, "finish_run", { run: wake, report: WAKE_REPORT, status: "succeeded" });
+    }
   } finally {
     await client.close();
   }

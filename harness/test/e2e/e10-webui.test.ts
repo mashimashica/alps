@@ -5,13 +5,16 @@
  * sessionStorage, so that it survives a reload. The network draws the ring of 11 Processes and 15
  * pills; a pill opens the focus view and a blank click returns; the marks on the ring follow the
  * runs through SSE. The switch at the top right shows the page in Japanese, what the harness itself
- * said in a run included.
+ * said in a run included. The request box, the main action, starts a wake with a fake agent: the
+ * file dropped on it is uploaded, the wake's record shows the request and the attachment, and the
+ * board gains the instance that the agent makes, which links back to the wake.
  */
 
 import { afterAll, describe, expect, test } from "bun:test";
 import fs from "node:fs";
 import path from "node:path";
 import type { Browser, Page } from "playwright";
+import { dayOf } from "../../src/shared/requests.ts";
 import type {
   InstanceResponse,
   RunDetailResponse,
@@ -390,5 +393,86 @@ describe("E10 WebUI", () => {
       }
     },
     { timeout: 60_000 },
+  );
+
+  test(
+    "E10 a request from the request box starts a wake: its record shows in the panel, and the board gains the instance that the agent makes, which links back to the wake",
+    async () => {
+      // The fake wake agent serves the request: it instantiates the Process the request names with
+      // the attachment as its input, runs it with the demo agent, and reports (test/fakes).
+      const ws = tmpWorkspace({
+        agents: {
+          "claude-code": {
+            command: path.join(FAKES, "wake-agent.ts"),
+            env: { ALPS_FAKE_SCENARIO: "ok" },
+          },
+        },
+      });
+      workspaces.push(ws);
+      const daemon = await startDaemon(ws.root, [], { cwd: "/" });
+      const browser = await launchBrowser();
+      try {
+        const { tab, problems } = await openPage(browser, daemon.uiUrl, "en-US");
+        await tab.locator('[data-testid="health"][data-status="ok"]').waitFor({ timeout: 10_000 });
+        await tab.getByTestId("request-open").click();
+        const box = tab.getByTestId("request");
+        await box.waitFor({ timeout: 5000 });
+        const request = "Clarify the requirements of CHG-002 from the memo.";
+        await box.getByTestId("request-text").fill(request);
+        await box.locator('[data-process="Requirements Clarification"] input').check();
+        // A file dropped on the box is attached; it is uploaded when the request is sent.
+        const dropped = await tab.evaluateHandle(() => {
+          const data = new DataTransfer();
+          data.items.add(new File(["# Memo\n"], "memo.md", { type: "text/markdown" }));
+          return data;
+        });
+        await box.getByTestId("request-drop").dispatchEvent("drop", { dataTransfer: dropped });
+        await box.getByTestId("request-attachments").getByText("memo.md").waitFor();
+        await box.getByRole("button", { name: "Send request" }).click();
+
+        // The box closes on the board, and the panel shows the wake's record: the request as given,
+        // and the attachment where the upload saved it.
+        const wake = tab.getByTestId("panel-run");
+        await wake.waitFor({ timeout: 10_000 });
+        const id = (await wake.getAttribute("data-run")) ?? "";
+        expect(id).toMatch(/^r\d+$/);
+        expect(await tab.getByTestId("request").count()).toBe(0);
+        expect(
+          await tab.locator('[role="tab"][data-view="instances"]').getAttribute("aria-selected"),
+        ).toBe("true");
+        expect(await wake.getByTestId("wake-request").textContent()).toBe(request);
+        const attachment = `inbox/${dayOf(Date.now())}/memo.md`;
+        expect(await wake.getByTestId("wake-attachments").textContent()).toContain(attachment);
+        expect(fs.readFileSync(path.join(ws.root, attachment), "utf8")).toBe("# Memo\n");
+
+        // The instance that the agent makes reaches the board through SSE, with a link to the wake.
+        const card = tab.locator("button.instance-card");
+        await card.first().waitFor({ timeout: 20_000 });
+        expect(await card.count()).toBe(1);
+        const origin = tab.locator(`.instance-card-origin[data-origin="${id}"]`);
+        await origin.waitFor({ timeout: 5000 });
+        // The wake ends with the report of its plan; it lists the instance it made and the run.
+        await tab
+          .locator(`[data-testid="panel-run"][data-run="${id}"][data-status="succeeded"]`)
+          .waitFor({ timeout: 30_000 });
+        expect(await wake.getByTestId("made-instances").locator("[data-instance]").count()).toBe(1);
+        expect(await wake.getByTestId("started-runs").locator("li").count()).toBe(1);
+        const made = await card.first().getAttribute("data-instance");
+        expect(await wake.textContent()).toContain(
+          `Planned Requirements Clarification as ${made} because the request names it.`,
+        );
+        // The card opens the instance, which names the wake; the card's link opens the wake again.
+        await card.first().click();
+        await tab.getByTestId("panel-instance").waitFor({ timeout: 5000 });
+        expect(await tab.getByTestId("instance-origin").textContent()).toBe(id);
+        await origin.click();
+        await tab.locator(`[data-testid="panel-run"][data-run="${id}"]`).waitFor({ timeout: 5000 });
+        expect(problems).toEqual([]);
+      } finally {
+        await closeBrowser(browser);
+        await daemon.stop();
+      }
+    },
+    { timeout: 90_000 },
   );
 });

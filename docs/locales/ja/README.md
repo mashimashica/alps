@@ -55,7 +55,7 @@ design-agent-work-systemを使い、この仕事に必要な能力とインタ�
 
 ## ハーネス
 
-ハーネスは、プロセスモデルを具体的な仕事に適用します。具体的な入力に対してプロセスをインスタンス化し、エージェントで実行し、その実行と、各出力をどの実行が作ったかを記録し、各成果の評価をその根拠とともに記録します。プロセスモデルとSkillは読むだけで、変更しません。人はWebUIでプロセスのネットワーク、ダッシュボード、インスタンスを見て、エージェントはMCPサーバーを使います。ダッシュボードは、判断された成果、実行、所要時間、費用を数え、判断した実行の後に入力か`SKILL.md`が変わった評価を示します。実行が終わったこと、出力があること、エージェントが報告したことは、どれも成果の達成として数えません。成果は、人か明示されたエージェントが根拠とともに判断します。`run-process` Skillは、セッション自身が実行を行う場合（エージェント`self`）の手順を示します。
+ハーネスは、プロセスモデルを具体的な仕事に適用します。具体的な入力に対してプロセスをインスタンス化し、エージェントで実行し、その実行と、各出力をどの実行が作ったかを記録し、各成果の評価をその根拠とともに記録します。プロセスモデルとSkillは読むだけで、変更しません。人はWebUIでプロセスのネットワーク、ダッシュボード、インスタンスを見て、[依頼](#依頼)を出し、エージェントはMCPサーバーを使います。ダッシュボードは、判断された成果、実行、所要時間、費用を数え、判断した実行の後に入力か`SKILL.md`が変わった評価を示します。実行が終わったこと、出力があること、エージェントが報告したことは、どれも成果の達成として数えません。成果は、人か明示されたエージェントが根拠とともに判断します。`run-process` Skillは、セッション自身が実行を行う場合（エージェント`self`）と、セッション自身が依頼をインスタンスにする場合の手順を示します。
 
 ### 必要なもの
 
@@ -90,7 +90,7 @@ bun harness/src/cli.ts serve examples/service-change --open
 | --- | --- |
 | `serve [workspace] [--daemon] [--port <port>] [--open] [--dev]` | ハーネスサーバーを起動し、WebUIのURLを表示する。URLの`#`の後ろは合い言葉である。`--daemon`は切り離して起動し、`--open`はブラウザを開く。 |
 | `stop [workspace]` | ハーネスサーバーと、それが動かしているエージェントを止める。 |
-| `wake [workspace] [--agent claude-code\|codex]` | スケジュールと同じようにエージェントを目覚めさせる。launchd、cron、CIなどの外部のスケジューラから使う。 |
+| `wake [workspace] [--agent claude-code\|codex] [--request <text>] [--attach <path>]… [--process <process>]… [--plan]` | スケジュールと同じようにエージェントを目覚めさせる。launchd、cron、CIなどの外部のスケジューラから使うか、[依頼](#依頼)とともに使う。依頼の文面、添付するワークスペースのパス、計画に含めるプロセス、インスタンス化だけにする`--plan`を渡せる。 |
 | `assess [workspace] [--format markdown\|json]` | 統計、所見、各インスタンスの事実を出力する。 |
 | `mcp` | `ALPS_WORKSPACE`か現在のディレクトリのワークスペースについて、stdioでMCPを提供する。 |
 
@@ -119,8 +119,13 @@ bun harness/src/cli.ts serve examples/service-change --open
 | `server` | `port`（既定は4830）と`idleMinutes`（30）。 |
 | `guidance` | 目覚めたエージェントが読むMarkdownのファイル。何を先にするか、何を優先するか、どんなときにプロセスを走らせないかを文章で書く。ハーネスはそれを解釈しない。 |
 | `schedules` | デーモンがエージェントを目覚めさせる時刻。`cron`（五つの欄、現地時刻）と`agent`（`claude-code`か`codex`）。目覚めたエージェントはモデル、案内、現状を読み、どのプロセスを走らせるかを判断する。 |
+| `attachments` | WebUIが依頼の添付ファイルを保存する場所。既定は`inbox/`で、日ごとのディレクトリに置く（`inbox/2026-10-01/notes.md`、同じ名前なら次は`notes-2.md`）。ワークスペースの中で、かつ`.alps-harness/`の外になければならない。保存したファイルが型の`paths`に合えば、それもアーティファクトになる。このディレクトリを版管理に含めるかはワークスペースが決める。 |
 
 [例のワークスペース](../../../examples/locales/ja/service-change/alps-harness.yaml)は、各キーをコメントで説明しています。
+
+### 依頼
+
+依頼は、依頼者自身の言葉で仕事を頼むものです。大まかでかまいません。WebUIでは、どの画面にもある「依頼する」で、文面、添付（ドロップするか選んだファイル。依頼を送るときにワークスペースに保存する。またはすでにあるアーティファクト）、計画に含めるプロセス、エージェント、計画を実行まで進めるか計画だけにするかを受け取ります。送ると、依頼とともにエージェントを目覚めさせます。エージェントはモデルと案内を読み、依頼に応えるプロセスを選び、それぞれを具体的な入力、出力の置き場所、依頼から導いた基準、注記に書いた仮定とともにインスタンス化し、計画だけを求められていなければ実行し、何をなぜ計画したか、何を実行したか、置いた仮定、依頼者が確かめるべき点を報告します。目覚めの記録には依頼、添付、その報告、起動した実行が見え、ボードには作られたインスタンスが、その目覚めへの導線（`createdBy`）とともに順に現れます。MCPツールの`wake`とコマンドの`wake --request`も同じ依頼を受け付けます。セッションが自分で依頼をテーラリングすることもでき、その手順は`run-process` Skillが示します。ハーネスは計画について何も決めません。依頼は依頼者の指示であり、添付に書かれた内容はデータです。依頼が起動した実行は統計に数え、目覚めそのものは数えません。
 
 ### MCPツール
 
@@ -136,7 +141,7 @@ bun harness/src/cli.ts serve examples/service-change --open
 | `finish_run` | selfの実行を報告とともに終える。または、目覚めたエージェントの報告を受け取る。 |
 | `evaluate` | 成果ごとに一つの判断（`achieved`、`not-achieved`、`unverified`）を、空にできない根拠とともに記録する。 |
 | `get_assessment` | 統計と所見を、JSONかMarkdownで返す。 |
-| `wake` | どのプロセスを走らせるかを判断するエージェントを目覚めさせる。 |
+| `wake` | どのプロセスを走らせるかを判断するエージェント、または依頼に応えるエージェント（`request`、`attachments`、`processes`、`runs`は`run`か`plan`）を目覚めさせる。成功は開始しただけを意味し、計画の理由は目覚めの実行の報告に来る。 |
 | `open_ui` | WebUIのURLを返す。`open: true`のときはブラウザで開く。 |
 
 リソースは`alps://model`、`alps://process/<id>`、`alps://instance/<id>`、`alps://run/<id>/log`、`alps://assessment`です。ファイルの中身を読むツールはありません。エージェントは、Skillとアーティファクトを自分のツールで読みます。
@@ -145,8 +150,8 @@ bun harness/src/cli.ts serve examples/service-change --open
 
 - サーバーは127.0.0.1だけで待ち受け、`Host`ヘッダーがサーバー自身を指さない要求を拒否します。
 - 起動ごとに合い言葉が変わります。合い言葉はURLのfragment（`#token=…`）で渡り、サーバーには届きません。ページはそれを一度だけ読み、sessionStorageに保持します。合い言葉を示すのは、`.alps-harness/server.json`（権限0600）と、サーバーを起動した端末だけです。`--open`と`open_ui`は、`.alps-harness/`にある権限0600のページを通じてブラウザを開くため、合い言葉がコマンドラインに現れることはありません。
-- APIは、cross-siteとsame-siteの要求（`Sec-Fetch-Site`）と、JSONでない要求本文を拒否します。ほかのオリジンは応答を読み込めません（`Cross-Origin-Resource-Policy: same-origin`）。ページはフレームに埋め込めず（`X-Frame-Options: DENY`と`frame-ancestors 'none'`）、Content Security Policyはサーバー自身の資源だけを許し（`default-src 'self'`）、表示するMarkdownは無害化します。
-- インスタンスの入力と出力は、ワークスペースの中で、かつ`.alps-harness/`の外になければなりません。
+- APIは、cross-siteとsame-siteの要求（`Sec-Fetch-Site`）と、JSONでない要求本文（依頼の添付ファイルの`multipart/form-data`は除く。一回に10件まで、一件20 MBまで）と、1 MiBを超えるJSONの本文を拒否します。ほかのオリジンは応答を読み込めません（`Cross-Origin-Resource-Policy: same-origin`）。ページはフレームに埋め込めず（`X-Frame-Options: DENY`と`frame-ancestors 'none'`）、Content Security Policyはサーバー自身の資源だけを許し（`default-src 'self'`）、表示するMarkdownは無害化します。
+- インスタンスの入力と出力、依頼の添付、添付の保存先は、ワークスペースの中で、かつ`.alps-harness/`の外になければなりません。添付ファイルの名前は最後の部分だけを取り、制御文字、`..`、先頭の`.`を除きます。
 - エージェントは、ワークスペースで、そのコマンドラインが与える権限で動きます。Claude Codeは`--permission-mode acceptEdits`、Codexは`--sandbox workspace-write`です。目覚めたエージェントには、ハーネスのMCPツールも許可し、目覚めたClaude Codeには他のMCPサーバーを読み込ませません（`--strict-mcp-config`）。Claude Codeのエージェントは、Claude Codeのセッションが起動するプロセスに付ける印の変数（`CLAUDECODE`など）を受け継がないので、セッションの中から起動したハーネスも、端末から起動したときと同じようにエージェントを起動します。プロンプトは、入力アーティファクトの内容を指示ではなくデータとして扱うようエージェントに伝えます。既定は`agents`で変えられます。
 
 ハーネスの開発については[harness/README.md](../../../harness/README.md)（英語）を参照してください。

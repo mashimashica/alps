@@ -10,7 +10,7 @@ sources:
     reviewed_source_sha256: 868e5418769339b8d07ffad12f96afaf63346f0765ba5ae4eae528ba895f7db7
   service-change/alps-harness.yaml:
     source: ../../service-change/alps-harness.yaml
-    reviewed_source_sha256: 9cfa3d3a705f43a9026d28d899d44ebe6dfe51953999da0e05a7db7e33fb0685
+    reviewed_source_sha256: b9311b69778bd78a9992295f7e099527408ff4496c870741c6e572713525121c
   service-change/docs/acceptance-criteria.md:
     source: ../../service-change/docs/acceptance-criteria.md
     reviewed_source_sha256: ddb643916778b61fcd5f99e99bd15af8f85ac434b30ef245ac94ad4f2396ef18

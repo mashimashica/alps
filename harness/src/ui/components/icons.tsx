@@ -144,6 +144,21 @@ const PATHS = {
       <path d="m13 20.5 4-9 4 9M14.4 17.5h5.2" />
     </>
   ),
+  send: (
+    <>
+      <path d="M20.5 3.5 10 14" />
+      <path d="m20.5 3.5-6.5 17-4-6.5-6.5-4z" />
+    </>
+  ),
+  paperclip: (
+    <path d="m19.5 11.5-7.4 7.4a5 5 0 0 1-7.1-7.1l7.8-7.8a3.3 3.3 0 0 1 4.7 4.7l-7.8 7.8a1.7 1.7 0 0 1-2.4-2.4l7.1-7.1" />
+  ),
+  upload: (
+    <>
+      <path d="M12 15.5v-11M7.5 9 12 4.5 16.5 9" />
+      <path d="M4.5 15v3a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-3" />
+    </>
+  ),
 } satisfies Record<string, JSX.Element>;
 
 export type IconName = keyof typeof PATHS;

@@ -2,6 +2,7 @@
 /* alps-harness: the harness's command line. */
 
 import fs from "node:fs";
+import path from "node:path";
 import pkg from "../package.json" with { type: "json" };
 import { startDirectory } from "./model/files.ts";
 
@@ -25,12 +26,19 @@ Commands:
         relays to the workspace's harness server and starts one (detached) when none runs.
         --wake  the wake run whose agent this server serves; the harness passes it to the
                 agents it wakes, so the runs they start are listed in that wake run
-  wake [workspace] [--agent <agent>]
+  wake [workspace] [--agent <agent>] [--request <text>] [--attach <path>]... [--process <process>]... [--plan]
         Wake an agent, as the schedules in alps-harness.yaml and the MCP tool wake do: it is
         started with the harness's MCP server and decides which Processes to run. For an
-        external scheduler (launchd, cron, CI). It returns once the agent has started; while
-        another wake runs, none is started (skipped).
-        --agent  claude-code (the default) or codex
+        external scheduler (launchd, cron, CI), or to hand the agent a request. It returns once
+        the agent has started; while another wake runs, none is started (skipped). What the
+        agent planned and why comes later, in the wake run's report.
+        --agent    claude-code (the default) or codex
+        --request  what is asked, in free text: the agent plans the Processes that serve it,
+                   instantiates them with criteria it derives from the request, and runs them
+        --attach   a file or directory in the workspace that the request refers to, relative to
+                   the current directory (repeatable, at most 10)
+        --process  a Process (id or name) that the plan must include (repeatable)
+        --plan     only instantiate what is planned; start no run
   assess [workspace] [--format markdown|json]
         Print the assessment: the statistics, the findings, and the facts of every instance,
         as the MCP tool get_assessment returns it (Markdown by default, in the workspace's
@@ -54,10 +62,14 @@ class UsageError extends Error {}
 const defaultStart = (): string =>
   startDirectory(process.env.ALPS_WORKSPACE, process.cwd(), fs.existsSync);
 
-/** Parses `[workspace]` and the given flags. Flags with a value take it as the next argument or after `=`. */
-function parse(args: string[], flags: { boolean: string[]; value: string[] }) {
+/**
+ * Parses `[workspace]` and the given flags. Flags with a value take it as the next argument or
+ * after `=`; those in `many` may be repeated, and their values are collected in `lists`.
+ */
+function parse(args: string[], flags: { boolean: string[]; value: string[]; many?: string[] }) {
   const positional: string[] = [];
   const options: Record<string, string | true> = {};
+  const lists: Record<string, string[]> = {};
   for (let i = 0; i < args.length; i++) {
     const arg = args[i] ?? "";
     if (!arg.startsWith("--")) {
@@ -65,15 +77,17 @@ function parse(args: string[], flags: { boolean: string[]; value: string[] }) {
       continue;
     }
     const [name = "", inline] = arg.slice(2).split(/=(.*)/s, 2);
+    const many = flags.many?.includes(name) ?? false;
     if (flags.boolean.includes(name) && inline === undefined) options[name] = true;
-    else if (flags.value.includes(name)) {
+    else if (flags.value.includes(name) || many) {
       const value = inline ?? args[++i];
       if (value === undefined) throw new UsageError(`--${name} needs a value.`);
-      options[name] = value;
+      if (many) (lists[name] ??= []).push(value);
+      else options[name] = value;
     } else throw new UsageError(`Unknown option: ${arg}`);
   }
   if (positional.length > 1) throw new UsageError(`Unexpected argument: ${positional[1]}`);
-  return { workspace: positional[0], options };
+  return { workspace: positional[0], options, lists };
 }
 
 async function main(argv: string[]): Promise<number> {
@@ -121,12 +135,21 @@ async function main(argv: string[]): Promise<number> {
       return 0;
     }
     case "wake": {
-      const { workspace, options } = parse(rest, { boolean: [], value: ["agent"] });
+      const { workspace, options, lists } = parse(rest, {
+        boolean: ["plan"],
+        value: ["agent", "request"],
+        many: ["attach", "process"],
+      });
       const { wake } = await import("./server/commands.ts");
-      return wake(
-        workspace ?? defaultStart(),
-        typeof options.agent === "string" ? options.agent : undefined,
-      );
+      return wake(workspace ?? defaultStart(), {
+        agent: typeof options.agent === "string" ? options.agent : undefined,
+        request: typeof options.request === "string" ? options.request : undefined,
+        // A path is read from the current directory, as the shell gives it; the server keeps it
+        // relative to the workspace and refuses one outside it.
+        attachments: (lists.attach ?? []).map((given) => path.resolve(given)),
+        processes: lists.process ?? [],
+        plan: options.plan === true,
+      });
     }
     case "assess": {
       const { workspace, options } = parse(rest, { boolean: [], value: ["format"] });

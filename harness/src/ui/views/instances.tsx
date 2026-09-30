@@ -4,6 +4,7 @@
  * activity first. Filters by Process, by the latest run's result, by whether it is judged, and by
  * a part of an input or output path; the counts at the top right set these filters too. Cards
  * are grouped by the latest run, independently of Outcome judgments, and open the detail panel.
+ * A card that a woken agent made for a request carries a link to that wake's record.
  */
 
 import type { InstanceView, RunStatus } from "../../shared/types.ts";
@@ -177,9 +178,9 @@ export function InstancesView({ modelError }: { modelError: unknown }) {
             title={t(all.length === 0 ? "instances.empty" : "instances.none")}
             action={
               all.length === 0 ? (
-                <Button onClick={() => openForm({ kind: "new" })}>
-                  <Icon name="plus" />
-                  {t("process.newInstance")}
+                <Button onClick={() => openForm({ kind: "request" })}>
+                  <Icon name="send" />
+                  {t("request.open")}
                 </Button>
               ) : (
                 <Button variant="outline" onClick={() => setFilter(NO_FILTER)}>
@@ -249,8 +250,9 @@ export function InstancesView({ modelError }: { modelError: unknown }) {
                     const at = updatedAt(instance);
                     const input = firstInput(model, instance);
                     const name = processName(model, instance.process);
+                    const origin = instance.createdBy?.run ?? null;
                     return (
-                      <li key={instance.id}>
+                      <li key={instance.id} class={origin ? "has-origin" : undefined}>
                         <button
                           type="button"
                           class="instance-card"
@@ -315,9 +317,26 @@ export function InstancesView({ modelError }: { modelError: unknown }) {
                                 t("none")
                               )}
                             </span>
+                            {origin && (
+                              <span class="instance-card-origin-space" aria-hidden="true" />
+                            )}
                             <Icon name="chevronRight" size={14} />
                           </span>
                         </button>
+                        {/* Beside the card, not in it (a button cannot hold another): the wake that made it. */}
+                        {origin && (
+                          <button
+                            type="button"
+                            class="instance-card-origin"
+                            data-origin={origin}
+                            aria-label={t("board.origin", { run: origin })}
+                            title={t("board.origin", { run: origin })}
+                            onClick={() => select({ kind: "run", id: origin })}
+                          >
+                            <Icon name="send" size={11} />
+                            <span class="mono">{origin}</span>
+                          </button>
+                        )}
                       </li>
                     );
                   })}

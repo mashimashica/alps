@@ -1,25 +1,35 @@
 /*
- * What a person writes in the WebUI, each in a dialog. Instantiation (framework §7): the Process,
- * the concrete inputs of each type (Artifacts found in its locations, or other paths), where each
- * output goes (or the agent decides), and, in free text, what each Outcome means in this
- * application and how to check it. Evaluation: the three-valued judgment of each Outcome with
- * its evidence and limits, and a Markdown note. Who judged is not sent: the harness records a
- * person for the WebUI. What cannot be saved is marked on its field (a Process not chosen, a path
- * that is empty or a pattern, a judgment without evidence); a path outside its type's locations
- * is saved as written, with a warning. A failure of the server is shown in the page's language.
+ * What a person writes in the WebUI, each in a dialog. A request (framework §7 tailoring, done by
+ * an agent): what is needed in free text, attachments (files dropped or chosen, which are uploaded
+ * when the request is sent, or Artifacts already in the workspace), the Processes that the plan
+ * must include, the agent, and whether it runs what it plans or only instantiates it. Sending it
+ * starts a wake; its record opens in the panel and its instances appear on the board as the agent
+ * makes them. The criteria and notes of an instance: in free text, what each Outcome means in this
+ * application and how to check it. Evaluation: the three-valued judgment of each Outcome with its
+ * evidence and limits, and a Markdown note. Who judged is not sent: the harness records a person
+ * for the WebUI. What cannot be sent is marked on its field (a request without text, a judgment
+ * without evidence); files over the limits are refused as they are added. A failure of the server
+ * is shown in the page's language.
  */
 
-import { useEffect, useRef, useState } from "preact/hooks";
-import { compilePattern } from "../../model/patterns.ts";
+import { useEffect, useId, useRef, useState } from "preact/hooks";
+import {
+  MAX_ATTACHMENT_BYTES,
+  MAX_ATTACHMENT_SIZE,
+  MAX_ATTACHMENTS,
+  MAX_REQUEST_LENGTH,
+} from "../../shared/requests.ts";
 import type {
   Artifact,
   ArtifactsResponse,
+  AttachmentsResponse,
   InstanceResponse,
   Judgment,
   OutcomeCriterion,
+  WakeResponse,
+  WakeRuns,
 } from "../../shared/types.ts";
 import { describeError } from "../api.ts";
-import { Badge } from "../components/badge.tsx";
 import { Button } from "../components/button.tsx";
 import { Checkbox, Segmented } from "../components/checkbox.tsx";
 import { Dialog } from "../components/dialog.tsx";
@@ -27,12 +37,12 @@ import { Alert } from "../components/feedback.tsx";
 import { Icon } from "../components/icons.tsx";
 import { Field, Input, Textarea } from "../components/input.tsx";
 import { Select } from "../components/select.tsx";
+import { cx } from "../components/util.ts";
 import { useUi } from "../context.ts";
 import { processName, typeName } from "./common.tsx";
+import { summaryOf } from "./panel.tsx";
 
 const JUDGMENTS: Judgment[] = ["achieved", "not-achieved", "unverified"];
-/** How many existing Artifacts are offered as places of an output. */
-const SUGGESTED = 4;
 
 /** The criteria of each Outcome as text fields; empty statements are left out when saved. */
 type CriteriaDraft = { statement: string; checks: string }[];
@@ -66,16 +76,6 @@ const focusFirstInvalid = (form: HTMLFormElement | null): void => {
     control?.focus();
   });
 };
-
-/** Whether a path is in one of a type's locations (only `*` and `**` are wildcards). */
-function fitsType(patterns: readonly string[], path: string): boolean {
-  if (patterns.length === 0) return true;
-  const relative = path
-    .replace(/\\/g, "/")
-    .replace(/^(?:\.\/)+/, "")
-    .replace(/\/+$/, "");
-  return patterns.some((pattern) => compilePattern(pattern).regex.test(relative));
-}
 
 function CriteriaFields({
   outcomes,
@@ -124,147 +124,37 @@ function CriteriaFields({
   );
 }
 
-type PathProblem = "empty" | "pattern" | "chosen";
-const PROBLEM_KEY = {
-  empty: "new.pathEmpty",
-  pattern: "new.pathPattern",
-  chosen: "new.pathChosen",
-} as const;
-
-/** The paths chosen for one input type: Artifacts found in its locations, and others typed in. */
-function InputChoice({
-  type,
-  control,
-  found,
-  chosen,
-  setChosen,
-}: {
-  type: string;
-  control: boolean;
-  found: readonly Artifact[];
-  chosen: readonly string[];
-  setChosen: (paths: string[]) => void;
-}) {
-  const { t, model } = useUi();
-  const [other, setOther] = useState("");
-  const [problem, setProblem] = useState<PathProblem | null>(null);
-  const name = typeName(model, type);
-  const patterns = model?.artifacts.find((a) => a.id === type)?.paths ?? [];
-  const candidates = found.map((a) => `${a.path}${a.dir ? "/" : ""}`);
-  const extra = chosen.filter((p) => !candidates.includes(p));
-  const toggle = (path: string, on: boolean): void =>
-    setChosen(on ? [...chosen, path] : chosen.filter((p) => p !== path));
-  const add = (): void => {
-    const path = other.trim().replace(/^(?:\.\/)+/, "");
-    const next: PathProblem | null = !path
-      ? "empty"
-      : path.includes("*")
-        ? "pattern"
-        : chosen.includes(path)
-          ? "chosen"
-          : null;
-    setProblem(next);
-    if (next) return;
-    setChosen([...chosen, path]);
-    setOther("");
-  };
-  return (
-    <div class="choice" data-input-type={type}>
-      <div class="choice-head">
-        <strong>{name}</strong>
-        {control && <Badge tone="outline">{t("new.control")}</Badge>}
-        {patterns.length > 0 && (
-          <span class="mono faint small choice-pattern">{patterns.join(", ")}</span>
-        )}
-      </div>
-      {candidates.length === 0 && <p class="faint small">{t("new.none")}</p>}
-      <div class="choice-list">
-        {candidates.map((path) => (
-          <Checkbox
-            key={path}
-            checked={chosen.includes(path)}
-            onChange={(on) => toggle(path, on)}
-            label={<span class="mono">{path}</span>}
-          />
-        ))}
-        {extra.map((path) => (
-          <Checkbox
-            key={path}
-            checked
-            onChange={() => toggle(path, false)}
-            ariaLabel={t("new.remove", { path })}
-            label={<span class="mono">{path}</span>}
-            description={
-              fitsType(patterns, path) ? undefined : (
-                <span class="warning-text">
-                  {t("new.pathNotType", { type: name, patterns: patterns.join(", ") })}
-                </span>
-              )
-            }
-          />
-        ))}
-      </div>
-      <Field
-        label={
-          <>
-            <span class="sr-only">{name}: </span>
-            {t("new.path")}
-          </>
-        }
-        error={problem ? t(PROBLEM_KEY[problem]) : undefined}
-      >
-        {(field) => (
-          <div class="inline">
-            <Input
-              id={field.id}
-              type="text"
-              class="mono"
-              placeholder={patterns[0] ?? ""}
-              aria-describedby={field.describedBy}
-              invalid={field.invalid}
-              value={other}
-              onInput={(event) => {
-                setOther(event.currentTarget.value);
-                if (problem) setProblem(null);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.preventDefault();
-                  add();
-                }
-              }}
-            />
-            <Button variant="outline" onClick={add}>
-              <Icon name="plus" />
-              {t("new.add")}
-            </Button>
-          </div>
-        )}
-      </Field>
-    </div>
-  );
-}
-
-/** The footer of a form dialog: its failure, if any, then Cancel and the action. */
+/** The footer of a form dialog: its notice and failure, if any, then Cancel and the action. */
 function Footer({
   failure,
   failureTitle,
   problem,
+  notice,
   saving,
   action,
+  busyLabel,
   onCancel,
 }: {
   failure: unknown;
   failureTitle: string;
   problem?: string | null;
+  /** What to know before trying again (the request was not started), as a warning. */
+  notice?: string | null;
   saving: boolean;
   action: string;
+  /** What the action says while it goes on; "Saving…" unless given. */
+  busyLabel?: string;
   onCancel: () => void;
 }) {
   const { t, language } = useUi();
   return (
     <div class="dialog-footer">
       {problem && <Alert tone="danger">{problem}</Alert>}
+      {notice && (
+        <Alert tone="warning" data-testid="form-notice">
+          {notice}
+        </Alert>
+      )}
       {failure !== null && (
         <Alert tone="danger" title={failureTitle} data-testid="form-error">
           {describeError(failure, language)}
@@ -274,28 +164,70 @@ function Footer({
         {t("new.cancel")}
       </Button>
       <Button type="submit" busy={saving} disabled={saving}>
-        {saving ? t("new.saving") : action}
+        {saving ? (busyLabel ?? t("new.saving")) : action}
       </Button>
     </div>
   );
 }
 
-function InstantiateDialog({ initial }: { initial?: string | undefined }) {
-  const { model, t, client, select, putInstance, openForm } = useUi();
+/**
+ * An attachment of a request: a file that is uploaded when the request is sent, or a path in the
+ * workspace (an Artifact chosen there, or a file already uploaded by an earlier try).
+ */
+type Attachment = { kind: "file"; file: File } | { kind: "path"; path: string; uploaded: boolean };
+
+const sameFile = (a: File, b: File): boolean =>
+  a.name === b.name && a.size === b.size && a.lastModified === b.lastModified;
+
+/** A size as a person reads it. */
+function size(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
+/** The files of a drop, and what was left out (folders cannot be uploaded). */
+function droppedFiles(data: DataTransfer): { files: File[]; folders: string[] } {
+  const files: File[] = [];
+  const folders: string[] = [];
+  const items = [...data.items].filter((item) => item.kind === "file");
+  if (items.length === 0) return { files: [...data.files], folders };
+  for (const item of items) {
+    const entry = item.webkitGetAsEntry?.();
+    if (entry?.isDirectory) {
+      folders.push(entry.name);
+      continue;
+    }
+    const file = item.getAsFile();
+    if (file) files.push(file);
+  }
+  return { files, folders };
+}
+
+/**
+ * The request box: what is needed, attachments, the Processes that the plan must include, the
+ * agent to wake, and how far it goes. Sending uploads the files first, one at a time, as the
+ * server takes them (each once: a retry sends the paths they were saved at), then starts the wake;
+ * the page then shows the board with the wake's record in the panel. A wake that still runs means
+ * this one is not started: the box stays open.
+ */
+function RequestDialog({ initial }: { initial?: string | undefined }) {
+  const { model, t, client, select, setView, putRun, openForm } = useUi();
   const form = useRef<HTMLFormElement>(null);
-  const outcomesOf = (id: string): number =>
-    model?.processes.find((p) => p.id === id)?.outcomes.length ?? 0;
-  const [processId, setProcessId] = useState(initial ?? "");
+  const picker = useRef<HTMLInputElement>(null);
+  const modeLabel = useId();
+  const [text, setText] = useState("");
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [refused, setRefused] = useState<string[]>([]);
   const [found, setFound] = useState<Artifact[]>([]);
-  const [inputs, setInputs] = useState<Record<string, string[]>>({});
-  const [outputs, setOutputs] = useState<Record<string, string>>({});
-  const [criteria, setCriteria] = useState<CriteriaDraft>(() =>
-    draftOf(outcomesOf(initial ?? ""), []),
-  );
-  const [notes, setNotes] = useState("");
+  const [processes, setProcesses] = useState<string[]>(initial ? [initial] : []);
+  const [agent, setAgent] = useState("");
+  const [runs, setRuns] = useState<WakeRuns>("run");
+  const [over, setOver] = useState(false);
   const [tried, setTried] = useState(false);
   const [saving, setSaving] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
+  const [skipped, setSkipped] = useState<string | null>(null);
   useEffect(() => {
     client.get<ArtifactsResponse>("/api/artifacts").then(
       (answer) => setFound(answer.artifacts),
@@ -303,67 +235,91 @@ function InstantiateDialog({ initial }: { initial?: string | undefined }) {
     );
   }, []);
   if (!model) return null;
-  const process = model.processes.find((p) => p.id === processId);
   const close = (): void => openForm(null);
-  const chooseProcess = (id: string): void => {
-    setProcessId(id);
-    setInputs({});
-    setOutputs({});
-    setCriteria(draftOf(outcomesOf(id), []));
+  // Only the agents that the harness can give its MCP server are woken: not the demo, not self.
+  const agents = model.agents.filter((a) => a.id !== "demo" && a.id !== "self");
+  const chosen =
+    agents.find((a) => a.id === agent) ??
+    agents.find((a) => a.id === "claude-code" && a.available) ??
+    agents.find((a) => a.available) ??
+    agents[0];
+  const attached = new Set(attachments.flatMap((a) => (a.kind === "path" ? [a.path] : [])));
+  const offered = [...new Map(found.map((a) => [a.path, a])).values()].filter(
+    (a) => !attached.has(a.path),
+  );
+  const full = attachments.length >= MAX_ATTACHMENTS;
+
+  const addFiles = (files: readonly File[], folders: readonly string[] = []): void => {
+    const next = [...attachments];
+    const notes = folders.map((name) => t("request.folder", { name }));
+    for (const file of files) {
+      if (file.size > MAX_ATTACHMENT_BYTES) {
+        notes.push(t("request.tooLarge", { name: file.name, limit: MAX_ATTACHMENT_SIZE }));
+        continue;
+      }
+      if (next.some((a) => a.kind === "file" && sameFile(a.file, file))) continue;
+      if (next.length >= MAX_ATTACHMENTS) {
+        notes.push(t("request.tooMany", { name: file.name, limit: MAX_ATTACHMENTS }));
+        continue;
+      }
+      next.push({ kind: "file", file });
+    }
+    setAttachments(next);
+    setRefused(notes);
   };
-  const types = process
-    ? [
-        ...process.inputs.map((type) => ({ type, control: false })),
-        ...process.controls
-          .filter((c) => !process.inputs.includes(c))
-          .map((type) => ({ type, control: true })),
-      ]
-    : [];
-  const create = (): void => {
+
+  const send = async (): Promise<void> => {
     setTried(true);
-    if (!process) {
+    if (!text.trim()) {
       focusFirstInvalid(form.current);
       return;
     }
     setSaving(true);
     setFailure(null);
-    const given = Object.fromEntries(
-      Object.entries(inputs).filter(([, paths]) => paths.length > 0),
-    );
-    const places = Object.fromEntries(
-      process.outputs.map((type) => [
-        type,
-        outputs[type]?.trim() ? (outputs[type] ?? "").trim() : null,
-      ]),
-    );
-    client
-      .post<InstanceResponse>("/api/instances", {
-        process: process.id,
-        inputs: given,
-        outputs: places,
-        criteria: criteriaOf(criteria),
-        notes,
-      })
-      .then(
-        (answer) => {
-          putInstance(answer.instance);
-          select({ kind: "instance", id: answer.instance.id });
-          close();
-        },
-        (error: unknown) => {
-          setFailure(error);
-          setSaving(false);
-        },
-      );
+    setSkipped(null);
+    try {
+      const list = [...attachments];
+      // One file an upload, as the server takes them. A file saved is in the workspace from then
+      // on: a second try sends its path, and uploads only the files not saved yet.
+      for (const [i, a] of list.entries()) {
+        if (a.kind !== "file") continue;
+        const body = new FormData();
+        body.append("files", a.file, a.file.name);
+        const { paths } = await client.upload<AttachmentsResponse>("/api/attachments", body);
+        list[i] = { kind: "path", path: paths[0] ?? "", uploaded: true };
+        setAttachments([...list]);
+      }
+      const answer = await client.post<WakeResponse>("/api/wake", {
+        ...(chosen ? { agent: chosen.id } : {}),
+        request: text.trim(),
+        attachments: list.flatMap((a) => (a.kind === "path" ? [a.path] : [])),
+        processes,
+        runs,
+      });
+      if (!answer.run) {
+        setSkipped(answer.running ?? "");
+        setSaving(false);
+        return;
+      }
+      putRun(summaryOf(answer.run));
+      close();
+      // The board shows the instances as the agent makes them; the panel, the wake's record.
+      setView("instances");
+      select({ kind: "run", id: answer.run.id });
+    } catch (error) {
+      setFailure(error);
+      setSaving(false);
+    }
   };
+
   return (
     <Dialog
-      title={t("new.title")}
-      description={process?.purpose || undefined}
+      title={t("request.title")}
+      description={t("request.description")}
       onClose={close}
       closeLabel={t("panel.close")}
       size="lg"
-      testid="instantiate"
+      testid="request"
     >
       <form
         ref={form}
@@ -371,109 +327,216 @@ function InstantiateDialog({ initial }: { initial?: string | undefined }) {
         noValidate
         onSubmit={(event) => {
           event.preventDefault();
-          create();
+          void send();
+        }}
+        // Files dropped anywhere in the box are attached, and never opened by the browser instead.
+        onDragOver={(event) => {
+          if (!event.dataTransfer?.types.includes("Files")) return;
+          event.preventDefault();
+          event.dataTransfer.dropEffect = "copy";
+          setOver(true);
+        }}
+        onDragLeave={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOver(false);
+        }}
+        onDrop={(event) => {
+          if (!event.dataTransfer) return;
+          event.preventDefault();
+          setOver(false);
+          const { files, folders } = droppedFiles(event.dataTransfer);
+          addFiles(files, folders);
         }}
       >
         <div class="dialog-body">
           <Field
-            label={t("new.process")}
+            label={t("request.text")}
             required
-            error={tried && !process ? t("new.processRequired") : undefined}
+            hint={t("request.textHint")}
+            error={tried && !text.trim() ? t("request.textRequired") : undefined}
           >
             {(control) => (
-              <Select
+              <Textarea
                 id={control.id}
-                labelledBy={control.labelId}
-                describedBy={control.describedBy}
+                rows={5}
+                maxLength={MAX_REQUEST_LENGTH}
+                aria-required="true"
+                aria-describedby={control.describedBy}
                 invalid={control.invalid}
-                value={processId}
-                placeholder={t("new.choose")}
-                icon={<Icon name="network" />}
-                options={model.processes.map((p) => ({ value: p.id, label: p.name }))}
-                onChange={chooseProcess}
+                placeholder={t("request.textPlaceholder")}
+                data-testid="request-text"
+                value={text}
+                onInput={(event) => setText(event.currentTarget.value)}
               />
             )}
           </Field>
-          {process && (
-            <>
-              <fieldset class="group">
-                <legend>{t("new.inputs")}</legend>
-                {types.map(({ type, control }) => (
-                  <InputChoice
-                    key={type}
-                    type={type}
-                    control={control}
-                    found={found.filter((a) => a.type === type)}
-                    chosen={inputs[type] ?? []}
-                    setChosen={(paths) => setInputs({ ...inputs, [type]: paths })}
-                  />
+          <fieldset class="group">
+            <legend>{t("request.attachments")}</legend>
+            <div class={cx("dropzone", over && "is-over")} data-testid="request-drop">
+              <Icon name="upload" size={20} />
+              <span class="dropzone-text">{t("request.drop")}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={full}
+                onClick={() => picker.current?.click()}
+              >
+                <Icon name="paperclip" />
+                {t("request.chooseFiles")}
+              </Button>
+              <input
+                ref={picker}
+                type="file"
+                multiple
+                class="sr-only"
+                tabIndex={-1}
+                aria-hidden="true"
+                data-testid="request-files"
+                onChange={(event) => {
+                  addFiles([...(event.currentTarget.files ?? [])]);
+                  event.currentTarget.value = "";
+                }}
+              />
+            </div>
+            <p class="faint small">
+              {t("request.limits", { count: MAX_ATTACHMENTS, size: MAX_ATTACHMENT_SIZE })}
+            </p>
+            {refused.length > 0 && (
+              <Alert tone="warning" data-testid="request-refused">
+                {refused.map((note, i) => (
+                  <p key={i}>{note}</p>
                 ))}
-              </fieldset>
-              <fieldset class="group">
-                <legend>{t("new.outputs")}</legend>
-                {process.outputs.map((type) => {
-                  const pattern = model.artifacts.find((a) => a.id === type)?.paths[0] ?? "";
-                  const existing = found
-                    .filter((a) => a.type === type)
-                    .slice(0, SUGGESTED)
-                    .map((a) => `${a.path}${a.dir ? "/" : ""}`);
+              </Alert>
+            )}
+            <Field label={t("request.existing")}>
+              {(control) => (
+                <Select
+                  id={control.id}
+                  labelledBy={control.labelId}
+                  value=""
+                  placeholder={
+                    offered.length > 0 ? t("request.chooseArtifact") : t("request.noArtifacts")
+                  }
+                  disabled={offered.length === 0 || full}
+                  icon={<Icon name="file" />}
+                  options={offered.map((a) => ({
+                    value: a.path,
+                    label: `${a.path}${a.dir ? "/" : ""}`,
+                    hint: typeName(model, a.type),
+                  }))}
+                  onChange={(path) =>
+                    setAttachments([...attachments, { kind: "path", path, uploaded: false }])
+                  }
+                  testid="request-artifact"
+                />
+              )}
+            </Field>
+            {attachments.length > 0 && (
+              <ul class="list attachment-list" data-testid="request-attachments">
+                {attachments.map((a, i) => {
+                  const name = a.kind === "file" ? a.file.name : a.path;
                   return (
-                    <Field key={type} label={typeName(model, type)}>
-                      {(control) => (
-                        <div class="output-field">
-                          <Input
-                            id={control.id}
-                            type="text"
-                            class="mono"
-                            placeholder={
-                              pattern
-                                ? `${t("new.agentDecides")} (${pattern})`
-                                : t("new.agentDecides")
-                            }
-                            value={outputs[type] ?? ""}
-                            onInput={(event) =>
-                              setOutputs({ ...outputs, [type]: event.currentTarget.value })
-                            }
-                          />
-                          {existing.length > 0 && (
-                            <div class="suggestions">
-                              {existing.map((path) => (
-                                <button
-                                  key={path}
-                                  type="button"
-                                  class="chip chip-path mono"
-                                  onClick={() => setOutputs({ ...outputs, [type]: path })}
-                                >
-                                  {path}
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </Field>
+                    <li
+                      key={a.kind === "file" ? `file:${i}:${a.file.name}` : `path:${a.path}`}
+                      class="list-row"
+                      data-attachment={a.kind === "path" ? a.path : undefined}
+                    >
+                      <span class="list-main attachment-name">
+                        <Icon name={a.kind === "file" ? "paperclip" : "file"} size={14} />
+                        <span class="mono small path-cell">{name}</span>
+                      </span>
+                      <span class="list-end">
+                        <span class="faint small">
+                          {a.kind === "file"
+                            ? `${size(a.file.size)} · ${t("request.toUpload")}`
+                            : a.uploaded
+                              ? t("request.uploaded")
+                              : t("request.inWorkspace")}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          aria-label={t("request.remove", { name })}
+                          title={t("request.remove", { name })}
+                          onClick={() => setAttachments(attachments.filter((_, k) => k !== i))}
+                        >
+                          <Icon name="x" />
+                        </Button>
+                      </span>
+                    </li>
                   );
                 })}
-              </fieldset>
-              <CriteriaFields outcomes={process.outcomes} draft={criteria} setDraft={setCriteria} />
-              <Field label={t("new.notes")}>
-                {(control) => (
-                  <Textarea
-                    id={control.id}
-                    rows={3}
-                    value={notes}
-                    onInput={(event) => setNotes(event.currentTarget.value)}
+              </ul>
+            )}
+          </fieldset>
+          <fieldset class="group">
+            <legend>{t("request.processes")}</legend>
+            <p class="faint small">{t("request.processesHint")}</p>
+            <div class="request-processes" data-testid="request-processes">
+              {model.processes.map((p) => (
+                <div key={p.id} data-process={p.id}>
+                  <Checkbox
+                    checked={processes.includes(p.id)}
+                    onChange={(on) =>
+                      setProcesses(
+                        on ? [...processes, p.id] : processes.filter((id) => id !== p.id),
+                      )
+                    }
+                    label={p.name}
                   />
-                )}
-              </Field>
-            </>
-          )}
+                </div>
+              ))}
+            </div>
+          </fieldset>
+          <div class="request-options">
+            <Field label={t("request.agent")}>
+              {(control) => (
+                <Select
+                  id={control.id}
+                  labelledBy={control.labelId}
+                  value={chosen?.id ?? ""}
+                  icon={<Icon name="terminal" />}
+                  options={agents.map((a) => ({
+                    value: a.id,
+                    label: a.label,
+                    disabled: !a.available,
+                    ...(a.available
+                      ? a.version
+                        ? { hint: a.version }
+                        : {}
+                      : { hint: t("overview.unavailable", { reason: a.reason ?? "" }) }),
+                  }))}
+                  onChange={setAgent}
+                  testid="request-agent"
+                />
+              )}
+            </Field>
+            <div class="field">
+              <span class="field-label" id={modeLabel}>
+                {t("request.mode")}
+              </span>
+              <Segmented
+                name="request-runs"
+                value={runs}
+                labelledBy={modeLabel}
+                options={[
+                  { value: "run", label: t("request.run") },
+                  { value: "plan", label: t("request.plan") },
+                ]}
+                onChange={setRuns}
+              />
+              <p class="field-hint">
+                {t(runs === "plan" ? "request.planHint" : "request.runHint")}
+              </p>
+            </div>
+          </div>
         </div>
         <Footer
           failure={failure}
-          failureTitle={t("new.failed")}
+          failureTitle={t("request.failed")}
+          notice={skipped !== null ? t("request.skipped", { run: skipped }) : null}
           saving={saving}
-          action={t("new.create")}
+          action={t("request.send")}
+          busyLabel={t("request.sending")}
           onCancel={close}
         />
       </form>
@@ -739,8 +802,8 @@ export function FormDialog() {
   const { form } = useUi();
   if (!form) return null;
   switch (form.kind) {
-    case "new":
-      return <InstantiateDialog initial={form.process} />;
+    case "request":
+      return <RequestDialog initial={form.process} />;
     case "edit":
       return <EditDialog key={form.id} id={form.id} />;
     case "evaluate":

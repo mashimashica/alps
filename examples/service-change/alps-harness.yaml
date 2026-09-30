@@ -43,6 +43,11 @@ guidance: [docs/operations.md]
 #   - cron: "0 9 * * 1-5"
 #     agent: claude-code
 
+# Where the WebUI saves the files attached to a request (Request, on every screen), in a directory for each day:
+# inbox/2026-10-01/notes.md, then notes-2.md for the same name. It must lie inside the workspace and outside .alps-harness/.
+# A saved file that matches the paths of a type above is an Artifact too. Whether to keep it in version control is the workspace's choice.
+attachments: inbox/
+
 # The harness server (daemon). It exits after idleMinutes without connections or running runs.
 # server:
 #   port: 4830

@@ -13,7 +13,13 @@ export {
   toPosix,
   type ParseYaml,
 } from "./files.ts";
-export { DEFAULT_IDLE_MINUTES, DEFAULT_PORT, loadWorkspace, type LoadedWorkspace } from "./load.ts";
+export {
+  DEFAULT_IDLE_MINUTES,
+  DEFAULT_PORT,
+  attachmentsLocation,
+  loadWorkspace,
+  type LoadedWorkspace,
+} from "./load.ts";
 export {
   compilePattern,
   isConcrete,

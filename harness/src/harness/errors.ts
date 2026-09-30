@@ -1,10 +1,10 @@
 import { say, type MessageArg, type MessageArgs, type MessageKey } from "../shared/strings.ts";
 import type { ErrorCode, ErrorInfo, HttpErrorCode } from "../shared/types.ts";
 
-/** The codes the harness core fails with: the MCP tools' codes and the two request-level ones. */
+/** The codes the harness core fails with: the MCP tools' codes and the request-level ones. */
 export type HarnessErrorCode =
   | ErrorCode
-  | Extract<HttpErrorCode, "invalid-request" | "outside-workspace">;
+  | Extract<HttpErrorCode, "invalid-request" | "outside-workspace" | "too-large">;
 
 /**
  * A request that the harness refuses, with the code that the API and the MCP tools report. Its
@@ -56,4 +56,5 @@ export const HTTP_STATUS: Record<HarnessErrorCode, number> = {
   "server-unreachable": 503,
   "invalid-request": 400,
   "outside-workspace": 403,
+  "too-large": 413,
 };

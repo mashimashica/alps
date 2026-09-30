@@ -104,6 +104,12 @@ describe("E2 MCP over stdio", () => {
     }
     const described = Object.fromEntries(tools.map((tool) => [tool.name, tool.description ?? ""]));
     expect(described.run).toContain("Success means only that the run started");
+    expect(described.run).toContain(
+      "The agent of a wake that plans only (runs: plan) starts no run",
+    );
+    // A wake's success is its start; the plan and its reasons come in its report.
+    expect(described.wake).toContain("says only that the agent started");
+    expect(described.wake).toContain("in the wake run's report");
     expect(described.evaluate).toContain("cannot be empty");
     for (const name of ["instantiate", "run", "finish_run"])
       expect(described[name], name).toMatch(/look with (get_run|list_instances)/);
@@ -296,7 +302,7 @@ describe("E2 MCP over stdio", () => {
   );
 
   test(
-    "E2 wake relays to the harness server, which starts a wake run: no instance, an agent given its MCP server",
+    "E2 wake relays to the harness server, which starts a wake run: no instance, an agent given its MCP server, and what the request asked",
     async () => {
       // The shared workspace has no Claude Code; this one has the fake, which ends as it does
       // for a Process (E6 has the fake that uses the MCP server it is given).
@@ -305,8 +311,18 @@ describe("E2 MCP over stdio", () => {
       });
       others.push(woken);
       const relay = await mcpClient({ workspace: woken.root });
+      const request = "Plan the design of CHG-001.";
+      const brief = "docs/changes/CHG-001/change-brief.md";
       try {
-        const result = await relay.client.callTool({ name: "wake", arguments: {} });
+        const result = await relay.client.callTool({
+          name: "wake",
+          arguments: {
+            request,
+            attachments: [brief],
+            processes: ["Solution Design"],
+            runs: "plan",
+          },
+        });
         expect(result.isError).toBeFalsy();
         const { run, skipped } = result.structuredContent as WakeResponse;
         expect(skipped).toBe(false);
@@ -316,18 +332,38 @@ describe("E2 MCP over stdio", () => {
           process: null,
           agent: "claude-code",
           status: "running",
+          request,
+          attachments: [brief],
+          processes: ["Solution Design"],
+          runs: "plan",
         });
         expect(run?.command).toContain("--mcp-config");
+        // Success is only the start: the plan and its reasons come later, in the report.
         expect(texts(result)[1]).toContain(`Started wake run ${run?.id} (claude-code)`);
+        expect(texts(result)[1]).toContain("starts no run");
+        expect(texts(result)[1]).toContain(
+          "what it planned and why comes in the wake run's report",
+        );
         const ended = await callTool<RunDetailResponse>(relay, "get_run", {
           run: run?.id,
           wait: 30,
         });
         expect(ended.run.status).toBe("succeeded");
         expect(ended.run.started).toEqual([]);
+        expect(ended.run.prompt).toContain(`> ${request}\n`);
       } finally {
         await relay.close();
       }
+      // What the request names is checked before anything else: a Process the model lacks, an
+      // attachment in .alps-harness/ or outside the workspace, and arguments off the schema.
+      const unknown = await toolFailure(session, "wake", { processes: ["No such"] });
+      expect(unknown.error.code).toBe("not-found");
+      for (const given of [".alps-harness/state.json", "../elsewhere.md"]) {
+        const refused = await toolFailure(session, "wake", { attachments: [given] });
+        expect(refused.error.code, given).toBe("outside-workspace");
+      }
+      const off = await session.client.callTool({ name: "wake", arguments: { runs: "later" } });
+      expect(off.isError).toBe(true);
       // Here claude-code cannot be started, and the demo is no agent that can be woken.
       const unavailable = await toolFailure(session, "wake", {});
       expect(unavailable.error.code).toBe("agent-unavailable");

@@ -1,7 +1,8 @@
 /*
- * The WebUI's side of the HTTP API: requests with the token, JSON bodies for writes, and failures
- * that carry the server's message key and arguments, so that they can be put in the page's
- * language. The event stream tells what changed; the page reads again what it shows.
+ * The WebUI's side of the HTTP API: requests with the token, JSON bodies for writes (and files as
+ * multipart/form-data for the attachments of a request, one file an upload), and failures that
+ * carry the server's message key and arguments, so that they can be put in the page's language.
+ * The event stream tells what changed; the page reads again what it shows.
  */
 
 import { sayReceived } from "../shared/strings.ts";
@@ -40,6 +41,8 @@ export interface Client {
   readonly token: string | null;
   get<T>(path: string): Promise<T>;
   post<T>(path: string, body?: unknown): Promise<T>;
+  /** Sends files as multipart/form-data (POST /api/attachments); the browser sets the boundary. */
+  upload<T>(path: string, form: FormData): Promise<T>;
   /** Opens the event stream; returns the function that closes it. */
   events(onEvent: (event: ServerEvent) => void, onState: (state: StreamState) => void): () => void;
 }
@@ -54,7 +57,12 @@ export function query(values: Record<string, string | number | undefined | null>
 }
 
 export function createClient(token: string | null): Client {
-  async function send<T>(method: "GET" | "POST", path: string, body?: unknown): Promise<T> {
+  async function send<T>(
+    method: "GET" | "POST",
+    path: string,
+    body?: unknown,
+    form?: FormData,
+  ): Promise<T> {
     if (!token) throw new ApiError(401, null, "This page has no token.");
     let response: Response;
     try {
@@ -63,9 +71,9 @@ export function createClient(token: string | null): Client {
         cache: "no-store",
         headers: {
           "X-Harness-Token": token,
-          ...(method === "POST" ? { "Content-Type": "application/json" } : {}),
+          ...(method === "POST" && !form ? { "Content-Type": "application/json" } : {}),
         },
-        ...(method === "POST" ? { body: JSON.stringify(body ?? {}) } : {}),
+        ...(form ? { body: form } : method === "POST" ? { body: JSON.stringify(body ?? {}) } : {}),
       });
     } catch (error) {
       throw new ApiError(0, null, (error as Error).message);
@@ -90,6 +98,7 @@ export function createClient(token: string | null): Client {
     token,
     get: (path) => send("GET", path),
     post: (path, body) => send("POST", path, body),
+    upload: (path, form) => send("POST", path, undefined, form),
     events(onEvent, onState) {
       if (!token) {
         onState("closed");

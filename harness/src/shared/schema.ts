@@ -5,6 +5,7 @@
  */
 
 import { z } from "zod";
+import { MAX_ATTACHMENTS, MAX_REQUEST_LENGTH } from "./requests.ts";
 import { cronProblem } from "./cron.ts";
 import type {
   Instance,
@@ -133,6 +134,12 @@ export const harnessConfigSchema = z.looseObject({
     .optional(),
   /** Markdown files, relative to the workspace, that a woken agent reads; the harness never interprets them. */
   guidance: textList.optional(),
+  /**
+   * Where the WebUI saves the files attached to a request, relative to the workspace (inbox/ by
+   * default). Whether it stays inside the workspace and outside .alps-harness/ depends on the
+   * workspace: loading checks it (model/load.ts).
+   */
+  attachments: text.optional(),
   /** When the daemon wakes an agent (crontab's five fields, local time); none keeps it from stopping when idle. */
   schedules: z
     .array(
@@ -210,6 +217,8 @@ const instance: z.ZodType<Instance> = z.object({
       at: epochMs,
     })
     .nullable(),
+  // Instances recorded before the harness kept what made them have none.
+  createdBy: z.object({ run: z.string() }).nullable().optional(),
 });
 
 const runSummary: z.ZodType<RunSummary> = z.object({
@@ -276,6 +285,11 @@ export const runRecordSchema: z.ZodType<Run, unknown> = z.object({
   git: gitInfo,
   skill: skillUsed,
   started: z.array(z.string()).optional(),
+  // Wake runs recorded before the harness kept what a wake was asked have none of these.
+  request: z.string().nullable().optional(),
+  attachments: z.array(z.string()).optional(),
+  processes: z.array(z.string()).optional(),
+  runs: z.enum(["run", "plan"]).optional(),
 });
 
 /** A run's usage in harness 0.8, which left out what an agent did not report (Codex's turns). */
@@ -432,9 +446,28 @@ export const clientHeader = z.strictObject({
   version: z.string().max(100),
 });
 
-/** `POST /api/wake` (`wake`): the agent to wake, claude-code when none is given. */
+/**
+ * `POST /api/wake` (`wake`): the agent to wake, claude-code when none is given, and what the wake
+ * is asked, if anything: the request in free text (the requester's instruction), the workspace
+ * paths it attaches, the Processes (id or name) that the plan must include, and whether the agent
+ * starts the runs it plans (`run`, the default) or only instantiates them (`plan`). The request is
+ * kept, in the record and in the prompt alike, without the white space around it and with its
+ * lines ending in \n; the lines themselves are as given.
+ */
 export const wakeRequest = z.strictObject({
   agent: z.string().min(1).optional(),
+  request: freeText
+    .max(MAX_REQUEST_LENGTH, {
+      error: `the request is longer than ${MAX_REQUEST_LENGTH} characters; attach long text as a file`,
+    })
+    .transform((text) => text.replace(/\r\n?/g, "\n"))
+    .optional(),
+  attachments: z
+    .array(z.string())
+    .max(MAX_ATTACHMENTS, { error: `a request attaches at most ${MAX_ATTACHMENTS} paths` })
+    .default([]),
+  processes: z.array(z.string().min(1)).default([]),
+  runs: z.enum(["run", "plan"]).default("run"),
 });
 export type WakeRequest = z.output<typeof wakeRequest>;
 

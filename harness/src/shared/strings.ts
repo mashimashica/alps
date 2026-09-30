@@ -86,9 +86,9 @@ const en = {
   "error.emptyPath": (a: { where: string; path: string }) =>
     `${a.where}: "${a.path}" names no file or directory in the workspace.`,
   "error.outside": (a: { where: string; path: string; root: string }) =>
-    `${a.where}: ${a.path} is outside the workspace (${a.root}). Instances name only paths inside it.`,
+    `${a.where}: ${a.path} is outside the workspace (${a.root}). Instances and requests name only paths inside it.`,
   "error.records": (a: { where: string; path: string }) =>
-    `${a.where}: ${a.path} is in .alps-harness/, the harness's own records. Instances name only the workspace's Artifacts.`,
+    `${a.where}: ${a.path} is in .alps-harness/, the harness's own records. Instances and requests name only the workspace's own files.`,
   "error.pattern": (a: { where: string; path: string }) =>
     `${a.where}: ${a.path} is a pattern. The inputs of an instance are concrete paths: name each file or directory (list_artifacts lists the candidates).`,
   "error.notInput": (a: { type: string; process: string; allowed: string }) =>
@@ -106,6 +106,8 @@ const en = {
     `${a.agent} cannot be started: ${a.reason}.`,
   "error.wakeAgent": (a: { agent: string; agents: string }) =>
     `${a.agent} cannot be woken: a wake needs the harness's MCP server, which the harness can give to Claude Code (--mcp-config) and Codex (-c mcp_servers) only. The agents that can be woken here: ${a.agents || "none"}.`,
+  "error.planOnly": (a: { run: string }) =>
+    `Wake run ${a.run} plans only (runs: plan): its agent instantiates what it plans and starts no run and no wake, so that the requester reviews the plan first. Report the plan with finish_run.`,
   "error.running": (a: { run: string; instance: string }) =>
     `Run ${a.run} of instance ${a.instance} has not ended. Wait for it (get_run with wait) or cancel it (cancel_run).`,
   "error.notSelf": (a: { run: string; agent: string }) =>
@@ -122,6 +124,19 @@ const en = {
   "error.client": (a: { detail: string }) =>
     `The X-Harness-Client header is not {name, version} as JSON: ${a.detail}`,
   "error.noSkill": (a: { process: string }) => `${a.process} has no readable SKILL.md.`,
+  "error.noAttachment": (a: { where: string; path: string }) =>
+    `${a.where}: ${a.path} does not exist in the workspace. A request attaches files and directories that exist there.`,
+  "error.attachmentCount": (a: { count: number; limit: number }) =>
+    `Sent ${plural(a.count, "file")}; one request attaches at most ${a.limit}.`,
+  "error.attachmentSize": (a: { name: string; limit: string }) =>
+    `${a.name} is larger than ${a.limit}, the most that one attachment may be. Put a larger file in the workspace and attach its path.`,
+  "error.noFiles": () => "The body holds no file to attach.",
+  "error.multipart": (a: { detail: string }) =>
+    `The body is not a form with files (multipart/form-data): ${a.detail}`,
+  "error.attachmentNames": (a: { name: string; folder: string; limit: number }) =>
+    `${a.folder} already holds ${a.name} and that name with each of -2 to -${a.limit}. Rename the file, or move the others out of the directory.`,
+  "error.attachmentsDir": (a: { folder: string; detail: string }) =>
+    `The attachments cannot be saved in ${a.folder}: something other than a directory (a file, or a symlink that leads nowhere) is on its path (${a.detail}). Move it, or name another directory in attachments (alps-harness.yaml).`,
 
   /* ---------- rejections of the HTTP layer ---------- */
   "error.host": () => "This host name is not accepted.",
@@ -129,6 +144,8 @@ const en = {
   "error.token": () =>
     "The token is missing or wrong. Open the URL that alps-harness serve printed (…/#token=…).",
   "error.mediaType": () => "Send the request body as JSON.",
+  "error.multipartType": () => "Send the attachments as multipart/form-data.",
+  "error.bodySize": (a: { limit: string }) => `The request body is larger than ${a.limit}.`,
   "error.route": (a: { method: string; path: string }) => `${a.method} ${a.path} does not exist.`,
   "error.internal": () => "The server failed to handle the request.",
 
@@ -198,8 +215,8 @@ const en = {
     stale: number;
   }) =>
     `${plural(a.findings, "finding")} about ${plural(a.instances, "instance")}. ${a.achieved} of ${plural(a.judged, "judged Outcome")} achieved; ${plural(a.stale, "evaluation")} on stale evidence.`,
-  "done.woke": (a: { run: string; agent: string }) =>
-    `Started wake run ${a.run} (${a.agent}): the agent reads the model, the guidance, and the state, and decides what to run. Starting achieves nothing by itself; the runs it starts are listed in the wake run's started (get_run).`,
+  "done.woke": (a: { run: string; agent: string; plan: boolean }) =>
+    `Started wake run ${a.run} (${a.agent}): the agent reads the model, the guidance, and the state, and decides what to run${a.plan ? ", but only instantiates what it plans (plan) and starts no run" : ""}. Starting achieves nothing by itself; the runs it starts are listed in the wake run's started, and what it planned and why comes in the wake run's report (get_run).`,
   "done.wakeSkipped": (a: { running: string }) =>
     `No wake was started: wake run ${a.running} still runs. The skip is recorded in its events.`,
   "done.ui": (a: { url: string; open: boolean; opened: boolean }) =>
@@ -224,6 +241,8 @@ const en = {
     `The agent reported with finish_run (${a.status}); the run ends when its process exits.`,
   "event.attached": (a: { run: string; agent: string; instance: string }) =>
     `Started run ${a.run} (${a.agent}) of instance ${a.instance}.`,
+  "event.instantiated": (a: { instance: string; process: string }) =>
+    `Created instance ${a.instance} of ${a.process}.`,
   "event.mcpConfig": (a: { agent: string; detail: string }) =>
     `The MCP configuration for ${a.agent} could not be written: ${a.detail}`,
 
@@ -272,9 +291,9 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
   "error.emptyPath": (a) =>
     `${a.where}: 「${a.path}」はワークスペースのファイルもディレクトリも指していない。`,
   "error.outside": (a) =>
-    `${a.where}: ${a.path} はワークスペース（${a.root}）の外にある。インスタンスが指せるのはその中のパスだけである。`,
+    `${a.where}: ${a.path} はワークスペース（${a.root}）の外にある。インスタンスと依頼が指せるのはその中のパスだけである。`,
   "error.records": (a) =>
-    `${a.where}: ${a.path} はハーネス自身の記録（.alps-harness/）の中にある。インスタンスが指せるのはワークスペースのアーティファクトだけである。`,
+    `${a.where}: ${a.path} はハーネス自身の記録（.alps-harness/）の中にある。インスタンスと依頼が指せるのはワークスペース自身のファイルだけである。`,
   "error.pattern": (a) =>
     `${a.where}: ${a.path} はパターンである。インスタンスの入力は具体的なパスにし、ファイルかディレクトリを一つずつ挙げること（候補は list_artifacts で得られる）。`,
   "error.notInput": (a) =>
@@ -291,6 +310,8 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
   "error.agentUnavailable": (a) => `${a.agent} を起動できない（${a.reason}）。`,
   "error.wakeAgent": (a) =>
     `${a.agent} は目覚めに使えない。目覚めにはハーネスの MCP サーバーが要り、ハーネスがそれを渡せるのは Claude Code（--mcp-config）と Codex（-c mcp_servers）だけである。ここで目覚めに使えるエージェント: ${a.agents || "なし"}。`,
+  "error.planOnly": (a) =>
+    `目覚めの実行 ${a.run} は計画だけである（runs: plan）。依頼者が先に計画を確かめるので、そのエージェントは計画したものをインスタンス化するだけで、実行も目覚めも起動しない。計画は finish_run で報告すること。`,
   "error.running": (a) =>
     `インスタンス ${a.instance} の実行 ${a.run} がまだ終わっていない。get_run（wait）で待つか、cancel_run で中止すること。`,
   "error.notSelf": (a) =>
@@ -307,12 +328,27 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
   "error.client": (a) =>
     `X-Harness-Client ヘッダーが {name, version} の JSON ではない: ${a.detail}`,
   "error.noSkill": (a) => `${a.process} には読める SKILL.md がない。`,
+  "error.noAttachment": (a) =>
+    `${a.where}: ${a.path} はワークスペースにない。依頼に添付できるのは、そこにあるファイルとディレクトリである。`,
+  "error.attachmentCount": (a) =>
+    `${a.count} 件のファイルが送られた。一回の依頼で添付できるのは ${a.limit} 件までである。`,
+  "error.attachmentSize": (a) =>
+    `${a.name} は一件の添付の上限（${a.limit}）より大きい。大きなファイルはワークスペースに置き、そのパスを添付すること。`,
+  "error.noFiles": () => "本文に添付するファイルがない。",
+  "error.multipart": (a) =>
+    `本文がファイルを含むフォーム（multipart/form-data）ではない: ${a.detail}`,
+  "error.attachmentNames": (a) =>
+    `${a.folder} には ${a.name} と、その名前に -2 から -${a.limit} までを付けたものがすべてある。ファイルの名前を変えるか、ほかのファイルをそのディレクトリから移すこと。`,
+  "error.attachmentsDir": (a) =>
+    `${a.folder} に添付を保存できない。そのパスの途中にディレクトリでないもの（ファイルか、行き先のない symlink）がある（${a.detail}）。それを移すか、alps-harness.yaml の attachments で別のディレクトリを指すこと。`,
 
   "error.host": () => "このホスト名は受け付けない。",
   "error.crossSite": () => "API はハーネス自身のページからの要求だけを受け付ける。",
   "error.token": () =>
     "合い言葉がないか、違う。alps-harness serve が印字した URL（…/#token=…）を開くこと。",
   "error.mediaType": () => "要求の本文は JSON で送ること。",
+  "error.multipartType": () => "添付は multipart/form-data で送ること。",
+  "error.bodySize": (a) => `要求の本文が ${a.limit} より大きい。`,
   "error.route": (a) => `${a.method} ${a.path} はない。`,
   "error.internal": () => "サーバーが要求を処理できなかった。",
 
@@ -372,7 +408,7 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
   "done.assessment": (a) =>
     `所見は ${a.findings} 件、インスタンスは ${a.instances} 件。判断された成果 ${a.judged} 件のうち達成は ${a.achieved} 件、根拠が古い評価は ${a.stale} 件。`,
   "done.woke": (a) =>
-    `目覚めの実行 ${a.run}（${a.agent}）を開始した。エージェントがモデル・案内・現状を読み、何を走らせるかを判断する。開始しただけでは何も達成されない。起動された実行は目覚めの実行の started に並ぶ（get_run）。`,
+    `目覚めの実行 ${a.run}（${a.agent}）を開始した。エージェントがモデル・案内・現状を読み、何を走らせるかを判断する${a.plan ? "（計画だけ：計画したものをインスタンス化し、実行は起動しない）" : ""}。開始しただけでは何も達成されない。起動された実行は目覚めの実行の started に並び、何をなぜ計画したかは目覚めの実行の report に来る（get_run）。`,
   "done.wakeSkipped": (a) =>
     `目覚めは開始しなかった。目覚めの実行 ${a.running} がまだ動いている。見送りはその実行のイベントに記録した。`,
   "done.ui": (a) =>
@@ -390,6 +426,7 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
   "event.wakeReported": (a) =>
     `エージェントが finish_run で報告した（${a.status}）。実行はそのプロセスが終わった時点で終わる。`,
   "event.attached": (a) => `インスタンス ${a.instance} の実行 ${a.run}（${a.agent}）を起動した。`,
+  "event.instantiated": (a) => `${a.process} のインスタンス ${a.instance} を作った。`,
   "event.mcpConfig": (a) => `${a.agent} の MCP 設定を書き込めなかった: ${a.detail}`,
 
   "runError.interrupted": () => "実行中にハーネスサーバーが停止した。",

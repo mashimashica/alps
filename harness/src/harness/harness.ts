@@ -39,6 +39,7 @@ import {
   type LoadedWorkspace,
   type ParseYaml,
 } from "../model/index.ts";
+import { attachmentPath, dayOf, MAX_NAME_CANDIDATES, safeFileName } from "../shared/requests.ts";
 import type {
   EvaluateRequest,
   FinishRequest,
@@ -79,6 +80,7 @@ import type {
   Stats,
   StatsFilter,
   StatsMembers,
+  WakeRuns,
 } from "../shared/types.ts";
 import { demoFile, demoReport, demoSteps } from "./demo.ts";
 import { DigestCache } from "./digest.ts";
@@ -163,6 +165,24 @@ export type Caller =
 
 /** What woke an agent: a schedule of alps-harness.yaml, or a request (the MCP tool, the CLI, the API). */
 export type WakeTrigger = { kind: "schedule"; cron: string } | { kind: "request"; caller: Caller };
+
+/**
+ * What a wake is asked, as its record keeps it: the request's text (`null` without one), the
+ * attached workspace paths, the ids of the Processes that the plan must include, and whether the
+ * agent starts the runs it plans.
+ */
+interface WakeAsked {
+  request: string | null;
+  attachments: string[];
+  processes: string[];
+  runs: WakeRuns;
+}
+
+/** A file that a person attaches to a request, as the WebUI sent it. */
+export interface AttachedFile {
+  name: string;
+  data: Uint8Array;
+}
 
 /** What woke an agent, as the wake events say it (shared/strings.ts). */
 const wokenBy = (trigger: WakeTrigger): MessageArgs<"event.woken"> =>
@@ -673,13 +693,19 @@ export class Harness {
 
   /**
    * `POST /api/instances`: a new instance, or new criteria and notes for an existing one. Inputs
-   * and outputs are fixed when the instance is made, because its evaluation rests on them.
+   * and outputs are fixed when the instance is made, because its evaluation rests on them. A new
+   * instance that the agent of a running wake makes (through the MCP server the wake gave it)
+   * records that wake in createdBy, and the wake's events say so.
    */
-  instantiate(request: InstantiateRequest): { instance: InstanceView; created: boolean } {
+  instantiate(
+    request: InstantiateRequest,
+    caller: Caller = { kind: "user" },
+  ): { instance: InstanceView; created: boolean } {
     const { loaded, description } = this.#describe();
     const { model } = loaded;
     let instance: Instance;
     let created: boolean;
+    let wake: Run | undefined;
     if ("instance" in request) {
       instance = this.#instance(request.instance);
       if (request.criteria !== undefined)
@@ -694,6 +720,7 @@ export class Harness {
       const inputs = this.#inputs(model, process, request.inputs);
       const outputs = this.#outputs(model, process, request.outputs);
       const criteria = this.#criteria(process, request.criteria);
+      wake = caller.kind === "agent" && caller.wake ? this.#runningWakeRun(caller.wake) : undefined;
       instance = {
         id: this.#nextId("i"),
         process: process.id,
@@ -703,14 +730,101 @@ export class Harness {
         notes: request.notes,
         runs: [],
         evaluation: null,
+        createdBy: wake ? { run: wake.id } : null,
       };
       this.#state.instances[instance.id] = instance;
       created = true;
     }
     this.#saveState();
+    if (wake) {
+      this.#emit(wake, {
+        kind: "system",
+        ...spoken("event.instantiated", {
+          instance: instance.id,
+          process: this.#process(model, instance.process).name,
+        }),
+      });
+      this.#writeRun(wake);
+    }
     const view = this.#view(instance, description);
     this.#sendInstance(view);
     return { instance: view, created };
+  }
+
+  /**
+   * `POST /api/attachments`: saves the files that a person attaches to a request in the
+   * attachments directory (alps-harness.yaml), in a directory for the day, each under its name
+   * made harmless and free there (shared/requests.ts). Returns their paths relative to the
+   * workspace, in the order given. The directory must stay inside the workspace and outside
+   * .alps-harness/, also where symlinks lead; no file is written otherwise. The API checks the
+   * number and sizes of the files first; here every name is found before any file is written, and
+   * the files of one upload are saved all or none.
+   */
+  attach(files: readonly AttachedFile[]): string[] {
+    if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
+    const { attachments } = this.#loaded();
+    const day = dayOf(Date.now());
+    const folder = this.#pathIn(`${attachments}${day}/`, "attachments");
+    const absolute = (relative: string): string => path.resolve(this.root, relative);
+    try {
+      fs.mkdirSync(absolute(folder), { recursive: true });
+    } catch (error) {
+      // Something other than a directory is on the way: a file, or a symlink that leads nowhere.
+      const { code, message } = error as NodeJS.ErrnoException;
+      if (code !== "ENOTDIR" && code !== "EEXIST" && code !== "ENOENT") throw error;
+      throw refuse("no-model", "error.attachmentsDir", { folder, detail: message }, [
+        absolute(folder),
+      ]);
+    }
+    // Once the directories exist, where they lead is checked again: through a symlink made meanwhile too.
+    this.#pathIn(folder, "attachments");
+    // A name is taken by whatever is there, a symlink that leads nowhere too, and by the names
+    // chosen for the upload's other files.
+    const chosen = new Set<string>();
+    const taken = (relative: string): boolean =>
+      chosen.has(relative) ||
+      fs.lstatSync(absolute(relative), { throwIfNoEntry: false }) !== undefined;
+    const place = (file: AttachedFile): string => {
+      const relative = attachmentPath(attachments, day, file.name, taken);
+      if (relative === null)
+        throw refuse("invalid-request", "error.attachmentNames", {
+          name: safeFileName(file.name),
+          folder,
+          limit: MAX_NAME_CANDIDATES,
+        });
+      chosen.add(relative);
+      return relative;
+    };
+    const planned = files.map(place);
+    const saved: string[] = [];
+    try {
+      files.forEach((file, i) => {
+        let relative = planned[i] ?? place(file);
+        for (;;) {
+          try {
+            // Never over another file: one that appears between the look and the write is left
+            // alone, and the next free name is taken.
+            fs.writeFileSync(absolute(relative), file.data, { flag: "wx" });
+            saved.push(relative);
+            return;
+          } catch (error) {
+            if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+            relative = place(file);
+          }
+        }
+      });
+    } catch (error) {
+      for (const relative of saved)
+        try {
+          fs.unlinkSync(absolute(relative));
+        } catch {
+          // Already gone.
+        }
+      throw error;
+    }
+    this.#deps.log(`saved ${saved.length} attachment(s) in ${folder}`);
+    this.#hooks.broadcast({ type: "artifacts" });
+    return saved;
   }
 
   /* ---------- runs ---------- */
@@ -783,7 +897,7 @@ export class Harness {
    * `POST /api/instances/:id/run`: records a run and starts its agent. Starting is all that
    * success means. An agent that starts a process is checked first (`<command> --version`); the
    * demo starts none, and a self run is performed by the calling session, which the result's prompt
-   * instructs and which ends it with finish_run.
+   * instructs and which ends it with finish_run. The agent of a wake that plans only starts none.
    */
   async startRun(
     instanceId: string,
@@ -791,6 +905,7 @@ export class Harness {
     caller: Caller,
   ): Promise<{ run: RunView; prompt?: string }> {
     if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
+    this.#refusePlanOnly(caller);
     this.#instance(instanceId);
     const agentSpec = (loaded: LoadedWorkspace): { spec: AgentSpec; specs: AgentSpec[] } => {
       const specs = resolveAgents(loaded.config.agents);
@@ -1302,29 +1417,81 @@ export class Harness {
     return { skipped: true, running: running.id };
   }
 
+  /** Writes a run's record; a failure is logged, and the record in memory stays as it is. */
+  #writeRun(run: Run): void {
+    try {
+      writeRun(this.root, run);
+    } catch (error) {
+      this.#deps.log(`cannot write run ${run.id}: ${(error as Error).message}`);
+    }
+  }
+
+  /**
+   * The wake run `id` while it runs: what its agent does through the MCP server that the wake gave
+   * it (X-Harness-Wake) is recorded in it. An ended or unknown wake gets nothing.
+   */
+  #runningWakeRun(id: string): Run | undefined {
+    const wake = this.#records.runs.get(id);
+    return wake?.kind === "wake" && wake.status === "running" ? wake : undefined;
+  }
+
+  /**
+   * Refuses a run or a wake that the agent of a wake asked for a plan only (runs: plan) starts,
+   * through the MCP server the wake gave it (X-Harness-Wake): the harness keeps that agent to
+   * instantiating, whatever its prompt made of it. Instantiating, evaluating, and reporting stay open.
+   */
+  #refusePlanOnly(caller: Caller | null): void {
+    if (caller?.kind !== "agent" || !caller.wake) return;
+    const wake = this.#records.runs.get(caller.wake);
+    if (wake?.kind === "wake" && wake.runs === "plan")
+      throw refuse("invalid-request", "error.planOnly", { run: wake.id });
+  }
+
   /** Lists a run in the wake run whose agent started it, through the MCP server the wake gave it. */
   #attach(wakeId: string, run: Run): void {
-    const wake = this.#records.runs.get(wakeId);
-    if (wake?.kind !== "wake" || wake.status !== "running") return;
+    const wake = this.#runningWakeRun(wakeId);
+    if (!wake) return;
     wake.started = [...(wake.started ?? []), run.id];
     this.#emit(wake, {
       kind: "system",
       ...spoken("event.attached", { run: run.id, agent: run.agent, instance: run.instance ?? "" }),
     });
-    try {
-      writeRun(this.root, wake);
-    } catch (error) {
-      this.#deps.log(`cannot write run ${wake.id}: ${(error as Error).message}`);
-    }
+    this.#writeRun(wake);
   }
 
-  /** What a wake's agent is told: where the model and the guidance are, and the state now. */
+  /**
+   * What a wake is asked, checked against the workspace: the Processes it names, by id (a name
+   * the model does not have is not-found), and its attachments, relative to the workspace, which
+   * must exist inside it and outside .alps-harness/.
+   */
+  #asked(request: WakeRequest): WakeAsked {
+    const { model } = this.#loaded();
+    const processes = [...new Set(request.processes.map((key) => this.#process(model, key).id))];
+    const attachments = [
+      ...new Set(
+        request.attachments.map((given, i) => {
+          const where = `attachments.${i}`;
+          const inside = artifactPath(this.#pathIn(given, where));
+          if (!fileState(this.root, inside))
+            throw refuse("invalid-request", "error.noAttachment", { where, path: given });
+          return inside;
+        }),
+      ),
+    ];
+    return { request: request.request || null, attachments, processes, runs: request.runs };
+  }
+
+  /**
+   * What a wake's agent is told: what it is asked, if anything, where the model and the guidance
+   * are, and the state now.
+   */
   #wakePrompt(
     run: string,
     since: number | null,
     loaded: LoadedWorkspace,
     description: ModelDescription,
     agents: AgentInfo[],
+    asked: WakeAsked,
   ): string {
     const changed = this.artifacts(since === null ? {} : { changedSince: since });
     const instances = Object.values(this.#state.instances).sort(
@@ -1340,11 +1507,27 @@ export class Harness {
       sharedOrigins: this.#sharedOrigins(),
     });
     const { model } = loaded;
+    const requested =
+      asked.request !== null ||
+      asked.attachments.length > 0 ||
+      asked.processes.length > 0 ||
+      asked.runs === "plan";
     return buildWakePrompt({
       language: loaded.language,
       root: this.root,
       run,
       server: WAKE_MCP_SERVER,
+      request: requested
+        ? {
+            text: asked.request,
+            attachments: asked.attachments,
+            processes: asked.processes.map((id) => ({
+              id,
+              name: model.processes.find((p) => p.id === id)?.name ?? id,
+            })),
+            runs: asked.runs,
+          }
+        : null,
       modelPath: description.modelPath,
       guidance: (loaded.config.guidance ?? []).map((file) => ({
         path: file,
@@ -1372,14 +1555,20 @@ export class Harness {
   /**
    * `POST /api/wake` and the schedules: records a wake run (no instance) and starts its agent with
    * this harness's MCP server, through which it instantiates, runs, waits, evaluates, and reports.
-   * The harness decides nothing about what runs. Only one wake runs at a time: while one runs,
-   * another is skipped, and the events of the one that runs record the skip.
+   * A wake may be given a request: its text, attachments, and the Processes that the plan must
+   * include go into the prompt and the record, and with `runs: plan` the agent only instantiates:
+   * the harness refuses the runs and wakes it would start. The harness decides nothing about what
+   * runs and interprets neither the request nor the guidance. Only one wake runs at a time: while
+   * one runs, another is skipped, and the events of the one that runs record the skip. A request
+   * that names what the workspace does not have is refused first, before it could be skipped.
    */
   async wake(
     request: WakeRequest,
     trigger: WakeTrigger,
   ): Promise<{ run: RunView; skipped: false } | { skipped: true; running: string }> {
     if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
+    this.#refusePlanOnly(trigger.kind === "request" ? trigger.caller : null);
+    const asked = this.#asked(request);
     const earlier = this.#runningWake();
     if (earlier) return this.#skip(earlier, trigger);
     const name = request.agent ?? WAKE_AGENT;
@@ -1418,7 +1607,7 @@ export class Harness {
     const now = Date.now();
     const id = this.#nextId("r");
     const since = this.#state.lastWakeAt;
-    const prompt = this.#wakePrompt(id, since, loaded, description, agents);
+    const prompt = this.#wakePrompt(id, since, loaded, description, agents, asked);
     // The agent's MCP server names this wake, so the runs it starts are listed in started.
     const server: McpServerLaunch = {
       name: WAKE_MCP_SERVER,
@@ -1456,6 +1645,7 @@ export class Harness {
       git: this.#deps.gitInfo(this.root),
       skill: null,
       started: [],
+      ...asked,
     };
     const active: ActiveRun = {
       locations: [],

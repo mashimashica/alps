@@ -4,7 +4,10 @@
  * and hold no secret: the per-start token reaches the browser only in the URL fragment
  * (`/#token=…`), which browsers never send to servers. The API requires the token, rejects
  * requests that browsers mark as coming from other sites, and accepts only JSON bodies for
- * writes. No response may be shown in a frame (clickjacking).
+ * writes, up to 1 MiB; the one exception is the files a person attaches to a request, which
+ * POST /api/attachments takes as multipart/form-data, up to 21 MiB a body, so one file at its
+ * limit at a time (behind the same checks: a form of another site cannot send the token). No
+ * response may be shown in a frame (clickjacking).
  *
  * An MCP server holds a session with the harness server while its client is connected
  * (`GET /api/session`, a stream like the event stream). The session names the self runs that the
@@ -14,7 +17,7 @@
 
 import type { Server } from "bun";
 import crypto from "node:crypto";
-import type { Harness } from "../harness/index.ts";
+import { HTTP_STATUS, HarnessError, type Harness } from "../harness/index.ts";
 import { say, type MessageArgs, type MessageKey } from "../shared/strings.ts";
 import type {
   ErrorCode,
@@ -25,7 +28,7 @@ import type {
   ServerInfo,
   SessionEvent,
 } from "../shared/types.ts";
-import { createApi } from "./api.ts";
+import { MAX_JSON_BYTES, MAX_UPLOAD_BYTES, createApi, mebibytes, textOf } from "./api.ts";
 import { IdleTracker } from "./idle.ts";
 import { probe, readServerInfo, removeServerInfo, serverUrl, writeServerInfo } from "./info.ts";
 import { openUi, removeOpenPage } from "./open.ts";
@@ -35,7 +38,13 @@ import { bundleUi, type UiBundle } from "./ui.ts";
 /** Consecutive ports tried when the configured one is in use. */
 const PORT_ATTEMPTS = 10;
 const PING_MS = 20_000;
-const MAX_BODY_BYTES = 1024 * 1024;
+/** The route whose body is files (multipart/form-data) rather than JSON. */
+const UPLOAD_ROUTE = "/api/attachments";
+/**
+ * Bun's own limit, just above the largest that a route reads (an upload), so that the API answers
+ * an oversized body in its own words; each route reads no more than its own limit.
+ */
+const MAX_REQUEST_BYTES = MAX_UPLOAD_BYTES + 64 * 1024;
 /** How often, while a WebUI is connected, the workspace is checked for edits made outside the harness. */
 const POLL_MS = 3000;
 
@@ -316,8 +325,20 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
     if (!tokenMatches(given, token)) return fail(401, "unauthorized", "error.token", {});
     if (request.method !== "GET" && request.method !== "HEAD") {
       const type = (request.headers.get("content-type") ?? "").toLowerCase();
-      if (!type.startsWith("application/json"))
-        return fail(415, "unsupported-media-type", "error.mediaType", {});
+      // The attachments of a request are the one body that is not JSON: files, as a form sends them.
+      const upload = request.method === "POST" && url.pathname === UPLOAD_ROUTE;
+      if (upload ? !type.startsWith("multipart/form-data") : !type.startsWith("application/json"))
+        return fail(
+          415,
+          "unsupported-media-type",
+          upload ? "error.multipartType" : "error.mediaType",
+          {},
+        );
+      // A body that says it is too long is refused unread; one that does not say its length is
+      // read to its end with no more than the limit kept, and refused then (api.ts).
+      const limit = upload ? MAX_UPLOAD_BYTES : MAX_JSON_BYTES;
+      if (Number(request.headers.get("content-length") ?? 0) > limit)
+        return fail(413, "too-large", "error.bodySize", { limit: mebibytes(limit) });
     }
 
     switch (`${request.method} ${url.pathname}`) {
@@ -333,7 +354,13 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
     }
     const closing = /^\/api\/sessions\/([A-Za-z0-9]+)\/close$/.exec(url.pathname);
     if (closing && request.method === "POST") {
-      await request.text();
+      // Its body is read as every JSON body is: no further than 1 MiB.
+      try {
+        await textOf(request);
+      } catch (error) {
+        if (!(error instanceof HarnessError)) throw error;
+        return json(HTTP_STATUS[error.code], { ok: false, error: error.info } satisfies Failure);
+      }
       sessions.get(closing[1] ?? "")?.close();
       return json(200, { ok: true });
     }
@@ -359,7 +386,7 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
       hostname: "127.0.0.1",
       port,
       development: options.development ? { hmr: true } : false,
-      maxRequestBodySize: MAX_BODY_BYTES,
+      maxRequestBodySize: MAX_REQUEST_BYTES,
       routes: devPage ? { "/": devPage } : undefined,
       fetch(request, srv) {
         idle.touch();

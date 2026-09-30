@@ -13,7 +13,7 @@ sources:
     reviewed_source_sha256: 9d46703b960c9f27e8269c5dabd96d55d01519b67564f5f68454998aedf140e2
   README.md:
     source: ../../../README.md
-    reviewed_source_sha256: 6e97fc6266cde2a838dc4ebedef2b02537e8d1571d23d80a0811f0954e93c2ce
+    reviewed_source_sha256: 7885e22e60c3bc2ba0e7d678980ddb132861a4cd23109f76076f25bc077aae9a
   versioning.md:
     source: ../../versioning.md
     reviewed_source_sha256: 2fd119249218765a7e0ac7e1f66998c068348f45c2041ce8ec4dc827bdd5c538
@@ -28,4 +28,4 @@ sources:
     reviewed_source_sha256: 53741acf39357e06d29152bc4d262f05e3c8c0b6dca65a345f26eb6b37d4aad0
   releases/0.9.0.md:
     source: ../../releases/0.9.0.md
-    reviewed_source_sha256: e5a65fbe36568f16d816718247b9ae2e012bf4e9b25b984f1979989252362259
+    reviewed_source_sha256: 1fcac86abfe9ca226eec00579ef7c57f5b3574ffee2d37a750c2629646fe3d48

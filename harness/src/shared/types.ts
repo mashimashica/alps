@@ -162,11 +162,20 @@ export interface Instance {
   /** Run ids, oldest first. */
   runs: string[];
   evaluation: Evaluation | null;
+  /**
+   * The wake run whose agent made the instance through the harness's MCP server (X-Harness-Wake);
+   * `null` for an instance made otherwise (a person, another MCP client). Instances recorded
+   * before the harness kept it have none.
+   */
+  createdBy?: { run: string } | null;
 }
 
 /* ---------- runs ---------- */
 
 export type RunKind = "process" | "wake";
+
+/** How far the agent of a wake goes: it starts the runs it plans (`run`), or only instantiates (`plan`). */
+export type WakeRuns = "run" | "plan";
 
 export type RunStatus = "running" | "succeeded" | "failed" | "canceled" | "interrupted";
 
@@ -280,6 +289,19 @@ export interface Run {
   skill: { path: string; sha256: string | null } | null;
   /** Wake runs only: the runs that its agent started through the harness's MCP server, oldest first. */
   started?: string[];
+  /**
+   * Wake runs only: what the wake was asked. `request` is the requester's text, the one that the
+   * prompt quotes: as given, without the white space around it and with lines ending in \n
+   * (`null` for a wake without one, as a schedule's); `attachments` are the workspace paths it
+   * attaches; `processes` are the ids of the Processes that the plan must include (none: the agent
+   * chooses); `runs` says whether the agent was to start the runs it plans, and with `plan` the
+   * harness refuses the runs and wakes that its agent would start. The reasons of the plan are in
+   * `report`. Wake runs recorded before requests were kept have none of them.
+   */
+  request?: string | null;
+  attachments?: string[];
+  processes?: string[];
+  runs?: WakeRuns;
 }
 
 /** A run as the API lists it: the record without its prompt. */
@@ -463,10 +485,15 @@ export type HttpErrorCode =
   | "cross-site"
   | "unauthorized"
   | "unsupported-media-type"
-  /** The body or query does not fit the endpoint, or names what the Process does not have. */
+  /**
+   * The body or query does not fit the endpoint, or names what the Process does not have, or the
+   * agent of a wake that plans only asks for a run or a wake.
+   */
   | "invalid-request"
-  /** An instance's input or output path lies outside the workspace. */
+  /** An instance's input or output path, or an attachment, lies outside the workspace. */
   | "outside-workspace"
+  /** A body over the server's limits: a JSON body over 1 MiB, an upload over 21 MiB, or an attachment over 20 MB. */
+  | "too-large"
   | "internal";
 
 export interface ErrorInfo {
@@ -572,6 +599,16 @@ export interface WakeResponse {
   skipped: boolean;
   /** When skipped: the wake run that still runs. */
   running?: string;
+}
+
+/**
+ * `POST /api/attachments` (the WebUI, multipart/form-data): where the files attached to a request
+ * were saved, relative to the workspace, in the order they were sent. A wake request lists them in
+ * its `attachments`.
+ */
+export interface AttachmentsResponse {
+  ok: true;
+  paths: string[];
 }
 
 /** `GET /api/assessment` (`get_assessment`, JSON form). */

@@ -5,8 +5,10 @@
  * there, and the run that made each), a run (its record and its log, followed while it runs), an
  * instance (in tabs: its inputs and criteria, its runs with starting and canceling, its
  * evaluation, the log of its latest run, and its Process's SKILL.md), or what a number of the
- * dashboard counts. With nothing selected, the model and the record of wakes. A wake run lists
- * the runs that its agent started.
+ * dashboard counts. With nothing selected, the model and the record of wakes. A wake run shows
+ * what it was asked (the request as given, the attachments, the Processes, how far to go), its
+ * report (what the agent planned and why), the runs that its agent started, and the instances it
+ * made; an instance that a wake made links to it.
  */
 
 import { Fragment } from "preact";
@@ -165,9 +167,9 @@ function Overview({ modelError }: { modelError: unknown }) {
       </Section>
       <Wakes />
       <p class="faint small panel-hint">{t("overview.hint")}</p>
-      <Button onClick={() => openForm({ kind: "new" })}>
-        <Icon name="plus" />
-        {t("process.newInstance")}
+      <Button onClick={() => openForm({ kind: "request" })}>
+        <Icon name="send" />
+        {t("request.open")}
       </Button>
     </div>
   );
@@ -332,9 +334,9 @@ function ProcessPanel({ id, initial }: { id: string; initial: ProcessTab }) {
                 ))}
               </ul>
             )}
-            <Button onClick={() => openForm({ kind: "new", process: id })}>
-              <Icon name="plus" />
-              {t("process.newInstance")}
+            <Button onClick={() => openForm({ kind: "request", process: id })}>
+              <Icon name="send" />
+              {t("process.request")}
             </Button>
           </>
         )}
@@ -556,6 +558,20 @@ function RunPanel({ id }: { id: string }) {
   const { run } = detail;
   const instance = run.instance ? instances.get(run.instance) : undefined;
   const agent = model?.agents.find((a) => a.id === run.agent)?.label ?? run.agent;
+  /** A wake that was given a request: what it was asked is shown, and its report is the plan's. */
+  const requested =
+    run.kind === "wake" &&
+    (Boolean(run.request) ||
+      (run.attachments ?? []).length > 0 ||
+      (run.processes ?? []).length > 0 ||
+      run.runs === "plan");
+  /** The instances that the wake's agent made, oldest first. */
+  const made =
+    run.kind === "wake"
+      ? [...instances.values()]
+          .filter((i) => i.createdBy?.run === run.id)
+          .sort((a, b) => a.id.localeCompare(b.id, "en", { numeric: true }))
+      : [];
   const cancel = (): void => {
     setCanceling(true);
     setCancelError(null);
@@ -649,13 +665,72 @@ function RunPanel({ id }: { id: string }) {
           </Alert>
         </Section>
       )}
-      <Section title={t("run.report")}>
+      {requested && (
+        <Section title={t("run.request")}>
+          {run.request ? (
+            <p class="pre request-text" data-testid="wake-request">
+              {run.request}
+            </p>
+          ) : (
+            <p class="faint small">{t("run.noRequestText")}</p>
+          )}
+          <div class="request-part">
+            <p class="faint small">{t("request.mode")}</p>
+            <p data-testid="wake-runs" data-runs={run.runs ?? "run"}>
+              <Badge tone={run.runs === "plan" ? "outline" : "brand"}>
+                {run.runs === "plan" ? t("request.plan") : t("request.run")}
+              </Badge>
+            </p>
+          </div>
+          {(run.processes ?? []).length > 0 && (
+            <div class="request-part">
+              <p class="faint small">{t("run.processes")}</p>
+              <div class="chips">
+                {(run.processes ?? []).map((process) => (
+                  <ProcessLink key={process} id={process} />
+                ))}
+              </div>
+            </div>
+          )}
+          {(run.attachments ?? []).length > 0 && (
+            <div class="request-part">
+              <p class="faint small">{t("run.attachments")}</p>
+              <ul class="list" data-testid="wake-attachments">
+                {(run.attachments ?? []).map((path) => (
+                  <li key={path} class="list-row mono small path-cell" title={path}>
+                    {path}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </Section>
+      )}
+      <Section title={requested ? t("run.planReport") : t("run.report")}>
         {run.report ? (
-          <Markdown source={run.report} />
+          <div data-testid="run-report">
+            <Markdown source={run.report} />
+          </div>
         ) : (
           <p class="faint small">{t("run.noReport")}</p>
         )}
       </Section>
+      {(requested || made.length > 0) && (
+        <Section title={t("run.madeInstances")}>
+          {made.length === 0 ? (
+            <p class="faint small">{t("run.noMadeInstances")}</p>
+          ) : (
+            <ul class="list" data-testid="made-instances">
+              {made.map((target) => (
+                <li key={target.id} class="list-row" data-instance={target.id}>
+                  <InstanceLink instance={target} />
+                  <span class="mono faint small">{target.id}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Section>
+      )}
       {run.kind === "wake" && (
         <Section title={t("run.startedRuns")}>
           {(run.started ?? []).length === 0 ? (
@@ -874,6 +949,14 @@ function InstancePanel({ id, initial }: { id: string; initial: InstanceTab }) {
                   </span>
                 </dd>
               </div>
+              {instance.createdBy && (
+                <div>
+                  <dt>{t("instance.createdBy")}</dt>
+                  <dd data-testid="instance-origin">
+                    <RunLink id={instance.createdBy.run} />
+                  </dd>
+                </div>
+              )}
             </dl>
             <p class="faint small">{t("instance.runVsOutcome")}</p>
             <Section title={t("instance.inputs")}>

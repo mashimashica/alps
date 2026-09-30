@@ -3,6 +3,7 @@ export {
   Harness,
   SESSION_CLOSED_ERROR,
   seqOf,
+  type AttachedFile,
   type Caller,
   type HarnessDeps,
   type HarnessHooks,

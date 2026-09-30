@@ -46,6 +46,11 @@ guidance: [docs/operations.md]
 #   - cron: "0 9 * * 1-5"
 #     agent: claude-code
 
+# WebUI が依頼の添付ファイル（どの画面にもある「依頼する」）を保存する場所。日ごとのディレクトリに置く。
+# inbox/2026-10-01/notes.md、同じ名前なら次は notes-2.md。ワークスペースの中で、かつ .alps-harness/ の外でなければならない。
+# 保存したファイルが上の型の paths に合えば、それもアーティファクトになる。版管理に含めるかはワークスペースが決める。
+attachments: inbox/
+
 # ハーネスのサーバー（デーモン）。接続も実行中の実行もない状態が idleMinutes 続くと終了する。
 # server:
 #   port: 4830
