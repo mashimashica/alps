@@ -1,0 +1,159 @@
+{
+  "description": "Records for test/unit/assess.test.ts. Times are ISO 8601 here and epoch milliseconds in the records; the clock is Wednesday 2026-09-30 21:00 at UTC+9.",
+  "now": "2026-09-30T12:00:00Z",
+  "utcOffsetMinutes": 540,
+  "processes": [
+    { "id": "Solution Design", "outcomes": ["Traceable components.", "Decisions with rationale."] },
+    {
+      "id": "Change Implementation",
+      "outcomes": ["Realizes the design.", "Identifiable candidate."]
+    },
+    { "id": "Production Release", "outcomes": ["Approved revision deployed.", "Rollback kept."] }
+  ],
+  "stale": ["i1"],
+  "instances": [
+    {
+      "id": "i1",
+      "process": "Solution Design",
+      "runs": ["r1", "r2"],
+      "evaluation": {
+        "runId": "r2",
+        "judgments": [
+          {
+            "outcome": 0,
+            "judgment": "achieved",
+            "evidence": "The components trace to the brief."
+          },
+          { "outcome": 1, "judgment": "not-achieved", "evidence": "No rationale is given." }
+        ],
+        "by": { "kind": "user" },
+        "at": "2026-09-29T03:00:00Z"
+      }
+    },
+    {
+      "id": "i2",
+      "process": "Production Release",
+      "runs": ["r3", "r6"],
+      "evaluation": {
+        "runId": "r3",
+        "judgments": [
+          {
+            "outcome": 0,
+            "judgment": "achieved",
+            "evidence": "deployment.json names the revision."
+          },
+          { "outcome": 1, "judgment": "unverified", "evidence": "The rollback was not tried." }
+        ],
+        "by": { "kind": "agent", "id": "claude-code", "self": true },
+        "at": "2026-09-30T05:00:00Z"
+      }
+    },
+    { "id": "i3", "process": "Change Implementation", "runs": ["r4"], "evaluation": null },
+    { "id": "i4", "process": "Solution Design", "runs": ["r7"], "evaluation": null },
+    { "id": "i5", "process": "Change Implementation", "runs": [], "evaluation": null },
+    {
+      "id": "i6",
+      "process": "Production Release",
+      "runs": ["r8"],
+      "evaluation": {
+        "runId": "r8",
+        "judgments": [
+          { "outcome": 0, "judgment": "unverified", "evidence": "Not deployed in the pilot." },
+          { "outcome": 1, "judgment": "unverified", "evidence": "Not tried." }
+        ],
+        "by": { "kind": "agent", "id": "codex" },
+        "at": "2026-08-01T01:00:00Z"
+      }
+    }
+  ],
+  "runs": [
+    {
+      "id": "r1",
+      "kind": "process",
+      "instance": "i1",
+      "process": "Solution Design",
+      "agent": "claude-code",
+      "status": "succeeded",
+      "startedAt": "2026-09-29T01:00:00Z",
+      "endedAt": "2026-09-29T01:01:00Z",
+      "usage": { "costUsd": 0.3, "turns": 4, "inputTokens": 1000, "outputTokens": 200 }
+    },
+    {
+      "id": "r2",
+      "kind": "process",
+      "instance": "i1",
+      "process": "Solution Design",
+      "agent": "claude-code",
+      "status": "failed",
+      "startedAt": "2026-09-29T02:00:00Z",
+      "endedAt": "2026-09-29T02:00:30Z",
+      "usage": { "costUsd": 0.1, "turns": 1, "inputTokens": null, "outputTokens": null }
+    },
+    {
+      "id": "r3",
+      "kind": "process",
+      "instance": "i2",
+      "process": "Production Release",
+      "agent": "codex",
+      "status": "succeeded",
+      "startedAt": "2026-09-30T03:00:00Z",
+      "endedAt": "2026-09-30T03:02:00Z",
+      "usage": null
+    },
+    {
+      "id": "r4",
+      "kind": "process",
+      "instance": "i3",
+      "process": "Change Implementation",
+      "agent": "demo",
+      "status": "canceled",
+      "startedAt": "2026-09-20T00:00:00Z",
+      "endedAt": "2026-09-20T00:00:10Z",
+      "usage": null
+    },
+    {
+      "id": "r5",
+      "kind": "wake",
+      "instance": null,
+      "process": null,
+      "agent": "claude-code",
+      "status": "succeeded",
+      "startedAt": "2026-09-30T04:00:00Z",
+      "endedAt": "2026-09-30T04:10:00Z",
+      "usage": { "costUsd": 9, "turns": 50, "inputTokens": 90000, "outputTokens": 9000 }
+    },
+    {
+      "id": "r6",
+      "kind": "process",
+      "instance": "i2",
+      "process": "Production Release",
+      "agent": "codex",
+      "status": "running",
+      "startedAt": "2026-09-30T11:00:00Z",
+      "endedAt": null,
+      "usage": null
+    },
+    {
+      "id": "r7",
+      "kind": "process",
+      "instance": "i4",
+      "process": "Solution Design",
+      "agent": "claude-code",
+      "status": "succeeded",
+      "startedAt": "2026-09-30T06:00:00Z",
+      "endedAt": "2026-09-30T06:01:30Z",
+      "usage": { "costUsd": 0.2, "turns": 3, "inputTokens": 500, "outputTokens": 100 }
+    },
+    {
+      "id": "r8",
+      "kind": "process",
+      "instance": "i6",
+      "process": "Production Release",
+      "agent": "codex",
+      "status": "succeeded",
+      "startedAt": "2026-08-01T00:00:00Z",
+      "endedAt": "2026-08-01T00:05:00Z",
+      "usage": null
+    }
+  ]
+}

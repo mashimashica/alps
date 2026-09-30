@@ -12,7 +12,6 @@ import fs from "node:fs";
 import net from "node:net";
 import os from "node:os";
 import path from "node:path";
-import { chromium } from "playwright";
 import type {
   Failure,
   InstanceResponse,
@@ -20,6 +19,7 @@ import type {
   OpenResponse,
 } from "../../src/shared/types.ts";
 import { apiClient } from "../helpers/api.ts";
+import { closeBrowser, killStrayBrowsers, launchBrowser } from "../helpers/browser.ts";
 import { killStrayDaemons, startDaemon, type Daemon } from "../helpers/daemon.ts";
 import { callTool, mcpClient, toolFailure } from "../helpers/mcp.ts";
 import { records } from "../helpers/paths.ts";
@@ -45,9 +45,22 @@ const ROUTES = [
   { method: "POST", path: "/api/runs/r1/cancel" },
   { method: "POST", path: "/api/runs/r1/finish" },
   { method: "GET", path: "/api/assessment" },
+  { method: "GET", path: "/api/stats" },
+  { method: "GET", path: "/api/skill" },
   { method: "POST", path: "/api/open" },
   { method: "GET", path: "/api/unknown" },
 ] as const;
+
+/**
+ * The Content-Security-Policy of every response: no page may frame it, and a page may run only
+ * the scripts that the server serves (no inline script, nothing from elsewhere).
+ */
+function expectPolicy(policy: string | null, where: string): void {
+  const directives = (policy ?? "").split(";").map((d) => d.trim());
+  expect(directives, where).toContain("frame-ancestors 'none'");
+  expect(directives, where).toContain("script-src 'self'");
+  expect(directives, where).toContain("default-src 'self'");
+}
 
 let ws: TmpWorkspace;
 let daemon: Daemon;
@@ -65,6 +78,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  killStrayBrowsers();
   await daemon?.stop().catch(() => {});
   killStrayDaemons();
   ws?.dispose();
@@ -270,7 +284,7 @@ describe("E8 safety", () => {
       expect(own.status, target).toBe(200);
       expect(own.body, target).not.toContain(token);
       expect(own.headers.get("x-frame-options"), target).toBe("DENY");
-      expect(own.headers.get("content-security-policy"), target).toBe("frame-ancestors 'none'");
+      expectPolicy(own.headers.get("content-security-policy"), target);
       expect(own.headers.get("x-content-type-options"), target).toBe("nosniff");
 
       const other = await send({ path: target, host: `attacker.example:${port}` });
@@ -317,7 +331,7 @@ describe("E8 safety", () => {
       });
       const otherUrl = `http://localhost:${other.port}/`;
       const origin = new URL(daemon.url).origin;
-      const browser = await chromium.launch();
+      const browser = await launchBrowser();
       try {
         const page = await browser.newPage();
         const api: string[] = [];
@@ -359,7 +373,7 @@ describe("E8 safety", () => {
         expect(api).toEqual([]);
         expect(await framed.getByTestId("health").count()).toBe(0);
       } finally {
-        await browser.close();
+        await closeBrowser(browser);
         await other.stop(true);
       }
     },
@@ -375,9 +389,7 @@ describe("E8 safety", () => {
         expect(sent.code).toBe("unauthorized");
         // No answer of the API may be framed by another page.
         expect(sent.headers.get("x-frame-options"), route.path).toBe("DENY");
-        expect(sent.headers.get("content-security-policy"), route.path).toBe(
-          "frame-ancestors 'none'",
-        );
+        expectPolicy(sent.headers.get("content-security-policy"), route.path);
       }
     }
     // EventSource cannot send headers, so the event stream, and only it, reads the token from the query.

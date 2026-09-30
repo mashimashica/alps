@@ -413,7 +413,9 @@ export type ServerEvent =
   /** A run started or ended. */
   | { type: "run"; run: RunSummary }
   /** Artifacts may have changed (a run ended); list them again. */
-  | { type: "artifacts" };
+  | { type: "artifacts" }
+  /** The model, the configuration, or a SKILL.md changed on disk; read the model again. */
+  | { type: "model" };
 
 /** Error codes of the MCP tools, also used by the HTTP API. */
 export type ErrorCode =
@@ -545,6 +547,22 @@ export interface AssessmentMarkdownResponse {
   markdown: string;
 }
 
+/** `GET /api/stats` (the dashboard): the statistics, and what each of their numbers counts. */
+export interface StatsResponse {
+  ok: true;
+  stats: Stats;
+  members: StatsMembers;
+}
+
+/** `GET /api/skill?process=` (the WebUI): the SKILL.md of a Process, as text. */
+export interface SkillResponse {
+  ok: true;
+  skill: SkillLocation;
+  text: string;
+  /** Whether the file was longer than what is returned. */
+  truncated: boolean;
+}
+
 /** The screens of the WebUI that `open_ui` can open. */
 export type UiView = "network" | "dashboard" | "instances";
 
@@ -567,6 +585,8 @@ export interface StatsFilter {
   granularity: Granularity;
   process?: string;
   agent?: string;
+  /** `get_assessment`'s `since` (epoch milliseconds): the window starts there instead of with the period. */
+  since?: number;
 }
 
 /** A share with its counts; `value` is `null` when the denominator is 0. */
@@ -587,7 +607,11 @@ export interface StatsMetrics {
   achievement: Ratio;
   /** Unverified among judged Outcomes, with the instances whose run ended but have no judgment yet. */
   unverified: Ratio & { awaitingJudgment: number };
-  /** Instances whose inputs or SKILL.md changed after the judgment. */
+  /**
+   * Instances whose inputs or SKILL.md changed after the judgment: the state now, whatever the
+   * window, as the WebUI's count at the top right. A Process filter applies; an agent filter
+   * does not.
+   */
   staleEvaluations: number;
   /** Process runs in the period that succeeded. */
   runSuccess: Ratio;
@@ -644,6 +668,12 @@ export interface JudgeBreakdown {
 
 export interface Stats {
   filter: StatsFilter;
+  /**
+   * The runs that started and the judgments made in this window count (the stale evaluations are
+   * the state now). `start` is `null` for all time; the periods of days start at midnight, the
+   * period's first day included.
+   */
+  window: { start: number | null; end: number };
   metrics: StatsMetrics;
   trends: TrendBucket[];
   breakdowns: {
@@ -654,12 +684,49 @@ export interface Stats {
   };
 }
 
+/** A process run that the statistics count, for listing what a number is made of. */
+export interface StatsRun {
+  id: string;
+  instance: string | null;
+  process: string | null;
+  agent: AgentId;
+  status: RunStatus;
+  startedAt: number;
+  endedAt: number | null;
+  costUsd: number | null;
+}
+
+/** An instance that the statistics count, and which of the numbers it is in. */
+export interface StatsInstance {
+  id: string;
+  process: string;
+  /** Its evaluation is in the window (and its judgments count). */
+  judged: boolean;
+  /** Its latest run ended in the window and has no judgment yet. */
+  awaiting: boolean;
+  /** Its evaluation's evidence is stale now (whatever the window). */
+  stale: boolean;
+}
+
+/** What the numbers of the statistics count; the WebUI lists them when a number is clicked. */
+export interface StatsMembers {
+  instances: StatsInstance[];
+  runs: StatsRun[];
+}
+
 /** A finding: a description problem, a configuration problem, or something unverified. */
 export type FindingKind = "description" | "configuration" | "unverified";
 
 export interface Finding {
   kind: FindingKind;
-  subject: { process?: string; outcome?: number; artifact?: string; instance?: string };
+  subject: {
+    process?: string;
+    outcome?: number;
+    artifact?: string;
+    instance?: string;
+    /** The agent that cannot be started. */
+    agent?: string;
+  };
   /** In English. */
   message: string;
   /** The message's key and arguments in shared/strings.ts, for a client that shows it in another language. */
@@ -670,8 +737,8 @@ export interface Finding {
 
 /** `GET /api/assessment` and the `get_assessment` tool (JSON form). */
 export interface Assessment {
-  /** The dashboard's statistics; `null` until they are computed (assess.ts). */
-  stats: Stats | null;
+  /** The dashboard's statistics: all time by week, or since `since`. */
+  stats: Stats;
   findings: Finding[];
   instances: InstanceFacts[];
 }

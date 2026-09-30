@@ -1,13 +1,14 @@
 /*
  * E5 (dashboard): after evaluate, changing an input or the SKILL.md makes the instance's evidence
- * stale, and get_assessment and /api/stats count the same (stage 4). What "changing" means is
- * settled already: the content differs (SHA-256) from what the judged run used.
+ * stale, and get_assessment and /api/stats count the same. "Changing" means that the content
+ * differs (SHA-256) from what the judged run used.
  */
 
 import { afterAll, describe, expect, test } from "bun:test";
 import fs from "node:fs";
 import path from "node:path";
 import type {
+  AssessmentMarkdownResponse,
   AssessmentResponse,
   InstanceResponse,
   InstancesResponse,
@@ -15,7 +16,7 @@ import type {
   RunDetailResponse,
   RunStartResponse,
   ServerInfo,
-  Stats,
+  StatsResponse,
 } from "../../src/shared/types.ts";
 import { apiClient } from "../helpers/api.ts";
 import { copyOf } from "../helpers/copy.ts";
@@ -123,7 +124,7 @@ describe("E5 dashboard", () => {
     { timeout: 90_000 },
   );
 
-  test.todo(
+  test(
     "E5 after evaluate, changing an input or the SKILL.md makes the evidence stale, and get_assessment and /api/stats count the same",
     async () => {
       ws = tmpWorkspace({ server: { idleMinutes: 5 } });
@@ -156,6 +157,7 @@ describe("E5 dashboard", () => {
 
       // After the judgments: the design's input and the release's SKILL.md change.
       await Bun.sleep(20);
+      const afterJudgments = Date.now();
       fs.appendFileSync(path.join(ws.root, brief), "\n- Search results show the stock level.\n");
       fs.appendFileSync(path.join(ws.root, skill), "\n");
       const facts = await stale();
@@ -173,11 +175,9 @@ describe("E5 dashboard", () => {
         format: "json",
       });
       const info = JSON.parse(fs.readFileSync(serverJson(ws.root), "utf8")) as ServerInfo;
-      const dashboard = await apiClient({ url: `http://127.0.0.1:${info.port}/`, info }).ok<{
-        ok: true;
-        stats: Stats;
-      }>("GET", "/api/stats?period=all");
-      expect(assessment.stats?.metrics.staleEvaluations).toBe(2);
+      const api = apiClient({ url: `http://127.0.0.1:${info.port}/`, info });
+      const dashboard = await api.ok<StatsResponse>("GET", "/api/stats?period=all");
+      expect(assessment.stats.metrics.staleEvaluations).toBe(2);
       expect(dashboard.stats.metrics.staleEvaluations).toBe(2);
       expect(
         assessment.instances
@@ -187,7 +187,55 @@ describe("E5 dashboard", () => {
       ).toEqual([design.id, release.id].sort());
       // Two Outcomes judged per instance: two achieved, two unverified.
       expect(dashboard.stats.metrics.achievement).toMatchObject({ numerator: 2, denominator: 4 });
-      expect(assessment.stats?.metrics.achievement).toEqual(dashboard.stats.metrics.achievement);
+      expect(assessment.stats.metrics.achievement).toEqual(dashboard.stats.metrics.achievement);
+      expect(assessment.stats.metrics.unverified).toEqual(dashboard.stats.metrics.unverified);
+      expect(assessment.stats.metrics.runSuccess).toEqual(dashboard.stats.metrics.runSuccess);
+      expect(dashboard.stats.metrics.runSuccess).toMatchObject({ numerator: 2, denominator: 2 });
+      // What the numbers count: both instances are judged, and their evaluations are stale.
+      expect(
+        dashboard.members.instances
+          .filter((i) => i.stale)
+          .map((i) => i.id)
+          .sort(),
+      ).toEqual([design.id, release.id].sort());
+      // The stale evaluations are the state now, whatever the window: an assessment since the
+      // judgments, which counts none of them, and the dashboard's 7 days count the same two.
+      const recent = await callTool<AssessmentResponse>(mcp, "get_assessment", {
+        format: "json",
+        since: afterJudgments,
+      });
+      const week = await api.ok<StatsResponse>("GET", "/api/stats?period=7d");
+      expect(recent.assessment.stats.metrics.achievement.denominator).toBe(0);
+      expect(recent.assessment.stats.metrics.staleEvaluations).toBe(2);
+      expect(week.stats.metrics.staleEvaluations).toBe(2);
+      expect(
+        week.members.instances
+          .filter((i) => i.stale)
+          .map((i) => i.id)
+          .sort(),
+      ).toEqual([design.id, release.id].sort());
+      // The findings say which SKILL.md changed after its Process last ran.
+      expect(assessment.findings).toContainEqual(
+        expect.objectContaining({
+          kind: "unverified",
+          key: "finding.skillChanged",
+          subject: { process: "Production Release" },
+        }),
+      );
+
+      // The Markdown form reports the same statistics.
+      const { markdown } = await callTool<AssessmentMarkdownResponse>(mcp, "get_assessment", {
+        format: "markdown",
+      });
+      expect(markdown).toContain("## Statistics");
+      expect(markdown).toContain("| Stale evaluations | 2 |");
+      expect(markdown).toContain("| Achievement | 50% (2 of 4 judged Outcomes) |");
+      const since = await callTool<AssessmentMarkdownResponse>(mcp, "get_assessment", {
+        format: "markdown",
+        since: afterJudgments,
+      });
+      expect(since.markdown).toContain("Stale evaluations are counted as they are now.");
+      expect(since.markdown).toContain("| Stale evaluations | 2 |");
     },
     { timeout: 90_000 },
   );

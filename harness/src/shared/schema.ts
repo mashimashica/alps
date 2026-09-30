@@ -462,12 +462,33 @@ export const runsQuery = z.object({
 });
 
 /**
- * `GET /api/assessment` (`get_assessment`). `since` limits the statistics to runs and judgments
- * since then; until the statistics are computed (stats is null) it has no effect.
+ * `GET /api/assessment` (`get_assessment`). The statistics cover all time by week, or the runs
+ * that started and the judgments made since `since`.
  */
 export const assessmentQuery = z.object({
   format: z.enum(["json", "markdown"]).default("json"),
   since: instant.optional(),
+});
+
+/** Minutes east of UTC, where days and weeks start (the WebUI sends the browser's). */
+const utcOffset = z.coerce
+  .number()
+  .int()
+  .min(-14 * 60)
+  .max(14 * 60);
+
+/** `GET /api/stats` (the dashboard). */
+export const statsQuery = z.object({
+  period: z.enum(["7d", "30d", "90d", "all"]).default("30d"),
+  granularity: z.enum(["day", "week"]).default("week"),
+  process: z.string().min(1).optional(),
+  agent: z.string().min(1).optional(),
+  tz: utcOffset.optional(),
+});
+
+/** `GET /api/skill` (the WebUI): a Process, by id or name. */
+export const skillQuery = z.object({
+  process: z.string().min(1),
 });
 
 /** One line per issue: `<file>: <path>: <message>`. */

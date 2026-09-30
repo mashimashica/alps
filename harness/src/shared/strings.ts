@@ -84,6 +84,7 @@ const en = {
   "error.judgment": (a: { detail: string }) => `The judgments do not fit: ${a.detail}`,
   "error.client": (a: { detail: string }) =>
     `The X-Harness-Client header is not {name, version} as JSON: ${a.detail}`,
+  "error.noSkill": (a: { process: string }) => `${a.process} has no readable SKILL.md.`,
 
   /* ---------- rejections of the HTTP layer ---------- */
   "error.host": () => "This host name is not accepted.",
@@ -109,6 +110,19 @@ const en = {
     `Run ${a.run} ended (${a.status}) and its results have no judgment yet.`,
   "finding.stale": (a: { run: string; paths: string }) =>
     `The judgment of run ${a.run} no longer rests on the workspace: ${a.paths} changed since the run used them.`,
+  "finding.noSkill": (a: { process: string }) =>
+    `No SKILL.md is found for ${a.process}: its runs get only the Process's description from the model.`,
+  "finding.skillChanged": (a: { process: string; run: string; path: string }) =>
+    `${a.path} changed after run ${a.run} of ${a.process} used it: no run has used the Skill as it is now.`,
+  "finding.noLocation": (a: { type: string }) =>
+    `The Artifact type ${a.type} has no location (artifacts in alps-harness.yaml): its Artifacts are not listed, and runs are given no place for them.`,
+  "finding.notProduced": (a: { type: string; consumers: string }) =>
+    `No Process produces ${a.type}; it comes from outside the model (read by ${a.consumers}).`,
+  "finding.notRead": (a: { type: string; producers: string }) =>
+    `No Process reads ${a.type} (produced by ${a.producers}).`,
+  "finding.unused": (a: { type: string }) => `No Process produces or reads ${a.type}.`,
+  "finding.agentUnavailable": (a: { agent: string; reason: string }) =>
+    `${a.agent} cannot be started: ${a.reason}.`,
 
   /* ---------- what the MCP tools report on success ---------- */
   "done.model": (a: { name: string; processes: number; types: number }) =>
@@ -137,8 +151,14 @@ const en = {
     `Run ${a.run} ended (${a.status}); ${plural(a.outputs, "output change")} recorded as its outputs.`,
   "done.evaluated": (a: { instance: string; run: string; self: boolean }) =>
     `Recorded the evaluation of run ${a.run} for instance ${a.instance}.${a.self ? " This MCP session also performed that run, so the evaluation is marked self: true." : ""}`,
-  "done.assessment": (a: { findings: number; instances: number }) =>
-    `${plural(a.findings, "finding")} about ${plural(a.instances, "instance")}.`,
+  "done.assessment": (a: {
+    findings: number;
+    instances: number;
+    achieved: number;
+    judged: number;
+    stale: number;
+  }) =>
+    `${plural(a.findings, "finding")} about ${plural(a.instances, "instance")}. ${a.achieved} of ${plural(a.judged, "judged Outcome")} achieved; ${plural(a.stale, "evaluation")} on stale evidence.`,
   "done.ui": (a: { url: string; open: boolean; opened: boolean }) =>
     `The WebUI is at ${a.url}.${a.opened ? " It was opened in the browser." : a.open ? " No browser could be started; open the URL yourself." : ""} ${TOKEN_NOTE_EN}`,
 } satisfies Record<string, (args: never) => string>;
@@ -194,6 +214,7 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
   "error.judgment": (a) => `判断の形が合わない: ${a.detail}`,
   "error.client": (a) =>
     `X-Harness-Client ヘッダーが {name, version} の JSON ではない: ${a.detail}`,
+  "error.noSkill": (a) => `${a.process} には読める SKILL.md がない。`,
 
   "error.host": () => "このホスト名は受け付けない。",
   "error.crossSite": () => "API はハーネス自身のページからの要求だけを受け付ける。",
@@ -216,6 +237,17 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
     `実行 ${a.run} は終わった（${a.status}）が、その結果はまだ判断されていない。`,
   "finding.stale": (a) =>
     `実行 ${a.run} についての判断は、今のワークスペースに基づかなくなった。実行が使った後に変わったもの: ${a.paths}。`,
+  "finding.noSkill": (a) =>
+    `${a.process} の SKILL.md が見つからない。実行にはモデルにあるプロセスの記述だけが渡る。`,
+  "finding.skillChanged": (a) =>
+    `${a.process} の実行 ${a.run} が使った後に ${a.path} が変わった。今のスキルを使った実行はまだない。`,
+  "finding.noLocation": (a) =>
+    `アーティファクトの型 ${a.type} に置き場所がない（alps-harness.yaml の artifacts）。実体を一覧できず、実行にも置き場所を渡せない。`,
+  "finding.notProduced": (a) =>
+    `${a.type} を作るプロセスはなく、モデルの外から与えられる（読むプロセス: ${a.consumers}）。`,
+  "finding.notRead": (a) => `${a.type} を読むプロセスはない（作るプロセス: ${a.producers}）。`,
+  "finding.unused": (a) => `${a.type} を作るプロセスも読むプロセスもない。`,
+  "finding.agentUnavailable": (a) => `${a.agent} を起動できない（${a.reason}）。`,
 
   "done.model": (a) =>
     `モデル「${a.name}」には ${a.processes} のプロセスと ${a.types} のアーティファクトの型がある。SKILL.md とアーティファクトは自分のファイルツールで読むこと。`,
@@ -243,7 +275,8 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
     `実行 ${a.run} を終えた（${a.status}）。出力の変化 ${a.outputs} 件をこの実行の出力として記録した。`,
   "done.evaluated": (a) =>
     `インスタンス ${a.instance} について、実行 ${a.run} の評価を記録した。${a.self ? "その実行もこの MCP セッションが行ったので、評価には self: true が付く。" : ""}`,
-  "done.assessment": (a) => `所見は ${a.findings} 件、インスタンスは ${a.instances} 件。`,
+  "done.assessment": (a) =>
+    `所見は ${a.findings} 件、インスタンスは ${a.instances} 件。判断された成果 ${a.judged} 件のうち達成は ${a.achieved} 件、根拠が古い評価は ${a.stale} 件。`,
   "done.ui": (a) =>
     `WebUI は ${a.url} にある。${a.opened ? "ブラウザで開いた。" : a.open ? "ブラウザを起動できなかったので、URL を自分で開くこと。" : ""}${TOKEN_NOTE_JA}`,
 };

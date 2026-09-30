@@ -34,6 +34,8 @@ import { bundleUi, type UiBundle } from "./ui.ts";
 const PORT_ATTEMPTS = 10;
 const PING_MS = 20_000;
 const MAX_BODY_BYTES = 1024 * 1024;
+/** How often, while a WebUI is connected, the workspace is checked for edits made outside the harness. */
+const POLL_MS = 3000;
 
 export interface ServeOptions {
   root: string;
@@ -64,12 +66,28 @@ export type StartResult =
   | { kind: "started"; server: HarnessServer }
   | { kind: "running"; info: ServerInfo };
 
+/**
+ * The page may run only the bundle it is served with (no inline or other scripts, so Markdown
+ * that gets through as HTML cannot run), load nothing from elsewhere, and never be framed.
+ */
+export const CONTENT_SECURITY_POLICY = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self'",
+  "img-src 'self' data:",
+  "connect-src 'self'",
+  "object-src 'none'",
+  "base-uri 'none'",
+  "form-action 'none'",
+  "frame-ancestors 'none'",
+].join("; ");
+
 /** Sent with every response: never cached, never framed, never sniffed, no referrer, no cross-origin reads. */
 const HEADERS = {
   "Cache-Control": "no-store",
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
-  "Content-Security-Policy": "frame-ancestors 'none'",
+  "Content-Security-Policy": CONTENT_SECURITY_POLICY,
   "Referrer-Policy": "no-referrer",
   "Cross-Origin-Resource-Policy": "same-origin",
 };
@@ -237,13 +255,33 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
     });
   }
 
+  // While a WebUI is connected, edits made outside the harness (the model, a SKILL.md, an input
+  // of a judged run) reach it as events.
+  let poller: ReturnType<typeof setInterval> | null = null;
+  const poll = (): void => {
+    try {
+      for (const event of harness.poll()) for (const stream of streams) stream.send(event);
+    } catch (error) {
+      log(`cannot check the workspace for changes: ${(error as Error).message}`);
+    }
+  };
   const openEvents = (request: Request, srv: Server<undefined>): Response =>
     openStream<ServerEvent>(
       request,
       srv,
       { type: "hello", startedAt },
-      (stream) => streams.add(stream),
-      (stream) => streams.delete(stream),
+      (stream) => {
+        streams.add(stream);
+        if (poller) return;
+        poll();
+        poller = setInterval(poll, POLL_MS);
+      },
+      (stream) => {
+        streams.delete(stream);
+        if (streams.size > 0 || !poller) return;
+        clearInterval(poller);
+        poller = null;
+      },
     );
 
   const openSession = (request: Request, srv: Server<undefined>): Response => {
@@ -343,6 +381,8 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
   async function stop(reason: string): Promise<void> {
     stopping ??= (async () => {
       idle.stop();
+      if (poller) clearInterval(poller);
+      poller = null;
       // The records are complete before server.json goes, so a server started next reads them
       // whole. Running agents are stopped with their process groups first.
       try {

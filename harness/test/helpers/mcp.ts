@@ -18,9 +18,11 @@ export const CLIENT_NAME = "alps-harness-e2e";
 /**
  * How long a test waits for a tool's result by default. It is longer than the longest get_run
  * wait the tests give (60 s), so that a run that does not end shows as status running in the
- * harness's answer instead of as the client giving up (the SDK's own default is 60 s).
+ * harness's answer instead of as the client giving up (the SDK's own default is 60 s), and shorter
+ * than the tests' own timeout (90 s), so that a call that does not come back fails with the
+ * tool's name instead of the test timing out without saying where it stopped.
  */
-export const TOOL_TIMEOUT_MS = 120_000;
+export const TOOL_TIMEOUT_MS = 80_000;
 
 /**
  * Spawns `bun <cli> mcp` through the SDK's stdio transport and completes the handshake.
@@ -56,6 +58,23 @@ export async function mcpClient(
   return { client, transport, stderr: () => stderr, close: () => client.close() };
 }
 
+/** Calls a tool; an error in the client, such as its request timeout, names the tool. */
+async function send(
+  session: McpSession,
+  name: string,
+  args: Record<string, unknown>,
+  timeout: number,
+) {
+  try {
+    return await session.client.callTool({ name, arguments: args }, { timeout });
+  } catch (error) {
+    throw new Error(
+      `${name}: ${(error as Error).message} (the client's request timeout is ${timeout} ms)`,
+      { cause: error },
+    );
+  }
+}
+
 /**
  * Calls a tool and returns its structured result (`{ ok: true, … }`, the HTTP API's answer). A
  * failed call throws with the error it reported. `timeout` is the client's request timeout in
@@ -67,7 +86,7 @@ export async function callTool<T>(
   args: Record<string, unknown> = {},
   timeout = TOOL_TIMEOUT_MS,
 ): Promise<T> {
-  const result = await session.client.callTool({ name, arguments: args }, { timeout });
+  const result = await send(session, name, args, timeout);
   if (result.isError)
     throw new Error(
       `${name} failed: ${JSON.stringify(result.structuredContent ?? result.content)}`,
@@ -86,7 +105,7 @@ export async function toolFailure(
   args: Record<string, unknown> = {},
   timeout = TOOL_TIMEOUT_MS,
 ): Promise<{ error: Failure["error"]; texts: string[] }> {
-  const result = await session.client.callTool({ name, arguments: args }, { timeout });
+  const result = await send(session, name, args, timeout);
   if (!result.isError)
     throw new Error(`${name} did not fail: ${JSON.stringify(result.structuredContent)}`);
   const texts = (result.content as { type: string; text?: string }[]).map(

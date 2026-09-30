@@ -1,16 +1,21 @@
 /*
  * E10 (screen design): opening / in a browser shows the WebUI. The server bundles the TSX when it
  * starts, so a UI that does not bundle stops the start, and what it serves does not depend on the
- * current directory. The ring of 11 processes and 15 pills, the focus view, and SSE updates come
- * with the screens (stage 4).
+ * current directory. The page reads the token once from the URL fragment and keeps it in
+ * sessionStorage, so that it survives a reload. The network draws the ring of 11 Processes and 15
+ * pills; a pill opens the focus view and a blank click returns; the marks on the ring follow the
+ * runs through SSE.
  */
 
 import { afterAll, describe, expect, test } from "bun:test";
 import fs from "node:fs";
 import path from "node:path";
-import { chromium } from "playwright";
+import type { Browser, Page } from "playwright";
+import type { InstanceResponse, RunStartResponse } from "../../src/shared/types.ts";
+import { apiClient } from "../helpers/api.ts";
+import { closeBrowser, killStrayBrowsers, launchBrowser } from "../helpers/browser.ts";
 import { killStrayDaemons, startDaemon } from "../helpers/daemon.ts";
-import { HARNESS_ROOT, serverJson } from "../helpers/paths.ts";
+import { FAKES, HARNESS_ROOT, serverJson } from "../helpers/paths.ts";
 import { exec, processCwd } from "../helpers/process.ts";
 import { copyHarness, tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
 
@@ -22,11 +27,28 @@ const workspace = (): TmpWorkspace => {
 };
 
 afterAll(() => {
+  killStrayBrowsers();
   killStrayDaemons();
   for (const ws of workspaces) ws.dispose();
 });
 
 const serverLog = (root: string): string => path.join(root, ".alps-harness", "server.log");
+
+/** Opens the WebUI and collects what goes wrong on the page: console errors, page errors, and failed responses. */
+async function openPage(browser: Browser, url: string): Promise<{ tab: Page; problems: string[] }> {
+  const tab = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+  const problems: string[] = [];
+  tab.on("console", (message) => {
+    if (message.type() === "error") problems.push(`console: ${message.text()}`);
+  });
+  tab.on("pageerror", (error) => problems.push(`page: ${error.message}`));
+  tab.on("response", (response) => {
+    if (response.status() >= 400) problems.push(`${response.status()} ${response.url()}`);
+  });
+  const response = await tab.goto(url);
+  expect(response?.status()).toBe(200);
+  return { tab, problems };
+}
 
 /** Whether `dir` is `ancestor` or inside it. */
 const within = (dir: string, ancestor: string): boolean => {
@@ -69,7 +91,7 @@ describe("E10 WebUI", () => {
           expect(response.headers.get("content-type") ?? "", asset).toMatch(/javascript|css/);
         }
 
-        const browser = await chromium.launch();
+        const browser = await launchBrowser();
         try {
           const tab = await browser.newPage();
           const problems: string[] = [];
@@ -95,9 +117,53 @@ describe("E10 WebUI", () => {
           expect(tab.url()).toBe(daemon.url);
           expect(problems).toEqual([]);
         } finally {
-          await browser.close();
+          await closeBrowser(browser);
         }
       } finally {
+        await daemon.stop();
+      }
+    },
+    { timeout: 60_000 },
+  );
+
+  test(
+    "E10 the token is read once from the fragment and kept in sessionStorage, so that it survives a reload",
+    async () => {
+      const ws = workspace();
+      const daemon = await startDaemon(ws.root, [], { cwd: "/" });
+      const browser = await launchBrowser();
+      try {
+        const { tab, problems } = await openPage(browser, daemon.uiUrl);
+        const healthy = async (): Promise<void> => {
+          await tab
+            .locator('[data-testid="health"][data-status="ok"]')
+            .waitFor({ timeout: 10_000 });
+          expect(await tab.getByTestId("health").textContent()).toContain(`pid ${daemon.info.pid}`);
+        };
+        const kept = (): Promise<string[]> => tab.evaluate(() => Object.values(sessionStorage));
+        await healthy();
+        // Read once: the token left the address bar and is kept in the tab's sessionStorage.
+        expect(tab.url()).toBe(daemon.url);
+        expect(await kept()).toContain(daemon.info.token);
+
+        // The reloaded page has no fragment to read; the kept token still reaches the API.
+        await tab.reload();
+        expect(tab.url()).toBe(daemon.url);
+        await healthy();
+        expect(await kept()).toContain(daemon.info.token);
+        expect(problems).toEqual([]);
+
+        // A new tab of another context, opened without the fragment, has no token.
+        const fresh = await (await browser.newContext()).newPage();
+        expect((await fresh.goto(daemon.url))?.status()).toBe(200);
+        await fresh
+          .locator('[data-testid="health"][data-status="error"]')
+          .waitFor({ timeout: 10_000 });
+        expect(await fresh.evaluate(() => Object.values(sessionStorage))).not.toContain(
+          daemon.info.token,
+        );
+      } finally {
+        await closeBrowser(browser);
         await daemon.stop();
       }
     },
@@ -138,14 +204,119 @@ describe("E10 WebUI", () => {
     { timeout: 60_000 },
   );
 
-  // The screens come in stage 4, which writes these scenarios against them. Until then, running
-  // them with --todo reports them as not written instead of letting an empty body pass.
-  test.todo("E10 the ring draws 11 processes and 15 pills; a pill opens the focus view and a blank click returns", () => {
-    throw new Error(
-      "Not written yet: the ring and the focus view come with the screens (stage 4).",
-    );
-  });
-  test.todo("E10 starting a run changes the ring marks through SSE", () => {
-    throw new Error("Not written yet: the ring marks come with the screens (stage 4).");
-  });
+  test(
+    "E10 the ring draws 11 processes and 15 pills; a pill opens the focus view and a blank click returns",
+    async () => {
+      const ws = workspace();
+      const daemon = await startDaemon(ws.root, [], { cwd: "/" });
+      const browser = await launchBrowser();
+      try {
+        const { tab, problems } = await openPage(browser, daemon.uiUrl);
+        const ring = tab.getByTestId("ring");
+        await ring.waitFor({ timeout: 10_000 });
+        // The outer ring holds the model's Processes, the pills inside its Artifact types.
+        expect(await ring.locator("[data-process]").count()).toBe(11);
+        expect(await ring.locator("[data-type]").count()).toBe(15);
+        expect(await ring.locator('[data-process="Solution Design"]').textContent()).toBe(
+          "Solution Design",
+        );
+
+        // A pill opens the focus view of its type: the Processes that produce it and those that read it.
+        await ring.locator('[data-type="Change brief"]').click();
+        const focus = tab.locator('[data-testid="focus"][data-focus-kind="type"]');
+        await focus.waitFor({ timeout: 5000 });
+        expect(await focus.getAttribute("data-focus-id")).toBe("Change brief");
+        expect(await tab.getByTestId("ring").count()).toBe(0);
+        expect(await focus.locator('[data-node^="process:"]').count()).toBe(6);
+        await tab.locator('[data-testid="panel-type"][data-type="Change brief"]').waitFor();
+
+        // A Process there moves the focus to it: its five columns.
+        await focus.locator('[data-node="process:Solution Design"]').click();
+        const processFocus = tab.locator(
+          '[data-testid="focus"][data-focus-kind="process"][data-focus-id="Solution Design"]',
+        );
+        await processFocus.waitFor({ timeout: 5000 });
+        expect(await processFocus.locator(".column-title").count()).toBe(5);
+        // Requirements Clarification and Feasibility Assessment produce the Change brief it reads;
+        // Change Implementation uses the Design description it produces.
+        expect(await processFocus.locator("[data-node]").count()).toBe(6);
+        await tab
+          .locator('[data-testid="panel-process"][data-process="Solution Design"]')
+          .waitFor();
+
+        // A click on the background returns to the whole ring.
+        await tab.getByTestId("backdrop").click({ position: { x: 5, y: 5 } });
+        await tab.getByTestId("ring").waitFor({ timeout: 5000 });
+        expect(await tab.getByTestId("focus").count()).toBe(0);
+        expect(problems).toEqual([]);
+      } finally {
+        await closeBrowser(browser);
+        await daemon.stop();
+      }
+    },
+    { timeout: 60_000 },
+  );
+
+  test(
+    "E10 starting a run changes the ring marks through SSE",
+    async () => {
+      const ws = tmpWorkspace({
+        agents: {
+          "claude-code": {
+            command: path.join(FAKES, "claude.ts"),
+            env: { ALPS_FAKE_SCENARIO: "slow", ALPS_FAKE_DELAY_MS: "400" },
+          },
+        },
+      });
+      workspaces.push(ws);
+      const daemon = await startDaemon(ws.root, [], { cwd: "/" });
+      const api = apiClient(daemon);
+      const brief = "docs/changes/CHG-001/change-brief.md";
+      const { instance } = await api.ok<InstanceResponse>("POST", "/api/instances", {
+        process: "Solution Design",
+        inputs: { "Change brief": [brief] },
+        outputs: { "Design description": "docs/changes/CHG-001/design/" },
+      });
+      const browser = await launchBrowser();
+      try {
+        const { tab, problems } = await openPage(browser, daemon.uiUrl);
+        const mark = (name: string, value: boolean) =>
+          tab.locator(
+            `[data-testid="ring"] [data-process="Solution Design"][data-${name}="${value}"]`,
+          );
+        await mark("running", false).waitFor({ timeout: 10_000 });
+        await mark("stale", false).waitFor();
+
+        // The run starts elsewhere (as an MCP client starts one): the page hears of it on the event
+        // stream and puts the dashed ring around the Process, until the run ends.
+        const { run } = await api.ok<RunStartResponse>(
+          "POST",
+          `/api/instances/${instance.id}/run`,
+          {
+            agent: "claude-code",
+          },
+        );
+        await mark("running", true).waitFor({ timeout: 10_000 });
+        expect(await tab.getByTestId("running-count").getAttribute("data-count")).toBe("1");
+        await mark("running", false).waitFor({ timeout: 30_000 });
+        expect(await tab.getByTestId("running-count").getAttribute("data-count")).toBe("0");
+
+        // Once the judged input changes on disk, the amber ring appears.
+        await api.ok<InstanceResponse>("POST", `/api/instances/${instance.id}/evaluate`, {
+          judgments: [
+            { outcome: 0, judgment: "achieved", evidence: `Read the output of ${run.id}.` },
+          ],
+        });
+        expect(await mark("stale", false).count()).toBe(1);
+        fs.appendFileSync(path.join(ws.root, brief), "\n- Search results show the stock level.\n");
+        await mark("stale", true).waitFor({ timeout: 10_000 });
+        expect(await tab.getByTestId("stale-count").getAttribute("data-count")).toBe("1");
+        expect(problems).toEqual([]);
+      } finally {
+        await closeBrowser(browser);
+        await daemon.stop();
+      }
+    },
+    { timeout: 90_000 },
+  );
 });

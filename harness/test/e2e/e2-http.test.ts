@@ -214,9 +214,14 @@ describe("E2 HTTP API", () => {
         stream.events.some((e) => e.type === "instance" && e.instance.runs.includes(run.id)),
       ).toBe(true);
 
-      // The assessment reports the instance's facts, and that its run's results await a judgment.
+      // The assessment reports the statistics, the instance's facts, and that its run's results
+      // await a judgment: a run that ended is no achievement.
       const { assessment } = await api.ok<AssessmentResponse>("GET", "/api/assessment");
-      expect(assessment.stats).toBeNull();
+      expect(assessment.stats.metrics).toMatchObject({
+        achievement: { numerator: 0, denominator: 0, value: null },
+        unverified: { awaitingJudgment: 1 },
+        runSuccess: { numerator: 1, denominator: 1, value: 1 },
+      });
       expect(assessment.instances).toContainEqual({
         instance: instance.id,
         process: "Requirements Clarification",

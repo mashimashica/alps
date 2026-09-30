@@ -16,6 +16,8 @@
  *   evaluate        POST /api/instances/:id/evaluate
  *   get_assessment  GET  /api/assessment?format&since
  *   open_ui         POST /api/open
+ *   (WebUI)         GET  /api/stats?period&granularity&process&agent&tz
+ *   (WebUI)         GET  /api/skill?process
  *
  * Who calls is not in any body. The MCP server names its client in X-Harness-Client (and the
  * session it holds in X-Harness-Session); a request without it comes from a person (the WebUI).
@@ -35,6 +37,8 @@ import {
   runQuery,
   runRequest,
   runsQuery,
+  skillQuery,
+  statsQuery,
   updateInstanceRequest,
 } from "../shared/schema.ts";
 import type {
@@ -51,6 +55,8 @@ import type {
   RunDetailResponse,
   RunStartResponse,
   RunsResponse,
+  SkillResponse,
+  StatsResponse,
 } from "../shared/types.ts";
 
 export interface ApiReply {
@@ -247,15 +253,35 @@ function routes(harness: Harness, host: ApiHost): Route[] {
     {
       method: "GET",
       pattern: /^\/api\/assessment$/,
-      handle: ({ url }) => {
-        const { format } = parse(assessmentQuery, query(url));
+      handle: async ({ url }) => {
+        const { format, since } = parse(assessmentQuery, query(url));
         return format === "markdown"
           ? ok({
               ok: true,
-              markdown: harness.assessmentMarkdown(),
+              markdown: await harness.assessmentMarkdown(since),
             } satisfies AssessmentMarkdownResponse)
-          : ok({ ok: true, assessment: harness.assessment() } satisfies AssessmentResponse);
+          : ok({
+              ok: true,
+              assessment: await harness.assessment(since),
+            } satisfies AssessmentResponse);
       },
+    },
+    {
+      method: "GET",
+      pattern: /^\/api\/stats$/,
+      handle: ({ url }) => {
+        const { tz, ...filter } = parse(statsQuery, query(url));
+        return ok({ ok: true, ...harness.stats(filter, tz) } satisfies StatsResponse);
+      },
+    },
+    {
+      method: "GET",
+      pattern: /^\/api\/skill$/,
+      handle: ({ url }) =>
+        ok({
+          ok: true,
+          ...harness.skill(parse(skillQuery, query(url)).process),
+        } satisfies SkillResponse),
     },
     {
       method: "POST",

@@ -40,14 +40,13 @@ import type {
   InstantiateRequest,
   RunRequest,
 } from "../shared/schema.ts";
-import { say, type MessageArgs, type MessageKey } from "../shared/strings.ts";
+import { computeStats, findingsOf, type FindingsInput, type StatsInput } from "../assess.ts";
 import type {
   AgentInfo,
   Artifact,
   ArtifactType,
   Assessment,
   ClientInfo,
-  Finding,
   Instance,
   InstanceFacts,
   InstanceView,
@@ -68,7 +67,11 @@ import type {
   RunTarget,
   RunView,
   ServerEvent,
+  SkillLocation,
   StateFile,
+  Stats,
+  StatsFilter,
+  StatsMembers,
 } from "../shared/types.ts";
 import { demoFile, demoReport, demoSteps } from "./demo.ts";
 import { DigestCache } from "./digest.ts";
@@ -102,6 +105,8 @@ const MAX_TEXT_REPORT = 6000;
 const AGENT_CHECK_TTL_MS = 5 * 60_000;
 /** How long cancel_run and a stopping server wait for an agent's process group to end (it gets SIGKILL after 5 s). */
 const STOP_WAIT_MS = 8000;
+/** The WebUI is given at most this much of a SKILL.md. */
+const MAX_SKILL_BYTES = 1024 * 1024;
 
 export const SESSION_CLOSED_ERROR =
   "The MCP connection of the session that performs the run closed before finish_run.";
@@ -184,13 +189,6 @@ const performedBy = (
   return performer.name === caller.client.name && performer.version === caller.client.version;
 };
 
-/** A message in English with its key and arguments, for a finding. */
-const said = <K extends MessageKey>(key: K, args: MessageArgs<K>) => ({
-  message: say("en", key, args),
-  key,
-  args: args as Record<string, string | number | boolean>,
-});
-
 /** The end of a text, kept to a length. */
 class Tail {
   #text = "";
@@ -249,6 +247,10 @@ export class Harness {
   #agentChecks: { key: string; at: number; info: Promise<AgentInfo[]> } | null = null;
   readonly #digests: DigestCache;
   #closing: Promise<void> | null = null;
+  /** The model's signature when poll() last looked; `null` before it first did. */
+  #polledModel: string | null = null;
+  /** Whether each instance's evidence was stale when the WebUI last heard of it. */
+  readonly #staleSent = new Map<string, boolean>();
 
   /** Reads the records; throws a StateError when state.json cannot be used. Nothing is written yet. */
   constructor(root: string, deps: HarnessDeps) {
@@ -513,6 +515,12 @@ export class Harness {
     return { ...instance, facts: this.#facts(instance, description) };
   }
 
+  /** Sends an instance to the WebUI, noting whether its evidence was stale then (for poll()). */
+  #sendInstance(view: InstanceView): void {
+    this.#staleSent.set(view.id, view.facts.stale);
+    this.#hooks.broadcast({ type: "instance", instance: view });
+  }
+
   /** `GET /api/instances`: newest first, a page at a time. */
   instances(query: { process?: string; path?: string; limit: number; cursor?: string }): {
     instances: InstanceView[];
@@ -662,7 +670,7 @@ export class Harness {
     }
     this.#saveState();
     const view = this.#view(instance, description);
-    this.#hooks.broadcast({ type: "instance", instance: view });
+    this.#sendInstance(view);
     return { instance: view, created };
   }
 
@@ -725,10 +733,7 @@ export class Harness {
     const instance = run.instance ? this.#state.instances[run.instance] : undefined;
     if (!instance) return;
     try {
-      this.#hooks.broadcast({
-        type: "instance",
-        instance: this.#view(instance, this.#describe().description),
-      });
+      this.#sendInstance(this.#view(instance, this.#describe().description));
     } catch {
       // The model cannot be read now; clients read the instance again when they need it.
     }
@@ -1216,68 +1221,163 @@ export class Harness {
     };
     this.#saveState();
     const view = this.#view(instance, description);
-    this.#hooks.broadcast({ type: "instance", instance: view });
+    this.#sendInstance(view);
     return { instance: view };
   }
 
-  /* ---------- assessment ---------- */
+  /* ---------- statistics and assessment ---------- */
+
+  /** What the statistics are computed from: the records, and which evaluations are stale now. */
+  #statsInput(description: ModelDescription, facts?: readonly InstanceFacts[]): StatsInput {
+    const instances = Object.values(this.#state.instances);
+    const stale = new Set<string>();
+    if (facts) {
+      for (const fact of facts) if (fact.stale) stale.add(fact.instance);
+    } else {
+      for (const instance of instances)
+        if (instance.evaluation && this.#facts(instance, description).stale) stale.add(instance.id);
+    }
+    return {
+      processes: description.processes.map((p) => ({ id: p.id, outcomes: p.outcomes })),
+      instances,
+      runs: [...this.#records.runs.values()],
+      stale,
+    };
+  }
 
   /**
-   * `GET /api/assessment`: the facts of each instance and the findings that follow from them and
-   * from the model. The statistics come with the dashboard.
+   * `GET /api/stats`: the dashboard's statistics for a filter, with what each number counts.
+   * Days and weeks start at `utcOffsetMinutes` east of UTC (the server's own zone by default).
    */
-  assessment(): Assessment {
+  stats(
+    filter: StatsFilter,
+    utcOffsetMinutes = localUtcOffset(),
+  ): { stats: Stats; members: StatsMembers } {
+    const { loaded, description } = this.#describe();
+    const resolved: StatsFilter = { ...filter };
+    if (filter.process !== undefined)
+      resolved.process = this.#process(loaded.model, filter.process).id;
+    return computeStats(this.#statsInput(description), resolved, {
+      now: Date.now(),
+      utcOffsetMinutes,
+    });
+  }
+
+  /** The SKILL.md that the latest process run of each Process used, and each SKILL.md's digest now. */
+  #skillUse(processes: readonly ProcessView[]): Pick<FindingsInput, "lastSkillUse" | "skillNow"> {
+    const lastSkillUse = new Map<string, { run: string; path: string; sha256: string | null }>();
+    const startedAt = new Map<string, number>();
+    for (const run of this.#records.runs.values()) {
+      if (run.kind !== "process" || !run.process || !run.skill) continue;
+      if ((startedAt.get(run.process) ?? Number.NEGATIVE_INFINITY) > run.startedAt) continue;
+      startedAt.set(run.process, run.startedAt);
+      lastSkillUse.set(run.process, { run: run.id, ...run.skill });
+    }
+    const skillNow = new Map<string, string | null>();
+    for (const process of processes)
+      if (process.skill && "path" in process.skill)
+        skillNow.set(process.id, this.#digests.of(process.skill.path));
+    return { lastSkillUse, skillNow };
+  }
+
+  /**
+   * `GET /api/assessment`: the statistics (all time by week, or since `since`), the findings that
+   * follow from the records, the model, and the configuration, and the facts of each instance.
+   */
+  async assessment(since?: number): Promise<Assessment> {
+    const agents = await this.model().then((model) => model.agents);
     const { description } = this.#describe();
     const facts = Object.values(this.#state.instances)
       .sort((a, b) => seqOf(a.id) - seqOf(b.id))
       .map((instance) => this.#facts(instance, description));
-    const findings: Finding[] = [];
-    for (const process of description.processes)
-      if (process.skill && "missing" in process.skill)
-        findings.push({
-          kind: "configuration",
-          subject: { process: process.id },
-          ...said("finding.skillMissing", {
-            process: process.name,
-            location: process.skill.missing,
-          }),
-          evidence: [process.skill.missing],
-        });
-    for (const fact of facts) {
-      const latest = fact.latestRun;
-      const subject = { instance: fact.instance, process: fact.process };
-      if (
-        latest &&
-        (latest.status === "succeeded" || latest.status === "failed") &&
-        fact.evaluatedRun !== latest.id
-      )
-        findings.push({
-          kind: "unverified",
-          subject,
-          ...said("finding.awaiting", { run: latest.id, status: latest.status }),
-          evidence: [latest.id],
-        });
-      if (fact.stale) {
-        const paths = fact.staleness.map((reason) => reason.path ?? "SKILL.md");
-        findings.push({
-          kind: "unverified",
-          subject,
-          ...said("finding.stale", { run: fact.evaluatedRun ?? "", paths: paths.join(", ") }),
-          evidence: paths,
-        });
-      }
-    }
-    return { stats: null, findings, instances: facts };
+    const findings = findingsOf({
+      processes: description.processes,
+      artifacts: description.artifacts,
+      agents,
+      facts,
+      ...this.#skillUse(description.processes),
+    });
+    const { stats } = computeStats(
+      this.#statsInput(description, facts),
+      { period: "all", granularity: "week", ...(since === undefined ? {} : { since }) },
+      { now: Date.now(), utcOffsetMinutes: localUtcOffset() },
+    );
+    return { stats, findings, instances: facts };
   }
 
   /** `GET /api/assessment?format=markdown`: the assessment as Markdown, in the workspace's language. */
-  assessmentMarkdown(): string {
-    const assessment = this.assessment();
+  async assessmentMarkdown(since?: number): Promise<string> {
+    const assessment = await this.assessment(since);
     const { loaded, description } = this.#describe();
+    const processOf = (id: string) => description.processes.find((p) => p.id === id);
     return assessmentMarkdown(assessment, {
       language: loaded.language,
       model: description.name,
-      processName: (id) => description.processes.find((p) => p.id === id)?.name ?? id,
+      processName: (id) => processOf(id)?.name ?? id,
+      outcomeText: (id, outcome) => processOf(id)?.outcomes[outcome] ?? "",
     });
   }
+
+  /** `GET /api/skill`: the text of a Process's SKILL.md, for the WebUI to show. */
+  skill(key: string): { skill: SkillLocation; text: string; truncated: boolean } {
+    const { loaded, description } = this.#describe();
+    const process = this.#process(loaded.model, key);
+    const skill = description.processes.find((p) => p.id === process.id)?.skill;
+    if (!skill || "missing" in skill)
+      throw refuse("not-found", "error.noSkill", { process: process.name });
+    let bytes: Buffer;
+    try {
+      bytes = fs.readFileSync(path.resolve(this.root, skill.path));
+    } catch {
+      throw refuse("not-found", "error.noSkill", { process: process.name });
+    }
+    return {
+      skill,
+      text: bytes.subarray(0, MAX_SKILL_BYTES).toString("utf8"),
+      truncated: bytes.length > MAX_SKILL_BYTES,
+    };
+  }
+
+  /* ---------- changes on disk ---------- */
+
+  /**
+   * What changed on disk since the last call, as events for the WebUI: the model, the
+   * configuration, or a SKILL.md (`model`), and evaluations whose evidence became stale or current
+   * again (`instance`). The first call only takes note. The server calls it every few seconds while
+   * a WebUI is connected; nothing else notices an edit made outside the harness.
+   */
+  poll(): ServerEvent[] {
+    let model: string;
+    let description: ModelDescription | null = null;
+    try {
+      const described = this.#describe();
+      description = described.description;
+      model = [
+        this.#modelSignature(described.loaded.modelPath),
+        ...description.processes.map((p) =>
+          p.skill && "path" in p.skill ? `${p.skill.path}:${this.#digests.of(p.skill.path)}` : "-",
+        ),
+      ].join("|");
+    } catch (error) {
+      model = `unreadable: ${(error as Error).message}`;
+    }
+    const events: ServerEvent[] = [];
+    if (this.#polledModel !== null && this.#polledModel !== model) events.push({ type: "model" });
+    this.#polledModel = model;
+    if (description)
+      for (const instance of Object.values(this.#state.instances)) {
+        if (!instance.evaluation) continue;
+        const view = this.#view(instance, description);
+        const before = this.#staleSent.get(instance.id);
+        if (before === undefined) this.#staleSent.set(instance.id, view.facts.stale);
+        else if (before !== view.facts.stale) {
+          this.#staleSent.set(instance.id, view.facts.stale);
+          events.push({ type: "instance", instance: view });
+        }
+      }
+    return events;
+  }
 }
+
+/** Minutes east of UTC on this machine now. */
+const localUtcOffset = (): number => -new Date().getTimezoneOffset();

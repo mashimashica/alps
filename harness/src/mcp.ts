@@ -96,7 +96,7 @@ Effect: the harness compares the run's output locations with their state when it
 The harness records who judged: you, by your MCP client's name, and self: true when this MCP session (this connection) also performed the judged run (a self run), which the dashboard counts apart; another session is not self, even of a client with the same name. Only the three values are counted: a run that ended, an output that exists, or an agent's report is not an achievement.
 Effect: replaces the instance's evaluation in .alps-harness/state.json. ${RESULTS} Success: {ok: true, instance}. error.code: invalid-judgment (empty evidence, an Outcome the Process does not have, an Outcome judged twice, or no judgment), not-found (instance, or it has no run to evaluate), already-running (the latest run has not ended: wait with get_run), no-model, server-unreachable. Calling it again with the same judgments records the same evaluation.`,
 
-  get_assessment: `Return the assessment: the facts of every instance (latest run, judgments, whether the evidence is stale) and the findings that follow from them and from the model ({kind: description, configuration, or unverified; subject; message; evidence}), as JSON or as Markdown (format; json by default). The statistics come with the dashboard: until then stats is null, and since (epoch milliseconds or an ISO 8601 date), which limits the statistics to runs and judgments since then, has no effect.
+  get_assessment: `Return the assessment, as JSON or as Markdown (format; json by default): the dashboard's statistics (stats: the achievement and unverified rates among judged Outcomes, stale evaluations, run success, durations, usage and cost, with trends by week and breakdowns by Process, agent, Outcome, and judge), the findings that follow from the records, the model, and the configuration ({kind: description, configuration, or unverified; subject; message; evidence}: a SKILL.md that is not found or changed after the last run, a type without a location, a type that no Process produces or reads, an agent that cannot be started, results that await a judgment, stale evidence), and the facts of every instance (latest run, judgments, whether the evidence is stale). The statistics cover all time, or the process runs that started and the judgments made since since (epoch milliseconds or an ISO 8601 date); stale evaluations are counted as they are now, whatever since; wake runs are never counted. Only recorded judgments are counted: a run that ended or an output that exists is not an achievement.
 ${RESULTS} Success: {ok: true, assessment} for json, {ok: true, markdown} for markdown. error.code: invalid-request, no-model, server-unreachable. No effects.`,
 
   wake: `Start a wake run: an agent that reads the model, the guidance, and the current state, decides which Processes to run for which inputs, and reports what it judged and started (scheduled runs).
@@ -645,6 +645,9 @@ export function createMcpServer(options: McpOptions, link: DaemonLink | null): M
             ? say(language, "done.assessment", {
                 findings: result.assessment.findings.length,
                 instances: result.assessment.instances.length,
+                achieved: result.assessment.stats.metrics.achievement.numerator,
+                judged: result.assessment.stats.metrics.achievement.denominator,
+                stale: result.assessment.stats.metrics.staleEvaluations,
               })
             : result.markdown,
       ),
