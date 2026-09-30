@@ -8,6 +8,7 @@
  * runs/<id>.json; `workItem` becomes `instance` and `summary` becomes `report`.
  */
 
+import { spoken, type Spoken } from "../shared/strings.ts";
 import type {
   Evaluation,
   Instance,
@@ -26,7 +27,15 @@ const JUDGMENTS: readonly string[] = [
   "unverified",
 ] satisfies Judgment[];
 
-export const INTERRUPTED_ERROR = "The harness server stopped while the run was running.";
+/** Why a run is interrupted when the harness server stopped before it ended. */
+export const INTERRUPTED_ERROR = spoken("runError.interrupted", {});
+
+/** A run's error as the harness records it: the English text, with its key and arguments. */
+export const runError = (message: Spoken): Pick<Run, "error" | "errorKey" | "errorArgs"> => ({
+  error: message.text,
+  errorKey: message.key,
+  errorArgs: message.args,
+});
 
 /** Instance ids use the prefix `i`: work item `w4` becomes instance `i4`. */
 export const instanceIdOf = (workItemId: string): string =>
@@ -92,7 +101,8 @@ function runOf(run: RunV1, now: number): Run {
     startedAt: run.startedAt,
     endedAt: run.endedAt ?? (interrupted ? now : null),
     exitCode: run.exitCode,
-    error: interrupted ? (run.error ?? INTERRUPTED_ERROR) : run.error,
+    // Version 1 wrote its errors in English only.
+    ...(interrupted && run.error === null ? runError(INTERRUPTED_ERROR) : { error: run.error }),
     agentError: run.agentError,
     // Version 1 listed only inputs that it had found, so none was missing; it kept no digests.
     inputs: run.inputs.map((input) => ({ ...input, missing: [], sha256: {} })),

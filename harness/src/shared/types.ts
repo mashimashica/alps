@@ -234,9 +234,15 @@ export interface Run {
   startedAt: number;
   endedAt: number | null;
   exitCode: number | null;
-  /** Why the harness considers the run failed or stopped. */
+  /** Why the harness considers the run failed or stopped, in English. */
   error: string | null;
-  /** The failure the agent itself reported. */
+  /**
+   * The key and arguments of `error` in shared/strings.ts, for a client that says it in another
+   * language. Records written before the harness kept them have none.
+   */
+  errorKey?: string;
+  errorArgs?: Record<string, string | number | boolean>;
+  /** The failure the agent itself reported, as the agent said it. */
   agentError: string | null;
   inputs: RunInput[];
   targets: RunTarget[];
@@ -275,7 +281,14 @@ export interface RunEvent {
     | "error"
     | "result"
     | "end";
+  /** In English for what the harness itself says; as the agent wrote it otherwise. */
   text: string;
+  /**
+   * What the harness itself says (the system and end events, and its own errors): the key and
+   * arguments of `text` in shared/strings.ts, for a client that shows it in another language.
+   */
+  key?: string;
+  args?: Record<string, string | number | boolean>;
 }
 
 /** The summary of a run kept in state.json; the full record is in runs/<id>.json. */

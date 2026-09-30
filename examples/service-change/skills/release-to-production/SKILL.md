@@ -34,7 +34,7 @@ Follow the production policy and the [acceptance criteria](../../docs/acceptance
 
 ## Constraints
 
-Candidate checks must precede approval; approval must precede deployment; production checks must follow deployment. Deployment must not occur while approval is missing or unconfirmed.
+Candidate checks must precede approval; approval must precede deployment; production checks must follow deployment. A candidate change invalidates the earlier check and approval basis. Deployment must not occur while approval is missing or unconfirmed.
 
 ## Enablers
 

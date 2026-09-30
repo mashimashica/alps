@@ -45,6 +45,7 @@ import type {
   RunRequest,
   WakeRequest,
 } from "../shared/schema.ts";
+import { spoken, type MessageArgs, type Spoken } from "../shared/strings.ts";
 import { computeStats, findingsOf, type FindingsInput, type StatsInput } from "../assess.ts";
 import type {
   AgentInfo,
@@ -81,7 +82,7 @@ import type {
 import { demoFile, demoReport, demoSteps } from "./demo.ts";
 import { DigestCache } from "./digest.ts";
 import { HarnessError, refuse } from "./errors.ts";
-import { INTERRUPTED_ERROR } from "./migrate.ts";
+import { INTERRUPTED_ERROR, runError } from "./migrate.ts";
 import { artifactPath, workspacePath } from "./paths.ts";
 import { buildPrompt } from "./prompt.ts";
 import { diffOutputs, type OutputSnapshot } from "./provenance.ts";
@@ -118,15 +119,8 @@ const WAKE_AGENT = "claude-code";
 /** The name of the harness's MCP server in the configuration of the agent that a wake starts. */
 const WAKE_MCP_SERVER = "alps_harness";
 
-export const SESSION_CLOSED_ERROR =
-  "The MCP connection of the session that performs the run closed before finish_run.";
-
-const END_LABEL: Record<Exclude<RunStatus, "running">, string> = {
-  succeeded: "Succeeded",
-  failed: "Failed",
-  canceled: "Canceled",
-  interrupted: "Interrupted",
-};
+/** Why a self run is interrupted when the MCP session that performs it closes before finish_run. */
+export const SESSION_CLOSED_ERROR = spoken("runError.sessionClosed", {});
 
 export interface HarnessDeps {
   parseYaml: ParseYaml;
@@ -163,18 +157,20 @@ export type Caller =
 /** What woke an agent: a schedule of alps-harness.yaml, or a request (the MCP tool, the CLI, the API). */
 export type WakeTrigger = { kind: "schedule"; cron: string } | { kind: "request"; caller: Caller };
 
-const wokenBy = (trigger: WakeTrigger): string =>
+/** What woke an agent, as the wake events say it (shared/strings.ts). */
+const wokenBy = (trigger: WakeTrigger): MessageArgs<"event.woken"> =>
   trigger.kind === "schedule"
-    ? `by the schedule "${trigger.cron}"`
+    ? { by: "schedule", cron: trigger.cron, client: "" }
     : trigger.caller.kind === "agent"
-      ? `on request of ${trigger.caller.client.name}`
-      : "on request";
+      ? { by: "client", cron: "", client: trigger.caller.client.name }
+      : { by: "request", cron: "", client: "" };
 
 /** How a run ends. */
 interface RunEnd {
   status: Exclude<RunStatus, "running">;
   exitCode?: number | null;
-  error?: string | null;
+  /** Why the harness considers the run failed or stopped (the run's error). */
+  error?: Spoken | null;
 }
 
 /** A run that has not ended. */
@@ -736,6 +732,7 @@ export class Harness {
       t: Date.now(),
       kind: draft.kind,
       text: draft.text.slice(0, MAX_EVENT_TEXT),
+      ...(draft.key ? { key: draft.key, args: draft.args ?? {} } : {}),
     };
     try {
       appendEvent(this.root, run.id, event);
@@ -915,11 +912,7 @@ export class Harness {
     this.#saveState();
     if (caller.kind === "agent" && caller.wake) this.#attach(caller.wake, run);
 
-    if (self)
-      this.#emit(run, {
-        kind: "system",
-        text: "The calling session performs the run (self). It ends with finish_run.",
-      });
+    if (self) this.#emit(run, { kind: "system", ...spoken("event.self", {}) });
     else if (spec.format === "demo") this.#runDemo(run, active, loaded, process);
     else this.#runAgent(run, active, spec, info, args);
     this.#announce(run);
@@ -938,7 +931,7 @@ export class Harness {
     const text = spec.format === "text" ? new Tail() : null;
     this.#emit(run, {
       kind: "system",
-      text: `Started ${spec.label}${info?.version ? ` (${info.version})` : ""}`,
+      ...spoken("event.started", { agent: spec.label, version: info?.version ?? "" }),
     });
     let handle: AgentHandle;
     try {
@@ -975,9 +968,12 @@ export class Harness {
       );
     } catch (error) {
       raw.close();
-      const message = `${spec.label} could not be started: ${(error as Error).message}`;
-      this.#emit(run, { kind: "error", text: message });
-      this.#end(run, { status: "failed", error: message });
+      const failure = spoken("event.notStarted", {
+        agent: spec.label,
+        detail: (error as Error).message,
+      });
+      this.#emit(run, { kind: "error", ...failure });
+      this.#end(run, { status: "failed", error: failure });
       return;
     }
     active.agent = handle;
@@ -1003,8 +999,8 @@ export class Harness {
             succeeded || run.agentError || reportedFailure
               ? null
               : exitCode !== null
-                ? `${spec.label} exited with code ${exitCode}.`
-                : `${spec.label} was stopped by ${signal ?? "a signal"}.`,
+                ? spoken("runError.exited", { agent: spec.label, code: exitCode })
+                : spoken("runError.signal", { agent: spec.label, signal: signal ?? "" }),
         });
       },
       (error: unknown) => {
@@ -1012,7 +1008,7 @@ export class Harness {
         this.#deps.log(`run ${run.id}: ${(error as Error).stack ?? String(error)}`);
         this.#end(run, {
           status: "failed",
-          error: `The harness lost ${spec.label}: ${(error as Error).message}`,
+          error: spoken("runError.lost", { agent: spec.label, detail: (error as Error).message }),
         });
       },
     );
@@ -1022,7 +1018,6 @@ export class Harness {
     const typeName = (type: string): string =>
       loaded.model.artifacts.find((a) => a.id === type)?.name ?? type;
     const steps = demoSteps({
-      language: loaded.language,
       processName: process.name,
       skillPath: run.skill?.path ?? null,
       inputs: run.inputs,
@@ -1044,7 +1039,7 @@ export class Harness {
           ? this.#writeDemo(step.write.path, typeName(step.write.type), run, process, loaded)
           : null;
         if (failure) {
-          this.#emit(run, { kind: "error", text: failure });
+          this.#emit(run, { kind: "error", ...failure });
           this.#finish(run, { status: "failed", exitCode: 1, error: failure });
           return;
         }
@@ -1053,7 +1048,10 @@ export class Harness {
       } catch (error) {
         const message = (error as Error).message;
         this.#deps.log(`demo run ${run.id}: ${(error as Error).stack ?? message}`);
-        this.#end(run, { status: "failed", error: `The demo stopped: ${message}` });
+        this.#end(run, {
+          status: "failed",
+          error: spoken("runError.demoStopped", { detail: message }),
+        });
       }
     };
     active.timer = setTimeout(tick, DEMO_STEP_MS);
@@ -1069,9 +1067,9 @@ export class Harness {
     run: Run,
     process: Process,
     loaded: LoadedWorkspace,
-  ): string | null {
+  ): Spoken | null {
     const target = workspacePath(this.root, location);
-    if (!target.ok) return `The demo does not write ${location}: it is outside the workspace.`;
+    if (!target.ok) return spoken("runError.demoOutside", { path: location });
     const { file, text } = demoFile({
       language: loaded.language,
       path: target.path,
@@ -1090,7 +1088,7 @@ export class Harness {
       }
       return null;
     } catch (error) {
-      return `The demo could not write ${file}: ${(error as Error).message}`;
+      return spoken("runError.demoWrite", { path: file, detail: (error as Error).message });
     }
   }
 
@@ -1107,7 +1105,7 @@ export class Harness {
     run.status = end.status;
     run.endedAt = Date.now();
     run.exitCode = end.exitCode ?? null;
-    if (end.error) run.error = end.error;
+    if (end.error) Object.assign(run, runError(end.error));
     if (active) {
       run.outputs = diffOutputs(active.before, this.#snapshot(active.locations));
       for (const output of run.outputs) this.#state.provenance[output.path] = run.id;
@@ -1128,7 +1126,7 @@ export class Harness {
         );
       }
     const seconds = Math.round((run.endedAt - run.startedAt) / 1000);
-    this.#emit(run, { kind: "end", text: `${END_LABEL[end.status]} (${seconds} s)` });
+    this.#emit(run, { kind: "end", ...spoken("event.end", { status: end.status, seconds }) });
     this.#state.runs[run.id] = summaryOf(run);
     try {
       writeRun(this.root, run);
@@ -1207,7 +1205,7 @@ export class Harness {
       active.reported = request.status;
       this.#emit(run, {
         kind: "system",
-        text: `The agent reported with finish_run (${request.status}); the run ends when its process exits.`,
+        ...spoken("event.wakeReported", { status: request.status }),
       });
       writeRun(this.root, run);
       return { run: viewOf(run), outputs: [] };
@@ -1239,16 +1237,14 @@ export class Harness {
 
   /** A wake while another runs is skipped; the events of the one that runs record it. */
   #skip(running: Run, trigger: WakeTrigger): { skipped: true; running: string } {
-    this.#emit(running, {
-      kind: "system",
-      text: `Skipped a wake ${wokenBy(trigger)}: this wake still runs.`,
-    });
+    const skipped = spoken("event.wakeSkipped", wokenBy(trigger));
+    this.#emit(running, { kind: "system", ...skipped });
     try {
       writeRun(this.root, running);
     } catch (error) {
       this.#deps.log(`cannot write run ${running.id}: ${(error as Error).message}`);
     }
-    this.#deps.log(`skipped a wake ${wokenBy(trigger)}: wake run ${running.id} still runs`);
+    this.#deps.log(`${skipped.text} (wake run ${running.id})`);
     return { skipped: true, running: running.id };
   }
 
@@ -1259,7 +1255,7 @@ export class Harness {
     wake.started = [...(wake.started ?? []), run.id];
     this.#emit(wake, {
       kind: "system",
-      text: `Started run ${run.id} (${run.agent}) of instance ${run.instance ?? ""}.`,
+      ...spoken("event.attached", { run: run.id, agent: run.agent, instance: run.instance ?? "" }),
     });
     try {
       writeRun(this.root, wake);
@@ -1421,14 +1417,17 @@ export class Harness {
     this.#state.lastWakeAt = now;
     writeRun(this.root, run);
     this.#saveState();
-    this.#emit(run, { kind: "system", text: `Woken ${wokenBy(trigger)}.` });
+    this.#emit(run, { kind: "system", ...spoken("event.woken", wokenBy(trigger)) });
     if (spec.format === "claude")
       try {
         fs.writeFileSync(configFile, mcpConfigFile(server));
       } catch (error) {
-        const message = `The MCP configuration for ${spec.label} could not be written: ${(error as Error).message}`;
-        this.#emit(run, { kind: "error", text: message });
-        this.#end(run, { status: "failed", error: message });
+        const failure = spoken("event.mcpConfig", {
+          agent: spec.label,
+          detail: (error as Error).message,
+        });
+        this.#emit(run, { kind: "error", ...failure });
+        this.#end(run, { status: "failed", error: failure });
         return { run: viewOf(run), skipped: false };
       }
     this.#runAgent(run, active, spec, info, args);

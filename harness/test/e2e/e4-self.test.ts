@@ -20,7 +20,7 @@ import { apiClient } from "../helpers/api.ts";
 import { copyOf } from "../helpers/copy.ts";
 import { killStrayDaemons, readServerInfo, stopWorkspaceDaemon } from "../helpers/daemon.ts";
 import { CLIENT_NAME, callTool, mcpClient, type McpSession } from "../helpers/mcp.ts";
-import { until } from "../helpers/process.ts";
+import { HOOK_TIMEOUT_MS, until } from "../helpers/process.ts";
 import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
 
 const workspaces: TmpWorkspace[] = [];
@@ -31,7 +31,7 @@ afterAll(async () => {
   for (const ws of workspaces) await stopWorkspaceDaemon(ws.root).catch(() => {});
   killStrayDaemons();
   for (const ws of workspaces) ws.dispose();
-});
+}, HOOK_TIMEOUT_MS);
 
 const INPUT = "docs/changes/CHG-002/stakeholders.md";
 const OUTPUT = "docs/changes/CHG-002/change-brief.md";

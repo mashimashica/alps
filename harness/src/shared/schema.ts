@@ -240,6 +240,9 @@ export const runRecordSchema: z.ZodType<Run, unknown> = z.object({
   endedAt: epochMs.nullable(),
   exitCode: z.number().nullable(),
   error: z.string().nullable(),
+  // Records written before the harness kept the key of its error have none.
+  errorKey: z.string().optional(),
+  errorArgs: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional(),
   agentError: z.string().nullable(),
   inputs: z.array(
     z.object({

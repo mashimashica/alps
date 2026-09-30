@@ -24,7 +24,7 @@ import { copyOf } from "../helpers/copy.ts";
 import { killStrayDaemons, stopWorkspaceDaemon } from "../helpers/daemon.ts";
 import { callTool, mcpClient, type McpSession } from "../helpers/mcp.ts";
 import { FAKES, records } from "../helpers/paths.ts";
-import { isAlive, waitFor } from "../helpers/process.ts";
+import { HOOK_TIMEOUT_MS, isAlive, waitFor } from "../helpers/process.ts";
 import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
 
 const workspaces: TmpWorkspace[] = [];
@@ -37,7 +37,7 @@ afterAll(async () => {
   killStrayDaemons();
   for (const ws of workspaces) ws.dispose();
   for (const dir of dirs) fs.rmSync(dir, { recursive: true, force: true });
-});
+}, HOOK_TIMEOUT_MS);
 
 const tmpDir = (): string => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "alps-harness-e3-"));

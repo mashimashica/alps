@@ -4,6 +4,29 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+### Added
+
+- The ALPS harness (`harness/`), which applies a process model to concrete work: it instantiates a Process for concrete inputs, runs it with Claude Code, Codex, a demo agent, or the calling session, records each run and which run produced each output, and records an evaluation of each Outcome with its evidence and who judged it. An evaluation whose inputs or `SKILL.md` no longer hold what the judged run used (by SHA-256) is shown as resting on stale evidence. A run that ended, an output that exists, or an agent's report is not counted as an achieved Outcome. The harness runs its TypeScript source on Bun 1.3.11 or later, without a build.
+- A harness server per workspace with a WebUI in English and Japanese: the network of Processes as a ring with a focus view, a dashboard of statistics (the achievement and unverified rates of judged Outcomes, stale evaluations, run success, durations, usage and cost, with trends and breakdowns by Process, agent, Outcome, and judge), and the instances with forms for instantiation and evaluation. The server listens on 127.0.0.1 only, checks the `Host` header, passes a per-start token in the URL fragment, refuses cross-site and same-site requests, framing, and request bodies that are not JSON, and refuses instance paths outside the workspace or in its records.
+- An MCP server with twelve tools and five resources, which relays to the harness server and starts it when none runs, registered for Claude Code in `.mcp.json` and in the Agent Plugins format in `mcp.json`, and the `/alps:harness` command, which opens the WebUI.
+- Wakes: at the times that `schedules` set, or on request from the MCP tool or the command line, the harness starts an agent with its MCP server; the agent reads the model, the Markdown guidance, and the state, and decides which Processes to run. The command line has `serve`, `stop`, `mcp`, `wake`, and `assess`.
+- The distributed `run-process` Skill, with which a session performs a harness run itself.
+- The example harness workspace `examples/service-change/`, with a Japanese counterpart, three example Skills, synthetic Artifacts, and operations guidance for a woken agent.
+- The harness's E2E and unit tests (`bun test`) and CI jobs that run them with the type check, lint, and format check on macOS and Linux, the WebUI's E2E in a job of its own with one retry, and the tests on Windows without requiring them to pass. Repository tests check the MCP server registrations, the command, the runtime-only fetch-time install, the Host adapters, the harness's version, and the listed catalogs; the validation also checks `mcp.json` against its Agent Plugins schema.
+
+### Changed
+
+- Make the root `package.json` and `bun.lock` hold only the harness's runtime dependencies, which Claude Code installs when it fetches the Plugin; the development tools are in `harness/package.json` and `harness/bun.lock`.
+- Point the Codex compatibility manifest to `mcp.json` and describe the harness in it. README, AGENTS, and `localization.yaml` describe the harness, its layout, and its English/Japanese catalogs, and README links the current release notes.
+- State in the Production Release example Skill that a candidate change invalidates the earlier check and approval basis, as its process model does.
+- Validate the Plugin with Claude Code 2.1.285, whose `claude plugin validate` also checks the MCP server entries in `.mcp.json`.
+
+### Removed
+
+- The Cursor adapter (`.cursor-plugin/`). Cursor loads the Skills through the Agent Plugins format; the harness's MCP server does not start there.
+
+See the [release notes](docs/releases/0.9.0.md) ([Japanese](docs/locales/ja/releases/0.9.0.md)) for the scope, the update guidance, and what is not yet verified.
+
 ## [0.8.0] - 2026-09-14
 
 ### Added

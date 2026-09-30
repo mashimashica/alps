@@ -12,6 +12,7 @@
  *   slow  ok, with a pause between lines (ALPS_FAKE_DELAY_MS, 1000 ms by default)
  *   hang  prints its first line, starts a child process, writes its own pid and the child's to
  *         the file ALPS_FAKE_PIDS names (one per line), ignores SIGTERM, and waits to be killed
+ *   exit  prints nothing and exits with code 3, so only the harness can say why the run failed
  * ALPS_FAKE_PROMPT names a file to write the prompt it received to.
  */
 
@@ -167,6 +168,10 @@ export async function runFake(agent: FakeAgent): Promise<void> {
   const { prompt, format } = await invocation(agent, args);
   if (process.env.ALPS_FAKE_PROMPT) writeWhole(process.env.ALPS_FAKE_PROMPT, prompt);
   const scenario = process.env.ALPS_FAKE_SCENARIO ?? "ok";
+  if (scenario === "exit") {
+    process.exitCode = 3;
+    return;
+  }
   const facts = readPrompt(prompt);
   const lines = fixtureLines(agent, scenario === "fail" ? "fail" : "ok", facts);
 

@@ -29,7 +29,11 @@ Do not infer Process requirements from tests, templates, Host manifests, icons, 
 | `docs/locales/ja/` and each Skill's `references/locales/ja/` | Supported translations of the corresponding English source files. A translated Skill body is named `SKILL.ja.md` and is not a Skill entry point. |
 | `examples/` | Bundled reference material, including a working target Skill; outside Plugin Skill discovery. The guide's translation is in `examples/locales/ja/`, and the target Skill's translations are in its `references/locales/ja/`. |
 | `examples/service-change/` | Example harness workspace with a process model, its realization in `alps-harness.yaml`, sample Artifacts, and example Skills under its `skills/`, which are also outside Plugin Skill discovery. Its Japanese counterpart is `examples/locales/ja/service-change/`, and each Skill's translation is in its `references/locales/ja/`. |
-| `plugin.json`, `.claude-plugin/`, `.cursor-plugin/`, `.codex-plugin/` | Root Plugin format and distinct Host adapters. |
+| `plugin.json`, `.claude-plugin/`, `.codex-plugin/` | Root Plugin format and distinct Host adapters. |
+| `harness/` | The harness: its TypeScript source, tests, and development tools in its own `package.json`, `bun.lock`, and `bunfig.toml`. Its English/Japanese texts are the catalogs that `localization.yaml` lists. |
+| `package.json` and `bun.lock` at the root | The harness's runtime dependencies, which Claude Code installs at the Plugin root when it fetches the Plugin. No `bunfig.toml` belongs beside them: with one there, Claude Code skips that install. |
+| `.mcp.json` and `mcp.json` | The harness's MCP server: for Claude Code with `${CLAUDE_PLUGIN_ROOT}`, and in the Agent Plugins format with `${PLUGIN_ROOT}`, which `.codex-plugin/plugin.json` also names. |
+| `commands/` | Plugin commands; `harness.md` is `/alps:harness`. Every file here is a command, so commands have no translations. |
 | `CLAUDE.md` | Claude Code entry point for repository development that imports this file; it adds no instructions of its own and is not Plugin context. |
 | `assets/` and the Skill's `agents/` and `assets/` | Presentation resources. |
 
@@ -39,7 +43,7 @@ Do not infer Process requirements from tests, templates, Host manifests, icons, 
 
 - Inspect current files and the task-owned diff before editing. Preserve unrelated work.
 - Use `review-alps` for changes to the Process Framework or work-system design principles, Skill content, repository guidance, tests, distribution, or presentation that affect their meaning or boundaries.
-- Use `sync-locales` for each affected English/Japanese pair. Repository-development Skills have no Japanese Plugin counterparts.
+- Use `sync-locales` for each affected English/Japanese pair, including the entries of the catalogs that `localization.yaml` lists. Repository-development Skills have no Japanese Plugin counterparts.
 - Use `design-process-description` when authoring or reviewing a Process Description.
 - Use `design-agent-work-system` when designing or reviewing the supporting configuration, implementation, or effectiveness. Preserve shared work meaning and apply each foundation within its subject.
 - Keep each Host adapter aligned with its native format and the distribution layout above.
@@ -56,6 +60,6 @@ Keep the following evidence distinct:
 5. Respect for applicable requirements, authority, and limits on effects, including those implemented by tools, assessed separately from tool behavior and effectiveness.
 6. Work-system effectiveness through representative work with an agent, information, tools, and environment, assessed against the work's Outcomes and conditions.
 
-Run the checks in `.github/workflows/validate.yml` that the environment permits. At minimum run `python3 -m unittest discover -s tests -v`, `git diff --check`, changed-link checks, and review the complete task-owned diff, including new files. Passing mechanical checks does not prove semantic validity or successful Process execution.
+Run the checks in `.github/workflows/validate.yml` that the environment permits. At minimum run `python3 -m unittest discover -s tests -v`, `git diff --check`, changed-link checks, and review the complete task-owned diff, including new files. For changes to the harness, also run its type check, lint, format check, and tests as [harness/README.md](harness/README.md) describes. Passing mechanical checks does not prove semantic validity or successful Process execution.
 
 Report findings, completed checks, failed or unperformed checks, and limits.

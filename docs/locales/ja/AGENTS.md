@@ -29,7 +29,11 @@
 | `docs/locales/ja/`、各Skillの`references/locales/ja/` | 対応する英語版の翻訳。翻訳したSkill本文は`SKILL.ja.md`とし、Skillの入口ではない。 |
 | `examples/` | 実働する対象Skillを含む、同梱する参照資料。Plugin Skillの発見対象外。ガイドの翻訳は`examples/locales/ja/`、対象Skillの翻訳はその`references/locales/ja/`に置く。 |
 | `examples/service-change/` | プロセスモデル、`alps-harness.yaml`による実現、アーティファクトの例、その`skills/`にある例のSkillを含む、ハーネスの例のワークスペース。これらのSkillもPlugin Skillの発見対象外。日本語版は`examples/locales/ja/service-change/`、各Skillの翻訳はその`references/locales/ja/`に置く。 |
-| `plugin.json`、`.claude-plugin/`、`.cursor-plugin/`、`.codex-plugin/` | ルートPlugin形式と、それぞれのHostアダプター。 |
+| `plugin.json`、`.claude-plugin/`、`.codex-plugin/` | ルートPlugin形式と、それぞれのHostアダプター。 |
+| `harness/` | ハーネス。TypeScriptのソース、テスト、独自の`package.json`・`bun.lock`・`bunfig.toml`にある開発用の道具。英日の文言は、`localization.yaml`が列挙する辞書である。 |
+| ルートの`package.json`と`bun.lock` | ハーネスの実行時の依存。Claude CodeがPluginの取得時にPluginのルートで導入する。その隣に`bunfig.toml`を置かない。置くとClaude Codeはその導入を省く。 |
+| `.mcp.json`と`mcp.json` | ハーネスのMCPサーバー。Claude Code用は`${CLAUDE_PLUGIN_ROOT}`で、Agent Plugins形式は`${PLUGIN_ROOT}`で登録し、後者は`.codex-plugin/plugin.json`も指す。 |
+| `commands/` | Pluginのコマンド。`harness.md`は`/alps:harness`である。ここにあるファイルはすべてコマンドになるため、コマンドには翻訳を置かない。 |
 | `CLAUDE.md` | このファイルを読み込む、リポジトリ開発用のClaude Codeの入口。独自の指示は持たず、Pluginの文脈ではない。 |
 | `assets/`およびSkillの`agents/`と`assets/` | 表示資源。 |
 
@@ -39,7 +43,7 @@
 
 - 編集前に現在のファイルと作業対象の差分を確認する。無関係な作業を保全する。
 - プロセスフレームワークや作業システムの設計原則、Skill内容、リポジトリ案内、テスト、配布、表示が意味や境界に影響する変更では`review-alps`を使用する。
-- 影響する日英の各ペアに`sync-locales`を使用する。開発用Skillには日本語のPlugin対応ファイルはない。
+- `localization.yaml`が列挙する辞書の項目を含め、影響する日英の各ペアに`sync-locales`を使用する。開発用Skillには日本語のPlugin対応ファイルはない。
 - プロセス記述の作成・レビューには`design-process-description`を用いる。
 - 実現を支える構成、実装、有効性の設計・レビューには`design-agent-work-system`を用いる。共有する仕事の意味を維持し、それぞれの対象に各基盤を適用する。
 - 各Hostアダプターを、そのHost固有の形式と上記の配布配置に整合させる。
@@ -56,6 +60,6 @@
 5. ツールが実装するものを含め、適用される要求、権限、影響の制限が守られていることについての、ツールの動作や有効性とは区別した評価。
 6. エージェント・情報・ツール・環境を用いた代表的な仕事を通じ、仕事の成果と条件に照らした作業システムの有効性の評価。
 
-`.github/workflows/validate.yml`の検証のうち環境で可能なものを実行する。最低限、`python3 -m unittest discover -s tests -v`、`git diff --check`、変更したリンクの検査、新規ファイルを含む作業対象差分全体のレビューを行う。機械検証の成功は意味の妥当性やプロセス実行の成功を証明しない。
+`.github/workflows/validate.yml`の検証のうち環境で可能なものを実行する。最低限、`python3 -m unittest discover -s tests -v`、`git diff --check`、変更したリンクの検査、新規ファイルを含む作業対象差分全体のレビューを行う。ハーネスを変更した場合は、[harness/README.md](../../../harness/README.md)のとおり、その型検査、lint、整形の検査、テストも実行する。機械検証の成功は意味の妥当性やプロセス実行の成功を証明しない。
 
 指摘、完了した検証、失敗または未実行の検証、限界を報告する。

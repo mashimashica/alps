@@ -7,10 +7,7 @@
 import type { RunEvent, Usage } from "../shared/types.ts";
 import type { AgentFormat } from "./index.ts";
 
-export interface EventDraft {
-  kind: RunEvent["kind"];
-  text: string;
-}
+export type EventDraft = Pick<RunEvent, "kind" | "text" | "key" | "args">;
 
 /** What one line of output means for the run. */
 export interface ParsedLine {

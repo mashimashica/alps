@@ -106,7 +106,7 @@ ${RESULTS} Success: {ok: true, assessment} for json, {ok: true, markdown} for ma
 Effect: records a wake run (kind wake, no instance) in .alps-harness/runs/<id>.json and starts the agent, which may start runs and write evaluations; the runs it starts are listed in the wake run's started (get_run), and each can be stopped with cancel_run. Wake runs are never counted in the statistics. ${RESULTS} Success: {ok: true, run, skipped: false} with run.status running, which says only that the agent started; {ok: true, skipped: true, running} when an earlier wake still runs: none was started, and the skip is recorded in the events of the one that runs. error.code: agent-unavailable (no such agent, an agent the harness cannot give its MCP server, or its command cannot be started; error.message says why), no-model, server-unreachable. When a call ends without a result, call it again: while the wake that started runs, the call is skipped and names it (running); look at it with get_run.`,
 
   open_ui: `Return the URL of this workspace's WebUI, where a person sees the network of Processes, the dashboard, and the instances; the harness server is started if it is not running. The URL carries the access token after #: give it only to the person who asked. view picks the screen (network, dashboard, or instances). With open: true the harness server opens the WebUI in the default browser, through a page in .alps-harness/ that only you can read, so the token never appears on a command line.
-${RESULTS} Success: {ok: true, url, opened}; opened: false with open: true means that no browser could be started. error.code: invalid-request, server-unreachable. Effect: with open: true, a browser window opens; nothing else changes.`,
+${RESULTS} Success: {ok: true, url, opened}; opened: false with open: true means that no browser could be started. error.code: invalid-request, no-model (no workspace was found, and there is no WebUI to open), server-unreachable. Effect: with open: true, a browser window opens; nothing else changes.`,
 } as const;
 
 /* ---------- the arguments of the tools ---------- */
@@ -381,24 +381,16 @@ const jsonContents = (uri: URL, value: unknown, cache: CacheHint = LIVE): ReadRe
   ...cache,
 });
 
+/** A run's events as text, in the workspace's language where the harness itself says them. */
 function runLog(detail: RunDetailResponse, language: Language): string {
   const { run, events } = detail;
-  const head =
-    language === "ja"
-      ? `# 実行 ${run.id} のログ（${run.agent}、${run.status}）`
-      : `# Log of run ${run.id} (${run.agent}, ${run.status})`;
+  const head = say(language, "log.head", { run: run.id, agent: run.agent, status: run.status });
   const cut =
-    detail.truncated && events[0]
-      ? [
-          language === "ja"
-            ? `（イベント ${events[0].n - 1} 件を省いた）`
-            : `(${events[0].n - 1} earlier events left out)`,
-        ]
-      : [];
-  const lines = events.map(
-    (event) =>
-      `[${event.n}] ${new Date(event.t).toISOString()} ${event.kind.padEnd(8)} ${event.text.replace(/\r?\n/g, "\n    ")}`,
-  );
+    detail.truncated && events[0] ? [say(language, "log.cut", { count: events[0].n - 1 })] : [];
+  const lines = events.map((event) => {
+    const text = sayReceived(language, event.key, event.args, event.text);
+    return `[${event.n}] ${new Date(event.t).toISOString()} ${event.kind.padEnd(8)} ${text.replace(/\r?\n/g, "\n    ")}`;
+  });
   return `${[head, "", ...cut, ...lines].join("\n")}\n`;
 }
 

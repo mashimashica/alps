@@ -1,6 +1,6 @@
 {
   "name": "alps-harness",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "private": true,
   "description": "Instantiate, run, record, and evaluate the Processes of an ALPS process model.",
   "license": "Apache-2.0",
@@ -13,12 +13,6 @@
     "lint": "oxlint",
     "fmt": "oxfmt",
     "test": "bun test"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/server": "^2.2.0",
-    "marked": "^18.0.14",
-    "preact": "^10.29.8",
-    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@modelcontextprotocol/client": "^2.2.0",

@@ -1,6 +1,12 @@
 import fs from "node:fs";
 import { CLI, HARNESS_ROOT } from "./paths.ts";
 
+/**
+ * How long a file's beforeAll or afterAll may take. Starting and stopping daemons and deleting the
+ * temporary workspaces pass bun's default 5 s on a loaded machine, which fails the file as "(unnamed)".
+ */
+export const HOOK_TIMEOUT_MS = 60_000;
+
 export interface Finished {
   pid: number;
   code: number;

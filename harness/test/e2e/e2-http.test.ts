@@ -25,7 +25,7 @@ import { copyOf } from "../helpers/copy.ts";
 import { killStrayDaemons, startDaemon, type Daemon } from "../helpers/daemon.ts";
 import { subscribe } from "../helpers/events.ts";
 import { records } from "../helpers/paths.ts";
-import { waitFor } from "../helpers/process.ts";
+import { HOOK_TIMEOUT_MS, waitFor } from "../helpers/process.ts";
 import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
 
 let ws: TmpWorkspace;
@@ -36,13 +36,13 @@ beforeAll(async () => {
   ws = tmpWorkspace({ server: { idleMinutes: 5 } });
   daemon = await startDaemon(ws.root);
   api = apiClient(daemon);
-});
+}, HOOK_TIMEOUT_MS);
 
 afterAll(async () => {
   await daemon?.stop().catch(() => {});
   killStrayDaemons();
   ws?.dispose();
-});
+}, HOOK_TIMEOUT_MS);
 
 const readJson = <T>(file: string): T => JSON.parse(fs.readFileSync(file, "utf8")) as T;
 

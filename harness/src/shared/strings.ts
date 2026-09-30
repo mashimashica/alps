@@ -1,8 +1,10 @@
 /*
  * What the harness says, in English and Japanese. The server answers a failure with the key and
- * arguments of its message besides the English text, so each client puts it in its own language:
+ * arguments of its message besides the English text, and records what it writes itself in a run
+ * (its own events and the run's error) the same way, so each client puts it in its own language:
  * the MCP server in the workspace's `language` (alps-harness.yaml), the WebUI in the person's.
- * The MCP server's own texts (the summary that follows each tool result) are here too.
+ * The MCP server's own texts (the summary that follows each tool result) are here too, and so is
+ * what the demo agent writes into the workspace, which follows the workspace's language.
  */
 
 import type { Language, RunStatus } from "./types.ts";
@@ -31,6 +33,39 @@ const STATUS_JA: Record<RunStatus, string> = {
 
 const statusOf = (status: string, words: Record<RunStatus, string>): string =>
   words[status as RunStatus] ?? status;
+
+type EndStatus = Exclude<RunStatus, "running">;
+
+const END_EN: Record<EndStatus, string> = {
+  succeeded: "Succeeded",
+  failed: "Failed",
+  canceled: "Canceled",
+  interrupted: "Interrupted",
+};
+
+const END_JA: Record<EndStatus, string> = {
+  succeeded: "正常終了",
+  failed: "異常終了",
+  canceled: "中止",
+  interrupted: "中断",
+};
+
+/** What woke a wake run: a schedule (its cron), an MCP client's request (its name), or a request. */
+type WokenBy = { by: "schedule" | "client" | "request"; cron: string; client: string };
+
+const wokenEn = (a: WokenBy): string =>
+  a.by === "schedule"
+    ? `by the schedule "${a.cron}"`
+    : a.by === "client"
+      ? `on request of ${a.client}`
+      : "on request";
+
+const wokenJa = (a: WokenBy): string =>
+  a.by === "schedule"
+    ? `スケジュール「${a.cron}」による`
+    : a.by === "client"
+      ? `${a.client} の求めによる`
+      : "求めによる";
 
 const TOKEN_NOTE_EN =
   "The part after # is the access token: give the URL only to the person who asked for it.";
@@ -167,6 +202,53 @@ const en = {
     `No wake was started: wake run ${a.running} still runs. The skip is recorded in its events.`,
   "done.ui": (a: { url: string; open: boolean; opened: boolean }) =>
     `The WebUI is at ${a.url}.${a.opened ? " It was opened in the browser." : a.open ? " No browser could be started; open the URL yourself." : ""} ${TOKEN_NOTE_EN}`,
+
+  /* ---------- the run log that the MCP server gives (alps://run/<id>/log) ---------- */
+  "log.head": (a: { run: string; agent: string; status: string }) =>
+    `# Log of run ${a.run} (${a.agent}, ${a.status})`,
+  "log.cut": (a: { count: number }) => `(${a.count} earlier events left out)`,
+
+  /* ---------- what the harness itself writes in a run's events ---------- */
+  "event.self": () => "The calling session performs the run (self). It ends with finish_run.",
+  "event.started": (a: { agent: string; version: string }) =>
+    `Started ${a.agent}${a.version ? ` (${a.version})` : ""}`,
+  "event.notStarted": (a: { agent: string; detail: string }) =>
+    `${a.agent} could not be started: ${a.detail}`,
+  "event.end": (a: { status: string; seconds: number }) =>
+    `${END_EN[a.status as EndStatus] ?? a.status} (${a.seconds} s)`,
+  "event.woken": (a: WokenBy) => `Woken ${wokenEn(a)}.`,
+  "event.wakeSkipped": (a: WokenBy) => `Skipped a wake ${wokenEn(a)}: this wake still runs.`,
+  "event.wakeReported": (a: { status: string }) =>
+    `The agent reported with finish_run (${a.status}); the run ends when its process exits.`,
+  "event.attached": (a: { run: string; agent: string; instance: string }) =>
+    `Started run ${a.run} (${a.agent}) of instance ${a.instance}.`,
+  "event.mcpConfig": (a: { agent: string; detail: string }) =>
+    `The MCP configuration for ${a.agent} could not be written: ${a.detail}`,
+
+  /* ---------- why the harness considers a run failed or stopped (its error) ---------- */
+  "runError.interrupted": () => "The harness server stopped while the run was running.",
+  "runError.sessionClosed": () =>
+    "The MCP connection of the session that performs the run closed before finish_run.",
+  "runError.exited": (a: { agent: string; code: number }) =>
+    `${a.agent} exited with code ${a.code}.`,
+  "runError.signal": (a: { agent: string; signal: string }) =>
+    `${a.agent} was stopped by ${a.signal || "a signal"}.`,
+  "runError.lost": (a: { agent: string; detail: string }) =>
+    `The harness lost ${a.agent}: ${a.detail}`,
+  "runError.demoOutside": (a: { path: string }) =>
+    `The demo does not write ${a.path}: it is outside the workspace.`,
+  "runError.demoWrite": (a: { path: string; detail: string }) =>
+    `The demo could not write ${a.path}: ${a.detail}`,
+  "runError.demoStopped": (a: { detail: string }) => `The demo stopped: ${a.detail}`,
+
+  /* ---------- what the demo agent says in its events, and writes ---------- */
+  "demo.start": () => "Running as a demo (no agent is started)",
+  "demo.aim": (a: { process: string }) =>
+    `Preparing the outputs toward the Outcomes of "${a.process}".`,
+  "demo.report": () =>
+    "This was a demo: no agent ran, and whether each Outcome is achieved was not checked. Judge from the content of the outputs.",
+  "demo.note": (a: { run: string; process: string }) =>
+    `Written by demo run ${a.run} (${a.process}). An agent's run writes the actual content.`,
 } satisfies Record<string, (args: never) => string>;
 
 export type MessageKey = keyof typeof en;
@@ -291,6 +373,39 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
     `目覚めは開始しなかった。目覚めの実行 ${a.running} がまだ動いている。見送りはその実行のイベントに記録した。`,
   "done.ui": (a) =>
     `WebUI は ${a.url} にある。${a.opened ? "ブラウザで開いた。" : a.open ? "ブラウザを起動できなかったので、URL を自分で開くこと。" : ""}${TOKEN_NOTE_JA}`,
+
+  "log.head": (a) => `# 実行 ${a.run} のログ（${a.agent}、${a.status}）`,
+  "log.cut": (a) => `（イベント ${a.count} 件を省いた）`,
+
+  "event.self": () => "呼び出し元のセッションが自分で実行する（self）。finish_run で終わる。",
+  "event.started": (a) => `${a.agent}${a.version ? `（${a.version}）` : ""}を起動した`,
+  "event.notStarted": (a) => `${a.agent} を起動できなかった: ${a.detail}`,
+  "event.end": (a) => `${END_JA[a.status as EndStatus] ?? a.status}（${a.seconds} 秒）`,
+  "event.woken": (a) => `${wokenJa(a)}目覚め。`,
+  "event.wakeSkipped": (a) => `${wokenJa(a)}目覚めを見送った。この目覚めがまだ動いている。`,
+  "event.wakeReported": (a) =>
+    `エージェントが finish_run で報告した（${a.status}）。実行はそのプロセスが終わった時点で終わる。`,
+  "event.attached": (a) => `インスタンス ${a.instance} の実行 ${a.run}（${a.agent}）を起動した。`,
+  "event.mcpConfig": (a) => `${a.agent} の MCP 設定を書き込めなかった: ${a.detail}`,
+
+  "runError.interrupted": () => "実行中にハーネスサーバーが停止した。",
+  "runError.sessionClosed": () => "実行を行うセッションの MCP の接続が、finish_run の前に切れた。",
+  "runError.exited": (a) => `${a.agent} は終了コード ${a.code} で終わった。`,
+  "runError.signal": (a) =>
+    a.signal
+      ? `${a.agent} はシグナル ${a.signal} で止められた。`
+      : `${a.agent} はシグナルで止められた。`,
+  "runError.lost": (a) => `ハーネスが ${a.agent} を見失った: ${a.detail}`,
+  "runError.demoOutside": (a) => `デモは ${a.path} に書かない。ワークスペースの外にある。`,
+  "runError.demoWrite": (a) => `デモは ${a.path} を書けなかった: ${a.detail}`,
+  "runError.demoStopped": (a) => `デモが止まった: ${a.detail}`,
+
+  "demo.start": () => "デモとして実行（エージェントは起動しない）",
+  "demo.aim": (a) => `「${a.process}」の成果に向けて、出力を用意する。`,
+  "demo.report": () =>
+    "デモのため、エージェントは起動しておらず、各成果の達成は確かめていない。出力の中身を見て判断すること。",
+  "demo.note": (a) =>
+    `デモ実行 ${a.run}（${a.process}）が作成した記録。実際の内容はエージェントの実行で作られる。`,
 };
 
 const CATALOG: Record<Language, { [K in MessageKey]: (typeof en)[K] }> = { en, ja };
@@ -304,6 +419,20 @@ export function say<K extends MessageKey>(
   const message = CATALOG[language][key] as (args: MessageArgs<K>) => string;
   return message(args);
 }
+
+/** A message as the harness records it: the English text, with its key and arguments for other languages. */
+export interface Spoken<K extends MessageKey = MessageKey> {
+  text: string;
+  key: K;
+  args: Record<string, MessageArg>;
+}
+
+/** The message `key` with `args`, as the harness records it. */
+export const spoken = <K extends MessageKey>(key: K, args: MessageArgs<K>): Spoken<K> => ({
+  text: say("en", key, args),
+  key,
+  args: args as Record<string, MessageArg>,
+});
 
 export const isMessageKey = (key: unknown): key is MessageKey =>
   typeof key === "string" && Object.hasOwn(en, key);

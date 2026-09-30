@@ -1,6 +1,6 @@
 {
   "name": "alps",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Design the meaning of work and the agent work system that realizes it.",
   "author": {
     "name": "mashimashica",
@@ -19,17 +19,19 @@
     "alps"
   ],
   "skills": "./skills/",
+  "mcpServers": "./mcp.json",
   "interface": {
     "displayName": "ALPS",
     "shortDescription": "Design the meaning of work and the agent work system that realizes it",
-    "longDescription": "ALPS helps clarify the purpose, observable success conditions, and necessary boundaries of work, and design the agents, tools, information resources, and environments that realize it. Create, revise, or review Process Descriptions and supporting configurations. Allocate judgment and processing, implement needed capabilities within the request, and assess both tool behavior and effectiveness through representative work.",
+    "longDescription": "ALPS helps clarify the purpose, observable success conditions, and necessary boundaries of work, and design the agents, tools, information resources, and environments that realize it. Create, revise, or review Process Descriptions and supporting configurations. Allocate judgment and processing, implement needed capabilities within the request, and assess both tool behavior and effectiveness through representative work. The harness runs the Processes of a process model with agents and records their runs and evaluations, through its MCP server and WebUI.",
     "developerName": "mashimashica",
     "category": "Developer Tools",
     "capabilities": [
       "Clarify purpose, Outcomes, and work boundaries",
       "Design agent and tool responsibilities and interfaces",
       "Implement and connect needed capabilities",
-      "Evaluate descriptions, tools, and work-system effectiveness"
+      "Evaluate descriptions, tools, and work-system effectiveness",
+      "Run Processes and record their runs and evaluations with the harness"
     ],
     "websiteURL": "https://github.com/mashimashica/alps",
     "defaultPrompt": [

@@ -25,6 +25,7 @@ import { copyOf } from "../helpers/copy.ts";
 import { readServerInfo, stopWorkspaceDaemon } from "../helpers/daemon.ts";
 import { callTool, mcpClient, toolFailure, type McpSession } from "../helpers/mcp.ts";
 import { FAKES, records } from "../helpers/paths.ts";
+import { HOOK_TIMEOUT_MS } from "../helpers/process.ts";
 import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
 
 const TOOLS = [
@@ -50,14 +51,14 @@ const dirs: string[] = [];
 beforeAll(async () => {
   ws = tmpWorkspace();
   session = await mcpClient({ workspace: ws.root });
-});
+}, HOOK_TIMEOUT_MS);
 
 afterAll(async () => {
   await session?.close();
   for (const workspace of [ws, ...others]) if (workspace) await stopWorkspaceDaemon(workspace.root);
   for (const workspace of [ws, ...others]) workspace?.dispose();
   for (const dir of dirs) fs.rmSync(dir, { recursive: true, force: true });
-});
+}, HOOK_TIMEOUT_MS);
 
 /** The Skill path of each Process that has one, by Process name. */
 const skillPaths = (model: ModelDescription): Record<string, string> =>

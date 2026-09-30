@@ -18,7 +18,7 @@ import {
   stateFileV1Schema,
 } from "../shared/schema.ts";
 import type { Run, RunEvent, RunSummary, StateFile } from "../shared/types.ts";
-import { INTERRUPTED_ERROR, migrateStateV1 } from "./migrate.ts";
+import { INTERRUPTED_ERROR, migrateStateV1, runError } from "./migrate.ts";
 
 export const STATE_VERSION = 2;
 
@@ -194,7 +194,7 @@ export function loadRecords(root: string, now = Date.now()): LoadedRecords {
     if (!run) continue;
     run.status = "interrupted";
     run.endedAt = now;
-    run.error ??= INTERRUPTED_ERROR;
+    if (run.error === null) Object.assign(run, runError(INTERRUPTED_ERROR));
     if (!loaded.changes.runs.includes(run)) loaded.changes.runs.push(run);
   }
   return loaded;

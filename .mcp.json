@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "harness": {
+      "type": "stdio",
+      "command": "bun",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/harness/src/cli.ts", "mcp"],
+      "env": {
+        "ALPS_WORKSPACE": "${CLAUDE_PROJECT_DIR}"
+      }
+    }
+  }
+}

@@ -41,7 +41,7 @@ jobs:
           skills-ref validate .agents/skills/review-alps
           skills-ref validate .agents/skills/sync-locales
 
-      - name: Validate root Agent Plugin manifest schema
+      - name: Validate root Agent Plugin manifest and MCP configuration schemas
         run: |
           python - <<'PY'
           import json
@@ -50,30 +50,34 @@ jobs:
 
           from jsonschema import FormatChecker, validators
 
-          manifest_path = Path("plugin.json")
-          root_schema = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
-          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-          if manifest.get("$schema") != root_schema:
-              raise SystemExit(f"plugin.json must declare {root_schema}")
-          with urllib.request.urlopen(root_schema, timeout=30) as response:
-              schema = json.load(response)
-          validator_class = validators.validator_for(schema)
-          validator_class.check_schema(schema)
-          errors = sorted(
-              validator_class(
-                  schema, format_checker=FormatChecker()
-              ).iter_errors(manifest),
-              key=lambda error: tuple(
-                  str(part) for part in error.absolute_path
-              ),
-          )
-          for error in errors:
-              location = (
-                  ".".join(str(part) for part in error.absolute_path)
-                  or "<root>"
+          base = "https://agent-plugins.org/schemas/1.0.0"
+          failed = False
+          for name in ("plugin", "mcp"):
+              manifest_path = Path(f"{name}.json")
+              root_schema = f"{base}/{name}.schema.json"
+              manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+              if manifest.get("$schema") != root_schema:
+                  raise SystemExit(f"{manifest_path} must declare {root_schema}")
+              with urllib.request.urlopen(root_schema, timeout=30) as response:
+                  schema = json.load(response)
+              validator_class = validators.validator_for(schema)
+              validator_class.check_schema(schema)
+              errors = sorted(
+                  validator_class(
+                      schema, format_checker=FormatChecker()
+                  ).iter_errors(manifest),
+                  key=lambda error: tuple(
+                      str(part) for part in error.absolute_path
+                  ),
               )
-              print(f"{manifest_path}:{location}: {error.message}")
-          if errors:
+              for error in errors:
+                  location = (
+                      ".".join(str(part) for part in error.absolute_path)
+                      or "<root>"
+                  )
+                  print(f"{manifest_path}:{location}: {error.message}")
+              failed = failed or bool(errors)
+          if failed:
               raise SystemExit(1)
           PY
 
@@ -82,12 +86,13 @@ jobs:
           # A directory with marketplace.json validates only the marketplace.
           # The root CLAUDE.md is for repository development, not Plugin context,
           # so the Plugin is validated strictly from a tracked copy without it.
+          # Claude Code 2.1.281 and later also check the MCP servers in .mcp.json.
           plugin_copy="$(mktemp -d)"
           git archive HEAD | tar -x -C "$plugin_copy"
           rm "$plugin_copy/CLAUDE.md"
-          npx --yes @anthropic-ai/claude-code@2.1.251 \
+          npx --yes @anthropic-ai/claude-code@2.1.285 \
             plugin validate "$plugin_copy/.claude-plugin/plugin.json" --strict
-          npx --yes @anthropic-ai/claude-code@2.1.251 \
+          npx --yes @anthropic-ai/claude-code@2.1.285 \
             plugin validate . --strict
 
       - name: Run manifest version and example tool tests
@@ -97,7 +102,7 @@ jobs:
         run: |
           find AGENTS.md README.md CONTRIBUTING.md skills examples .agents/skills \
             docs/versioning.md docs/releases docs/locales/ja/*.md \
-            docs/locales/ja/releases \
+            docs/locales/ja/releases commands harness/README.md \
             .github/pull_request_template.md \
             -type f -name '*.md' -print0 \
             | xargs -0 npx --yes markdown-link-check@3.13.7 \
@@ -129,3 +134,116 @@ jobs:
 
       - name: Run example tool tests on the minimum supported Python
         run: python -m unittest tests.test_service_comparison -v
+
+  # The harness on the supported systems: type check, lint, format, and the tests apart from E10.
+  harness:
+    name: harness (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.3.11
+
+      - name: Install the runtime dependencies as the Plugin fetch does
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Install the development tools
+        working-directory: harness
+        run: bun install --frozen-lockfile
+
+      - name: Type-check
+        working-directory: harness
+        run: bun run check
+
+      - name: Lint
+        working-directory: harness
+        run: bun run lint
+
+      - name: Check formatting
+        working-directory: harness
+        run: bunx oxfmt --check
+
+      - name: Install Chromium for the browser tests (E8)
+        working-directory: harness
+        run: bunx playwright install --with-deps chromium
+
+      - name: Run the unit and E2E tests except the WebUI's (E10)
+        working-directory: harness
+        run: bun test --path-ignore-patterns='**/e10-*'
+
+  # E10 drives the WebUI in Chromium. In whole-suite runs its browser has at times stopped
+  # answering; a failed test is retried once, and the retry shows in the log.
+  harness-webui:
+    name: harness WebUI E10 (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.3.11
+
+      - name: Install the runtime dependencies as the Plugin fetch does
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Install the development tools
+        working-directory: harness
+        run: bun install --frozen-lockfile
+
+      - name: Install Chromium
+        working-directory: harness
+        run: bunx playwright install --with-deps chromium
+
+      - name: Run the WebUI tests (E10), retrying a failed test once
+        working-directory: harness
+        run: bun test test/e2e/e10-webui.test.ts --retry=1
+
+  # Windows is experimental: the job runs, and its failures do not fail the workflow.
+  harness-windows:
+    name: harness (windows-2025, experimental)
+    runs-on: windows-2025
+    continue-on-error: true
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.3.11
+
+      - name: Install the runtime dependencies as the Plugin fetch does
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Install the development tools
+        working-directory: harness
+        run: bun install --frozen-lockfile
+
+      - name: Type-check
+        working-directory: harness
+        run: bun run check
+
+      - name: Install Chromium
+        working-directory: harness
+        run: bunx playwright install chromium
+
+      - name: Run the unit and E2E tests
+        working-directory: harness
+        run: bun test --retry=1

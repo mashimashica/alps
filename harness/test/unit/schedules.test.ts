@@ -9,13 +9,14 @@
 import { afterAll, describe, expect, test } from "bun:test";
 import path from "node:path";
 import { loadWorkspace, ModelError } from "../../src/model/index.ts";
+import { HOOK_TIMEOUT_MS } from "../helpers/process.ts";
 import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
 
 const workspaces: TmpWorkspace[] = [];
 
 afterAll(() => {
   for (const ws of workspaces) ws.dispose();
-});
+}, HOOK_TIMEOUT_MS);
 
 /** Loads the example workspace with these schedules and agents: the ModelError it throws, or `null`. */
 function load(

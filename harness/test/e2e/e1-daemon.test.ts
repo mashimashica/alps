@@ -16,7 +16,7 @@ import type {
 import { killStrayDaemons, startDaemon } from "../helpers/daemon.ts";
 import { callTool, mcpClient } from "../helpers/mcp.ts";
 import { serverJson } from "../helpers/paths.ts";
-import { cli, isAlive, waitFor } from "../helpers/process.ts";
+import { cli, HOOK_TIMEOUT_MS, isAlive, waitFor } from "../helpers/process.ts";
 import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
 
 const workspaces: TmpWorkspace[] = [];
@@ -29,7 +29,7 @@ const workspace = (overrides?: Parameters<typeof tmpWorkspace>[0]): TmpWorkspace
 afterAll(() => {
   killStrayDaemons();
   for (const ws of workspaces) ws.dispose();
-});
+}, HOOK_TIMEOUT_MS);
 
 const readServerJson = (root: string): ServerInfo =>
   JSON.parse(fs.readFileSync(serverJson(root), "utf8")) as ServerInfo;

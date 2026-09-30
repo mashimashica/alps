@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { EXAMPLES, HARNESS_ROOT } from "./paths.ts";
+import { EXAMPLES, HARNESS_ROOT, REPO_ROOT } from "./paths.ts";
 
 export interface TmpWorkspace {
   /** The copied workspace (…/examples/service-change, or …/examples/locales/ja/service-change). */
@@ -64,18 +64,15 @@ export function tmpWorkspace(overrides: WorkspaceOverrides = {}): TmpWorkspace {
 }
 
 /**
- * Copies the harness package (its sources and manifests) into `dir` for a test that changes the
- * sources, and links the copy's node_modules to the real one. Returns the copy's cli.ts.
+ * Copies the harness package (its sources and manifests) into `dir`/harness for a test that changes
+ * the sources. As in the repository, the runtime dependencies are beside it: `dir`/node_modules
+ * links to the root's install. Returns the copy's cli.ts.
  */
 export function copyHarness(dir: string): string {
   const copy = path.join(dir, "harness");
   fs.cpSync(path.join(HARNESS_ROOT, "src"), path.join(copy, "src"), { recursive: true });
   for (const file of ["package.json", "tsconfig.json"])
     fs.copyFileSync(path.join(HARNESS_ROOT, file), path.join(copy, file));
-  fs.symlinkSync(
-    path.join(HARNESS_ROOT, "node_modules"),
-    path.join(copy, "node_modules"),
-    "junction",
-  );
+  fs.symlinkSync(path.join(REPO_ROOT, "node_modules"), path.join(dir, "node_modules"), "junction");
   return path.join(copy, "src", "cli.ts");
 }

@@ -4,19 +4,24 @@
  * current directory. The page reads the token once from the URL fragment and keeps it in
  * sessionStorage, so that it survives a reload. The network draws the ring of 11 Processes and 15
  * pills; a pill opens the focus view and a blank click returns; the marks on the ring follow the
- * runs through SSE.
+ * runs through SSE. The switch at the top right shows the page in Japanese, what the harness itself
+ * said in a run included.
  */
 
 import { afterAll, describe, expect, test } from "bun:test";
 import fs from "node:fs";
 import path from "node:path";
 import type { Browser, Page } from "playwright";
-import type { InstanceResponse, RunStartResponse } from "../../src/shared/types.ts";
+import type {
+  InstanceResponse,
+  RunDetailResponse,
+  RunStartResponse,
+} from "../../src/shared/types.ts";
 import { apiClient } from "../helpers/api.ts";
 import { closeBrowser, killStrayBrowsers, launchBrowser } from "../helpers/browser.ts";
 import { killStrayDaemons, startDaemon } from "../helpers/daemon.ts";
 import { FAKES, HARNESS_ROOT, serverJson } from "../helpers/paths.ts";
-import { exec, processCwd } from "../helpers/process.ts";
+import { exec, HOOK_TIMEOUT_MS, processCwd } from "../helpers/process.ts";
 import { copyHarness, tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
 
 const workspaces: TmpWorkspace[] = [];
@@ -30,13 +35,20 @@ afterAll(() => {
   killStrayBrowsers();
   killStrayDaemons();
   for (const ws of workspaces) ws.dispose();
-});
+}, HOOK_TIMEOUT_MS);
 
 const serverLog = (root: string): string => path.join(root, ".alps-harness", "server.log");
 
-/** Opens the WebUI and collects what goes wrong on the page: console errors, page errors, and failed responses. */
-async function openPage(browser: Browser, url: string): Promise<{ tab: Page; problems: string[] }> {
-  const tab = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+/**
+ * Opens the WebUI and collects what goes wrong on the page: console errors, page errors, and
+ * failed responses. `locale` sets the browser's language, which the page starts in.
+ */
+async function openPage(
+  browser: Browser,
+  url: string,
+  locale?: string,
+): Promise<{ tab: Page; problems: string[] }> {
+  const tab = await browser.newPage({ viewport: { width: 1280, height: 800 }, locale });
   const problems: string[] = [];
   tab.on("console", (message) => {
     if (message.type() === "error") problems.push(`console: ${message.text()}`);
@@ -318,5 +330,65 @@ describe("E10 WebUI", () => {
       }
     },
     { timeout: 90_000 },
+  );
+
+  test(
+    "E10 the language switch at the top right shows a run in Japanese, with what the harness itself said in it: the end of its log and its error",
+    async () => {
+      // The fake Codex exits with code 3 without a word, so only the harness says why it failed.
+      const ws = tmpWorkspace({
+        agents: {
+          codex: { command: path.join(FAKES, "codex.ts"), env: { ALPS_FAKE_SCENARIO: "exit" } },
+        },
+      });
+      workspaces.push(ws);
+      const daemon = await startDaemon(ws.root, [], { cwd: "/" });
+      const api = apiClient(daemon);
+      const { instance } = await api.ok<InstanceResponse>("POST", "/api/instances", {
+        process: "Solution Design",
+        inputs: { "Change brief": ["docs/changes/CHG-001/change-brief.md"] },
+        outputs: { "Design description": "docs/changes/CHG-001/design/" },
+      });
+      const { run } = await api.ok<RunStartResponse>("POST", `/api/instances/${instance.id}/run`, {
+        agent: "codex",
+      });
+      const ended = await api.ok<RunDetailResponse>("GET", `/api/runs/${run.id}?wait=30`);
+      expect(ended.run.status).toBe("failed");
+      const browser = await launchBrowser();
+      try {
+        // The browser's language is English, so the page starts in English.
+        const { tab, problems } = await openPage(browser, daemon.uiUrl, "en-US");
+        await tab.locator('[role="tab"][data-view="instances"]').click();
+        await tab.locator(`tr[data-instance="${instance.id}"]`).click();
+        await tab
+          .getByTestId("panel-instance")
+          .getByRole("button", { name: run.id, exact: true })
+          .first()
+          .click();
+        const panel = tab.locator(`[data-testid="panel-run"][data-run="${run.id}"]`);
+        const log = panel.getByTestId("run-log");
+        const error = panel.getByTestId("run-error");
+        await log.filter({ hasText: "Failed (" }).waitFor({ timeout: 10_000 });
+        expect(await log.textContent()).toMatch(/ end\s+Failed \(\d+ s\)/);
+        expect(await log.textContent()).toContain("Started Codex (codex-cli 0.999.0)");
+        expect(await error.textContent()).toBe("Codex exited with code 3.");
+
+        // After the switch the harness's own lines and the run's error are in Japanese.
+        await tab.locator("header button.language").click();
+        await log.filter({ hasText: "異常終了" }).waitFor({ timeout: 5000 });
+        expect(await log.textContent()).toMatch(/ end\s+異常終了（\d+ 秒）/);
+        expect(await log.textContent()).toContain("Codex（codex-cli 0.999.0）を起動した");
+        expect(await log.textContent()).not.toContain("Failed (");
+        expect(await error.textContent()).toBe("Codex は終了コード 3 で終わった。");
+        expect(await tab.locator('[role="tab"][data-view="instances"]').textContent()).toBe(
+          "インスタンス",
+        );
+        expect(problems).toEqual([]);
+      } finally {
+        await closeBrowser(browser);
+        await daemon.stop();
+      }
+    },
+    { timeout: 60_000 },
   );
 });

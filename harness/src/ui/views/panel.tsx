@@ -20,6 +20,7 @@ import type {
   SkillResponse,
   StaleReason,
 } from "../../shared/types.ts";
+import { sayReceived } from "../../shared/strings.ts";
 import { query } from "../api.ts";
 import { useUi, type Selection } from "../context.ts";
 import { clock, count, dateTime, duration, money } from "../format.ts";
@@ -442,7 +443,14 @@ function RunPanel({ id }: { id: string }) {
       )}
       {(run.error || run.agentError) && (
         <Section title={t("run.error")}>
-          <p class="fail-text pre">{[run.error, run.agentError].filter(Boolean).join("\n")}</p>
+          <p class="fail-text pre" data-testid="run-error">
+            {[
+              run.error && sayReceived(language, run.errorKey, run.errorArgs, run.error),
+              run.agentError,
+            ]
+              .filter(Boolean)
+              .join("\n")}
+          </p>
         </Section>
       )}
       <Section title={t("run.report")}>
@@ -507,7 +515,10 @@ function RunPanel({ id }: { id: string }) {
         {truncated && <p class="muted small">{t("run.earlier")}</p>}
         <pre class="log" data-testid="run-log">
           {events
-            .map((event) => `${clock(event.t, language)} ${event.kind.padEnd(8)} ${event.text}`)
+            .map(
+              (event) =>
+                `${clock(event.t, language)} ${event.kind.padEnd(8)} ${sayReceived(language, event.key, event.args, event.text)}`,
+            )
             .join("\n")}
         </pre>
         {run.status === "running" && <p class="muted small">{t("run.following")}</p>}

@@ -24,7 +24,7 @@ import { copyOf } from "../helpers/copy.ts";
 import { killStrayDaemons, stopWorkspaceDaemon } from "../helpers/daemon.ts";
 import { callTool, mcpClient, type McpSession } from "../helpers/mcp.ts";
 import { serverJson } from "../helpers/paths.ts";
-import { cli } from "../helpers/process.ts";
+import { cli, HOOK_TIMEOUT_MS } from "../helpers/process.ts";
 import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
 
 let ws: TmpWorkspace | undefined;
@@ -38,7 +38,7 @@ afterAll(async () => {
     if (workspace) await stopWorkspaceDaemon(workspace.root).catch(() => {});
   killStrayDaemons();
   for (const workspace of [ws, ...workspaces]) workspace?.dispose();
-});
+}, HOOK_TIMEOUT_MS);
 
 /** Instantiates a Process, runs it with the demo, and judges each of its Outcomes with evidence. */
 async function evaluated(

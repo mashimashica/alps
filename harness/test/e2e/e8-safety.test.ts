@@ -23,7 +23,7 @@ import { closeBrowser, killStrayBrowsers, launchBrowser } from "../helpers/brows
 import { killStrayDaemons, startDaemon, type Daemon } from "../helpers/daemon.ts";
 import { callTool, mcpClient, toolFailure } from "../helpers/mcp.ts";
 import { records } from "../helpers/paths.ts";
-import { isAlive, waitFor } from "../helpers/process.ts";
+import { HOOK_TIMEOUT_MS, isAlive, waitFor } from "../helpers/process.ts";
 import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
 
 /** Every route of the API, and one that does not exist: the checks come before routing. */
@@ -76,14 +76,14 @@ beforeAll(async () => {
   const script = `#!/bin/sh\nprintf '%s' "$1" > '${opened}.part' && mv '${opened}.part' '${opened}'\n`;
   fs.writeFileSync(browser, script, { mode: 0o755 });
   daemon = await startDaemon(ws.root, ["--open"], { env: { BROWSER: browser } });
-});
+}, HOOK_TIMEOUT_MS);
 
 afterAll(async () => {
   killStrayBrowsers();
   await daemon?.stop().catch(() => {});
   killStrayDaemons();
   ws?.dispose();
-});
+}, HOOK_TIMEOUT_MS);
 
 interface Sent {
   status: number;

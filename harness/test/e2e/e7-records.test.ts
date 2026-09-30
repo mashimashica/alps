@@ -18,6 +18,7 @@ import { apiClient } from "../helpers/api.ts";
 import { copyOf } from "../helpers/copy.ts";
 import { killStrayDaemons, startDaemon } from "../helpers/daemon.ts";
 import { FIXTURES, records } from "../helpers/paths.ts";
+import { HOOK_TIMEOUT_MS } from "../helpers/process.ts";
 import { tmpWorkspace, type TmpWorkspace } from "../helpers/workspace.ts";
 
 const workspaces: TmpWorkspace[] = [];
@@ -25,7 +26,7 @@ const workspaces: TmpWorkspace[] = [];
 afterAll(() => {
   killStrayDaemons();
   for (const ws of workspaces) ws.dispose();
-});
+}, HOOK_TIMEOUT_MS);
 
 const readJson = <T>(file: string): T => JSON.parse(fs.readFileSync(file, "utf8")) as T;
 

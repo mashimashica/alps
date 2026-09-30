@@ -25,7 +25,7 @@ import { copyOf } from "../helpers/copy.ts";
 import { killStrayDaemons, startDaemon, stopWorkspaceDaemon } from "../helpers/daemon.ts";
 import { callTool, mcpClient, type McpSession } from "../helpers/mcp.ts";
 import { FAKES, records } from "../helpers/paths.ts";
-import { cli, isAlive } from "../helpers/process.ts";
+import { cli, HOOK_TIMEOUT_MS, isAlive } from "../helpers/process.ts";
 import { tmpWorkspace, type TmpWorkspace, type WorkspaceOverrides } from "../helpers/workspace.ts";
 
 const workspaces: TmpWorkspace[] = [];
@@ -36,7 +36,7 @@ afterAll(async () => {
   for (const ws of workspaces) await stopWorkspaceDaemon(ws.root).catch(() => {});
   killStrayDaemons();
   for (const ws of workspaces) ws.dispose();
-});
+}, HOOK_TIMEOUT_MS);
 
 const WAKE_AGENT = path.join(FAKES, "wake-agent.ts");
 

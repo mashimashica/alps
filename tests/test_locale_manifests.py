@@ -93,6 +93,36 @@ class LocaleManifestTests(unittest.TestCase):
                         "translation and update reviewed_source_sha256",
                     )
 
+    def test_catalogs_are_listed_with_current_hashes(self) -> None:
+        text = (ROOT / "localization.yaml").read_text(encoding="utf-8")
+        _, _, listed = text.partition("\ncatalogs:\n")
+        catalogs: dict = {}
+        current = None
+        for raw in listed.splitlines():
+            if not raw.strip() or raw.lstrip().startswith("#"):
+                continue
+            indent = len(raw) - len(raw.lstrip(" "))
+            if indent == 0:
+                break
+            key, _, value = raw.strip().partition(":")
+            if indent == 2 and not value.strip():
+                current = catalogs.setdefault(key, {})
+            elif indent == 4 and current is not None:
+                current[key] = value.strip().strip('"')
+            else:
+                self.fail(f"localization.yaml: unsupported catalogs entry {raw!r}")
+        self.assertTrue(catalogs)
+        for catalog, entry in sorted(catalogs.items()):
+            with self.subTest(catalog=catalog):
+                path = ROOT / catalog
+                self.assertTrue(path.is_file(), "catalog does not exist")
+                self.assertEqual(
+                    entry.get("reviewed_source_sha256"),
+                    hashlib.sha256(path.read_bytes()).hexdigest(),
+                    f"{catalog} changed since review; review its Japanese entries and "
+                    "update reviewed_source_sha256 in localization.yaml",
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

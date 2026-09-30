@@ -1,4 +1,9 @@
 {
   "private": true,
-  "workspaces": ["harness"]
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.2.0",
+    "marked": "^18.0.14",
+    "preact": "^10.29.8",
+    "zod": "^4.6.5"
+  }
 }
