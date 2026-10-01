@@ -2,7 +2,7 @@
  * E2 (MCP, data): over MCP, get_model returns the example model, and instantiate → run(demo) →
  * get_run(wait) succeeds with the outputs recorded in provenance. The MCP server relays to the
  * workspace's daemon, which it starts when there is none; e2-http.test.ts runs the same scenario
- * on the HTTP API. With it: the twelve tools and five resources, the failures that the MCP server
+ * on the HTTP API. With it: the fifteen tools and five resources, the failures that the MCP server
  * answers itself (no workspace, no server), and responses in the workspace's language.
  */
 
@@ -39,6 +39,9 @@ const TOOLS = [
   "finish_run",
   "evaluate",
   "get_assessment",
+  "list_runs",
+  "assess",
+  "record_assessment",
   "wake",
   "open_ui",
 ];
@@ -94,7 +97,7 @@ describe("E2 MCP over stdio", () => {
     expect(client.getServerCapabilities()?.resources).toBeDefined();
   });
 
-  test("E2 the MCP server lists the twelve tools, each with a description of its results", async () => {
+  test("E2 the MCP server lists the fifteen tools, each with a description of its results", async () => {
     const { tools } = await session.client.listTools();
     expect(tools.map((tool) => tool.name).sort()).toEqual([...TOOLS].sort());
     for (const tool of tools) {
@@ -111,6 +114,15 @@ describe("E2 MCP over stdio", () => {
     expect(described.wake).toContain("says only that the agent started");
     expect(described.wake).toContain("in the wake run's report");
     expect(described.evaluate).toContain("cannot be empty");
+    // An assessment's success is its start; its result is the latest of get_assessment, which is
+    // kept apart from what the harness observes, and an item rests on evidence.
+    expect(described.assess).toContain("says only that it started");
+    expect(described.get_assessment).toContain(
+      "latest is the latest assessment whose run has ended",
+    );
+    expect(described.record_assessment).toContain(
+      "It cannot be empty except for an unverified item",
+    );
     for (const name of ["instantiate", "run", "finish_run"])
       expect(described[name], name).toMatch(/look with (get_run|list_instances)/);
     expect(described.list_artifacts).toContain("truncated");
@@ -271,7 +283,8 @@ describe("E2 MCP over stdio", () => {
       expect(log.text).toMatch(/\] \S+ end\s+Succeeded/);
       const assessment = await read("alps://assessment");
       expect(assessment.contents[0]?.mimeType).toBe("text/markdown");
-      expect(assessment.text).toContain("## Findings");
+      expect(assessment.text).toContain("## Latest assessment (interpretation)");
+      expect(assessment.text).toContain("## Checks");
       expect(assessment.text).toContain(
         `| ${instance.id} | Solution Design | ${run.id} (succeeded) |`,
       );

@@ -7,7 +7,9 @@
  * runs through SSE. The switch at the top right shows the page in Japanese, what the harness itself
  * said in a run included. The request box, the main action, starts a wake with a fake agent: the
  * file dropped on it is uploaded, the wake's record shows the request and the attachment, and the
- * board gains the instance that the agent makes, which links back to the wake. The state of the
+ * board gains the instance that the agent makes, which links back to the wake; the instance's
+ * details have three tabs (the run's log is in the run's panel), and the analysis, where no
+ * assessment has been made, shows only the empty state above the observation. The state of the
  * connection at the top right names the server it reached (its pid) in its title.
  */
 
@@ -471,8 +473,17 @@ describe("E10 WebUI", () => {
         await card.first().click();
         await tab.getByTestId("panel-instance").waitFor({ timeout: 5000 });
         expect(await tab.getByTestId("instance-origin").textContent()).toBe(id);
+        // Its details have three tabs: overview, runs, and evaluation.
+        expect(await tab.getByTestId("panel-instance").getByRole("tab").count()).toBe(3);
         await origin.click();
         await tab.locator(`[data-testid="panel-run"][data-run="${id}"]`).waitFor({ timeout: 5000 });
+        // No assessment has been made: the analysis shows its empty state above the observation.
+        await tab.locator('[role="tab"][data-view="dashboard"]').click();
+        await tab
+          .locator('[data-testid="assessment"][data-state="empty"]')
+          .waitFor({ timeout: 10_000 });
+        expect(await tab.getByTestId("assessment-latest").count()).toBe(0);
+        expect(await tab.getByTestId("observation").count()).toBe(1);
         expect(problems).toEqual([]);
       } finally {
         await closeBrowser(browser);

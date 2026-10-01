@@ -1,23 +1,24 @@
 /*
- * The records in .alps-harness/: state.json (instances, provenance, the sequence, run summaries),
- * runs/<id>.json (each run in full, prompt included), runs/<id>.jsonl (its events),
- * runs/<id>.raw.log (the agent's own output), and, while a wake run of Claude Code runs,
- * runs/<id>.mcp.json (the harness's MCP server for it). Files are replaced atomically (written
- * aside, then renamed). Reading never writes: what loading changes (a conversion from version 1,
- * runs that were running when the last server stopped) is written by persist() once the server
- * owns the workspace.
+ * The records in .alps-harness/: state.json (instances, provenance, the sequence, run summaries,
+ * the latest assessment), runs/<id>.json (each run in full, prompt included), runs/<id>.jsonl (its
+ * events), runs/<id>.raw.log (the agent's own output), assessments/<run>.json (what an assessment
+ * run recorded), and, while a wake or assessment run of Claude Code runs, runs/<id>.mcp.json (the
+ * harness's MCP server for it). Files are replaced atomically (written aside, then renamed).
+ * Reading never writes: what loading changes (a conversion from version 1, runs that were running
+ * when the last server stopped) is written by persist() once the server owns the workspace.
  */
 
 import fs from "node:fs";
 import path from "node:path";
 import { HARNESS_DIR } from "../model/index.ts";
 import {
+  assessmentRecordSchema,
   formatIssues,
   runRecordSchema,
   stateFileSchema,
   stateFileV1Schema,
 } from "../shared/schema.ts";
-import type { Run, RunEvent, RunSummary, StateFile } from "../shared/types.ts";
+import type { Assessment, Run, RunEvent, RunSummary, StateFile } from "../shared/types.ts";
 import { INTERRUPTED_ERROR, migrateStateV1, runError } from "./migrate.ts";
 
 export const STATE_VERSION = 2;
@@ -41,8 +42,10 @@ export const recordPaths = (root: string) => {
     run: (id: string) => path.join(dir, "runs", `${id}.json`),
     events: (id: string) => path.join(dir, "runs", `${id}.jsonl`),
     raw: (id: string) => path.join(dir, "runs", `${id}.raw.log`),
-    /** A wake run's --mcp-config for Claude Code, while the run runs. */
+    /** A wake or assessment run's --mcp-config for Claude Code, while the run runs. */
     mcpConfig: (id: string) => path.join(dir, "runs", `${id}.mcp.json`),
+    /** What an assessment run recorded. */
+    assessment: (run: string) => path.join(dir, "assessments", `${run}.json`),
   };
 };
 
@@ -52,6 +55,7 @@ export const emptyState = (): StateFile => ({
   provenance: {},
   seq: 0,
   lastWakeAt: null,
+  latestAssessment: null,
   runs: {},
 });
 
@@ -67,8 +71,12 @@ export const summaryOf = (run: Run): RunSummary => ({
 export interface LoadedRecords {
   state: StateFile;
   runs: Map<string, Run>;
+  /** What the assessment runs recorded, by run id. */
+  assessments: Map<string, Assessment>;
   /** Runs whose record is missing or unreadable, with why. */
   unreadable: { id: string; reason: string }[];
+  /** Assessment runs whose recorded assessment cannot be read, with why. */
+  unreadableAssessments: { id: string; reason: string }[];
   /** What loading changed and persist() writes. */
   changes: {
     /** The text of a version 1 state.json that was converted. */
@@ -105,21 +113,32 @@ const readJson = (file: string): { ok: true; value: unknown } | { ok: false; rea
 function readRunRecords(
   root: string,
   state: StateFile,
-): Pick<LoadedRecords, "runs" | "unreadable"> {
+): Pick<LoadedRecords, "runs" | "unreadable" | "assessments" | "unreadableAssessments"> {
   const paths = recordPaths(root);
   const runs = new Map<string, Run>();
   const unreadable: LoadedRecords["unreadable"] = [];
-  for (const id of Object.keys(state.runs)) {
+  const assessments = new Map<string, Assessment>();
+  const unreadableAssessments: LoadedRecords["unreadableAssessments"] = [];
+  for (const [id, summary] of Object.entries(state.runs)) {
     const read = readJson(paths.run(id));
-    if (!read.ok) {
-      unreadable.push({ id, reason: read.reason });
+    if (!read.ok) unreadable.push({ id, reason: read.reason });
+    else {
+      const parsed = runRecordSchema.safeParse(read.value);
+      if (parsed.success) runs.set(id, parsed.data);
+      else unreadable.push({ id, reason: formatIssues(`${id}.json`, parsed.error) });
+    }
+    // An assessment run that recorded nothing has no file.
+    if (summary.kind !== "assess" || !fs.existsSync(paths.assessment(id))) continue;
+    const recorded = readJson(paths.assessment(id));
+    if (!recorded.ok) {
+      unreadableAssessments.push({ id, reason: recorded.reason });
       continue;
     }
-    const parsed = runRecordSchema.safeParse(read.value);
-    if (parsed.success) runs.set(id, parsed.data);
-    else unreadable.push({ id, reason: formatIssues(`${id}.json`, parsed.error) });
+    const parsed = assessmentRecordSchema.safeParse(recorded.value);
+    if (parsed.success) assessments.set(id, parsed.data);
+    else unreadableAssessments.push({ id, reason: formatIssues(`${id}.json`, parsed.error) });
   }
-  return { runs, unreadable };
+  return { runs, unreadable, assessments, unreadableAssessments };
 }
 
 /**
@@ -132,7 +151,9 @@ export function loadRecords(root: string, now = Date.now()): LoadedRecords {
     return {
       state: emptyState(),
       runs: new Map(),
+      assessments: new Map(),
       unreadable: [],
+      unreadableAssessments: [],
       changes: { convertedV1: null, runs: [], state: false },
     };
 
@@ -164,7 +185,9 @@ export function loadRecords(root: string, now = Date.now()): LoadedRecords {
     loaded = {
       state,
       runs: new Map(runs.map((run) => [run.id, run])),
+      assessments: new Map(),
       unreadable: [],
+      unreadableAssessments: [],
       changes: { convertedV1: text, runs, state: true },
     };
   } else if (version === STATE_VERSION) {
@@ -184,12 +207,17 @@ export function loadRecords(root: string, now = Date.now()): LoadedRecords {
     );
   }
 
-  // No run survives the server that ran it.
-  for (const summary of Object.values(loaded.state.runs)) {
+  // No run survives the server that ran it. An assessment run that recorded its assessment has
+  // ended with it, as one that ends while the server runs does.
+  const { state } = loaded;
+  for (const summary of Object.values(state.runs)) {
     if (summary.status !== "running") continue;
     summary.status = "interrupted";
     summary.endedAt = now;
     loaded.changes.state = true;
+    const latest = state.latestAssessment ? state.runs[state.latestAssessment] : undefined;
+    if (loaded.assessments.has(summary.id) && (!latest || latest.startedAt <= summary.startedAt))
+      state.latestAssessment = summary.id;
     const run = loaded.runs.get(summary.id);
     if (!run) continue;
     run.status = "interrupted";
@@ -237,6 +265,12 @@ export const writeState = (root: string, state: StateFile): void =>
 
 export const writeRun = (root: string, run: Run): void =>
   writeAtomic(recordPaths(root).run(run.id), `${JSON.stringify(run, null, 2)}\n`);
+
+export const writeAssessment = (root: string, assessment: Assessment): void =>
+  writeAtomic(
+    recordPaths(root).assessment(assessment.runId),
+    `${JSON.stringify(assessment, null, 2)}\n`,
+  );
 
 export function appendEvent(root: string, runId: string, event: RunEvent): void {
   const file = recordPaths(root).events(runId);

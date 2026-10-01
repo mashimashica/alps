@@ -163,6 +163,12 @@ export interface Instance {
   runs: string[];
   evaluation: Evaluation | null;
   /**
+   * The evaluations that later ones replaced, newest first: `evaluate` moves the current one here
+   * before it records the new one, so that an assessment can tell how the judgments changed.
+   * Instances evaluated before the harness kept them have none.
+   */
+  evaluations?: Evaluation[];
+  /**
    * The wake run whose agent made the instance through the harness's MCP server (X-Harness-Wake);
    * `null` for an instance made otherwise (a person, another MCP client). Instances recorded
    * before the harness kept it have none.
@@ -172,7 +178,11 @@ export interface Instance {
 
 /* ---------- runs ---------- */
 
-export type RunKind = "process" | "wake";
+/**
+ * A run of a Process; a wake, whose agent decides what to run; or an assessment, whose agent
+ * reads the records and records the opportunities to improve the processes that it finds.
+ */
+export type RunKind = "process" | "wake" | "assess";
 
 /** How far the agent of a wake goes: it starts the runs it plans (`run`), or only instantiates (`plan`). */
 export type WakeRuns = "run" | "plan";
@@ -302,6 +312,20 @@ export interface Run {
   attachments?: string[];
   processes?: string[];
   runs?: WakeRuns;
+  /** Assessment runs only: what the assessment was asked to read, and from what point of view. */
+  scope?: AssessScope;
+}
+
+/**
+ * What an assessment is asked to read: the records of a period (all time when none is given), of a
+ * Process, and of an agent's runs, and from what point of view (`request`, the requester's words).
+ */
+export interface AssessScope {
+  period?: Period;
+  /** A Process id. */
+  process?: string;
+  agent?: string;
+  request?: string;
 }
 
 /** A run as the API lists it: the record without its prompt. */
@@ -350,6 +374,11 @@ export interface StateFile {
   /** The last number used for an instance or run id. */
   seq: number;
   lastWakeAt: number | null;
+  /**
+   * The latest assessment whose run has ended (its id, which is its run's); `null` before any, and
+   * in state files written before the harness kept assessments.
+   */
+  latestAssessment: string | null;
   runs: Record<string, RunSummary>;
 }
 
@@ -468,7 +497,9 @@ export type ServerEvent =
   /** Artifacts may have changed (a run ended); list them again. */
   | { type: "artifacts" }
   /** The model, the configuration, or a SKILL.md changed on disk; read the model again. */
-  | { type: "model" };
+  | { type: "model" }
+  /** An assessment was recorded, or a person reviewed one of its items. */
+  | { type: "assessment"; assessment: Assessment };
 
 /** Error codes of the MCP tools, also used by the HTTP API. */
 export type ErrorCode =
@@ -536,10 +567,18 @@ export interface InstancesResponse {
   next: string | null;
 }
 
-/** `GET /api/runs`: run summaries, newest first; `next` is the cursor of the next page. */
+/** A run as `GET /api/runs` (`list_runs`) lists it: its summary, with its Process, agent, and cost. */
+export interface ListedRun extends RunSummary {
+  process: string | null;
+  /** `null` when the run's record cannot be read. */
+  agent: AgentId | null;
+  costUsd: number | null;
+}
+
+/** `GET /api/runs` (`list_runs`): runs, newest first; `next` is the cursor of the next page. */
 export interface RunsResponse {
   ok: true;
-  runs: RunSummary[];
+  runs: ListedRun[];
   next: string | null;
 }
 
@@ -614,7 +653,33 @@ export interface AttachmentsResponse {
 /** `GET /api/assessment` (`get_assessment`, JSON form). */
 export interface AssessmentResponse {
   ok: true;
+  assessment: AssessmentOverview;
+}
+
+/**
+ * `POST /api/assess` (`assess`): the assessment run that started. Success means that it started;
+ * its result is the latest assessment of `GET /api/assessment` once it has ended.
+ */
+export interface AssessResponse {
+  ok: true;
+  run: RunView;
+  /** `self` runs only: what the calling session is to do. */
+  prompt?: string;
+}
+
+/**
+ * `POST /api/assessments` (`record_assessment`), `GET /api/assessments/:id`, and
+ * `POST /api/assessments/:id/items/:n/review` (the WebUI).
+ */
+export interface AssessmentRecordResponse {
+  ok: true;
   assessment: Assessment;
+}
+
+/** `GET /api/assessments`: the assessments recorded, newest first. */
+export interface AssessmentsResponse {
+  ok: true;
+  assessments: Assessment[];
 }
 
 /** `GET /api/assessment?format=markdown` (`get_assessment`, Markdown form, in the workspace's language). */
@@ -677,7 +742,7 @@ export interface DurationStats {
   p90Ms: number | null;
 }
 
-/** The metric tiles. Wake runs are excluded from all statistics. */
+/** The metric tiles. Wake and assessment runs are excluded from all statistics. */
 export interface StatsMetrics {
   /** Achieved among judged Outcomes. */
   achievement: Ratio;
@@ -812,10 +877,103 @@ export interface Finding {
   evidence: string[];
 }
 
-/** `GET /api/assessment` and the `get_assessment` tool (JSON form). */
-export interface Assessment {
+/**
+ * `GET /api/assessment` and the `get_assessment` tool (JSON form): what the harness observes (the
+ * statistics, the checks, the facts of the instances) and the latest assessment, an agent's
+ * interpretation, apart from them.
+ */
+export interface AssessmentOverview {
   /** The dashboard's statistics: all time by week, or since `since`. */
   stats: Stats;
+  /** The checks: what fixed tests of the records, the model, and the configuration find. */
   findings: Finding[];
   instances: InstanceFacts[];
+  /** The latest assessment whose run has ended; `null` before any. */
+  latest: Assessment | null;
+  /**
+   * What the records gained after the latest assessment's run started, within its scope's Process
+   * and agent: the process runs that started, and the Outcome judgments made (those that later
+   * evaluations replaced included). `null` without an assessment.
+   */
+  since: { runs: number; judgments: number } | null;
+}
+
+/* ---------- assessments ---------- */
+
+/**
+ * What an assessment item is about: the Process Description (`description`, for
+ * design-process-description), the configuration that realizes it (`configuration`, for
+ * design-agent-work-system), how the work is operated (`operation`: guidance, schedules, requests),
+ * or what the records cannot settle (`unverified`).
+ */
+export type AssessmentItemKind = "description" | "configuration" | "operation" | "unverified";
+
+/** A cut of the statistics: the dashboard's filter. */
+export type StatCut = Partial<Pick<StatsFilter, "period" | "granularity" | "process" | "agent">>;
+
+/** A record that an assessment item rests on. */
+export type Evidence =
+  | { run: string }
+  | { instance: string }
+  /** The evaluation of an instance, and the evaluations it replaced. */
+  | { evaluation: string }
+  /** A number of the statistics (`metric`, as the dashboard names it) for a cut. */
+  | { stat: { filter: StatCut; metric: string } }
+  /** One event of a run's log, by its number. */
+  | { log: { run: string; n: number } }
+  /** A file or directory of the workspace, relative to it. */
+  | { path: string };
+
+/** One opportunity to improve the processes, as an assessment's agent found it. */
+export interface AssessmentItem {
+  /** From 1, in the order recorded. */
+  n: number;
+  kind: AssessmentItemKind;
+  subject: {
+    process?: string;
+    /** An Artifact type id. */
+    artifact?: string;
+    agent?: string;
+    /** A guidance file, relative to the workspace. */
+    guidance?: string;
+    instance?: string;
+  };
+  /** One sentence. */
+  statement: string;
+  /** Never empty, except for an unverified item. */
+  evidence: Evidence[];
+  /** What the evidence does not cover. */
+  limits?: string;
+}
+
+/** A person's review of an assessment item. */
+export type ReviewJudgment = "adopted" | "held" | "rejected";
+
+export interface Review {
+  /** The item's number. */
+  n: number;
+  judgment: ReviewJudgment;
+  note?: string;
+  /** Only a person reviews (the WebUI): an agent does not adopt its own findings. */
+  by: { kind: "user" };
+  at: number;
+}
+
+/**
+ * An agent's assessment of the records (`.alps-harness/assessments/<run>.json`): its
+ * interpretation, which the harness keeps apart from what it observes. One assessment run records
+ * one; its id is the run's.
+ */
+export interface Assessment {
+  id: string;
+  runId: string;
+  /** When it was recorded (record_assessment). */
+  at: number;
+  agent: AgentId;
+  scope: AssessScope;
+  /** Markdown: what the agent read and did not read, and what it found. */
+  summary: string;
+  items: AssessmentItem[];
+  /** Oldest first. A later review of an item comes after the earlier ones, which stay. */
+  reviews: Review[];
 }

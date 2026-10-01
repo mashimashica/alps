@@ -1,17 +1,22 @@
 /*
  * The assessment as Markdown, in the workspace's language (get_assessment with format markdown
- * and the alps://assessment resource): the statistics, the findings, then the facts of each
- * instance.
+ * and the alps://assessment resource): first the latest assessment, an agent's interpretation,
+ * with what the records gained since it; then what the harness observes: the statistics, the
+ * checks (the JSON's findings), and the facts of each instance.
  */
 
 import { sayReceived } from "../shared/strings.ts";
 import type {
   Assessment,
+  AssessmentItemKind,
+  AssessmentOverview,
+  Evidence,
   FindingKind,
   Judgment,
   Language,
   OutcomeBreakdown,
   Ratio,
+  ReviewJudgment,
   Stats,
 } from "../shared/types.ts";
 
@@ -34,11 +39,45 @@ const count = (n: number | null): string => (n === null ? "—" : n.toLocaleStri
 const WORDS = {
   en: {
     title: (model: string) => `# Assessment of ${model}`,
+    latest: "Latest assessment (interpretation)",
+    noAssessment: "No assessment has been made.",
+    by: (a: { agent: string; at: string; run: string }) =>
+      `An agent's interpretation: ${a.agent}, ${a.at}, run ${a.run}.`,
+    scope: (parts: string) => `Scope: ${parts}.`,
+    allTime: "all time",
+    days: (n: string) => `the last ${n} days`,
+    process: (name: string) => `Process ${name}`,
+    agent: (agent: string) => `agent ${agent}`,
+    pointOfView: (text: string) => `point of view “${text}”`,
+    since: (runs: number, judgments: number) =>
+      `Since its run started: ${runs} process run(s) started and ${judgments} Outcome judgment(s) made.`,
+    noItems: "No items.",
+    itemKind: {
+      description: "Description",
+      configuration: "Configuration",
+      operation: "Operation",
+      unverified: "Unverified",
+    } satisfies Record<AssessmentItemKind, string>,
+    limits: "Limits",
+    review: "Review",
+    reviewed: {
+      adopted: "adopted",
+      held: "held",
+      rejected: "rejected",
+    } satisfies Record<ReviewJudgment, string>,
+    evidenceOf: {
+      run: (id: string) => `run ${id}`,
+      instance: (id: string) => `instance ${id}`,
+      evaluation: (id: string) => `the evaluation of ${id}`,
+      stat: (metric: string, cut: string) => `statistics ${metric}${cut ? ` (${cut})` : ""}`,
+      log: (run: string, n: number) => `event ${n} of run ${run}`,
+      path: (p: string) => p,
+    },
     statistics: "Statistics",
     window: (since: string | null) =>
       since
-        ? `The process runs that started, and the judgments made, since ${since}. Stale evaluations are counted as they are now. Wake runs are not counted.`
-        : "All process runs and judgments. Stale evaluations are counted as they are now. Wake runs are not counted.",
+        ? `The process runs that started, and the judgments made, since ${since}. Stale evaluations are counted as they are now. Wake and assessment runs are not counted.`
+        : "All process runs and judgments. Stale evaluations are counted as they are now. Wake and assessment runs are not counted.",
     metrics: "| Metric | Value |",
     achievement: "Achievement",
     unverified: "Unverified",
@@ -60,8 +99,8 @@ const WORDS = {
     attention: "Outcomes judged but never achieved, or mostly unverified",
     outcome: (process: string, n: number, text: string, row: OutcomeBreakdown) =>
       `- ${process}, Outcome ${n}${text ? ` (${text})` : ""}: achieved ${row.counts.achieved}, not achieved ${row.counts["not-achieved"]}, unverified ${row.counts.unverified}`,
-    findings: "Findings",
-    noFindings: "No findings.",
+    findings: "Checks",
+    noFindings: "The checks found nothing.",
     kind: {
       description: "Description",
       configuration: "Configuration",
@@ -82,12 +121,46 @@ const WORDS = {
     none: "—",
   },
   ja: {
-    title: (model: string) => `# ${model} の所見`,
+    title: (model: string) => `# ${model} のアセスメント`,
+    latest: "最新のアセスメント（解釈）",
+    noAssessment: "アセスメントはまだ行われていない。",
+    by: (a: { agent: string; at: string; run: string }) =>
+      `エージェントの解釈：${a.agent}、${a.at}、実行 ${a.run}。`,
+    scope: (parts: string) => `範囲：${parts}。`,
+    allTime: "全期間",
+    days: (n: string) => `直近 ${n} 日`,
+    process: (name: string) => `プロセス ${name}`,
+    agent: (agent: string) => `エージェント ${agent}`,
+    pointOfView: (text: string) => `観点「${text}」`,
+    since: (runs: number, judgments: number) =>
+      `その実行の開始後に、プロセスの実行 ${runs} 件が始まり、成果の判断 ${judgments} 件が記録された。`,
+    noItems: "項目はない。",
+    itemKind: {
+      description: "記述",
+      configuration: "構成",
+      operation: "運用",
+      unverified: "未確認",
+    } satisfies Record<AssessmentItemKind, string>,
+    limits: "限界",
+    review: "確認",
+    reviewed: {
+      adopted: "採用",
+      held: "保留",
+      rejected: "却下",
+    } satisfies Record<ReviewJudgment, string>,
+    evidenceOf: {
+      run: (id: string) => `実行 ${id}`,
+      instance: (id: string) => `インスタンス ${id}`,
+      evaluation: (id: string) => `${id} の評価`,
+      stat: (metric: string, cut: string) => `統計 ${metric}${cut ? `（${cut}）` : ""}`,
+      log: (run: string, n: number) => `実行 ${run} のイベント ${n}`,
+      path: (p: string) => p,
+    },
     statistics: "統計",
     window: (since: string | null) =>
       since
-        ? `${since} 以降に始まったプロセスの実行と、その間の判断。根拠が古い評価は今の状態を数える。目覚めの実行は数えない。`
-        : "すべてのプロセスの実行と判断。根拠が古い評価は今の状態を数える。目覚めの実行は数えない。",
+        ? `${since} 以降に始まったプロセスの実行と、その間の判断。根拠が古い評価は今の状態を数える。目覚めとアセスメントの実行は数えない。`
+        : "すべてのプロセスの実行と判断。根拠が古い評価は今の状態を数える。目覚めとアセスメントの実行は数えない。",
     metrics: "| 指標 | 値 |",
     achievement: "成果の達成率",
     unverified: "未確認率",
@@ -109,8 +182,8 @@ const WORDS = {
     attention: "判断されたが一度も達成されていない成果と、未確認が過半の成果",
     outcome: (process: string, n: number, text: string, row: OutcomeBreakdown) =>
       `- ${process} の成果 ${n}${text ? `（${text}）` : ""}: 達成 ${row.counts.achieved}、未達成 ${row.counts["not-achieved"]}、未確認 ${row.counts.unverified}`,
-    findings: "所見",
-    noFindings: "所見はない。",
+    findings: "検査",
+    noFindings: "検査で見つかったことはない。",
     kind: {
       description: "記述の問題",
       configuration: "構成の問題",
@@ -222,13 +295,79 @@ function statisticsLines(stats: Stats, words: Words, options: ReportOptions): st
   return lines;
 }
 
-export function assessmentMarkdown(assessment: Assessment, options: ReportOptions): string {
+/** A text on one line, as a list item holds it. */
+const oneLine = (text: string): string => text.replace(/\r?\n/g, " ");
+
+function evidenceText(evidence: Evidence, words: Words): string {
+  const of = words.evidenceOf;
+  if ("run" in evidence) return of.run(evidence.run);
+  if ("instance" in evidence) return of.instance(evidence.instance);
+  if ("evaluation" in evidence) return of.evaluation(evidence.evaluation);
+  if ("log" in evidence) return of.log(evidence.log.run, evidence.log.n);
+  if ("path" in evidence) return of.path(evidence.path);
+  const cut = Object.values(evidence.stat.filter).filter(Boolean).join(", ");
+  return of.stat(evidence.stat.metric, cut);
+}
+
+/** The latest assessment: who read what and when, its summary quoted, and its items with their reviews. */
+function latestLines(
+  latest: Assessment | null,
+  since: AssessmentOverview["since"],
+  words: Words,
+  options: ReportOptions,
+): string[] {
+  const lines = [`## ${words.latest}`, ""];
+  if (!latest) return [...lines, words.noAssessment];
+  const { scope } = latest;
+  const parts = [
+    !scope.period || scope.period === "all" ? words.allTime : words.days(scope.period.slice(0, -1)),
+    ...(scope.process ? [words.process(options.processName(scope.process))] : []),
+    ...(scope.agent ? [words.agent(scope.agent)] : []),
+    ...(scope.request ? [words.pointOfView(oneLine(scope.request))] : []),
+  ];
+  lines.push(
+    words.by({ agent: latest.agent, at: new Date(latest.at).toISOString(), run: latest.runId }),
+    words.scope(parts.join(options.language === "ja" ? "、" : ", ")),
+  );
+  if (since) lines.push(words.since(since.runs, since.judgments));
+  lines.push("", ...latest.summary.split(/\r?\n/).map((line) => (line ? `> ${line}` : ">")), "");
+  if (latest.items.length === 0) lines.push(words.noItems);
+  for (const item of latest.items) {
+    const subject = [
+      item.subject.instance,
+      item.subject.process && options.processName(item.subject.process),
+      item.subject.artifact,
+      item.subject.agent,
+      item.subject.guidance,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    const evidence = item.evidence.map((e) => evidenceText(e, words)).join(", ");
+    // The latest review of the item says where it stands; the earlier ones stay in the record.
+    const review = latest.reviews.filter((r) => r.n === item.n).at(-1);
+    const parts = [
+      `${item.n}. **${words.itemKind[item.kind]}**${subject ? ` (${subject})` : ""}: ${oneLine(item.statement)}`,
+      ...(evidence ? [`${words.evidence}: ${evidence}.`] : []),
+      ...(item.limits ? [`${words.limits}: ${oneLine(item.limits)}`] : []),
+      ...(review
+        ? [
+            `${words.review}: ${words.reviewed[review.judgment]}${review.note ? ` (${oneLine(review.note)})` : ""}, ${new Date(review.at).toISOString()}.`,
+          ]
+        : []),
+    ];
+    lines.push(parts.join(" "));
+  }
+  return lines;
+}
+
+export function assessmentMarkdown(overview: AssessmentOverview, options: ReportOptions): string {
   const words = WORDS[options.language];
   const lines = [words.title(options.model), ""];
-  lines.push(...statisticsLines(assessment.stats, words, options));
+  lines.push(...latestLines(overview.latest, overview.since, words, options), "");
+  lines.push(...statisticsLines(overview.stats, words, options));
   lines.push("", `## ${words.findings}`, "");
-  if (assessment.findings.length === 0) lines.push(words.noFindings);
-  for (const finding of assessment.findings) {
+  if (overview.findings.length === 0) lines.push(words.noFindings);
+  for (const finding of overview.findings) {
     const subject = [
       finding.subject.instance,
       finding.subject.process && options.processName(finding.subject.process),
@@ -246,9 +385,9 @@ export function assessmentMarkdown(assessment: Assessment, options: ReportOption
   }
 
   lines.push("", `## ${words.instances}`, "");
-  if (assessment.instances.length === 0) lines.push(words.noInstances);
+  if (overview.instances.length === 0) lines.push(words.noInstances);
   else lines.push(words.header, "| --- | --- | --- | --- | --- |");
-  for (const fact of assessment.instances) {
+  for (const fact of overview.instances) {
     const latest = fact.latestRun ? `${fact.latestRun.id} (${fact.latestRun.status})` : words.none;
     const counts = new Map<Judgment, number>();
     for (const judgment of fact.judgments ?? [])

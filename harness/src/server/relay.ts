@@ -5,7 +5,8 @@
  * does) and waits for server.json. While its client is connected it holds a session with the
  * server (GET /api/session) and names the session and the client in every request, so the server
  * knows who calls and which self runs to interrupt when the connection closes. The MCP server that
- * a wake gives its agent also names that wake run (X-Harness-Wake).
+ * a wake gives its agent also names that wake run (X-Harness-Wake), and the one that an assessment
+ * gives its agent, that assessment run (X-Harness-Assess).
  */
 
 import fs from "node:fs";
@@ -88,15 +89,22 @@ export class DaemonLink {
   readonly #parseYaml: ParseYaml;
   /** The wake run whose agent this link serves, if any. */
   readonly #wake: string | null;
+  /** The assessment run whose agent this link serves, if any. */
+  readonly #assess: string | null;
   #link: Link | null = null;
   #connecting: Promise<Link> | null = null;
   #closed = false;
   #settings: { signature: string; value: RelaySettings } | null = null;
 
-  constructor(root: string, parseYaml: ParseYaml, options: { wake?: string | null } = {}) {
+  constructor(
+    root: string,
+    parseYaml: ParseYaml,
+    options: { wake?: string | null; assess?: string | null } = {},
+  ) {
     this.root = root;
     this.#parseYaml = parseYaml;
     this.#wake = options.wake ?? null;
+    this.#assess = options.assess ?? null;
   }
 
   /** The workspace's language and port; the defaults when alps-harness.yaml cannot be read. */
@@ -234,6 +242,7 @@ export class DaemonLink {
               ? { "X-Harness-Client": encodeURIComponent(JSON.stringify(options.client)) }
               : {}),
             ...(this.#wake ? { "X-Harness-Wake": this.#wake } : {}),
+            ...(this.#assess ? { "X-Harness-Assess": this.#assess } : {}),
             ...(method === "POST" ? { "Content-Type": "application/json" } : {}),
           },
           body: method === "POST" ? JSON.stringify(options.body ?? {}) : undefined,

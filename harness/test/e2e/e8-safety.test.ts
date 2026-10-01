@@ -8,8 +8,10 @@
  * JSON, the files attached to a request (POST /api/attachments, multipart/form-data), passes the
  * same checks, is saved only inside the workspace and outside .alps-harness/ under a harmless
  * name that is free there (a symlink that leads nowhere takes its name too), all the files of an
- * upload or none, and is refused over 20 MB a file, 10 files, or 21 MiB a body (unread when the
- * body says so); a JSON body over 1 MiB is refused too, on every route that reads one.
+ * upload or none, and is refused over 20 MB a file, 10 files, or 21 MiB a body; a JSON body over
+ * 1 MiB is refused too, on every route that reads one, and the connection stays usable after it.
+ * The routes of the assessments pass the same checks; only a person reviews an assessment's items,
+ * and only the agent of a running assessment run records one.
  */
 
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
@@ -18,6 +20,7 @@ import net from "node:net";
 import os from "node:os";
 import path from "node:path";
 import { MAX_JSON_BYTES, MAX_UPLOAD_BYTES } from "../../src/server/api.ts";
+import { MAX_REQUEST_BYTES } from "../../src/server/http.ts";
 import {
   dayOf,
   MAX_ATTACHMENT_BYTES,
@@ -30,6 +33,7 @@ import type {
   InstanceResponse,
   InstancesResponse,
   OpenResponse,
+  RunsResponse,
 } from "../../src/shared/types.ts";
 import { apiClient } from "../helpers/api.ts";
 import { closeBrowser, killStrayBrowsers, launchBrowser } from "../helpers/browser.ts";
@@ -58,6 +62,11 @@ const ROUTES = [
   { method: "POST", path: "/api/runs/r1/cancel" },
   { method: "POST", path: "/api/runs/r1/finish" },
   { method: "GET", path: "/api/assessment" },
+  { method: "POST", path: "/api/assess" },
+  { method: "GET", path: "/api/assessments" },
+  { method: "POST", path: "/api/assessments" },
+  { method: "GET", path: "/api/assessments/r1" },
+  { method: "POST", path: "/api/assessments/r1/items/1/review" },
   { method: "GET", path: "/api/stats" },
   { method: "GET", path: "/api/skill" },
   { method: "POST", path: "/api/wake" },
@@ -460,6 +469,55 @@ describe("E8 safety", () => {
     expect(isAlive(daemon.info.pid)).toBe(true);
   });
 
+  test("E8 only a person reviews an assessment's items, only the agent of a running assessment run records one, and the assessment routes refuse a JSON body over 1 MiB", async () => {
+    const { token } = daemon.info;
+    const agent = {
+      "X-Harness-Client": encodeURIComponent(JSON.stringify({ name: "e8-agent", version: "0" })),
+    };
+    const post = async (
+      route: string,
+      body: string,
+      headers: Record<string, string> = {},
+    ): Promise<[number, string | undefined]> => {
+      const response = await fetch(new URL(route, daemon.url), {
+        method: "POST",
+        headers: { "X-Harness-Token": token, "Content-Type": "application/json", ...headers },
+        body,
+      });
+      return [response.status, ((await response.json()) as Failure).error?.code];
+    };
+    // A review that names an MCP client is an agent's, whatever it reviews: refused.
+    const review = JSON.stringify({ judgment: "adopted" });
+    expect(await post("/api/assessments/r1/items/1/review", review, agent)).toEqual([
+      400,
+      "invalid-request",
+    ]);
+    // An assessment is recorded only for a running assessment run that the caller performs: not
+    // for a person, an agent that performs none, or one that names a run that is no assessment.
+    const assessment = JSON.stringify({ summary: "Read nothing.", items: [] });
+    for (const headers of [{}, agent, { ...agent, "X-Harness-Assess": "r1" }])
+      expect(await post("/api/assessments", assessment, headers)).toEqual([400, "invalid-request"]);
+    // Their bodies are JSON of at most 1 MiB.
+    const long = JSON.stringify({ summary: "x".repeat(MAX_JSON_BYTES), items: [] });
+    for (const route of ["/api/assess", "/api/assessments", "/api/assessments/r1/items/1/review"])
+      expect(await post(route, long), route).toEqual([413, "too-large"]);
+    // Through the MCP server too, and its next call is answered at once.
+    const mcp = await mcpClient({ workspace: ws.root });
+    try {
+      const refused = await toolFailure(mcp, "record_assessment", {
+        summary: "x".repeat(MAX_JSON_BYTES),
+        items: [],
+      });
+      expect(refused.error.code).toBe("too-large");
+      const asked = Date.now();
+      await callTool<RunsResponse>(mcp, "list_runs", {});
+      expect(Date.now() - asked).toBeLessThan(2000);
+    } finally {
+      await mcp.close();
+    }
+    expect(isAlive(daemon.info.pid)).toBe(true);
+  });
+
   test("E8 a POST that is not JSON answers 415, and the attachments take multipart/form-data only", async () => {
     const { token } = daemon.info;
     // No type, and the three that another site can send without a CORS preflight, to every POST
@@ -699,26 +757,30 @@ describe("E8 safety", () => {
     const none = await upload([]);
     expect([none.status, code(none)]).toEqual([400, "invalid-request"]);
     // An upload is one attachment at its limit and the form around it (the WebUI sends one file
-    // at a time): a body that says it is longer is refused before any of it is sent, and one that
-    // does not say its length (chunked) is refused once read, no more of it kept than that.
-    expect(
-      await answerToHead(UPLOAD, "multipart/form-data; boundary=x", MAX_UPLOAD_BYTES + 1),
-    ).toBe(413);
-    const overlong = await fetch(new URL(UPLOAD, daemon.url), {
-      method: "POST",
-      headers: { "X-Harness-Token": token, "Content-Type": "multipart/form-data; boundary=x" },
-      body: chunked("x".repeat(MAX_UPLOAD_BYTES + 1)),
-    });
-    expect([overlong.status, ((await overlong.json()) as Failure).error.code]).toEqual([
-      413,
-      "too-large",
-    ]);
+    // at a time): a longer body is refused once read, whether it says its length or not
+    // (chunked), no more of it kept than that.
+    for (const sized of [true, false]) {
+      const overlong = await fetch(new URL(UPLOAD, daemon.url), {
+        method: "POST",
+        headers: { "X-Harness-Token": token, "Content-Type": "multipart/form-data; boundary=x" },
+        body: sized ? "x".repeat(MAX_UPLOAD_BYTES + 1) : chunked("x".repeat(MAX_UPLOAD_BYTES + 1)),
+      });
+      expect(
+        [overlong.status, ((await overlong.json()) as Failure).error.code],
+        sized ? "sized" : "chunked",
+      ).toEqual([413, "too-large"]);
+    }
     expect(saved()).toEqual(before);
 
+    // A body that says it is longer than the server reads at all (Bun's limit) is refused before
+    // any of it is sent, and the daemon stays up.
+    expect(await answerToHead("/api/instances", "application/json", MAX_REQUEST_BYTES + 1)).toBe(
+      413,
+    );
+    expect(isAlive(daemon.info.pid)).toBe(true);
     // A JSON body over 1 MiB is refused on every route that reads one, the close of an MCP
-    // session too: before it is read when it says its length, and once read when it does not
-    // (chunked); the connection stays usable for the next request either way.
-    expect(await answerToHead("/api/instances", "application/json", MAX_JSON_BYTES + 1)).toBe(413);
+    // session too, once read, whether it says its length or not (chunked); the connection stays
+    // usable for the next request either way.
     const long = JSON.stringify({ process: "Solution Design", notes: "x".repeat(MAX_JSON_BYTES) });
     for (const route of ["/api/instances", "/api/sessions/s1/close"])
       for (const sized of [true, false]) {

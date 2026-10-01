@@ -9,7 +9,12 @@ from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parents[1]
 SKIPPED_DIRECTORIES = {".git", ".claude", "node_modules"}
-DISTRIBUTED_SKILLS = ("design-process-description", "design-agent-work-system", "run-process")
+DISTRIBUTED_SKILLS = (
+    "design-process-description",
+    "design-agent-work-system",
+    "run-process",
+    "assess-harness-records",
+)
 DEVELOPMENT_SKILLS = ("review-alps", "sync-locales")
 EXAMPLE_SKILLS = (
     "examples/assess-service-change",

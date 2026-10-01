@@ -348,6 +348,9 @@ export function App({ session }: { session: Session }) {
             void loadModel();
             bump();
             break;
+          case "assessment":
+            bump();
+            break;
           case "shutdown":
             setStream("shutdown");
             break;
@@ -396,6 +399,7 @@ export function App({ session }: { session: Session }) {
     setFocus,
     putInstance: (instance) => setInstances((known) => new Map(known).set(instance.id, instance)),
     putRun: (run) => setRuns((known) => new Map(known).set(run.id, run)),
+    refresh: bump,
   };
 
   const running = [...runs.values()].filter((run) => run.status === "running").length;

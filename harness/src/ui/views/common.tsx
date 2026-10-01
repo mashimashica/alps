@@ -39,6 +39,30 @@ export function firstInputOf(
 export const firstInput = (model: ModelView | null, instance: InstanceView): string | null =>
   firstInputOf(model, instance)?.path ?? null;
 
+/**
+ * Brings an element into view within the box that scrolls it (the panel, a Sheet, a list),
+ * without moving the page, whose header stays where it is.
+ */
+export function reveal(element: Element): void {
+  for (let box = element.parentElement; box && box !== document.body; box = box.parentElement) {
+    if (!/(auto|scroll)/.test(getComputedStyle(box).overflowY)) continue;
+    if (box.scrollHeight <= box.clientHeight) continue;
+    const offset = element.getBoundingClientRect().top - box.getBoundingClientRect().top;
+    box.scrollTop = Math.max(0, box.scrollTop + offset - box.clientHeight / 3);
+    return;
+  }
+}
+
+/** Scrolls the page so that an element's top is just under the page's header. */
+export function scrollUnderHeader(element: Element): void {
+  const header = document.querySelector(".topbar")?.getBoundingClientRect().height ?? 0;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.scrollTo({
+    top: Math.max(0, element.getBoundingClientRect().top + window.scrollY - header - 12),
+    behavior: reduced ? "auto" : "smooth",
+  });
+}
+
 /** The last part of a path: the name of its file or folder. */
 export function lastPart(path: string): string {
   const parts = path.split(/[\\/]+/).filter(Boolean);

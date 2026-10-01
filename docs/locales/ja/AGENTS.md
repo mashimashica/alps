@@ -21,7 +21,7 @@
 
 | パス | 役割 |
 | --- | --- |
-| `skills/design-process-description/`、`skills/design-agent-work-system/`、`skills/run-process/` | 配布Skill。各ルートの英語`SKILL.md`を、そのプロセスの基準とする。 |
+| `skills/design-process-description/`、`skills/design-agent-work-system/`、`skills/run-process/`、`skills/assess-harness-records/` | 配布Skill。各ルートの英語`SKILL.md`を、そのプロセスの基準とする。 |
 | `.agents/skills/<distributed-skill>` | リポジトリ内の発見用に`../../skills/<distributed-skill>`を指す相対symlink。 |
 | `.agents/skills/review-alps/` | リポジトリの意味と配布をレビューする実ディレクトリ。Plugin Skillではない。 |
 | `.agents/skills/sync-locales/` | 日英レビューの実ディレクトリ。Plugin Skillではない。 |
@@ -37,7 +37,7 @@
 | `CLAUDE.md` | このファイルを読み込む、リポジトリ開発用のClaude Codeの入口。独自の指示は持たず、Pluginの文脈ではない。 |
 | `assets/`およびSkillの`agents/`と`assets/` | 表示資源。 |
 
-`skills/`をPlugin Skillの配布元とする。Hostは各規約とmanifestにより発見する。`.agents/skills/`はリポジトリ内の統合ビューであり、普遍的なHost規約ではない。checkoutに開発用Skillを含めても、それをPlugin Skillとして公開することにはならない。各配布Skillは単体で機能する。その相対リンクは自身のディレクトリ内で解決し、ファイルや名前によって他のSkillに依存しない。設計のSkillを組み合わせる場合は、仕事の記述だけを受け渡す。`run-process`は、ハーネスのMCPツールを通じてハーネスの実行を行う。PluginはこれらのSkillを、参照資料である`examples/`とともに配布する。Skillから`examples/`へはリンクしない。開発用Skillと例のSkillは`skills/`の外に置く。
+`skills/`をPlugin Skillの配布元とする。Hostは各規約とmanifestにより発見する。`.agents/skills/`はリポジトリ内の統合ビューであり、普遍的なHost規約ではない。checkoutに開発用Skillを含めても、それをPlugin Skillとして公開することにはならない。各配布Skillは単体で機能する。その相対リンクは自身のディレクトリ内で解決し、ファイルや名前によって他のSkillに依存しない。設計のSkillを組み合わせる場合は、仕事の記述だけを受け渡す。`run-process`は、ハーネスのMCPツールを通じてハーネスの実行を行い、`assess-harness-records`は、それらを通じてハーネスの記録を読み、見つけたプロセスの改善の機会を記録する。PluginはこれらのSkillを、参照資料である`examples/`とともに配布する。Skillから`examples/`へはリンクしない。開発用Skillと例のSkillは`skills/`の外に置く。
 
 ## 変更とレビュー
 

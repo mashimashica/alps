@@ -12,6 +12,7 @@ import {
   loadWorkspace,
 } from "../model/index.ts";
 import type {
+  AssessResponse,
   AssessmentMarkdownResponse,
   AssessmentResponse,
   Failure,
@@ -251,7 +252,33 @@ export async function wake(start: string, args: WakeArgs): Promise<number> {
   return 0;
 }
 
-/** Prints the assessment (the statistics, the findings, the facts of the instances), as get_assessment returns it. */
+/**
+ * Starts an assessment run, as the MCP tool assess does: its agent reads the records and records
+ * what it finds. It returns once the agent has started; the result is the latest assessment of
+ * `assess` once the run has ended.
+ */
+export async function startAssessment(
+  start: string,
+  args: { agent: string; request?: string | undefined },
+): Promise<number> {
+  const root = workspaceOrReport(start);
+  if (!root) return 1;
+  const result = await ask<AssessResponse>(root, "POST", "/api/assess", {
+    agent: args.agent,
+    ...(args.request !== undefined ? { request: args.request } : {}),
+  });
+  if (!result) return 1;
+  out(`Started ${result.run.agent}  assessment run ${result.run.id}`);
+  out(
+    "Its agent reads the records and records what it finds. The result is the latest assessment of alps-harness assess once the run has ended.",
+  );
+  return 0;
+}
+
+/**
+ * Prints the assessment, as get_assessment returns it: the latest assessment, and the statistics,
+ * the checks, and the facts of the instances.
+ */
 export async function assess(start: string, format: "markdown" | "json"): Promise<number> {
   const root = workspaceOrReport(start);
   if (!root) return 1;

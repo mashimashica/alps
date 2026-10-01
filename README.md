@@ -28,7 +28,7 @@ In Claude Code, you can also add this repository as a plugin marketplace and ins
 /plugin install alps@alps
 ```
 
-Reload affected clients after installation. Each Skill functions on its own; to combine them, pass the description of the work from one to the other. The Plugin distributes the two design Skills with their reference resources, together with the `examples/` reference material, and the [harness](#harness) with its `run-process` Skill. Check that your client exposes `design-process-description` and `design-agent-work-system` and that their reference links open. The harness needs [Bun](#requirements).
+Reload affected clients after installation. Each Skill functions on its own; to combine them, pass the description of the work from one to the other. The Plugin distributes the two design Skills with their reference resources, together with the `examples/` reference material, and the [harness](#harness) with its `run-process` and `assess-harness-records` Skills. Check that your client exposes `design-process-description` and `design-agent-work-system` and that their reference links open. The harness needs [Bun](#requirements).
 
 ## Use the Skills
 
@@ -55,7 +55,7 @@ The [working example](examples/README.md) shows both design responsibilities on 
 
 ## Harness
 
-The harness applies a process model to concrete work. It instantiates a Process for concrete inputs, runs it with an agent, records the run and which run produced each output, and records an evaluation of each Outcome with its evidence. It reads the process model and the Skills and never changes them. A person uses its WebUI, which shows the network of Processes, a dashboard, and the instances, and takes [requests](#requests); an agent uses its MCP server. The dashboard counts judged Outcomes, runs, durations, and cost, and shows which evaluations rest on inputs or a `SKILL.md` that have changed since the judged run. A run that ended, an output that exists, or an agent's report is never counted as an achieved Outcome: Outcomes are judged by a person or a named agent, with evidence. The `run-process` Skill guides a session that performs a run itself (the agent `self`), or that turns a request into instances itself.
+The harness applies a process model to concrete work. It instantiates a Process for concrete inputs, runs it with an agent, records the run and which run produced each output, and records an evaluation of each Outcome with its evidence. It reads the process model and the Skills and never changes them. A person uses its WebUI, which shows the network of Processes, a dashboard, and the instances, and takes [requests](#requests); an agent uses its MCP server. The dashboard counts judged Outcomes, runs, durations, and cost, and shows which evaluations rest on inputs or a `SKILL.md` that have changed since the judged run. A run that ended, an output that exists, or an agent's report is never counted as an achieved Outcome: Outcomes are judged by a person or a named agent, with evidence. An [assessment](#assessments) is an agent's reading of these records for opportunities to improve the processes, kept apart from what the harness observes. The `run-process` Skill guides a session that performs a run itself (the agent `self`), or that turns a request into instances itself, and the `assess-harness-records` Skill a session that performs an assessment itself.
 
 ### Requirements
 
@@ -91,7 +91,7 @@ bun harness/src/cli.ts serve examples/service-change --open
 | `serve [workspace] [--daemon] [--port <port>] [--open] [--dev]` | Starts the harness server and prints the WebUI's URL, which carries the access token after `#`. `--daemon` detaches it; `--open` opens a browser. |
 | `stop [workspace]` | Stops the harness server and the agents it runs. |
 | `wake [workspace] [--agent claude-code\|codex] [--request <text>] [--attach <path>]… [--process <process>]… [--plan]` | Wakes an agent, as a schedule does, for an external scheduler such as launchd, cron, or CI, or with a [request](#requests): its text, the workspace paths it attaches, the Processes that the plan must include, and `--plan` to only instantiate. |
-| `assess [workspace] [--format markdown\|json]` | Prints the statistics, the findings, and the facts of every instance. |
+| `assess [workspace] [--format markdown\|json] [--with <agent> [--request <text>]]` | Prints the latest [assessment](#assessments) and, apart from it, the statistics, the checks, and the facts of every instance. `--with claude-code` or `codex` starts an assessment instead, with an optional point of view. |
 | `mcp` | Serves MCP on stdio for the workspace in `ALPS_WORKSPACE` or the current directory. |
 
 `bun harness/src/cli.ts --help` describes each option. `--dev` bundles the WebUI on each request, with hot reloading, for developing it: its page and assets bypass the server's Host check and security headers.
@@ -105,7 +105,7 @@ The workspace is the nearest directory, from the given one (the project director
 | `process-model.yaml` | The meaning of the work: the Processes with their Purposes and Outcomes, and the Artifact types they read and produce. |
 | `alps-harness.yaml` | How the workspace realizes the model, with the keys below. |
 | `skills/<name>/SKILL.md` | The Skill of each Process, found by its name, directory name, or heading. |
-| `.alps-harness/` | The harness's records: `state.json`, `runs/`, and `server.json` while the server runs. Keep it out of version control. |
+| `.alps-harness/` | The harness's records: `state.json`, `runs/`, `assessments/`, and `server.json` while the server runs. Keep it out of version control. |
 
 | Key of `alps-harness.yaml` | Meaning |
 | --- | --- |
@@ -127,20 +127,27 @@ The [example workspace](examples/service-change/alps-harness.yaml) describes eac
 
 A request asks for work in the requester's own words; roughly is enough. In the WebUI, **Request** on every screen takes the text, attachments (files dropped or chosen, which are saved in the workspace when the request is sent, or Artifacts already there), the Processes that the plan must include, the agent, and whether to run the plan or only instantiate it. Sending it wakes the agent with the request. The agent reads the model and the guidance, chooses the Processes that serve the request, and instantiates each with concrete inputs, output locations, criteria derived from the request, and its assumptions in the notes; it runs them unless asked for a plan only, and reports what it planned and why, what it ran, its assumptions, and what the requester needs to confirm. The wake's record shows the request, the attachments, that report, and the runs it started, and the board shows each instance as it is made, with a link back to the wake (`createdBy`). The MCP tool `wake` and the command `wake --request` take the same request. A session can instead tailor a request itself, as the `run-process` Skill describes. The harness decides nothing about the plan: the request is the requester's instruction, and what the attachments say is data. The runs that a request starts are counted in the statistics; the wake itself is not.
 
+### Assessments
+
+An assessment is an agent's reading of the harness's records (the runs with their reports and logs, the evaluations and those they replaced, the statistics, and the checks) for opportunities to improve how the Processes are described, configured, and operated. In the WebUI, **Request an assessment** at the top of the analysis starts one with an agent, the analysis's filter as its scope, and an optional point of view; the MCP tool `assess` and the command `assess --with` do the same, and with the agent `self` a session performs it itself, as the `assess-harness-records` Skill describes. The agent reads through the harness's MCP tools and records a summary and items with `record_assessment`: each item is a matter of the description, the configuration, or the operation, or unverified, and rests on evidence that the records hold (runs, instances, evaluations, cuts of the statistics, events of logs, paths); the harness refuses an item without evidence, unless it is unverified, and evidence that names what the records do not have. The agent of an assessment changes nothing: the harness refuses the instances, runs, wakes, evaluations, and cancellations it asks for. The analysis shows the latest assessment whose run has ended above what the harness observes, quoted as the agent's interpretation, with what the records gained since; an evidence chip opens the record it names or sets the filter below. A person reviews each item (adopted, on hold, or rejected, with a note), and an adopted one can start a request from a draft, which the person sends or not. Before any assessment there is only the request for one. The checks, which fixed tests of the records, the model, and the configuration give (`findings` in JSON), and the statistics stay below, as observations. Assessment runs are not counted in the statistics.
+
 ### MCP tools
 
 | Tool | What it does |
 | --- | --- |
 | `get_model` | Returns the Processes with their Outcomes and Skill locations, the Artifact types, and the available agents. |
 | `list_artifacts` | Lists the Artifacts at the types' locations, with the run that last produced each. |
-| `list_instances` | Lists instances with their facts: the latest run, the judgments, and whether the evidence is stale. |
+| `list_instances` | Lists instances with their facts: the latest run, the judgments, and whether the evidence is stale; each with its evaluation and the evaluations it replaced. |
 | `instantiate` | Creates an instance: concrete input paths, output locations, and what each Outcome means in this application. |
 | `run` | Starts a run with `claude-code`, `codex`, `demo`, or `self`. Success means only that it started. |
 | `get_run` | Returns a run's record and last events, waiting for its end with `wait`. |
 | `cancel_run` | Stops a run and its agent's process group. |
-| `finish_run` | Ends a self run with its report, or takes the report of a woken agent. |
-| `evaluate` | Records one judgment per Outcome (`achieved`, `not-achieved`, or `unverified`) with evidence, which cannot be empty. |
-| `get_assessment` | Returns the statistics and the findings, as JSON or Markdown. |
+| `list_runs` | Lists runs, newest first, by Process, agent, status, kind (`process`, `wake`, or `assess`), and start. |
+| `finish_run` | Ends a self run with its report, or takes the report of a woken or assessing agent. |
+| `evaluate` | Records one judgment per Outcome (`achieved`, `not-achieved`, or `unverified`) with evidence, which cannot be empty; the evaluation it replaces is kept. |
+| `get_assessment` | Returns the latest assessment and what the records gained since, apart from the statistics, the checks, and the facts of the instances, as JSON or Markdown. |
+| `assess` | Starts an assessment run with `claude-code`, `codex`, or `self`, its scope, and a point of view. Success means only that it started; its result is the latest of `get_assessment` once it has ended. |
+| `record_assessment` | Records the summary and items of the assessment run that the caller performs, each item with evidence. |
 | `wake` | Wakes an agent that decides which Processes to run, or that serves a request (`request`, `attachments`, `processes`, and `runs`: `run` or `plan`). Success means only that it started; the plan's reasons come in the wake run's report. |
 | `open_ui` | Returns the WebUI's URL, and opens it in a browser with `open: true`. |
 
@@ -177,6 +184,7 @@ Specify methods and order where the work requires them, while leaving room for j
 | Process Description Design | [Skill](skills/design-process-description/SKILL.md) | [Skill](skills/design-process-description/references/locales/ja/SKILL.ja.md) |
 | Agent Work System Design | [Skill](skills/design-agent-work-system/SKILL.md) | [Skill](skills/design-agent-work-system/references/locales/ja/SKILL.ja.md) |
 | Self-performed harness runs | [Skill](skills/run-process/SKILL.md) | [Skill](skills/run-process/references/locales/ja/SKILL.ja.md) |
+| Harness record assessments | [Skill](skills/assess-harness-records/SKILL.md) | [Skill](skills/assess-harness-records/references/locales/ja/SKILL.ja.md) |
 | Harness development | [harness/README.md](harness/README.md) | — |
 | Contribution and repository work | [CONTRIBUTING](CONTRIBUTING.md), [AGENTS](AGENTS.md) | [CONTRIBUTING](docs/locales/ja/CONTRIBUTING.md), [AGENTS](docs/locales/ja/AGENTS.md) |
 | Version policy and release notes | [Versioning](docs/versioning.md), [0.9.0](docs/releases/0.9.0.md) | [版管理](docs/locales/ja/versioning.md), [0.9.0](docs/locales/ja/releases/0.9.0.md) |

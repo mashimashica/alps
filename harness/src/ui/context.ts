@@ -3,6 +3,7 @@
 import { createContext } from "preact";
 import { useContext } from "preact/hooks";
 import type {
+  AssessScope,
   HealthInfo,
   InstanceView,
   Language,
@@ -16,16 +17,21 @@ import type { Client } from "./api.ts";
 import type { FocusTarget } from "./graph/focus.ts";
 import type { Translate } from "./strings.ts";
 
-/** The tabs of the panel of an instance. */
-export type InstanceTab = "overview" | "runs" | "evaluation" | "log" | "skill";
+/**
+ * The tabs of the panel of an instance. A run's log is in the run's panel, and the SKILL.md in the
+ * Process's: the instance links to them.
+ */
+export type InstanceTab = "overview" | "runs" | "evaluation";
 /** The tabs of the panel of a Process. */
 export type ProcessTab = "overview" | "instances" | "skill";
 
 /** What the right panel shows (a Sheet over the page in narrow windows). */
 export type Selection =
   | { kind: "process"; id: string; tab?: ProcessTab }
-  | { kind: "type"; id: string }
-  | { kind: "run"; id: string }
+  /** With `path`, that Artifact is marked among those of the type (cited as evidence). */
+  | { kind: "type"; id: string; path?: string }
+  /** With `line`, that event of the log is marked (cited as evidence). */
+  | { kind: "run"; id: string; line?: number }
   | { kind: "instance"; id: string; tab?: InstanceTab }
   /** What a number of the dashboard counts. */
   | {
@@ -38,13 +44,16 @@ export type Selection =
 
 /**
  * What a person writes, in a dialog: a request, which a woken agent turns into instances (with a
- * Process chosen beforehand, when it is opened from one), the criteria and notes of an instance,
- * or an evaluation.
+ * Process chosen beforehand, when it is opened from one, or a draft, when it is opened from an
+ * opportunity of an assessment), the criteria and notes of an instance, an evaluation, a request
+ * for an assessment (its scope is the analysis's filter), or the review of an assessment's item.
  */
 export type Form =
-  | { kind: "request"; process?: string }
+  | { kind: "request"; process?: string; draft?: string }
   | { kind: "edit"; id: string }
-  | { kind: "evaluate"; id: string };
+  | { kind: "evaluate"; id: string }
+  | { kind: "assess"; scope: AssessScope }
+  | { kind: "review"; assessment: string; n: number };
 
 /** The filters of the list of instances; the counts at the top right set them too. */
 export interface InstanceFilter {
@@ -93,6 +102,8 @@ export interface Ui {
   /** Keeps what an answer of the API returned. */
   putInstance(instance: InstanceView): void;
   putRun(run: RunSummary): void;
+  /** Has the views read again what they show besides the records (after a change they made). */
+  refresh(): void;
 }
 
 export const UiContext = createContext<Ui | null>(null);

@@ -5,8 +5,10 @@
  * an Outcome: only the three-valued judgments that people and agents recorded are counted.
  *
  * What counts (the statistics' window, `Stats.window`):
- * - process runs that started in the window; wake runs are not process runs and never count;
- * - the judgments of the evaluations made in the window (an instance keeps its latest evaluation);
+ * - process runs that started in the window; wake and assessment runs are not process runs and
+ *   never count;
+ * - the judgments of the evaluations made in the window (an instance's latest evaluation; those
+ *   that it replaced count only in what an assessment has not seen, countSince);
  * - with a Process, the runs and judgments of its instances; with an agent, its runs and the
  *   judgments about the runs it performed.
  * The stale evaluations are the state now, whatever the window, as the WebUI's count at the top
@@ -152,6 +154,39 @@ const runSuccess = (runs: readonly StatsRunRecord[]): Ratio => {
   const ended = runs.filter((r) => r.status !== "running");
   return ratio(ended.filter((r) => r.status === "succeeded").length, ended.length);
 };
+
+/* ---------- what an assessment has not seen ---------- */
+
+/**
+ * What the records gained from `start` on (when an assessment's run started): the process runs
+ * that started since, and the Outcome judgments of the evaluations made since, in the evaluations
+ * now and in those that they replaced. With a Process, those of its instances; with an agent, its
+ * runs and the judgments about the runs it performed, as the statistics count them.
+ */
+export function countSince(
+  input: { instances: readonly Instance[]; runs: readonly StatsRunRecord[] },
+  start: number,
+  scope: { process?: string | undefined; agent?: string | undefined } = {},
+): { runs: number; judgments: number } {
+  const agentOf = new Map(input.runs.map((run) => [run.id, run.agent]));
+  const ofAgent = (run: string): boolean =>
+    scope.agent === undefined || agentOf.get(run) === scope.agent;
+  const runs = input.runs.filter(
+    (run) =>
+      run.kind === "process" &&
+      run.startedAt >= start &&
+      (scope.process === undefined || run.process === scope.process) &&
+      ofAgent(run.id),
+  ).length;
+  let judgments = 0;
+  for (const instance of input.instances) {
+    if (scope.process !== undefined && instance.process !== scope.process) continue;
+    for (const evaluation of [instance.evaluation, ...(instance.evaluations ?? [])])
+      if (evaluation && evaluation.at >= start && ofAgent(evaluation.runId))
+        judgments += evaluation.judgments.length;
+  }
+  return { runs, judgments };
+}
 
 /* ---------- statistics ---------- */
 

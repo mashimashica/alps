@@ -990,6 +990,259 @@ svg.chart:focus-visible {
   margin-top: 10px;
 }
 
+/* The evidence of a check or an opportunity: chips that open the record, with its kind's icon. */
+.evidence-chips {
+  gap: 6px;
+}
+
+.chip-evidence {
+  gap: 5px;
+  min-height: 24px;
+  padding: 1px 9px;
+  border-radius: var(--radius-sm);
+  font-size: 11.5px;
+}
+
+.chip-evidence svg {
+  flex-shrink: 0;
+  color: var(--faint-foreground);
+}
+
+.chip-evidence.is-static {
+  cursor: default;
+  color: var(--muted-foreground);
+}
+
+.chip-evidence.is-static:hover {
+  border-color: var(--border-strong);
+  color: var(--muted-foreground);
+}
+
+.chip-agent,
+.chip-scope {
+  border-radius: 999px;
+  cursor: default;
+  color: var(--muted-foreground);
+}
+
+.chip-agent:hover,
+.chip-scope:hover {
+  border-color: var(--border-strong);
+  color: var(--muted-foreground);
+}
+
+/* ---------- assessment (the analysis's upper part: an agent's interpretation) ---------- */
+
+.assessment-card {
+  margin-bottom: 22px;
+}
+
+.assessment-card .card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 14px;
+}
+
+.assessment-empty {
+  padding: 18px 12px 10px;
+}
+
+.assessment-running {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+/* The interpretation: a thin band and a quotation, set apart from the numbers below. */
+.assessment-quote {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 2px 0 2px 16px;
+  border-left: 3px solid var(--brand);
+}
+
+.assessment-by {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-size: 12px;
+}
+
+.assessment-label {
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.assessment-agent {
+  font-weight: 500;
+}
+
+/* What the records gained since: an observation, at the band's end. */
+.assessment-since {
+  margin-left: auto;
+  padding: 1px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  color: var(--muted-foreground);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.assessment-scope {
+  gap: 6px;
+}
+
+.assessment-scope .chip {
+  min-height: 22px;
+  font-size: 11.5px;
+}
+
+.assessment-pov {
+  color: var(--muted-foreground);
+  font-size: 12.5px;
+  font-style: italic;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.assessment-pov::before {
+  content: "“";
+}
+
+.assessment-pov::after {
+  content: "”";
+}
+
+.assessment-summary {
+  position: relative;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.assessment-summary::before {
+  content: "“";
+  position: absolute;
+  top: -6px;
+  left: 0;
+  color: var(--faint-foreground);
+  font-size: 26px;
+  line-height: 1;
+}
+
+.assessment-summary .md {
+  font-size: 13px;
+}
+
+.opportunities {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The kind, the opportunity, and what a person does with it, each in its column. */
+.opportunity {
+  display: grid;
+  grid-template-columns: 7.6em minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+
+.opportunity-kind {
+  justify-self: start;
+  min-width: 5.5em;
+  justify-content: center;
+}
+
+.opportunity-body {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.opportunity-statement {
+  color: var(--foreground);
+}
+
+/* What the records cannot settle: grey, as unverified is everywhere. */
+.opportunity.is-unverified .opportunity-statement {
+  color: var(--muted-foreground);
+}
+
+.opportunity-limits {
+  color: var(--faint-foreground);
+}
+
+.opportunity-review {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+
+.opportunity-review[data-review="none"] {
+  display: none;
+}
+
+.review-note {
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+}
+
+.opportunity-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+/* In a narrow window the kind sits over the opportunity, and the actions under it. */
+@media (max-width: 640px) {
+  .opportunity {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 7px;
+  }
+
+  .opportunity-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .assessment-since {
+    margin-left: 0;
+  }
+}
+
+/* A record cited as evidence: marked where its panel lists it. */
+.list-row.is-cited {
+  border-radius: var(--radius-sm);
+  background: var(--info-soft);
+  box-shadow: inset 3px 0 0 var(--info);
+}
+
+.log-line.is-cited {
+  background: var(--info-soft);
+  box-shadow: inset 3px 0 0 var(--info);
+}
+
+.observation {
+  display: flex;
+  flex-direction: column;
+}
+
 /* ---------- network ---------- */
 
 .network-card {

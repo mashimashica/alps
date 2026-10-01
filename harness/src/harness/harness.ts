@@ -1,8 +1,9 @@
 /*
- * The harness of one workspace: instances, runs, provenance, and evaluations. While its server
- * runs it is the only writer of .alps-harness/. It reads the model and the configuration again
- * whenever their files change, and it never writes them. Runtime-agnostic: reading YAML, `git`,
- * agent version checks, and starting agent processes are passed in by src/server/.
+ * The harness of one workspace: instances, runs, provenance, evaluations, and assessments. While
+ * its server runs it is the only writer of .alps-harness/. It reads the model and the
+ * configuration again whenever their files change, and it never writes them. Runtime-agnostic:
+ * reading YAML, `git`, agent version checks, and starting agent processes are passed in by
+ * src/server/.
  */
 
 import fs from "node:fs";
@@ -41,24 +42,38 @@ import {
 } from "../model/index.ts";
 import { attachmentPath, dayOf, MAX_NAME_CANDIDATES, safeFileName } from "../shared/requests.ts";
 import type {
+  AssessRequest,
   EvaluateRequest,
   FinishRequest,
   InstantiateRequest,
+  RecordAssessmentRequest,
+  ReviewRequest,
   RunRequest,
   WakeRequest,
 } from "../shared/schema.ts";
 import { spoken, type MessageArgs, type Spoken } from "../shared/strings.ts";
-import { computeStats, findingsOf, type FindingsInput, type StatsInput } from "../assess.ts";
+import {
+  computeStats,
+  countSince,
+  findingsOf,
+  type FindingsInput,
+  type StatsInput,
+} from "../assess.ts";
 import type {
   AgentInfo,
   Artifact,
   ArtifactType,
+  AssessScope,
   Assessment,
+  AssessmentItem,
+  AssessmentOverview,
   ClientInfo,
+  Evaluation,
   Instance,
   InstanceFacts,
   InstanceView,
   Judge,
+  ListedRun,
   ModelDescription,
   ModelView,
   OutcomeCriterion,
@@ -70,6 +85,7 @@ import type {
   RunEvent,
   RunInput,
   RunOutput,
+  RunKind,
   RunStatus,
   RunSummary,
   RunTarget,
@@ -82,6 +98,8 @@ import type {
   StatsMembers,
   WakeRuns,
 } from "../shared/types.ts";
+import { buildAssessPrompt } from "./assess-prompt.ts";
+import { checkedItems, type ItemDraft } from "./assessment.ts";
 import { demoFile, demoReport, demoSteps } from "./demo.ts";
 import { DigestCache } from "./digest.ts";
 import { HarnessError, refuse } from "./errors.ts";
@@ -105,6 +123,7 @@ import {
   recordPaths,
   stateSignature,
   summaryOf,
+  writeAssessment,
   writeRun,
   writeState,
   type LoadedRecords,
@@ -125,7 +144,12 @@ const STOP_WAIT_MS = 8000;
 const MAX_SKILL_BYTES = 1024 * 1024;
 /** The agent that a wake starts when none is named. */
 const WAKE_AGENT = "claude-code";
-/** The name of the harness's MCP server in the configuration of the agent that a wake starts. */
+/** The agent that an assessment starts when none is named. */
+const ASSESS_AGENT = "claude-code";
+/**
+ * The name of the harness's MCP server in the configuration of the agent that a wake or an
+ * assessment starts.
+ */
 const WAKE_MCP_SERVER = "alps_harness";
 
 /** Why a self run is interrupted when the MCP session that performs it closes before finish_run. */
@@ -157,11 +181,17 @@ export interface HarnessHooks {
 /**
  * Who makes a request: a person (the WebUI, or an HTTP client that names no MCP client), or an
  * agent through the MCP server, which names its client and the session it holds with the server,
- * and, for the agent that a wake started, that wake run.
+ * and, for the agent that a wake or an assessment started, that run.
  */
 export type Caller =
   | { kind: "user" }
-  | { kind: "agent"; client: ClientInfo; session: string | null; wake: string | null };
+  | {
+      kind: "agent";
+      client: ClientInfo;
+      session: string | null;
+      wake: string | null;
+      assess: string | null;
+    };
 
 /** What woke an agent: a schedule of alps-harness.yaml, or a request (the MCP tool, the CLI, the API). */
 export type WakeTrigger = { kind: "schedule"; cron: string } | { kind: "request"; caller: Caller };
@@ -217,8 +247,8 @@ interface ActiveRun {
   /** How the run ends once its agent's process has: set when it is canceled or the server stops. */
   stopping: "canceled" | "interrupted" | null;
   /**
-   * A wake run: the status that its agent gave with finish_run. The run ends when the agent's
-   * process does, so the usage it reports last is kept.
+   * A wake or assessment run: the status that its agent gave with finish_run. The run ends when
+   * the agent's process does, so the usage it reports last is kept.
    */
   reported: FinishRequest["status"] | null;
 }
@@ -233,6 +263,16 @@ const viewOf = (run: Run): RunView => {
 
 const byKey = <T extends { id: string; name: string }>(list: T[], key: string): T | undefined =>
   list.find((item) => item.id === key) ?? list.find((item) => item.name === key);
+
+/**
+ * Records a new evaluation of an instance: the one it replaces goes to the front of the
+ * instance's evaluations, which keep the replaced evaluations newest first.
+ */
+export function supersede(instance: Instance, evaluation: Evaluation): void {
+  if (instance.evaluation)
+    instance.evaluations = [instance.evaluation, ...(instance.evaluations ?? [])];
+  instance.evaluation = evaluation;
+}
 
 /**
  * Whether the agent that calls performed a self run: through the same MCP session. A record
@@ -320,6 +360,8 @@ export class Harness {
     this.#records = loadRecords(root);
     for (const { id, reason } of this.#records.unreadable)
       deps.log(`the record of run ${id} cannot be read: ${reason}`);
+    for (const { id, reason } of this.#records.unreadableAssessments)
+      deps.log(`the assessment of run ${id} cannot be read: ${reason}`);
   }
 
   /**
@@ -701,6 +743,7 @@ export class Harness {
     request: InstantiateRequest,
     caller: Caller = { kind: "user" },
   ): { instance: InstanceView; created: boolean } {
+    this.#refuseAssessing(caller);
     const { loaded, description } = this.#describe();
     const { model } = loaded;
     let instance: Instance;
@@ -837,11 +880,48 @@ export class Harness {
       : refuse("not-found", "error.noRun", { id });
   }
 
-  /** `GET /api/runs`: run summaries, newest first, a page at a time. */
-  runs(query: { limit: number; cursor?: string }): { runs: RunSummary[]; next: string | null } {
+  /**
+   * `GET /api/runs` (`list_runs`): runs, newest first, a page at a time, each its summary with its
+   * Process, agent, and cost; with a Process (id or name), an agent, a status, a kind, or the runs
+   * that started at or after `since`.
+   */
+  runs(query: {
+    process?: string;
+    agent?: string;
+    status?: RunStatus;
+    kind?: RunKind;
+    since?: number;
+    limit: number;
+    cursor?: string;
+  }): { runs: ListedRun[]; next: string | null } {
+    const process =
+      query.process === undefined
+        ? undefined
+        : this.#process(this.#loaded().model, query.process).id;
     const before = query.cursor === undefined ? Number.POSITIVE_INFINITY : Number(query.cursor);
+    const listed = (summary: RunSummary): ListedRun => {
+      const record = this.#records.runs.get(summary.id);
+      return {
+        ...summary,
+        process: record?.process ?? null,
+        agent: record?.agent ?? null,
+        costUsd: record?.usage?.costUsd ?? null,
+      };
+    };
     const matching = Object.values(this.#state.runs)
-      .filter((run) => seqOf(run.id) < before)
+      .filter(
+        (run) =>
+          seqOf(run.id) < before &&
+          (query.kind === undefined || run.kind === query.kind) &&
+          (query.status === undefined || run.status === query.status) &&
+          (query.since === undefined || run.startedAt >= query.since),
+      )
+      .map(listed)
+      .filter(
+        (run) =>
+          (process === undefined || run.process === process) &&
+          (query.agent === undefined || run.agent === query.agent),
+      )
       .sort((a, b) => seqOf(b.id) - seqOf(a.id));
     const page = matching.slice(0, query.limit);
     const last = page.at(-1);
@@ -906,6 +986,7 @@ export class Harness {
   ): Promise<{ run: RunView; prompt?: string }> {
     if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
     this.#refusePlanOnly(caller);
+    this.#refuseAssessing(caller);
     this.#instance(instanceId);
     const agentSpec = (loaded: LoadedWorkspace): { spec: AgentSpec; specs: AgentSpec[] } => {
       const specs = resolveAgents(loaded.config.agents);
@@ -1286,7 +1367,7 @@ export class Harness {
           if (digest) input.sha256[p] = digest;
         }
     }
-    if (run.kind === "wake")
+    if (run.kind !== "process")
       try {
         fs.rmSync(recordPaths(this.root).mcpConfig(run.id), { force: true });
       } catch (error) {
@@ -1294,6 +1375,10 @@ export class Harness {
           `cannot remove the MCP configuration of run ${run.id}: ${(error as Error).message}`,
         );
       }
+    // An assessment is the latest once its run has ended, whatever its status: what it recorded
+    // was read and recorded in full (record_assessment takes all the items at once).
+    if (run.kind === "assess" && this.#records.assessments.has(run.id))
+      this.#state.latestAssessment = run.id;
     const seconds = Math.round((run.endedAt - run.startedAt) / 1000);
     this.#emit(run, { kind: "end", ...spoken("event.end", { status: end.status, seconds }) });
     this.#state.runs[run.id] = summaryOf(run);
@@ -1346,7 +1431,8 @@ export class Harness {
    * `POST /api/runs/:id/cancel`. An agent's process group is stopped (SIGTERM, then SIGKILL after
    * 5 s) and the answer comes once it has ended; a run that has already ended is left as it is.
    */
-  async cancelRun(id: string): Promise<{ run: RunView; canceled: boolean }> {
+  async cancelRun(id: string, caller: Caller): Promise<{ run: RunView; canceled: boolean }> {
+    this.#refuseAssessing(caller);
     const run = this.#run(id);
     if (run.status !== "running") return { run: viewOf(run), canceled: false };
     const active = this.#active.get(id);
@@ -1359,18 +1445,19 @@ export class Harness {
   }
 
   /**
-   * `POST /api/runs/:id/finish`: ends a self run with the session's report. A wake run's agent
-   * reports the same way, and its run ends when the agent's process does, right after.
+   * `POST /api/runs/:id/finish`: ends a self run with the session's report. The agent of a wake or
+   * an assessment reports the same way, and its run ends when the agent's process does, right
+   * after.
    */
   finishRun(id: string, request: FinishRequest): { run: RunView; outputs: RunOutput[] } {
     const run = this.#run(id);
-    if (run.agent !== "self" && run.kind !== "wake")
+    if (run.agent !== "self" && run.kind === "process")
       throw refuse("invalid-request", "error.notSelf", { run: id, agent: run.agent });
     if (run.status !== "running")
       throw refuse("invalid-request", "error.ended", { run: id, status: run.status });
     run.report = request.report;
     const active = this.#active.get(id);
-    if (run.kind === "wake" && active?.agent) {
+    if (run.kind !== "process" && active?.agent) {
       active.reported = request.status;
       this.#emit(run, {
         kind: "system",
@@ -1568,6 +1655,7 @@ export class Harness {
   ): Promise<{ run: RunView; skipped: false } | { skipped: true; running: string }> {
     if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
     this.#refusePlanOnly(trigger.kind === "request" ? trigger.caller : null);
+    this.#refuseAssessing(trigger.kind === "request" ? trigger.caller : null);
     const asked = this.#asked(request);
     const earlier = this.#runningWake();
     if (earlier) return this.#skip(earlier, trigger);
@@ -1685,15 +1773,17 @@ export class Harness {
 
   /**
    * `POST /api/instances/:id/evaluate`: judgments of the latest run's results, per Outcome, with
-   * evidence. It replaces the instance's evaluation. Who judged comes from the caller, not the
-   * request: a user, or an agent by its MCP client's name, marked self when the judged run is a
-   * self run that the same MCP session performed (performedBy).
+   * evidence. It replaces the instance's evaluation, which is kept at the front of its evaluations
+   * (supersede). Who judged comes from the caller, not the request: a user, or an agent by its
+   * MCP client's name, marked self when the judged run is a self run that the same MCP session
+   * performed (performedBy).
    */
   evaluate(
     instanceId: string,
     request: EvaluateRequest,
     caller: Caller,
   ): { instance: InstanceView } {
+    this.#refuseAssessing(caller);
     const instance = this.#instance(instanceId);
     const { loaded, description } = this.#describe();
     const process = this.#process(loaded.model, instance.process);
@@ -1727,7 +1817,7 @@ export class Harness {
         ...(performedBy(performer, caller) ? { self: true } : {}),
       };
     }
-    instance.evaluation = {
+    supersede(instance, {
       runId: latest.id,
       judgments: [...request.judgments]
         .sort((a, b) => a.outcome - b.outcome)
@@ -1740,7 +1830,7 @@ export class Harness {
       ...(request.note?.trim() ? { note: request.note } : {}),
       by,
       at: Date.now(),
-    };
+    });
     this.#saveState();
     const view = this.#view(instance, description);
     this.#sendInstance(view);
@@ -1817,10 +1907,12 @@ export class Harness {
   }
 
   /**
-   * `GET /api/assessment`: the statistics (all time by week, or since `since`), the findings that
-   * follow from the records, the model, and the configuration, and the facts of each instance.
+   * `GET /api/assessment`: what the harness observes (the statistics, all time by week or since
+   * `since`; the checks, which follow from the records, the model, and the configuration; the
+   * facts of each instance) and, apart from it, the latest assessment whose run has ended, with
+   * what the records gained after its run started (countSince, within its scope).
    */
-  async assessment(since?: number): Promise<Assessment> {
+  async assessment(since?: number): Promise<AssessmentOverview> {
     const agents = await this.model().then((model) => model.agents);
     const { description } = this.#describe();
     const facts = Object.values(this.#state.instances)
@@ -1834,25 +1926,382 @@ export class Harness {
       ...this.#skillUse(description.processes),
       sharedOrigins: this.#sharedOrigins(),
     });
+    const input = this.#statsInput(description, facts);
     const { stats } = computeStats(
-      this.#statsInput(description, facts),
+      input,
       { period: "all", granularity: "week", ...(since === undefined ? {} : { since }) },
       { now: Date.now(), utcOffsetMinutes: localUtcOffset() },
     );
-    return { stats, findings, instances: facts };
+    const id = this.#state.latestAssessment;
+    const latest = id === null ? null : (this.#records.assessments.get(id) ?? null);
+    const started = latest ? (this.#records.runs.get(latest.runId)?.startedAt ?? latest.at) : null;
+    return {
+      stats,
+      findings,
+      instances: facts,
+      latest,
+      since:
+        latest && started !== null
+          ? countSince(input, started, {
+              process: latest.scope.process,
+              agent: latest.scope.agent,
+            })
+          : null,
+    };
   }
 
   /** `GET /api/assessment?format=markdown`: the assessment as Markdown, in the workspace's language. */
   async assessmentMarkdown(since?: number): Promise<string> {
-    const assessment = await this.assessment(since);
+    const overview = await this.assessment(since);
     const { loaded, description } = this.#describe();
     const processOf = (id: string) => description.processes.find((p) => p.id === id);
-    return assessmentMarkdown(assessment, {
+    return assessmentMarkdown(overview, {
       language: loaded.language,
       model: description.name,
       processName: (id) => processOf(id)?.name ?? id,
       outcomeText: (id, outcome) => processOf(id)?.outcomes[outcome] ?? "",
     });
+  }
+
+  /* ---------- assessments ---------- */
+
+  /** The assessment run that has not ended; there is at most one. */
+  #runningAssessment(): Run | undefined {
+    for (const id of this.#active.keys()) {
+      const run = this.#records.runs.get(id);
+      if (run?.kind === "assess") return run;
+    }
+    return undefined;
+  }
+
+  /**
+   * The assessment run that the caller performs: the one whose agent the caller's MCP server
+   * serves (X-Harness-Assess), or a self assessment run that the caller's MCP session performs
+   * while it runs.
+   */
+  #assessmentOf(caller: Caller | null): Run | undefined {
+    if (caller?.kind !== "agent") return undefined;
+    if (caller.assess) {
+      const run = this.#records.runs.get(caller.assess);
+      return run?.kind === "assess" ? run : undefined;
+    }
+    const running = this.#runningAssessment();
+    return running && performedBy(running.client, caller) ? running : undefined;
+  }
+
+  /**
+   * Refuses an instance, a run, a wake, an evaluation, or a cancellation that the agent of an
+   * assessment asks for: it reads the records and records what it finds, and changes neither the
+   * records nor the workspace, whatever its prompt made of it. Reading, recording the assessment,
+   * and reporting stay open.
+   */
+  #refuseAssessing(caller: Caller | null): void {
+    const run = this.#assessmentOf(caller);
+    if (run) throw refuse("invalid-request", "error.assessOnly", { run: run.id });
+  }
+
+  /** What an assessment is asked to read, checked against the model: its Process, by id. */
+  #scope(request: AssessRequest): AssessScope {
+    const { model } = this.#loaded();
+    const { period, process, agent } = request.scope;
+    return {
+      ...(period ? { period } : {}),
+      ...(process ? { process: this.#process(model, process).id } : {}),
+      ...(agent ? { agent } : {}),
+      ...(request.request ? { request: request.request } : {}),
+    };
+  }
+
+  /**
+   * `POST /api/assess`: records an assessment run (no instance) and starts its agent with this
+   * harness's MCP server, through which it reads the records and records what it finds
+   * (record_assessment), then reports with finish_run. With the agent self, the calling session
+   * performs it: the result carries the prompt, and finish_run ends it. Only one assessment runs at
+   * a time. The harness reads nothing for the agent and interprets nothing: the scope and the
+   * point of view go into the prompt and the record as given.
+   */
+  async assess(request: AssessRequest, caller: Caller): Promise<{ run: RunView; prompt?: string }> {
+    if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
+    this.#refusePlanOnly(caller);
+    this.#refuseAssessing(caller);
+    const scope = this.#scope(request);
+    const earlier = this.#runningAssessment();
+    if (earlier) throw refuse("already-running", "error.assessing", { run: earlier.id });
+    const name = request.agent ?? ASSESS_AGENT;
+    const agentSpec = (loaded: LoadedWorkspace): { spec: AgentSpec; specs: AgentSpec[] } => {
+      const specs = resolveAgents(loaded.config.agents);
+      const spec = specs.find((s) => s.id === name);
+      const agents = specs.map((s) => s.id).join(", ");
+      if (!spec)
+        throw name === "self"
+          ? refuse("agent-unavailable", "error.selfDisabled", { agents })
+          : refuse("agent-unavailable", "error.noAgent", { agent: name, agents });
+      // A self assessment is recorded by the MCP session that performs it, so only one may ask.
+      if (spec.format === "self" && caller.kind !== "agent")
+        throw refuse("invalid-request", "error.selfAssess", {});
+      if (spec.format !== "self" && !takesMcpServer(spec))
+        throw refuse("agent-unavailable", "error.assessAgent", {
+          agent: spec.label,
+          agents: specs
+            .filter((s) => s.format === "self" || takesMcpServer(s))
+            .map((s) => s.id)
+            .join(", "),
+        });
+      return { spec, specs };
+    };
+    let info: AgentInfo | null = null;
+    {
+      const { spec, specs } = agentSpec(this.#loaded());
+      if (startsProcess(spec)) {
+        info = await this.#availability(spec, specs);
+        if (!info.available)
+          throw refuse("agent-unavailable", "error.agentUnavailable", {
+            agent: spec.label,
+            reason: info.reason ?? "it is not available",
+          });
+      }
+    }
+    // From here on nothing waits, so no other assessment comes between the checks and the record.
+    if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
+    const other = this.#runningAssessment();
+    if (other) throw refuse("already-running", "error.assessing", { run: other.id });
+    const { loaded, description } = this.#describe();
+    const { spec } = agentSpec(loaded);
+    const self = spec.format === "self";
+    const now = Date.now();
+    const id = this.#nextId("r");
+    const prompt = buildAssessPrompt({
+      language: loaded.language,
+      root: this.root,
+      run: id,
+      server: self ? null : WAKE_MCP_SERVER,
+      scope,
+      processName: (process) =>
+        loaded.model.processes.find((p) => p.id === process)?.name ?? process,
+      modelPath: description.modelPath,
+      guidance: (loaded.config.guidance ?? []).map((file) => ({
+        path: file,
+        found: fs.existsSync(path.resolve(this.root, file)),
+      })),
+    });
+    // The agent's MCP server names this assessment, so what it records is the run's.
+    const server: McpServerLaunch = {
+      name: WAKE_MCP_SERVER,
+      command: this.#deps.mcpServer.command,
+      args: [...this.#deps.mcpServer.args, "--assess", id],
+      env: { ALPS_WORKSPACE: this.root },
+    };
+    const configFile = recordPaths(this.root).mcpConfig(id);
+    const args = self
+      ? []
+      : argsFor({ ...spec, args: [...spec.args, ...mcpArgs(spec, server, configFile)] }, prompt);
+    const run: Run = {
+      id,
+      kind: "assess",
+      instance: null,
+      process: null,
+      agent: spec.id,
+      status: "running",
+      createdAt: now,
+      startedAt: now,
+      endedAt: null,
+      exitCode: null,
+      error: null,
+      agentError: null,
+      inputs: [],
+      targets: [],
+      outputs: [],
+      usage: null,
+      report: "",
+      events: 0,
+      command: self ? null : commandLine(spec, args, prompt),
+      // As for a self process run, the session tells who performs it.
+      client:
+        self && caller.kind === "agent" ? { ...caller.client, session: caller.session } : null,
+      prompt,
+      git: this.#deps.gitInfo(this.root),
+      skill: null,
+      scope,
+    };
+    const active: ActiveRun = {
+      locations: [],
+      before: new Map(),
+      overlapping: new Set(),
+      release: this.#hooks.hold(),
+      timer: null,
+      agent: null,
+      stopping: null,
+      reported: null,
+    };
+    this.#active.set(id, active);
+    this.#records.runs.set(id, run);
+    this.#state.runs[id] = summaryOf(run);
+    writeRun(this.root, run);
+    this.#saveState();
+    if (self) {
+      this.#emit(run, { kind: "system", ...spoken("event.self", {}) });
+      this.#writeRun(run);
+      this.#announce(run);
+      return { run: viewOf(run), prompt };
+    }
+    if (spec.format === "claude")
+      try {
+        fs.writeFileSync(configFile, mcpConfigFile(server));
+      } catch (error) {
+        const failure = spoken("event.mcpConfig", {
+          agent: spec.label,
+          detail: (error as Error).message,
+        });
+        this.#emit(run, { kind: "error", ...failure });
+        this.#end(run, { status: "failed", error: failure });
+        return { run: viewOf(run) };
+      }
+    this.#runAgent(run, active, spec, info, args);
+    this.#announce(run);
+    return { run: viewOf(run) };
+  }
+
+  /**
+   * `POST /api/assessments` (`record_assessment`): the result of the assessment run that the
+   * caller performs, while it runs. Each item rests on evidence that the records have (an
+   * unverified one may give none), and its subject is put in the model's ids. Recording again
+   * replaces what the run recorded. The assessment becomes the latest once its run ends.
+   */
+  recordAssessment(request: RecordAssessmentRequest, caller: Caller): Assessment {
+    const run = this.#assessmentOf(caller);
+    if (!run || run.status !== "running") throw refuse("invalid-request", "error.noAssessRun", {});
+    const { model } = this.#loaded();
+    const drafts: ItemDraft[] = request.items.map((item, i) => {
+      const n = i + 1;
+      const { process, artifact, instance, agent, guidance } = item.subject;
+      const subject: AssessmentItem["subject"] = {};
+      if (process) {
+        const found = byKey(model.processes, process);
+        if (!found)
+          throw refuse("invalid-request", "error.itemSubject", {
+            n,
+            kind: "process",
+            name: process,
+          });
+        subject.process = found.id;
+      }
+      if (artifact) {
+        const found = byKey(model.artifacts, artifact);
+        if (!found)
+          throw refuse("invalid-request", "error.itemSubject", {
+            n,
+            kind: "artifact",
+            name: artifact,
+          });
+        subject.artifact = found.id;
+      }
+      if (agent) subject.agent = agent;
+      if (guidance) subject.guidance = guidance;
+      if (instance) {
+        if (!this.#state.instances[instance])
+          throw refuse("invalid-request", "error.itemSubject", {
+            n,
+            kind: "instance",
+            name: instance,
+          });
+        subject.instance = instance;
+      }
+      // A cut of the statistics names its Process as the dashboard's filter does: by id.
+      const evidence = item.evidence.map((cited) => {
+        if (!("stat" in cited) || !cited.stat.filter.process) return cited;
+        const found = byKey(model.processes, cited.stat.filter.process);
+        if (!found)
+          throw refuse("invalid-request", "error.evidenceProcess", {
+            n,
+            name: cited.stat.filter.process,
+          });
+        return { stat: { ...cited.stat, filter: { ...cited.stat.filter, process: found.id } } };
+      });
+      return {
+        kind: item.kind,
+        subject,
+        statement: item.statement,
+        evidence,
+        ...(item.limits ? { limits: item.limits } : {}),
+      };
+    });
+    const items = checkedItems(drafts, {
+      run: (id) =>
+        this.#state.runs[id] ? { events: this.#records.runs.get(id)?.events ?? null } : null,
+      instance: (id) => {
+        const instance = this.#state.instances[id];
+        return instance
+          ? { evaluated: instance.evaluation !== null || (instance.evaluations ?? []).length > 0 }
+          : null;
+      },
+      path: (given, where) => {
+        const inside = this.#pathIn(given, where);
+        return fileState(this.root, artifactPath(inside)) ? inside : null;
+      },
+    });
+    const assessment: Assessment = {
+      id: run.id,
+      runId: run.id,
+      at: Date.now(),
+      agent: run.agent,
+      scope: run.scope ?? {},
+      summary: request.summary,
+      items,
+      reviews: [],
+    };
+    writeAssessment(this.root, assessment);
+    this.#records.assessments.set(run.id, assessment);
+    this.#emit(run, {
+      kind: "system",
+      ...spoken("event.assessmentRecorded", { items: items.length }),
+    });
+    this.#writeRun(run);
+    this.#hooks.broadcast({ type: "assessment", assessment });
+    return assessment;
+  }
+
+  /** `GET /api/assessments`: the assessments recorded, newest first. */
+  assessments(): Assessment[] {
+    return [...this.#records.assessments.values()].sort((a, b) => seqOf(b.id) - seqOf(a.id));
+  }
+
+  /** `GET /api/assessments/:id`: one assessment. */
+  assessmentRecord(id: string): Assessment {
+    const assessment = this.#records.assessments.get(id);
+    if (!assessment) throw refuse("not-found", "error.noAssessment", { id });
+    return assessment;
+  }
+
+  /**
+   * `POST /api/assessments/:id/items/:n/review`: a person's review of one item of an assessment
+   * whose run has ended, added after the earlier ones, which stay. Only a person reviews (the
+   * WebUI, which names no MCP client): an agent does not adopt what it found. Adopting an item
+   * does nothing else: a request that follows from it is the person's to send.
+   */
+  review(id: string, n: number, request: ReviewRequest, caller: Caller): Assessment {
+    if (caller.kind !== "user") throw refuse("invalid-request", "error.reviewByPerson", {});
+    const assessment = this.assessmentRecord(id);
+    if (this.#state.runs[assessment.runId]?.status === "running")
+      throw refuse("invalid-request", "error.assessmentOpen", { id });
+    if (!assessment.items.some((item) => item.n === n))
+      throw refuse("not-found", "error.noItem", { id, n, count: assessment.items.length });
+    const reviewed: Assessment = {
+      ...assessment,
+      reviews: [
+        ...assessment.reviews,
+        {
+          n,
+          judgment: request.judgment,
+          ...(request.note ? { note: request.note } : {}),
+          by: { kind: "user" },
+          at: Date.now(),
+        },
+      ],
+    };
+    writeAssessment(this.root, reviewed);
+    this.#records.assessments.set(id, reviewed);
+    this.#hooks.broadcast({ type: "assessment", assessment: reviewed });
+    return reviewed;
   }
 
   /** `GET /api/skill`: the text of a Process's SKILL.md, for the WebUI to show. */

@@ -135,6 +135,7 @@ export function migrateStateV1(v1: StateFileV1, now: number): { state: StateFile
       provenance: { ...v1.provenance },
       seq,
       lastWakeAt: null,
+      latestAssessment: null,
       runs: Object.fromEntries(
         runs.map((run) => [
           run.id,

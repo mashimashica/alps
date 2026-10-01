@@ -42,9 +42,9 @@ const PING_MS = 20_000;
 const UPLOAD_ROUTE = "/api/attachments";
 /**
  * Bun's own limit, just above the largest that a route reads (an upload), so that the API answers
- * an oversized body in its own words; each route reads no more than its own limit.
+ * an oversized body in its own words; each route keeps no more than its own limit.
  */
-const MAX_REQUEST_BYTES = MAX_UPLOAD_BYTES + 64 * 1024;
+export const MAX_REQUEST_BYTES = MAX_UPLOAD_BYTES + 64 * 1024;
 /** How often, while a WebUI is connected, the workspace is checked for edits made outside the harness. */
 const POLL_MS = 3000;
 
@@ -131,6 +131,27 @@ function tokenMatches(given: string | null, token: string): boolean {
 }
 
 const formatSize = (bytes: number): string => `${(bytes / 1024).toFixed(1)} KiB`;
+
+/**
+ * Reads a body to its end and keeps none of it, so that the answer comes after all of it: a client
+ * that has its answer before it has sent the rest may send its next request on the same connection,
+ * where it would be taken for that rest (Bun's fetch does). No more than Bun's limit is read, since
+ * Bun refuses a body that says it is longer before the harness sees it.
+ */
+async function discard(body: ReadableStream<Uint8Array> | null): Promise<void> {
+  const reader = body?.getReader();
+  if (!reader) return;
+  try {
+    for (let size = 0; size <= MAX_REQUEST_BYTES;) {
+      const { done, value } = await reader.read();
+      if (done) return;
+      size += value.byteLength;
+    }
+    await reader.cancel();
+  } catch {
+    // The client went away before it sent all of it.
+  }
+}
 
 /** Tries the configured port and the next ones while they are in use. Port 0 is tried once. */
 function listen(port: number, serve: (port: number) => Server<undefined>): Server<undefined> {
@@ -334,11 +355,14 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
           upload ? "error.multipartType" : "error.mediaType",
           {},
         );
-      // A body that says it is too long is refused unread; one that does not say its length is
-      // read to its end with no more than the limit kept, and refused then (api.ts).
+      // A body that says it is too long is read to its end, none of it kept, and refused then; one
+      // that does not say its length is read to its end with no more than the limit kept, and
+      // refused then (api.ts).
       const limit = upload ? MAX_UPLOAD_BYTES : MAX_JSON_BYTES;
-      if (Number(request.headers.get("content-length") ?? 0) > limit)
+      if (Number(request.headers.get("content-length") ?? 0) > limit) {
+        await discard(request.body);
         return fail(413, "too-large", "error.bodySize", { limit: mebibytes(limit) });
+      }
     }
 
     switch (`${request.method} ${url.pathname}`) {

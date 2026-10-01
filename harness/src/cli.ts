@@ -21,11 +21,13 @@ Commands:
                   never appears on a command line
   stop [workspace]
         Stop the harness server of the workspace, and the agents it is running.
-  mcp [--wake <run>]
+  mcp [--wake <run>] [--assess <run>]
         Serve MCP on stdio for the workspace in ALPS_WORKSPACE or the current directory. It
         relays to the workspace's harness server and starts one (detached) when none runs.
-        --wake  the wake run whose agent this server serves; the harness passes it to the
-                agents it wakes, so the runs they start are listed in that wake run
+        --wake    the wake run whose agent this server serves; the harness passes it to the
+                  agents it wakes, so the runs they start are listed in that wake run
+        --assess  the assessment run whose agent this server serves; the harness passes it to
+                  the agents that assess, so what they record is that run's
   wake [workspace] [--agent <agent>] [--request <text>] [--attach <path>]... [--process <process>]... [--plan]
         Wake an agent, as the schedules in alps-harness.yaml and the MCP tool wake do: it is
         started with the harness's MCP server and decides which Processes to run. For an
@@ -39,10 +41,16 @@ Commands:
                    the current directory (repeatable, at most 10)
         --process  a Process (id or name) that the plan must include (repeatable)
         --plan     only instantiate what is planned; start no run
-  assess [workspace] [--format markdown|json]
-        Print the assessment: the statistics, the findings, and the facts of every instance,
-        as the MCP tool get_assessment returns it (Markdown by default, in the workspace's
-        language).
+  assess [workspace] [--format markdown|json] [--with <agent> [--request <text>]]
+        Print the assessment, as the MCP tool get_assessment returns it (Markdown by default,
+        in the workspace's language): the latest assessment, an agent's interpretation of the
+        records, apart from what the harness observes (the statistics, the checks, and the facts
+        of every instance).
+        --with     start an assessment instead, with claude-code or codex: the agent reads the
+                   records and records the opportunities to improve the processes that it finds.
+                   It returns once the agent has started; the result is the latest assessment
+                   once its run has ended
+        --request  the point of view of the assessment, in free text
 
 The workspace is the first of the given directory, ALPS_WORKSPACE, and the current directory,
 or the nearest parent of it that has alps-harness.yaml or process-model.yaml.
@@ -120,7 +128,7 @@ async function main(argv: string[]): Promise<number> {
       return stop(workspace ?? defaultStart());
     }
     case "mcp": {
-      const { workspace, options } = parse(rest, { boolean: [], value: ["wake"] });
+      const { workspace, options } = parse(rest, { boolean: [], value: ["wake", "assess"] });
       if (workspace !== undefined) throw new UsageError(`Unexpected argument: ${workspace}`);
       const [{ runMcp }, { parseYaml }] = await Promise.all([
         import("./mcp.ts"),
@@ -131,6 +139,7 @@ async function main(argv: string[]): Promise<number> {
         parseYaml,
         version: pkg.version,
         wake: typeof options.wake === "string" ? options.wake : null,
+        assess: typeof options.assess === "string" ? options.assess : null,
       });
       return 0;
     }
@@ -152,11 +161,28 @@ async function main(argv: string[]): Promise<number> {
       });
     }
     case "assess": {
-      const { workspace, options } = parse(rest, { boolean: [], value: ["format"] });
+      const { workspace, options } = parse(rest, {
+        boolean: [],
+        value: ["format", "with", "request"],
+      });
       const format = options.format ?? "markdown";
       if (format !== "markdown" && format !== "json")
         throw new UsageError("--format must be markdown or json.");
-      const { assess } = await import("./server/commands.ts");
+      if (typeof options.request === "string" && typeof options.with !== "string")
+        throw new UsageError(
+          "--request needs --with: it is the point of view of a new assessment.",
+        );
+      // A self assessment is performed by a session through MCP (assess with the agent self).
+      if (options.with === "self")
+        throw new UsageError(
+          "--with self: a session performs a self assessment through MCP (assess with the agent self).",
+        );
+      const { assess, startAssessment } = await import("./server/commands.ts");
+      if (typeof options.with === "string")
+        return startAssessment(workspace ?? defaultStart(), {
+          agent: options.with,
+          request: typeof options.request === "string" ? options.request : undefined,
+        });
       return assess(workspace ?? defaultStart(), format);
     }
     case "-h":

@@ -8,8 +8,8 @@ import { afterAll, describe, expect, test } from "bun:test";
 import fs from "node:fs";
 import path from "node:path";
 import type {
-  Assessment,
   AssessmentMarkdownResponse,
+  AssessmentOverview,
   AssessmentResponse,
   InstanceResponse,
   InstancesResponse,
@@ -247,7 +247,7 @@ describe("E5 dashboard", () => {
       expect(printed.stdout).toContain("| Achievement | 50% (2 of 4 judged Outcomes) |");
       const json = await cli(["assess", ws.root, "--format", "json"]);
       expect(json.code, json.stderr).toBe(0);
-      const printedJson = JSON.parse(json.stdout) as Assessment;
+      const printedJson = JSON.parse(json.stdout) as AssessmentOverview;
       expect(printedJson.stats.metrics.staleEvaluations).toBe(2);
       expect(printedJson.stats.metrics.achievement).toMatchObject({ numerator: 2, denominator: 4 });
       expect(printedJson.findings).toEqual(assessment.findings);

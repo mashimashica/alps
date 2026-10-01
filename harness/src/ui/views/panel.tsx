@@ -2,10 +2,12 @@
  * The panel on the right (in narrow windows a Sheet over the page, or under the network's
  * diagram): the details of what is selected. A Process (its purpose, Outcomes, inputs, controls,
  * outputs; its instances; its SKILL.md), an Artifact type (its locations, the Artifacts found
- * there, and the run that made each), a run (its record and its log, followed while it runs), an
- * instance (in tabs: its inputs and criteria, its runs with starting and canceling, its
- * evaluation, the log of its latest run, and its Process's SKILL.md), or what a number of the
- * dashboard counts. With nothing selected, the model (its counts, its workspace, the server, the
+ * there, and the run that made each; one cited as evidence is marked), a run (its record and its
+ * log, followed while it runs; an event cited as evidence is marked), an instance (in tabs: its
+ * inputs and criteria, its runs with starting and canceling, and its evaluation with the ones it
+ * replaced; the latest run's log is in the run's panel and the SKILL.md in the Process's, and the
+ * instance links to both), or what a number of the dashboard counts. An assessment run shows
+ * what it was asked to read and its report. With nothing selected, the model (its counts, its workspace, the server, the
  * agents) and the record of wakes. A wake run shows what it was asked (the request as given, the
  * attachments, the Processes, how far to go), its report (what the agent planned and why), the
  * runs that its agent started, and the instances it made; an instance that a wake made links to
@@ -36,6 +38,7 @@ import { Alert, Empty, Loading } from "../components/feedback.tsx";
 import { Icon } from "../components/icons.tsx";
 import { Select } from "../components/select.tsx";
 import { tabPanel, Tabs } from "../components/tabs.tsx";
+import { cx } from "../components/util.ts";
 import { useUi, type InstanceTab, type ProcessTab, type Selection, type Ui } from "../context.ts";
 import { clock, count, dateTime, duration, money } from "../format.ts";
 import { splitFrontmatter } from "../markdown.ts";
@@ -48,7 +51,9 @@ import {
   PanelHead,
   Path,
   PathTail,
+  pathTail,
   ProcessLink,
+  reveal,
   processName,
   RunLink,
   Section,
@@ -353,10 +358,19 @@ function ProcessPanel({ id, initial }: { id: string; initial: ProcessTab }) {
   );
 }
 
-function TypePanel({ id }: { id: string }) {
+function TypePanel({ id, path: cited }: { id: string; path?: string | undefined }) {
   const { model, t, client, version, language } = useUi();
   const [found, setFound] = useState<Loaded<ArtifactsResponse>>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
+  const listed = useRef<HTMLUListElement>(null);
+  // The Artifact cited as evidence is brought into view once, when the list first shows it.
+  const shown = useRef(false);
+  useEffect(() => {
+    if (found.status !== "ok" || !cited || shown.current) return;
+    const row = listed.current?.querySelector(".is-cited");
+    if (row) reveal(row);
+    shown.current = true;
+  }, [found.status, cited]);
   useEffect(() => {
     let live = true;
     client.get<ArtifactsResponse>(`/api/artifacts${query({ type: id })}`).then(
@@ -433,9 +447,13 @@ function TypePanel({ id }: { id: string }) {
           (found.value.artifacts.length === 0 ? (
             <p class="faint small">{t("type.noArtifacts")}</p>
           ) : (
-            <ul class="list" data-testid="artifacts">
+            <ul class="list" data-testid="artifacts" ref={listed}>
               {found.value.artifacts.map((artifact) => (
-                <li key={artifact.path} class="list-row list-row-stack">
+                <li
+                  key={artifact.path}
+                  class={cx("list-row list-row-stack", artifact.path === cited && "is-cited")}
+                  data-path={artifact.path}
+                >
                   <span class="mono small path-cell" title={artifact.path}>
                     <Path path={`${artifact.path}${artifact.dir ? "/" : ""}`} />
                   </span>
@@ -458,8 +476,11 @@ function TypePanel({ id }: { id: string }) {
   );
 }
 
-/** A run's record, read again when the records change and every FOLLOW_MS while it runs. */
-function useRun(id: string | null) {
+/**
+ * A run's record and its last `tail` events, read again when the records change and every
+ * FOLLOW_MS while it runs.
+ */
+function useRun(id: string | null, tail = 200) {
   const { client, version } = useUi();
   const [detail, setDetail] = useState<RunDetailResponse | null>(null);
   const [error, setError] = useState<unknown>(null);
@@ -469,27 +490,25 @@ function useRun(id: string | null) {
     let live = true;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const load = (): void => {
-      client
-        .get<RunDetailResponse>(`/api/runs/${encodeURIComponent(id)}${query({ tail: 200 })}`)
-        .then(
-          (answer) => {
-            if (!live) return;
-            setDetail(answer);
-            setError(null);
-            // Follow the log while the run runs.
-            if (answer.run.status === "running") timer = setTimeout(load, FOLLOW_MS);
-          },
-          (failure: unknown) => {
-            if (live) setError(failure);
-          },
-        );
+      client.get<RunDetailResponse>(`/api/runs/${encodeURIComponent(id)}${query({ tail })}`).then(
+        (answer) => {
+          if (!live) return;
+          setDetail(answer);
+          setError(null);
+          // Follow the log while the run runs.
+          if (answer.run.status === "running") timer = setTimeout(load, FOLLOW_MS);
+        },
+        (failure: unknown) => {
+          if (live) setError(failure);
+        },
+      );
     };
     load();
     return () => {
       live = false;
       clearTimeout(timer);
     };
-  }, [id, version, attempt]);
+  }, [id, tail, version, attempt]);
   return {
     detail: detail && detail.run.id === id ? detail : null,
     error,
@@ -499,18 +518,29 @@ function useRun(id: string | null) {
 
 /**
  * A run's log, one event per line, what the harness itself said in the page's language. While the
- * run runs, the box stays at its end unless it was scrolled up.
+ * run runs, the box stays at its end unless it was scrolled up. An event cited as evidence (`line`)
+ * is marked, and the box shows it.
  */
-function RunLog({ detail }: { detail: RunDetailResponse }) {
+function RunLog({ detail, line }: { detail: RunDetailResponse; line?: number | undefined }) {
   const { t, language } = useUi();
   const box = useRef<HTMLPreElement>(null);
-  const atEnd = useRef(true);
+  const atEnd = useRef(line === undefined);
+  // The cited event is brought into view once, when the log first holds it.
+  const citedShown = useRef(false);
   const { run, events, truncated } = detail;
   const last = events[events.length - 1];
   useLayoutEffect(() => {
     const element = box.current;
-    if (element && atEnd.current) element.scrollTop = element.scrollHeight;
-  }, [events.length, last?.t]);
+    if (!element) return;
+    const cited =
+      line === undefined || citedShown.current
+        ? null
+        : element.querySelector<HTMLElement>(".is-cited");
+    if (cited) {
+      element.scrollTop = Math.max(0, cited.offsetTop - element.clientHeight / 3);
+      citedShown.current = true;
+    } else if (atEnd.current) element.scrollTop = element.scrollHeight;
+  }, [events.length, last?.t, line]);
   return (
     <>
       {truncated && <p class="faint small">{t("run.earlier")}</p>}
@@ -528,7 +558,10 @@ function RunLog({ detail }: { detail: RunDetailResponse }) {
         {events.map((event, i) => (
           <Fragment key={i}>
             {i > 0 && "\n"}
-            <span class={`log-line k-${event.kind}`}>
+            <span
+              class={cx(`log-line k-${event.kind}`, event.n === line && "is-cited")}
+              data-n={event.n}
+            >
               <span class="log-time">{clock(event.t, language)}</span>{" "}
               <span class="log-kind">{event.kind.padEnd(8)}</span>{" "}
               <span class="log-text">
@@ -548,9 +581,10 @@ function RunLog({ detail }: { detail: RunDetailResponse }) {
   );
 }
 
-function RunPanel({ id }: { id: string }) {
+function RunPanel({ id, line }: { id: string; line?: number | undefined }) {
   const { client, t, language, putRun, instances, model, runs } = useUi();
-  const { detail, error, retry } = useRun(id);
+  // An event cited as evidence may be older than the last 200.
+  const { detail, error, retry } = useRun(id, line === undefined ? 200 : 1000);
   const [canceling, setCanceling] = useState(false);
   const [cancelError, setCancelError] = useState<unknown>(null);
   if (!detail)
@@ -590,13 +624,15 @@ function RunPanel({ id }: { id: string }) {
     <div data-testid="panel-run" data-run={id} data-status={run.status}>
       {/* Named by what it is (a Process, a request, a wake); its id is small in the kicker. */}
       <PanelHead
-        kicker={`${run.kind === "wake" ? t("run.wake") : t("panel.run")} · ${run.id}`}
+        kicker={`${run.kind === "wake" ? t("run.wake") : run.kind === "assess" ? t("run.assess") : t("panel.run")} · ${run.id}`}
         title={
           run.kind === "wake"
             ? requested
               ? t("run.request")
               : t("run.wakeTitle")
-            : processName(model, run.process) || t("panel.run")
+            : run.kind === "assess"
+              ? t("run.assessTitle")
+              : processName(model, run.process) || t("panel.run")
         }
         sub={<StatusText status={run.status} />}
       />
@@ -714,6 +750,20 @@ function RunPanel({ id }: { id: string }) {
           )}
         </Section>
       )}
+      {run.kind === "assess" && run.scope && (
+        <Section title={t("run.scope")}>
+          <div class="chips" data-testid="assess-scope">
+            <span class="chip chip-scope">{t(`period.${run.scope.period ?? "all"}`)}</span>
+            {run.scope.process && <ProcessLink id={run.scope.process} />}
+            {run.scope.agent && (
+              <span class="chip chip-agent">
+                {model?.agents.find((a) => a.id === run.scope?.agent)?.label ?? run.scope.agent}
+              </span>
+            )}
+          </div>
+          {run.scope.request && <p class="pre request-text">{run.scope.request}</p>}
+        </Section>
+      )}
       <Section title={requested ? t("run.planReport") : t("run.report")}>
         {run.report ? (
           <div data-testid="run-report">
@@ -804,7 +854,7 @@ function RunPanel({ id }: { id: string }) {
         </Section>
       )}
       <Section title={t("run.log")}>
-        <RunLog detail={detail} />
+        <RunLog detail={detail} line={line} />
       </Section>
     </div>
   );
@@ -815,30 +865,8 @@ function staleText(t: Ui["t"], reason: StaleReason): string {
   return t(`stale.${reason.change}`, { path: reason.path });
 }
 
-/** The log tab of an instance: its latest run's log, followed while it runs. */
-function LatestLog({ run }: { run: string }) {
-  const { t, language } = useUi();
-  const { detail, error, retry } = useRun(run);
-  return (
-    <>
-      <p class="tab-lead">
-        <RunLink id={run} />
-      </p>
-      {detail ? (
-        <RunLog detail={detail} />
-      ) : error ? (
-        <Alert tone="danger" title={t("error.title")} action={<Retry onRetry={retry} />}>
-          {describeError(error, language)}
-        </Alert>
-      ) : (
-        <Loading label={t("loading")} lines={5} />
-      )}
-    </>
-  );
-}
-
 function InstancePanel({ id, initial }: { id: string; initial: InstanceTab }) {
-  const { model, instances, runs, t, language, client, putRun, openForm } = useUi();
+  const { model, instances, runs, t, language, client, putRun, openForm, select } = useUi();
   const base = useId();
   const [tab, setTab] = useState<InstanceTab>(initial);
   const [agent, setAgent] = useState<string>("");
@@ -864,7 +892,8 @@ function InstancePanel({ id, initial }: { id: string; initial: InstanceTab }) {
       .then(
         (answer) => {
           putRun(summaryOf(answer.run));
-          setTab("log");
+          // The run's panel follows its log.
+          select({ kind: "run", id: answer.run.id });
         },
         (error: unknown) => setActionError({ what: "start", error }),
       )
@@ -887,15 +916,15 @@ function InstancePanel({ id, initial }: { id: string; initial: InstanceTab }) {
     : Object.keys(instance.inputs);
   const outputs = process ? process.outputs : Object.keys(instance.outputs);
   const evaluation = instance.evaluation;
-  const by = !evaluation
-    ? ""
-    : evaluation.by.kind === "user"
-      ? t("judge.user")
-      : evaluation.by.self
-        ? t("judge.self", { id: evaluation.by.id })
-        : evaluation.by.id;
   const outcomes = process?.outcomes.length ?? 0;
   const input = firstInputOf(model, instance);
+  const skill = process?.skill && "path" in process.skill ? process.skill : null;
+  const judgeOf = (judged: NonNullable<typeof evaluation>): string =>
+    judged.by.kind === "user"
+      ? t("judge.user")
+      : judged.by.self
+        ? t("judge.self", { id: judged.by.id })
+        : judged.by.id;
   /** Each Outcome as this application reads it: its criterion, or the model's own words. */
   const readings = Array.from(
     { length: Math.max(outcomes, ...instance.criteria.map((c) => c.outcome + 1)) },
@@ -927,8 +956,6 @@ function InstancePanel({ id, initial }: { id: string; initial: InstanceTab }) {
           { value: "overview", label: t("tab.overview") },
           { value: "runs", label: t("instance.runs"), count: instance.runs.length },
           { value: "evaluation", label: t("instance.evaluation") },
-          { value: "log", label: t("run.log") },
-          { value: "skill", label: t("tab.skill") },
         ]}
       />
       <div class="panel-tab" {...tabPanel(base, tab)}>
@@ -970,6 +997,25 @@ function InstancePanel({ id, initial }: { id: string; initial: InstanceTab }) {
                   <dt>{t("instance.createdBy")}</dt>
                   <dd data-testid="instance-origin" class="summary-id">
                     <RunLink id={instance.createdBy.run} />
+                  </dd>
+                </div>
+              )}
+              {/* The Process's SKILL.md is in the Process's panel. */}
+              {skill && (
+                <div>
+                  <dt>{t("tab.skill")}</dt>
+                  <dd>
+                    <button
+                      type="button"
+                      class="link mono small"
+                      data-testid="instance-skill"
+                      title={skill.path}
+                      onClick={() =>
+                        select({ kind: "process", id: instance.process, tab: "skill" })
+                      }
+                    >
+                      {pathTail(skill.path)}
+                    </button>
                   </dd>
                 </div>
               )}
@@ -1138,7 +1184,7 @@ function InstancePanel({ id, initial }: { id: string; initial: InstanceTab }) {
                 <p class="faint small">
                   {t("instance.judgedRun", {
                     run: evaluation.runId,
-                    by,
+                    by: judgeOf(evaluation),
                     at: dateTime(evaluation.at, language),
                   })}
                 </p>
@@ -1186,17 +1232,29 @@ function InstancePanel({ id, initial }: { id: string; initial: InstanceTab }) {
                   </>
                 )}
                 {evaluate}
+                {(instance.evaluations ?? []).length > 0 && (
+                  <Section title={t("instance.earlier")}>
+                    <ul class="list" data-testid="earlier-evaluations">
+                      {(instance.evaluations ?? []).map((earlier) => (
+                        <li key={`${earlier.at}`} class="list-row list-row-stack">
+                          <span class="list-main">
+                            <Glyphs judgments={earlier.judgments} outcomes={outcomes} />
+                            <span class="faint small">
+                              {dateTime(earlier.at, language)} · {judgeOf(earlier)}
+                            </span>
+                          </span>
+                          <span class="summary-id">
+                            <RunLink id={earlier.runId} />
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </Section>
+                )}
               </>
             )}
           </>
         )}
-        {tab === "log" &&
-          (latest ? (
-            <LatestLog run={latest.id} />
-          ) : (
-            <Empty icon="activity" title={t("instance.noRuns")} />
-          ))}
-        {tab === "skill" && <SkillTab process={instance.process} />}
       </div>
     </div>
   );
@@ -1275,9 +1333,21 @@ export function Panel({ modelError }: { modelError: unknown }) {
         />
       );
     case "type":
-      return <TypePanel key={selection.id} id={selection.id} />;
+      return (
+        <TypePanel
+          key={`${selection.id}:${selection.path ?? ""}`}
+          id={selection.id}
+          path={selection.path}
+        />
+      );
     case "run":
-      return <RunPanel key={selection.id} id={selection.id} />;
+      return (
+        <RunPanel
+          key={`${selection.id}:${selection.line ?? ""}`}
+          id={selection.id}
+          line={selection.line}
+        />
+      );
     case "instance":
       return (
         <InstancePanel

@@ -4,28 +4,35 @@
  * http.ts before a route is chosen. The one body that is not JSON is that of the attachments a
  * person uploads with a request (multipart/form-data); the MCP server has no such tool.
  *
- *   get_model       GET  /api/model
- *   list_artifacts  GET  /api/artifacts?type&changedSince
- *   list_instances  GET  /api/instances?process&path&limit&cursor
- *   instantiate     POST /api/instances
- *   (resource)      GET  /api/instances/:id
- *   run             POST /api/instances/:id/run
- *   (resource)      GET  /api/runs?limit&cursor
- *   get_run         GET  /api/runs/:id?tail&wait
- *   cancel_run      POST /api/runs/:id/cancel
- *   finish_run      POST /api/runs/:id/finish
- *   evaluate        POST /api/instances/:id/evaluate
- *   get_assessment  GET  /api/assessment?format&since
- *   wake            POST /api/wake
- *   open_ui         POST /api/open
- *   (WebUI)         GET  /api/stats?period&granularity&process&agent&tz
- *   (WebUI)         GET  /api/skill?process
- *   (WebUI)         POST /api/attachments  (multipart/form-data)
+ *   get_model          GET  /api/model
+ *   list_artifacts     GET  /api/artifacts?type&changedSince
+ *   list_instances     GET  /api/instances?process&path&limit&cursor
+ *   instantiate        POST /api/instances
+ *   (resource)         GET  /api/instances/:id
+ *   run                POST /api/instances/:id/run
+ *   list_runs          GET  /api/runs?process&agent&status&kind&since&limit&cursor
+ *   get_run            GET  /api/runs/:id?tail&wait
+ *   cancel_run         POST /api/runs/:id/cancel
+ *   finish_run         POST /api/runs/:id/finish
+ *   evaluate           POST /api/instances/:id/evaluate
+ *   get_assessment     GET  /api/assessment?format&since
+ *   assess             POST /api/assess
+ *   record_assessment  POST /api/assessments
+ *   (WebUI)            GET  /api/assessments
+ *   (WebUI)            GET  /api/assessments/:id
+ *   (WebUI)            POST /api/assessments/:id/items/:n/review
+ *   wake               POST /api/wake
+ *   open_ui            POST /api/open
+ *   (WebUI)            GET  /api/stats?period&granularity&process&agent&tz
+ *   (WebUI)            GET  /api/skill?process
+ *   (WebUI)            POST /api/attachments  (multipart/form-data)
  *
  * Who calls is not in any body. The MCP server names its client in X-Harness-Client (and the
  * session it holds in X-Harness-Session); a request without it comes from a person (the WebUI).
  * The MCP server that a wake gives its agent also names the wake run in X-Harness-Wake, so the
- * runs that the agent starts are listed in that wake's started.
+ * runs that the agent starts are listed in that wake's started; the one that an assessment gives
+ * its agent names the assessment run in X-Harness-Assess, so what the agent records is that
+ * run's.
  */
 
 import type { z } from "zod";
@@ -46,12 +53,15 @@ import {
 import {
   artifactsQuery,
   assessmentQuery,
+  assessRequest,
   clientHeader,
   createInstanceRequest,
   evaluateRequest,
   finishRequest,
   instancesQuery,
   openRequest,
+  recordAssessmentRequest,
+  reviewRequest,
   runQuery,
   runRequest,
   runsQuery,
@@ -63,8 +73,11 @@ import {
 import type {
   ArtifactsResponse,
   AttachmentsResponse,
+  AssessResponse,
   AssessmentMarkdownResponse,
+  AssessmentRecordResponse,
   AssessmentResponse,
+  AssessmentsResponse,
   CancelResponse,
   Failure,
   FinishResponse,
@@ -96,6 +109,8 @@ interface RouteContext {
   url: URL;
   /** The route's id. */
   id: string;
+  /** What the route's pattern matched after the id (an item's number). */
+  rest: string[];
   caller: Caller;
   /** Lets the request stay open longer than the server's idle timeout (a waiting get_run, a cancel). */
   keepOpen(): void;
@@ -124,9 +139,10 @@ export const mebibytes = (bytes: number): string => `${Math.round(bytes / 1024 /
 
 /**
  * The request's body, refused when it is longer than `limit`. A body that says it is longer is
- * refused unread (http.ts). One that does not say its length (chunked) is read to its end with no
- * more than the limit kept, and refused then: a client that stops sending on an early answer and
- * sends its next request on the same connection would have that request taken for the rest.
+ * read to its end, none of it kept, and refused then (http.ts). One that does not say its length
+ * (chunked) is read to its end with no more than the limit kept, and refused then: a client that
+ * stops sending on an early answer and sends its next request on the same connection would have
+ * that request taken for the rest.
  */
 async function bytesOf(request: Request, limit: number): Promise<Uint8Array<ArrayBuffer>> {
   const chunks: Uint8Array[] = [];
@@ -251,6 +267,7 @@ export function callerOf(request: Request): Caller {
     client: parsed.data,
     session: request.headers.get("x-harness-session") || null,
     wake: request.headers.get("x-harness-wake") || null,
+    assess: request.headers.get("x-harness-assess") || null,
   };
 }
 
@@ -346,10 +363,10 @@ function routes(harness: Harness, host: ApiHost): Route[] {
     {
       method: "POST",
       pattern: new RegExp(`^/api/runs/${id}/cancel$`),
-      handle: async ({ request, id: run, keepOpen }) => {
+      handle: async ({ request, id: run, keepOpen, caller }) => {
         await body(request);
         keepOpen();
-        return ok({ ok: true, ...(await harness.cancelRun(run)) } satisfies CancelResponse);
+        return ok({ ok: true, ...(await harness.cancelRun(run, caller)) } satisfies CancelResponse);
       },
     },
     {
@@ -376,6 +393,62 @@ function routes(harness: Harness, host: ApiHost): Route[] {
               assessment: await harness.assessment(since),
             } satisfies AssessmentResponse);
       },
+    },
+    {
+      method: "POST",
+      pattern: /^\/api\/assess$/,
+      handle: async ({ request, caller }) =>
+        ok(
+          {
+            ok: true,
+            ...(await harness.assess(parse(assessRequest, await body(request)), caller)),
+          } satisfies AssessResponse,
+          201,
+        ),
+    },
+    {
+      method: "GET",
+      pattern: /^\/api\/assessments$/,
+      handle: () =>
+        ok({ ok: true, assessments: harness.assessments() } satisfies AssessmentsResponse),
+    },
+    {
+      method: "POST",
+      pattern: /^\/api\/assessments$/,
+      handle: async ({ request, caller }) =>
+        ok(
+          {
+            ok: true,
+            assessment: harness.recordAssessment(
+              parse(recordAssessmentRequest, await body(request)),
+              caller,
+            ),
+          } satisfies AssessmentRecordResponse,
+          201,
+        ),
+    },
+    {
+      method: "GET",
+      pattern: new RegExp(`^/api/assessments/${id}$`),
+      handle: ({ id: assessment }) =>
+        ok({
+          ok: true,
+          assessment: harness.assessmentRecord(assessment),
+        } satisfies AssessmentRecordResponse),
+    },
+    {
+      method: "POST",
+      pattern: new RegExp(`^/api/assessments/${id}/items/(\\d+)/review$`),
+      handle: async ({ request, id: assessment, rest, caller }) =>
+        ok({
+          ok: true,
+          assessment: harness.review(
+            assessment,
+            Number(rest[0]),
+            parse(reviewRequest, await body(request)),
+            caller,
+          ),
+        } satisfies AssessmentRecordResponse),
     },
     {
       method: "GET",
@@ -451,6 +524,7 @@ export function createApi(harness: Harness, host: ApiHost): Api {
           request,
           url,
           id: match[1] ?? "",
+          rest: match.slice(2).map((part) => part ?? ""),
           caller: callerOf(request),
           keepOpen,
         });

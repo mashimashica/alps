@@ -10,9 +10,9 @@ locales:
 # files under locales/ja/ directories, and then update the catalog's reviewed_source_sha256.
 catalogs:
   harness/src/shared/strings.ts:
-    reviewed_source_sha256: 4175c0976d9b561ada61fdaf803f5660ff54bf9131812f1af91d38c817b05878
+    reviewed_source_sha256: a83358cf30bba666c7ee0fc8e42e335c5ff469ffa5a85a4d848be9ff5354c59f
   harness/src/ui/strings.ts:
-    reviewed_source_sha256: 4211a3e934837946ecf437aba6eac02be7f267254d6acbfd6e35ab4a53acb9e6
+    reviewed_source_sha256: 7c965a46be1874eff63811a97b98809baa1fbecab6fafbd1793b256199f69b20
   harness/src/ui/format.ts:
     reviewed_source_sha256: a3bf2e6378dc166a7754623bd884e10901fa003d3d726927d7b32922a75dccca
   harness/src/harness/prompt.ts:
@@ -20,4 +20,6 @@ catalogs:
   harness/src/harness/wake-prompt.ts:
     reviewed_source_sha256: fd4d2a919447c8dea66212a351a28bb8f3ec41b936deb82d9520d8f615ff6343
   harness/src/harness/report.ts:
-    reviewed_source_sha256: 696f96d1b0117cda09f8ab80786f6d53f7c448806a3978bc5e1f9aae665edb33
+    reviewed_source_sha256: 8bd8ce5b0d026acfc4e5358ec9aa8709285f24fa99263a7d856cdbd2f838075b
+  harness/src/harness/assess-prompt.ts:
+    reviewed_source_sha256: 57b62f110fd5dc7479c9a789b5c90af8a85e75595559a0facc2c5212927c4d7a

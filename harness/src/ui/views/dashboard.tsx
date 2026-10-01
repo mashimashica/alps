@@ -1,24 +1,32 @@
 /*
- * The dashboard: what the statistics of GET /api/stats say for a period, a granularity, a Process,
- * and an agent. The metric tiles on top (each with the trend of its buckets), then the runs and
- * their results beside the period's judgments (a donut of achieved, not achieved, and unverified,
- * counted in its legend; its centre is empty, since the total is the tile's), the other trends, a
- * breakdown table whose cut can be switched, and the findings of the assessment (GET
- * /api/assessment). Each number is shown once; a tile's line under the value is its count, and
- * what a number means is in its title. A click on a number lists, in the panel, the instances or
- * the runs it counts. The page draws the numbers; it judges nothing.
+ * The analysis. On top, the latest assessment: an agent's interpretation of the records
+ * (views/assessment.tsx). Below it, what the harness observes: what the statistics of GET
+ * /api/stats say for a period, a granularity, a Process, and an agent. The metric tiles (each with
+ * the trend of its buckets), then the runs and their results beside the period's judgments (a
+ * donut of achieved, not achieved, and unverified, counted in its legend; its centre is empty,
+ * since the total is the tile's), the other trends, a breakdown table whose cut can be switched,
+ * and the checks (the findings of GET /api/assessment), those of the filter's Process, of the
+ * instances that its numbers count, and of its agent, with their evidence as links. Each number is
+ * shown once; a tile's line under the value is its count, and what a number means is in its
+ * title. A click on a number lists, in the panel, the instances or the runs it counts. The filter
+ * is kept in the URL's fragment, so that a reload and a cut that an assessment cites show the same
+ * numbers. The page draws the numbers; it judges nothing.
  */
 
 import type { ComponentChildren } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { sayReceived } from "../../shared/strings.ts";
 import type {
+  Artifact,
+  ArtifactsResponse,
   AssessmentResponse,
+  AssessmentsResponse,
   Finding,
   FindingKind,
   Granularity,
   Period,
   Ratio,
+  StatCut,
   Stats,
   StatsResponse,
   StatsRun,
@@ -37,8 +45,21 @@ import { tabPanel, Tabs } from "../components/tabs.tsx";
 import { cx } from "../components/util.ts";
 import { useUi, type Ui } from "../context.ts";
 import { count, dateTime, duration, money, percent, shortDate } from "../format.ts";
+import {
+  AssessmentSection,
+  EvidenceChip,
+  type AssessmentData,
+  type Loaded,
+} from "./assessment.tsx";
 import { Legend, Lines, Sparkline, StackedBars, Whiskers, type SeriesStyle } from "./charts.tsx";
-import { InstanceLink, ModelProblem, processName, ProcessLink, TypeLink } from "./common.tsx";
+import {
+  InstanceLink,
+  ModelProblem,
+  processName,
+  ProcessLink,
+  scrollUnderHeader,
+  TypeLink,
+} from "./common.tsx";
 
 interface Filter {
   period: Period;
@@ -49,7 +70,7 @@ interface Filter {
 
 type Cut = "process" | "agent" | "outcome" | "judge";
 
-/** The filter and the cut stay as they were while the page is open. */
+/** The filter and the cut stay as they were while the page is open (and in the URL's fragment). */
 let kept: { filter: Filter; cut: Cut } = {
   filter: { period: "30d", granularity: "day", process: "", agent: "" },
   cut: "process",
@@ -58,6 +79,48 @@ let kept: { filter: Filter; cut: Cut } = {
 const PERIODS: Period[] = ["7d", "30d", "90d", "all"];
 const GRANULARITIES: Granularity[] = ["day", "week"];
 const CUTS: Cut[] = ["process", "agent", "outcome", "judge"];
+/** The keys of the analysis's state in the URL's fragment. */
+const HASH_KEYS = ["period", "granularity", "process", "agent", "cut"] as const;
+
+/** The filter and the cut that the URL's fragment holds, over what the page kept. */
+function fromHash(): { filter: Filter; cut: Cut } {
+  const params = new URLSearchParams(location.hash.slice(1));
+  const one = <T extends string>(key: string, allowed: readonly T[], fallback: T): T => {
+    const value = params.get(key);
+    return value !== null && (allowed as readonly string[]).includes(value)
+      ? (value as T)
+      : fallback;
+  };
+  return {
+    filter: {
+      period: one("period", PERIODS, kept.filter.period),
+      granularity: one("granularity", GRANULARITIES, kept.filter.granularity),
+      process: params.get("process") ?? kept.filter.process,
+      agent: params.get("agent") ?? kept.filter.agent,
+    },
+    cut: one("cut", CUTS, kept.cut),
+  };
+}
+
+/** Puts the filter and the cut in the URL's fragment, or, with `null`, takes them out. */
+function writeHash(state: { filter: Filter; cut: Cut } | null): void {
+  const params = new URLSearchParams(location.hash.slice(1));
+  for (const key of HASH_KEYS) params.delete(key);
+  if (state) {
+    const { filter, cut } = state;
+    params.set("period", filter.period);
+    params.set("granularity", filter.granularity);
+    if (filter.process) params.set("process", filter.process);
+    if (filter.agent) params.set("agent", filter.agent);
+    params.set("cut", cut);
+  }
+  const text = params.toString();
+  history.replaceState(
+    history.state,
+    "",
+    `${location.pathname}${location.search}${text ? `#${text}` : ""}`,
+  );
+}
 const AGENT_CLASSES = ["a0", "a1", "a2", "a3", "a4"];
 /** How many findings show before "Show all". */
 const FINDINGS_SHOWN = 6;
@@ -794,42 +857,56 @@ const KIND_TONE: Record<FindingKind, Tone> = {
   unverified: "outline",
 };
 
-type Loaded<T> =
-  | { status: "loading" }
-  | { status: "ok"; value: T }
-  | { status: "error"; error: unknown };
+/**
+ * A check's evidence as what it names: a run or an instance (which open), a Process (its panel),
+ * an agent, or a path (an Artifact or a SKILL.md opens; another path shows as it is).
+ */
+function CheckEvidence({ line, artifacts }: { line: string; artifacts: readonly Artifact[] }) {
+  const { runs, instances, model } = useUi();
+  if (/^r\d+$/.test(line) && runs.has(line))
+    return <EvidenceChip evidence={{ run: line }} artifacts={artifacts} />;
+  if (/^i\d+$/.test(line) && instances.has(line))
+    return <EvidenceChip evidence={{ instance: line }} artifacts={artifacts} />;
+  if (model?.processes.some((p) => p.id === line)) return <ProcessLink id={line} />;
+  const agent = model?.agents.find((a) => a.id === line);
+  if (agent) return <span class="chip chip-agent">{agent.label}</span>;
+  return <EvidenceChip evidence={{ path: line }} artifacts={artifacts} />;
+}
 
-/** The findings of the assessment: what is wrong in the description or the configuration, and what is unverified. */
-function Findings({ process }: { process: string }) {
-  const { client, t, language, version, instances } = useUi();
-  const [state, setState] = useState<Loaded<Finding[]>>({ status: "loading" });
+/**
+ * The checks that the filter shows: one about an instance, when the filter's numbers count that
+ * instance (its runs, judgments, or stale evidence); one about an agent, when no other agent is
+ * chosen; and the others, when no other Process is chosen.
+ */
+function checksIn(findings: readonly Finding[], filter: Filter, answer: StatsResponse): Finding[] {
+  const counted = new Set(answer.members.instances.map((i) => i.id));
+  return findings.filter((finding) => {
+    const { subject } = finding;
+    if (subject.instance) return counted.has(subject.instance);
+    if (subject.agent && filter.agent) return subject.agent === filter.agent;
+    return !filter.process || subject.process === filter.process;
+  });
+}
+
+/**
+ * The checks: what fixed tests of the records, the model, and the configuration find (what is
+ * wrong in the description or the configuration, and what is unverified), as observations.
+ */
+function Checks({
+  data,
+  retry,
+  filter,
+  answer,
+}: {
+  data: Loaded<AssessmentData>;
+  retry: () => void;
+  filter: Filter;
+  answer: StatsResponse;
+}) {
+  const { t, language, instances } = useUi();
   const [all, setAll] = useState(false);
-  const [attempt, setAttempt] = useState(0);
-  useEffect(() => {
-    let live = true;
-    const timer = setTimeout(
-      () => {
-        client.get<AssessmentResponse>("/api/assessment").then(
-          (answer) => {
-            if (live) setState({ status: "ok", value: answer.assessment.findings });
-          },
-          (error: unknown) => {
-            if (live) setState({ status: "error", error });
-          },
-        );
-      },
-      state.status === "ok" ? 400 : 0,
-    );
-    return () => {
-      live = false;
-      clearTimeout(timer);
-    };
-  }, [client, version, attempt]);
-
-  const found =
-    state.status === "ok"
-      ? state.value.filter((f) => !process || f.subject.process === process)
-      : [];
+  const found = data.status === "ok" ? checksIn(data.value.overview.findings, filter, answer) : [];
+  const artifacts = data.status === "ok" ? data.value.artifacts : [];
   const shown = all ? found : found.slice(0, FINDINGS_SHOWN);
   return (
     <Card class="findings-card" data-testid="findings">
@@ -837,13 +914,13 @@ function Findings({ process }: { process: string }) {
         title={t("findings.title")}
         icon={<Icon name="list" />}
         actions={
-          state.status === "ok" && found.length > 0 ? (
+          data.status === "ok" && found.length > 0 ? (
             <Badge tone="outline">{found.length}</Badge>
           ) : undefined
         }
       />
       <div class="card-body">
-        {state.status === "loading" && (
+        {data.status === "loading" && (
           <div class="loading" role="status">
             <span class="sr-only">{t("loading")}</span>
             <Skeleton width="80%" />
@@ -851,20 +928,20 @@ function Findings({ process }: { process: string }) {
             <Skeleton width="72%" />
           </div>
         )}
-        {state.status === "error" && (
+        {data.status === "error" && (
           <Alert
             tone="danger"
             title={t("findings.error")}
             action={
-              <Button variant="outline" size="sm" onClick={() => setAttempt((n) => n + 1)}>
+              <Button variant="outline" size="sm" onClick={retry}>
                 {t("retry")}
               </Button>
             }
           >
-            {describeError(state.error, language)}
+            {describeError(data.error, language)}
           </Alert>
         )}
-        {state.status === "ok" && found.length === 0 && (
+        {data.status === "ok" && found.length === 0 && (
           <Empty icon="check" title={t("findings.none")} class="findings-empty" />
         )}
         {shown.length > 0 && (
@@ -888,13 +965,11 @@ function Findings({ process }: { process: string }) {
                       </div>
                     )}
                     {finding.evidence.length > 0 && (
-                      <ul class="finding-evidence mono">
+                      <div class="chips evidence-chips">
                         {finding.evidence.slice(0, 3).map((line) => (
-                          <li key={line} title={line}>
-                            {line}
-                          </li>
+                          <CheckEvidence key={line} line={line} artifacts={artifacts} />
                         ))}
-                      </ul>
+                      </div>
                     )}
                   </div>
                 </li>
@@ -910,6 +985,50 @@ function Findings({ process }: { process: string }) {
       </div>
     </Card>
   );
+}
+
+/**
+ * What the analysis reads besides the statistics: the assessment (the latest, its since, and the
+ * checks), the assessments recorded (the history), and the Artifacts (where a cited path opens),
+ * again once the records settle after a change.
+ */
+function useAssessmentData(): { data: Loaded<AssessmentData>; retry: () => void } {
+  const { client, version } = useUi();
+  const [data, setData] = useState<Loaded<AssessmentData>>({ status: "loading" });
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    let live = true;
+    const timer = setTimeout(
+      () => {
+        Promise.all([
+          client.get<AssessmentResponse>("/api/assessment"),
+          client.get<AssessmentsResponse>("/api/assessments"),
+          client.get<ArtifactsResponse>("/api/artifacts"),
+        ]).then(
+          ([overview, history, artifacts]) => {
+            if (live)
+              setData({
+                status: "ok",
+                value: {
+                  overview: overview.assessment,
+                  history: history.assessments,
+                  artifacts: artifacts.artifacts,
+                },
+              });
+          },
+          (error: unknown) => {
+            if (live) setData({ status: "error", error });
+          },
+        );
+      },
+      data.status === "ok" ? 400 : 0,
+    );
+    return () => {
+      live = false;
+      clearTimeout(timer);
+    };
+  }, [client, version, attempt]);
+  return { data, retry: () => setAttempt((n) => n + 1) };
 }
 
 function DashboardSkeleton({ label }: { label: string }) {
@@ -947,11 +1066,13 @@ const sameFilter = (stats: Stats, filter: Filter): boolean =>
 
 export function DashboardView({ modelError }: { modelError: unknown }) {
   const { client, model, t, version, language } = useUi();
-  const [filter, setFilterState] = useState<Filter>(kept.filter);
-  const [cut, setCutState] = useState<Cut>(kept.cut);
+  const [initial] = useState(fromHash);
+  const [filter, setFilterState] = useState<Filter>(initial.filter);
+  const [cut, setCutState] = useState<Cut>(initial.cut);
   const [answer, setAnswer] = useState<StatsResponse | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [attempt, setAttempt] = useState(0);
+  const assessment = useAssessmentData();
   const setFilter = (next: Partial<Filter>): void => {
     const merged = { ...filter, ...next };
     kept = { ...kept, filter: merged };
@@ -960,6 +1081,23 @@ export function DashboardView({ modelError }: { modelError: unknown }) {
   const setCut = (next: Cut): void => {
     kept = { ...kept, cut: next };
     setCutState(next);
+  };
+  // The fragment follows the filter while the analysis is shown, and is left clean after it.
+  useEffect(() => {
+    kept = { filter, cut };
+    writeHash(kept);
+  }, [filter, cut]);
+  useEffect(() => () => writeHash(null), []);
+  /** A cut of the statistics that an assessment cites: the observation shows it. */
+  const showCut = (cited: StatCut): void => {
+    setFilter({
+      period: cited.period ?? "all",
+      granularity: cited.granularity ?? "week",
+      process: cited.process ?? "",
+      agent: cited.agent ?? "",
+    });
+    const observation = document.querySelector('[data-testid="observation"]');
+    if (observation) scrollUnderHeader(observation);
   };
 
   useEffect(() => {
@@ -1006,84 +1144,101 @@ export function DashboardView({ modelError }: { modelError: unknown }) {
   );
   return (
     <div class="dashboard" data-testid="dashboard">
-      <div class="toolbar filters dashboard-filters">
-        <Field label={t("filter.process")}>
-          {(control) => (
-            <Select
-              id={control.id}
-              labelledBy={control.labelId}
-              value={filter.process}
-              icon={<Icon name="network" />}
-              options={[
-                { value: "", label: t("filter.allProcesses") },
-                ...model.processes.map((p) => ({ value: p.id, label: p.name })),
-              ]}
-              onChange={(process) => setFilter({ process })}
-            />
-          )}
-        </Field>
-        <Field label={t("filter.agent")}>
-          {(control) => (
-            <Select
-              id={control.id}
-              labelledBy={control.labelId}
-              value={filter.agent}
-              icon={<Icon name="terminal" />}
-              options={[
-                { value: "", label: t("filter.allAgents") },
-                ...model.agents.map((a) => ({ value: a.id, label: a.label })),
-              ]}
-              onChange={(agent) => setFilter({ agent })}
-            />
-          )}
-        </Field>
-        <Field class="filter-period" label={t("filter.period")}>
-          {(control) => (
-            <Select
-              id={control.id}
-              labelledBy={control.labelId}
-              value={filter.period}
-              icon={<Icon name="clock" />}
-              options={PERIODS.map((p) => ({ value: p, label: t(`period.${p}`) }))}
-              onChange={(period) => setFilter({ period })}
-            />
-          )}
-        </Field>
-        <Field class="filter-granularity" label={t("filter.granularity")}>
-          {(control) => (
-            <Select
-              id={control.id}
-              labelledBy={control.labelId}
-              value={filter.granularity}
-              options={GRANULARITIES.map((g) => ({ value: g, label: t(`granularity.${g}`) }))}
-              onChange={(granularity) => setFilter({ granularity })}
-            />
-          )}
-        </Field>
-      </div>
-      {error !== null && answer !== null && (
-        <Alert tone="danger" title={t("dashboard.error")} action={retry}>
-          {describeError(error, language)}
-        </Alert>
-      )}
-      {answer ? (
-        <div class={cx("dashboard-body", updating && "is-updating")} aria-busy={updating}>
-          <Tiles answer={answer} />
-          <SummaryCharts answer={answer} />
-          <Tiles answer={answer} secondary />
-          <Trends answer={answer} />
-          <div class="dashboard-lower">
-            <Breakdown answer={answer} cut={cut} setCut={setCut} />
-            <Findings process={filter.process} />
-          </div>
+      <AssessmentSection
+        data={assessment.data}
+        retry={assessment.retry}
+        scope={{
+          period: filter.period,
+          ...(filter.process ? { process: filter.process } : {}),
+          ...(filter.agent ? { agent: filter.agent } : {}),
+        }}
+        onCut={showCut}
+      />
+      <div class="observation" data-testid="observation">
+        <div class="toolbar filters dashboard-filters">
+          <Field label={t("filter.process")}>
+            {(control) => (
+              <Select
+                id={control.id}
+                labelledBy={control.labelId}
+                value={filter.process}
+                icon={<Icon name="network" />}
+                options={[
+                  { value: "", label: t("filter.allProcesses") },
+                  ...model.processes.map((p) => ({ value: p.id, label: p.name })),
+                ]}
+                onChange={(process) => setFilter({ process })}
+              />
+            )}
+          </Field>
+          <Field label={t("filter.agent")}>
+            {(control) => (
+              <Select
+                id={control.id}
+                labelledBy={control.labelId}
+                value={filter.agent}
+                icon={<Icon name="terminal" />}
+                options={[
+                  { value: "", label: t("filter.allAgents") },
+                  ...model.agents.map((a) => ({ value: a.id, label: a.label })),
+                ]}
+                onChange={(agent) => setFilter({ agent })}
+              />
+            )}
+          </Field>
+          <Field class="filter-period" label={t("filter.period")}>
+            {(control) => (
+              <Select
+                id={control.id}
+                labelledBy={control.labelId}
+                value={filter.period}
+                icon={<Icon name="clock" />}
+                options={PERIODS.map((p) => ({ value: p, label: t(`period.${p}`) }))}
+                onChange={(period) => setFilter({ period })}
+              />
+            )}
+          </Field>
+          <Field class="filter-granularity" label={t("filter.granularity")}>
+            {(control) => (
+              <Select
+                id={control.id}
+                labelledBy={control.labelId}
+                value={filter.granularity}
+                options={GRANULARITIES.map((g) => ({ value: g, label: t(`granularity.${g}`) }))}
+                onChange={(granularity) => setFilter({ granularity })}
+              />
+            )}
+          </Field>
         </div>
-      ) : error !== null ? (
-        <Alert tone="danger" title={t("dashboard.error")} action={retry}>
-          {describeError(error, language)}
-        </Alert>
-      ) : (
-        <DashboardSkeleton label={t("loading")} />
-      )}
+        {error !== null && answer !== null && (
+          <Alert tone="danger" title={t("dashboard.error")} action={retry}>
+            {describeError(error, language)}
+          </Alert>
+        )}
+        {answer ? (
+          <div class={cx("dashboard-body", updating && "is-updating")} aria-busy={updating}>
+            <Tiles answer={answer} />
+            <SummaryCharts answer={answer} />
+            <Tiles answer={answer} secondary />
+            <Trends answer={answer} />
+            <div class="dashboard-lower">
+              <Breakdown answer={answer} cut={cut} setCut={setCut} />
+              <Checks
+                data={assessment.data}
+                retry={assessment.retry}
+                filter={filter}
+                answer={answer}
+              />
+            </div>
+          </div>
+        ) : error !== null ? (
+          <Alert tone="danger" title={t("dashboard.error")} action={retry}>
+            {describeError(error, language)}
+          </Alert>
+        ) : (
+          <DashboardSkeleton label={t("loading")} />
+        )}
+      </div>
     </div>
   );
 }

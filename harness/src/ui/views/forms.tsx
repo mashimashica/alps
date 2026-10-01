@@ -9,11 +9,14 @@
  * evidence and limits, and a Markdown note. Who judged is not sent: the harness records a person
  * for the WebUI. What cannot be sent is marked on its field (a request without text, a judgment
  * without evidence); files over the limits are refused as they are added, and the limits
- * themselves are in the drop zone's title. The dialogs carry no paragraphs of explanation: the
- * fields' names and examples say what to write, and where a distinction matters it is said where
- * it is made (a judgment's evidence field says that a run that ended is not evidence). The id of
- * the instance or the run is only in the subtitle's title. A failure of the server is shown in the
- * page's language.
+ * themselves are in the drop zone's title. A request opened from an opportunity of an assessment
+ * starts with a draft of it, which the person edits and sends, or not. A request for an
+ * assessment: the agent, the scope (the analysis's filter, as it is), and a point of view. The
+ * review of an assessment's item: adopted, on hold, or rejected, with a note. The dialogs carry no
+ * paragraphs of explanation: the fields' names and examples say what to write, and where a
+ * distinction matters it is said where it is made (a judgment's evidence field says that a run
+ * that ended is not evidence). The id of the instance or the run is only in the subtitle's title.
+ * A failure of the server is shown in the page's language.
  */
 
 import { useEffect, useId, useRef, useState } from "preact/hooks";
@@ -26,10 +29,14 @@ import {
 import type {
   Artifact,
   ArtifactsResponse,
+  AssessResponse,
+  AssessmentRecordResponse,
+  AssessScope,
   AttachmentsResponse,
   InstanceResponse,
   Judgment,
   OutcomeCriterion,
+  ReviewJudgment,
   WakeResponse,
   WakeRuns,
 } from "../../shared/types.ts";
@@ -216,12 +223,19 @@ function droppedFiles(data: DataTransfer): { files: File[]; folders: string[] } 
  * the page then shows the board with the wake's record in the panel. A wake that still runs means
  * this one is not started: the box stays open.
  */
-function RequestDialog({ initial }: { initial?: string | undefined }) {
+function RequestDialog({
+  initial,
+  draft,
+}: {
+  initial?: string | undefined;
+  /** What the request starts with: an opportunity of an assessment. */
+  draft?: string | undefined;
+}) {
   const { model, t, client, select, setView, putRun, openForm } = useUi();
   const form = useRef<HTMLFormElement>(null);
   const picker = useRef<HTMLInputElement>(null);
   const modeLabel = useId();
-  const [text, setText] = useState("");
+  const [text, setText] = useState(draft ?? "");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [refused, setRefused] = useState<string[]>([]);
   const [found, setFound] = useState<Artifact[]>([]);
@@ -811,16 +825,244 @@ function EvaluateDialog({ id }: { id: string }) {
   );
 }
 
+/**
+ * A request for an assessment: the agent that reads the records, the scope (the analysis's filter,
+ * as it was when the dialog opened), and a point of view. Sending starts the assessment run, whose
+ * record opens in the panel; the analysis shows its mark until it ends.
+ */
+function AssessDialog({ scope }: { scope: AssessScope }) {
+  const { model, t, client, select, putRun, openForm } = useUi();
+  const [agent, setAgent] = useState("");
+  const [request, setRequest] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [failure, setFailure] = useState<unknown>(null);
+  if (!model) return null;
+  const close = (): void => openForm(null);
+  // Only the agents that the harness can give its MCP server assess: not the demo, not self.
+  const agents = model.agents.filter((a) => a.id !== "demo" && a.id !== "self");
+  const chosen =
+    agents.find((a) => a.id === agent) ??
+    agents.find((a) => a.id === "claude-code" && a.available) ??
+    agents.find((a) => a.available) ??
+    agents[0];
+  const process = scope.process ? model.processes.find((p) => p.id === scope.process) : undefined;
+  const send = async (): Promise<void> => {
+    setSaving(true);
+    setFailure(null);
+    try {
+      const answer = await client.post<AssessResponse>("/api/assess", {
+        ...(chosen ? { agent: chosen.id } : {}),
+        scope: {
+          ...(scope.period ? { period: scope.period } : {}),
+          ...(scope.process ? { process: scope.process } : {}),
+          ...(scope.agent ? { agent: scope.agent } : {}),
+        },
+        ...(request.trim() ? { request: request.trim() } : {}),
+      });
+      putRun(summaryOf(answer.run));
+      close();
+      select({ kind: "run", id: answer.run.id });
+    } catch (error) {
+      setFailure(error);
+      setSaving(false);
+    }
+  };
+  return (
+    <Dialog title={t("assess.title")} onClose={close} closeLabel={t("panel.close")} testid="assess">
+      <form
+        class="dialog-form"
+        noValidate
+        onSubmit={(event) => {
+          event.preventDefault();
+          void send();
+        }}
+      >
+        <div class="dialog-body">
+          <Field label={t("request.agent")}>
+            {(control) => (
+              <Select
+                id={control.id}
+                labelledBy={control.labelId}
+                value={chosen?.id ?? ""}
+                icon={<Icon name="terminal" />}
+                options={agents.map((a) => ({
+                  value: a.id,
+                  label: a.label,
+                  disabled: !a.available,
+                  ...(a.available
+                    ? a.version
+                      ? { hint: a.version }
+                      : {}
+                    : { hint: t("overview.unavailable", { reason: a.reason ?? "" }) }),
+                }))}
+                onChange={setAgent}
+                testid="assess-agent"
+              />
+            )}
+          </Field>
+          <fieldset class="group">
+            <legend>{t("assess.scope")}</legend>
+            <div class="chips" data-testid="assess-scope">
+              <span class="chip chip-scope">{t(`period.${scope.period ?? "all"}`)}</span>
+              <span class="chip chip-scope">{process?.name ?? t("filter.allProcesses")}</span>
+              <span class="chip chip-scope">
+                {scope.agent
+                  ? (model.agents.find((a) => a.id === scope.agent)?.label ?? scope.agent)
+                  : t("filter.allAgents")}
+              </span>
+            </div>
+          </fieldset>
+          <Field label={t("assess.request")}>
+            {(control) => (
+              <Textarea
+                id={control.id}
+                rows={3}
+                maxLength={MAX_REQUEST_LENGTH}
+                placeholder={t("assess.requestPlaceholder")}
+                data-testid="assess-request"
+                value={request}
+                onInput={(event) => setRequest(event.currentTarget.value)}
+              />
+            )}
+          </Field>
+        </div>
+        <Footer
+          failure={failure}
+          failureTitle={t("assess.failed")}
+          saving={saving}
+          action={t("assess.send")}
+          busyLabel={t("request.sending")}
+          onCancel={close}
+        />
+      </form>
+    </Dialog>
+  );
+}
+
+const REVIEWS: ReviewJudgment[] = ["adopted", "held", "rejected"];
+
+/**
+ * A person's review of one item of an assessment: adopted, on hold, or rejected, with a note. It is
+ * added after the earlier ones, which stay; adopting does nothing else.
+ */
+function ReviewDialog({ assessment, n }: { assessment: string; n: number }) {
+  const { t, client, openForm, refresh } = useUi();
+  const form = useRef<HTMLFormElement>(null);
+  const judgmentLabel = useId();
+  const [statement, setStatement] = useState("");
+  const [judgment, setJudgment] = useState<ReviewJudgment | "">("");
+  const [note, setNote] = useState("");
+  const [tried, setTried] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [failure, setFailure] = useState<unknown>(null);
+  useEffect(() => {
+    client.get<AssessmentRecordResponse>(`/api/assessments/${encodeURIComponent(assessment)}`).then(
+      (answer) => {
+        setStatement(answer.assessment.items.find((item) => item.n === n)?.statement ?? "");
+        const earlier = answer.assessment.reviews.filter((r) => r.n === n).at(-1);
+        if (earlier) setJudgment(earlier.judgment);
+      },
+      (error: unknown) => setFailure(error),
+    );
+  }, []);
+  const close = (): void => openForm(null);
+  const save = async (): Promise<void> => {
+    setTried(true);
+    if (!judgment) {
+      focusFirstInvalid(form.current);
+      return;
+    }
+    setSaving(true);
+    setFailure(null);
+    try {
+      await client.post<AssessmentRecordResponse>(
+        `/api/assessments/${encodeURIComponent(assessment)}/items/${n}/review`,
+        { judgment, ...(note.trim() ? { note: note.trim() } : {}) },
+      );
+      refresh();
+      close();
+    } catch (error) {
+      setFailure(error);
+      setSaving(false);
+    }
+  };
+  return (
+    <Dialog
+      title={t("review.title")}
+      description={statement || undefined}
+      onClose={close}
+      closeLabel={t("panel.close")}
+      testid="review"
+    >
+      <form
+        ref={form}
+        class="dialog-form"
+        noValidate
+        onSubmit={(event) => {
+          event.preventDefault();
+          void save();
+        }}
+      >
+        <div class="dialog-body">
+          <div class="field">
+            {/* The dialog's title names the choice; the label is for assistive technology. */}
+            <span class="field-label sr-only" id={judgmentLabel}>
+              {t("review.title")}
+            </span>
+            <Segmented
+              name={`review-${assessment}-${n}`}
+              value={judgment}
+              labelledBy={judgmentLabel}
+              invalid={tried && !judgment}
+              options={REVIEWS.map((value) => ({ value, label: t(`review.${value}`) }))}
+              onChange={setJudgment}
+            />
+          </div>
+          <Field label={t("review.note")}>
+            {(control) => (
+              <Textarea
+                id={control.id}
+                rows={3}
+                data-testid="review-note"
+                value={note}
+                onInput={(event) => setNote(event.currentTarget.value)}
+              />
+            )}
+          </Field>
+        </div>
+        <Footer
+          failure={failure}
+          failureTitle={t("review.failed")}
+          problem={tried && !judgment ? t("review.required") : null}
+          saving={saving}
+          action={t("review.save")}
+          onCancel={close}
+        />
+      </form>
+    </Dialog>
+  );
+}
+
 /** The dialog of the form that is open, if any. */
 export function FormDialog() {
   const { form } = useUi();
   if (!form) return null;
   switch (form.kind) {
     case "request":
-      return <RequestDialog initial={form.process} />;
+      return <RequestDialog initial={form.process} draft={form.draft} />;
     case "edit":
       return <EditDialog key={form.id} id={form.id} />;
     case "evaluate":
       return <EvaluateDialog key={form.id} id={form.id} />;
+    case "assess":
+      return <AssessDialog scope={form.scope} />;
+    case "review":
+      return (
+        <ReviewDialog
+          key={`${form.assessment}:${form.n}`}
+          assessment={form.assessment}
+          n={form.n}
+        />
+      );
   }
 }

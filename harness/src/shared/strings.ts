@@ -137,6 +137,39 @@ const en = {
     `${a.folder} already holds ${a.name} and that name with each of -2 to -${a.limit}. Rename the file, or move the others out of the directory.`,
   "error.attachmentsDir": (a: { folder: string; detail: string }) =>
     `The attachments cannot be saved in ${a.folder}: something other than a directory (a file, or a symlink that leads nowhere) is on its path (${a.detail}). Move it, or name another directory in attachments (alps-harness.yaml).`,
+  "error.assessOnly": (a: { run: string }) =>
+    `Run ${a.run} is an assessment (assess): its agent reads the records and records what it finds with record_assessment; it makes no instance, starts no run or wake, and neither evaluates nor cancels. Report with finish_run.`,
+  "error.assessAgent": (a: { agent: string; agents: string }) =>
+    `${a.agent} cannot assess: an assessment needs the harness's MCP server, which the harness can give to Claude Code (--mcp-config) and Codex (-c mcp_servers) only, or a session that performs it itself (self). The agents that can assess here: ${a.agents || "none"}.`,
+  "error.assessing": (a: { run: string }) =>
+    `Assessment run ${a.run} has not ended, and one assessment runs at a time. Wait for it (get_run with wait) or cancel it (cancel_run).`,
+  "error.noAssessRun": () =>
+    "record_assessment records the result of a running assessment run, for the agent that performs it: the agent that assess started, or the session that started one with the agent self. The caller performs none.",
+  "error.selfAssess": () =>
+    "With the agent self, the MCP session that asks performs the assessment, and this request comes from no MCP client. Choose another agent, or call assess through the harness's MCP server.",
+  "error.noEvidence": (a: { n: number }) =>
+    `Item ${a.n} gives no evidence. Every item but an unverified one rests on records: a run, an instance, an evaluation, a cut of the statistics, an event of a log, or a path.`,
+  "error.evidenceRun": (a: { n: number; run: string }) =>
+    `Item ${a.n} cites run ${a.run}, which the records do not have.`,
+  "error.evidenceInstance": (a: { n: number; instance: string }) =>
+    `Item ${a.n} cites instance ${a.instance}, which the records do not have.`,
+  "error.evidenceEvaluation": (a: { n: number; instance: string }) =>
+    `Item ${a.n} cites the evaluation of instance ${a.instance}, which has none.`,
+  "error.evidenceLog": (a: { n: number; run: string; event: number; events: number }) =>
+    `Item ${a.n} cites event ${a.event} of run ${a.run}, whose log has ${plural(a.events, "event")} (numbered from 1).`,
+  "error.evidencePath": (a: { n: number; path: string }) =>
+    `Item ${a.n} cites ${a.path}, which does not exist in the workspace.`,
+  "error.evidenceProcess": (a: { n: number; name: string }) =>
+    `Item ${a.n} cites the statistics of the Process ${a.name}, which the model does not have.`,
+  "error.itemSubject": (a: { n: number; kind: string; name: string }) =>
+    `Item ${a.n} is about ${a.kind === "process" ? "the Process" : a.kind === "artifact" ? "the Artifact type" : "the instance"} ${a.name}, which the workspace does not have.`,
+  "error.noAssessment": (a: { id: string }) => `No assessment ${a.id}.`,
+  "error.noItem": (a: { id: string; n: number; count: number }) =>
+    `Assessment ${a.id} has ${plural(a.count, "item")} (numbered from 1); there is no item ${a.n}.`,
+  "error.assessmentOpen": (a: { id: string }) =>
+    `Assessment ${a.id} is still being made: its run has not ended. Review it once the run has.`,
+  "error.reviewByPerson": () =>
+    "Only a person reviews the items of an assessment (in the WebUI): an agent does not adopt what it found.",
 
   /* ---------- rejections of the HTTP layer ---------- */
   "error.host": () => "This host name is not accepted.",
@@ -213,8 +246,20 @@ const en = {
     achieved: number;
     judged: number;
     stale: number;
+    latest: string;
+    items: number;
   }) =>
-    `${plural(a.findings, "finding")} about ${plural(a.instances, "instance")}. ${a.achieved} of ${plural(a.judged, "judged Outcome")} achieved; ${plural(a.stale, "evaluation")} on stale evidence.`,
+    `The checks found ${plural(a.findings, "thing")} about the records, the model, and the configuration, with ${plural(a.instances, "instance")}. ${a.achieved} of ${plural(a.judged, "judged Outcome")} achieved; ${plural(a.stale, "evaluation")} on stale evidence. ${a.latest ? `The latest assessment, an agent's interpretation, is that of run ${a.latest} (${plural(a.items, "item")}).` : "No assessment has been made (latest: null)."}`,
+  "done.runs": (a: { count: number; next: string }) =>
+    `${plural(a.count, "run")}.${a.next ? ` More with cursor ${a.next}.` : ""}`,
+  "done.assess": (a: { run: string; agent: string }) =>
+    `Started assessment run ${a.run} (${a.agent}): its agent reads the records and records what it finds with record_assessment. Starting finds nothing by itself; the result is get_assessment's latest once the run has ended (get_run with wait).`,
+  "done.assessSelf": (a: { run: string }) =>
+    `Assessment run ${a.run} is yours to perform: follow the prompt, record what you find with record_assessment, and end the run with finish_run. If this MCP connection closes first, the run is recorded as interrupted.`,
+  "done.recorded": (a: { run: string; items: number }) =>
+    `Recorded the assessment of run ${a.run} with ${plural(a.items, "item")}; calling again replaces it while the run runs. It becomes get_assessment's latest once the run has ended: end it with finish_run.`,
+  "done.reported": (a: { run: string; status: string }) =>
+    `Recorded your report for run ${a.run} (${a.status}). The run ends when your process exits: end now.`,
   "done.woke": (a: { run: string; agent: string; plan: boolean }) =>
     `Started wake run ${a.run} (${a.agent}): the agent reads the model, the guidance, and the state, and decides what to run${a.plan ? ", but only instantiates what it plans (plan) and starts no run" : ""}. Starting achieves nothing by itself; the runs it starts are listed in the wake run's started, and what it planned and why comes in the wake run's report (get_run).`,
   "done.wakeSkipped": (a: { running: string }) =>
@@ -245,6 +290,8 @@ const en = {
     `Created instance ${a.instance} of ${a.process}.`,
   "event.mcpConfig": (a: { agent: string; detail: string }) =>
     `The MCP configuration for ${a.agent} could not be written: ${a.detail}`,
+  "event.assessmentRecorded": (a: { items: number }) =>
+    `Recorded the assessment (${plural(a.items, "item")}).`,
 
   /* ---------- why the harness considers a run failed or stopped (its error) ---------- */
   "runError.interrupted": () => "The harness server stopped while the run was running.",
@@ -341,6 +388,36 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
     `${a.folder} には ${a.name} と、その名前に -2 から -${a.limit} までを付けたものがすべてある。ファイルの名前を変えるか、ほかのファイルをそのディレクトリから移すこと。`,
   "error.attachmentsDir": (a) =>
     `${a.folder} に添付を保存できない。そのパスの途中にディレクトリでないもの（ファイルか、行き先のない symlink）がある（${a.detail}）。それを移すか、alps-harness.yaml の attachments で別のディレクトリを指すこと。`,
+  "error.assessOnly": (a) =>
+    `実行 ${a.run} はアセスメント（assess）である。そのエージェントは記録を読み、見つけたことを record_assessment で記録する。インスタンスは作らず、実行も目覚めも起動せず、評価も中止もしない。報告は finish_run で行うこと。`,
+  "error.assessAgent": (a) =>
+    `${a.agent} はアセスメントに使えない。アセスメントにはハーネスの MCP サーバーか、自分で行うセッション（self）が要り、ハーネスが MCP サーバーを渡せるのは Claude Code（--mcp-config）と Codex（-c mcp_servers）だけである。ここでアセスメントに使えるエージェント: ${a.agents || "なし"}。`,
+  "error.assessing": (a) =>
+    `アセスメントの実行 ${a.run} がまだ終わっていない。アセスメントは一度に一つだけである。get_run（wait）で待つか、cancel_run で中止すること。`,
+  "error.noAssessRun": () =>
+    "record_assessment は、動いているアセスメントの実行の結果を、それを行うエージェントが記録するものである（assess が起動したエージェントか、エージェント self で始めたセッション）。呼び出し元はどれも行っていない。",
+  "error.selfAssess": () =>
+    "エージェント self では、求めた MCP のセッションがアセスメントを行う。この要求は MCP クライアントからではない。別のエージェントを選ぶか、ハーネスの MCP サーバーの assess を使うこと。",
+  "error.noEvidence": (a) =>
+    `項目 ${a.n} に根拠がない。未確認の項目のほかは、記録（実行、インスタンス、評価、統計の切り口、ログのイベント、パス）を根拠にすること。`,
+  "error.evidenceRun": (a) => `項目 ${a.n} が挙げる実行 ${a.run} は記録にない。`,
+  "error.evidenceInstance": (a) => `項目 ${a.n} が挙げるインスタンス ${a.instance} は記録にない。`,
+  "error.evidenceEvaluation": (a) =>
+    `項目 ${a.n} はインスタンス ${a.instance} の評価を挙げるが、その評価はない。`,
+  "error.evidenceLog": (a) =>
+    `項目 ${a.n} は実行 ${a.run} のイベント ${a.event} を挙げるが、そのログのイベントは ${a.events} 件（番号は 1 から）である。`,
+  "error.evidencePath": (a) => `項目 ${a.n} が挙げる ${a.path} はワークスペースにない。`,
+  "error.evidenceProcess": (a) =>
+    `項目 ${a.n} はプロセス ${a.name} の統計を挙げるが、そのプロセスはモデルにない。`,
+  "error.itemSubject": (a) =>
+    `項目 ${a.n} の対象の${a.kind === "process" ? "プロセス" : a.kind === "artifact" ? "アーティファクトの型" : "インスタンス"} ${a.name} は、このワークスペースにない。`,
+  "error.noAssessment": (a) => `アセスメント ${a.id} はない。`,
+  "error.noItem": (a) =>
+    `アセスメント ${a.id} の項目は ${a.count} 件（番号は 1 から）で、項目 ${a.n} はない。`,
+  "error.assessmentOpen": (a) =>
+    `アセスメント ${a.id} はまだ作られている途中で、その実行が終わっていない。実行が終わってから確認すること。`,
+  "error.reviewByPerson": () =>
+    "アセスメントの項目を確認するのは人だけである（WebUI）。エージェントは自分の見つけたことを採用しない。",
 
   "error.host": () => "このホスト名は受け付けない。",
   "error.crossSite": () => "API はハーネス自身のページからの要求だけを受け付ける。",
@@ -406,7 +483,17 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
   "done.evaluated": (a) =>
     `インスタンス ${a.instance} について、実行 ${a.run} の評価を記録した。${a.self ? "その実行もこの MCP セッションが行ったので、評価には self: true が付く。" : ""}`,
   "done.assessment": (a) =>
-    `所見は ${a.findings} 件、インスタンスは ${a.instances} 件。判断された成果 ${a.judged} 件のうち達成は ${a.achieved} 件、根拠が古い評価は ${a.stale} 件。`,
+    `記録・モデル・設定の検査で見つかったことは ${a.findings} 件、インスタンスは ${a.instances} 件。判断された成果 ${a.judged} 件のうち達成は ${a.achieved} 件、根拠が古い評価は ${a.stale} 件。${a.latest ? `最新のアセスメント（エージェントの解釈）は実行 ${a.latest} のもの（項目 ${a.items} 件）。` : "アセスメントはまだ行われていない（latest は null）。"}`,
+  "done.runs": (a) =>
+    `実行は ${a.count} 件。${a.next ? `続きは cursor ${a.next} で得られる。` : ""}`,
+  "done.assess": (a) =>
+    `アセスメントの実行 ${a.run}（${a.agent}）を開始した。エージェントが記録を読み、見つけたことを record_assessment で記録する。開始しただけでは何も見つかっていない。結果は、実行が終わった後（get_run の wait で待つ）の get_assessment の latest に来る。`,
+  "done.assessSelf": (a) =>
+    `アセスメントの実行 ${a.run} はあなた自身が行う。プロンプトに従い、見つけたことを record_assessment で記録し、finish_run で実行を終えること。先にこの MCP の接続が切れると、実行は中断として記録される。`,
+  "done.recorded": (a) =>
+    `実行 ${a.run} のアセスメントを項目 ${a.items} 件で記録した。実行が動いているあいだは、呼び直すと置き換わる。実行が終わると get_assessment の latest になるので、finish_run で終えること。`,
+  "done.reported": (a) =>
+    `実行 ${a.run} の報告を記録した（${a.status}）。実行はあなたのプロセスが終わった時点で終わるので、このまま終了すること。`,
   "done.woke": (a) =>
     `目覚めの実行 ${a.run}（${a.agent}）を開始した。エージェントがモデル・案内・現状を読み、何を走らせるかを判断する${a.plan ? "（計画だけ：計画したものをインスタンス化し、実行は起動しない）" : ""}。開始しただけでは何も達成されない。起動された実行は目覚めの実行の started に並び、何をなぜ計画したかは目覚めの実行の report に来る（get_run）。`,
   "done.wakeSkipped": (a) =>
@@ -428,6 +515,7 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
   "event.attached": (a) => `インスタンス ${a.instance} の実行 ${a.run}（${a.agent}）を起動した。`,
   "event.instantiated": (a) => `${a.process} のインスタンス ${a.instance} を作った。`,
   "event.mcpConfig": (a) => `${a.agent} の MCP 設定を書き込めなかった: ${a.detail}`,
+  "event.assessmentRecorded": (a) => `アセスメントを記録した（項目 ${a.items} 件）。`,
 
   "runError.interrupted": () => "実行中にハーネスサーバーが停止した。",
   "runError.sessionClosed": () => "実行を行うセッションの MCP の接続が、finish_run の前に切れた。",

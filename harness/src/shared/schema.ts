@@ -8,6 +8,9 @@ import { z } from "zod";
 import { MAX_ATTACHMENTS, MAX_REQUEST_LENGTH } from "./requests.ts";
 import { cronProblem } from "./cron.ts";
 import type {
+  Assessment,
+  Evaluation,
+  Evidence,
   Instance,
   Judge,
   Run,
@@ -162,6 +165,8 @@ export type HarnessConfig = z.output<typeof harnessConfigSchema>;
 
 const epochMs = z.number().nonnegative();
 const runStatus = z.enum(["running", "succeeded", "failed", "canceled", "interrupted"]);
+const runKind = z.enum(["process", "wake", "assess"]);
+const period = z.enum(["7d", "30d", "90d", "all"]);
 const judgment = z.enum(["achieved", "not-achieved", "unverified"]);
 const judge: z.ZodType<Judge> = z.union([
   z.object({ kind: z.literal("user") }),
@@ -191,6 +196,21 @@ const runOutput: z.ZodType<RunOutput> = z.object({
 const gitInfo = z.object({ head: z.string(), dirty: z.boolean() }).nullable();
 const skillUsed = z.object({ path: z.string(), sha256: z.string().nullable() }).nullable();
 
+const evaluation: z.ZodType<Evaluation> = z.object({
+  runId: z.string(),
+  judgments: z.array(
+    z.object({
+      outcome: z.int().min(0),
+      judgment,
+      evidence: z.string(),
+      limits: z.string().optional(),
+    }),
+  ),
+  note: z.string().optional(),
+  by: judge,
+  at: epochMs,
+});
+
 const instance: z.ZodType<Instance> = z.object({
   id: z.string(),
   process: z.string(),
@@ -201,29 +221,16 @@ const instance: z.ZodType<Instance> = z.object({
   ),
   notes: z.string(),
   runs: z.array(z.string()),
-  evaluation: z
-    .object({
-      runId: z.string(),
-      judgments: z.array(
-        z.object({
-          outcome: z.int().min(0),
-          judgment,
-          evidence: z.string(),
-          limits: z.string().optional(),
-        }),
-      ),
-      note: z.string().optional(),
-      by: judge,
-      at: epochMs,
-    })
-    .nullable(),
+  evaluation: evaluation.nullable(),
+  // Instances evaluated before the harness kept the evaluations that later ones replaced have none.
+  evaluations: z.array(evaluation).optional(),
   // Instances recorded before the harness kept what made them have none.
   createdBy: z.object({ run: z.string() }).nullable().optional(),
 });
 
 const runSummary: z.ZodType<RunSummary> = z.object({
   id: z.string(),
-  kind: z.enum(["process", "wake"]),
+  kind: runKind,
   instance: z.string().nullable(),
   status: runStatus,
   startedAt: epochMs,
@@ -237,13 +244,23 @@ export const stateFileSchema: z.ZodType<StateFile> = z.object({
   provenance: z.record(z.string(), z.string()),
   seq: z.int().min(0),
   lastWakeAt: epochMs.nullable(),
+  // State files written before the harness kept assessments have none.
+  latestAssessment: z.string().nullable().default(null),
   runs: z.record(z.string(), runSummary),
+});
+
+/** What an assessment is asked to read (`Run.scope`, `Assessment.scope`). */
+const assessScope = z.object({
+  period: period.optional(),
+  process: z.string().optional(),
+  agent: z.string().optional(),
+  request: z.string().optional(),
 });
 
 /** `.alps-harness/runs/<id>.json`. */
 export const runRecordSchema: z.ZodType<Run, unknown> = z.object({
   id: z.string(),
-  kind: z.enum(["process", "wake"]),
+  kind: runKind,
   instance: z.string().nullable(),
   process: z.string().nullable(),
   agent: z.string(),
@@ -290,6 +307,63 @@ export const runRecordSchema: z.ZodType<Run, unknown> = z.object({
   attachments: z.array(z.string()).optional(),
   processes: z.array(z.string()).optional(),
   runs: z.enum(["run", "plan"]).optional(),
+  scope: assessScope.optional(),
+});
+
+/** A cut of the statistics that evidence names: the dashboard's filter. */
+const statCut = z.strictObject({
+  period: period.optional(),
+  granularity: z.enum(["day", "week"]).optional(),
+  process: z.string().min(1).optional(),
+  agent: z.string().min(1).optional(),
+});
+
+/** A record that an assessment item rests on: one key, which says what kind of record it is. */
+const evidence: z.ZodType<Evidence> = z.union([
+  z.strictObject({ run: z.string().min(1) }),
+  z.strictObject({ instance: z.string().min(1) }),
+  z.strictObject({ evaluation: z.string().min(1) }),
+  z.strictObject({ stat: z.strictObject({ filter: statCut, metric: z.string().min(1) }) }),
+  z.strictObject({ log: z.strictObject({ run: z.string().min(1), n: z.int().min(1) }) }),
+  z.strictObject({ path: z.string().min(1) }),
+]);
+
+const itemKind = z.enum(["description", "configuration", "operation", "unverified"]);
+const itemSubject = z.strictObject({
+  process: z.string().min(1).optional(),
+  artifact: z.string().min(1).optional(),
+  agent: z.string().min(1).optional(),
+  guidance: z.string().min(1).optional(),
+  instance: z.string().min(1).optional(),
+});
+
+/** `.alps-harness/assessments/<run>.json`. */
+export const assessmentRecordSchema: z.ZodType<Assessment> = z.object({
+  id: z.string(),
+  runId: z.string(),
+  at: epochMs,
+  agent: z.string(),
+  scope: assessScope,
+  summary: z.string(),
+  items: z.array(
+    z.object({
+      n: z.int().min(1),
+      kind: itemKind,
+      subject: itemSubject,
+      statement: z.string(),
+      evidence: z.array(evidence),
+      limits: z.string().optional(),
+    }),
+  ),
+  reviews: z.array(
+    z.object({
+      n: z.int().min(1),
+      judgment: z.enum(["adopted", "held", "rejected"]),
+      note: z.string().optional(),
+      by: z.object({ kind: z.literal("user") }),
+      at: epochMs,
+    }),
+  ),
 });
 
 /** A run's usage in harness 0.8, which left out what an agent did not report (Codex's turns). */
@@ -471,6 +545,55 @@ export const wakeRequest = z.strictObject({
 });
 export type WakeRequest = z.output<typeof wakeRequest>;
 
+/**
+ * `POST /api/assess` (`assess`): the agent that assesses (claude-code when none is given, codex, or
+ * self for the calling session), what it reads (a period, a Process by id or name, an agent's
+ * runs), and from what point of view (`request`, kept as the wake's request is).
+ */
+export const assessRequest = z.strictObject({
+  agent: z.string().min(1).optional(),
+  scope: z
+    .strictObject({
+      period: period.optional(),
+      process: z.string().min(1).optional(),
+      agent: z.string().min(1).optional(),
+    })
+    .default({}),
+  request: freeText
+    .max(MAX_REQUEST_LENGTH, {
+      error: `the request is longer than ${MAX_REQUEST_LENGTH} characters`,
+    })
+    .transform((text) => text.replace(/\r\n?/g, "\n"))
+    .optional(),
+});
+export type AssessRequest = z.output<typeof assessRequest>;
+
+/**
+ * `POST /api/assessments` (`record_assessment`): the result of the assessment run that the caller
+ * performs. The harness numbers the items from 1; whether each rests on evidence that exists is
+ * checked there (an item without evidence is refused unless it is unverified).
+ */
+export const recordAssessmentRequest = z.strictObject({
+  summary: freeText.min(1, { error: "the summary cannot be empty" }),
+  items: z.array(
+    z.strictObject({
+      kind: itemKind,
+      subject: itemSubject.default({}),
+      statement: freeText.min(1, { error: "an item needs a statement" }),
+      evidence: z.array(evidence).default([]),
+      limits: freeText.optional(),
+    }),
+  ),
+});
+export type RecordAssessmentRequest = z.output<typeof recordAssessmentRequest>;
+
+/** `POST /api/assessments/:id/items/:n/review` (the WebUI): a person's review of one item. */
+export const reviewRequest = z.strictObject({
+  judgment: z.enum(["adopted", "held", "rejected"]),
+  note: freeText.optional(),
+});
+export type ReviewRequest = z.output<typeof reviewRequest>;
+
 /** `POST /api/open` (`open_ui`). */
 export const openRequest = z.strictObject({
   view: z.enum(["network", "dashboard", "instances"]).optional(),
@@ -525,8 +648,16 @@ export const runQuery = z.object({
   wait: count.max(MAX_WAIT_SECONDS).default(0),
 });
 
-/** `GET /api/runs`: newest first, a page at a time. */
+/**
+ * `GET /api/runs` (`list_runs`): newest first, a page at a time; with a Process (id or name), an
+ * agent, a status, a kind, or the runs that started at or after `since`.
+ */
 export const runsQuery = z.object({
+  process: z.string().min(1).optional(),
+  agent: z.string().min(1).optional(),
+  status: runStatus.optional(),
+  kind: runKind.optional(),
+  since: instant.optional(),
   limit: count.min(1).max(200).default(50),
   cursor: z
     .string()
