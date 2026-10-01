@@ -21,6 +21,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from "preact/hook
 import { sayReceived } from "../../shared/strings.ts";
 import type {
   ArtifactsResponse,
+  AgentSelection,
   CancelResponse,
   InstanceView,
   Judgment,
@@ -34,6 +35,7 @@ import type {
 import { describeError, query } from "../api.ts";
 import { Badge, type Tone } from "../components/badge.tsx";
 import { Button } from "../components/button.tsx";
+import { AgentSettings } from "../components/agent-settings.tsx";
 import { Alert, Empty, Loading } from "../components/feedback.tsx";
 import { Icon } from "../components/icons.tsx";
 import { Select } from "../components/select.tsx";
@@ -642,6 +644,18 @@ function RunPanel({ id, line }: { id: string; line?: number | undefined }) {
           {agent}
           {run.client ? ` · ${t("run.self")}` : ""}
         </dd>
+        {run.selection?.model && (
+          <>
+            <dt>{t("agent.model")}</dt>
+            <dd class="mono">{run.selection.model}</dd>
+          </>
+        )}
+        {run.selection?.effort && (
+          <>
+            <dt>{t("agent.effort")}</dt>
+            <dd>{run.selection.effort}</dd>
+          </>
+        )}
         {instance && (
           <>
             <dt>{t("run.instance")}</dt>
@@ -870,6 +884,7 @@ function InstancePanel({ id, initial }: { id: string; initial: InstanceTab }) {
   const base = useId();
   const [tab, setTab] = useState<InstanceTab>(initial);
   const [agent, setAgent] = useState<string>("");
+  const [agentSettings, setAgentSettings] = useState<AgentSelection>({});
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState<{
     what: "start" | "cancel";
@@ -888,7 +903,10 @@ function InstancePanel({ id, initial }: { id: string; initial: InstanceTab }) {
     setBusy(true);
     setActionError(null);
     client
-      .post<RunStartResponse>(`/api/instances/${encodeURIComponent(id)}/run`, { agent: chosen.id })
+      .post<RunStartResponse>(`/api/instances/${encodeURIComponent(id)}/run`, {
+        agent: chosen.id,
+        ...agentSettings,
+      })
       .then(
         (answer) => {
           putRun(summaryOf(answer.run));
@@ -1120,23 +1138,37 @@ function InstancePanel({ id, initial }: { id: string; initial: InstanceTab }) {
                 </Button>
               </div>
             ) : agents.some((a) => a.available) ? (
-              <div class="action-row">
-                <Select
-                  label={t("instance.agent")}
-                  value={chosen?.id ?? ""}
-                  options={agents.map((a) => ({
-                    value: a.id,
-                    label: a.available ? a.label : t("instance.unavailable", { label: a.label }),
-                    hint: a.available ? (a.version ?? undefined) : (a.reason ?? undefined),
-                    disabled: !a.available,
-                  }))}
-                  onChange={setAgent}
-                  class="action-select"
-                />
-                <Button busy={busy} disabled={busy} onClick={start} data-testid="start-run">
-                  <Icon name="play" />
-                  {busy ? t("instance.starting") : t("instance.start")}
-                </Button>
+              <div class="instance-agent-settings">
+                <div class="action-row">
+                  <Select
+                    label={t("instance.agent")}
+                    value={chosen?.id ?? ""}
+                    options={agents.map((a) => ({
+                      value: a.id,
+                      label: a.available ? a.label : t("instance.unavailable", { label: a.label }),
+                      hint: a.available ? (a.version ?? undefined) : (a.reason ?? undefined),
+                      disabled: !a.available,
+                    }))}
+                    onChange={(agent) => {
+                      setAgentSettings({});
+                      setAgent(agent);
+                    }}
+                    class="action-select"
+                  />
+                  <Button busy={busy} disabled={busy} onClick={start} data-testid="start-run">
+                    <Icon name="play" />
+                    {busy ? t("instance.starting") : t("instance.start")}
+                  </Button>
+                </div>
+                {chosen?.available && (
+                  <AgentSettings
+                    key={chosen.id}
+                    agent={chosen.id}
+                    value={agentSettings}
+                    onChange={setAgentSettings}
+                    disabled={busy}
+                  />
+                )}
               </div>
             ) : (
               <Alert tone="warning">{t("instance.noAgent")}</Alert>

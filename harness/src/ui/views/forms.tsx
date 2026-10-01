@@ -28,6 +28,7 @@ import {
 } from "../../shared/requests.ts";
 import type {
   Artifact,
+  AgentSelection,
   ArtifactsResponse,
   AssessResponse,
   AssessmentRecordResponse,
@@ -42,6 +43,7 @@ import type {
 } from "../../shared/types.ts";
 import { describeError } from "../api.ts";
 import { Button } from "../components/button.tsx";
+import { AgentSettings } from "../components/agent-settings.tsx";
 import { Checkbox, Segmented } from "../components/checkbox.tsx";
 import { Dialog } from "../components/dialog.tsx";
 import { Alert } from "../components/feedback.tsx";
@@ -241,6 +243,7 @@ function RequestDialog({
   const [found, setFound] = useState<Artifact[]>([]);
   const [processes, setProcesses] = useState<string[]>(initial ? [initial] : []);
   const [agent, setAgent] = useState("");
+  const [agentSettings, setAgentSettings] = useState<AgentSelection>({});
   const [runs, setRuns] = useState<WakeRuns>("run");
   const [over, setOver] = useState(false);
   const [tried, setTried] = useState(false);
@@ -310,6 +313,7 @@ function RequestDialog({
       }
       const answer = await client.post<WakeResponse>("/api/wake", {
         ...(chosen ? { agent: chosen.id } : {}),
+        ...agentSettings,
         request: text.trim(),
         attachments: list.flatMap((a) => (a.kind === "path" ? [a.path] : [])),
         processes,
@@ -524,7 +528,10 @@ function RequestDialog({
                         : {}
                       : { hint: t("overview.unavailable", { reason: a.reason ?? "" }) }),
                   }))}
-                  onChange={setAgent}
+                  onChange={(agent) => {
+                    setAgentSettings({});
+                    setAgent(agent);
+                  }}
                   testid="request-agent"
                 />
               )}
@@ -545,6 +552,15 @@ function RequestDialog({
               />
             </div>
           </div>
+          {chosen?.available && (
+            <AgentSettings
+              key={chosen.id}
+              agent={chosen.id}
+              value={agentSettings}
+              onChange={setAgentSettings}
+              disabled={saving}
+            />
+          )}
         </div>
         <Footer
           failure={failure}
@@ -833,6 +849,7 @@ function EvaluateDialog({ id }: { id: string }) {
 function AssessDialog({ scope }: { scope: AssessScope }) {
   const { model, t, client, select, putRun, openForm } = useUi();
   const [agent, setAgent] = useState("");
+  const [agentSettings, setAgentSettings] = useState<AgentSelection>({});
   const [request, setRequest] = useState("");
   const [saving, setSaving] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
@@ -852,6 +869,7 @@ function AssessDialog({ scope }: { scope: AssessScope }) {
     try {
       const answer = await client.post<AssessResponse>("/api/assess", {
         ...(chosen ? { agent: chosen.id } : {}),
+        ...agentSettings,
         scope: {
           ...(scope.period ? { period: scope.period } : {}),
           ...(scope.process ? { process: scope.process } : {}),
@@ -895,11 +913,23 @@ function AssessDialog({ scope }: { scope: AssessScope }) {
                       : {}
                     : { hint: t("overview.unavailable", { reason: a.reason ?? "" }) }),
                 }))}
-                onChange={setAgent}
+                onChange={(agent) => {
+                  setAgentSettings({});
+                  setAgent(agent);
+                }}
                 testid="assess-agent"
               />
             )}
           </Field>
+          {chosen?.available && (
+            <AgentSettings
+              key={chosen.id}
+              agent={chosen.id}
+              value={agentSettings}
+              onChange={setAgentSettings}
+              disabled={saving}
+            />
+          )}
           <fieldset class="group">
             <legend>{t("assess.scope")}</legend>
             <div class="chips" data-testid="assess-scope">

@@ -22,6 +22,7 @@
  * report says how each was answered.
  */
 
+import { fakeModels } from "./models.ts";
 import { Client } from "@modelcontextprotocol/client";
 import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 import fs from "node:fs";
@@ -48,6 +49,7 @@ interface InstanceListed {
 }
 
 const args = process.argv.slice(2);
+if (await fakeModels(args)) process.exit(0);
 
 /** Claude Code: `--mcp-config <file or JSON>`. */
 function claudeServer(): Server | null {

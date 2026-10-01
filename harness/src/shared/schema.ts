@@ -264,6 +264,7 @@ export const runRecordSchema: z.ZodType<Run, unknown> = z.object({
   instance: z.string().nullable(),
   process: z.string().nullable(),
   agent: z.string(),
+  selection: z.object({ model: z.string().optional(), effort: z.string().optional() }).optional(),
   status: runStatus,
   createdAt: epochMs,
   startedAt: epochMs,
@@ -486,7 +487,24 @@ export type InstantiateRequest = z.output<typeof instantiateRequest>;
  * `POST /api/instances/:id/run` (`run`). Who starts the run is not part of the body: the MCP server
  * names its client in the X-Harness-Client header (clientHeader).
  */
+const agentSelection = {
+  model: z
+    .string()
+    .trim()
+    .min(1)
+    .max(200)
+    .regex(/^[a-zA-Z0-9][^\s]*$/)
+    .optional(),
+  effort: z
+    .string()
+    .min(1)
+    .max(40)
+    .regex(/^[a-z][a-z0-9_-]*$/)
+    .optional(),
+};
+
 export const runRequest = z.strictObject({
+  ...agentSelection,
   agent: z.string().min(1),
 });
 export type RunRequest = z.output<typeof runRequest>;
@@ -529,6 +547,7 @@ export const clientHeader = z.strictObject({
  * lines ending in \n; the lines themselves are as given.
  */
 export const wakeRequest = z.strictObject({
+  ...agentSelection,
   agent: z.string().min(1).optional(),
   request: freeText
     .max(MAX_REQUEST_LENGTH, {
@@ -551,6 +570,7 @@ export type WakeRequest = z.output<typeof wakeRequest>;
  * runs), and from what point of view (`request`, kept as the wake's request is).
  */
 export const assessRequest = z.strictObject({
+  ...agentSelection,
   agent: z.string().min(1).optional(),
   scope: z
     .strictObject({

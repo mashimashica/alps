@@ -98,6 +98,10 @@ const en = {
   "error.noOutcome": (a: { where: string; process: string; count: number; outcome: number }) =>
     `${a.where}${a.process} has ${plural(a.count, "Outcome")} (numbered from 0); there is no Outcome ${a.outcome}.`,
   "error.judgedTwice": (a: { outcome: number }) => `Outcome ${a.outcome} is judged twice.`,
+  "error.agentModels": (a: { agent: string; detail: string }) =>
+    `Cannot read ${a.agent}'s models: ${a.detail}`,
+  "error.agentSelection": (a: { agent: string; detail: string }) =>
+    `Cannot use these settings for ${a.agent}: ${a.detail}`,
   "error.noAgent": (a: { agent: string; agents: string }) =>
     `No agent "${a.agent}" in this workspace. Its agents are: ${a.agents}.`,
   "error.selfDisabled": (a: { agents: string }) =>
@@ -350,6 +354,8 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
   "error.noOutcome": (a) =>
     `${a.where}${a.process} の成果は ${a.count} 件（番号は 0 から）で、成果 ${a.outcome} はない。`,
   "error.judgedTwice": (a) => `成果 ${a.outcome} を二度判断している。`,
+  "error.agentModels": (a) => `${a.agent} のモデル一覧を取得できません: ${a.detail}`,
+  "error.agentSelection": (a) => `${a.agent} でこの設定を使用できません: ${a.detail}`,
   "error.noAgent": (a) =>
     `このワークスペースにエージェント「${a.agent}」はない。エージェントは次のとおり: ${a.agents}。`,
   "error.selfDisabled": (a) =>

@@ -425,6 +425,10 @@ describe("E10 WebUI", () => {
         await tab.getByTestId("request-open").click();
         const box = tab.getByTestId("request");
         await box.waitFor({ timeout: 5000 });
+        await box.getByTestId("agent-model").getByRole("combobox").click();
+        await tab.getByRole("option", { name: "Future model", exact: true }).click();
+        await box.getByTestId("agent-effort").getByRole("combobox").click();
+        await tab.getByRole("option", { name: "high", exact: true }).click();
         const request = "Clarify the requirements of CHG-002 from the memo.";
         await box.getByTestId("request-text").fill(request);
         await box.locator('[data-process="Requirements Clarification"] input').check();

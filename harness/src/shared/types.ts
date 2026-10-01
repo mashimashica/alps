@@ -63,6 +63,28 @@ export type ProcessView = Omit<Process, "skill"> & { skill: SkillLocation | Miss
 
 export type AgentId = "claude-code" | "codex" | "demo" | "self" | (string & {});
 
+/** Per-launch overrides. Omitted fields retain the agent's own configuration. */
+export interface AgentSelection {
+  model?: string;
+  effort?: string;
+}
+
+export interface AgentModel {
+  id: string;
+  label: string;
+  description: string;
+  efforts: string[];
+  defaultEffort?: string;
+}
+
+export interface AgentModelsResponse {
+  ok: true;
+  agent: string;
+  supported: boolean;
+  models: AgentModel[];
+  fetchedAt: number;
+}
+
 export interface AgentInfo {
   id: AgentId;
   label: string;
@@ -266,6 +288,8 @@ export interface Run {
   instance: string | null;
   process: string | null;
   agent: AgentId;
+  /** Requested model and effort, not a claim about the agent's resolved defaults. */
+  selection?: AgentSelection;
   status: RunStatus;
   createdAt: number;
   startedAt: number;

@@ -27,6 +27,7 @@
  * tests' own; the others may hold the user's credentials).
  */
 
+import { fakeModels } from "./models.ts";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -183,6 +184,7 @@ const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout
 
 export async function runFake(agent: FakeAgent): Promise<void> {
   const args = process.argv.slice(2);
+  if (await fakeModels(args)) return;
   if (args.includes("--version")) {
     dumpEnv("version");
     console.log(VERSIONS[agent]);

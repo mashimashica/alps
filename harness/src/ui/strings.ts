@@ -8,6 +8,14 @@
 import type { Language } from "../shared/types.ts";
 
 const en = {
+  "agent.model": "Model",
+  "agent.effort": "Effort",
+  "agent.default": "Agent default",
+  "agent.loading": "Loading models…",
+  "agent.noEffort": "Not supported",
+  "agent.loadFailed": "Could not load models. Agent defaults are still available.",
+  "agent.liveChoices": "Available in the installed CLI",
+  "agent.refresh": "Refresh",
   "app.title": "ALPS Harness",
   // The sidebar's heading: the name, then the product in small capitals; together, the title.
   "brand.name": "ALPS",
@@ -430,6 +438,14 @@ const en = {
 export type UiKey = keyof typeof en;
 
 const ja: { [K in UiKey]: (typeof en)[K] } = {
+  "agent.model": "モデル",
+  "agent.effort": "エフォート",
+  "agent.default": "エージェントの既定値",
+  "agent.loading": "モデルを取得中…",
+  "agent.noEffort": "指定なし",
+  "agent.loadFailed": "モデルを取得できません。既定値での実行は可能です。",
+  "agent.liveChoices": "インストール済みCLIから取得",
+  "agent.refresh": "再取得",
   "app.title": "ALPS Harness",
   "brand.name": "ALPS",
   "brand.product": "Harness",

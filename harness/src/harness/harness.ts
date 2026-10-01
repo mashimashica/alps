@@ -6,6 +6,7 @@
  * src/server/.
  */
 
+import { withAgentSelection } from "../agents/models.ts";
 import fs from "node:fs";
 import path from "node:path";
 import {
@@ -61,6 +62,9 @@ import {
 } from "../assess.ts";
 import type {
   AgentInfo,
+  AgentModel,
+  AgentModelsResponse,
+  AgentSelection,
   Artifact,
   ArtifactType,
   AssessScope,
@@ -161,6 +165,7 @@ export interface HarnessDeps {
   gitInfo(root: string): { head: string; dirty: boolean } | null;
   /** Runs `<command> --version` for an agent that starts a process. Never rejects. */
   checkVersion(spec: AgentSpec): Promise<VersionCheck>;
+  readAgentModels(spec: AgentSpec, root: string): Promise<AgentModel[]>;
   /** Starts an agent's process in a process group of its own; throws when it cannot be started. */
   startAgent(launch: AgentLaunch, output: AgentOutput): AgentHandle;
   /**
@@ -344,6 +349,10 @@ export class Harness {
   readonly #waiters = new Map<string, Set<() => void>>();
   #workspace: { loaded: LoadedWorkspace; signature: string } | null = null;
   #agentChecks: { key: string; at: number; info: Promise<AgentInfo[]> } | null = null;
+  readonly #agentCatalogs = new Map<
+    string,
+    { at: number; pending: boolean; result: Promise<AgentModelsResponse> }
+  >();
   readonly #digests: DigestCache;
   #closing: Promise<void> | null = null;
   /** The model's signature when poll() last looked; `null` before it first did. */
@@ -499,6 +508,67 @@ export class Harness {
   async model(): Promise<ModelView> {
     const { loaded, description } = this.#describe();
     return { ...description, agents: await this.#checkAgents(resolveAgents(loaded.config.agents)) };
+  }
+
+  /** Metadata only; a short cache coalesces concurrent requests, and refresh bypasses completed entries. */
+  async agentModels(agent: string, refresh = false): Promise<AgentModelsResponse> {
+    const specs = resolveAgents(this.#loaded().config.agents);
+    const spec = specs.find((s) => s.id === agent);
+    if (!spec)
+      throw refuse("agent-unavailable", "error.noAgent", {
+        agent,
+        agents: specs.map((s) => s.id).join(", "),
+      });
+    if (!takesMcpServer(spec))
+      return { ok: true, agent, supported: false, models: [], fetchedAt: Date.now() };
+    const key = JSON.stringify(spec);
+    const known = this.#agentCatalogs.get(key);
+    if (known && (known.pending || (!refresh && Date.now() - known.at < 60_000)))
+      return known.result;
+    // Expired configurations need no retained catalog; switching agents can reuse fresh results.
+    for (const [other, entry] of this.#agentCatalogs)
+      if (!entry.pending && Date.now() - entry.at >= 60_000) this.#agentCatalogs.delete(other);
+    const entry = {
+      at: Date.now(),
+      pending: true,
+      result: Promise.resolve(null as unknown as AgentModelsResponse),
+    };
+    entry.result = this.#deps
+      .readAgentModels(spec, this.root)
+      .then((models) => {
+        if (models.length === 0) throw new Error("The agent returned an empty model catalog.");
+        entry.at = Date.now();
+        return { ok: true as const, agent, supported: true, models, fetchedAt: entry.at };
+      })
+      .catch((error: unknown) => {
+        this.#agentCatalogs.delete(key);
+        throw refuse("agent-unavailable", "error.agentModels", {
+          agent: spec.label,
+          detail: error instanceof Error ? error.message : String(error),
+        });
+      })
+      .finally(() => {
+        entry.pending = false;
+      });
+    this.#agentCatalogs.set(key, entry);
+    return entry.result;
+  }
+
+  async #validateSelection(spec: AgentSpec, selection: AgentSelection): Promise<void> {
+    if (!selection.model && !selection.effort) return;
+    const invalid = (detail: string): never => {
+      throw refuse("invalid-request", "error.agentSelection", { agent: spec.label, detail });
+    };
+    if (!takesMcpServer(spec)) invalid("This agent does not support model selection.");
+    if (!selection.model) invalid("Choose a model before choosing its effort.");
+    const catalog = await this.agentModels(spec.id);
+    const model = catalog.models.find((m) => m.id === selection.model);
+    if (!model)
+      invalid(
+        `Model ${selection.model} is not in the agent's current catalog. Refresh the model list.`,
+      );
+    if (selection.effort && !model!.efforts.includes(selection.effort))
+      invalid(`Effort ${selection.effort} is not supported by ${selection.model}.`);
   }
 
   #process(model: ProcessModel, key: string): Process {
@@ -1009,12 +1079,13 @@ export class Harness {
           });
       }
     }
+    await this.#validateSelection(agentSpec(this.#loaded()).spec, request);
     // From here on nothing waits, so no other request comes between the checks and the record.
     if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
     const instance = this.#instance(instanceId);
     const { loaded, description } = this.#describe();
     const { model } = loaded;
-    const { spec } = agentSpec(loaded);
+    const spec = withAgentSelection(agentSpec(loaded).spec, request);
     const process = this.#process(model, instance.process);
     const skill = description.processes.find((p) => p.id === process.id)?.skill ?? null;
     const running = instance.runs
@@ -1069,6 +1140,14 @@ export class Harness {
       instance: instance.id,
       process: process.id,
       agent: spec.id,
+      ...(request.model || request.effort
+        ? {
+            selection: {
+              ...(request.model ? { model: request.model } : {}),
+              ...(request.effort ? { effort: request.effort } : {}),
+            },
+          }
+        : {}),
       status: "running",
       createdAt: now,
       startedAt: now,
@@ -1685,13 +1764,14 @@ export class Harness {
         agent: checked.spec.label,
         reason: info.reason ?? "it is not available",
       });
+    await this.#validateSelection(checked.spec, request);
     const agents = await this.#checkAgents(checked.specs);
     // From here on nothing waits, so no other wake comes between the checks and the record.
     if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
     const other = this.#runningWake();
     if (other) return this.#skip(other, trigger);
     const { loaded, description } = this.#describe();
-    const { spec } = agentSpec(loaded);
+    const spec = withAgentSelection(agentSpec(loaded).spec, request);
     const now = Date.now();
     const id = this.#nextId("r");
     const since = this.#state.lastWakeAt;
@@ -1714,6 +1794,14 @@ export class Harness {
       instance: null,
       process: null,
       agent: spec.id,
+      ...(request.model || request.effort
+        ? {
+            selection: {
+              ...(request.model ? { model: request.model } : {}),
+              ...(request.effort ? { effort: request.effort } : {}),
+            },
+          }
+        : {}),
       status: "running",
       createdAt: now,
       startedAt: now,
@@ -2061,12 +2149,13 @@ export class Harness {
           });
       }
     }
+    await this.#validateSelection(agentSpec(this.#loaded()).spec, request);
     // From here on nothing waits, so no other assessment comes between the checks and the record.
     if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
     const other = this.#runningAssessment();
     if (other) throw refuse("already-running", "error.assessing", { run: other.id });
     const { loaded, description } = this.#describe();
-    const { spec } = agentSpec(loaded);
+    const spec = withAgentSelection(agentSpec(loaded).spec, request);
     const self = spec.format === "self";
     const now = Date.now();
     const id = this.#nextId("r");
@@ -2101,6 +2190,14 @@ export class Harness {
       instance: null,
       process: null,
       agent: spec.id,
+      ...(request.model || request.effort
+        ? {
+            selection: {
+              ...(request.model ? { model: request.model } : {}),
+              ...(request.effort ? { effort: request.effort } : {}),
+            },
+          }
+        : {}),
       status: "running",
       createdAt: now,
       startedAt: now,

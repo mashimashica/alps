@@ -4,6 +4,7 @@
  * http.ts before a route is chosen. The one body that is not JSON is that of the attachments a
  * person uploads with a request (multipart/form-data); the MCP server has no such tool.
  *
+ *   (WebUI)            GET  /api/agents/:id/models?refresh
  *   get_model          GET  /api/model
  *   list_artifacts     GET  /api/artifacts?type&changedSince
  *   list_instances     GET  /api/instances?process&path&limit&cursor
@@ -278,6 +279,12 @@ function routes(harness: Harness, host: ApiHost): Route[] {
       method: "GET",
       pattern: /^\/api\/model$/,
       handle: async () => ok({ ok: true, model: await harness.model() } satisfies ModelResponse),
+    },
+    {
+      method: "GET",
+      pattern: new RegExp(`^/api/agents/${id}/models$`),
+      handle: async ({ id: agent, url }) =>
+        ok(await harness.agentModels(agent, url.searchParams.get("refresh") === "1")),
     },
     {
       method: "GET",

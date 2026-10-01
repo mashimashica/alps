@@ -10,9 +10,9 @@ locales:
 # files under locales/ja/ directories, and then update the catalog's reviewed_source_sha256.
 catalogs:
   harness/src/shared/strings.ts:
-    reviewed_source_sha256: a83358cf30bba666c7ee0fc8e42e335c5ff469ffa5a85a4d848be9ff5354c59f
+    reviewed_source_sha256: 5fe725be6b7ebd9021de83f87e8025ca90a74bc9f5b35048e49aade39627ec61
   harness/src/ui/strings.ts:
-    reviewed_source_sha256: 7c965a46be1874eff63811a97b98809baa1fbecab6fafbd1793b256199f69b20
+    reviewed_source_sha256: 7f5f2b3cfa1799a673efad9853249ec9e6be129f308e2d07ed34acce4ee3556e
   harness/src/ui/format.ts:
     reviewed_source_sha256: a3bf2e6378dc166a7754623bd884e10901fa003d3d726927d7b32922a75dccca
   harness/src/harness/prompt.ts:

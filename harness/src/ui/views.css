@@ -3479,3 +3479,40 @@ dl.front dd {
   outline-offset: 2px;
   border-radius: var(--radius-xl);
 }
+
+/* Agent choices use the same glass fields in dialogs and in the narrower run panel. */
+.agent-settings {
+  min-width: 0;
+}
+.agent-settings-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 12px;
+}
+.agent-settings-fields .field {
+  min-width: 0;
+}
+.agent-settings-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+.agent-settings-error {
+  color: var(--danger);
+  overflow-wrap: anywhere;
+  margin: 4px 0 0;
+}
+.instance-agent-settings {
+  display: grid;
+  gap: 12px;
+}
+.instance-agent-settings .agent-settings-fields {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (max-width: 480px) {
+  .agent-settings-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

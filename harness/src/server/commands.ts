@@ -22,6 +22,7 @@ import type {
 import { startAgent } from "./agent-process.ts";
 import { CLI_PATH, DaemonError, startDaemon, stopServer } from "./daemon.ts";
 import { checkVersion, gitInfo } from "./host.ts";
+import { readAgentModels } from "./agent-models.ts";
 import { startServer } from "./http.ts";
 import { liveServer, serverUrl, uiUrl } from "./info.ts";
 import { openUi } from "./open.ts";
@@ -128,6 +129,7 @@ export async function serve(args: ServeArgs, version: string): Promise<number> {
           parseYaml,
           gitInfo,
           checkVersion,
+          readAgentModels,
           startAgent,
           mcpServer: { command: process.execPath, args: [CLI_PATH, "mcp"] },
           log,
