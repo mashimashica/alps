@@ -3,6 +3,7 @@
 import { createContext } from "preact";
 import { useContext } from "preact/hooks";
 import type {
+  HealthInfo,
   InstanceView,
   Language,
   ModelView,
@@ -59,6 +60,8 @@ export interface Ui {
   language: Language;
   t: Translate;
   client: Client;
+  /** What GET /api/health said, once it answered: the server's version, pid, and port. */
+  server: HealthInfo | null;
   model: ModelView | null;
   /** Every instance, by id. */
   instances: ReadonlyMap<string, InstanceView>;

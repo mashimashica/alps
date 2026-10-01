@@ -7,7 +7,8 @@
  * runs through SSE. The switch at the top right shows the page in Japanese, what the harness itself
  * said in a run included. The request box, the main action, starts a wake with a fake agent: the
  * file dropped on it is uploaded, the wake's record shows the request and the attachment, and the
- * board gains the instance that the agent makes, which links back to the wake.
+ * board gains the instance that the agent makes, which links back to the wake. The state of the
+ * connection at the top right names the server it reached (its pid) in its title.
  */
 
 import { afterAll, describe, expect, test } from "bun:test";
@@ -122,12 +123,15 @@ describe("E10 WebUI", () => {
           const response = await tab.goto(daemon.uiUrl);
           expect(response?.status()).toBe(200);
 
-          // Preact renders the heading, and the page reaches the API with the per-start token.
+          // Preact renders the heading, and the page reaches the API with the per-start token: the
+          // state of the connection names this daemon in its title.
           expect(await tab.locator("h1").textContent({ timeout: 10_000 })).toBe("ALPS Harness");
           await tab
             .locator('[data-testid="health"][data-status="ok"]')
             .waitFor({ timeout: 10_000 });
-          expect(await tab.getByTestId("health").textContent()).toContain(`pid ${daemon.info.pid}`);
+          expect(await tab.getByTestId("health").getAttribute("title")).toContain(
+            `pid ${daemon.info.pid}`,
+          );
           // The page took the token from the fragment and removed it from the address bar.
           expect(tab.url()).toBe(daemon.url);
           expect(problems).toEqual([]);
@@ -153,7 +157,9 @@ describe("E10 WebUI", () => {
           await tab
             .locator('[data-testid="health"][data-status="ok"]')
             .waitFor({ timeout: 10_000 });
-          expect(await tab.getByTestId("health").textContent()).toContain(`pid ${daemon.info.pid}`);
+          expect(await tab.getByTestId("health").getAttribute("title")).toContain(
+            `pid ${daemon.info.pid}`,
+          );
         };
         const kept = (): Promise<string[]> => tab.evaluate(() => Object.values(sessionStorage));
         await healthy();

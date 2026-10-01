@@ -1,9 +1,12 @@
 /*
  * The dashboard: what the statistics of GET /api/stats say for a period, a granularity, a Process,
- * and an agent. The metric tiles on top (each with the trend of its buckets), the four trends in
- * the middle, a breakdown table below whose cut can be switched, and the findings of the
- * assessment (GET /api/assessment). A click on a number lists, in the panel, the instances or the
- * runs it counts. The page draws the numbers; it judges nothing.
+ * and an agent. The metric tiles on top (each with the trend of its buckets), then the runs and
+ * their results beside the period's judgments (a donut of achieved, not achieved, and unverified,
+ * counted in its legend; its centre is empty, since the total is the tile's), the other trends, a
+ * breakdown table whose cut can be switched, and the findings of the assessment (GET
+ * /api/assessment). Each number is shown once; a tile's line under the value is its count, and
+ * what a number means is in its title. A click on a number lists, in the panel, the instances or
+ * the runs it counts. The page draws the numbers; it judges nothing.
  */
 
 import type { ComponentChildren } from "preact";
@@ -83,6 +86,7 @@ function Tile({
   value,
   unit,
   sub,
+  hint,
   icon,
   tone,
   spark,
@@ -92,7 +96,10 @@ function Tile({
   label: string;
   value: string;
   unit?: string;
+  /** The count under the value; empty when the value says it all. */
   sub: string;
+  /** What the number means, in the title. */
+  hint?: string;
   icon: IconName;
   tone?: "primary" | "stale";
   spark: ComponentChildren;
@@ -104,6 +111,7 @@ function Tile({
       type="button"
       class={cx("tile", tone && `tile-${tone}`)}
       data-testid={testid}
+      title={hint}
       onClick={onPick}
     >
       <span class="tile-top">
@@ -239,7 +247,8 @@ function Tiles({ answer, secondary = false }: { answer: StatsResponse; secondary
           label={t("metric.stale")}
           value={String(metrics.staleEvaluations)}
           unit={t("unit.items")}
-          sub={t("metric.staleSub")}
+          sub=""
+          hint={t("metric.staleHint")}
           spark={
             <Badge tone="warning" class="tile-now">
               {t("metric.now")}
@@ -299,18 +308,75 @@ function Tiles({ answer, secondary = false }: { answer: StatsResponse; secondary
   );
 }
 
-/** Overview graphics use the same server buckets and judgments as the detailed charts. */
-function SummaryCharts({ answer }: { answer: StatsResponse }) {
+/** Lists, in the panel, what a bucket of the trends counts: its judged instances and its runs. */
+function bucketPicker(ui: Ui, answer: StatsResponse): (i: number) => void {
+  const { t, language } = ui;
+  const { trends } = answer.stats;
+  const next = (i: number): number => trends[i + 1]?.start ?? Number.POSITIVE_INFINITY;
+  return (i) => {
+    const bucket = trends[i];
+    if (!bucket) return;
+    const inBucket = (at: number | undefined): boolean =>
+      at !== undefined && at >= bucket.start && at < next(i);
+    members(
+      ui,
+      shortDate(bucket.start, language),
+      t("members.bucket", { from: dateTime(bucket.start, language) }),
+      answer.members.instances
+        .filter((m) => m.judged && inBucket(ui.instances.get(m.id)?.evaluation?.at))
+        .map((m) => m.id),
+      answer.members.runs.filter((r) => inBucket(r.startedAt)),
+    );
+  };
+}
+
+/** The chart's name for assistive technology, with how to use it from the keyboard. */
+const chartName = (t: Ui["t"], title: string): string => `${title}. ${t("chart.keys")}`;
+
+/** The runs of each bucket by result, stacked: succeeded, failed, canceled, interrupted. */
+function RunsChart({ answer }: { answer: StatsResponse }) {
   const ui = useUi();
   const { t, language } = ui;
-  const { trends, metrics } = answer.stats;
+  const { trends } = answer.stats;
   const labels = trends.map((b) => shortDate(b.start, language));
-  const runTotals = trends.map((bucket, i) => {
-    const end = trends[i + 1]?.start ?? Number.POSITIVE_INFINITY;
-    return answer.members.runs.filter((run) => run.startedAt >= bucket.start && run.startedAt < end)
-      .length;
-  });
-  const successes = trends.map((b) => b.runs.succeeded);
+  const runSeries: SeriesStyle[] = [
+    { label: t("status.succeeded"), className: "c-succeeded" },
+    { label: t("status.failed"), className: "c-failed" },
+    { label: t("status.canceled"), className: "c-canceled" },
+    { label: t("status.interrupted"), className: "c-interrupted" },
+  ];
+  const none = trends.every((b) => endedTotal(b) === 0);
+  return (
+    <ChartCard title={t("trend.runs")} legend={<Legend series={runSeries} />} class="summary-trend">
+      {none && <p class="chart-empty-note">{t("trend.noData")}</p>}
+      <StackedBars
+        label={chartName(t, t("trend.runs"))}
+        labels={labels}
+        titles={trends.map(
+          (b, i) =>
+            `${labels[i]}: ${runSeries.map((s, k) => `${s.label} ${Object.values(b.runs)[k] ?? 0}`).join(", ")}`,
+        )}
+        onPick={bucketPicker(ui, answer)}
+        series={runSeries}
+        stacks={trends.map((b) => [
+          b.runs.succeeded,
+          b.runs.failed,
+          b.runs.canceled,
+          b.runs.interrupted,
+        ])}
+      />
+    </ChartCard>
+  );
+}
+
+/**
+ * The first row under the tiles: the runs and their results, and the period's judgments as a
+ * donut. Both use the server's buckets, as the trends below do. The donut's counts are in its
+ * legend, and its centre is empty: how many were judged, and the rate, are the tile's.
+ */
+function SummaryCharts({ answer }: { answer: StatsResponse }) {
+  const { t } = useUi();
+  const { trends } = answer.stats;
   const totals = trends.reduce(
     (n, b) => [
       n[0]! + b.judgments.achieved,
@@ -324,52 +390,11 @@ function SummaryCharts({ answer }: { answer: StatsResponse }) {
   const names = [t("judgment.achieved"), t("judgment.not-achieved"), t("judgment.unverified")];
   const circumference = 2 * Math.PI * 66;
   let offset = 0;
-  const series = [
-    { label: t("col.runs"), className: "a0" },
-    { label: t("status.succeeded"), className: "a1" },
-  ];
   return (
     <div class="summary-charts">
-      <Card class="summary-trend">
-        <CardHeader
-          title={t("trend.runs")}
-          actions={
-            <Badge tone="outline">
-              {runTotals.reduce((a, b) => a + b, 0)} {t("col.runs")}
-            </Badge>
-          }
-        />
-        <div class="card-body">
-          <Legend series={series} />
-          {runTotals.every((n) => n === 0) && <p class="chart-empty-note">{t("trend.noData")}</p>}
-          <Lines
-            label={`${t("trend.runs")}. ${t("chart.keys")}`}
-            labels={labels}
-            titles={labels.map(
-              (label, i) =>
-                `${label}: ${series[0]!.label} ${runTotals[i]}, ${series[1]!.label} ${successes[i]}`,
-            )}
-            series={series}
-            values={[runTotals, successes]}
-            area
-            format={String}
-            onPick={(i) => {
-              const start = trends[i]?.start;
-              if (start === undefined) return;
-              const end = trends[i + 1]?.start ?? Number.POSITIVE_INFINITY;
-              members(
-                ui,
-                t("trend.runs"),
-                labels[i] ?? "",
-                [],
-                answer.members.runs.filter((r) => r.startedAt >= start && r.startedAt < end),
-              );
-            }}
-          />
-        </div>
-      </Card>
+      <RunsChart answer={answer} />
       <Card class="summary-donut">
-        <CardHeader title={t("trend.judgments")} />
+        <CardHeader title={t("summary.judgments")} />
         <div class="card-body">
           <div class="donut-wrap">
             <svg viewBox="0 0 160 160" aria-hidden="true">
@@ -392,14 +417,6 @@ function SummaryCharts({ answer }: { answer: StatsResponse }) {
                 );
               })}
             </svg>
-            <div class="donut-center">
-              <strong>
-                {metrics.achievement.value === null
-                  ? "—"
-                  : `${percent(metrics.achievement.value)}%`}
-              </strong>
-              <small>{t("metric.achievement")}</small>
-            </div>
           </div>
           <dl class="donut-legend">
             {totals.map((n, i) => (
@@ -421,48 +438,30 @@ function SummaryCharts({ answer }: { answer: StatsResponse }) {
 function ChartCard({
   title,
   legend,
+  class: extra,
   children,
 }: {
   title: string;
   legend?: ComponentChildren;
+  class?: string;
   children: ComponentChildren;
 }) {
   return (
-    <Card class="chart-card">
+    <Card class={cx("chart-card", extra)}>
       <CardHeader title={title} actions={legend} />
       <div class="card-body">{children}</div>
     </Card>
   );
 }
 
+/** The trends below the first row: the judgments with the achievement rate, cost, and duration. */
 function Trends({ answer }: { answer: StatsResponse }) {
   const ui = useUi();
   const { t, language } = ui;
   const { trends } = answer.stats;
   const labels = trends.map((b) => shortDate(b.start, language));
-  const next = (i: number): number => trends[i + 1]?.start ?? Number.POSITIVE_INFINITY;
-  const pick = (i: number): void => {
-    const bucket = trends[i];
-    if (!bucket) return;
-    const inBucket = (at: number | undefined): boolean =>
-      at !== undefined && at >= bucket.start && at < next(i);
-    members(
-      ui,
-      labels[i] ?? "",
-      t("members.bucket", { from: dateTime(bucket.start, language) }),
-      answer.members.instances
-        .filter((m) => m.judged && inBucket(ui.instances.get(m.id)?.evaluation?.at))
-        .map((m) => m.id),
-      answer.members.runs.filter((r) => inBucket(r.startedAt)),
-    );
-  };
-  const named = (title: string): string => `${title}. ${t("chart.keys")}`;
-  const runSeries: SeriesStyle[] = [
-    { label: t("status.succeeded"), className: "c-succeeded" },
-    { label: t("status.failed"), className: "c-failed" },
-    { label: t("status.canceled"), className: "c-canceled" },
-    { label: t("status.interrupted"), className: "c-interrupted" },
-  ];
+  const pick = bucketPicker(ui, answer);
+  const named = (title: string): string => chartName(t, title);
   const judgmentSeries: SeriesStyle[] = [
     { label: t("judgment.achieved"), className: "c-achieved" },
     { label: t("judgment.not-achieved"), className: "c-not-achieved" },
@@ -481,24 +480,6 @@ function Trends({ answer }: { answer: StatsResponse }) {
   if (empty) return null;
   return (
     <div class="trends">
-      <ChartCard title={t("trend.runs")} legend={<Legend series={runSeries} />}>
-        <StackedBars
-          label={named(t("trend.runs"))}
-          labels={labels}
-          titles={trends.map(
-            (b, i) =>
-              `${labels[i]}: ${runSeries.map((s, k) => `${s.label} ${Object.values(b.runs)[k] ?? 0}`).join(", ")}`,
-          )}
-          onPick={pick}
-          series={runSeries}
-          stacks={trends.map((b) => [
-            b.runs.succeeded,
-            b.runs.failed,
-            b.runs.canceled,
-            b.runs.interrupted,
-          ])}
-        />
-      </ChartCard>
       <ChartCard
         title={t("trend.judgments")}
         legend={
@@ -581,7 +562,6 @@ function Breakdown({
     <Card class="breakdown">
       <CardHeader
         title={t("breakdown.title")}
-        description={t("breakdown.hint")}
         actions={
           <Tabs
             value={cut}
@@ -855,7 +835,6 @@ function Findings({ process }: { process: string }) {
     <Card class="findings-card" data-testid="findings">
       <CardHeader
         title={t("findings.title")}
-        description={t("findings.sub")}
         icon={<Icon name="list" />}
         actions={
           state.status === "ok" && found.length > 0 ? (

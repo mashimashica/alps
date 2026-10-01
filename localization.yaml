@@ -12,7 +12,7 @@ catalogs:
   harness/src/shared/strings.ts:
     reviewed_source_sha256: 4175c0976d9b561ada61fdaf803f5660ff54bf9131812f1af91d38c817b05878
   harness/src/ui/strings.ts:
-    reviewed_source_sha256: 8ee0a73c99934a0c63d579288e02f7e95612900329b68dde0c35f7b642aad586
+    reviewed_source_sha256: 4211a3e934837946ecf437aba6eac02be7f267254d6acbfd6e35ab4a53acb9e6
   harness/src/ui/format.ts:
     reviewed_source_sha256: a3bf2e6378dc166a7754623bd884e10901fa003d3d726927d7b32922a75dccca
   harness/src/harness/prompt.ts:

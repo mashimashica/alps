@@ -4,7 +4,11 @@
  * activity first. Filters by Process, by the latest run's result, by whether it is judged, and by
  * a part of an input or output path; the counts at the top right set these filters too. Cards
  * are grouped by the latest run, independently of Outcome judgments, and open the detail panel.
- * A card that a woken agent made for a request carries a link to that wake's record.
+ * The two are told apart by place and shape, not in words: a card's lane is its latest run's
+ * result, and its Judgments row carries one mark per Outcome (● × ○ ·) and the amber mark of
+ * stale evidence. A card names its Process and the end of its first input path (the whole path
+ * in the title); its id is in the detail. A card that a woken agent made for a request carries
+ * the request's mark, a link to that wake's record.
  */
 
 import type { InstanceView, RunStatus } from "../../shared/types.ts";
@@ -17,7 +21,17 @@ import { Field, Input } from "../components/input.tsx";
 import { Select } from "../components/select.tsx";
 import { NO_FILTER, useUi, type InstanceFilter } from "../context.ts";
 import { dateTime } from "../format.ts";
-import { firstInput, Glyphs, ModelProblem, processName, StatusText, updatedAt } from "./common.tsx";
+import {
+  firstInputOf,
+  Glyphs,
+  ModelProblem,
+  Path,
+  pathTail,
+  processName,
+  StatusText,
+  typeName,
+  updatedAt,
+} from "./common.tsx";
 
 const LANES = [
   { id: "not-run", title: "instances.notRun", icon: "layers" },
@@ -148,28 +162,20 @@ export function InstancesView({ modelError }: { modelError: unknown }) {
             />
           )}
         </Field>
-      </div>
-      <div class="instance-board-heading">
-        <div class="instance-board-view">
-          <Icon name="board" />
-          <span>{t("board.label")}</span>
-        </div>
-        <p>{t("board.hint")}</p>
-        <div class="instance-board-actions">
-          <span class="faint small tabular" aria-live="polite">
-            {t("instances.count", { n: shown.length, total: all.length })}
-          </span>
+        {/* How many match shows only while the filters leave some out. */}
+        <div class="toolbar-end" aria-live="polite">
           {filtered(filter) && (
-            <Button variant="ghost" size="sm" onClick={() => setFilter(NO_FILTER)}>
-              <Icon name="x" />
-              {t("instances.clear")}
-            </Button>
+            <>
+              <span class="faint small tabular" data-testid="instances-count">
+                {t("instances.count", { n: shown.length, total: all.length })}
+              </span>
+              <Button variant="ghost" size="sm" onClick={() => setFilter(NO_FILTER)}>
+                <Icon name="x" />
+                {t("instances.clear")}
+              </Button>
+            </>
           )}
         </div>
-        <span class="instance-board-order">
-          <Icon name="clock" size={13} />
-          {t("board.order")}
-        </span>
       </div>
       {recordsLoaded && (all.length === 0 || shown.length === 0) && (
         <Card class="instance-board-empty">
@@ -234,21 +240,14 @@ export function InstancesView({ modelError }: { modelError: unknown }) {
                     </div>
                   ))}
                 </div>
-              ) : members.length === 0 ? (
-                <div class="instance-lane-empty">
-                  <span>
-                    <Icon name={lane.icon} size={21} />
-                  </span>
-                  <p>{t("board.emptyLane")}</p>
-                </div>
-              ) : (
+              ) : members.length === 0 ? null : (
                 <ol class="instance-lane-cards">
                   {members.map((instance) => {
                     const status = statusOf(instance);
                     const outcomes =
                       model?.processes.find((p) => p.id === instance.process)?.outcomes.length ?? 0;
                     const at = updatedAt(instance);
-                    const input = firstInput(model, instance);
+                    const input = firstInputOf(model, instance);
                     const name = processName(model, instance.process);
                     const origin = instance.createdBy?.run ?? null;
                     return (
@@ -261,44 +260,31 @@ export function InstancesView({ modelError }: { modelError: unknown }) {
                           aria-label={t("board.open", { process: name, id: instance.id })}
                           onClick={() => select({ kind: "instance", id: instance.id })}
                         >
-                          <span class="instance-card-meta">
-                            <span class="instance-card-id mono">{instance.id}</span>
-                            {status ? (
-                              <StatusText status={status} />
-                            ) : (
-                              <Badge tone="outline">{t("instances.notRun")}</Badge>
+                          <span class="instance-card-head">
+                            <strong class="instance-card-title">{name}</strong>
+                            {/* The lane is the result; only the stopped lane holds several. */}
+                            {status && lane.id === "stopped" && <StatusText status={status} />}
+                          </span>
+                          <span
+                            class="instance-card-path"
+                            title={
+                              input ? `${typeName(model, input.type)}: ${input.path}` : undefined
+                            }
+                          >
+                            <Icon name="file" size={13} />
+                            <span class="mono">
+                              {input ? <Path path={pathTail(input.path)} /> : t("instance.notYet")}
+                            </span>
+                          </span>
+                          {/* Not judged yet: a dash, as in the panel. */}
+                          <span class="instance-card-fact">
+                            <span class="instance-card-fact-label">{t("col.judgments")}</span>
+                            <Glyphs judgments={instance.facts.judgments} outcomes={outcomes} />
+                            {instance.evaluation && instance.facts.stale && (
+                              <Badge tone="warning" dot class="instance-card-stale">
+                                {t("instances.staleOnly")}
+                              </Badge>
                             )}
-                          </span>
-                          <strong class="instance-card-title">{name}</strong>
-                          <span class="instance-card-path" title={input ?? ""}>
-                            <Icon name="file" size={14} />
-                            <span class="mono">{input ?? t("instance.notYet")}</span>
-                          </span>
-                          <span class="instance-card-facts">
-                            <span class="instance-card-fact">
-                              <span>{t("col.judgments")}</span>
-                              {instance.facts.judgments ? (
-                                <Glyphs judgments={instance.facts.judgments} outcomes={outcomes} />
-                              ) : (
-                                <span class="instance-card-unjudged">
-                                  {t("instances.unjudged")}
-                                </span>
-                              )}
-                            </span>
-                            <span class="instance-card-fact">
-                              <span>{t("col.evidence")}</span>
-                              {!instance.evaluation ? (
-                                <span>{t("none")}</span>
-                              ) : instance.facts.stale ? (
-                                <Badge tone="warning" dot>
-                                  {t("instances.staleOnly")}
-                                </Badge>
-                              ) : (
-                                <span class="instance-card-current">
-                                  {t("instances.currentEvidence")}
-                                </span>
-                              )}
-                            </span>
                           </span>
                           <span class="instance-card-footer">
                             <span
@@ -323,7 +309,8 @@ export function InstancesView({ modelError }: { modelError: unknown }) {
                             <Icon name="chevronRight" size={14} />
                           </span>
                         </button>
-                        {/* Beside the card, not in it (a button cannot hold another): the wake that made it. */}
+                        {/* Beside the card, not in it (a button cannot hold another): the wake that
+                            made it, as the request's mark; its id is in the title. */}
                         {origin && (
                           <button
                             type="button"
@@ -333,8 +320,7 @@ export function InstancesView({ modelError }: { modelError: unknown }) {
                             title={t("board.origin", { run: origin })}
                             onClick={() => select({ kind: "run", id: origin })}
                           >
-                            <Icon name="send" size={11} />
-                            <span class="mono">{origin}</span>
+                            <Icon name="send" size={12} />
                           </button>
                         )}
                       </li>

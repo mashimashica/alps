@@ -3,8 +3,11 @@
  * what surrounds it (the focus view, G4). A click on the background, Esc, or the "Whole model"
  * crumb returns to the ring. A Process with a running run has a dashed ring around its dot; one
  * with stale evidence, an amber ring. The lines are the relationships of Artifact types (which
- * Processes produce and read each), not an order of execution, and the legend says so. The
- * layout is computed by the pure functions of ../graph/.
+ * Processes produce and read each), not an order of execution: they have no arrowheads, a node
+ * that the pointer or the keyboard is on brings out only its own lines and neighbours (one step,
+ * never a path), and the focus view sets what is read and what is made in columns. The legend
+ * says it in words, on the first visit and when asked for ("?"); once closed, it stays closed.
+ * The layout is computed by the pure functions of ../graph/.
  */
 
 import { flushSync } from "preact/compat";
@@ -17,6 +20,7 @@ import { Skeleton } from "../components/feedback.tsx";
 import { Icon } from "../components/icons.tsx";
 import { useUi } from "../context.ts";
 import { FOCUS, focusLayout, type FocusLayout, type FocusNode } from "../graph/focus.ts";
+import { keepLegendClosed, keptLegendClosed } from "../session.ts";
 import {
   estimateWidth,
   type Edge,
@@ -104,6 +108,21 @@ export function marksOf(
 
 type EdgeHighlight = { kind: "process" | "type"; id: string };
 
+/**
+ * What a highlight brings out on the ring: the node itself and the nodes one line away from it.
+ * Nothing further: the lines are relations, and following them would read as an order.
+ */
+function neighbours(edges: readonly Edge[], highlight: EdgeHighlight): Set<string> {
+  const near = new Set([`${highlight.kind}:${highlight.id}`]);
+  for (const edge of edges) {
+    if (highlight.kind === "process" && edge.process === highlight.id)
+      near.add(`type:${edge.type}`);
+    if (highlight.kind === "type" && edge.type === highlight.id)
+      near.add(`process:${edge.process}`);
+  }
+  return near;
+}
+
 function Edges({ edges, highlight }: { edges: readonly Edge[]; highlight?: EdgeHighlight | null }) {
   return (
     <g class="edges">
@@ -166,6 +185,10 @@ function Ring({
   const { x, y, width, height } = layout.viewBox;
   const [hovered, setHovered] = useState<EdgeHighlight | null>(null);
   const [keyboardFocus, setKeyboardFocus] = useState<EdgeHighlight | null>(null);
+  const highlight = hovered ?? keyboardFocus;
+  const near = highlight ? neighbours(layout.edges, highlight) : null;
+  const emphasis = (key: string): "active" | "muted" | undefined =>
+    near ? (near.has(key) ? "active" : "muted") : undefined;
   return (
     <svg
       class="graph"
@@ -185,7 +208,7 @@ function Ring({
         onClick={onBlank}
       />
       <circle class="orbit" cx={0} cy={0} r={layout.radius} />
-      <Edges edges={layout.edges} highlight={hovered ?? keyboardFocus} />
+      <Edges edges={layout.edges} highlight={highlight} />
       {layout.processes.map((p) => {
         const mark = marks.get(p.id) ?? { running: false, stale: false };
         const pick = (): void =>
@@ -203,6 +226,7 @@ function Ring({
             data-process={p.id}
             data-running={String(mark.running)}
             data-stale={String(mark.stale)}
+            data-emphasis={emphasis(`process:${p.id}`)}
             role="button"
             tabindex={0}
             aria-label={p.name}
@@ -246,6 +270,7 @@ function Ring({
             key={pill.id}
             class="pill"
             data-type={pill.id}
+            data-emphasis={emphasis(`type:${pill.id}`)}
             role="button"
             tabindex={0}
             aria-label={pill.name}
@@ -356,14 +381,9 @@ function focusFrame(layout: FocusLayout): {
 
 function Focus({ layout, onBlank }: { layout: FocusLayout; onBlank: () => void }) {
   const { t } = useUi();
-  const producers = layout.nodes.filter((n) => n.column === 0).length;
-  const consumers = layout.nodes.filter((n) => n.column === 2).length;
-  const sub =
-    layout.target.kind === "type"
-      ? producers > 0
-        ? t("focus.typeSub", { producers, consumers })
-        : t("focus.givenSub", { consumers })
-      : "";
+  // The columns show who makes and who reads a type; only why nobody makes it needs saying.
+  const given = layout.target.kind === "type" && layout.nodes.every((n) => n.column !== 0);
+  const sub = given ? t("focus.given") : "";
   const frame = focusFrame(layout);
   return (
     <svg
@@ -398,41 +418,47 @@ function Focus({ layout, onBlank }: { layout: FocusLayout; onBlank: () => void }
   );
 }
 
-function Legend({ focused }: { focused: boolean }) {
-  const { t } = useUi();
+/** What the lines and the marks mean, shown until it is closed; the marks only where they are drawn. */
+function Legend({ marks, onClose }: { marks: boolean; onClose: () => void }) {
+  const { t, language } = useUi();
   return (
-    <div class="legend">
-      <div class="legend-group">
-        <span class="legend-title">{t("legend.relations")}</span>
+    <div class="legend" id="network-legend" data-testid="legend">
+      <div class="legend-keys">
         <span>
-          <span class="legend-line line-output" aria-hidden="true" />
-          {t("legend.output")}
-        </span>
-        <span>
-          <span class="legend-line line-input" aria-hidden="true" />
-          {t("legend.input")}
+          <span class="legend-line" aria-hidden="true" />
+          {t("legend.lines")}
         </span>
         <span>
           <span class="legend-line line-control" aria-hidden="true" />
           {t("legend.control")}
         </span>
+        {marks && (
+          <>
+            <span>
+              <span class="mark-running" aria-hidden="true" />
+              {t("legend.running")}
+            </span>
+            <span>
+              <span class="mark-stale-ring" aria-hidden="true" />
+              {t("legend.stale")}
+            </span>
+          </>
+        )}
       </div>
-      <div class="legend-group">
-        <span class="legend-title">{t("legend.marks")}</span>
-        <span>
-          <span class="mark-running" aria-hidden="true" />
-          {t("legend.running")}
-        </span>
-        <span>
-          <span class="mark-stale-ring" aria-hidden="true" />
-          {t("legend.stale")}
-        </span>
-      </div>
-      <p class="legend-note">{t("legend.notOrder")}</p>
-      <p class="legend-hint">
-        <Icon name="info" size={14} />
-        {focused ? t("legend.focusHint") : t("legend.ringHint")}
+      <p class="legend-note">
+        {[t("legend.relation"), t("legend.use")].join(language === "ja" ? "" : " ")}
       </p>
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        class="legend-close"
+        aria-label={t("legend.hide")}
+        title={t("legend.hide")}
+        data-testid="legend-close"
+        onClick={onClose}
+      >
+        <Icon name="x" />
+      </Button>
     </div>
   );
 }
@@ -446,6 +472,12 @@ export function NetworkView({ modelError }: { modelError: unknown }) {
     [graph, focus],
   );
   const marks = useMemo(() => marksOf(instances, runs), [instances, runs]);
+  /** The legend shows by itself until it is closed once; after that, only when asked for. */
+  const [legend, setLegend] = useState(() => !keptLegendClosed());
+  const closeLegend = (): void => {
+    setLegend(false);
+    keepLegendClosed();
+  };
   // Where the graph is wider than its box (narrow windows), it opens at its middle.
   const canvasBox = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
@@ -490,15 +522,13 @@ export function NetworkView({ modelError }: { modelError: unknown }) {
       ? processName(model, focus.id)
       : typeName(model, focus.id);
   return (
-    <Card class="network-card" data-mode={focused ? "focus" : "ring"}>
-      {/* The heading and the toolbar share a row where they fit, to leave the height to the ring. */}
+    <Card
+      class="network-card"
+      data-mode={focused ? "focus" : "ring"}
+      data-legend={legend ? "open" : undefined}
+    >
+      {/* Where the view is, and the way back from a focus; the legend on the right. */}
       <div class="network-head">
-        <div class="network-heading">
-          <p class="eyebrow" aria-hidden="true">
-            {t("network.eyebrow")}
-          </p>
-          <h3>{t("network.heading")}</h3>
-        </div>
         <div class="network-toolbar">
           <nav class="crumbs" aria-label={t("tab.network")}>
             {focused ? (
@@ -524,14 +554,22 @@ export function NetworkView({ modelError }: { modelError: unknown }) {
               </>
             )}
           </nav>
-          <Badge tone="outline" class="network-counts">
-            {t("overview.counts", {
-              processes: model.processes.length,
-              types: model.artifacts.length,
-            })}
-          </Badge>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            class="legend-toggle"
+            aria-label={t("legend.show")}
+            aria-expanded={legend}
+            aria-controls={legend ? "network-legend" : undefined}
+            title={t("legend.show")}
+            data-testid="legend-toggle"
+            onClick={() => (legend ? closeLegend() : setLegend(true))}
+          >
+            <Icon name="help" />
+          </Button>
         </div>
       </div>
+      {legend && <Legend marks={!focused} onClose={closeLegend} />}
       <div class="network-canvas" ref={canvasBox}>
         {focused ? (
           <Focus layout={focused} onBlank={back} />
@@ -539,7 +577,6 @@ export function NetworkView({ modelError }: { modelError: unknown }) {
           ring && <Ring layout={ring} marks={marks} label={t("network.label")} onBlank={back} />
         )}
       </div>
-      <Legend focused={focused !== null} />
     </Card>
   );
 }

@@ -8,6 +8,10 @@
 /* ---------- shell ---------- */
 
 .app {
+  /* The page's heading row; the panel's column starts below it. */
+  --main-top: 32px;
+  --page-head-height: 44px;
+  --page-head-gap: 22px;
   min-height: 100dvh;
   overflow-x: clip;
 }
@@ -94,11 +98,6 @@
   line-height: 1.35;
 }
 
-.workspace-label {
-  font-size: 10.5px;
-  color: var(--faint-foreground);
-}
-
 .workspace-text strong {
   font-size: 13px;
   font-weight: 600;
@@ -111,18 +110,6 @@
   color: var(--faint-foreground);
   text-overflow: ellipsis;
   white-space: nowrap;
-  direction: rtl;
-  text-align: left;
-}
-
-.nav-label {
-  padding: 0 10px;
-  margin-bottom: 8px;
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--faint-foreground);
 }
 
 .tabs-nav {
@@ -161,10 +148,6 @@
 .sidebar-section {
   padding: 14px 10px 4px;
   border-top: 1px solid var(--border);
-}
-
-.sidebar-section .nav-label {
-  padding: 0;
 }
 
 .sidebar-section .switch-row {
@@ -219,31 +202,6 @@
   flex-shrink: 0;
 }
 
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  font-size: 12.5px;
-  color: var(--faint-foreground);
-}
-
-.breadcrumb-root {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.breadcrumb-current {
-  font-weight: 500;
-  color: var(--muted-foreground);
-  white-space: nowrap;
-}
-
-.breadcrumb-separator {
-  flex-shrink: 0;
-}
-
 .counts {
   display: flex;
   align-items: center;
@@ -269,6 +227,10 @@
 .count:hover {
   background: var(--card);
   border-color: var(--border);
+  color: var(--foreground);
+}
+
+.count.has-running {
   color: var(--foreground);
 }
 
@@ -332,9 +294,18 @@
 }
 
 .connection.is-offline {
-  border-radius: var(--radius-sm);
   color: var(--danger);
   border-color: var(--danger-line);
+}
+
+.connection.is-offline .connection-dot {
+  background: var(--danger);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 18%, transparent);
+}
+
+/* Once the event stream is lost for good, the state is a button that reconnects. */
+.btn.connection.is-offline {
+  border-radius: var(--radius-sm);
 }
 
 .language {
@@ -372,7 +343,7 @@
   flex-direction: column;
   min-width: 0;
   min-height: calc(100dvh - var(--header-height));
-  padding: 32px 36px 0;
+  padding: var(--main-top) 36px 32px;
 }
 
 .page-head {
@@ -380,22 +351,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  min-height: 84px;
-  margin-bottom: 26px;
+  min-height: var(--page-head-height);
+  margin-bottom: var(--page-head-gap);
 }
 
 .page-title {
   min-width: 0;
-}
-
-.eyebrow {
-  margin-bottom: 10px;
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--faint-foreground);
-  overflow-wrap: anywhere;
 }
 
 .page-title h2 {
@@ -403,13 +364,6 @@
   font-weight: 600;
   letter-spacing: 0.035em;
   line-height: 1.35;
-}
-
-.page-sub {
-  margin-top: 9px;
-  max-width: 72ch;
-  font-size: 11.5px;
-  color: var(--muted-foreground);
 }
 
 .view {
@@ -421,26 +375,11 @@
   outline: none;
 }
 
-.status-bar {
-  margin-top: 28px;
-  padding: 14px 2px 20px;
-  border-top: 1px solid var(--border);
-  font-size: 11.5px;
-  color: var(--faint-foreground);
-}
-
-.health {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .panel {
   position: sticky;
   top: calc(var(--header-height) + 16px);
   max-height: calc(100dvh - var(--header-height) - 32px);
-  margin: 142px 36px 24px 0;
+  margin: calc(var(--main-top) + var(--page-head-height) + var(--page-head-gap)) 36px 24px 0;
   padding: 26px 22px;
   overflow-y: auto;
   border: 1px solid var(--glass-border);
@@ -1103,19 +1042,19 @@ svg.chart:focus-visible {
   color: var(--faint-foreground);
 }
 
-.network-counts {
-  font-weight: 400;
-}
-
 /*
- * The ring takes the height that the page leaves under the heading, down to the legend's first
- * row, and the whole width (its drawing keeps a margin): at 1280 × 800 the lowest name and the
- * legend are in the window, and the names keep a legible size.
+ * The ring takes the height that the page leaves under the heading, and the whole width (its
+ * drawing keeps a margin): at 1280 × 800 the lowest name is in the window, and the names keep a
+ * legible size. While the legend shows, the ring leaves it its room.
  */
 .network-canvas {
   position: relative;
-  height: clamp(420px, calc(100dvh - 310px), 900px);
+  height: clamp(420px, calc(100dvh - 232px), 900px);
   min-height: 0;
+}
+
+.network-card[data-legend="open"] .network-canvas {
+  height: clamp(380px, calc(100dvh - 292px), 860px);
 }
 
 /* The focus view is wide and short: its height follows its own proportions. */
@@ -1243,8 +1182,29 @@ svg.graph {
   stroke-dasharray: 5 5;
 }
 
+/*
+ * A node that the pointer or the keyboard is on brings out the nodes one line away; the rest
+ * steps back. One step only: the lines are relations, not a path to follow.
+ */
+.graph .proc,
+.graph .pill {
+  transition: opacity 160ms ease;
+}
+
+.graph .proc[data-emphasis="muted"],
+.graph .pill[data-emphasis="muted"] {
+  opacity: 0.4;
+}
+
+.graph .proc[data-emphasis="active"] .label-bg,
+.graph .pill[data-emphasis="active"] rect {
+  stroke: var(--edge-highlight);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .graph .edge {
+  .graph .edge,
+  .graph .proc,
+  .graph .pill {
     transition: none;
   }
 }
@@ -1407,33 +1367,38 @@ svg.graph {
   fill: var(--faint-foreground);
 }
 
+.legend-toggle[aria-expanded="true"] {
+  color: var(--brand);
+  background: var(--secondary);
+}
+
+/* The legend, until it is closed: a strip under the head, so that it covers none of the graph. */
 .legend {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px 22px;
-  padding: 12px 18px 14px;
-  border-top: 1px solid var(--border);
+  gap: 6px 18px;
+  margin: 6px 14px 0 20px;
+  padding: 9px 44px 9px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--muted) 40%, transparent);
   font-size: 12px;
   color: var(--muted-foreground);
 }
 
-.legend-group {
+.legend-keys {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px 14px;
+  gap: 6px 16px;
 }
 
-.legend-group > span {
+.legend-keys > span {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-}
-
-.legend-title {
-  font-weight: 600;
-  color: var(--foreground);
 }
 
 .legend-line {
@@ -1442,26 +1407,19 @@ svg.graph {
   border-top: 1.6px solid var(--edge-highlight);
 }
 
-.legend-line.line-input {
-  border-top-color: var(--edge-highlight);
-}
-
 .legend-line.line-control {
   border-top: 1.6px dashed var(--edge-highlight);
 }
 
 .legend-note {
-  flex-basis: 100%;
   font-size: 11.5px;
   color: var(--faint-foreground);
 }
 
-.legend-hint {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11.5px;
-  color: var(--faint-foreground);
+.legend-close {
+  position: absolute;
+  top: 5px;
+  right: 6px;
 }
 
 /* ---------- instances ---------- */
@@ -1476,41 +1434,9 @@ svg.graph {
   backdrop-filter: var(--glass-filter);
 }
 
-.instance-board-heading {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px 18px;
-  margin: 24px 2px 18px;
-}
-
-.instance-board-view {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--brand);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.instance-board-heading p {
-  font-size: 11px;
-  color: var(--muted-foreground);
-}
-
-.instance-board-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-left: auto;
-}
-
-.instance-board-order {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 10px;
-  color: var(--faint-foreground);
+/* How many match, while the filters leave some out; nothing otherwise. */
+.instances .filters .toolbar-end:empty {
+  display: none;
 }
 
 .instance-board {
@@ -1530,7 +1456,7 @@ svg.graph {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  height: clamp(380px, calc(100dvh - 360px), 720px);
+  height: clamp(380px, calc(100dvh - 300px), 760px);
   padding: 14px 11px;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
@@ -1643,24 +1569,26 @@ svg.graph {
   outline-offset: 2px;
 }
 
-.instance-card-meta,
+.instance-card-head,
 .instance-card-fact,
 .instance-card-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
 }
 
-.instance-card-id {
-  color: var(--faint-foreground);
-  font-size: 10px;
-  letter-spacing: 0.04em;
+.instance-card-head {
+  align-items: flex-start;
+  justify-content: space-between;
 }
 
 .instance-card .badge {
   padding: 3px 7px;
-  font-size: 9px;
+  font-size: 10px;
+}
+
+.instance-card-head .badge {
+  flex-shrink: 0;
 }
 
 .instance-card-title {
@@ -1670,12 +1598,14 @@ svg.graph {
   overflow-wrap: anywhere;
 }
 
+/* The end of the first input path: its folder, and its file below it when the two do not fit on
+   one line, each cut with an ellipsis; the whole path is in the title. */
 .instance-card-path {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 7px;
-  min-height: 50px;
-  padding: 9px 8px;
+  min-width: 0;
+  padding: 7px 8px;
   border-radius: 8px;
   background: var(--accent);
   color: var(--muted-foreground);
@@ -1683,39 +1613,41 @@ svg.graph {
 
 .instance-card-path .icon {
   flex-shrink: 0;
-  margin-top: 1px;
 }
 
 .instance-card-path .mono {
-  display: -webkit-box;
   overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow-wrap: anywhere;
-  font-size: 10px;
-  line-height: 1.6;
+  font-size: 11px;
+  line-height: 1.5;
 }
 
-.instance-card-facts {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-  font-size: 10px;
+.instance-card-path .path-part {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+/* The Outcomes' judgments: their own row and their own marks, apart from the lane's result. */
+.instance-card-fact {
+  flex-wrap: wrap;
+  font-size: 11px;
   color: var(--muted-foreground);
 }
 
-.instance-card-unjudged {
+.instance-card-fact-label {
   color: var(--faint-foreground);
 }
 
-.instance-card-current {
-  color: var(--muted-foreground);
+.instance-card-stale {
+  margin-left: auto;
 }
 
 .instance-card-footer {
-  padding-top: 11px;
+  justify-content: space-between;
+  padding-top: 10px;
   border-top: 1px solid var(--border);
-  font-size: 9px;
+  font-size: 10.5px;
   color: var(--faint-foreground);
 }
 
@@ -1737,38 +1669,30 @@ svg.graph {
   position: relative;
 }
 
-/* Keeps the footer's time clear of the chip, which lies over this place. */
+/* Keeps the footer's time clear of the request's mark, which lies over this place. */
 .instance-card-origin-space {
-  flex: 0 0 60px;
+  flex: 0 0 26px;
   margin-left: auto;
 }
 
 .instance-card-origin {
   position: absolute;
-  right: 36px;
-  bottom: 9px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  max-width: calc(100% - 150px);
-  padding: 2px 7px;
+  right: 34px;
+  bottom: 8px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 22px;
+  padding: 0;
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--accent);
   color: var(--muted-foreground);
-  font-size: 9px;
-  line-height: 1.5;
   cursor: pointer;
   transition:
     border-color 160ms,
     color 160ms,
     transform 160ms;
-}
-
-.instance-card-origin .mono {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .instance-card-origin:hover {
@@ -1792,37 +1716,6 @@ svg.graph {
   transform: translateY(-2px);
 }
 
-.instance-lane-empty {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  min-height: 215px;
-  padding: 24px 14px;
-  border: 1px dashed var(--border);
-  border-radius: 12px;
-  color: var(--muted-foreground);
-}
-
-.instance-lane-empty > span {
-  display: grid;
-  place-items: center;
-  width: 46px;
-  height: 46px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--accent);
-}
-
-.instance-lane-empty p {
-  max-width: 18em;
-  text-align: center;
-  font-size: 11px;
-  line-height: 1.8;
-}
-
 .instance-board-empty {
   margin-bottom: 18px;
 }
@@ -1836,15 +1729,6 @@ svg.graph {
   .instance-board {
     grid-template-columns: repeat(4, minmax(264px, 84%));
     gap: 12px;
-  }
-
-  .instance-board-heading {
-    gap: 8px 12px;
-  }
-
-  .instance-board-heading p {
-    order: 3;
-    flex-basis: 100%;
   }
 
   .instances .filters {
@@ -1932,13 +1816,6 @@ svg.graph {
   margin: -4px -6px 0 0;
 }
 
-.head-status {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-
 .panel-tab {
   display: flex;
   flex-direction: column;
@@ -1972,10 +1849,6 @@ svg.graph {
   color: var(--muted-foreground);
 }
 
-.panel-hint {
-  margin-top: 4px;
-}
-
 .section {
   display: flex;
   flex-direction: column;
@@ -1983,12 +1856,18 @@ svg.graph {
   min-width: 0;
 }
 
+/* The heading and its action on one line, or, where they do not fit, the action below at the right. */
 .section-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 4px 8px;
   min-height: 24px;
+}
+
+.section-head > .btn {
+  margin-left: auto;
 }
 
 .section h3 {
@@ -2058,10 +1937,22 @@ svg.graph {
   overflow-wrap: anywhere;
 }
 
+/* A path breaks after its slashes (Path puts the chances there), and anywhere only if it must. */
 .path-block,
 .path-cell {
   overflow-wrap: anywhere;
-  word-break: break-all;
+}
+
+/* A part of a path with its slash, one box: not broken at a hyphen, nor anywhere unless it is
+   wider than the line. A link's underline does not reach into a box, so it is drawn here. */
+.path-part {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.link:hover .path-part {
+  text-decoration: underline;
 }
 
 .path-block {
@@ -2091,6 +1982,16 @@ dl.facts dd {
   margin: 0;
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+/* Types and their paths, each type above its paths, so that a path has the whole width. */
+dl.facts.facts-stack {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+}
+
+dl.facts.facts-stack dt:not(:first-child) {
+  margin-top: 8px;
 }
 
 dl.summary {
@@ -2126,6 +2027,28 @@ dl.summary dd {
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+}
+
+/* An id in the details: there for reference (and for MCP), small and quiet. */
+.summary-id .link {
+  font-size: 11.5px;
+  color: var(--muted-foreground);
+}
+
+.summary-id .link:hover {
+  color: var(--brand);
+}
+
+/* The evidence of the judgments is current: a quiet check, its meaning in the title. */
+.current-evidence {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--success);
+}
+
+.path-tail {
+  overflow-wrap: anywhere;
 }
 
 .chips {
@@ -2242,6 +2165,12 @@ dl.summary dd {
 
 .criteria-list .criterion-number {
   margin-right: 0;
+}
+
+/* An Outcome without a criterion: the model's words, faint, under a dashed number. */
+.criteria-list [data-criterion="as-stated"] .criterion-number {
+  background: none;
+  border: 1px dashed var(--border-strong);
 }
 
 .judgments {
@@ -2671,20 +2600,9 @@ dl.front dd {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.workspace-label {
-  font-size: 9px;
-  letter-spacing: 0.08em;
-}
 .workspace-path {
   max-width: 125px;
-  margin-top: 3px;
-  font-size: 9px;
-}
-.nav-label {
-  font-size: 9px;
-  letter-spacing: 0.16em;
-  margin-bottom: 12px;
-  font-weight: 500;
+  margin-top: 2px;
 }
 .tabs-nav {
   gap: 6px;
@@ -2702,55 +2620,19 @@ dl.front dd {
   border-radius: 50%;
   background: currentColor;
 }
-.sidebar-activity {
-  margin-top: 28px;
-  padding: 24px 2px 0;
-  border-top: 1px solid var(--border);
-}
-.sidebar-counts {
-  align-items: stretch;
-  flex-direction: column;
-  gap: 3px;
-}
-.sidebar-counts .count {
-  height: auto;
-  min-height: 36px;
-  padding: 7px 12px;
-  font-size: 11px;
-  gap: 11px;
-  text-align: left;
-}
-.sidebar-counts .mark-running {
-  width: 6px;
-  height: 6px;
-  border: 0;
-  background: var(--chart-succeeded);
-  box-shadow: 0 0 0 3px var(--success-soft);
-}
-.sidebar-counts .mark-stale {
-  width: 6px;
-  height: 6px;
-}
 .sidebar-section {
   padding-top: 18px;
 }
 .sidebar-section .check-label {
   font-size: 11px;
 }
-.sidebar-section .check-description {
-  font-size: 10px;
-}
 .topbar {
   padding: 10px 36px;
   background: transparent;
 }
-.breadcrumb {
-  font-size: 11px;
-  gap: 14px;
-}
 .connection {
   border-color: var(--glass-border);
-  font-size: 10px;
+  font-size: 11px;
   height: 27px;
   padding: 0 9px;
 }
@@ -2857,33 +2739,25 @@ dl.front dd {
   grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
   gap: 18px;
 }
+/* The runs and their results beside the donut: the chart sits in the middle of its card. */
+.summary-trend {
+  display: flex;
+  flex-direction: column;
+}
 .summary-trend .card-body {
   position: relative;
-  padding-top: 12px;
-}
-.summary-trend .chart-frame {
-  margin-top: 52px;
-}
-.summary-trend .chart-legend {
-  margin: 8px 0 0;
-}
-.summary-trend .series-line {
-  stroke-width: 2;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
 }
 .series-area {
   stroke: none;
   opacity: 0.1;
 }
-.summary-trend .series-dot {
-  r: 0;
-}
-.summary-trend .series-line.a1 {
-  stroke-dasharray: 4 4;
-  opacity: 0.8;
-}
 .summary-trend .chart-empty-note {
   position: absolute;
-  inset: 90px 25px auto;
+  inset: 64px 25px auto;
   z-index: 1;
   text-align: center;
   color: var(--muted-foreground);
@@ -2892,8 +2766,8 @@ dl.front dd {
 .summary-donut .card-body {
   padding-top: 18px;
 }
+/* The ring only: its counts are in the legend below, and the total and the rate are the tiles'. */
 .donut-wrap {
-  position: relative;
   width: 170px;
   height: 170px;
   margin: 0 auto 20px;
@@ -2911,24 +2785,6 @@ dl.front dd {
 .donut-segment {
   fill: none;
   stroke-width: 8;
-}
-.donut-center {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-.donut-center strong {
-  font-size: 30px;
-  font-weight: 500;
-  letter-spacing: -0.04em;
-}
-.donut-center small {
-  font-size: 9px;
-  color: var(--muted-foreground);
-  margin-top: 2px;
 }
 .donut-legend {
   display: grid;
@@ -2957,36 +2813,17 @@ dl.front dd {
   height: 5px;
   border-radius: 50%;
 }
-/* The heading on the left and the toolbar on the right; the toolbar wraps under it if need be. */
+/* Where the view is, and the way back from a focus, on the left; the legend's "?" on the right. */
 .network-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 10px 20px;
-  padding: 18px 24px 6px;
-}
-.network-heading {
-  min-width: 0;
-}
-.network-heading h3 {
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 0.025em;
-}
-.network-heading .eyebrow {
-  margin-bottom: 8px;
+  padding: 12px 14px 2px 20px;
 }
 .network-toolbar {
+  flex-wrap: nowrap;
   border-bottom: 0;
   padding: 0;
 }
 .network-toolbar .crumb {
-  font-size: 11px;
-}
-.network-counts {
-  font-size: 9px;
-  border-color: var(--border);
+  font-size: 12px;
 }
 .graph .proc .dot {
   opacity: 0.38;
@@ -3053,9 +2890,20 @@ dl.front dd {
   line-height: 1.6;
 }
 .panel-head .kicker {
-  font-size: 9px;
-  letter-spacing: 0.15em;
-  margin-bottom: 7px;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+/* In the panel's narrow column the sections wrap to a second row rather than hide past its edge. */
+.panel .tabs-line {
+  flex-wrap: wrap;
+  column-gap: 12px;
+  overflow-x: visible;
+}
+
+.panel .tabs-line .tab {
+  font-size: 12.5px;
 }
 .panel .path-block {
   font-size: 10px;
@@ -3088,7 +2936,6 @@ dl.front dd {
   .sidebar .brand-caption,
   .sidebar .brand-title,
   .sidebar .workspace-text,
-  .sidebar .nav-label,
   .sidebar .tab-label,
   .sidebar-section .check-text {
     position: absolute;
@@ -3107,7 +2954,7 @@ dl.front dd {
     margin-bottom: 18px;
   }
 
-  nav[aria-labelledby="nav-label"] {
+  .sidebar-nav {
     width: 100%;
   }
 
@@ -3178,11 +3025,6 @@ dl.front dd {
     gap: 4px;
   }
 
-  .breadcrumb-root,
-  .breadcrumb-separator {
-    display: none;
-  }
-
   .count {
     padding: 0 7px;
     gap: 5px;
@@ -3211,7 +3053,7 @@ dl.front dd {
   }
 
   .main {
-    padding: 18px 16px 0;
+    padding: 18px 16px 24px;
   }
 
   .banners {
@@ -3291,7 +3133,8 @@ dl.front dd {
   }
 
   .legend {
-    padding: 10px 14px 12px;
+    margin: 6px 12px 0;
+    padding: 9px 40px 9px 12px;
   }
 
   .dialog-header {
@@ -3324,10 +3167,6 @@ dl.front dd {
 }
 
 @media (max-width: 480px) {
-  .breadcrumb {
-    display: none;
-  }
-
   .tile-label {
     font-size: 12px;
   }
@@ -3338,25 +3177,6 @@ dl.front dd {
 }
 
 @media (min-width: 761px) and (max-width: 1059px) {
-  .sidebar-activity {
-    width: 100%;
-    padding: 18px 0 0;
-  }
-  .sidebar-counts .count {
-    padding: 8px 0;
-    justify-content: center;
-    gap: 6px;
-  }
-  .sidebar-counts .count-text {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-  }
-  .sidebar-counts .count-n {
-    display: inline;
-  }
   .tabs-nav .tab[aria-selected="true"]::after {
     display: none;
   }
@@ -3365,20 +3185,6 @@ dl.front dd {
   .page-head {
     min-height: 0;
     margin-bottom: 24px;
-  }
-  .page-sub {
-    max-width: 40ch;
-  }
-  .sidebar-counts .count-text {
-    position: static;
-    width: auto;
-    height: auto;
-    clip: auto;
-    overflow: visible;
-    white-space: normal;
-  }
-  .sidebar-counts .count-n {
-    display: none;
   }
   .tiles-secondary {
     grid-template-columns: 1fr;
@@ -3397,7 +3203,7 @@ dl.front dd {
     margin-top: 26px;
   }
   .network-head {
-    padding: 20px 18px 8px;
+    padding: 10px 10px 2px 14px;
   }
   .network-canvas {
     padding: 8px 0;

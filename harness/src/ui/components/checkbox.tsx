@@ -86,6 +86,8 @@ export interface SegmentOption<T extends string> {
   label: ComponentChildren;
   /** Colours the chosen option (achieved, not achieved, unverified). */
   tone?: string;
+  /** What the option does, in its title. */
+  title?: string;
 }
 
 export function Segmented<T extends string>({
@@ -117,6 +119,7 @@ export function Segmented<T extends string>({
           key={option.value}
           class={cx("segment", option.tone && `tone-${option.tone}`)}
           data-checked={value === option.value ? "true" : undefined}
+          title={option.title}
         >
           <input
             type="radio"

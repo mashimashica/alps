@@ -8,8 +8,12 @@
  * application and how to check it. Evaluation: the three-valued judgment of each Outcome with its
  * evidence and limits, and a Markdown note. Who judged is not sent: the harness records a person
  * for the WebUI. What cannot be sent is marked on its field (a request without text, a judgment
- * without evidence); files over the limits are refused as they are added. A failure of the server
- * is shown in the page's language.
+ * without evidence); files over the limits are refused as they are added, and the limits
+ * themselves are in the drop zone's title. The dialogs carry no paragraphs of explanation: the
+ * fields' names and examples say what to write, and where a distinction matters it is said where
+ * it is made (a judgment's evidence field says that a run that ended is not evidence). The id of
+ * the instance or the run is only in the subtitle's title. A failure of the server is shown in the
+ * page's language.
  */
 
 import { useEffect, useId, useRef, useState } from "preact/hooks";
@@ -39,7 +43,8 @@ import { Field, Input, Textarea } from "../components/input.tsx";
 import { Select } from "../components/select.tsx";
 import { cx } from "../components/util.ts";
 import { useUi } from "../context.ts";
-import { processName, typeName } from "./common.tsx";
+import { dateTime } from "../format.ts";
+import { firstInput, Path, pathTail, processName, typeName } from "./common.tsx";
 import { summaryOf } from "./panel.tsx";
 
 const JUDGMENTS: Judgment[] = ["achieved", "not-achieved", "unverified"];
@@ -315,7 +320,6 @@ function RequestDialog({ initial }: { initial?: string | undefined }) {
   return (
     <Dialog
       title={t("request.title")}
-      description={t("request.description")}
       onClose={close}
       closeLabel={t("panel.close")}
       size="lg"
@@ -351,7 +355,6 @@ function RequestDialog({ initial }: { initial?: string | undefined }) {
           <Field
             label={t("request.text")}
             required
-            hint={t("request.textHint")}
             error={tried && !text.trim() ? t("request.textRequired") : undefined}
           >
             {(control) => (
@@ -371,7 +374,12 @@ function RequestDialog({ initial }: { initial?: string | undefined }) {
           </Field>
           <fieldset class="group">
             <legend>{t("request.attachments")}</legend>
-            <div class={cx("dropzone", over && "is-over")} data-testid="request-drop">
+            {/* The limits are in the title; a file over them is refused where it is added. */}
+            <div
+              class={cx("dropzone", over && "is-over")}
+              data-testid="request-drop"
+              title={t("request.limits", { count: MAX_ATTACHMENTS, size: MAX_ATTACHMENT_SIZE })}
+            >
               <Icon name="upload" size={20} />
               <span class="dropzone-text">{t("request.drop")}</span>
               <Button
@@ -397,9 +405,6 @@ function RequestDialog({ initial }: { initial?: string | undefined }) {
                 }}
               />
             </div>
-            <p class="faint small">
-              {t("request.limits", { count: MAX_ATTACHMENTS, size: MAX_ATTACHMENT_SIZE })}
-            </p>
             {refused.length > 0 && (
               <Alert tone="warning" data-testid="request-refused">
                 {refused.map((note, i) => (
@@ -442,16 +447,17 @@ function RequestDialog({ initial }: { initial?: string | undefined }) {
                     >
                       <span class="list-main attachment-name">
                         <Icon name={a.kind === "file" ? "paperclip" : "file"} size={14} />
-                        <span class="mono small path-cell">{name}</span>
+                        <span class="mono small path-cell">
+                          <Path path={name} />
+                        </span>
                       </span>
                       <span class="list-end">
-                        <span class="faint small">
-                          {a.kind === "file"
-                            ? `${size(a.file.size)} · ${t("request.toUpload")}`
-                            : a.uploaded
-                              ? t("request.uploaded")
-                              : t("request.inWorkspace")}
-                        </span>
+                        {/* The icon tells a file to upload from one in the workspace; the size is a file's. */}
+                        {(a.kind === "file" || a.uploaded) && (
+                          <span class="faint small">
+                            {a.kind === "file" ? size(a.file.size) : t("request.uploaded")}
+                          </span>
+                        )}
                         <Button
                           variant="ghost"
                           size="icon-sm"
@@ -469,8 +475,7 @@ function RequestDialog({ initial }: { initial?: string | undefined }) {
             )}
           </fieldset>
           <fieldset class="group">
-            <legend>{t("request.processes")}</legend>
-            <p class="faint small">{t("request.processesHint")}</p>
+            <legend title={t("request.processesHint")}>{t("request.processes")}</legend>
             <div class="request-processes" data-testid="request-processes">
               {model.processes.map((p) => (
                 <div key={p.id} data-process={p.id}>
@@ -519,14 +524,11 @@ function RequestDialog({ initial }: { initial?: string | undefined }) {
                 value={runs}
                 labelledBy={modeLabel}
                 options={[
-                  { value: "run", label: t("request.run") },
-                  { value: "plan", label: t("request.plan") },
+                  { value: "run", label: t("request.run"), title: t("request.runHint") },
+                  { value: "plan", label: t("request.plan"), title: t("request.planHint") },
                 ]}
                 onChange={setRuns}
               />
-              <p class="field-hint">
-                {t(runs === "plan" ? "request.planHint" : "request.runHint")}
-              </p>
             </div>
           </div>
         </div>
@@ -580,7 +582,14 @@ function EditDialog({ id }: { id: string }) {
   return (
     <Dialog
       title={t("instance.edit")}
-      description={`${processName(model, instance.process)} · ${id}`}
+      description={
+        <span title={`${t("panel.instance")} · ${instance.id}`}>
+          {[processName(model, instance.process), firstInput(model, instance)]
+            .filter(Boolean)
+            .map((part, i) => (i === 0 ? part : pathTail(part ?? "")))
+            .join(" · ")}
+        </span>
+      }
       onClose={close}
       closeLabel={t("panel.close")}
       size="lg"
@@ -626,7 +635,7 @@ interface JudgmentDraft {
 }
 
 function EvaluateDialog({ id }: { id: string }) {
-  const { model, instances, t, client, select, putInstance, openForm } = useUi();
+  const { model, instances, runs, t, language, client, select, putInstance, openForm } = useUi();
   const form = useRef<HTMLFormElement>(null);
   const instance = instances.get(id);
   const process = model?.processes.find((p) => p.id === instance?.process);
@@ -693,7 +702,14 @@ function EvaluateDialog({ id }: { id: string }) {
   return (
     <Dialog
       title={`${t("evaluate.title")} · ${processName(model, instance.process)}`}
-      description={t("evaluate.of", { run: run.id })}
+      description={
+        <span title={`${t("panel.run")} · ${run.id}`}>
+          {t("evaluate.of", {
+            at: dateTime(run.startedAt, language),
+            status: t(`status.${(runs.get(run.id) ?? run).status}`),
+          })}
+        </span>
+      }
       onClose={close}
       closeLabel={t("panel.close")}
       size="lg"
@@ -709,9 +725,6 @@ function EvaluateDialog({ id }: { id: string }) {
         }}
       >
         <div class="dialog-body">
-          <Alert tone="info" live={false}>
-            {t("evaluate.hint")}
-          </Alert>
           {process.outcomes.map((outcome, i) => {
             const draft = drafts[i] ?? { judgment: "", evidence: "", limits: "" };
             const criterion = instance.criteria.find((c) => c.outcome === i);
@@ -753,6 +766,7 @@ function EvaluateDialog({ id }: { id: string }) {
                           aria-required="true"
                           aria-describedby={control.describedBy}
                           invalid={control.invalid}
+                          placeholder={t("evaluate.evidencePlaceholder")}
                           value={draft.evidence}
                           onInput={(event) => change(i, { evidence: event.currentTarget.value })}
                         />

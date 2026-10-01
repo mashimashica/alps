@@ -4,7 +4,8 @@
  * from the address bar and the history; the token is kept in sessionStorage so that the page
  * survives a reload (it goes when the tab closes). The API gets the token in the X-Harness-Token
  * header; the event stream, which cannot send headers, in `?token=`. The page's language, theme,
- * and transparency are the viewer's choices, kept in localStorage.
+ * and transparency are the viewer's choices, kept in localStorage, and so is whether the
+ * network's legend, shown on the first visit, was closed.
  */
 
 import type { Language, UiView } from "../shared/types.ts";
@@ -14,6 +15,7 @@ const VIEW_KEY = "alps-harness:view";
 const LANGUAGE_KEY = "alps-harness:language";
 const THEME_KEY = "alps-harness:theme";
 const GLASS_KEY = "alps-harness:transparency";
+const LEGEND_KEY = "alps-harness:legend";
 const VIEWS: readonly UiView[] = ["network", "dashboard", "instances"];
 
 /** Storage that may be missing (a private window, blocked site data): reads and writes never throw. */
@@ -104,6 +106,11 @@ export function keptTransparency(): boolean | null {
 }
 
 export const keepTransparency = (on: boolean): void => local.write(GLASS_KEY, on ? "on" : "off");
+
+/** Whether the network's legend was closed once; until then it shows by itself. */
+export const keptLegendClosed = (): boolean => local.read(LEGEND_KEY) === "closed";
+
+export const keepLegendClosed = (): void => local.write(LEGEND_KEY, "closed");
 
 /**
  * Puts the theme and the transparency on the root element, where the tokens of tokens.css read

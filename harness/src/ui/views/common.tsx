@@ -1,6 +1,6 @@
 /* Small parts that the screens and the panel share. */
 
-import type { ComponentChildren } from "preact";
+import { Fragment, type ComponentChildren } from "preact";
 import type {
   InstanceView,
   Judgment,
@@ -21,15 +21,70 @@ export const processName = (model: ModelView | null, id: string | null): string 
 export const typeName = (model: ModelView | null, id: string): string =>
   model?.artifacts.find((a) => a.id === id)?.name ?? id;
 
-/** The first input path of an instance, in the order of the Process's inputs and controls. */
-export function firstInput(model: ModelView | null, instance: InstanceView): string | null {
+/** The first input of an instance, its type and path, in the order of the Process's inputs and controls. */
+export function firstInputOf(
+  model: ModelView | null,
+  instance: InstanceView,
+): { type: string; path: string } | null {
   const process = model?.processes.find((p) => p.id === instance.process);
   const order = process ? [...process.inputs, ...process.controls] : [];
   for (const type of [...order, ...Object.keys(instance.inputs)]) {
     const path = instance.inputs[type]?.[0];
-    if (path) return path;
+    if (path) return { type, path };
   }
   return null;
+}
+
+/** The first input path of an instance. */
+export const firstInput = (model: ModelView | null, instance: InstanceView): string | null =>
+  firstInputOf(model, instance)?.path ?? null;
+
+/** The last part of a path: the name of its file or folder. */
+export function lastPart(path: string): string {
+  const parts = path.split(/[\\/]+/).filter(Boolean);
+  return parts[parts.length - 1] ?? path;
+}
+
+/**
+ * The end of a path that tells it apart: its file or folder and the folder that holds it
+ * (docs/changes/CHG-001/change-brief.md shows as CHG-001/change-brief.md). The screens show
+ * this, and the whole path is in the title and in the details.
+ */
+export function pathTail(path: string): string {
+  const parts = path.split("/").filter(Boolean);
+  if (parts.length <= 2) return path;
+  return `${parts.slice(-2).join("/")}${path.endsWith("/") ? "/" : ""}`;
+}
+
+/**
+ * A path that breaks after its slashes, where it is too long for its line, and not at its hyphens:
+ * each part with its slash is a box of its own (.path-part), which breaks inside only when it is
+ * wider than the whole line. One element, so that a flex row takes it as one item.
+ */
+export function Path({ path }: { path: string }) {
+  const parts = path.split("/");
+  return (
+    <span>
+      {parts.map((part, i) => {
+        const last = i === parts.length - 1;
+        return last && !part ? null : (
+          <Fragment key={i}>
+            <span class="path-part">{last ? part : `${part}/`}</span>
+            {!last && <wbr />}
+          </Fragment>
+        );
+      })}
+    </span>
+  );
+}
+
+/** A path as its end, with the whole path (and its type, when known) in the title. */
+export function PathTail({ path, type }: { path: string; type?: string }) {
+  return (
+    <span class="path-tail mono" title={type ? `${type}: ${path}` : path}>
+      <Path path={pathTail(path)} />
+    </span>
+  );
 }
 
 /** When an instance last changed: its latest run or its evaluation, whichever is later. */
@@ -145,17 +200,20 @@ export function RunLink({ id }: { id: string }) {
   );
 }
 
+/** An instance as its Process and the end of its first input path (the whole path in the title). */
 export function InstanceLink({ instance }: { instance: InstanceView }) {
   const { model, select } = useUi();
+  const input = firstInputOf(model, instance);
   return (
     <button
       type="button"
       class="link instance-link"
+      title={input ? `${typeName(model, input.type)}: ${input.path}` : instance.id}
       onClick={() => select({ kind: "instance", id: instance.id })}
     >
       <span class="instance-link-name">{processName(model, instance.process)}</span>
       <span class="mono faint instance-link-path">
-        {firstInput(model, instance) ?? instance.id}
+        {input ? <Path path={pathTail(input.path)} /> : instance.id}
       </span>
     </button>
   );

@@ -5,10 +5,13 @@
  * there, and the run that made each), a run (its record and its log, followed while it runs), an
  * instance (in tabs: its inputs and criteria, its runs with starting and canceling, its
  * evaluation, the log of its latest run, and its Process's SKILL.md), or what a number of the
- * dashboard counts. With nothing selected, the model and the record of wakes. A wake run shows
- * what it was asked (the request as given, the attachments, the Processes, how far to go), its
- * report (what the agent planned and why), the runs that its agent started, and the instances it
- * made; an instance that a wake made links to it.
+ * dashboard counts. With nothing selected, the model (its counts, its workspace, the server, the
+ * agents) and the record of wakes. A wake run shows what it was asked (the request as given, the
+ * attachments, the Processes, how far to go), its report (what the agent planned and why), the
+ * runs that its agent started, and the instances it made; an instance that a wake made links to
+ * it. The panel is where the details are: whole paths and ids, small and faint. An instance keeps
+ * its latest run's result and its judgments apart, each in its own row and its own marks; an
+ * Outcome without a criterion shows as the model states it.
  */
 
 import { Fragment } from "preact";
@@ -37,12 +40,14 @@ import { useUi, type InstanceTab, type ProcessTab, type Selection, type Ui } fro
 import { clock, count, dateTime, duration, money } from "../format.ts";
 import { splitFrontmatter } from "../markdown.ts";
 import {
-  firstInput,
+  firstInputOf,
   Glyphs,
   InstanceLink,
   Markdown,
   ModelProblem,
   PanelHead,
+  Path,
+  PathTail,
   ProcessLink,
   processName,
   RunLink,
@@ -117,7 +122,7 @@ function Wakes() {
 }
 
 function Overview({ modelError }: { modelError: unknown }) {
-  const { model, t, openForm, onDemand } = useUi();
+  const { model, t, onDemand, server } = useUi();
   if (!model)
     return modelError ? <ModelProblem error={modelError} /> : <Loading label={t("loading")} />;
   return (
@@ -127,20 +132,25 @@ function Overview({ modelError }: { modelError: unknown }) {
       </div>
       <PanelHead kicker={t("panel.model")} title={model.name} closable={onDemand} />
       {model.description && <p class="panel-text">{model.description}</p>}
-      <div class="overview-counts">
+      <div class="overview-counts" data-testid="model-counts">
         <div>
           <strong>{model.processes.length}</strong>
-          <span>{t("panel.process")}</span>
+          <span>{t("overview.processes")}</span>
         </div>
         <div>
           <strong>{model.artifacts.length}</strong>
-          <span>{t("panel.type")}</span>
+          <span>{t("overview.types")}</span>
         </div>
       </div>
       <Section title={t("overview.workspace")}>
         <p class="mono small path-block" title={model.workspace}>
-          {model.workspace}
+          <Path path={model.workspace} />
         </p>
+        {server && (
+          <p class="faint small" data-testid="server">
+            {t("health.ok", { version: server.version, pid: server.pid, port: server.port })}
+          </p>
+        )}
       </Section>
       <Section title={t("overview.agents")}>
         <ul class="list">
@@ -166,11 +176,6 @@ function Overview({ modelError }: { modelError: unknown }) {
         </ul>
       </Section>
       <Wakes />
-      <p class="faint small panel-hint">{t("overview.hint")}</p>
-      <Button onClick={() => openForm({ kind: "request" })}>
-        <Icon name="send" />
-        {t("request.open")}
-      </Button>
     </div>
   );
 }
@@ -224,7 +229,9 @@ function SkillView({ process }: { process: string }) {
     <div class="skill" data-testid="skill">
       <p class="mono small faint skill-path">
         <Icon name="file" size={14} />
-        {skill.skill.path}
+        <span>
+          <Path path={skill.skill.path} />
+        </span>
       </p>
       {parts.front.length > 0 && (
         <dl class="front">
@@ -383,7 +390,7 @@ function TypePanel({ id }: { id: string }) {
           <ul class="list mono small">
             {type.paths.map((p) => (
               <li key={p} class="path-block">
-                {p}
+                <Path path={p} />
               </li>
             ))}
           </ul>
@@ -430,8 +437,7 @@ function TypePanel({ id }: { id: string }) {
               {found.value.artifacts.map((artifact) => (
                 <li key={artifact.path} class="list-row list-row-stack">
                   <span class="mono small path-cell" title={artifact.path}>
-                    {artifact.path}
-                    {artifact.dir ? "/" : ""}
+                    <Path path={`${artifact.path}${artifact.dir ? "/" : ""}`} />
                   </span>
                   <span class="faint small">
                     {artifact.dir && artifact.items !== null
@@ -582,15 +588,17 @@ function RunPanel({ id }: { id: string }) {
   };
   return (
     <div data-testid="panel-run" data-run={id} data-status={run.status}>
+      {/* Named by what it is (a Process, a request, a wake); its id is small in the kicker. */}
       <PanelHead
-        kicker={run.kind === "wake" ? t("run.wake") : t("panel.run")}
-        title={<span class="mono">{run.id}</span>}
-        sub={
-          <span class="head-status">
-            <StatusText status={run.status} />
-            {run.process && <span>{processName(model, run.process)}</span>}
-          </span>
+        kicker={`${run.kind === "wake" ? t("run.wake") : t("panel.run")} · ${run.id}`}
+        title={
+          run.kind === "wake"
+            ? requested
+              ? t("run.request")
+              : t("run.wakeTitle")
+            : processName(model, run.process) || t("panel.run")
         }
+        sub={<StatusText status={run.status} />}
       />
       <dl class="facts">
         <dt>{t("run.agent")}</dt>
@@ -619,7 +627,7 @@ function RunPanel({ id }: { id: string }) {
         {run.usage && (
           <>
             <dt>{t("run.usage")}</dt>
-            <dd>
+            <dd title={run.usage.turns === null ? undefined : t("run.turns")}>
               {t("run.usageValue", {
                 cost: money(run.usage.costUsd),
                 input: count(run.usage.inputTokens, language),
@@ -698,7 +706,7 @@ function RunPanel({ id }: { id: string }) {
               <ul class="list" data-testid="wake-attachments">
                 {(run.attachments ?? []).map((path) => (
                   <li key={path} class="list-row mono small path-cell" title={path}>
-                    {path}
+                    <Path path={path} />
                   </li>
                 ))}
               </ul>
@@ -724,7 +732,6 @@ function RunPanel({ id }: { id: string }) {
               {made.map((target) => (
                 <li key={target.id} class="list-row" data-instance={target.id}>
                   <InstanceLink instance={target} />
-                  <span class="mono faint small">{target.id}</span>
                 </li>
               ))}
             </ul>
@@ -763,7 +770,7 @@ function RunPanel({ id }: { id: string }) {
               {run.outputs.map((output) => (
                 <li key={output.path} class="list-row list-row-stack">
                   <span class="mono small path-cell" title={output.path}>
-                    {output.path}
+                    <Path path={output.path} />
                   </span>
                   <span class="faint small">
                     {typeName(model, output.type)} · {t(`run.${output.change}`)}
@@ -784,7 +791,7 @@ function RunPanel({ id }: { id: string }) {
               input.paths.map((p) => (
                 <li key={`${input.type}:${p}`} class="list-row list-row-stack">
                   <span class="mono small path-cell" title={p}>
-                    {p}
+                    <Path path={p} />
                   </span>
                   <span class="faint small">
                     {typeName(model, input.type)}
@@ -815,7 +822,6 @@ function LatestLog({ run }: { run: string }) {
   return (
     <>
       <p class="tab-lead">
-        <span class="faint small">{t("instance.logOf", { run })}</span>
         <RunLink id={run} />
       </p>
       {detail ? (
@@ -889,6 +895,16 @@ function InstancePanel({ id, initial }: { id: string; initial: InstanceTab }) {
         ? t("judge.self", { id: evaluation.by.id })
         : evaluation.by.id;
   const outcomes = process?.outcomes.length ?? 0;
+  const input = firstInputOf(model, instance);
+  /** Each Outcome as this application reads it: its criterion, or the model's own words. */
+  const readings = Array.from(
+    { length: Math.max(outcomes, ...instance.criteria.map((c) => c.outcome + 1)) },
+    (_, outcome) => ({
+      outcome,
+      criterion: instance.criteria.find((c) => c.outcome === outcome),
+      stated: process?.outcomes[outcome] ?? "",
+    }),
+  );
   const evaluate = latest && status !== "running" && (
     <Button onClick={() => openForm({ kind: "evaluate", id })}>
       <Icon name="check" />
@@ -900,7 +916,7 @@ function InstancePanel({ id, initial }: { id: string; initial: InstanceTab }) {
       <PanelHead
         kicker={`${t("panel.instance")} · ${instance.id}`}
         title={processName(model, instance.process)}
-        sub={<span class="mono path-cell">{firstInput(model, instance) ?? ""}</span>}
+        sub={input ? <PathTail path={input.path} type={typeName(model, input.type)} /> : undefined}
       />
       <Tabs
         value={tab}
@@ -918,15 +934,18 @@ function InstancePanel({ id, initial }: { id: string; initial: InstanceTab }) {
       <div class="panel-tab" {...tabPanel(base, tab)}>
         {tab === "overview" && (
           <>
+            {/* The run's result and the Outcomes' judgments: two rows, two kinds of mark. */}
             <dl class="summary">
               <div>
                 <dt>{t("instance.latest")}</dt>
                 <dd>
                   {latest && status ? (
                     <span class="summary-run">
-                      <RunLink id={latest.id} />
                       <StatusText status={status} />
                       <span class="faint small">{dateTime(latest.startedAt, language)}</span>
+                      <span class="summary-id">
+                        <RunLink id={latest.id} />
+                      </span>
                     </span>
                   ) : (
                     <span class="faint">{t("instance.noRuns")}</span>
@@ -938,80 +957,94 @@ function InstancePanel({ id, initial }: { id: string; initial: InstanceTab }) {
                 <dd>
                   <span class="summary-run">
                     <Glyphs judgments={instance.facts.judgments} outcomes={outcomes} />
-                    {evaluation &&
-                      (instance.facts.stale ? (
-                        <Badge tone="warning" dot>
-                          {t("instances.stale")}
-                        </Badge>
-                      ) : (
-                        <span class="muted small">{t("instances.currentEvidence")}</span>
-                      ))}
+                    {evaluation && instance.facts.stale && (
+                      <Badge tone="warning" dot>
+                        {t("instances.stale")}
+                      </Badge>
+                    )}
                   </span>
                 </dd>
               </div>
               {instance.createdBy && (
                 <div>
                   <dt>{t("instance.createdBy")}</dt>
-                  <dd data-testid="instance-origin">
+                  <dd data-testid="instance-origin" class="summary-id">
                     <RunLink id={instance.createdBy.run} />
                   </dd>
                 </div>
               )}
             </dl>
-            <p class="faint small">{t("instance.runVsOutcome")}</p>
+            {/* The whole paths, each type above its paths; a path breaks after its slashes. */}
             <Section title={t("instance.inputs")}>
-              <dl class="facts">
+              <dl class="facts facts-stack">
                 {types.map((type) => (
                   <Fragment key={type}>
                     <dt>{typeName(model, type)}</dt>
-                    <dd class="mono small pre path-cell">
-                      {(instance.inputs[type] ?? []).length === 0
-                        ? t("instance.notYet")
-                        : (instance.inputs[type] ?? []).join("\n")}
-                    </dd>
+                    {(instance.inputs[type] ?? []).length === 0 ? (
+                      <dd class="faint small">{t("instance.notYet")}</dd>
+                    ) : (
+                      (instance.inputs[type] ?? []).map((path) => (
+                        <dd key={path} class="mono small path-cell">
+                          <Path path={path} />
+                        </dd>
+                      ))
+                    )}
                   </Fragment>
                 ))}
               </dl>
             </Section>
             <Section title={t("instance.outputs")}>
-              <dl class="facts">
+              <dl class="facts facts-stack">
                 {outputs.map((type) => (
                   <Fragment key={type}>
                     <dt>{typeName(model, type)}</dt>
-                    <dd class="mono small path-cell">
-                      {instance.outputs[type] ?? t("instance.decided")}
-                    </dd>
+                    {instance.outputs[type] ? (
+                      <dd class="mono small path-cell">
+                        <Path path={instance.outputs[type] ?? ""} />
+                      </dd>
+                    ) : (
+                      <dd class="faint small">{t("instance.decided")}</dd>
+                    )}
                   </Fragment>
                 ))}
               </dl>
             </Section>
+            {/* Each Outcome as this application reads it: its criterion, or, faint, the model's
+                words. Headed Criteria when one is written, and Outcomes when none is. */}
             <Section
-              title={t("instance.criteria")}
+              title={instance.criteria.length > 0 ? t("instance.criteria") : t("process.outcomes")}
               actions={
-                <Button variant="ghost" size="sm" onClick={() => openForm({ kind: "edit", id })}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  data-testid="edit-open"
+                  onClick={() => openForm({ kind: "edit", id })}
+                >
                   {t("instance.edit")}
                 </Button>
               }
             >
-              {instance.criteria.length === 0 ? (
-                <p class="faint small">{t("instance.noCriteria")}</p>
-              ) : (
-                <ol class="criteria-list">
-                  {instance.criteria.map((c) => (
-                    <li key={c.outcome}>
-                      <span class="criterion-number">{c.outcome + 1}</span>
+              <ol class="criteria-list" data-testid="criteria">
+                {readings.map(({ outcome, criterion, stated }) => (
+                  <li key={outcome} data-criterion={criterion ? "written" : "as-stated"}>
+                    <span class="criterion-number">{outcome + 1}</span>
+                    {criterion ? (
                       <div>
-                        <p>{c.statement}</p>
-                        {c.checks && (
+                        <p>{criterion.statement}</p>
+                        {criterion.checks && (
                           <p class="faint small">
-                            {t("instance.checks")}: {c.checks}
+                            {t("instance.checks")}: {criterion.checks}
                           </p>
                         )}
                       </div>
-                    </li>
-                  ))}
-                </ol>
-              )}
+                    ) : (
+                      <p class="faint" title={t("instance.asStated")}>
+                        {stated}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ol>
               {instance.notes && (
                 <>
                   <h4>{t("instance.notes")}</h4>
@@ -1027,7 +1060,7 @@ function InstancePanel({ id, initial }: { id: string; initial: InstanceTab }) {
               <div class="action-row">
                 <span class="action-text">
                   <span class="live-dot" aria-hidden="true" />
-                  {t("instance.running", { run: latest.id })}
+                  {t("status.running")}
                 </span>
                 <Button
                   variant="destructive"
@@ -1118,9 +1151,10 @@ function InstancePanel({ id, initial }: { id: string; initial: InstanceTab }) {
                     </ul>
                   </Alert>
                 ) : (
-                  <Alert tone="success" live={false}>
+                  <p class="current-evidence small" title={t("instance.currentHint")}>
+                    <Icon name="check" size={14} />
                     {t("instance.current")}
-                  </Alert>
+                  </p>
                 )}
                 <ul class="judgments">
                   {evaluation.judgments.map((j) => (

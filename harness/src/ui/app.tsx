@@ -1,7 +1,8 @@
 /*
- * The WebUI: a sidebar with the three screens (the dashboard, the network, the instances), the
- * activity counts, and the display settings; a header with the counts of running runs and stale
- * evidence at the top right, the state of the event stream, the language, and the theme; and a
+ * The WebUI: a sidebar with the model, the three screens (the dashboard, the network, the
+ * instances), and the display setting; a header with the counts of running runs and stale
+ * evidence at the top right (the only place they are shown), the state of the connection to the
+ * server (its version, pid, and port in the title), the language, and the theme; and a
  * panel on the right for what is selected. In wide windows the panel is a column: the network
  * keeps it (the model's overview until something is picked), and the dashboard and the instances
  * open it for what is picked, so that their screens keep the whole width until then. In narrow
@@ -10,6 +11,8 @@
  * view and the background whose click returns to the whole ring.
  * Each screen's heading carries the main action, Request: a person says what is needed, and a
  * woken agent plans, instantiates, and runs the Processes that serve it (views/forms.tsx).
+ * The page shows states by colour, shape, and place, not in sentences: what a screen is for, a
+ * legend, and the details (full paths, ids, the server) are in the panel or in titles.
  * The records are read once and kept current through the event stream; the page only draws them.
  */
 
@@ -58,6 +61,7 @@ import {
   type Theme,
 } from "./session.ts";
 import { browserLanguage, translator } from "./strings.ts";
+import { lastPart } from "./views/common.tsx";
 import { DashboardView } from "./views/dashboard.tsx";
 import { FormDialog } from "./views/forms.tsx";
 import { InstancesView } from "./views/instances.tsx";
@@ -87,55 +91,92 @@ type Health =
 
 type Stream = StreamState | "connecting" | "shutdown";
 
-/** The state of the event stream at the top right; once it is lost for good, a way to reconnect. */
-function Connection({ stream, onReconnect }: { stream: Stream; onReconnect: () => void }) {
-  const { t } = useUi();
-  if (stream === "closed" || stream === "shutdown")
+/**
+ * The page's link to the server at the top right: live, connecting, or offline by the colour of
+ * its dot, with what GET /api/health said in its title (the server's version, pid, and port, or
+ * why it cannot be reached) and in `data-status`. Once the event stream is lost for good, it is a
+ * button that reconnects.
+ */
+function Connection({
+  stream,
+  health,
+  onReconnect,
+}: {
+  stream: Stream;
+  health: Health;
+  onReconnect: () => void;
+}) {
+  const { t, language, client } = useUi();
+  const status = client.token ? health.status : "error";
+  const title = !client.token
+    ? t("token.missing")
+    : health.status === "ok"
+      ? t("health.ok", {
+          version: health.health.version,
+          pid: health.health.pid,
+          port: health.health.port,
+        })
+      : health.status === "error"
+        ? t("health.error", { message: describeError(health.error, language) })
+        : t("health.loading");
+  if (client.token && (stream === "closed" || stream === "shutdown"))
     return (
-      <Button variant="outline" size="sm" class="connection is-offline" onClick={onReconnect}>
+      <Button
+        variant="outline"
+        size="sm"
+        class="connection is-offline"
+        data-testid="health"
+        data-status={status}
+        title={title}
+        onClick={onReconnect}
+      >
         <Icon name="refresh" />
         <span class="connection-text">{t("events.reconnect")}</span>
       </Button>
     );
-  const live = stream === "open";
+  const state =
+    status === "error" ? "offline" : stream === "open" && status === "ok" ? "live" : "connecting";
   return (
     <span
-      class={cx("connection", live ? "is-live" : "is-connecting")}
+      class={cx("connection", `is-${state}`)}
       role="status"
-      title={live ? t("events.liveHint") : t("events.connecting")}
+      data-testid="health"
+      data-status={status}
+      title={title}
     >
       <span class="connection-dot" aria-hidden="true" />
-      <span class="connection-text">{live ? t("events.live") : t("events.connecting")}</span>
+      <span class="connection-text">
+        {t(
+          state === "live"
+            ? "events.live"
+            : state === "offline"
+              ? "events.offline"
+              : "events.connecting",
+        )}
+      </span>
     </span>
   );
 }
 
-/**
- * The counts of running runs and of stale evidence; each lists its instances. The header's are
- * the ones the tests read (`testids`); the sidebar repeats them next to the screens.
- */
+/** The counts of running runs and of stale evidence at the top right; each lists its instances. */
 function Counts({
   running,
   stale,
   show,
-  testids = false,
-  class: className,
 }: {
   running: number;
   stale: number;
   show: (filter: Partial<InstanceFilter>) => void;
-  testids?: boolean;
-  class?: string;
 }) {
   const { t } = useUi();
   return (
-    <div class={cx("counts", className)}>
+    <div class="counts">
       <Tooltip content={t("count.showRunning")}>
         {(tip) => (
           <button
             type="button"
-            class="count"
-            data-testid={testids ? "running-count" : undefined}
+            class={cx("count", running > 0 && "has-running")}
+            data-testid="running-count"
             data-count={running}
             onClick={() => show({ status: "running" })}
             {...tip}
@@ -153,7 +194,7 @@ function Counts({
           <button
             type="button"
             class={cx("count", stale > 0 && "has-stale")}
-            data-testid={testids ? "stale-count" : undefined}
+            data-testid="stale-count"
             data-count={stale}
             onClick={() => show({ judgment: "stale" })}
             {...tip}
@@ -331,6 +372,7 @@ export function App({ session }: { session: Session }) {
     language,
     t,
     client,
+    server: health.status === "ok" ? health.health : null,
     model,
     instances,
     runs,
@@ -411,6 +453,7 @@ export function App({ session }: { session: Session }) {
               </Button>
             )}
           </div>
+          {/* The model and the folder of its workspace; the whole path is in the title and the overview. */}
           <button
             type="button"
             onClick={() => {
@@ -426,15 +469,11 @@ export function App({ session }: { session: Session }) {
               <Icon name="layers" />
             </span>
             <span class="workspace-text">
-              <span class="workspace-label">{t("workspace.label")}</span>
               <strong>{model?.name ?? "—"}</strong>
-              <span class="workspace-path mono">{model?.workspace ?? ""}</span>
+              <span class="workspace-path mono">{model ? lastPart(model.workspace) : ""}</span>
             </span>
           </button>
-          <p class="nav-label" id="nav-label">
-            {t("tabs.label")}
-          </p>
-          <nav aria-labelledby="nav-label">
+          <nav class="sidebar-nav" aria-label={t("tabs.label")}>
             <Tabs
               value={view}
               onChange={(next) => {
@@ -454,13 +493,8 @@ export function App({ session }: { session: Session }) {
               variant="nav"
             />
           </nav>
-          <div class="sidebar-activity">
-            <p class="nav-label">{t("sidebar.activity")}</p>
-            <Counts running={running} stale={stale} show={showInstances} class="sidebar-counts" />
-          </div>
           <div class="sidebar-spacer" />
           <div class="sidebar-section">
-            <p class="nav-label">{t("display.title")}</p>
             <Switch
               checked={opaque}
               onChange={(off) => {
@@ -469,7 +503,6 @@ export function App({ session }: { session: Session }) {
                 applyDisplay(theme, !off);
               }}
               label={t("display.transparency")}
-              description={t("display.transparencyHint")}
               title={rail ? t("display.transparency") : undefined}
             />
           </div>
@@ -493,15 +526,10 @@ export function App({ session }: { session: Session }) {
                   <Icon name="menu" size={18} />
                 </button>
               )}
-              <p class="breadcrumb">
-                <span class="breadcrumb-root">{model?.name ?? t("app.title")}</span>
-                <Icon name="chevronRight" size={13} class="breadcrumb-separator" />
-                <span class="breadcrumb-current">{t(`tab.${view}`)}</span>
-              </p>
             </div>
             <div class="topbar-end">
-              <Counts running={running} stale={stale} show={showInstances} testids />
-              {client.token && <Connection stream={stream} onReconnect={reconnect} />}
+              <Counts running={running} stale={stale} show={showInstances} />
+              <Connection stream={stream} health={health} onReconnect={reconnect} />
               <button
                 type="button"
                 class="language btn btn-ghost btn-sm"
@@ -583,11 +611,7 @@ export function App({ session }: { session: Session }) {
             <main class="main" id="main">
               <div class="page-head">
                 <div class="page-title">
-                  <p class="eyebrow" aria-hidden="true">
-                    {t(`eyebrow.${view}`)}
-                  </p>
                   <h2>{t(`tab.${view}`)}</h2>
-                  <p class="page-sub">{t(`screen.${view}`)}</p>
                 </div>
                 {/* The main action on every screen: a request, which a woken agent turns into instances. */}
                 <Button
@@ -609,25 +633,6 @@ export function App({ session }: { session: Session }) {
                   <Panel modelError={modelError} />
                 </aside>
               )}
-              <footer class="status-bar">
-                <span
-                  class="health"
-                  data-testid="health"
-                  data-status={client.token ? health.status : "error"}
-                >
-                  {!client.token && t("token.missing")}
-                  {client.token && health.status === "loading" && t("health.loading")}
-                  {health.status === "ok" &&
-                    t("health.ok", {
-                      version: health.health.version,
-                      pid: health.health.pid,
-                      port: health.health.port,
-                      workspace: health.health.workspace,
-                    })}
-                  {health.status === "error" &&
-                    t("health.error", { message: describeError(health.error, language) })}
-                </span>
-              </footer>
             </main>
             {wide && (
               <aside class="panel" aria-label={t("panel.label")}>
