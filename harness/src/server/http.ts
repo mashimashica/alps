@@ -184,8 +184,7 @@ async function listen(
     const candidate = port === 0 ? 0 : port + i;
     const status = candidate === 0 ? "unknown" : await portStatus(candidate);
     if (status !== "busy") return serve(candidate);
-    if (i + 1 >= attempts)
-      throw new Error(`No available port found from ${port} to ${candidate}.`);
+    if (i + 1 >= attempts) throw new Error(`No available port found from ${port} to ${candidate}.`);
   }
 }
 
