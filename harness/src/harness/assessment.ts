@@ -13,6 +13,8 @@ import { refuse } from "./errors.ts";
 export interface EvidenceRecords {
   /** A run, or `null` when there is none; `events` is `null` when its record cannot be read. */
   run(id: string): { events: number | null } | null;
+  /** A bounded run observation, or `null` when no run records it. */
+  observation(id: string): { run: string } | null;
   /** An instance, or `null` when there is none; `evaluated` once it has had an evaluation. */
   instance(id: string): { evaluated: boolean } | null;
   /**
@@ -63,6 +65,14 @@ export function checkedItems(
           throw refuse("invalid-request", "error.evidenceEvaluation", {
             n,
             instance: cited.evaluation,
+          });
+        return cited;
+      }
+      if ("observation" in cited) {
+        if (!records.observation(cited.observation))
+          throw refuse("invalid-request", "error.evidenceObservation", {
+            n,
+            observation: cited.observation,
           });
         return cited;
       }

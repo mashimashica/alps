@@ -13,6 +13,7 @@
  *   run                POST /api/instances/:id/run
  *   list_runs          GET  /api/runs?process&agent&status&kind&since&limit&cursor
  *   get_run            GET  /api/runs/:id?tail&wait
+ *   (collector)        POST /api/runs/:id/observations
  *   cancel_run         POST /api/runs/:id/cancel
  *   finish_run         POST /api/runs/:id/finish
  *   evaluate           POST /api/instances/:id/evaluate
@@ -22,6 +23,8 @@
  *   (WebUI)            GET  /api/assessments
  *   (WebUI)            GET  /api/assessments/:id
  *   (WebUI)            POST /api/assessments/:id/items/:n/review
+ *   (WebUI)            POST /api/execution/mcp-config
+ *   (local product)    POST /api/ui
  *   wake               POST /api/wake
  *   open_ui            POST /api/open
  *   (WebUI)            GET  /api/stats?period&granularity&process&agent&tz
@@ -37,6 +40,7 @@
  */
 
 import type { z } from "zod";
+import { Launches } from "./launches.ts";
 import {
   HTTP_STATUS,
   HarnessError,
@@ -59,6 +63,7 @@ import {
   createInstanceRequest,
   evaluateRequest,
   finishRequest,
+  installUiRequest,
   instancesQuery,
   openRequest,
   recordAssessmentRequest,
@@ -70,7 +75,14 @@ import {
   statsQuery,
   updateInstanceRequest,
   wakeRequest,
+  launchRequest,
+  claimLaunchRequest,
 } from "../shared/schema.ts";
+import {
+  PRODUCT_UI_CONTRACT,
+  RUNTIME_CONTRACT,
+  type RuntimeContractResponse,
+} from "../shared/contract.ts";
 import type {
   ArtifactsResponse,
   AttachmentsResponse,
@@ -84,8 +96,10 @@ import type {
   FinishResponse,
   InstanceResponse,
   InstancesResponse,
+  InstallUiResponse,
   ModelResponse,
   OpenResponse,
+  ExecutionMcpConfigSave,
   RunDetailResponse,
   RunStartResponse,
   RunsResponse,
@@ -101,8 +115,11 @@ export interface ApiReply {
 
 /** What the API needs from the server around it. */
 export interface ApiHost {
+  version: string;
   /** The WebUI's URL with the token in the fragment, opened in a browser when asked. */
   openUi(options: { view?: string; open: boolean }): Promise<{ url: string; opened: boolean }>;
+  /** Attach a UI bundle to this daemon without restarting the runtime or active jobs. */
+  installUi(entry: string): Promise<InstallUiResponse["ui"]>;
 }
 
 interface RouteContext {
@@ -272,9 +289,102 @@ export function callerOf(request: Request): Caller {
   };
 }
 
-function routes(harness: Harness, host: ApiHost): Route[] {
+function routes(harness: Harness, host: ApiHost, launches: Launches): Route[] {
   const id = "([A-Za-z0-9_-]+)";
   return [
+    {
+      method: "GET",
+      pattern: /^\/api\/execution$/,
+      handle: async () => ok(await launches.capabilities()),
+    },
+    {
+      method: "POST",
+      pattern: /^\/api\/execution\/mcp-config$/,
+      handle: async ({ request, caller }) => {
+        await body(request);
+        if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
+        return ok(launches.saveMcpConfigs() satisfies ExecutionMcpConfigSave);
+      },
+    },
+    {
+      method: "POST",
+      pattern: /^\/api\/ui$/,
+      handle: async ({ request, caller }) => {
+        if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
+        const options = parse(installUiRequest, await body(request));
+        return ok({
+          ok: true,
+          ui: await host.installUi(options.entry),
+        } satisfies InstallUiResponse);
+      },
+    },
+    {
+      method: "GET",
+      pattern: /^\/api\/contract$/,
+      handle: () =>
+        ok({
+          ok: true,
+          contract: RUNTIME_CONTRACT,
+          uiContract: PRODUCT_UI_CONTRACT,
+          runtime: { version: host.version, workspace: harness.root },
+        } satisfies RuntimeContractResponse),
+    },
+    {
+      method: "GET",
+      pattern: /^\/api\/launches$/,
+      handle: () => ok({ ok: true, launches: launches.list() }),
+    },
+    {
+      method: "POST",
+      pattern: /^\/api\/launches$/,
+      handle: async ({ request, caller }) => {
+        if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
+        return ok(await launches.submit(parse(launchRequest, await body(request))), 201);
+      },
+    },
+    {
+      method: "GET",
+      pattern: new RegExp(`^/api/launches/${id}$`),
+      handle: ({ id }) =>
+        ok({ ok: true, launch: launches.get(id), prompt: launches.prompt(launches.get(id)) }),
+    },
+    {
+      method: "POST",
+      pattern: new RegExp(`^/api/launches/${id}/claim$`),
+      handle: async ({ id, request, caller }) => {
+        const options = parse(claimLaunchRequest, await body(request));
+        return ok(await launches.claim(id, caller, options.sessionId));
+      },
+    },
+    {
+      method: "POST",
+      pattern: new RegExp(`^/api/launches/${id}/open$`),
+      handle: async ({ id, request, caller }) => {
+        await body(request);
+        if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
+        await launches.open(id);
+        return ok({ ok: true });
+      },
+    },
+    {
+      method: "POST",
+      pattern: new RegExp(`^/api/launches/${id}/cancel$`),
+      handle: async ({ id, request, caller }) => {
+        await body(request);
+        if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
+        return ok({ ok: true, launch: launches.cancel(id) });
+      },
+    },
+    {
+      method: "POST",
+      pattern: new RegExp(`^/api/runs/${id}/terminal$`),
+      handle: async ({ id, request, caller }) => {
+        await body(request);
+        if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
+        await launches.openLog(id);
+        return ok({ ok: true });
+      },
+    },
     {
       method: "GET",
       pattern: /^\/api\/model$/,
@@ -379,11 +489,21 @@ function routes(harness: Harness, host: ApiHost): Route[] {
     {
       method: "POST",
       pattern: new RegExp(`^/api/runs/${id}/finish$`),
-      handle: async ({ request, id: run }) =>
-        ok({
+      handle: async ({ request, id: run, caller }) => {
+        const execution = harness.runExecution(run);
+        if (
+          execution &&
+          execution.method !== "cli" &&
+          (caller.kind !== "agent" ||
+            !caller.session ||
+            harness.externalRunFor(caller.session)?.id !== run)
+        )
+          throw refuse("invalid-request", "error.externalSession", {});
+        return ok({
           ok: true,
           ...harness.finishRun(run, parse(finishRequest, await body(request))),
-        } satisfies FinishResponse),
+        } satisfies FinishResponse);
+      },
     },
     {
       method: "GET",
@@ -521,21 +641,26 @@ const failure = (error: HarnessError): ApiReply => ({
 
 /** The API over a harness. It answers `null` for a path it does not have. */
 export function createApi(harness: Harness, host: ApiHost): Api {
-  const table = routes(harness, host);
+  const table = routes(harness, host, new Launches(harness));
   return async (request, url, keepOpen) => {
     for (const route of table) {
       const match = route.pattern.exec(url.pathname);
       if (!match || route.method !== request.method) continue;
+      const caller = harness.externalCaller(callerOf(request));
       try {
-        return await route.handle({
+        const reply = await route.handle({
           request,
           url,
           id: match[1] ?? "",
           rest: match.slice(2).map((part) => part ?? ""),
-          caller: callerOf(request),
+          caller,
           keepOpen,
         });
+        harness.observeTool(caller, `${request.method} ${url.pathname}`, true, reply.status);
+        return reply;
       } catch (error) {
+        if (caller.kind === "agent")
+          harness.observeTool(caller, `${request.method} ${url.pathname}`, false, 500);
         if (error instanceof HarnessError) return failure(error);
         throw error;
       }

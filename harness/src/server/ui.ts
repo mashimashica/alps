@@ -8,8 +8,9 @@
 
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+export { PRODUCT_UI_CONTRACT } from "../shared/contract.ts";
 
-/** The WebUI's entry point. */
+/** The bundled reference WebUI's entry point. */
 export const UI_ENTRY = fileURLToPath(new URL("../ui/index.html", import.meta.url));
 
 export interface UiAsset {
@@ -40,12 +41,12 @@ type BuildLog = Awaited<ReturnType<typeof Bun.build>>["logs"][number];
 const formatLog = ({ message, position }: BuildLog): string =>
   position ? `${position.file}:${position.line}:${position.column}: ${message}` : message;
 
-export async function bundleUi(): Promise<UiBundle> {
+export async function bundleUi(entrypoint = UI_ENTRY): Promise<UiBundle> {
   const started = performance.now();
   let result: Awaited<ReturnType<typeof Bun.build>>;
   try {
     result = await Bun.build({
-      entrypoints: [UI_ENTRY],
+      entrypoints: [entrypoint],
       target: "browser",
       minify: true,
       // Chunk URLs are absolute (/chunk-….js), whatever path the page is opened at.
@@ -55,15 +56,15 @@ export async function bundleUi(): Promise<UiBundle> {
       throw: false,
     });
   } catch (error) {
-    throw new UiBuildError(`Cannot bundle the WebUI (${UI_ENTRY}): ${(error as Error).message}`);
+    throw new UiBuildError(`Cannot bundle the WebUI (${entrypoint}): ${(error as Error).message}`);
   }
   if (!result.success) {
     const errors = result.logs.filter((log) => log.level === "error");
     const lines = (errors.length > 0 ? errors : result.logs).map(formatLog);
-    throw new UiBuildError(`Cannot bundle the WebUI (${UI_ENTRY}):\n  ${lines.join("\n  ")}`);
+    throw new UiBuildError(`Cannot bundle the WebUI (${entrypoint}):\n  ${lines.join("\n  ")}`);
   }
 
-  const page = path.basename(UI_ENTRY);
+  const page = path.basename(entrypoint);
   const assets = new Map<string, UiAsset>();
   let bytes = 0;
   for (const output of result.outputs) {
@@ -71,6 +72,6 @@ export async function bundleUi(): Promise<UiBundle> {
     assets.set(name === page ? "/" : `/${name}`, { body: output, type: output.type });
     bytes += output.size;
   }
-  if (!assets.has("/")) throw new UiBuildError(`Bundling ${UI_ENTRY} produced no page.`);
+  if (!assets.has("/")) throw new UiBuildError(`Bundling ${entrypoint} produced no page.`);
   return { assets, ms: performance.now() - started, bytes };
 }

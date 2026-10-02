@@ -347,6 +347,7 @@ const en = {
   "itemKind.operation": "Operation",
   "itemKind.unverified": "Unverified",
   "evidence.evaluation": (a: { instance: string }) => `Evaluation ${a.instance}`,
+  "evidence.observation": (a: { id: string }) => `Observation ${a.id}`,
   "evidence.log": (a: { run: string; n: number }) => `Log ${a.run} #${a.n}`,
   "evidence.instance": (a: { process: string; path: string }) =>
     a.path ? `${a.process}: ${a.path}` : a.process,
@@ -762,6 +763,7 @@ const ja: { [K in UiKey]: (typeof en)[K] } = {
   "itemKind.operation": "運用",
   "itemKind.unverified": "未確認",
   "evidence.evaluation": (a) => `評価 ${a.instance}`,
+  "evidence.observation": (a) => `観測 ${a.id}`,
   "evidence.log": (a) => `ログ ${a.run} #${a.n}`,
   "evidence.instance": (a) => (a.path ? `${a.process}: ${a.path}` : a.process),
   "review.open": "確認する",

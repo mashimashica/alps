@@ -212,6 +212,12 @@ export function loadRecords(root: string, now = Date.now()): LoadedRecords {
   const { state } = loaded;
   for (const summary of Object.values(state.runs)) {
     if (summary.status !== "running") continue;
+    const external = loaded.runs.get(summary.id);
+    if (external?.execution && external.execution.method !== "cli") {
+      external.execution.disconnectedAt = now;
+      if (!loaded.changes.runs.includes(external)) loaded.changes.runs.push(external);
+      continue;
+    }
     summary.status = "interrupted";
     summary.endedAt = now;
     loaded.changes.state = true;

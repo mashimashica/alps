@@ -68,12 +68,15 @@ import { InstancesView } from "./views/instances.tsx";
 import { NetworkView } from "./views/network.tsx";
 import { Panel, selectionLabel } from "./views/panel.tsx";
 
-const VIEWS: readonly UiView[] = ["dashboard", "network", "instances"];
-const VIEW_ICONS: Record<UiView, IconName> = {
+type VisibleView = Extract<UiView, "dashboard" | "network" | "instances">;
+const VIEWS: readonly VisibleView[] = ["dashboard", "network", "instances"];
+const VIEW_ICONS: Record<VisibleView, IconName> = {
   network: "network",
   dashboard: "dashboard",
   instances: "board",
 };
+const visibleView = (view: UiView): VisibleView =>
+  (VIEWS as readonly UiView[]).includes(view) ? (view as VisibleView) : "network";
 const THEME_ICONS: Record<Theme, IconName> = { system: "monitor", light: "sun", dark: "moon" };
 /** How many pages of runs (200 each) the page keeps; older runs are read when they are opened. */
 const RUN_PAGES = 5;
@@ -217,7 +220,7 @@ export function App({ session }: { session: Session }) {
     () => keptLanguage() ?? browserLanguage(navigator.languages ?? [navigator.language]),
   );
   const t = useMemo(() => translator(language), [language]);
-  const [view, setViewState] = useState<UiView>(session.view);
+  const [view, setViewState] = useState<VisibleView>(() => visibleView(session.view));
   const [health, setHealth] = useState<Health>({ status: "loading" });
   const [model, setModel] = useState<ModelView | null>(null);
   const [modelError, setModelError] = useState<unknown>(null);
@@ -365,8 +368,9 @@ export function App({ session }: { session: Session }) {
     setOverview(false);
   };
   const setView = (next: UiView): void => {
-    setViewState(next);
-    keepView(next);
+    const shown = visibleView(next);
+    setViewState(shown);
+    keepView(shown);
     // A selection belongs to the screen it was opened on. Do not cover the next screen with it.
     closePanel();
     window.scrollTo({ top: 0, behavior: "instant" });

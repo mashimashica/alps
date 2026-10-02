@@ -32,7 +32,7 @@
 | `plugin.json`、`.claude-plugin/`、`.codex-plugin/` | ルートPlugin形式と、それぞれのHostアダプター。 |
 | `harness/` | ハーネス。TypeScriptのソース、テスト、独自の`package.json`・`bun.lock`・`bunfig.toml`にある開発用の道具。英日の文言は、`localization.yaml`が列挙する辞書である。 |
 | ルートの`package.json`と`bun.lock` | ハーネスの実行時の依存。Claude CodeがPluginの取得時にPluginのルートで導入する。その隣に`bunfig.toml`を置かない。置くとClaude Codeはその導入を省く。 |
-| `.mcp.json`と`mcp.json` | ハーネスのMCPサーバー。Claude Code用は`${CLAUDE_PLUGIN_ROOT}`で、Agent Plugins形式は`${PLUGIN_ROOT}`で登録し、後者は`.codex-plugin/plugin.json`も指す。 |
+| `.mcp.json`と`mcp.json` | ハーネスのMCPサーバー。`.mcp.json`はClaude Code向けにプラグインの根、プロジェクトの根、現在のディレクトリの順に解決して起動する。Agent Plugins形式は`${PLUGIN_ROOT}`で登録し、`.codex-plugin/plugin.json`もそれを指す。 |
 | `commands/` | Pluginのコマンド。`harness.md`は`/alps:harness`である。ここにあるファイルはすべてコマンドになるため、コマンドには翻訳を置かない。 |
 | `CLAUDE.md` | このファイルを読み込む、リポジトリ開発用のClaude Codeの入口。独自の指示は持たず、Pluginの文脈ではない。 |
 | `assets/`およびSkillの`agents/`と`assets/` | 表示資源。 |

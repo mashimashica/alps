@@ -69,7 +69,7 @@ macOSとLinuxに対応します。Windowsは試験的な対応です。CIでハ�
 
 ### Pluginから使う
 
-- **Claude Code**は、`.mcp.json`から`harness` MCPサーバーを登録し、各セッションでプロジェクトのディレクトリに対して起動します。マーケットプレイスからPluginを取得する際、Claude Codeは根の`bun.lock`からハーネスの実行時の依存を導入します。ネットワークに接続できないなどでこの導入を実行できなかった場合は、Pluginのディレクトリで`bun install`を実行してください。ツールは`mcp__plugin_alps_harness__<ツール名>`として現れ、`/alps:harness [network|dashboard|instances]`はWebUIを開いてそのURLを示します。
+- **Claude Code**は、`.mcp.json`から`harness` MCPサーバーを登録し、各セッションでプロジェクトのディレクトリに対して起動します。この起動定義は、ALPSをPluginとして導入した場合と、このリポジトリを直接プロジェクトとして開いた場合の両方で動きます。マーケットプレイスからPluginを取得する際、Claude Codeは根の`bun.lock`からハーネスの実行時の依存を導入します。ネットワークに接続できないなどでこの導入を実行できなかった場合は、Pluginのディレクトリで`bun install`を実行してください。ツールは`mcp__plugin_alps_harness__<ツール名>`として現れ、`/alps:harness [network|dashboard|instances]`はWebUIを開いてそのURLを示します。
 - **Codex**は、根の`plugin.json`を読みます。これはMCPサーバーを登録しません。Agent Pluginsはサーバーの設定を既定の場所、つまりPluginの根の`mcp.json`で見つけます。`mcp.json`は同じサーバーを`${PLUGIN_ROOT}`で登録し、`.codex-plugin/plugin.json`もこれを指します。Agent Pluginsは依存の導入を定めていないため、Pluginのディレクトリで`bun install`を実行してください。また、Agent Pluginsはサーバーにプロジェクトのディレクトリを渡しません。ハーネスはワークスペースをそこから探しますが、Codexがサーバーをプロジェクトのディレクトリで起動するかはまだ検証していません。
 - **Cursor**は、Agent Plugins形式を通じてSkillを読み込みますが、ハーネスは読み込みません。`mcp.json`の`${PLUGIN_ROOT}`を展開しないため、MCPサーバーが起動しません。
 

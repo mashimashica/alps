@@ -32,7 +32,7 @@ Do not infer Process requirements from tests, templates, Host manifests, icons, 
 | `plugin.json`, `.claude-plugin/`, `.codex-plugin/` | Root Plugin format and distinct Host adapters. |
 | `harness/` | The harness: its TypeScript source, tests, and development tools in its own `package.json`, `bun.lock`, and `bunfig.toml`. Its English/Japanese texts are the catalogs that `localization.yaml` lists. |
 | `package.json` and `bun.lock` at the root | The harness's runtime dependencies, which Claude Code installs at the Plugin root when it fetches the Plugin. No `bunfig.toml` belongs beside them: with one there, Claude Code skips that install. |
-| `.mcp.json` and `mcp.json` | The harness's MCP server: for Claude Code with `${CLAUDE_PLUGIN_ROOT}`, and in the Agent Plugins format with `${PLUGIN_ROOT}`, which `.codex-plugin/plugin.json` also names. |
+| `.mcp.json` and `mcp.json` | The harness's MCP server: `.mcp.json` starts it for Claude Code by resolving the plugin root, the project root, or the current directory; `mcp.json` registers the Agent Plugins form with `${PLUGIN_ROOT}`, which `.codex-plugin/plugin.json` also names. |
 | `commands/` | Plugin commands; `harness.md` is `/alps:harness`. Every file here is a command, so commands have no translations. |
 | `CLAUDE.md` | Claude Code entry point for repository development that imports this file; it adds no instructions of its own and is not Plugin context. |
 | `assets/` and the Skill's `agents/` and `assets/` | Presentation resources. |

@@ -9,16 +9,21 @@ import { startDirectory } from "./model/files.ts";
 const USAGE = `Usage: alps-harness <command> [options]
 
 Commands:
-  serve [workspace] [--daemon] [--port <port>] [--dev] [--open]
+  serve [workspace] [--daemon] [--port <port>] [--dev] [--headless] [--ui <index.html>] [--open]
         Start the harness server (WebUI and HTTP API) for the workspace and print the
         WebUI's URL. The URL carries the per-start token after #; keep it to yourself.
         --daemon  start it detached and return once .alps-harness/server.json is written
         --port    the port to try first (default: server.port in alps-harness.yaml, or 4830)
         --dev     Bun's development mode (the UI is bundled on each request, with HMR); its
                   page and assets bypass the server's Host check and security headers
+        --headless
+                  start the HTTP API, MCP relay, schedules, and records without serving a WebUI
+        --ui      serve a product UI entry point instead of the bundled reference UI
         --open    open the WebUI in a browser (BROWSER=<command> picks it, BROWSER=none opens
                   none) through .alps-harness/open.html, which only you can read, so the token
                   never appears on a command line
+  terminal-log [workspace] --run <id>
+        View the recorded run log without controlling its agent. Closing leaves the run running.
   stop [workspace]
         Stop the harness server of the workspace, and the agents it is running.
   mcp [--wake <run>] [--assess <run>]
@@ -103,8 +108,8 @@ async function main(argv: string[]): Promise<number> {
   switch (command) {
     case "serve": {
       const { workspace, options } = parse(rest, {
-        boolean: ["daemon", "dev", "open"],
-        value: ["port"],
+        boolean: ["daemon", "dev", "headless", "open"],
+        value: ["port", "ui"],
       });
       const port = options.port === undefined ? null : Number(options.port);
       if (port !== null && !(Number.isInteger(port) && port >= 0 && port <= 65_535)) {
@@ -117,10 +122,19 @@ async function main(argv: string[]): Promise<number> {
           daemon: options.daemon === true,
           port,
           dev: options.dev === true,
+          headless: options.headless === true,
+          uiEntry: typeof options.ui === "string" ? path.resolve(options.ui) : null,
           open: options.open === true,
         },
         pkg.version,
       );
+    }
+    case "terminal-log": {
+      const { workspace, options } = parse(rest, { boolean: [], value: ["run"] });
+      if (typeof options.run !== "string") throw new UsageError("--run needs a run id.");
+      const { showTerminalLog } = await import("./server/terminal-log.ts");
+      await showTerminalLog(workspace ?? defaultStart(), options.run);
+      return 0;
     }
     case "stop": {
       const { workspace } = parse(rest, { boolean: [], value: [] });

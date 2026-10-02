@@ -51,6 +51,8 @@ interface Link {
   ended: boolean;
 }
 
+const HEADLESS_DAEMON_ARGS = ["--headless"] as const;
+
 /** Reads server-sent events from a stream until it ends. */
 async function readEvents(
   body: ReadableStream<Uint8Array>,
@@ -144,18 +146,19 @@ export class DaemonLink {
     void this.#ensure().catch(() => {});
   }
 
-  #ensure(): Promise<Link> {
+  #ensure(serveArgs: readonly string[] = HEADLESS_DAEMON_ARGS): Promise<Link> {
     if (this.#link && !this.#link.ended) return Promise.resolve(this.#link);
-    this.#connecting ??= this.#connect().finally(() => {
+    this.#connecting ??= this.#connect(serveArgs).finally(() => {
       this.#connecting = null;
     });
     return this.#connecting;
   }
 
-  async #connect(): Promise<Link> {
+  async #connect(serveArgs: readonly string[]): Promise<Link> {
     let info: ServerInfo;
     try {
-      info = (await liveServer(this.root))?.info ?? (await startDaemon(this.root, [])).info;
+      info =
+        (await liveServer(this.root))?.info ?? (await startDaemon(this.root, [...serveArgs])).info;
     } catch (error) {
       if (error instanceof DaemonError) throw new RelayError(this.root, error.message);
       throw new RelayError(this.root, (error as Error).message);
@@ -227,10 +230,16 @@ export class DaemonLink {
   async request(
     method: "GET" | "POST",
     route: string,
-    options: { body?: unknown; client?: ClientInfo; signal?: AbortSignal } = {},
+    options: {
+      body?: unknown;
+      client?: ClientInfo;
+      signal?: AbortSignal;
+      /** Arguments used only if this call has to start the daemon. */
+      serveArgs?: readonly string[];
+    } = {},
   ): Promise<Reply> {
     for (let attempt = 0; ; attempt++) {
-      const link = await this.#ensure();
+      const link = await this.#ensure(options.serveArgs);
       let response: Response;
       try {
         response = await fetch(new URL(route.replace(/^\//, ""), serverUrl(link.info)), {

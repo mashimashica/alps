@@ -69,6 +69,7 @@ const WORDS = {
       run: (id: string) => `run ${id}`,
       instance: (id: string) => `instance ${id}`,
       evaluation: (id: string) => `the evaluation of ${id}`,
+      observation: (id: string) => `observation ${id}`,
       stat: (metric: string, cut: string) => `statistics ${metric}${cut ? ` (${cut})` : ""}`,
       log: (run: string, n: number) => `event ${n} of run ${run}`,
       path: (p: string) => p,
@@ -152,6 +153,7 @@ const WORDS = {
       run: (id: string) => `実行 ${id}`,
       instance: (id: string) => `インスタンス ${id}`,
       evaluation: (id: string) => `${id} の評価`,
+      observation: (id: string) => `観測 ${id}`,
       stat: (metric: string, cut: string) => `統計 ${metric}${cut ? `（${cut}）` : ""}`,
       log: (run: string, n: number) => `実行 ${run} のイベント ${n}`,
       path: (p: string) => p,
@@ -303,6 +305,7 @@ function evidenceText(evidence: Evidence, words: Words): string {
   if ("run" in evidence) return of.run(evidence.run);
   if ("instance" in evidence) return of.instance(evidence.instance);
   if ("evaluation" in evidence) return of.evaluation(evidence.evaluation);
+  if ("observation" in evidence) return of.observation(evidence.observation);
   if ("log" in evidence) return of.log(evidence.log.run, evidence.log.n);
   if ("path" in evidence) return of.path(evidence.path);
   const cut = Object.values(evidence.stat.filter).filter(Boolean).join(", ");

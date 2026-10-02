@@ -17,23 +17,30 @@
 
 import type { Server } from "bun";
 import crypto from "node:crypto";
-import { HTTP_STATUS, HarnessError, type Harness } from "../harness/index.ts";
+import net from "node:net";
+import path from "node:path";
+import { HTTP_STATUS, HarnessError, refuse, type Harness } from "../harness/index.ts";
 import { say, type MessageArgs, type MessageKey } from "../shared/strings.ts";
 import type {
   ErrorCode,
   Failure,
   HealthInfo,
   HttpErrorCode,
+  InstallUiResponse,
   ServerEvent,
   ServerInfo,
+  ServerUiInfo,
   SessionEvent,
 } from "../shared/types.ts";
+import { RUNTIME_CONTRACT } from "../shared/contract.ts";
+import { installUiRequest } from "../shared/schema.ts";
 import { MAX_JSON_BYTES, MAX_UPLOAD_BYTES, createApi, mebibytes, textOf } from "./api.ts";
 import { IdleTracker } from "./idle.ts";
 import { probe, readServerInfo, removeServerInfo, serverUrl, writeServerInfo } from "./info.ts";
 import { openUi, removeOpenPage } from "./open.ts";
+import { createObservability, type Observability } from "./observability.ts";
 import { startSchedules, type Schedules } from "./schedule.ts";
-import { bundleUi, type UiBundle } from "./ui.ts";
+import { UI_ENTRY, bundleUi, type UiBundle } from "./ui.ts";
 
 /** Consecutive ports tried when the configured one is in use. */
 const PORT_ATTEMPTS = 10;
@@ -47,7 +54,6 @@ const UPLOAD_ROUTE = "/api/attachments";
 export const MAX_REQUEST_BYTES = MAX_UPLOAD_BYTES + 64 * 1024;
 /** How often, while a WebUI is connected, the workspace is checked for edits made outside the harness. */
 const POLL_MS = 3000;
-
 export interface ServeOptions {
   root: string;
   /** 0 lets the system choose a free port. */
@@ -56,13 +62,17 @@ export interface ServeOptions {
   idleMinutes: number;
   /** Bun's development mode: the UI is an HTML import, bundled on request with HMR. */
   development: boolean;
+  /** No WebUI is bundled at startup. The HTTP API, SSE, MCP relay, and schedules still run. */
+  headless?: boolean;
+  /** WebUI entry point. Omit for the bundled reference UI. Headless daemons load it only on demand. */
+  uiEntry?: string;
   version: string;
   log: (line: string) => void;
   /**
    * Reads the workspace's records (it may throw a StateError). It is called before the server
    * listens; the harness writes nothing until the server owns the workspace.
    */
-  openHarness: () => Harness;
+  openHarness: (observability: Observability) => Harness;
 }
 
 export interface HarnessServer {
@@ -153,15 +163,29 @@ async function discard(body: ReadableStream<Uint8Array> | null): Promise<void> {
   }
 }
 
+async function portStatus(port: number): Promise<"available" | "busy" | "unknown"> {
+  return new Promise((resolve) => {
+    const candidate = net.createServer();
+    candidate.once("error", (error: NodeJS.ErrnoException) =>
+      resolve(error.code === "EADDRINUSE" ? "busy" : "unknown"),
+    );
+    candidate.once("listening", () => candidate.close(() => resolve("available")));
+    candidate.listen({ host: "127.0.0.1", port });
+  });
+}
+
 /** Tries the configured port and the next ones while they are in use. Port 0 is tried once. */
-function listen(port: number, serve: (port: number) => Server<undefined>): Server<undefined> {
+async function listen(
+  port: number,
+  serve: (port: number) => Server<undefined>,
+): Promise<Server<undefined>> {
   const attempts = port === 0 ? 1 : PORT_ATTEMPTS;
   for (let i = 0; ; i++) {
-    try {
-      return serve(port === 0 ? 0 : port + i);
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "EADDRINUSE" || i + 1 >= attempts) throw error;
-    }
+    const candidate = port === 0 ? 0 : port + i;
+    const status = candidate === 0 ? "unknown" : await portStatus(candidate);
+    if (status !== "busy") return serve(candidate);
+    if (i + 1 >= attempts)
+      throw new Error(`No available port found from ${port} to ${candidate}.`);
   }
 }
 
@@ -172,27 +196,54 @@ interface Stream<T> {
 }
 
 /**
- * Starts the server for the workspace. Rejects, before listening, with a UiBuildError when the
- * WebUI does not bundle and with a StateError when the records cannot be read.
+ * Starts the server for the workspace. With `headless`, no WebUI is bundled before listening and
+ * a broken or absent UI cannot stop the daemon. `open_ui` may later bundle the configured entry
+ * and expose it on the same origin. Otherwise it rejects, before listening, with a UiBuildError
+ * when the requested WebUI does not bundle and with a StateError when the records cannot be read.
  */
 export async function startServer(options: ServeOptions): Promise<StartResult> {
   const { root, log } = options;
 
-  // The UI is bundled before the server listens, so a broken UI stops the start. Only --dev uses
-  // the HTML import, for HMR; its page and assets are served by Bun's routes and therefore bypass
-  // the fetch handler (no Host check, no security headers). They hold no secret either.
+  // The UI is bundled before the server listens unless this is a headless runtime daemon. Only
+  // --dev uses the HTML import, for HMR; its page and assets are served by Bun's routes and
+  // therefore bypass the fetch handler (no Host check, no security headers). They hold no secret
+  // either.
   let ui: UiBundle | null = null;
   let devPage: Bun.HTMLBundle | null = null;
-  if (options.development) {
+  let uiEntry = options.uiEntry ?? UI_ENTRY;
+  let customUi = options.uiEntry !== undefined;
+  let serverInfo: ServerInfo | null = null;
+  function uiInfo(): ServerUiInfo {
+    return devPage || ui
+      ? { available: true, mode: customUi ? "custom" : "reference", entry: uiEntry }
+      : { available: false, mode: "none" };
+  }
+  const setUi = async (entry: string, custom: boolean): Promise<ServerUiInfo> => {
+    const bundled = await bundleUi(entry);
+    ui = bundled;
+    devPage = null;
+    uiEntry = entry;
+    customUi = custom;
+    log(
+      `bundled the WebUI from ${entry} in ${Math.round(bundled.ms)} ms (${bundled.assets.size} files, ${formatSize(bundled.bytes)})`,
+    );
+    const next = uiInfo();
+    if (serverInfo) {
+      serverInfo.ui = next;
+      writeServerInfo(root, serverInfo, false);
+    }
+    return next;
+  };
+  if (options.headless) {
+    log("starting without a WebUI bundle; open_ui will bundle it on demand");
+  } else if (options.development && !customUi) {
     devPage = (await import("../ui/index.html")).default;
   } else {
-    ui = await bundleUi();
-    log(
-      `bundled the WebUI in ${Math.round(ui.ms)} ms (${ui.assets.size} files, ${formatSize(ui.bytes)})`,
-    );
+    await setUi(uiEntry, customUi);
   }
 
-  const harness = options.openHarness();
+  const observability = createObservability({ workspace: root, version: options.version, log });
+  const harness = options.openHarness(observability);
   const token = crypto.randomBytes(24).toString("hex");
   const startedAt = Date.now();
   const encoder = new TextEncoder();
@@ -204,8 +255,31 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
   const idle = new IdleTracker(options.idleMinutes * 60_000, () => void stop("idle"));
   let schedules: Schedules | null = null;
 
+  const ensureUi = async (): Promise<void> => {
+    if (devPage || ui) return;
+    try {
+      await setUi(uiEntry, customUi);
+    } catch (error) {
+      log((error as Error).message);
+      throw refuse("invalid-request", "error.uiUnavailable", {});
+    }
+  };
+
   const api = createApi(harness, {
-    openUi: (open) => openUi(root, { port: server.port ?? 0, token }, open),
+    version: options.version,
+    openUi: async (open) => {
+      await ensureUi();
+      return openUi(root, { port: server.port ?? 0, token }, open);
+    },
+    installUi: async (entry) => {
+      try {
+        const resolved = path.resolve(entry);
+        return await setUi(resolved, resolved !== UI_ENTRY);
+      } catch (error) {
+        log((error as Error).message);
+        throw refuse("invalid-request", "error.uiUnavailable", {});
+      }
+    },
   });
 
   const health = (): HealthInfo => ({
@@ -217,6 +291,9 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
     startedAt,
     workspace: root,
     development: options.development,
+    ui: uiInfo(),
+    contract: RUNTIME_CONTRACT,
+    observability: observability.status(),
   });
 
   const hostAllowed = (request: Request): boolean => {
@@ -368,6 +445,24 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
     switch (`${request.method} ${url.pathname}`) {
       case "GET /api/health":
         return json(200, health());
+      case "POST /api/ui": {
+        let given: unknown;
+        try {
+          const text = await textOf(request);
+          given = text.trim() ? (JSON.parse(text) as unknown) : {};
+        } catch (error) {
+          return fail(400, "invalid-request", "error.notJson", {
+            detail: (error as Error).message,
+          });
+        }
+        const parsed = installUiRequest.safeParse(given);
+        if (!parsed.success)
+          return fail(400, "invalid-request", "error.model", {
+            detail: parsed.error.issues.map((issue) => issue.message).join("; "),
+          });
+        const next = await setUi(parsed.data.entry, true);
+        return json(200, { ok: true, ui: next } satisfies InstallUiResponse);
+      }
       case "GET /api/events":
         return openEvents(request, srv);
       case "GET /api/session":
@@ -405,7 +500,7 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
     return new Response(asset.body, { headers: { ...HEADERS, "Content-Type": asset.type } });
   };
 
-  const server = listen(options.port, (port) =>
+  const server = await listen(options.port, (port) =>
     Bun.serve({
       hostname: "127.0.0.1",
       port,
@@ -427,7 +522,14 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
     }),
   );
 
-  const info: ServerInfo = { pid: process.pid, port: server.port ?? 0, token, startedAt };
+  const info: ServerInfo = {
+    pid: process.pid,
+    port: server.port ?? 0,
+    token,
+    startedAt,
+    ui: uiInfo(),
+  };
+  serverInfo = info;
 
   async function stop(reason: string): Promise<void> {
     stopping ??= (async () => {
@@ -453,6 +555,7 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
       }
       removeServerInfo(root, info);
       removeOpenPage(root);
+      await observability.shutdown();
       await server.stop(true);
       log(`stopped (${reason})`);
       resolveClosed(reason);
@@ -479,9 +582,14 @@ export async function startServer(options: ServeOptions): Promise<StartResult> {
     });
   } catch (error) {
     removeServerInfo(root, info);
+    await observability.shutdown();
     await server.stop(true);
     throw error;
   }
+  observability.record("alps.server.start", {
+    "alps.ui.mode": uiInfo().mode,
+    "alps.headless": options.headless === true,
+  });
   schedules = startSchedules({ harness, hold: () => idle.hold(), log });
   idle.start();
   // The token stays out of the log: it is in server.json and in the URL that `serve` prints.

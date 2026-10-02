@@ -72,6 +72,35 @@ const TOKEN_NOTE_EN =
 const TOKEN_NOTE_JA = "# の後ろは合い言葉なので、URL は求めた本人にだけ渡すこと。";
 
 const en = {
+  "error.launchProcess": (a: { process: string }) => `Process ${a.process} is not in this model.`,
+  "error.externalSession": () => "Connect the ALPS MCP server before starting this request.",
+  "error.externalConnected": () =>
+    "This connection or conversation already has active work. Finish it before starting another request.",
+  "error.externalIdentity": () =>
+    "Reconnect the same recorded conversation to continue this attempt.",
+  "error.launchMissing": () => "This saved request could not be found.",
+  "error.launchChanged": () =>
+    "This request has already been saved with different conditions. Start a new request.",
+  "error.launchModel": () => "Choose the model and effort in the application or terminal.",
+  "error.launchProvider": () => "This agent does not support this start method.",
+  "error.desktopUnavailable": () =>
+    "Install the desktop application before using this start method.",
+  "error.terminalUnavailable": () => "Opening a native terminal is currently supported on macOS.",
+  "error.launchClaim": () =>
+    "This request is no longer waiting to start. Check its record before trying again.",
+  "error.launchClient": (a: { agent: string }) => `Start this request from ${a.agent}.`,
+  "error.launchWakeRunning": (a: { run: string }) =>
+    `Orchestration ${a.run} is still running. This request was not started.`,
+  "error.launchFailed": () => "Could not start this request.",
+  "error.launchUser": () => "Start or open this request from the ALPS interface.",
+  "error.resumeRunning": () => "Wait for the current run to end before resuming this conversation.",
+  "error.resumeMissing": () => "No saved conversation id is available for this run.",
+  "error.nativeOpen": () => "The application could not be opened. The saved request is kept.",
+  "error.uiUnavailable": () =>
+    "The WebUI could not be prepared for this harness server. Check the server log and try again.",
+  "done.launch": (a: { run: string }) =>
+    `Started attempt ${a.run} in this conversation. Follow the returned prompt and finish with finish_run.`,
+
   /* ---------- failures of the harness ---------- */
   "error.model": (a: { detail: string }) => a.detail,
   "error.stopping": () => "The harness server is stopping. Call again once it has restarted.",
@@ -159,6 +188,8 @@ const en = {
     `Item ${a.n} cites instance ${a.instance}, which the records do not have.`,
   "error.evidenceEvaluation": (a: { n: number; instance: string }) =>
     `Item ${a.n} cites the evaluation of instance ${a.instance}, which has none.`,
+  "error.evidenceObservation": (a: { n: number; observation: string }) =>
+    `Item ${a.n} cites observation ${a.observation}, which the records do not have.`,
   "error.evidenceLog": (a: { n: number; run: string; event: number; events: number }) =>
     `Item ${a.n} cites event ${a.event} of run ${a.run}, whose log has ${plural(a.events, "event")} (numbered from 1).`,
   "error.evidencePath": (a: { n: number; path: string }) =>
@@ -329,6 +360,32 @@ export type MessageArgs<K extends MessageKey> =
   Parameters<(typeof en)[K]> extends [infer A] ? A : Record<string, never>;
 
 const ja: { [K in MessageKey]: (typeof en)[K] } = {
+  "error.launchProcess": (a) => `プロセス${a.process}はこのモデルにありません。`,
+  "error.externalSession": () => "この依頼を開始するには、ALPSのMCP接続が必要です。",
+  "error.externalConnected": () =>
+    "この接続または会話で作業が進行中です。終了してから次の依頼を開始してください。",
+  "error.externalIdentity": () => "この実行に記録された同じ会話から再接続してください。",
+  "error.launchMissing": () => "保存した依頼が見つかりません。",
+  "error.launchChanged": () => "この依頼は別の条件で保存済みです。新しい依頼として送ってください。",
+  "error.launchModel": () => "モデルとエフォートは、アプリまたはターミナルで設定してください。",
+  "error.launchProvider": () => "このエージェントは、この開始方法に対応していません。",
+  "error.desktopUnavailable": () =>
+    "この開始方法を使うには、デスクトップアプリのインストールが必要です。",
+  "error.terminalUnavailable": () => "ターミナルを開く機能は現在macOSに対応しています。",
+  "error.launchClaim": () => "この依頼は開始待ちではありません。記録を確認してください。",
+  "error.launchClient": (a) => `この依頼は${a.agent}から開始してください。`,
+  "error.launchWakeRunning": (a) =>
+    `オーケストレーション${a.run}が進行中です。この依頼は開始されませんでした。`,
+  "error.launchFailed": () => "この依頼を開始できませんでした。",
+  "error.launchUser": () => "この依頼の開始・表示はALPSの画面から行ってください。",
+  "error.resumeRunning": () => "この会話を再開するには、現在の実行が終わるまで待ってください。",
+  "error.resumeMissing": () => "この実行には、再開できる会話IDが記録されていません。",
+  "error.nativeOpen": () => "アプリを開けませんでした。保存した依頼は保持されています。",
+  "error.uiUnavailable": () =>
+    "このハーネスサーバーのWebUIを準備できませんでした。サーバーログを確認して、もう一度試してください。",
+  "done.launch": (a) =>
+    `この会話で実行${a.run}を開始しました。返された指示に従い、finish_runで報告してください。`,
+
   "error.model": (a) => `プロセスモデルか設定を読めない。${a.detail}`,
   "error.stopping": () =>
     "ハーネスサーバーが停止しているところである。再起動してから呼び直すこと。",
@@ -410,6 +467,7 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
   "error.evidenceInstance": (a) => `項目 ${a.n} が挙げるインスタンス ${a.instance} は記録にない。`,
   "error.evidenceEvaluation": (a) =>
     `項目 ${a.n} はインスタンス ${a.instance} の評価を挙げるが、その評価はない。`,
+  "error.evidenceObservation": (a) => `項目 ${a.n} が挙げる観測 ${a.observation} は記録にない。`,
   "error.evidenceLog": (a) =>
     `項目 ${a.n} は実行 ${a.run} のイベント ${a.event} を挙げるが、そのログのイベントは ${a.events} 件（番号は 1 から）である。`,
   "error.evidencePath": (a) => `項目 ${a.n} が挙げる ${a.path} はワークスペースにない。`,

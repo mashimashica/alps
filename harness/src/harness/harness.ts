@@ -6,6 +6,7 @@
  * src/server/.
  */
 
+import { externalTracking } from "../shared/schema.ts";
 import { withAgentSelection } from "../agents/models.ts";
 import fs from "node:fs";
 import path from "node:path";
@@ -48,6 +49,7 @@ import type {
   FinishRequest,
   InstantiateRequest,
   RecordAssessmentRequest,
+  RecordObservationRequest,
   ReviewRequest,
   RunRequest,
   WakeRequest,
@@ -65,6 +67,7 @@ import type {
   AgentModel,
   AgentModelsResponse,
   AgentSelection,
+  RunExecution,
   Artifact,
   ArtifactType,
   AssessScope,
@@ -88,6 +91,7 @@ import type {
   RunClient,
   RunEvent,
   RunInput,
+  RunObservation,
   RunOutput,
   RunKind,
   RunStatus,
@@ -173,6 +177,11 @@ export interface HarnessDeps {
    * gives the agent it starts.
    */
   mcpServer: { command: string; args: string[] };
+  /** Optional telemetry sink. It must never throw or block a run from continuing. */
+  observe?: (
+    name: string,
+    attributes: Record<string, string | number | boolean>,
+  ) => { traceId: string; spanId: string } | null;
   log(line: string): void;
 }
 
@@ -360,6 +369,82 @@ export class Harness {
   /** Whether each instance's evidence was stale when the WebUI last heard of it. */
   readonly #staleSent = new Map<string, boolean>();
 
+  #observe(
+    run: Run,
+    kind: RunObservation["kind"],
+    message: string,
+    options: {
+      source?: RunObservation["source"];
+      coverage?: RunObservation["coverage"];
+      trace?: RunObservation["trace"];
+      attributes?: Record<string, string | number | boolean>;
+    } = {},
+  ): RunObservation {
+    const observations = run.observations ?? [];
+    const id = `${run.id}:o${observations.length + 1}`;
+    const attributes = {
+      "alps.run": run.id,
+      "alps.run.kind": run.kind,
+      "alps.run.agent": run.agent,
+      "alps.observation": id,
+      ...(run.process ? { "alps.process": run.process } : {}),
+      ...(run.instance ? { "alps.instance": run.instance } : {}),
+      ...(run.execution?.launchId ? { "alps.launch": run.execution.launchId } : {}),
+      ...options.attributes,
+    };
+    let trace: RunObservation["trace"] | undefined = options.trace;
+    try {
+      trace ??= this.#deps.observe?.(`alps.${kind}`, attributes) ?? undefined;
+    } catch (error) {
+      this.#deps.log(`cannot record telemetry for ${run.id}: ${(error as Error).message}`);
+    }
+    const observation: RunObservation = {
+      id,
+      at: Date.now(),
+      source: options.source ?? "alps",
+      kind,
+      coverage: options.coverage ?? "observed",
+      message: message.slice(0, 1000),
+      ...(trace ? { trace } : {}),
+      ...(Object.keys(attributes).length ? { attributes } : {}),
+    };
+    run.observations = [...observations.slice(-199), observation];
+    this.#writeRun(run);
+    return observation;
+  }
+
+  observation(id: string): { run: string } | null {
+    for (const run of this.#records.runs.values())
+      if (run.observations?.some((observation) => observation.id === id)) return { run: run.id };
+    return null;
+  }
+
+  recordObservation(id: string, request: RecordObservationRequest): RunObservation {
+    const run = this.#run(id);
+    return this.#observe(run, request.kind, request.message, {
+      source: request.source,
+      coverage: request.coverage,
+      trace: request.trace,
+      attributes: request.attributes,
+    });
+  }
+
+  observeTool(caller: Caller, operation: string, ok: boolean, status: number): void {
+    if (caller.kind !== "agent") return;
+    const run =
+      (caller.wake ? this.#records.runs.get(caller.wake) : undefined) ??
+      (caller.assess ? this.#records.runs.get(caller.assess) : undefined) ??
+      (caller.session ? this.externalRunFor(caller.session) : undefined);
+    if (!run || run.status !== "running") return;
+    this.#observe(run, "tool.called", `${operation} ${ok ? "succeeded" : "failed"}`, {
+      attributes: {
+        "alps.tool.operation": operation,
+        "alps.tool.ok": ok,
+        "http.response.status_code": status,
+      },
+    });
+  }
+
   /** Reads the records; throws a StateError when state.json cannot be used. Nothing is written yet. */
   constructor(root: string, deps: HarnessDeps) {
     this.root = root;
@@ -383,6 +468,39 @@ export class Harness {
     if (this.#records.changes.convertedV1 !== null)
       this.#deps.log("converted state.json from version 1; the original is kept as state.v1.json");
     persist(this.root, this.#records);
+    for (const run of this.#records.runs.values()) {
+      if (run.status !== "running" || !run.execution || run.execution.method === "cli") continue;
+      let locations: OutputLocation[] = [];
+      let before: OutputSnapshot = new Map();
+      let overlapping = new Set<string>();
+      try {
+        const saved = externalTracking.parse(
+          JSON.parse(fs.readFileSync(this.#trackingFile(run.id), "utf8")),
+        );
+        locations = saved.locations;
+        before = new Map(saved.before);
+        overlapping = new Set(saved.overlapping);
+      } catch (error) {
+        // Never attribute all existing files to a run when its original snapshot is missing.
+        if (run.kind === "process") {
+          run.execution.attributionUnknown = true;
+          this.#writeRun(run);
+        }
+        this.#deps.log(
+          `Output attribution snapshot unavailable for ${run.id}: ${(error as Error).message}`,
+        );
+      }
+      this.#active.set(run.id, {
+        locations,
+        before,
+        overlapping,
+        release: this.#hooks.hold(),
+        timer: null,
+        agent: null,
+        stopping: null,
+        reported: null,
+      });
+    }
   }
 
   /**
@@ -393,6 +511,14 @@ export class Harness {
   close(): Promise<void> {
     this.#closing ??= (async () => {
       const waits: Promise<void>[] = [];
+      for (const [id, active] of this.#active) {
+        const run = this.#records.runs.get(id);
+        if (!run?.execution || run.execution.method === "cli") continue;
+        run.execution.disconnectedAt = Date.now();
+        this.#writeRun(run);
+        active.release();
+        this.#active.delete(id);
+      }
       // Ending a run deletes its entry, which iterating the map allows.
       for (const id of this.#active.keys()) {
         const active = this.#active.get(id);
@@ -427,13 +553,133 @@ export class Harness {
   sessionClosed(session: string): void {
     for (const id of this.#active.keys()) {
       const run = this.#records.runs.get(id);
-      if (run?.client?.session === session)
-        this.#end(run, { status: "interrupted", error: SESSION_CLOSED_ERROR });
+      if (run?.client?.session !== session) continue;
+      if (run.execution && run.execution.method !== "cli") {
+        run.execution.disconnectedAt = Date.now();
+        if (run.execution.session)
+          run.execution.session = {
+            ...run.execution.session,
+            coverage: "disconnected",
+            capturedAt: Date.now(),
+          };
+        this.#observe(run, "run.disconnected", "The MCP connection for this host run closed.", {
+          coverage: "reference-only",
+        });
+        this.#writeRun(run);
+        this.#announce(run);
+      } else this.#end(run, { status: "interrupted", error: SESSION_CLOSED_ERROR });
     }
   }
 
   get #state(): StateFile {
     return this.#records.state;
+  }
+
+  /** Bind one external attempt to an MCP connection; do not infer a host thread from that connection. */
+  bindExternal(id: string, caller: Caller, sessionId?: string): { run: RunView; prompt: string } {
+    const run = this.#run(id);
+    if (
+      caller.kind !== "agent" ||
+      !caller.session ||
+      !run.execution ||
+      run.execution.method === "cli" ||
+      run.status !== "running"
+    )
+      throw refuse("invalid-request", "error.externalSession", {});
+    if (run.client?.session !== caller.session && !run.execution.sessionId)
+      throw refuse("invalid-request", "error.externalIdentity", {});
+    if (run.client?.session !== caller.session && !run.execution.disconnectedAt)
+      throw refuse("already-running", "error.externalConnected", {});
+    const bound = this.externalRunFor(caller.session);
+    if (bound && bound.id !== id) throw refuse("already-running", "error.externalConnected", {});
+    if (
+      run.execution.sessionId &&
+      run.execution.sessionId !== sessionId &&
+      !(run.client?.session === caller.session && !sessionId)
+    )
+      throw refuse("invalid-request", "error.externalIdentity", {});
+    run.client = { ...caller.client, session: caller.session };
+    if (sessionId) {
+      run.execution.sessionId = sessionId;
+      run.execution.session = {
+        id: sessionId,
+        source: run.execution.session?.source ?? "claim",
+        capturedAt: Date.now(),
+        coverage: "reference-only",
+        note: "ALPS has a host conversation id, but no transcript reader is attached.",
+      };
+    }
+    delete run.execution.disconnectedAt;
+    this.#writeRun(run);
+    this.#observe(
+      run,
+      run.execution.session ? "run.reconnected" : "launch.claimed",
+      "The host session claimed this run.",
+      {
+        coverage: sessionId ? "reference-only" : "observed",
+        attributes: {
+          "alps.mcp.session": caller.session,
+          ...(sessionId ? { "alps.host.session": sessionId } : {}),
+        },
+      },
+    );
+    this.#announce(run);
+    return { run: viewOf(run), prompt: run.prompt };
+  }
+
+  #trackingFile(id: string): string {
+    return path.join(this.root, ".alps-harness", "runs", `${id}.tracking.json`);
+  }
+  #persistExternalActive(run: Run): void {
+    if (!run.execution || run.execution.method === "cli") return;
+    const active = this.#active.get(run.id);
+    if (!active) return;
+    const file = this.#trackingFile(run.id);
+    fs.mkdirSync(path.dirname(file), { recursive: true, mode: 0o700 });
+    fs.writeFileSync(
+      `${file}.tmp`,
+      JSON.stringify({
+        locations: active.locations,
+        before: [...active.before],
+        overlapping: [...active.overlapping],
+      }),
+      { mode: 0o600 },
+    );
+    fs.renameSync(`${file}.tmp`, file);
+  }
+  runForLaunch(id: string): Run | undefined {
+    return [...this.#records.runs.values()].find((run) => run.execution?.launchId === id);
+  }
+  runExecution(id: string): RunExecution | undefined {
+    return this.#records.runs.get(id)?.execution;
+  }
+  externalRunFor(session: string): Run | undefined {
+    return [...this.#records.runs.values()].find(
+      (run) =>
+        run.status === "running" &&
+        run.execution &&
+        run.execution.method !== "cli" &&
+        run.client?.session === session,
+    );
+  }
+  activeConversation(sessionId: string): boolean {
+    return [...this.#records.runs.values()].some(
+      (run) => run.status === "running" && run.execution?.sessionId === sessionId,
+    );
+  }
+
+  externalCaller(caller: Caller): Caller {
+    if (caller.kind !== "agent" || !caller.session) return caller;
+    const runs = [...this.#records.runs.values()].filter(
+      (run) =>
+        run.status === "running" &&
+        run.execution?.method !== "cli" &&
+        run.execution &&
+        run.client?.session === caller.session,
+    );
+    const wake = runs.find((run) => run.kind === "wake");
+    const assess = runs.find((run) => run.kind === "assess");
+    return { ...caller, wake: wake?.id ?? caller.wake, assess: assess?.id ?? caller.assess };
   }
 
   /* ---------- model and agents ---------- */
@@ -1053,6 +1299,8 @@ export class Harness {
     instanceId: string,
     request: RunRequest,
     caller: Caller,
+    execution: RunExecution = { method: "cli" },
+    instruction?: string,
   ): Promise<{ run: RunView; prompt?: string }> {
     if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
     this.#refusePlanOnly(caller);
@@ -1070,7 +1318,7 @@ export class Harness {
     let info: AgentInfo | null = null;
     {
       const { spec, specs } = agentSpec(this.#loaded());
-      if (startsProcess(spec)) {
+      if (execution.method === "cli" && startsProcess(spec)) {
         info = await this.#availability(spec, specs);
         if (!info.available)
           throw refuse("agent-unavailable", "error.agentUnavailable", {
@@ -1079,7 +1327,8 @@ export class Harness {
           });
       }
     }
-    await this.#validateSelection(agentSpec(this.#loaded()).spec, request);
+    if (execution.method === "cli")
+      await this.#validateSelection(agentSpec(this.#loaded()).spec, request);
     // From here on nothing waits, so no other request comes between the checks and the record.
     if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
     const instance = this.#instance(instanceId);
@@ -1120,8 +1369,8 @@ export class Harness {
     });
     const now = Date.now();
     const id = this.#nextId("r");
-    const self = spec.format === "self";
-    const prompt = buildPrompt({
+    const self = execution.method !== "cli" || spec.format === "self";
+    const basePrompt = buildPrompt({
       language: loaded.language,
       template: loaded.config.prompt,
       process,
@@ -1133,10 +1382,14 @@ export class Harness {
       notes: instance.notes,
       ...(self ? { finishRun: id } : {}),
     });
-    const args = startsProcess(spec) ? argsFor(spec, prompt) : [];
+    const prompt = instruction
+      ? `${basePrompt}\n\nAdditional request from the person:\n${instruction}`
+      : basePrompt;
+    const args = !self && startsProcess(spec) ? argsFor(spec, prompt) : [];
     const run: Run = {
       id,
       kind: "process",
+      execution,
       instance: instance.id,
       process: process.id,
       agent: spec.id,
@@ -1161,7 +1414,7 @@ export class Harness {
       usage: null,
       report: "",
       events: 0,
-      command: startsProcess(spec) ? commandLine(spec, args, prompt) : null,
+      command: !self && startsProcess(spec) ? commandLine(spec, args, prompt) : null,
       // The session tells who performs the run: it is interrupted when the session closes, and an
       // evaluation through the same session is marked self.
       client:
@@ -1173,6 +1426,14 @@ export class Harness {
           ? { path: skill.path, sha256: this.#digests.of(skill.path) }
           : null,
     };
+    if (run.execution?.sessionId)
+      run.execution.session = {
+        id: run.execution.sessionId,
+        source: run.execution.resumedFrom ? "resume" : "claim",
+        capturedAt: now,
+        coverage: "reference-only",
+        note: "ALPS has a host conversation id, but no transcript reader is attached.",
+      };
     // A concrete location is the only place of the run's outputs of its type; without one, the run
     // decides within the instance's pattern, or else within the type's location patterns.
     const locations: OutputLocation[] = process.outputs.map((type) => {
@@ -1199,11 +1460,18 @@ export class Harness {
       if (this.#records.runs.get(other)?.kind !== "process") continue;
       running.overlapping.add(id);
       active.overlapping.add(other);
+      const related = this.#records.runs.get(other);
+      if (related) this.#persistExternalActive(related);
     }
     this.#active.set(id, active);
+    this.#persistExternalActive(run);
     this.#records.runs.set(id, run);
     this.#state.runs[id] = summaryOf(run);
     instance.runs.push(id);
+    this.#observe(run, "run.started", "The run was recorded and started.", {
+      coverage: run.execution?.method === "cli" ? "observed" : "reference-only",
+      attributes: { "alps.execution.method": run.execution?.method ?? "cli" },
+    });
     writeRun(this.root, run);
     this.#saveState();
     if (caller.kind === "agent" && caller.wake) this.#attach(caller.wake, run);
@@ -1250,6 +1518,29 @@ export class Harness {
             raw.write(line);
             if (run.status !== "running") return;
             const parsed = parseOutputLine(spec.format, line);
+            if (parsed.sessionId) {
+              run.execution = {
+                ...(run.execution ?? { method: "cli" }),
+                sessionId: parsed.sessionId,
+                session: {
+                  id: parsed.sessionId,
+                  source: "agent-output",
+                  capturedAt: Date.now(),
+                  coverage: "reference-only",
+                  note: "The agent reported a host conversation id; transcript contents were not read.",
+                },
+              };
+              this.#observe(
+                run,
+                "run.reconnected",
+                "The agent output identified its host conversation.",
+                {
+                  coverage: "reference-only",
+                  attributes: { "alps.host.session": parsed.sessionId },
+                },
+              );
+              this.#writeRun(run);
+            }
             for (const event of parsed.events) this.#emit(run, event);
             if (parsed.usage) run.usage = parsed.usage;
             // A wake's agent that reported with finish_run keeps that report.
@@ -1460,10 +1751,18 @@ export class Harness {
       this.#state.latestAssessment = run.id;
     const seconds = Math.round((run.endedAt - run.startedAt) / 1000);
     this.#emit(run, { kind: "end", ...spoken("event.end", { status: end.status, seconds }) });
+    this.#observe(run, "run.finished", `The run ended with status ${end.status}.`, {
+      attributes: {
+        "alps.run.status": end.status,
+        "alps.run.duration_ms": run.endedAt - run.startedAt,
+      },
+    });
     this.#state.runs[run.id] = summaryOf(run);
     try {
       writeRun(this.root, run);
       this.#saveState();
+      if (run.execution && run.execution.method !== "cli")
+        fs.rmSync(this.#trackingFile(run.id), { force: true });
     } finally {
       active?.release();
       for (const wake of this.#waiters.get(run.id) ?? []) wake();
@@ -1530,7 +1829,12 @@ export class Harness {
    */
   finishRun(id: string, request: FinishRequest): { run: RunView; outputs: RunOutput[] } {
     const run = this.#run(id);
-    if (run.agent !== "self" && run.kind === "process")
+    if (
+      run.agent !== "self" &&
+      run.execution?.method !== "desktop" &&
+      run.execution?.method !== "terminal" &&
+      run.kind === "process"
+    )
       throw refuse("invalid-request", "error.notSelf", { run: id, agent: run.agent });
     if (run.status !== "running")
       throw refuse("invalid-request", "error.ended", { run: id, status: run.status });
@@ -1731,6 +2035,7 @@ export class Harness {
   async wake(
     request: WakeRequest,
     trigger: WakeTrigger,
+    execution: RunExecution = { method: "cli" },
   ): Promise<{ run: RunView; skipped: false } | { skipped: true; running: string }> {
     if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
     this.#refusePlanOnly(trigger.kind === "request" ? trigger.caller : null);
@@ -1758,13 +2063,14 @@ export class Harness {
       return { spec, specs };
     };
     const checked = agentSpec(this.#loaded());
-    const info = await this.#availability(checked.spec, checked.specs);
-    if (!info.available)
+    const info =
+      execution.method === "cli" ? await this.#availability(checked.spec, checked.specs) : null;
+    if (info && !info.available)
       throw refuse("agent-unavailable", "error.agentUnavailable", {
         agent: checked.spec.label,
         reason: info.reason ?? "it is not available",
       });
-    await this.#validateSelection(checked.spec, request);
+    if (execution.method === "cli") await this.#validateSelection(checked.spec, request);
     const agents = await this.#checkAgents(checked.specs);
     // From here on nothing waits, so no other wake comes between the checks and the record.
     if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
@@ -1791,6 +2097,7 @@ export class Harness {
     const run: Run = {
       id,
       kind: "wake",
+      execution,
       instance: null,
       process: null,
       agent: spec.id,
@@ -1815,8 +2122,11 @@ export class Harness {
       usage: null,
       report: "",
       events: 0,
-      command: commandLine(spec, args, prompt),
-      client: null,
+      command: execution.method === "cli" ? commandLine(spec, args, prompt) : null,
+      client:
+        execution.method !== "cli" && trigger.kind === "request" && trigger.caller.kind === "agent"
+          ? { ...trigger.caller.client, session: trigger.caller.session }
+          : null,
       prompt,
       git: this.#deps.gitInfo(this.root),
       skill: null,
@@ -1834,12 +2144,19 @@ export class Harness {
       reported: null,
     };
     this.#active.set(id, active);
+    this.#persistExternalActive(run);
     this.#records.runs.set(id, run);
     this.#state.runs[id] = summaryOf(run);
     this.#state.lastWakeAt = now;
     writeRun(this.root, run);
     this.#saveState();
     this.#emit(run, { kind: "system", ...spoken("event.woken", wokenBy(trigger)) });
+    if (execution.method !== "cli") {
+      this.#emit(run, { kind: "system", ...spoken("event.self", {}) });
+      this.#writeRun(run);
+      this.#announce(run);
+      return { run: viewOf(run), skipped: false };
+    }
     if (spec.format === "claude")
       try {
         fs.writeFileSync(configFile, mcpConfigFile(server));
@@ -2108,7 +2425,11 @@ export class Harness {
    * a time. The harness reads nothing for the agent and interprets nothing: the scope and the
    * point of view go into the prompt and the record as given.
    */
-  async assess(request: AssessRequest, caller: Caller): Promise<{ run: RunView; prompt?: string }> {
+  async assess(
+    request: AssessRequest,
+    caller: Caller,
+    execution: RunExecution = { method: "cli" },
+  ): Promise<{ run: RunView; prompt?: string }> {
     if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
     this.#refusePlanOnly(caller);
     this.#refuseAssessing(caller);
@@ -2140,7 +2461,7 @@ export class Harness {
     let info: AgentInfo | null = null;
     {
       const { spec, specs } = agentSpec(this.#loaded());
-      if (startsProcess(spec)) {
+      if (execution.method === "cli" && startsProcess(spec)) {
         info = await this.#availability(spec, specs);
         if (!info.available)
           throw refuse("agent-unavailable", "error.agentUnavailable", {
@@ -2149,14 +2470,15 @@ export class Harness {
           });
       }
     }
-    await this.#validateSelection(agentSpec(this.#loaded()).spec, request);
+    if (execution.method === "cli")
+      await this.#validateSelection(agentSpec(this.#loaded()).spec, request);
     // From here on nothing waits, so no other assessment comes between the checks and the record.
     if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
     const other = this.#runningAssessment();
     if (other) throw refuse("already-running", "error.assessing", { run: other.id });
     const { loaded, description } = this.#describe();
     const spec = withAgentSelection(agentSpec(loaded).spec, request);
-    const self = spec.format === "self";
+    const self = execution.method !== "cli" || spec.format === "self";
     const now = Date.now();
     const id = this.#nextId("r");
     const prompt = buildAssessPrompt({
@@ -2187,6 +2509,7 @@ export class Harness {
     const run: Run = {
       id,
       kind: "assess",
+      execution,
       instance: null,
       process: null,
       agent: spec.id,
@@ -2231,6 +2554,7 @@ export class Harness {
       reported: null,
     };
     this.#active.set(id, active);
+    this.#persistExternalActive(run);
     this.#records.runs.set(id, run);
     this.#state.runs[id] = summaryOf(run);
     writeRun(this.root, run);
@@ -2325,6 +2649,7 @@ export class Harness {
     const items = checkedItems(drafts, {
       run: (id) =>
         this.#state.runs[id] ? { events: this.#records.runs.get(id)?.events ?? null } : null,
+      observation: (id) => this.observation(id),
       instance: (id) => {
         const instance = this.#state.instances[id];
         return instance

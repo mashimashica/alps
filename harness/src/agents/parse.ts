@@ -15,6 +15,7 @@ export interface ParsedLine {
   usage?: Usage;
   report?: string;
   agentError?: string;
+  sessionId?: string;
 }
 
 type Json = Record<string, unknown>;
@@ -110,7 +111,10 @@ function parseClaude(line: Json): ParsedLine {
       );
       if (servers.length)
         events.push({ kind: "system", text: `MCP servers: ${servers.join(", ")}` });
-      return { events };
+      return {
+        events,
+        ...(typeof line.session_id === "string" ? { sessionId: line.session_id } : {}),
+      };
     }
     case "rate_limit_event": {
       const info = isJson(line.rate_limit_info) ? line.rate_limit_info : {};
@@ -253,7 +257,10 @@ function codexMessage(value: unknown): string {
 function parseCodex(line: Json): ParsedLine {
   switch (line.type) {
     case "thread.started":
-      return { events: [{ kind: "system", text: "Thread started" }] };
+      return {
+        events: [{ kind: "system", text: "Thread started" }],
+        ...(typeof line.thread_id === "string" ? { sessionId: line.thread_id } : {}),
+      };
     case "turn.completed": {
       if (!isJson(line.usage)) return { events: [] };
       // Codex's input tokens include those read from the prompt cache.

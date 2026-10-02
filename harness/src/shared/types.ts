@@ -1,3 +1,5 @@
+import type { RuntimeContract } from "./contract.ts";
+
 /*
  * The shapes of the harness's records and views, shared by the server, the MCP
  * server, and the UI. Record shapes are defined here and nowhere else.
@@ -246,6 +248,29 @@ export interface RunOutput {
   sharedWith?: string[];
 }
 
+/** Bounded operational provenance that is safe for assessment and telemetry metadata. */
+export interface RunObservation {
+  id: string;
+  at: number;
+  source: "alps" | "otel" | "host";
+  kind:
+    | "launch.submitted"
+    | "launch.claimed"
+    | "run.started"
+    | "run.finished"
+    | "run.disconnected"
+    | "run.reconnected"
+    | "tool.called"
+    | "telemetry.export";
+  coverage: "observed" | "reference-only" | "unavailable" | "unverified";
+  message: string;
+  trace?: {
+    traceId: string;
+    spanId: string;
+  };
+  attributes?: Record<string, string | number | boolean>;
+}
+
 /**
  * What an agent's output says it used; `null` where it says nothing (Codex reports no cost or
  * turns). Tokens are counted alike for every agent: the input tokens include those written to and
@@ -280,10 +305,126 @@ export interface RunClient extends ClientInfo {
   session: string | null;
 }
 
+/** How an attempt was launched; a host conversation is separate from an MCP connection. */
+export interface RunExecution {
+  method: "cli" | "desktop" | "terminal";
+  launchId?: string;
+  sessionId?: string;
+  session?: {
+    id: string;
+    source: "claim" | "agent-output" | "resume";
+    capturedAt: number;
+    coverage: "connected" | "reference-only" | "disconnected" | "unverified";
+    note?: string;
+  };
+  resumedFrom?: string;
+  disconnectedAt?: number;
+  attributionUnknown?: boolean;
+}
+
+export type LaunchMethod = RunExecution["method"];
+export interface LaunchRequest extends AgentSelection {
+  id: string;
+  kind: RunKind;
+  agent: string;
+  method: LaunchMethod;
+  instance?: string;
+  request?: string;
+  attachments?: string[];
+  processes?: string[];
+  runs?: WakeRuns;
+  scope?: AssessScope;
+  resumedFrom?: string;
+  replacesLaunch?: string;
+}
+
+/** A delivery intent. A pending intent is not a running attempt. */
+export interface LaunchRecord {
+  id: string;
+  createdAt: number;
+  status: "pending" | "starting" | "started" | "canceled" | "failed";
+  request: LaunchRequest;
+  runId: string | null;
+  error: ErrorInfo | null;
+}
+export interface LaunchResponse {
+  ok: true;
+  launch: LaunchRecord;
+  run?: RunView;
+  prompt?: string;
+}
+export interface LaunchesResponse {
+  ok: true;
+  launches: LaunchRecord[];
+}
+export interface ExecutionMcpServer {
+  name: string;
+  command: string;
+  args: string[];
+  env: Record<string, string>;
+}
+export interface ExecutionMcpConfig {
+  path: string;
+  exists: boolean;
+  status: "missing" | "usable" | "plugin-template" | "unusable";
+  reason: string | null;
+  recommended: string;
+}
+export interface ExecutionSavedMcpConfig extends ExecutionMcpConfig {
+  changed: boolean;
+  backup: string | null;
+}
+export interface ExecutionMcpConfigSave {
+  ok: true;
+  server: ExecutionMcpServer;
+  claude: ExecutionSavedMcpConfig;
+  codex: ExecutionSavedMcpConfig;
+}
+export interface ExecutionMcpProbe {
+  ok: boolean;
+  initialized: boolean;
+  toolsListed: boolean;
+  claimTool: boolean;
+  toolCount: number;
+  error: string | null;
+}
+export interface ExecutionDesktopStatus {
+  supported: boolean;
+  installed: boolean;
+  scheme: "claude" | "codex" | null;
+  canOpen: boolean;
+  canStartFromAlps: boolean;
+  reason: string | null;
+}
+export interface ExecutionAgentCapability {
+  id: string;
+  provider: "claude" | "codex" | null;
+  desktop: boolean;
+  cli: { available: boolean; version: string | null; reason: string | null };
+  desktopStatus: ExecutionDesktopStatus;
+  mcp: { supported: boolean; claimTool: boolean; reason: string | null };
+}
+export interface ExecutionCapabilities {
+  ok: true;
+  workspace: string;
+  terminal: boolean;
+  runtime: { command: string; args: string[] };
+  mcp: {
+    server: ExecutionMcpServer;
+    claudeProjectConfig: ExecutionMcpConfig;
+    codexProjectConfig: ExecutionMcpConfig;
+    probe: ExecutionMcpProbe;
+    claim: { tool: "claim_launch"; available: boolean; requiresPendingLaunch: true };
+  };
+  agents: ExecutionAgentCapability[];
+}
+
 /** One attempt by an agent (`.alps-harness/runs/<id>.json`, prompt included). */
 export interface Run {
   id: string;
   kind: RunKind;
+  /** Absent in older records. */
+  execution?: RunExecution;
   /** `null` for wake runs. */
   instance: string | null;
   process: string | null;
@@ -309,6 +450,8 @@ export interface Run {
   targets: RunTarget[];
   /** The Artifacts that the run created or modified, found by comparing the output locations before and after it. */
   outputs: RunOutput[];
+  /** Bounded operational observations. Prompts, tokens, and transcript bodies are not stored here. */
+  observations?: RunObservation[];
   usage: Usage | null;
   /** The agent's final report. */
   report: string;
@@ -493,6 +636,14 @@ export interface ServerInfo {
   port: number;
   token: string;
   startedAt: number;
+  /** Absent in older daemons, which served the reference UI when healthy. */
+  ui?: ServerUiInfo;
+}
+
+export interface ServerUiInfo {
+  available: boolean;
+  mode: "reference" | "custom" | "none";
+  entry?: string;
 }
 
 /** `GET /api/health`. */
@@ -505,6 +656,13 @@ export interface HealthInfo {
   startedAt: number;
   workspace: string;
   development: boolean;
+  ui: ServerUiInfo;
+  contract: RuntimeContract;
+  observability: {
+    enabled: boolean;
+    exporter: "otlp-http" | "none";
+    endpoint: string | null;
+  };
 }
 
 /** Messages on `GET /api/session`, the connection that an MCP server holds while its client is connected. */
@@ -635,6 +793,12 @@ export interface RunDetailResponse {
   truncated: boolean;
 }
 
+/** `POST /api/runs/:id/observations`: bounded host or collector observations for this run. */
+export interface ObservationResponse {
+  ok: true;
+  observation: RunObservation;
+}
+
 /** `POST /api/runs/:id/cancel` (`cancel_run`). It answers once the run has ended. */
 export interface CancelResponse {
   ok: true;
@@ -729,7 +893,7 @@ export interface SkillResponse {
 }
 
 /** The screens of the WebUI that `open_ui` can open. */
-export type UiView = "network" | "dashboard" | "instances";
+export type UiView = "network" | "dashboard" | "instances" | "activity";
 
 /** `POST /api/open` (`open_ui`). */
 export interface OpenResponse {
@@ -738,6 +902,12 @@ export interface OpenResponse {
   url: string;
   /** Whether the server opened it in a browser. */
   opened: boolean;
+}
+
+/** `POST /api/ui` (a trusted local product shell): the UI now served by this runtime. */
+export interface InstallUiResponse {
+  ok: true;
+  ui: ServerUiInfo;
 }
 
 /* ---------- dashboard and assessment ---------- */
@@ -941,6 +1111,8 @@ export type Evidence =
   | { instance: string }
   /** The evaluation of an instance, and the evaluations it replaced. */
   | { evaluation: string }
+  /** An operational observation recorded on a run. */
+  | { observation: string }
   /** A number of the statistics (`metric`, as the dashboard names it) for a cut. */
   | { stat: { filter: StatCut; metric: string } }
   /** One event of a run's log, by its number. */

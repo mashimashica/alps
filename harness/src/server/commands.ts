@@ -16,6 +16,7 @@ import type {
   AssessmentMarkdownResponse,
   AssessmentResponse,
   Failure,
+  OpenResponse,
   ServerInfo,
   WakeResponse,
 } from "../shared/types.ts";
@@ -36,6 +37,8 @@ export interface ServeArgs {
   daemon: boolean;
   port: number | null;
   dev: boolean;
+  headless: boolean;
+  uiEntry: string | null;
   /** Open the WebUI in a browser once the server answers. */
   open: boolean;
 }
@@ -74,6 +77,28 @@ async function openOrReport(root: string, info: ServerInfo): Promise<void> {
   if (!opened) err("Could not open a browser. Open the URL above.");
 }
 
+/** Asks a running daemon to prepare and optionally open its WebUI. */
+async function openThroughApi(info: ServerInfo, open: boolean): Promise<OpenResponse | null> {
+  try {
+    const response = await fetch(new URL("api/open", serverUrl(info)), {
+      method: "POST",
+      headers: {
+        "X-Harness-Token": info.token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ open }),
+    });
+    const body = (await response.json()) as OpenResponse | Failure;
+    if ("ok" in body && body.ok) return body;
+    if ("error" in body) err(body.error.message);
+    else err(`The harness server answered ${response.status} without a result.`);
+    return null;
+  } catch (error) {
+    err(`Could not ask the harness server to open its WebUI: ${(error as Error).message}`);
+    return null;
+  }
+}
+
 /** Prints the WebUI's URL, which carries the token in its fragment, and opens it when asked. */
 async function announce(
   root: string,
@@ -81,6 +106,18 @@ async function announce(
   info: ServerInfo,
   open: boolean,
 ): Promise<void> {
+  if (info.ui?.available === false) {
+    if (open) {
+      const opened = await openThroughApi(info, true);
+      if (opened) {
+        out(`${label}  ${opened.url}  (pid ${info.pid})`);
+        if (!opened.opened) err("Could not open a browser. Open the URL above.");
+        return;
+      }
+    }
+    out(`${label}  ${serverUrl(info)}  (pid ${info.pid}, no WebUI)`);
+    return;
+  }
   out(`${label}  ${uiUrl(info)}  (pid ${info.pid})`);
   if (open) await openOrReport(root, info);
 }
@@ -94,6 +131,8 @@ export async function serve(args: ServeArgs, version: string): Promise<number> {
     const forwarded = [
       ...(args.port === null ? [] : ["--port", String(args.port)]),
       ...(args.dev ? ["--dev"] : []),
+      ...(args.headless ? ["--headless"] : []),
+      ...(args.uiEntry ? ["--ui", args.uiEntry] : []),
     ];
     try {
       const { info, reused } = await startDaemon(root, forwarded);
@@ -122,9 +161,11 @@ export async function serve(args: ServeArgs, version: string): Promise<number> {
       port: args.port ?? settings.port,
       idleMinutes: settings.idleMinutes,
       development: args.dev,
+      headless: args.headless,
+      ...(args.uiEntry ? { uiEntry: args.uiEntry } : {}),
       version,
       log,
-      openHarness: () =>
+      openHarness: (observability) =>
         new Harness(root, {
           parseYaml,
           gitInfo,
@@ -132,6 +173,7 @@ export async function serve(args: ServeArgs, version: string): Promise<number> {
           readAgentModels,
           startAgent,
           mcpServer: { command: process.execPath, args: [CLI_PATH, "mcp"] },
+          observe: (name, attributes) => observability.record(name, attributes),
           log,
         }),
     });
@@ -147,9 +189,20 @@ export async function serve(args: ServeArgs, version: string): Promise<number> {
     return 0;
   }
   const { server } = result;
-  out(`ALPS harness  ${uiUrl(server.info)}`);
+  let openedOnStart: OpenResponse | null = null;
+  if (args.open && server.info.ui?.available === false)
+    openedOnStart = await openThroughApi(server.info, true);
+  out(
+    openedOnStart
+      ? `ALPS harness  ${openedOnStart.url}`
+      : server.info.ui?.available === false
+        ? `ALPS harness  ${serverUrl(server.info)}  (no WebUI)`
+        : `ALPS harness  ${uiUrl(server.info)}`,
+  );
   out(`Workspace     ${root}`);
-  if (args.open) await openOrReport(root, server.info);
+  if (args.open && server.info.ui?.available !== false) await openOrReport(root, server.info);
+  else if (openedOnStart && !openedOnStart.opened)
+    err("Could not open a browser. Open the URL above.");
   const onSignal = (signal: NodeJS.Signals): void => void server.stop(signal);
   process.once("SIGINT", onSignal);
   process.once("SIGTERM", onSignal);

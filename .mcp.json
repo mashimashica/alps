@@ -2,8 +2,11 @@
   "mcpServers": {
     "harness": {
       "type": "stdio",
-      "command": "bun",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/harness/src/cli.ts", "mcp"],
+      "command": "sh",
+      "args": [
+        "-lc",
+        "root=\"$CLAUDE_PLUGIN_ROOT\"; if [ -z \"$root\" ] || [ ! -f \"$root/harness/src/cli.ts\" ]; then root=\"$CLAUDE_PROJECT_DIR\"; fi; if [ -z \"$root\" ] || [ ! -f \"$root/harness/src/cli.ts\" ]; then root=\"$PWD\"; fi; exec bun \"$root/harness/src/cli.ts\" mcp"
+      ],
       "env": {
         "ALPS_WORKSPACE": "${CLAUDE_PROJECT_DIR}"
       }

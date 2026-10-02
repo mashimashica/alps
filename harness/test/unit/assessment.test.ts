@@ -128,6 +128,7 @@ describe("checkedItems", () => {
   /** A run r1 with 5 events, a run r2 whose record cannot be read, i1 evaluated, i2 not. */
   const records: EvidenceRecords = {
     run: (id) => (id === "r1" ? { events: 5 } : id === "r2" ? { events: null } : null),
+    observation: (id) => (id === "r1:o1" ? { run: "r1" } : null),
     instance: (id) =>
       id === "i1" ? { evaluated: true } : id === "i2" ? { evaluated: false } : null,
     path: (given, where) => {

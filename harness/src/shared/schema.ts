@@ -14,6 +14,7 @@ import type {
   Instance,
   Judge,
   Run,
+  RunObservation,
   RunOutput,
   RunSummary,
   RunTarget,
@@ -193,6 +194,32 @@ const runOutput: z.ZodType<RunOutput> = z.object({
   // Records written before the harness told concurrent runs apart have none.
   sharedWith: z.array(z.string()).optional(),
 });
+const observationKind = z.enum([
+  "launch.submitted",
+  "launch.claimed",
+  "run.started",
+  "run.finished",
+  "run.disconnected",
+  "run.reconnected",
+  "tool.called",
+  "telemetry.export",
+]);
+const observationCoverage = z.enum(["observed", "reference-only", "unavailable", "unverified"]);
+const observationAttributes = z
+  .record(z.string(), z.union([z.string(), z.number(), z.boolean()]))
+  .refine((value) => Object.keys(value).length <= 20, {
+    message: "at most 20 attributes",
+  });
+const runObservation: z.ZodType<RunObservation> = z.object({
+  id: z.string().min(1),
+  at: epochMs,
+  source: z.enum(["alps", "otel", "host"]),
+  kind: observationKind,
+  coverage: observationCoverage,
+  message: z.string().max(1000),
+  trace: z.object({ traceId: z.string(), spanId: z.string() }).optional(),
+  attributes: observationAttributes.optional(),
+});
 const gitInfo = z.object({ head: z.string(), dirty: z.boolean() }).nullable();
 const skillUsed = z.object({ path: z.string(), sha256: z.string().nullable() }).nullable();
 
@@ -287,6 +314,7 @@ export const runRecordSchema: z.ZodType<Run, unknown> = z.object({
   ),
   targets: z.array(runTarget),
   outputs: z.array(runOutput),
+  observations: z.array(runObservation).optional(),
   usage: usage.nullable(),
   report: z.string(),
   events: z.int().min(0),
@@ -300,6 +328,25 @@ export const runRecordSchema: z.ZodType<Run, unknown> = z.object({
     })
     .nullable(),
   prompt: z.string(),
+  execution: z
+    .object({
+      method: z.enum(["cli", "desktop", "terminal"]),
+      launchId: z.string().optional(),
+      sessionId: z.string().min(1).max(500).optional(),
+      session: z
+        .object({
+          id: z.string().min(1).max(500),
+          source: z.enum(["claim", "agent-output", "resume"]),
+          capturedAt: epochMs,
+          coverage: z.enum(["connected", "reference-only", "disconnected", "unverified"]),
+          note: z.string().max(1000).optional(),
+        })
+        .optional(),
+      resumedFrom: z.string().optional(),
+      disconnectedAt: epochMs.optional(),
+      attributionUnknown: z.boolean().optional(),
+    })
+    .optional(),
   git: gitInfo,
   skill: skillUsed,
   started: z.array(z.string()).optional(),
@@ -324,6 +371,7 @@ const evidence: z.ZodType<Evidence> = z.union([
   z.strictObject({ run: z.string().min(1) }),
   z.strictObject({ instance: z.string().min(1) }),
   z.strictObject({ evaluation: z.string().min(1) }),
+  z.strictObject({ observation: z.string().min(1) }),
   z.strictObject({ stat: z.strictObject({ filter: statCut, metric: z.string().min(1) }) }),
   z.strictObject({ log: z.strictObject({ run: z.string().min(1), n: z.int().min(1) }) }),
   z.strictObject({ path: z.string().min(1) }),
@@ -616,9 +664,14 @@ export type ReviewRequest = z.output<typeof reviewRequest>;
 
 /** `POST /api/open` (`open_ui`). */
 export const openRequest = z.strictObject({
-  view: z.enum(["network", "dashboard", "instances"]).optional(),
+  view: z.enum(["network", "dashboard", "instances", "activity"]).optional(),
   /** Open the WebUI in a browser on the machine that runs the harness server. */
   open: z.boolean().default(false),
+});
+
+/** `POST /api/ui` (trusted local product shell): attach a UI bundle to an existing daemon. */
+export const installUiRequest = z.strictObject({
+  entry: z.string().min(1).max(2000),
 });
 
 /** `POST /api/runs/:id/finish` (`finish_run`). */
@@ -724,3 +777,95 @@ export function formatIssues(file: string, error: z.ZodError): string {
     )
     .join("\n");
 }
+
+/** A person's delivery intent, identified before submitting so retries cannot duplicate work. */
+export const launchRequest = z
+  .strictObject({
+    id: z.string().uuid(),
+    kind: z.enum(["process", "wake", "assess"]),
+    agent: z.string().min(1),
+    method: z.enum(["cli", "desktop", "terminal"]),
+    instance: z.string().min(1).optional(),
+    request: z.string().max(20000).optional(),
+    attachments: z.array(z.string()).max(10).optional(),
+    processes: z.array(z.string()).optional(),
+    runs: z.enum(["run", "plan"]).optional(),
+    scope: assessScope.optional(),
+    model: z.string().min(1).optional(),
+    effort: z.string().min(1).optional(),
+    resumedFrom: z
+      .string()
+      .regex(/^r\d+$/)
+      .optional(),
+    replacesLaunch: z.string().uuid().optional(),
+  })
+  .superRefine((value, ctx) => {
+    if (value.kind === "wake" && !value.request?.trim())
+      ctx.addIssue({ code: "custom", path: ["request"], message: "write the request" });
+    if (value.kind !== "wake" && (value.processes || value.attachments || value.runs))
+      ctx.addIssue({
+        code: "custom",
+        path: ["kind"],
+        message: "processes, attachments and planning scope are for orchestration",
+      });
+    if (value.kind !== "assess" && value.scope)
+      ctx.addIssue({
+        code: "custom",
+        path: ["scope"],
+        message: "analysis scope is for assessments",
+      });
+    if (value.kind !== "process" && value.instance)
+      ctx.addIssue({
+        code: "custom",
+        path: ["instance"],
+        message: "only process runs have an instance",
+      });
+    if (value.resumedFrom && value.method !== "terminal")
+      ctx.addIssue({
+        code: "custom",
+        path: ["resumedFrom"],
+        message: "resume through the terminal",
+      });
+    if (value.kind === "process" && !value.instance)
+      ctx.addIssue({ code: "custom", path: ["instance"], message: "name the instance" });
+    if (value.method !== "cli" && (value.model || value.effort))
+      ctx.addIssue({
+        code: "custom",
+        path: ["method"],
+        message: "set model and effort in the application or terminal",
+      });
+    if (value.method === "terminal" && !value.resumedFrom)
+      ctx.addIssue({
+        code: "custom",
+        path: ["resumedFrom"],
+        message: "name the conversation to resume",
+      });
+  });
+export const claimLaunchRequest = z.strictObject({
+  sessionId: z.string().min(1).max(500).optional(),
+});
+export const recordObservationRequest = z.strictObject({
+  source: z.enum(["otel", "host"]).default("host"),
+  kind: observationKind.default("telemetry.export"),
+  coverage: observationCoverage.default("reference-only"),
+  message: z.string().trim().min(1).max(1000),
+  trace: z
+    .strictObject({
+      traceId: z.string().min(1).max(64),
+      spanId: z.string().min(1).max(32),
+    })
+    .optional(),
+  attributes: observationAttributes.optional(),
+});
+export type RecordObservationRequest = z.output<typeof recordObservationRequest>;
+
+/** Private snapshot required to attribute an externally performed run after server restart. */
+export const externalTracking = z.strictObject({
+  locations: z.array(
+    z.strictObject({ type: z.string(), patterns: z.array(z.string()), paths: z.array(z.string()) }),
+  ),
+  before: z.array(
+    z.tuple([z.string(), z.strictObject({ type: z.string(), signature: z.string() })]),
+  ),
+  overlapping: z.array(z.string().regex(/^r\d+$/)),
+});

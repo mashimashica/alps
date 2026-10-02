@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 HOST_ADAPTERS = {".claude-plugin", ".codex-plugin"}
 CLI = "harness/src/cli.ts"
 # Each registration of the harness's MCP server and the variable its Host puts the Plugin root in.
-REGISTRATIONS = {".mcp.json": "${CLAUDE_PLUGIN_ROOT}", "mcp.json": "${PLUGIN_ROOT}"}
+REGISTRATIONS = {"mcp.json": "${PLUGIN_ROOT}"}
 FRONTMATTER = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
 
 
@@ -46,6 +46,20 @@ class PluginComponentTests(unittest.TestCase):
                 self.assertEqual(server["args"], [f"{root}/{CLI}", "mcp"])
                 # No cwd: the harness finds the workspace from ALPS_WORKSPACE or its working directory.
                 self.assertNotIn("cwd", server)
+        with self.subTest(registration=".mcp.json"):
+            servers = load(".mcp.json")["mcpServers"]
+            self.assertEqual(set(servers), {"harness"})
+            server = servers["harness"]
+            self.assertEqual(server["type"], "stdio")
+            self.assertEqual(server["command"], "sh")
+            self.assertEqual(server["args"][0], "-lc")
+            command = server["args"][1]
+            self.assertIn("$CLAUDE_PLUGIN_ROOT", command)
+            self.assertIn("$CLAUDE_PROJECT_DIR", command)
+            self.assertIn("$PWD", command)
+            self.assertIn(f"/{CLI}", command)
+            self.assertIn("exec bun", command)
+            self.assertNotIn("cwd", server)
         with self.subTest(registration=".mcp.json", key="env"):
             self.assertEqual(
                 load(".mcp.json")["mcpServers"]["harness"].get("env"),

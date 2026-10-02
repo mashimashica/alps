@@ -77,6 +77,7 @@ const EVIDENCE_ICON: Record<string, IconName> = {
   run: "activity",
   instance: "layers",
   evaluation: "target",
+  observation: "info",
   stat: "dashboard",
   log: "terminal",
   path: "file",
@@ -183,6 +184,13 @@ function evidenceView(
       open: target ? () => select(target) : null,
     };
   }
+  if ("observation" in evidence)
+    return {
+      kind: "observation",
+      label: t("evidence.observation", { id: evidence.observation }),
+      title: t("evidence.observation", { id: evidence.observation }),
+      open: null,
+    };
   const { filter, metric } = evidence.stat;
   const process = processOf(model, filter.process);
   const parts = [
