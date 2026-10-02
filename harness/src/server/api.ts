@@ -66,6 +66,7 @@ import {
   installUiRequest,
   instancesQuery,
   openRequest,
+  recordObservationRequest,
   recordAssessmentRequest,
   reviewRequest,
   runQuery,
@@ -98,6 +99,7 @@ import type {
   InstancesResponse,
   InstallUiResponse,
   ModelResponse,
+  ObservationResponse,
   OpenResponse,
   ExecutionMcpConfigSave,
   RunDetailResponse,
@@ -476,6 +478,21 @@ function routes(harness: Harness, host: ApiHost, launches: Launches): Route[] {
           ...(await harness.getRun(run, options, request.signal)),
         } satisfies RunDetailResponse);
       },
+    },
+    {
+      method: "POST",
+      pattern: new RegExp(`^/api/runs/${id}/observations$`),
+      handle: async ({ request, id: run }) =>
+        ok(
+          {
+            ok: true,
+            observation: harness.recordObservation(
+              run,
+              parse(recordObservationRequest, await body(request)),
+            ),
+          } satisfies ObservationResponse,
+          201,
+        ),
     },
     {
       method: "POST",
