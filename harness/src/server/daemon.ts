@@ -61,7 +61,7 @@ function logSince(file: string, offset: number): string {
 export async function startDaemon(
   root: string,
   serveArgs: string[],
-  timeoutMs = 20_000,
+  timeoutMs = 60_000,
 ): Promise<{ info: ServerInfo; reused: boolean }> {
   const running = await liveServer(root);
   if (running) return { info: running.info, reused: true };
