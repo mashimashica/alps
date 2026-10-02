@@ -100,6 +100,8 @@ bun harness/src/cli.ts serve examples/service-change --open
 
 ワークスペースは、与えられたディレクトリ（Pluginからはプロジェクトのディレクトリ、または`ALPS_WORKSPACE`）から上へたどって、最初に`alps-harness.yaml`か`process-model.yaml`があるディレクトリです。
 
+初期設定を行うクライアントは、`harness/src/model/index.ts`の`createWorkspace()`から空のワークスペースを作成できます。`draft: true`と空の`processes`・`artifacts`を持つモデル、およびモデルのパスと言語を指定した設定を書き込みます。サンプルのプロセス、成果、実行記録は作成しません。空のモデルには明示的な下書きフラグが必要で、通常のモデルには引き続き一つ以上のプロセスが必要です。既存のモデル、設定、ハーネス記録のファイルは上書きしません。
+
 | ファイル | 内容 |
 | --- | --- |
 | `process-model.yaml` | 仕事の意味。プロセスとその目的と成果、プロセスが読み書きするアーティファクトの型。 |

@@ -100,6 +100,8 @@ bun harness/src/cli.ts serve examples/service-change --open
 
 The workspace is the nearest directory, from the given one (the project directory from the Plugin, or `ALPS_WORKSPACE`) upward, that has `alps-harness.yaml` or `process-model.yaml`.
 
+An onboarding client can create an empty workspace through `createWorkspace()` in `harness/src/model/index.ts`. It writes a model with `draft: true`, empty `processes` and `artifacts`, and a configuration with the model path and language. No sample Processes, Outcomes, or run records are created. Empty models require the explicit draft flag; ordinary models still need at least one Process. Existing model, configuration, and harness-record files are never overwritten.
+
 | File | Content |
 | --- | --- |
 | `process-model.yaml` | The meaning of the work: the Processes with their Purposes and Outcomes, and the Artifact types they read and produce. |

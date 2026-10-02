@@ -1,4 +1,5 @@
 export { describeModel } from "./describe.ts";
+export { createWorkspace, type CreateWorkspaceOptions } from "./create.ts";
 export {
   CONFIG_FILES,
   HARNESS_DIR,

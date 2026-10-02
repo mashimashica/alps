@@ -86,15 +86,25 @@ const artifactEntry = z.preprocess(
 );
 
 /** process-model.yaml: the meaning of the work. Its format is shared with the ALPS process model viewer. */
-export const processModelFileSchema = z.looseObject({
-  name: text.optional(),
-  description: text.optional(),
-  processes: z.array(processEntry).min(1, { error: "list at least one process under processes" }),
-  artifacts: z
-    .array(artifactEntry)
-    .nullish()
-    .transform((value) => value ?? []),
-});
+export const processModelFileSchema = z
+  .looseObject({
+    name: text.optional(),
+    description: text.optional(),
+    draft: z.boolean().optional(),
+    processes: z.array(processEntry),
+    artifacts: z
+      .array(artifactEntry)
+      .nullish()
+      .transform((value) => value ?? []),
+  })
+  .superRefine((model, context) => {
+    if (model.processes.length === 0 && model.draft !== true)
+      context.addIssue({
+        code: "custom",
+        path: ["processes"],
+        message: "list at least one process under processes, or mark the model with draft: true",
+      });
+  });
 
 export type ProcessModelFile = z.output<typeof processModelFileSchema>;
 
