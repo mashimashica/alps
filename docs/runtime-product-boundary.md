@@ -35,6 +35,15 @@ tool availability; the host must still claim the saved launch before doing its w
 disconnected desktop run has an uncertain external execution state until reconnection or an
 explicit report resolves it.
 
+On macOS, Claude Code and Codex desktop handoffs require an installed application URL handler,
+usable workspace MCP settings and a successful `claim_launch` tool probe. Their links open a
+new composer with the workspace and saved request; they do not send it. The user still confirms
+workspace trust and submits the request in the host. Codex uses the documented
+[`codex://new` parameters](https://learn.chatgpt.com/docs/reference/commands).
+Preflight does not prove that a particular native session loaded its configuration. A native
+host check must verify the claim and completion independently of link construction, and an
+unverified host check must not be reported as passed.
+
 A wake is an orchestration occasion, not an instance. It can create several instances, start
 several runs, or record a report with no new instance. Instance records and assessment records
 remain attached to their subjects, with links between them. This boundary introduces no new

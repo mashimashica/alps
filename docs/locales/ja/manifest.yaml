@@ -19,7 +19,7 @@ sources:
     reviewed_source_sha256: 2fd119249218765a7e0ac7e1f66998c068348f45c2041ce8ec4dc827bdd5c538
   runtime-product-boundary.md:
     source: ../../runtime-product-boundary.md
-    reviewed_source_sha256: ca90feae8067b1a492289d78969564c53c9f7a09e11d5754b0881e6c4e3bf428
+    reviewed_source_sha256: 027cc9862c4f782c0229c3658f56bd8c51c2f51d2ea47f0ac06f23ff9cd1f645
   releases/0.6.0.md:
     source: ../../releases/0.6.0.md
     reviewed_source_sha256: 1191210af2cfe5eea631350faed3415c14f0e3f2a4f7b2acaeaa32401a8a0db4
