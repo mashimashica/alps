@@ -219,12 +219,16 @@ export class Launches {
           spec.format === "claude"
             ? installed(["Claude.app"], "claude", connection.ready, connection.reason)
             : spec.format === "codex"
-              ? installed(
-                  ["Codex.app", "ChatGPT.app"],
-                  "codex",
-                  connection.ready,
-                  connection.reason,
-                )
+              ? (() => {
+                  const status = installed(["Codex.app", "ChatGPT.app"], "codex", false, null);
+                  if (!status.installed) return status;
+                  return {
+                    ...status,
+                    canStartFromAlps: false,
+                    reason:
+                      "Codex desktop can be linked from recorded sessions, but starting a new ALPS handoff from a URL is not yet supported.",
+                  };
+                })()
               : {
                   supported: false,
                   installed: false,

@@ -85,16 +85,31 @@ export function isAlive(pid: number): boolean {
 
 /** Asks the recorded daemon for its health. Only the daemon that holds the token answers with its own pid. */
 export async function probe(info: ServerInfo, timeoutMs = 2000): Promise<HealthInfo | null> {
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | null = null;
   try {
-    const response = await fetch(`http://127.0.0.1:${info.port}/api/health`, {
-      headers: { "X-Harness-Token": info.token },
-      signal: AbortSignal.timeout(timeoutMs),
+    const timeout = new Promise<null>((resolve) => {
+      timer = setTimeout(() => {
+        controller.abort();
+        resolve(null);
+      }, timeoutMs);
     });
+    const response = await Promise.race([
+      fetch(`http://127.0.0.1:${info.port}/api/health`, {
+        headers: { "X-Harness-Token": info.token },
+        signal: controller.signal,
+      }),
+      timeout,
+    ]);
+    if (response === null) return null;
     if (!response.ok) return null;
-    const health = (await response.json()) as HealthInfo;
+    const health = (await Promise.race([response.json(), timeout])) as HealthInfo | null;
+    if (!health) return null;
     return health.ok && health.pid === info.pid ? health : null;
   } catch {
     return null;
+  } finally {
+    if (timer) clearTimeout(timer);
   }
 }
 
