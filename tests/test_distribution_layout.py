@@ -8,10 +8,20 @@ from urllib.parse import unquote
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SKIPPED_DIRECTORIES = {".git", ".claude", "node_modules"}
-DISTRIBUTED_SKILLS = ("design-process-description", "design-agent-work-system")
+SKIPPED_DIRECTORIES = {".git", ".claude", ".verification", "node_modules"}
+DISTRIBUTED_SKILLS = (
+    "design-process-description",
+    "design-agent-work-system",
+    "run-process",
+    "assess-harness-records",
+)
 DEVELOPMENT_SKILLS = ("review-alps", "sync-locales")
-EXAMPLE_SKILLS = ("examples/assess-service-change",)
+EXAMPLE_SKILLS = (
+    "examples/assess-service-change",
+    "examples/service-change/skills/clarify-requirements",
+    "examples/service-change/skills/design-solution",
+    "examples/service-change/skills/release-to-production",
+)
 
 LINK_PATTERNS = (
     re.compile(r"\[[^\]]*\]\(\s*<?([^)\s>]+)>?(?:\s+\"[^\"]*\")?\s*\)"),

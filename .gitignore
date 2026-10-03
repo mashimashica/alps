@@ -4,6 +4,11 @@
 # Local worktrees and environments
 .worktrees/
 .venv/
+.verification/
+
+# Bun and the harness's per-workspace records
+node_modules/
+.alps-harness/
 
 # Python
 __pycache__/

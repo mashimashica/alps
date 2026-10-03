@@ -7,4 +7,52 @@ status: reviewed
 sources:
   README.md:
     source: ../../README.md
-    reviewed_source_sha256: c73ee29bfcc030dee850787642b355f6f2eb21fefde569a489fab23d31952530
+    reviewed_source_sha256: 868e5418769339b8d07ffad12f96afaf63346f0765ba5ae4eae528ba895f7db7
+  service-change/alps-harness.yaml:
+    source: ../../service-change/alps-harness.yaml
+    reviewed_source_sha256: b9311b69778bd78a9992295f7e099527408ff4496c870741c6e572713525121c
+  service-change/docs/acceptance-criteria.md:
+    source: ../../service-change/docs/acceptance-criteria.md
+    reviewed_source_sha256: ddb643916778b61fcd5f99e99bd15af8f85ac434b30ef245ac94ad4f2396ef18
+  service-change/docs/changes/CHG-001/change-brief.md:
+    source: ../../service-change/docs/changes/CHG-001/change-brief.md
+    reviewed_source_sha256: 0bec16089e6e45752493ca51d5fe12bcc19ab2595118dd7fba834f16386fe8ac
+  service-change/docs/changes/CHG-001/design/README.md:
+    source: ../../service-change/docs/changes/CHG-001/design/README.md
+    reviewed_source_sha256: eb3189b4bdef7543e6b818c4e4eb5afaabc32117116f870d2cd8227878c6b49d
+  service-change/docs/changes/CHG-001/design/components.md:
+    source: ../../service-change/docs/changes/CHG-001/design/components.md
+    reviewed_source_sha256: 151c11c1c494ab71909fd819fe033ac834185775b6b42d3d257639fd3f8678bf
+  service-change/docs/changes/CHG-001/stakeholders.md:
+    source: ../../service-change/docs/changes/CHG-001/stakeholders.md
+    reviewed_source_sha256: 4b06d11c2779d69f74e860a0e87b9a3f726d37fc701cc22d7c8f8231d4230765
+  service-change/docs/changes/CHG-002/stakeholders.md:
+    source: ../../service-change/docs/changes/CHG-002/stakeholders.md
+    reviewed_source_sha256: 57c1c7fa60ad84d8d504d60380427464b3608c72ef26d8c0d6c06ca5cb190208
+  service-change/docs/operations.md:
+    source: ../../service-change/docs/operations.md
+    reviewed_source_sha256: f717e1c7d88b7c97d9ec4df451bf64d39e521b98ca13165e94c5898f9df151f6
+  service-change/docs/pilot-context.md:
+    source: ../../service-change/docs/pilot-context.md
+    reviewed_source_sha256: e53d8cf1bb1623a9864894a5a723e93001cf96336af7b2b798128f7713b113eb
+  service-change/docs/policies/production.md:
+    source: ../../service-change/docs/policies/production.md
+    reviewed_source_sha256: 3e093f52907f1ff7572bc4caec7459ebacbeac922922a0eb0a704d4e5e8bf11a
+  service-change/docs/slo.md:
+    source: ../../service-change/docs/slo.md
+    reviewed_source_sha256: 2e5559f19b3204d8611e73f104eee4cd832f5a25b653ff80445ed5ab1c8a9603
+  service-change/measurements/CHG-001/baseline.json:
+    source: ../../service-change/measurements/CHG-001/baseline.json
+    reviewed_source_sha256: 0a59ced31b176d540b3a3a5f966fdcf460ed96b3fe92bcb4a6099e4da85b43ce
+  service-change/measurements/CHG-001/candidate.json:
+    source: ../../service-change/measurements/CHG-001/candidate.json
+    reviewed_source_sha256: 6a256e000c19a001d5f5a6c98a445977738780ec7022ad87ba428b26bfdf31da
+  service-change/observations/2026-09-27.md:
+    source: ../../service-change/observations/2026-09-27.md
+    reviewed_source_sha256: 56a784103359d7f339b96898a139924687279acd9f8ccd2c49f284bbc914996e
+  service-change/process-model.yaml:
+    source: ../../service-change/process-model.yaml
+    reviewed_source_sha256: 8f1aea13d7dbc381ac4bf4e9de0302736b7e83bf26c2226d9e123c24f79879b9
+  service-change/releases/CHG-001/candidate.json:
+    source: ../../service-change/releases/CHG-001/candidate.json
+    reviewed_source_sha256: d2a45c021fbb3be027a8fd04c96b657b6526e9915303a57572c1a8d49ec52b92

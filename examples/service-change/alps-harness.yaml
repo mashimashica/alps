@@ -1,0 +1,61 @@
+# The meaning of the work lives in process-model.yaml. This file only says how this workspace realizes it.
+model: process-model.yaml
+
+# The language of the prompts given to agents and of the MCP responses (en or ja; the default is en).
+# The Japanese counterpart of this workspace is ../locales/ja/service-change, with language: ja.
+language: en
+
+# The kind and location of each Artifact type.
+#   kind: information | product | service
+#   paths: * matches within one directory level, ** matches any number of levels, and a trailing / makes a directory one Artifact.
+#   When a product or service lives outside the workspace, keep a reference record here that names its version or digest.
+artifacts:
+  Stakeholder information: { kind: information, paths: [docs/changes/*/stakeholders.md] }
+  Change brief: { kind: information, paths: [docs/changes/*/change-brief.md] }
+  Improvement proposal: { kind: information, paths: [docs/improvements/*.md] }
+  Design description: { kind: information, paths: [docs/changes/*/design/] }
+  Release candidate: { kind: product, paths: [releases/*/candidate.json] }
+  Pilot conditions: { kind: information, paths: [docs/pilot-context.md] }
+  Request measurements: { kind: information, paths: [measurements/*/] }
+  Pilot assessment: { kind: information, paths: [docs/changes/*/pilot-assessment.md] }
+  Acceptance criteria: { kind: information, paths: [docs/acceptance-criteria.md] }
+  Change request: { kind: information, paths: [docs/changes/*/change-request.md] }
+  Production policy: { kind: information, paths: [docs/policies/production.md] }
+  Deployed service revision: { kind: service, paths: [releases/*/deployment.json] }
+  Service level objectives: { kind: information, paths: [docs/slo.md] }
+  Production observations: { kind: information, paths: [observations/*.md] }
+  Incident record: { kind: information, paths: [incidents/*.md] }
+
+# Skills are found under skills/ (and the other Skill roots) by frontmatter name, directory name, or heading,
+# including the headings of translations in references/locales/<lang>/SKILL.<lang>.md.
+# A declared location wins. The assessment Skill is the repository's example Skill, next to this workspace.
+skills:
+  Service Change Assessment: ../assess-service-change
+
+# The guidance that a woken agent reads: prose on what comes first, what takes priority, and when not to run a Process.
+# The harness points the agent to it and never interprets it.
+guidance: [docs/operations.md]
+
+# When the harness server wakes an agent, which reads the model, the guidance, and the state, and decides what to run.
+# cron takes crontab's five fields (minute, hour, day of the month, month, day of the week) in the server machine's local time.
+# While schedules are configured, the server does not exit when idle. alps-harness wake wakes one from an external scheduler.
+# schedules:
+#   - cron: "0 9 * * 1-5"
+#     agent: claude-code
+
+# Where the WebUI saves the files attached to a request (Request, on every screen), in a directory for each day:
+# inbox/2026-10-01/notes.md, then notes-2.md for the same name. It must lie inside the workspace and outside .alps-harness/.
+# A saved file that matches the paths of a type above is an Artifact too. Whether to keep it in version control is the workspace's choice.
+attachments: inbox/
+
+# The harness server (daemon). It exits after idleMinutes without connections or running runs.
+# server:
+#   port: 4830
+#   idleMinutes: 30
+
+# To change how an agent is started (overrides the defaults):
+# agents:
+#   claude-code:
+#     args: ["-p", "{prompt}", "--output-format", "stream-json", "--verbose", "--permission-mode", "acceptEdits", "--max-turns", "30"]
+#   codex:
+#     args: ["exec", "--json", "--sandbox", "workspace-write", "--skip-git-repo-check", "{prompt}"]

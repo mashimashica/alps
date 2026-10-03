@@ -21,24 +21,29 @@ Do not infer Process requirements from tests, templates, Host manifests, icons, 
 
 | Path | Role |
 | --- | --- |
-| `skills/design-process-description/`, `skills/design-agent-work-system/` | Distributed Skills; each root English `SKILL.md` is the source for its Process. |
+| `skills/design-process-description/`, `skills/design-agent-work-system/`, `skills/run-process/`, `skills/assess-harness-records/` | Distributed Skills; each root English `SKILL.md` is the source for its Process. |
 | `.agents/skills/<distributed-skill>` | Relative symlink to `../../skills/<distributed-skill>` for repository discovery. |
 | `.agents/skills/review-alps/` | Real directory for repository semantic and distribution review; not a Plugin Skill. |
 | `.agents/skills/sync-locales/` | Real directory for English/Japanese review; not a Plugin Skill. |
 | Each Skill's `references/` | Principles and supporting material used by that Skill; each document's role determines its normative force. |
 | `docs/locales/ja/` and each Skill's `references/locales/ja/` | Supported translations of the corresponding English source files. A translated Skill body is named `SKILL.ja.md` and is not a Skill entry point. |
 | `examples/` | Bundled reference material, including a working target Skill; outside Plugin Skill discovery. The guide's translation is in `examples/locales/ja/`, and the target Skill's translations are in its `references/locales/ja/`. |
-| `plugin.json`, `.claude-plugin/`, `.cursor-plugin/`, `.codex-plugin/` | Root Plugin format and distinct Host adapters. |
+| `examples/service-change/` | Example harness workspace with a process model, its realization in `alps-harness.yaml`, sample Artifacts, and example Skills under its `skills/`, which are also outside Plugin Skill discovery. Its Japanese counterpart is `examples/locales/ja/service-change/`, and each Skill's translation is in its `references/locales/ja/`. |
+| `plugin.json`, `.claude-plugin/`, `.codex-plugin/` | Root Plugin format and distinct Host adapters. |
+| `harness/` | The harness: its TypeScript source, tests, and development tools in its own `package.json`, `bun.lock`, and `bunfig.toml`. Its English/Japanese texts are the catalogs that `localization.yaml` lists. |
+| `package.json` and `bun.lock` at the root | The harness's runtime dependencies, which Claude Code installs at the Plugin root when it fetches the Plugin. No `bunfig.toml` belongs beside them: with one there, Claude Code skips that install. |
+| `.mcp.json` and `mcp.json` | The harness's MCP server: `.mcp.json` starts it for Claude Code by resolving the plugin root, the project root, or the current directory; `mcp.json` registers the Agent Plugins form with `${PLUGIN_ROOT}`, which `.codex-plugin/plugin.json` also names. |
+| `commands/` | Plugin commands; `harness.md` is `/alps:harness`. Every file here is a command, so commands have no translations. |
 | `CLAUDE.md` | Claude Code entry point for repository development that imports this file; it adds no instructions of its own and is not Plugin context. |
 | `assets/` and the Skill's `agents/` and `assets/` | Presentation resources. |
 
-`skills/` is the source of Plugin Skills. Hosts discover it through their applicable conventions and manifests. `.agents/skills/` is an integrated repository view, not a universal Host convention. A checkout can contain development Skills without exposing them as Plugin Skills. Each distributed Skill functions on its own: its relative links resolve within its own directory, and it does not depend on the other Skill by file or name. When the Skills are combined, they exchange only a description of the work. The Plugin distributes both Skills together with `examples/` as reference material; the Skills do not link to it. Keep development Skills and example Skills outside `skills/`.
+`skills/` is the source of Plugin Skills. Hosts discover it through their applicable conventions and manifests. `.agents/skills/` is an integrated repository view, not a universal Host convention. A checkout can contain development Skills without exposing them as Plugin Skills. Each distributed Skill functions on its own: its relative links resolve within its own directory, and it does not depend on another Skill by file or name. When the design Skills are combined, they exchange only a description of the work. `run-process` performs a harness run through the harness's MCP tools, and `assess-harness-records` reads the harness's records through them and records the opportunities to improve the processes that it finds. The Plugin distributes the Skills together with `examples/` as reference material; the Skills do not link to it. Keep development Skills and example Skills outside `skills/`.
 
 ## Change and review
 
 - Inspect current files and the task-owned diff before editing. Preserve unrelated work.
 - Use `review-alps` for changes to the Process Framework or work-system design principles, Skill content, repository guidance, tests, distribution, or presentation that affect their meaning or boundaries.
-- Use `sync-locales` for each affected English/Japanese pair. Repository-development Skills have no Japanese Plugin counterparts.
+- Use `sync-locales` for each affected English/Japanese pair, including the entries of the catalogs that `localization.yaml` lists. Repository-development Skills have no Japanese Plugin counterparts.
 - Use `design-process-description` when authoring or reviewing a Process Description.
 - Use `design-agent-work-system` when designing or reviewing the supporting configuration, implementation, or effectiveness. Preserve shared work meaning and apply each foundation within its subject.
 - Keep each Host adapter aligned with its native format and the distribution layout above.
@@ -55,6 +60,6 @@ Keep the following evidence distinct:
 5. Respect for applicable requirements, authority, and limits on effects, including those implemented by tools, assessed separately from tool behavior and effectiveness.
 6. Work-system effectiveness through representative work with an agent, information, tools, and environment, assessed against the work's Outcomes and conditions.
 
-Run the checks in `.github/workflows/validate.yml` that the environment permits. At minimum run `python3 -m unittest discover -s tests -v`, `git diff --check`, changed-link checks, and review the complete task-owned diff, including new files. Passing mechanical checks does not prove semantic validity or successful Process execution.
+Run the checks in `.github/workflows/validate.yml` that the environment permits. At minimum run `python3 -m unittest discover -s tests -v`, `git diff --check`, changed-link checks, and review the complete task-owned diff, including new files. For changes to the harness, also run its type check, lint, format check, and tests as [harness/README.md](harness/README.md) describes. Passing mechanical checks does not prove semantic validity or successful Process execution.
 
 Report findings, completed checks, failed or unperformed checks, and limits.

@@ -1,0 +1,597 @@
+/*
+ * The harness server: the WebUI and the HTTP API. It listens on 127.0.0.1 only and answers
+ * nothing to other Host headers (DNS rebinding). The page and its chunks are bundled at startup
+ * and hold no secret: the per-start token reaches the browser only in the URL fragment
+ * (`/#token=…`), which browsers never send to servers. The API requires the token, rejects
+ * requests that browsers mark as coming from other sites, and accepts only JSON bodies for
+ * writes, up to 1 MiB; the one exception is the files a person attaches to a request, which
+ * POST /api/attachments takes as multipart/form-data, up to 21 MiB a body, so one file at its
+ * limit at a time (behind the same checks: a form of another site cannot send the token). No
+ * response may be shown in a frame (clickjacking).
+ *
+ * An MCP server holds a session with the harness server while its client is connected
+ * (`GET /api/session`, a stream like the event stream). The session names the self runs that the
+ * client performs; when it closes (the MCP server ends, or says so), those runs are interrupted.
+ * The server also wakes agents on the schedules of alps-harness.yaml (schedule.ts).
+ */
+
+import type { Server } from "bun";
+import crypto from "node:crypto";
+import net from "node:net";
+import path from "node:path";
+import { HTTP_STATUS, HarnessError, refuse, type Harness } from "../harness/index.ts";
+import { say, type MessageArgs, type MessageKey } from "../shared/strings.ts";
+import type {
+  ErrorCode,
+  Failure,
+  HealthInfo,
+  HttpErrorCode,
+  InstallUiResponse,
+  ServerEvent,
+  ServerInfo,
+  ServerUiInfo,
+  SessionEvent,
+} from "../shared/types.ts";
+import { RUNTIME_CONTRACT } from "../shared/contract.ts";
+import { installUiRequest } from "../shared/schema.ts";
+import { MAX_JSON_BYTES, MAX_UPLOAD_BYTES, createApi, mebibytes, textOf } from "./api.ts";
+import { IdleTracker } from "./idle.ts";
+import { probe, readServerInfo, removeServerInfo, serverUrl, writeServerInfo } from "./info.ts";
+import { openUi, removeOpenPage } from "./open.ts";
+import { createObservability, type Observability } from "./observability.ts";
+import { startSchedules, type Schedules } from "./schedule.ts";
+import { UI_ENTRY, bundleUi, type UiBundle } from "./ui.ts";
+
+/** Consecutive ports tried when the configured one is in use. */
+const PORT_ATTEMPTS = 10;
+const PING_MS = 20_000;
+/** The route whose body is files (multipart/form-data) rather than JSON. */
+const UPLOAD_ROUTE = "/api/attachments";
+/**
+ * Bun's own limit, just above the largest that a route reads (an upload), so that the API answers
+ * an oversized body in its own words; each route keeps no more than its own limit.
+ */
+export const MAX_REQUEST_BYTES = MAX_UPLOAD_BYTES + 64 * 1024;
+/** How often, while a WebUI is connected, the workspace is checked for edits made outside the harness. */
+const POLL_MS = 3000;
+export interface ServeOptions {
+  root: string;
+  /** 0 lets the system choose a free port. */
+  port: number;
+  /** Minutes without connections, running runs, or schedules before the server stops. */
+  idleMinutes: number;
+  /** Bun's development mode: the UI is an HTML import, bundled on request with HMR. */
+  development: boolean;
+  /** No WebUI is bundled at startup. The HTTP API, SSE, MCP relay, and schedules still run. */
+  headless?: boolean;
+  /** WebUI entry point. Omit for the bundled reference UI. Headless daemons load it only on demand. */
+  uiEntry?: string;
+  version: string;
+  log: (line: string) => void;
+  /**
+   * Reads the workspace's records (it may throw a StateError). It is called before the server
+   * listens; the harness writes nothing until the server owns the workspace.
+   */
+  openHarness: (observability: Observability) => Harness;
+}
+
+export interface HarnessServer {
+  info: ServerInfo;
+  url: string;
+  /** Resolves with the reason once the server has stopped and server.json is removed. */
+  closed: Promise<string>;
+  stop(reason: string): Promise<void>;
+}
+
+export type StartResult =
+  | { kind: "started"; server: HarnessServer }
+  | { kind: "running"; info: ServerInfo };
+
+/**
+ * The page may run only the bundle it is served with (no inline or other scripts, so Markdown
+ * that gets through as HTML cannot run), load nothing from elsewhere, and never be framed.
+ */
+export const CONTENT_SECURITY_POLICY = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self'",
+  "img-src 'self' data:",
+  "connect-src 'self'",
+  "object-src 'none'",
+  "base-uri 'none'",
+  "form-action 'none'",
+  "frame-ancestors 'none'",
+].join("; ");
+
+/** Sent with every response: never cached, never framed, never sniffed, no referrer, no cross-origin reads. */
+const HEADERS = {
+  "Cache-Control": "no-store",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Content-Security-Policy": CONTENT_SECURITY_POLICY,
+  "Referrer-Policy": "no-referrer",
+  "Cross-Origin-Resource-Policy": "same-origin",
+};
+
+const json = (status: number, body: unknown): Response =>
+  Response.json(body, { status, headers: HEADERS });
+
+function fail<K extends MessageKey>(
+  status: number,
+  code: ErrorCode | HttpErrorCode,
+  key: K,
+  args: MessageArgs<K>,
+): Response {
+  return json(status, {
+    ok: false,
+    error: {
+      code,
+      message: say("en", key, args),
+      key,
+      args: args as Record<string, string | number | boolean>,
+    },
+  } satisfies Failure);
+}
+
+function tokenMatches(given: string | null, token: string): boolean {
+  if (!given) return false;
+  const a = Buffer.from(given);
+  const b = Buffer.from(token);
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
+const formatSize = (bytes: number): string => `${(bytes / 1024).toFixed(1)} KiB`;
+
+/**
+ * Reads a body to its end and keeps none of it, so that the answer comes after all of it: a client
+ * that has its answer before it has sent the rest may send its next request on the same connection,
+ * where it would be taken for that rest (Bun's fetch does). No more than Bun's limit is read, since
+ * Bun refuses a body that says it is longer before the harness sees it.
+ */
+async function discard(body: ReadableStream<Uint8Array> | null): Promise<void> {
+  const reader = body?.getReader();
+  if (!reader) return;
+  try {
+    for (let size = 0; size <= MAX_REQUEST_BYTES;) {
+      const { done, value } = await reader.read();
+      if (done) return;
+      size += value.byteLength;
+    }
+    await reader.cancel();
+  } catch {
+    // The client went away before it sent all of it.
+  }
+}
+
+async function portStatus(port: number): Promise<"available" | "busy" | "unknown"> {
+  return new Promise((resolve) => {
+    const candidate = net.createServer();
+    candidate.once("error", (error: NodeJS.ErrnoException) =>
+      resolve(error.code === "EADDRINUSE" ? "busy" : "unknown"),
+    );
+    candidate.once("listening", () => candidate.close(() => resolve("available")));
+    candidate.listen({ host: "127.0.0.1", port });
+  });
+}
+
+/** Tries the configured port and the next ones while they are in use. Port 0 is tried once. */
+async function listen(
+  port: number,
+  serve: (port: number) => Server<undefined>,
+): Promise<Server<undefined>> {
+  const attempts = port === 0 ? 1 : PORT_ATTEMPTS;
+  for (let i = 0; ; i++) {
+    const candidate = port === 0 ? 0 : port + i;
+    const status = candidate === 0 ? "unknown" : await portStatus(candidate);
+    if (status !== "busy") return serve(candidate);
+    if (i + 1 >= attempts) throw new Error(`No available port found from ${port} to ${candidate}.`);
+  }
+}
+
+/** An open stream of server-sent events. */
+interface Stream<T> {
+  send(event: T): void;
+  close(): void;
+}
+
+/**
+ * Starts the server for the workspace. With `headless`, no WebUI is bundled before listening and
+ * a broken or absent UI cannot stop the daemon. `open_ui` may later bundle the configured entry
+ * and expose it on the same origin. Otherwise it rejects, before listening, with a UiBuildError
+ * when the requested WebUI does not bundle and with a StateError when the records cannot be read.
+ */
+export async function startServer(options: ServeOptions): Promise<StartResult> {
+  const { root, log } = options;
+
+  // The UI is bundled before the server listens unless this is a headless runtime daemon. Only
+  // --dev uses the HTML import, for HMR; its page and assets are served by Bun's routes and
+  // therefore bypass the fetch handler (no Host check, no security headers). They hold no secret
+  // either.
+  let ui: UiBundle | null = null;
+  let devPage: Bun.HTMLBundle | null = null;
+  let uiEntry = options.uiEntry ?? UI_ENTRY;
+  let customUi = options.uiEntry !== undefined;
+  let serverInfo: ServerInfo | null = null;
+  function uiInfo(): ServerUiInfo {
+    return devPage || ui
+      ? { available: true, mode: customUi ? "custom" : "reference", entry: uiEntry }
+      : { available: false, mode: "none" };
+  }
+  const setUi = async (entry: string, custom: boolean): Promise<ServerUiInfo> => {
+    const bundled = await bundleUi(entry);
+    ui = bundled;
+    devPage = null;
+    uiEntry = entry;
+    customUi = custom;
+    log(
+      `bundled the WebUI from ${entry} in ${Math.round(bundled.ms)} ms (${bundled.assets.size} files, ${formatSize(bundled.bytes)})`,
+    );
+    const next = uiInfo();
+    if (serverInfo) {
+      serverInfo.ui = next;
+      writeServerInfo(root, serverInfo, false);
+    }
+    return next;
+  };
+  if (options.headless) {
+    log("starting without a WebUI bundle; open_ui will bundle it on demand");
+  } else if (options.development && !customUi) {
+    devPage = (await import("../ui/index.html")).default;
+  } else {
+    await setUi(uiEntry, customUi);
+  }
+
+  const observability = createObservability({ workspace: root, version: options.version, log });
+  const harness = options.openHarness(observability);
+  const token = crypto.randomBytes(24).toString("hex");
+  const startedAt = Date.now();
+  const encoder = new TextEncoder();
+  const streams = new Set<Stream<ServerEvent>>();
+  const sessions = new Map<string, Stream<SessionEvent>>();
+  let stopping: Promise<void> | null = null;
+  let resolveClosed: (reason: string) => void = () => {};
+  const closed = new Promise<string>((resolve) => (resolveClosed = resolve));
+  const idle = new IdleTracker(options.idleMinutes * 60_000, () => void stop("idle"));
+  let schedules: Schedules | null = null;
+
+  const ensureUi = async (): Promise<void> => {
+    if (devPage || ui) return;
+    try {
+      await setUi(uiEntry, customUi);
+    } catch (error) {
+      log((error as Error).message);
+      throw refuse("invalid-request", "error.uiUnavailable", {});
+    }
+  };
+
+  const api = createApi(harness, {
+    version: options.version,
+    openUi: async (open) => {
+      await ensureUi();
+      return openUi(root, { port: server.port ?? 0, token }, open);
+    },
+    installUi: async (entry) => {
+      try {
+        const resolved = path.resolve(entry);
+        return await setUi(resolved, resolved !== UI_ENTRY);
+      } catch (error) {
+        log((error as Error).message);
+        throw refuse("invalid-request", "error.uiUnavailable", {});
+      }
+    },
+  });
+
+  const health = (): HealthInfo => ({
+    ok: true,
+    name: "alps-harness",
+    version: options.version,
+    pid: process.pid,
+    port: server.port ?? 0,
+    startedAt,
+    workspace: root,
+    development: options.development,
+    ui: uiInfo(),
+    contract: RUNTIME_CONTRACT,
+    observability: observability.status(),
+  });
+
+  const hostAllowed = (request: Request): boolean => {
+    const host = request.headers.get("host");
+    return host === `127.0.0.1:${server.port}` || host === `localhost:${server.port}`;
+  };
+
+  /**
+   * A stream of server-sent events. An open stream counts as a connection: it keeps the server
+   * from stopping when idle. `onClose` runs once, however the stream ends.
+   */
+  function openStream<T>(
+    request: Request,
+    srv: Server<undefined>,
+    first: T,
+    onOpen: (stream: Stream<T>) => void,
+    onClose: (stream: Stream<T>) => void,
+  ): Response {
+    srv.timeout(request, 0);
+    const release = idle.hold();
+    let ping: ReturnType<typeof setInterval> | undefined;
+    let done = false;
+    let stream: Stream<T> | undefined;
+    const finish = (): void => {
+      if (done) return;
+      done = true;
+      clearInterval(ping);
+      release();
+      if (stream) onClose(stream);
+    };
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        const write = (chunk: string): void => {
+          if (done) return;
+          try {
+            controller.enqueue(encoder.encode(chunk));
+          } catch {
+            finish();
+          }
+        };
+        stream = {
+          send: (event) => write(`data: ${JSON.stringify(event)}\n\n`),
+          close: () => {
+            finish();
+            try {
+              controller.close();
+            } catch {
+              // Already closed by the client.
+            }
+          },
+        };
+        onOpen(stream);
+        ping = setInterval(() => write(": ping\n\n"), PING_MS);
+        request.signal.addEventListener("abort", finish, { once: true });
+        write("retry: 2000\n\n");
+        stream.send(first);
+      },
+      cancel: finish,
+    });
+    return new Response(body, {
+      headers: {
+        ...HEADERS,
+        "Content-Type": "text/event-stream; charset=utf-8",
+        Connection: "keep-alive",
+      },
+    });
+  }
+
+  // While a WebUI is connected, edits made outside the harness (the model, a SKILL.md, an input
+  // of a judged run) reach it as events.
+  let poller: ReturnType<typeof setInterval> | null = null;
+  const poll = (): void => {
+    try {
+      for (const event of harness.poll()) for (const stream of streams) stream.send(event);
+    } catch (error) {
+      log(`cannot check the workspace for changes: ${(error as Error).message}`);
+    }
+  };
+  const openEvents = (request: Request, srv: Server<undefined>): Response =>
+    openStream<ServerEvent>(
+      request,
+      srv,
+      { type: "hello", startedAt },
+      (stream) => {
+        streams.add(stream);
+        if (poller) return;
+        poll();
+        poller = setInterval(poll, POLL_MS);
+      },
+      (stream) => {
+        streams.delete(stream);
+        if (streams.size > 0 || !poller) return;
+        clearInterval(poller);
+        poller = null;
+      },
+    );
+
+  const openSession = (request: Request, srv: Server<undefined>): Response => {
+    const id = `s${crypto.randomBytes(8).toString("hex")}`;
+    return openStream<SessionEvent>(
+      request,
+      srv,
+      { type: "session", id },
+      (stream) => sessions.set(id, stream),
+      () => {
+        sessions.delete(id);
+        harness.sessionClosed(id);
+      },
+    );
+  };
+
+  const handleApi = async (
+    request: Request,
+    url: URL,
+    srv: Server<undefined>,
+  ): Promise<Response> => {
+    // Browsers say where a request comes from. Only the harness's own page (same-origin), the
+    // address bar (none), and clients that are not browsers (no header) may use the API. A page
+    // on another port of 127.0.0.1 is same-site and is refused too.
+    const site = request.headers.get("sec-fetch-site");
+    if (site !== null && site !== "same-origin" && site !== "none")
+      return fail(403, "cross-site", "error.crossSite", {});
+    // EventSource cannot send headers, so the event stream also accepts the token as a query parameter.
+    const given =
+      request.headers.get("x-harness-token") ??
+      (url.pathname === "/api/events" ? url.searchParams.get("token") : null);
+    if (!tokenMatches(given, token)) return fail(401, "unauthorized", "error.token", {});
+    if (request.method !== "GET" && request.method !== "HEAD") {
+      const type = (request.headers.get("content-type") ?? "").toLowerCase();
+      // The attachments of a request are the one body that is not JSON: files, as a form sends them.
+      const upload = request.method === "POST" && url.pathname === UPLOAD_ROUTE;
+      if (upload ? !type.startsWith("multipart/form-data") : !type.startsWith("application/json"))
+        return fail(
+          415,
+          "unsupported-media-type",
+          upload ? "error.multipartType" : "error.mediaType",
+          {},
+        );
+      // A body that says it is too long is read to its end, none of it kept, and refused then; one
+      // that does not say its length is read to its end with no more than the limit kept, and
+      // refused then (api.ts).
+      const limit = upload ? MAX_UPLOAD_BYTES : MAX_JSON_BYTES;
+      if (Number(request.headers.get("content-length") ?? 0) > limit) {
+        await discard(request.body);
+        return fail(413, "too-large", "error.bodySize", { limit: mebibytes(limit) });
+      }
+    }
+
+    switch (`${request.method} ${url.pathname}`) {
+      case "GET /api/health":
+        return json(200, health());
+      case "POST /api/ui": {
+        let given: unknown;
+        try {
+          const text = await textOf(request);
+          given = text.trim() ? (JSON.parse(text) as unknown) : {};
+        } catch (error) {
+          return fail(400, "invalid-request", "error.notJson", {
+            detail: (error as Error).message,
+          });
+        }
+        const parsed = installUiRequest.safeParse(given);
+        if (!parsed.success)
+          return fail(400, "invalid-request", "error.model", {
+            detail: parsed.error.issues.map((issue) => issue.message).join("; "),
+          });
+        const next = await setUi(parsed.data.entry, true);
+        return json(200, { ok: true, ui: next } satisfies InstallUiResponse);
+      }
+      case "GET /api/events":
+        return openEvents(request, srv);
+      case "GET /api/session":
+        return openSession(request, srv);
+      case "POST /api/shutdown":
+        setTimeout(() => void stop("stop"), 20);
+        return json(200, { ok: true });
+    }
+    const closing = /^\/api\/sessions\/([A-Za-z0-9]+)\/close$/.exec(url.pathname);
+    if (closing && request.method === "POST") {
+      // Its body is read as every JSON body is: no further than 1 MiB.
+      try {
+        await textOf(request);
+      } catch (error) {
+        if (!(error instanceof HarnessError)) throw error;
+        return json(HTTP_STATUS[error.code], { ok: false, error: error.info } satisfies Failure);
+      }
+      sessions.get(closing[1] ?? "")?.close();
+      return json(200, { ok: true });
+    }
+    const reply = await api(request, url, () => srv.timeout(request, 0));
+    return reply
+      ? json(reply.status, reply.body)
+      : fail(404, "not-found", "error.route", { method: request.method, path: url.pathname });
+  };
+
+  /** The bundled page and its chunks, from memory. */
+  const serveUi = (request: Request, url: URL): Response => {
+    const asset =
+      request.method === "GET" || request.method === "HEAD"
+        ? ui?.assets.get(url.pathname)
+        : undefined;
+    if (!asset)
+      return fail(404, "not-found", "error.route", { method: request.method, path: url.pathname });
+    return new Response(asset.body, { headers: { ...HEADERS, "Content-Type": asset.type } });
+  };
+
+  const server = await listen(options.port, (port) =>
+    Bun.serve({
+      hostname: "127.0.0.1",
+      port,
+      development: options.development ? { hmr: true } : false,
+      maxRequestBodySize: MAX_REQUEST_BYTES,
+      routes: devPage ? { "/": devPage } : undefined,
+      fetch(request, srv) {
+        idle.touch();
+        if (!hostAllowed(request)) return fail(403, "forbidden-host", "error.host", {});
+        const url = new URL(request.url);
+        return url.pathname.startsWith("/api/")
+          ? handleApi(request, url, srv)
+          : serveUi(request, url);
+      },
+      error(error) {
+        log(`error: ${error.stack ?? error.message}`);
+        return fail(500, "internal", "error.internal", {});
+      },
+    }),
+  );
+
+  const info: ServerInfo = {
+    pid: process.pid,
+    port: server.port ?? 0,
+    token,
+    startedAt,
+    ui: uiInfo(),
+  };
+  serverInfo = info;
+
+  async function stop(reason: string): Promise<void> {
+    stopping ??= (async () => {
+      idle.stop();
+      schedules?.stop();
+      if (poller) clearInterval(poller);
+      poller = null;
+      // The records are complete before server.json goes, so a server started next reads them
+      // whole. Running agents are stopped with their process groups first.
+      try {
+        await harness.close();
+      } catch (error) {
+        log(`cannot write the records: ${(error as Error).message}`);
+      }
+      for (const stream of streams) {
+        stream.send({ type: "shutdown" });
+        stream.close();
+      }
+      // Closing a session deletes its entry, which iterating the map allows.
+      for (const session of sessions.values()) {
+        session.send({ type: "shutdown" });
+        session.close();
+      }
+      removeServerInfo(root, info);
+      removeOpenPage(root);
+      await observability.shutdown();
+      await server.stop(true);
+      log(`stopped (${reason})`);
+      resolveClosed(reason);
+    })();
+    return stopping;
+  }
+
+  // Two servers starting at once must not both claim the workspace: the first to write server.json wins.
+  if (!writeServerInfo(root, info, true)) {
+    const recorded = readServerInfo(root);
+    if (recorded && (await probe(recorded))) {
+      await server.stop(true);
+      return { kind: "running", info: recorded };
+    }
+    writeServerInfo(root, info, false);
+  }
+  process.once("exit", () => removeServerInfo(root, info));
+  try {
+    harness.start({
+      broadcast: (event) => {
+        for (const stream of streams) stream.send(event);
+      },
+      hold: () => idle.hold(),
+    });
+  } catch (error) {
+    removeServerInfo(root, info);
+    await observability.shutdown();
+    await server.stop(true);
+    throw error;
+  }
+  observability.record("alps.server.start", {
+    "alps.ui.mode": uiInfo().mode,
+    "alps.headless": options.headless === true,
+  });
+  schedules = startSchedules({ harness, hold: () => idle.hold(), log });
+  idle.start();
+  // The token stays out of the log: it is in server.json and in the URL that `serve` prints.
+  log(`listening on ${serverUrl(info)} for ${root}${options.development ? " (development)" : ""}`);
+  return { kind: "started", server: { info, url: serverUrl(info), closed, stop } };
+}

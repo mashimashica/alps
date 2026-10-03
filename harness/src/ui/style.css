@@ -1,0 +1,12 @@
+/*
+ * The WebUI's styles: the glass UI after shadcn/ui (New York). index.html loads this file; Bun
+ * bundles the imports into one stylesheet at startup (and in --dev through the HTML import).
+ *
+ *   tokens.css      the colours, radii, glass, and type (light and dark), and the page itself
+ *   components.css  the components of src/ui/components/
+ *   views.css       the shell and the screens
+ */
+
+@import "./tokens.css";
+@import "./components.css";
+@import "./views.css";

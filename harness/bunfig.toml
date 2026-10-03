@@ -1,0 +1,7 @@
+# The harness's development tools. Its runtime dependencies are in the repository root's
+# package.json, which is all that the Plugin's fetch-time install (bun install at the root) reads.
+[install]
+# Only the direct dependencies at the top of harness/node_modules, so the harness's own imports
+# (zod, preact, marked, the MCP server) resolve to the root's install, as they do for users,
+# never to a copy that a development tool brings along.
+linker = "isolated"

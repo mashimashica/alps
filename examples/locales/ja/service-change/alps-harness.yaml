@@ -1,0 +1,64 @@
+# 仕事の意味は process-model.yaml にある。このファイルには、このワークスペースでの実現だけを書く。
+model: process-model.yaml
+
+# エージェントに渡すプロンプトと MCP の応答の言語（en か ja。既定は en）。
+# このワークスペースは ../../../service-change（language: en）の日本語版である。
+language: ja
+
+# アーティファクトの型ごとの種類と置き場所。
+#   kind: information | product | service
+#   paths: * は一階層の中で、** は任意の数の階層にわたって一致し、末尾の / はディレクトリを一つのアーティファクトにする。
+#   製品やサービスの実体がワークスペースの外にある場合は、その版かダイジェストを書いた参照の記録をここに置く。
+artifacts:
+  関係者の情報: { kind: information, paths: [docs/changes/*/stakeholders.md] }
+  変更概要: { kind: information, paths: [docs/changes/*/change-brief.md] }
+  改善提案: { kind: information, paths: [docs/improvements/*.md] }
+  設計記述: { kind: information, paths: [docs/changes/*/design/] }
+  候補版: { kind: product, paths: [releases/*/candidate.json] }
+  試行条件: { kind: information, paths: [docs/pilot-context.md] }
+  リクエスト測定値: { kind: information, paths: [measurements/*/] }
+  試行評価: { kind: information, paths: [docs/changes/*/pilot-assessment.md] }
+  受入基準: { kind: information, paths: [docs/acceptance-criteria.md] }
+  変更要求: { kind: information, paths: [docs/changes/*/change-request.md] }
+  本番運用方針: { kind: information, paths: [docs/policies/production.md] }
+  デプロイされたサービスの版: { kind: service, paths: [releases/*/deployment.json] }
+  サービス水準目標: { kind: information, paths: [docs/slo.md] }
+  本番の観測結果: { kind: information, paths: [observations/*.md] }
+  インシデント記録: { kind: information, paths: [incidents/*.md] }
+
+# スキルは skillRoots の下で、frontmatter の name、ディレクトリ名、見出しによって探す。
+# 見出しには references/locales/<言語>/SKILL.<言語>.md にある訳の見出しも含む。
+# このワークスペースは英語版のワークスペースのスキルを使う。プロセス名は、各スキルの SKILL.ja.md の見出しと一致させている。
+skillRoots: [../../../service-change/skills]
+
+# 明示した置き場所が優先する。評価のスキルは、リポジトリの例のスキルである。
+skills:
+  サービス変更の評価: ../../../assess-service-change
+
+# 目覚めたエージェントが読む案内。何を先にするか、何を優先するか、どんなときにプロセスを走らせないかを文章で書く。
+# ハーネスはエージェントに場所を示すだけで、中身を解釈しない。
+guidance: [docs/operations.md]
+
+# ハーネスのサーバーがエージェントを起こす時刻。起こされたエージェントはモデル・案内・現状を読み、何を走らせるかを判断する。
+# cron には crontab の五つの欄（分、時、日、月、曜日）を、サーバーを動かすマシンの現地時刻で書く。
+# schedules があるあいだ、サーバーはアイドルで終了しない。外部のスケジューラからは alps-harness wake で起こせる。
+# schedules:
+#   - cron: "0 9 * * 1-5"
+#     agent: claude-code
+
+# WebUI が依頼の添付ファイル（どの画面にもある「依頼する」）を保存する場所。日ごとのディレクトリに置く。
+# inbox/2026-10-01/notes.md、同じ名前なら次は notes-2.md。ワークスペースの中で、かつ .alps-harness/ の外でなければならない。
+# 保存したファイルが上の型の paths に合えば、それもアーティファクトになる。版管理に含めるかはワークスペースが決める。
+attachments: inbox/
+
+# ハーネスのサーバー（デーモン）。接続も実行中の実行もない状態が idleMinutes 続くと終了する。
+# server:
+#   port: 4830
+#   idleMinutes: 30
+
+# エージェントの起動方法を変えるとき（既定値を上書きする）。
+# agents:
+#   claude-code:
+#     args: ["-p", "{prompt}", "--output-format", "stream-json", "--verbose", "--permission-mode", "acceptEdits", "--max-turns", "30"]
+#   codex:
+#     args: ["exec", "--json", "--sandbox", "workspace-write", "--skip-git-repo-check", "{prompt}"]

@@ -1,0 +1,3518 @@
+/*
+ * The screens: the shell (sidebar, header, page heading, panel), the dashboard, the network, the
+ * instances, the panel's contents, and the forms. Long paths are cut with an ellipsis on one
+ * line in tables and tiles (the whole path is in the title) and wrap anywhere in the panel;
+ * long Japanese text wraps.
+ */
+
+/* ---------- shell ---------- */
+
+.app {
+  /* The page's heading row; the panel's column starts below it. */
+  --main-top: 32px;
+  --page-head-height: 44px;
+  --page-head-gap: 22px;
+  min-height: 100dvh;
+  overflow-x: clip;
+}
+
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  width: var(--sidebar-width);
+  padding: 30px 19px 18px;
+  overflow-y: auto;
+  background: var(--sidebar);
+  border-right: 1px solid var(--sidebar-border);
+  backdrop-filter: var(--glass-filter);
+  -webkit-backdrop-filter: var(--glass-filter);
+  scrollbar-width: thin;
+}
+
+.sidebar > * {
+  flex-shrink: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px 30px;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  color: #ffffff;
+  background: linear-gradient(140deg, #7d89d9, #4f5eb6);
+  box-shadow: 0 4px 10px -4px rgba(79, 94, 182, 0.55);
+}
+
+.brand-title {
+  flex: 1;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -1.6px;
+  line-height: 1;
+}
+
+.drawer-close {
+  margin-left: auto;
+}
+
+.workspace-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 10px;
+  margin-bottom: 30px;
+  text-align: left;
+  cursor: pointer;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.workspace-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: var(--secondary);
+  color: var(--brand);
+}
+
+.workspace-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.workspace-text strong {
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.workspace-path {
+  overflow: hidden;
+  font-size: 10.5px;
+  color: var(--faint-foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tabs-nav {
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tabs-nav .tab {
+  gap: 11px;
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  text-align: left;
+}
+
+.tabs-nav .tab:hover {
+  background: var(--card);
+}
+
+.tabs-nav .tab[aria-selected="true"] {
+  color: var(--brand);
+  background: var(--popover);
+  border-color: var(--glass-border);
+  box-shadow: 0 4px 10px -6px rgba(71, 92, 144, 0.3);
+  font-weight: 600;
+}
+
+.sidebar-spacer {
+  flex: 1 1 auto;
+  min-height: 24px;
+}
+
+.sidebar-section {
+  padding: 14px 10px 4px;
+  border-top: 1px solid var(--border);
+}
+
+.sidebar-section .switch-row {
+  gap: 12px;
+}
+
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 39;
+  background: var(--overlay);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  margin-left: var(--sidebar-width);
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: var(--header-height);
+  padding: 10px 28px;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--background) 72%, transparent);
+  backdrop-filter: var(--glass-filter);
+  -webkit-backdrop-filter: var(--glass-filter);
+}
+
+:root[data-glass="off"] .topbar {
+  background: var(--background);
+}
+
+.topbar-start,
+.topbar-end {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.topbar-end {
+  flex-shrink: 0;
+}
+
+.counts {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.count {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--muted-foreground);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.count:hover {
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--foreground);
+}
+
+.count.has-running {
+  color: var(--foreground);
+}
+
+.count.has-stale {
+  color: var(--warning);
+}
+
+.count-n {
+  display: none;
+  font-weight: 600;
+}
+
+.mark-running,
+.mark-stale,
+.mark-stale-ring {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.mark-running {
+  border: 1.6px dashed var(--brand);
+}
+
+.mark-stale {
+  background: var(--warning-mark);
+}
+
+.mark-stale-ring {
+  border: 2.2px solid var(--warning-mark);
+}
+
+.connection {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  font-size: 12px;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+
+.connection-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--chart-succeeded);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--chart-succeeded) 18%, transparent);
+}
+
+.connection.is-connecting .connection-dot {
+  background: var(--warning-mark);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--warning-mark) 18%, transparent);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.connection.is-offline {
+  color: var(--danger);
+  border-color: var(--danger-line);
+}
+
+.connection.is-offline .connection-dot {
+  background: var(--danger);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 18%, transparent);
+}
+
+/* Once the event stream is lost for good, the state is a button that reconnects. */
+.btn.connection.is-offline {
+  border-radius: var(--radius-sm);
+}
+
+.language {
+  gap: 6px;
+}
+
+.theme-select .select-trigger {
+  min-width: 0;
+}
+
+.banners {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 28px;
+}
+
+.banners:not(:empty) {
+  padding-top: 14px;
+}
+
+.workarea {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  flex: 1;
+}
+
+.app.has-column .workarea {
+  grid-template-columns: minmax(0, 1fr) var(--panel-width);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: calc(100dvh - var(--header-height));
+  padding: var(--main-top) 36px 32px;
+}
+
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: var(--page-head-height);
+  margin-bottom: var(--page-head-gap);
+}
+
+.page-title {
+  min-width: 0;
+}
+
+.page-title h2 {
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: 0.035em;
+  line-height: 1.35;
+}
+
+.view {
+  flex: 1;
+  min-width: 0;
+}
+
+.view:focus {
+  outline: none;
+}
+
+.panel {
+  position: sticky;
+  top: calc(var(--header-height) + 16px);
+  max-height: calc(100dvh - var(--header-height) - 32px);
+  margin: calc(var(--main-top) + var(--page-head-height) + var(--page-head-gap)) 36px 24px 0;
+  padding: 26px 22px;
+  overflow-y: auto;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  backdrop-filter: var(--glass-filter);
+  -webkit-backdrop-filter: var(--glass-filter);
+  scrollbar-width: thin;
+}
+
+/* The network in a narrow window: the panel follows the diagram in the page, over nothing. */
+.panel.panel-below {
+  position: static;
+  max-height: none;
+  margin: 20px 0 0;
+  overflow: visible;
+}
+
+/* ---------- toolbars and filters ---------- */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.filters .field {
+  flex: 0 1 190px;
+  min-width: 140px;
+  gap: 5px;
+}
+
+.filters .field-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+.filters .select {
+  width: 100%;
+}
+
+.filters .field-grow {
+  flex: 1 1 220px;
+}
+
+.toolbar-end {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  min-height: 36px;
+}
+
+/* ---------- dashboard ---------- */
+
+.dashboard-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  transition: opacity 0.2s;
+}
+
+.dashboard-body.is-updating {
+  opacity: 0.6;
+}
+
+.dashboard > .alert {
+  margin-bottom: 14px;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  min-height: 150px;
+  padding: 20px 20px 17px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  backdrop-filter: var(--glass-filter);
+  -webkit-backdrop-filter: var(--glass-filter);
+  color: var(--foreground);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.16s,
+    box-shadow 0.16s,
+    border-color 0.16s;
+}
+
+.tile:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.tile:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.tile-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tile-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  line-height: 1.45;
+}
+
+.tile-icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--faint-foreground);
+  background: color-mix(in srgb, var(--muted) 50%, transparent);
+}
+
+.tile-primary .tile-icon {
+  color: var(--brand);
+  background: var(--info-soft);
+  border-color: var(--info-line);
+}
+
+.tile-stale .tile-icon {
+  color: var(--warning);
+  background: var(--warning-soft);
+  border-color: var(--warning-line);
+}
+
+.tile-middle {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 46px;
+}
+
+.tile-value {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+  font-size: 36px;
+  font-weight: 450;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.tile-unit {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--faint-foreground);
+}
+
+.tile-stale .tile-value {
+  color: var(--warning);
+}
+
+.tile-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.tile-sub {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--faint-foreground);
+  overflow-wrap: anywhere;
+}
+
+.tile-arrow {
+  color: var(--faint-foreground);
+  opacity: 0.7;
+}
+
+.tile-now {
+  margin-bottom: 6px;
+}
+
+.tile-skeleton {
+  cursor: default;
+  gap: 12px;
+}
+
+.tile-skeleton:hover {
+  transform: none;
+  box-shadow: var(--shadow);
+}
+
+.spark {
+  flex-shrink: 0;
+  margin-bottom: 4px;
+  opacity: 0.85;
+}
+
+.spark rect {
+  fill: var(--chart-5);
+}
+
+.spark rect.none {
+  fill: var(--chart-grid);
+}
+
+.spark.spark-achieved rect:not(.none) {
+  fill: var(--chart-achieved);
+}
+
+.spark.spark-succeeded rect:not(.none) {
+  fill: var(--chart-succeeded);
+}
+
+.spark.spark-unverified rect:not(.none) {
+  fill: var(--chart-5);
+}
+
+.trends {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+  gap: 14px;
+}
+
+.chart-card .card-header {
+  padding-bottom: 0;
+}
+
+.chart-card .card-body {
+  padding-top: 8px;
+}
+
+.chart-empty {
+  padding: 28px 12px;
+}
+
+.trends-empty .empty {
+  padding: 44px 20px;
+}
+
+.chart-frame {
+  position: relative;
+}
+
+svg.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  border-radius: var(--radius-sm);
+}
+
+svg.chart:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+}
+
+.chart .grid line {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.chart .grid line.base {
+  stroke-dasharray: none;
+}
+
+.chart .axis text {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  fill: var(--faint-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart .slot {
+  fill: transparent;
+}
+
+.chart .slot.pickable {
+  cursor: pointer;
+}
+
+.chart .slot.pickable:hover {
+  fill: var(--accent);
+}
+
+.chart .slot-active {
+  fill: var(--info-soft);
+  stroke: var(--info-line);
+}
+
+.chart .bar {
+  shape-rendering: geometricPrecision;
+}
+
+.c-achieved {
+  fill: var(--chart-achieved);
+  background: var(--chart-achieved);
+}
+
+.c-not-achieved {
+  fill: var(--chart-not-achieved);
+  background: var(--chart-not-achieved);
+}
+
+.c-unverified {
+  fill: var(--chart-unverified);
+  background: var(--chart-unverified);
+}
+
+.c-succeeded {
+  fill: var(--chart-succeeded);
+  background: var(--chart-succeeded);
+}
+
+.c-failed {
+  fill: var(--chart-failed);
+  background: var(--chart-failed);
+}
+
+.c-canceled {
+  fill: var(--chart-canceled);
+  background: var(--chart-canceled);
+}
+
+.c-interrupted {
+  fill: var(--chart-interrupted);
+  background: var(--chart-interrupted);
+}
+
+.c-rate {
+  background: var(--chart-line);
+}
+
+.chart .rate-line {
+  fill: none;
+  stroke: var(--chart-line);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+.chart .rate-dot {
+  fill: var(--chart-line);
+}
+
+.chart .series-line {
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.a0 {
+  stroke: var(--chart-1);
+  fill: var(--chart-1);
+  background: var(--chart-1);
+}
+
+.a1 {
+  stroke: var(--chart-2);
+  fill: var(--chart-2);
+  background: var(--chart-2);
+}
+
+.a2 {
+  stroke: var(--chart-3);
+  fill: var(--chart-3);
+  background: var(--chart-3);
+}
+
+.a3 {
+  stroke: var(--chart-4);
+  fill: var(--chart-4);
+  background: var(--chart-4);
+}
+
+.a4 {
+  stroke: var(--chart-5);
+  fill: var(--chart-5);
+  background: var(--chart-5);
+}
+
+.chart .series-line.a0,
+.chart .series-line.a1,
+.chart .series-line.a2,
+.chart .series-line.a3,
+.chart .series-line.a4 {
+  fill: none;
+}
+
+.chart .whisker {
+  stroke: var(--faint-foreground);
+  stroke-width: 1.2;
+}
+
+.chart .median {
+  fill: var(--chart-achieved);
+  stroke: var(--card);
+  stroke-width: 1.5;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px 12px;
+  font-size: 11.5px;
+  color: var(--muted-foreground);
+}
+
+.chart-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+}
+
+.swatch.c-rate {
+  height: 2px;
+  width: 12px;
+  border-radius: 2px;
+}
+
+.chart-skeleton {
+  margin-top: 16px;
+  border-radius: var(--radius-md);
+}
+
+.dashboard-lower {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+.card-table {
+  margin-top: 14px;
+}
+
+.card-table:focus-visible {
+  outline-offset: -2px;
+}
+
+.card-table .table th:first-child,
+.card-table .table td:first-child {
+  padding-left: 20px;
+}
+
+.breakdown .table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.cell-name {
+  font-weight: 500;
+  min-width: 10em;
+}
+
+.cell-outcome {
+  min-width: 16em;
+}
+
+.outcome-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.55;
+}
+
+.flag {
+  margin-top: 4px;
+  margin-right: 4px;
+}
+
+.ratio {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 64px;
+}
+
+.meter {
+  display: block;
+  width: 64px;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--muted);
+}
+
+.meter-fill {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--chart-achieved);
+}
+
+.counts-cell {
+  min-width: 170px;
+}
+
+.stack {
+  display: flex;
+  width: 140px;
+  height: 7px;
+  margin-bottom: 5px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--muted);
+}
+
+.stack > span {
+  display: block;
+  height: 100%;
+}
+
+.findings-card .card-body {
+  padding-top: 12px;
+}
+
+.findings {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.finding {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.finding:first-child {
+  padding-top: 2px;
+}
+
+.finding:last-child {
+  border-bottom: 0;
+}
+
+.finding-kind {
+  flex-shrink: 0;
+  min-width: 5.5em;
+  justify-content: center;
+}
+
+.finding-body {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.finding-evidence {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 11px;
+  color: var(--faint-foreground);
+}
+
+.finding-evidence li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.findings-empty {
+  padding: 22px 12px;
+}
+
+.findings-more {
+  margin-top: 10px;
+}
+
+/* The evidence of a check or an opportunity: chips that open the record, with its kind's icon. */
+.evidence-chips {
+  gap: 6px;
+}
+
+.chip-evidence {
+  gap: 5px;
+  min-height: 24px;
+  padding: 1px 9px;
+  border-radius: var(--radius-sm);
+  font-size: 11.5px;
+}
+
+.chip-evidence svg {
+  flex-shrink: 0;
+  color: var(--faint-foreground);
+}
+
+.chip-evidence.is-static {
+  cursor: default;
+  color: var(--muted-foreground);
+}
+
+.chip-evidence.is-static:hover {
+  border-color: var(--border-strong);
+  color: var(--muted-foreground);
+}
+
+.chip-agent,
+.chip-scope {
+  border-radius: 999px;
+  cursor: default;
+  color: var(--muted-foreground);
+}
+
+.chip-agent:hover,
+.chip-scope:hover {
+  border-color: var(--border-strong);
+  color: var(--muted-foreground);
+}
+
+/* ---------- assessment (the analysis's upper part: an agent's interpretation) ---------- */
+
+.assessment-card {
+  margin-bottom: 22px;
+}
+
+.assessment-card .card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 14px;
+}
+
+.assessment-empty {
+  padding: 18px 12px 10px;
+}
+
+.assessment-running {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+/* The interpretation: a thin band and a quotation, set apart from the numbers below. */
+.assessment-quote {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 2px 0 2px 16px;
+  border-left: 3px solid var(--brand);
+}
+
+.assessment-by {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-size: 12px;
+}
+
+.assessment-label {
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.assessment-agent {
+  font-weight: 500;
+}
+
+/* What the records gained since: an observation, at the band's end. */
+.assessment-since {
+  margin-left: auto;
+  padding: 1px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  color: var(--muted-foreground);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.assessment-scope {
+  gap: 6px;
+}
+
+.assessment-scope .chip {
+  min-height: 22px;
+  font-size: 11.5px;
+}
+
+.assessment-pov {
+  color: var(--muted-foreground);
+  font-size: 12.5px;
+  font-style: italic;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.assessment-pov::before {
+  content: "“";
+}
+
+.assessment-pov::after {
+  content: "”";
+}
+
+.assessment-summary {
+  position: relative;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.assessment-summary::before {
+  content: "“";
+  position: absolute;
+  top: -6px;
+  left: 0;
+  color: var(--faint-foreground);
+  font-size: 26px;
+  line-height: 1;
+}
+
+.assessment-summary .md {
+  font-size: 13px;
+}
+
+.opportunities {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The kind, the opportunity, and what a person does with it, each in its column. */
+.opportunity {
+  display: grid;
+  grid-template-columns: 7.6em minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+
+.opportunity-kind {
+  justify-self: start;
+  min-width: 5.5em;
+  justify-content: center;
+}
+
+.opportunity-body {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.opportunity-statement {
+  color: var(--foreground);
+}
+
+/* What the records cannot settle: grey, as unverified is everywhere. */
+.opportunity.is-unverified .opportunity-statement {
+  color: var(--muted-foreground);
+}
+
+.opportunity-limits {
+  color: var(--faint-foreground);
+}
+
+.opportunity-review {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+
+.opportunity-review[data-review="none"] {
+  display: none;
+}
+
+.review-note {
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+}
+
+.opportunity-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+/* In a narrow window the kind sits over the opportunity, and the actions under it. */
+@media (max-width: 640px) {
+  .opportunity {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 7px;
+  }
+
+  .opportunity-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .assessment-since {
+    margin-left: 0;
+  }
+}
+
+/* A record cited as evidence: marked where its panel lists it. */
+.list-row.is-cited {
+  border-radius: var(--radius-sm);
+  background: var(--info-soft);
+  box-shadow: inset 3px 0 0 var(--info);
+}
+
+.log-line.is-cited {
+  background: var(--info-soft);
+  box-shadow: inset 3px 0 0 var(--info);
+}
+
+.observation {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- network ---------- */
+
+.network-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.network-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  font-size: 13px;
+}
+
+.crumb-current {
+  padding: 0 4px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.crumb-current .icon {
+  color: var(--brand);
+}
+
+.crumb-name {
+  overflow-wrap: anywhere;
+}
+
+.crumb-separator {
+  color: var(--faint-foreground);
+}
+
+/*
+ * The ring takes the height that the page leaves under the heading, and the whole width (its
+ * drawing keeps a margin): at 1280 × 800 the lowest name is in the window, and the names keep a
+ * legible size. While the legend shows, the ring leaves it its room.
+ */
+.network-canvas {
+  position: relative;
+  height: clamp(420px, calc(100dvh - 232px), 900px);
+  min-height: 0;
+}
+
+.network-card[data-legend="open"] .network-canvas {
+  height: clamp(380px, calc(100dvh - 292px), 860px);
+}
+
+/* The focus view is wide and short: its height follows its own proportions. */
+.network-card[data-mode="focus"] .network-canvas {
+  height: auto;
+}
+
+.network-card[data-mode="focus"] svg.graph {
+  height: auto;
+}
+
+/* Keep the card's change in height continuous while both graph layouts crossfade. */
+html[data-network-transition] .network-card {
+  view-transition-name: network-card;
+}
+
+html[data-network-transition] .network-canvas {
+  view-transition-name: network-graph;
+}
+
+html[data-network-transition]::view-transition {
+  pointer-events: none;
+}
+
+html[data-network-transition]::view-transition-group(network-card),
+html[data-network-transition]::view-transition-group(network-graph) {
+  animation-duration: 360ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html[data-network-transition]::view-transition-old(network-graph) {
+  animation: network-leave 180ms ease-out both;
+}
+
+html[data-network-transition]::view-transition-new(network-graph) {
+  animation: network-enter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+html[data-network-transition="focus"] {
+  --network-enter-scale: 0.97;
+}
+
+html[data-network-transition="ring"] {
+  --network-enter-scale: 1.03;
+}
+
+@keyframes network-leave {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes network-enter {
+  from {
+    opacity: 0;
+    transform: scale(var(--network-enter-scale));
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.network-loading {
+  display: grid;
+  place-items: center;
+}
+
+.ring-skeleton {
+  width: min(60%, 420px);
+  aspect-ratio: 1;
+  height: auto;
+  border-radius: 50%;
+}
+
+svg.graph {
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+}
+
+.graph .backdrop {
+  fill: transparent;
+  cursor: default;
+}
+
+.graph .orbit {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 1;
+  stroke-dasharray: 3 6;
+}
+
+.graph .edges {
+  pointer-events: none;
+}
+
+.graph .edge {
+  fill: none;
+  stroke: var(--edge-line);
+  stroke-width: 1;
+  opacity: 0.28;
+  transition:
+    opacity 160ms ease,
+    stroke 160ms ease;
+}
+
+.graph .edge-control {
+  stroke-dasharray: 4 4;
+}
+
+.graph .edge[data-emphasis="muted"] {
+  opacity: 0.08;
+}
+
+.graph .edge[data-emphasis="active"],
+.network-card[data-mode="focus"] .edge {
+  stroke: var(--edge-highlight);
+  stroke-width: 1.6;
+  opacity: 0.8;
+}
+
+.network-card[data-mode="focus"] .edge-control {
+  stroke-dasharray: 5 5;
+}
+
+/*
+ * A node that the pointer or the keyboard is on brings out the nodes one line away; the rest
+ * steps back. One step only: the lines are relations, not a path to follow.
+ */
+.graph .proc,
+.graph .pill {
+  transition: opacity 160ms ease;
+}
+
+.graph .proc[data-emphasis="muted"],
+.graph .pill[data-emphasis="muted"] {
+  opacity: 0.4;
+}
+
+.graph .proc[data-emphasis="active"] .label-bg,
+.graph .pill[data-emphasis="active"] rect {
+  stroke: var(--edge-highlight);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .graph .edge,
+  .graph .proc,
+  .graph .pill {
+    transition: none;
+  }
+}
+
+.graph .proc,
+.graph .pill,
+.graph .fnode {
+  cursor: pointer;
+}
+
+.graph .proc:focus,
+.graph .pill:focus,
+.graph .fnode:focus {
+  outline: none;
+}
+
+.graph .proc .hit {
+  fill: transparent;
+}
+
+.graph .proc .label-bg {
+  fill: var(--node-fill);
+  stroke: var(--glass-border);
+  stroke-width: 1.2;
+  filter: drop-shadow(0 2px 3px rgba(68, 93, 128, 0.12));
+}
+
+.graph .proc .dot {
+  fill: var(--brand);
+  stroke: var(--background);
+  stroke-width: 3;
+}
+
+/* The ring's names are a size up from the focus view's (network.tsx measures them so). */
+.graph .proc text {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  fill: var(--foreground);
+}
+
+.graph .proc:hover .label-bg,
+.graph .proc:focus-visible .label-bg {
+  stroke: var(--ring);
+}
+
+.graph .proc:focus-visible .label-bg {
+  stroke-width: 2;
+}
+
+.graph .proc:hover text {
+  fill: var(--brand);
+}
+
+.graph .proc .mark {
+  fill: none;
+}
+
+.graph .proc .mark.running {
+  stroke: var(--brand);
+  stroke-width: 1.7;
+  stroke-dasharray: 3 2.5;
+}
+
+.graph .proc .mark.stale {
+  stroke: var(--warning-mark);
+  stroke-width: 2.4;
+}
+
+.graph .pill rect {
+  fill: var(--pill-fill);
+  stroke: var(--border-strong);
+  stroke-width: 1;
+}
+
+.graph .pill text {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  fill: var(--muted-foreground);
+}
+
+.graph .pill:hover rect,
+.graph .pill:focus-visible rect {
+  stroke: var(--ring);
+  fill: var(--secondary);
+}
+
+.graph .pill:focus-visible rect {
+  stroke-width: 2;
+}
+
+.graph .pill:hover text {
+  fill: var(--foreground);
+}
+
+.graph .fnode rect {
+  fill: var(--node-fill);
+  stroke: var(--glass-border);
+  stroke-width: 1.2;
+  filter: drop-shadow(0 2px 4px rgba(68, 93, 128, 0.12));
+}
+
+.graph .fnode.type rect {
+  fill: var(--pill-fill);
+  stroke: var(--border-strong);
+  filter: none;
+}
+
+.graph .fnode.dashed rect {
+  stroke-dasharray: 4 3;
+}
+
+.graph .fnode.focused rect {
+  fill: var(--info-soft);
+  stroke: var(--brand);
+  stroke-width: 1.8;
+}
+
+.graph .fnode text {
+  font-family: var(--font-sans);
+}
+
+.graph .fnode text.name {
+  font-size: 13px;
+  font-weight: 500;
+  fill: var(--foreground);
+}
+
+.graph .fnode.type text.name {
+  font-size: 12.5px;
+  font-weight: 400;
+  fill: var(--muted-foreground);
+}
+
+.graph .fnode.focused text.name {
+  font-size: 14px;
+  font-weight: 600;
+  fill: var(--brand);
+}
+
+.graph .fnode text.note {
+  font-size: 11.5px;
+  fill: var(--faint-foreground);
+}
+
+.graph .fnode:hover rect,
+.graph .fnode:focus-visible rect {
+  stroke: var(--ring);
+}
+
+.graph .fnode:focus-visible rect {
+  stroke-width: 2;
+}
+
+.graph .column-title {
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  fill: var(--faint-foreground);
+}
+
+.legend-toggle[aria-expanded="true"] {
+  color: var(--brand);
+  background: var(--secondary);
+}
+
+/* The legend, until it is closed: a strip under the head, so that it covers none of the graph. */
+.legend {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 18px;
+  margin: 6px 14px 0 20px;
+  padding: 9px 44px 9px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--muted) 40%, transparent);
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+
+.legend-keys {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+}
+
+.legend-keys > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.legend-line {
+  display: inline-block;
+  width: 26px;
+  border-top: 1.6px solid var(--edge-highlight);
+}
+
+.legend-line.line-control {
+  border-top: 1.6px dashed var(--edge-highlight);
+}
+
+.legend-note {
+  font-size: 11.5px;
+  color: var(--faint-foreground);
+}
+
+.legend-close {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+}
+
+/* ---------- instances ---------- */
+
+/* The board follows run facts; Outcome judgments remain visible inside each card. */
+.instances .filters {
+  padding: 16px 18px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  backdrop-filter: var(--glass-filter);
+}
+
+/* How many match, while the filters leave some out; nothing otherwise. */
+.instances .filters .toolbar-end:empty {
+  display: none;
+}
+
+.instance-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(224px, 1fr));
+  gap: 16px;
+  overflow-x: auto;
+  padding: 2px 2px 20px;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+
+.instance-lane {
+  --lane-ink: var(--muted-foreground);
+  --lane-tint: var(--accent);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: clamp(380px, calc(100dvh - 300px), 760px);
+  padding: 14px 11px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  scroll-snap-align: start;
+}
+
+.instance-lane[data-lane="running"] {
+  --lane-ink: var(--info);
+  --lane-tint: var(--info-soft);
+}
+
+.instance-lane[data-lane="succeeded"] {
+  --lane-ink: var(--success);
+  --lane-tint: var(--success-soft);
+}
+
+.instance-lane[data-lane="stopped"] {
+  --lane-ink: var(--warning);
+  --lane-tint: var(--warning-soft);
+}
+
+.instance-lane-heading {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 9px;
+  min-height: 34px;
+  margin: 0 3px 16px;
+}
+
+.instance-lane-icon {
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  color: var(--lane-ink);
+  background: var(--lane-tint);
+}
+
+.instance-lane-heading h3 {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.015em;
+}
+
+.instance-lane-count {
+  display: grid;
+  place-items: center;
+  min-width: 23px;
+  height: 23px;
+  margin-left: auto;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+
+.instance-lane-cards,
+.instance-lane-loading {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  margin: -2px;
+  padding: 2px;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  list-style: none;
+}
+
+.instance-card,
+.instance-card-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+  padding: 16px 14px 12px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface-raised);
+  box-shadow: 0 5px 14px -10px rgba(31, 49, 82, 0.2);
+}
+
+.instance-card {
+  color: var(--foreground);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 160ms,
+    box-shadow 160ms,
+    transform 160ms;
+}
+
+.instance-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.instance-card:focus-visible,
+.instance-card[data-selected="true"] {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.instance-card-head,
+.instance-card-fact,
+.instance-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.instance-card-head {
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.instance-card .badge {
+  padding: 3px 7px;
+  font-size: 10px;
+}
+
+.instance-card-head .badge {
+  flex-shrink: 0;
+}
+
+.instance-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+/* The end of the first input path: its folder, and its file below it when the two do not fit on
+   one line, each cut with an ellipsis; the whole path is in the title. */
+.instance-card-path {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  padding: 7px 8px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--muted-foreground);
+}
+
+.instance-card-path .icon {
+  flex-shrink: 0;
+}
+
+.instance-card-path .mono {
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.instance-card-path .path-part {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+/* The Outcomes' judgments: their own row and their own marks, apart from the lane's result. */
+.instance-card-fact {
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+.instance-card-fact-label {
+  color: var(--faint-foreground);
+}
+
+.instance-card-stale {
+  margin-left: auto;
+}
+
+.instance-card-footer {
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 10.5px;
+  color: var(--faint-foreground);
+}
+
+.instance-card-footer > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.instance-card-footer .icon {
+  flex-shrink: 0;
+}
+
+/*
+ * The wake that made a card, for a request: a button beside the card's own (a button cannot hold
+ * another), laid on the card's footer. It rises with the card, and the card rises with it.
+ */
+.instance-lane-cards > li {
+  position: relative;
+}
+
+/* Keeps the footer's time clear of the request's mark, which lies over this place. */
+.instance-card-origin-space {
+  flex: 0 0 26px;
+  margin-left: auto;
+}
+
+.instance-card-origin {
+  position: absolute;
+  right: 34px;
+  bottom: 8px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition:
+    border-color 160ms,
+    color 160ms,
+    transform 160ms;
+}
+
+.instance-card-origin:hover {
+  border-color: var(--border-strong);
+  color: var(--foreground);
+}
+
+.instance-card-origin:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.instance-card:hover + .instance-card-origin,
+.instance-card-origin:hover {
+  transform: translateY(-2px);
+}
+
+.instance-lane-cards > li:has(> .instance-card-origin:hover) > .instance-card {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.instance-board-empty {
+  margin-bottom: 18px;
+}
+
+.instance-board-empty .empty {
+  min-height: 0;
+  padding: 24px;
+}
+
+@media (max-width: 600px) {
+  .instance-board {
+    grid-template-columns: repeat(4, minmax(264px, 84%));
+    gap: 12px;
+  }
+
+  .instances .filters {
+    padding: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .instance-card,
+  .instance-card-origin {
+    transition: none;
+  }
+
+  .instance-card:hover,
+  .instance-card:hover + .instance-card-origin,
+  .instance-card-origin:hover,
+  .instance-lane-cards > li:has(> .instance-card-origin:hover) > .instance-card {
+    transform: none;
+  }
+}
+
+.glyphs {
+  display: inline-flex;
+  gap: 3px;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.glyphs .g-achieved {
+  color: var(--chart-achieved);
+}
+
+.glyphs .g-not-achieved {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.glyphs .g-unverified {
+  color: var(--faint-foreground);
+}
+
+.glyphs .g-none {
+  color: var(--faint-foreground);
+  opacity: 0.7;
+}
+
+/* ---------- the panel's contents ---------- */
+
+.panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.panel-head-text {
+  min-width: 0;
+}
+
+.kicker {
+  font-size: 11.5px;
+  color: var(--faint-foreground);
+  overflow-wrap: anywhere;
+}
+
+.panel-head h2 {
+  margin-top: 2px;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.panel-head .sub {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+}
+
+.panel-close {
+  flex-shrink: 0;
+  margin: -4px -6px 0 0;
+}
+
+.panel-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 16px;
+}
+
+.panel-tab > .btn,
+[data-testid^="panel-"] > .btn {
+  align-self: flex-start;
+}
+
+[data-testid^="panel-"] {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 13px;
+}
+
+[data-testid^="panel-"] > .panel-head {
+  margin-bottom: 2px;
+}
+
+.panel-text,
+.purpose {
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.purpose {
+  color: var(--muted-foreground);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* The heading and its action on one line, or, where they do not fit, the action below at the right. */
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 8px;
+  min-height: 24px;
+}
+
+.section-head > .btn {
+  margin-left: auto;
+}
+
+.section h3 {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--faint-foreground);
+}
+
+.section h4,
+.panel-tab h4 {
+  margin-top: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.list-row:last-child {
+  border-bottom: 0;
+}
+
+.list-row-stack {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.list-main {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.list-end {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.strong {
+  font-weight: 600;
+}
+
+.danger-text {
+  color: var(--danger);
+  overflow-wrap: anywhere;
+}
+
+/* A path breaks after its slashes (Path puts the chances there), and anywhere only if it must. */
+.path-block,
+.path-cell {
+  overflow-wrap: anywhere;
+}
+
+/* A part of a path with its slash, one box: not broken at a hyphen, nor anywhere unless it is
+   wider than the line. A link's underline does not reach into a box, so it is drawn here. */
+.path-part {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.link:hover .path-part {
+  text-decoration: underline;
+}
+
+.path-block {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--muted) 45%, transparent);
+}
+
+.list .path-block {
+  margin-bottom: 6px;
+}
+
+dl.facts {
+  display: grid;
+  grid-template-columns: minmax(6em, max-content) minmax(0, 1fr);
+  gap: 6px 14px;
+  margin: 0;
+  font-size: 12.5px;
+}
+
+dl.facts dt {
+  color: var(--faint-foreground);
+}
+
+dl.facts dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Types and their paths, each type above its paths, so that a path has the whole width. */
+dl.facts.facts-stack {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+}
+
+dl.facts.facts-stack dt:not(:first-child) {
+  margin-top: 8px;
+}
+
+dl.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--muted) 40%, transparent);
+}
+
+dl.summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+dl.summary dt {
+  font-size: 12px;
+  color: var(--faint-foreground);
+}
+
+dl.summary dd {
+  margin: 0;
+}
+
+.summary-run {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* An id in the details: there for reference (and for MCP), small and quiet. */
+.summary-id .link {
+  font-size: 11.5px;
+  color: var(--muted-foreground);
+}
+
+.summary-id .link:hover {
+  color: var(--brand);
+}
+
+/* The evidence of the judgments is current: a quiet check, its meaning in the title. */
+.current-evidence {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--success);
+}
+
+.path-tail {
+  overflow-wrap: anywhere;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: 26px;
+  padding: 2px 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--card);
+  color: var(--foreground);
+  font-size: 12px;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.chip:hover {
+  border-color: var(--ring);
+  color: var(--brand);
+}
+
+.chip-type {
+  border-radius: 999px;
+  background: var(--pill-fill);
+}
+
+.chip-process {
+  border-radius: var(--radius-sm);
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand);
+  font-size: inherit;
+  text-align: left;
+  cursor: pointer;
+  text-underline-offset: 3px;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.instance-link {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.instance-link-name {
+  font-weight: 500;
+}
+
+.instance-link-path {
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.outcomes,
+.criteria-list,
+.bullets {
+  margin: 0;
+  padding-left: 1.3em;
+  line-height: 1.7;
+}
+
+.outcomes li + li,
+.bullets li + li {
+  margin-top: 4px;
+}
+
+.criteria-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.criteria-list li {
+  display: flex;
+  gap: 10px;
+}
+
+.criterion-number {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  min-width: 20px;
+  height: 20px;
+  margin-right: 6px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: var(--secondary);
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.criteria-list .criterion-number {
+  margin-right: 0;
+}
+
+/* An Outcome without a criterion: the model's words, faint, under a dashed number. */
+.criteria-list [data-criterion="as-stated"] .criterion-number {
+  background: none;
+  border: 1px dashed var(--border-strong);
+}
+
+.judgments {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.judgment-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  overflow-wrap: anywhere;
+}
+
+.judgment-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-select {
+  flex: 1 1 160px;
+}
+
+.action-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 auto;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--brand);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.tab-lead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+pre.log {
+  max-height: 420px;
+  margin: 0;
+  padding: 12px 14px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-solid) 70%, transparent);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  scrollbar-width: thin;
+}
+
+.log-time {
+  color: var(--faint-foreground);
+}
+
+.log-kind {
+  color: var(--brand);
+}
+
+.k-error .log-kind,
+.k-error .log-text {
+  color: var(--danger);
+}
+
+.k-system .log-kind,
+.k-end .log-kind {
+  color: var(--success);
+}
+
+.following {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+
+.skill {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skill-path {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-wrap: anywhere;
+}
+
+dl.front {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 4px 12px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+}
+
+dl.front dt {
+  font-family: var(--font-mono);
+  color: var(--faint-foreground);
+}
+
+dl.front dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.md {
+  font-size: 13px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.md > * + * {
+  margin-top: 0.7em;
+}
+
+.md h1,
+.md h2,
+.md h3,
+.md h4 {
+  margin-top: 1.1em;
+  font-size: 14px;
+}
+
+.md h1 {
+  font-size: 16px;
+}
+
+.md p,
+.md ul,
+.md ol,
+.md pre,
+.md table,
+.md blockquote {
+  margin-bottom: 0;
+}
+
+.md ul,
+.md ol {
+  padding-left: 1.4em;
+}
+
+.md code {
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: var(--secondary);
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+.md pre {
+  padding: 10px 12px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-solid) 70%, transparent);
+}
+
+.md pre code {
+  padding: 0;
+  background: none;
+}
+
+.md table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.md th,
+.md td {
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.md blockquote {
+  margin-left: 0;
+  padding-left: 12px;
+  border-left: 3px solid var(--border-strong);
+  color: var(--muted-foreground);
+}
+
+.md a {
+  color: var(--brand);
+}
+
+.md .md-link {
+  color: var(--muted-foreground);
+  text-decoration: underline dotted;
+}
+
+.md .md-image {
+  color: var(--faint-foreground);
+  font-style: italic;
+}
+
+.problem p + p,
+.problem-files-title {
+  margin-top: 6px;
+}
+
+.problem-files-title {
+  font-weight: 600;
+}
+
+.problem-files {
+  margin: 4px 0 0;
+  padding-left: 1.2em;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- forms ---------- */
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 14px 16px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--card) 70%, transparent);
+}
+
+.group > legend {
+  display: flex;
+  align-items: flex-start;
+  padding: 0 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+/* The request box: files are dropped anywhere on it, and the zone says so while they are over it. */
+.dropzone {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 12px;
+  padding: 18px 16px;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--muted) 35%, transparent);
+  color: var(--muted-foreground);
+  text-align: center;
+  transition:
+    border-color 160ms,
+    background-color 160ms;
+}
+
+.dropzone.is-over {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 9%, transparent);
+  color: var(--foreground);
+}
+
+.dropzone-text {
+  font-size: 12.5px;
+}
+
+.attachment-list .list-row {
+  padding: 6px 0;
+}
+
+.attachment-name {
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.attachment-name .icon {
+  flex-shrink: 0;
+  color: var(--faint-foreground);
+}
+
+.request-processes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px 16px;
+}
+
+.request-options {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 560px) {
+  .request-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* What a wake was asked, in its record: the request as its requester wrote it, then the rest. */
+.request-part {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.request-text {
+  padding: 10px 12px;
+  border-left: 3px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+  background: color-mix(in srgb, var(--muted) 40%, transparent);
+  font-size: 12.5px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dropzone {
+    transition: none;
+  }
+}
+
+.criterion {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.criterion:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.criterion-outcome {
+  display: flex;
+  align-items: flex-start;
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.criterion-note {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+
+.outcome-field > legend {
+  max-width: 100%;
+}
+
+.judgment-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* The preview's proportions: breathing room around the work, quiet glass surfaces. */
+/* The title's text is the name and the product; the dot and the capitals are drawn. */
+.brand-title {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.brand-name::after {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-left: 2px;
+  border-radius: 50%;
+  background: #7082bb;
+}
+.brand-caption {
+  padding-bottom: 4px;
+  color: var(--faint-foreground);
+  font-size: 7px;
+  font-weight: 400;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+}
+.brand-mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  /* The ALPS mark, a copy of the repository's assets/icon.svg: the harness bundles on its own. */
+  background: url("./icon.svg") center / contain no-repeat;
+  box-shadow: none;
+}
+.workspace-text strong {
+  font-size: 12px;
+  line-height: 1.65;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.workspace-path {
+  max-width: 125px;
+  margin-top: 2px;
+}
+.tabs-nav {
+  gap: 6px;
+}
+.tabs-nav .tab {
+  position: relative;
+  min-height: 44px;
+  font-size: 12px;
+}
+.tabs-nav .tab[aria-selected="true"]::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  margin-left: auto;
+  border-radius: 50%;
+  background: currentColor;
+}
+.sidebar-section {
+  padding-top: 18px;
+}
+.sidebar-section .check-label {
+  font-size: 11px;
+}
+.topbar {
+  padding: 10px 36px;
+  background: transparent;
+}
+.connection {
+  border-color: var(--glass-border);
+  font-size: 11px;
+  height: 27px;
+  padding: 0 9px;
+}
+.theme-select .select-trigger {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+.theme-select .select-chevron {
+  display: none;
+}
+.theme-select .select-trigger {
+  width: 30px;
+  justify-content: center;
+}
+.app.has-column .main {
+  padding-right: 18px;
+}
+.app.has-column .page-head {
+  width: calc(100% + var(--panel-width) - 18px);
+}
+.tile-label {
+  font-size: 11.5px;
+  font-weight: 400;
+}
+.tile-sub {
+  font-size: 10.5px;
+}
+.tile-middle {
+  min-height: 50px;
+}
+.tile-icon {
+  border-color: var(--border);
+  opacity: 0.78;
+}
+.tile .spark {
+  opacity: 0.48;
+  width: 66px;
+}
+.tile-primary .tile-icon {
+  color: var(--brand);
+}
+.tile-stale .tile-value {
+  color: var(--foreground);
+}
+.tiles-secondary {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.tiles-secondary .tile {
+  min-height: 104px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 5px 18px;
+  padding: 17px 22px;
+}
+.tiles-secondary .tile-top {
+  align-items: center;
+}
+.tiles-secondary .tile-icon {
+  display: none;
+}
+.tiles-secondary .tile-middle {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  min-height: 0;
+  align-items: center;
+}
+.tiles-secondary .tile-value {
+  font-size: 25px;
+}
+.tiles-secondary .spark,
+.tiles-secondary .tile-arrow {
+  display: none;
+}
+.tiles-secondary .tile-sub {
+  max-width: 30em;
+}
+.dashboard-filters .field-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+.dashboard-filters .field {
+  flex-basis: 196px;
+  min-width: 0;
+}
+.dashboard-filters .filter-period {
+  margin-left: auto;
+  flex-basis: 126px;
+}
+.dashboard-filters .filter-granularity {
+  flex-basis: 88px;
+}
+.dashboard-filters .select-trigger {
+  font-size: 12px;
+}
+.dashboard-body {
+  gap: 18px;
+}
+.summary-charts {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+  gap: 18px;
+}
+/* The runs and their results beside the donut: the chart sits in the middle of its card. */
+.summary-trend {
+  display: flex;
+  flex-direction: column;
+}
+.summary-trend .card-body {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+}
+.series-area {
+  stroke: none;
+  opacity: 0.1;
+}
+.summary-trend .chart-empty-note {
+  position: absolute;
+  inset: 64px 25px auto;
+  z-index: 1;
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.summary-donut .card-body {
+  padding-top: 18px;
+}
+/* The ring only: its counts are in the legend below, and the total and the rate are the tiles'. */
+.donut-wrap {
+  width: 170px;
+  height: 170px;
+  margin: 0 auto 20px;
+}
+.donut-wrap svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.donut-track {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 8;
+}
+.donut-segment {
+  fill: none;
+  stroke-width: 8;
+}
+.donut-legend {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  gap: 8px;
+}
+.donut-legend div {
+  text-align: center;
+}
+.donut-legend dt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+.donut-legend dd {
+  margin: 4px 0 0;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.donut-legend .swatch {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+/* Where the view is, and the way back from a focus, on the left; the legend's "?" on the right. */
+.network-head {
+  padding: 12px 14px 2px 20px;
+}
+.network-toolbar {
+  flex-wrap: nowrap;
+  border-bottom: 0;
+  padding: 0;
+}
+.network-toolbar .crumb {
+  font-size: 12px;
+}
+.graph .proc .dot {
+  opacity: 0.38;
+}
+.graph .orbit {
+  opacity: 0.5;
+}
+.overview-symbol {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  color: var(--brand);
+  background: var(--secondary);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  margin-bottom: 10px;
+}
+[data-testid="panel-overview"] {
+  gap: 20px;
+}
+[data-testid="panel-overview"] .panel-text {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  line-height: 1.9;
+}
+[data-testid="panel-overview"] .section {
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+[data-testid="panel-overview"] .list-row {
+  border-bottom: 0;
+  padding: 8px 0;
+}
+[data-testid="panel-overview"] .strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+[data-testid="panel-overview"] .list-row .small {
+  font-size: 10px;
+}
+.overview-counts {
+  display: flex;
+  gap: 26px;
+  padding: 0 0 4px;
+}
+.overview-counts div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.overview-counts strong {
+  font-weight: 450;
+  font-size: 29px;
+}
+.overview-counts span {
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+.panel-head h2 {
+  font-size: 16px;
+  font-weight: 550;
+  line-height: 1.6;
+}
+.panel-head .kicker {
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+/* In the panel's narrow column the sections wrap to a second row rather than hide past its edge. */
+.panel .tabs-line {
+  flex-wrap: wrap;
+  column-gap: 12px;
+  overflow-x: visible;
+}
+
+.panel .tabs-line .tab {
+  font-size: 12.5px;
+}
+.panel .path-block {
+  font-size: 10px;
+}
+.instances .filters .field {
+  flex: 1 1 160px;
+}
+.instances .filters .field-grow {
+  flex-basis: 240px;
+}
+
+/* ---------- widths ---------- */
+
+/* Between the drawer and the full sidebar, the sidebar is a rail of icons (names in titles). */
+@media (min-width: 761px) and (max-width: 1059px) {
+  :root {
+    --sidebar-width: 72px;
+  }
+
+  .sidebar {
+    align-items: center;
+    padding: 18px 12px 16px;
+  }
+
+  .brand {
+    justify-content: center;
+    padding: 0 0 18px;
+  }
+
+  .sidebar .brand-caption,
+  .sidebar .brand-title,
+  .sidebar .workspace-text,
+  .sidebar .tab-label,
+  .sidebar-section .check-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .workspace-card {
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    margin-bottom: 18px;
+  }
+
+  .sidebar-nav {
+    width: 100%;
+  }
+
+  .tabs-nav {
+    align-items: center;
+  }
+
+  .tabs-nav .tab {
+    justify-content: center;
+    width: 46px;
+    min-height: 44px;
+    padding: 0;
+  }
+
+  .sidebar-section {
+    width: 100%;
+    padding: 12px 0 0;
+  }
+
+  .sidebar-section .switch-row {
+    justify-content: center;
+  }
+
+  .topbar,
+  .main,
+  .banners {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+}
+
+@media (max-width: 1179px) {
+  .connection-text {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .sidebar {
+    z-index: 50;
+    width: min(280px, 86vw);
+    background: var(--popover);
+    box-shadow: var(--shadow-dialog);
+    transform: translateX(-104%);
+    visibility: hidden;
+    transition:
+      transform 0.22s ease,
+      visibility 0s linear 0.22s;
+  }
+
+  .sidebar.is-open {
+    transform: none;
+    visibility: visible;
+    transition: transform 0.22s ease;
+  }
+
+  .shell {
+    margin-left: 0;
+  }
+
+  .topbar {
+    gap: 6px;
+    padding: 8px 12px;
+    min-height: 56px;
+  }
+
+  .topbar-end {
+    gap: 4px;
+  }
+
+  .count {
+    padding: 0 7px;
+    gap: 5px;
+  }
+
+  .count-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .count-n {
+    display: inline;
+  }
+
+  .language-text {
+    display: none;
+  }
+
+  .language {
+    width: 30px;
+    padding: 0;
+  }
+
+  .main {
+    padding: 18px 16px 24px;
+  }
+
+  .banners {
+    padding: 0 16px;
+  }
+
+  .page-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .page-title h2 {
+    font-size: 21px;
+  }
+
+  .filters .field {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+  }
+
+  .toolbar-end {
+    width: 100%;
+    justify-content: space-between;
+    margin-left: 0;
+  }
+
+  .tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .tile {
+    min-height: 124px;
+    padding: 12px 12px 11px;
+  }
+
+  .tile-value {
+    font-size: 24px;
+  }
+
+  .tile .spark {
+    display: none;
+  }
+
+  .card-header {
+    padding: 14px 14px 0;
+  }
+
+  .card-body {
+    padding: 12px 14px 16px;
+  }
+
+  .card-table .table th:first-child,
+  .card-table .table td:first-child,
+  .table th:first-child,
+  .table td:first-child {
+    padding-left: 14px;
+  }
+
+  .chart-legend {
+    justify-content: flex-start;
+  }
+
+  /* Too narrow for the graph's names: it keeps a readable size and scrolls sideways. */
+  .network-canvas,
+  .network-card[data-mode="focus"] .network-canvas {
+    height: auto;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  .network-canvas svg.graph {
+    width: 720px;
+    max-width: none;
+    height: auto;
+  }
+
+  .legend {
+    margin: 6px 12px 0;
+    padding: 9px 40px 9px 12px;
+  }
+
+  .dialog-header {
+    padding: 20px 52px 2px 18px;
+  }
+
+  .dialog-body {
+    padding: 14px 18px 18px;
+  }
+
+  .dialog-footer {
+    padding: 12px 18px 16px;
+  }
+
+  .dialog-footer .btn {
+    flex: 1 1 auto;
+  }
+
+  .group {
+    padding: 12px 12px 14px;
+  }
+
+  .inline {
+    flex-direction: column;
+  }
+
+  .sheet-surface {
+    padding: 18px 16px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tile-label {
+    font-size: 12px;
+  }
+
+  .tile-sub {
+    font-size: 11px;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1059px) {
+  .tabs-nav .tab[aria-selected="true"]::after {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .page-head {
+    min-height: 0;
+    margin-bottom: 24px;
+  }
+  .tiles-secondary {
+    grid-template-columns: 1fr;
+  }
+  .summary-charts {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-filters .filter-period {
+    margin-left: 0;
+  }
+  .dashboard-filters .filter-period,
+  .dashboard-filters .filter-granularity {
+    flex: 1 1 calc(50% - 6px);
+  }
+  .summary-trend .chart-frame {
+    margin-top: 26px;
+  }
+  .network-head {
+    padding: 10px 10px 2px 14px;
+  }
+  .network-canvas {
+    padding: 8px 0;
+  }
+  .sheet-surface {
+    padding: 24px 18px;
+  }
+}
+
+/* Keep the board within reach on small screens, with a two-row filter bar. */
+@media (max-width: 600px) {
+  .instances .filters .field {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+  }
+}
+
+.instance-board:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-xl);
+}
+
+/* Agent choices use the same glass fields in dialogs and in the narrower run panel. */
+.agent-settings {
+  min-width: 0;
+}
+.agent-settings-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 12px;
+}
+.agent-settings-fields .field {
+  min-width: 0;
+}
+.agent-settings-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+.agent-settings-error {
+  color: var(--danger);
+  overflow-wrap: anywhere;
+  margin: 4px 0 0;
+}
+.instance-agent-settings {
+  display: grid;
+  gap: 12px;
+}
+.instance-agent-settings .agent-settings-fields {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (max-width: 480px) {
+  .agent-settings-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

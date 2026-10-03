@@ -48,3 +48,9 @@ python3 scripts/compare_measurements.py assets/baseline.csv assets/candidate.csv
 | 作業システム | 通常の測定値を与えるが、候補では同時クライアント数が1でなく10だったと明示する。 | 数値検査は満たしたままだが、比較可能な条件は確認できていない。影響する評価の成果は未確認のままとし、必要な追加証拠を識別する。 |
 
 リポジトリのテストはスクリプトとCLIの契約を検査する。構成全体の評価には、エージェントを介したこれらのケースの適用が必要である。その評価を報告する際は、実際のエージェント・環境、ケース、判断、限界を示す。データの計算は、稼働中のサービスや、本番用測定計画の科学的な妥当性を検証するものではない。
+
+## ハーネスのワークスペース
+
+`examples/service-change/`は、ALPSハーネスの例のワークスペースである。その[プロセスモデル](service-change/process-model.yaml)は、架空の11のプロセスを15のアーティファクトの型だけを介してつなぎ、[alps-harness.yaml](service-change/alps-harness.yaml)は、それらのアーティファクトの置き場所と適用するSkillを示す。三つのプロセスには`examples/service-change/skills/`に例のSkillがあり、サービス変更の評価には上記のSkillを用いる。変更CHG-001とCHG-002のアーティファクトは合成データである。`guidance`で指す[運用の案内](service-change/docs/operations.md)は、何を先にするか、何を優先するか、どんなときにプロセスを走らせないかを文章で書く。ハーネスが起こすエージェントはそれを読み、ハーネスはそれを解釈しない。
+
+[日本語版](service-change/alps-harness.yaml)の`examples/locales/ja/service-change/`は`language: ja`とし、同じSkillを用いる。ハーネスは、Skillのname、ディレクトリ名、見出しによってプロセスのSkillを探し、見出しには`references/locales/<言語>/SKILL.<言語>.md`にある訳の見出しも含む。このため、日本語版のプロセス名はそれらの見出しと一致させている。

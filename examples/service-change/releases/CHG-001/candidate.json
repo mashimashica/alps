@@ -1,0 +1,7 @@
+{
+  "artifact": "Release candidate",
+  "case": "CHG-001",
+  "image": "registry.example.com/shop/search@sha256:4f1c9a0d2b7e",
+  "commit": "a1b2c3d",
+  "note": "The candidate itself is in the registry; only the reference needed to identify it is kept here."
+}

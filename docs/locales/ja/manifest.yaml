@@ -7,16 +7,19 @@ status: reviewed
 sources:
   AGENTS.md:
     source: ../../../AGENTS.md
-    reviewed_source_sha256: 8d02dec29693f208ce23f6178fcc751434ff30dc471048c00ff688b6e3022255
+    reviewed_source_sha256: 5a2323757b5b1320c01ac0b9ece4f2e240c904820e1f7350c42d2db9feb58d3a
   CONTRIBUTING.md:
     source: ../../../CONTRIBUTING.md
     reviewed_source_sha256: 9d46703b960c9f27e8269c5dabd96d55d01519b67564f5f68454998aedf140e2
   README.md:
     source: ../../../README.md
-    reviewed_source_sha256: 92c96d58c9af3206d259e80d2f53c92e3832a2dd3f37f4340ba0119e71637779
+    reviewed_source_sha256: f51314cd0048e81494c240f8683fef346c22cc6338afeeb6ad8aa9d1ce24a849
   versioning.md:
     source: ../../versioning.md
     reviewed_source_sha256: 2fd119249218765a7e0ac7e1f66998c068348f45c2041ce8ec4dc827bdd5c538
+  runtime-product-boundary.md:
+    source: ../../runtime-product-boundary.md
+    reviewed_source_sha256: 027cc9862c4f782c0229c3658f56bd8c51c2f51d2ea47f0ac06f23ff9cd1f645
   releases/0.6.0.md:
     source: ../../releases/0.6.0.md
     reviewed_source_sha256: 1191210af2cfe5eea631350faed3415c14f0e3f2a4f7b2acaeaa32401a8a0db4
@@ -26,3 +29,6 @@ sources:
   releases/0.8.0.md:
     source: ../../releases/0.8.0.md
     reviewed_source_sha256: 53741acf39357e06d29152bc4d262f05e3c8c0b6dca65a345f26eb6b37d4aad0
+  releases/0.9.0.md:
+    source: ../../releases/0.9.0.md
+    reviewed_source_sha256: f1715e12183e879f5992cd84807ab38034d2c580448235f56a295d3e18943ce6

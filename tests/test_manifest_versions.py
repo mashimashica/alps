@@ -1,4 +1,4 @@
-"""Keep native Plugin manifests aligned with the repository release version."""
+"""Keep native Plugin manifests and the harness package aligned with the repository release version."""
 
 import json
 import unittest
@@ -9,10 +9,11 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFESTS = (
     "plugin.json",
     ".claude-plugin/plugin.json",
-    ".cursor-plugin/plugin.json",
     ".codex-plugin/plugin.json",
 )
 MARKETPLACE = ".claude-plugin/marketplace.json"
+# The harness has no version of its own; its package carries the release version.
+HARNESS_PACKAGE = "harness/package.json"
 
 
 def load(path: str) -> dict:
@@ -32,7 +33,7 @@ def marketplace_entry() -> dict:
 class ManifestVersionTests(unittest.TestCase):
     def test_versions_match_release_version(self) -> None:
         version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
-        for path in MANIFESTS:
+        for path in (*MANIFESTS, HARNESS_PACKAGE):
             with self.subTest(manifest=path):
                 self.assertEqual(load(path)["version"], version)
         with self.subTest(manifest=MARKETPLACE):

@@ -48,3 +48,9 @@ The table gives criteria for evaluating the example, not a claim that every agen
 | Work system | Supply the normal measurements but state that the candidate used ten concurrent clients instead of one. | Numerical checks still hold, but comparable conditions have not been established. The affected assessment Outcome remains unconfirmed. Identify the additional evidence needed. |
 
 Repository tests exercise the script and CLI contract. An agent-mediated application of these cases is needed to evaluate the whole configuration. Record the actual agent/environment, cases, judgments, and limits when reporting that evaluation. Fixture calculations do not validate an operational service or the scientific adequacy of a production measurement plan.
+
+## Harness workspace
+
+`examples/service-change/` is an example workspace for the ALPS harness. Its [process model](service-change/process-model.yaml) connects eleven fictional Processes only through fifteen Artifact types, and its [alps-harness.yaml](service-change/alps-harness.yaml) states where their Artifacts are and which Skills apply. Three Processes have example Skills under `examples/service-change/skills/`, and Service Change Assessment uses the Skill described above. The Artifacts for the changes CHG-001 and CHG-002 are synthetic. The [operations guidance](service-change/docs/operations.md), which `guidance` names, says in prose what comes first, what takes priority, and when not to run a Process; the agent that the harness wakes reads it, and the harness does not interpret it.
+
+The [Japanese counterpart](locales/ja/service-change/alps-harness.yaml), `examples/locales/ja/service-change/`, sets `language: ja` and uses the same Skills. The harness finds a Process's Skill by the Skill's name, directory name, or heading, including the heading of its translation in `references/locales/<lang>/SKILL.<lang>.md`; the Japanese Process names therefore match those headings.
