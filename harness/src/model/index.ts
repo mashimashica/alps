@@ -1,6 +1,13 @@
 export { describeModel } from "./describe.ts";
 export { createWorkspace, type CreateWorkspaceOptions } from "./create.ts";
 export {
+  ModelRevisionError,
+  prepareWorkspaceModelUpdate,
+  updateWorkspaceModel,
+  type PreparedWorkspaceModelUpdate,
+  type UpdateWorkspaceModelOptions,
+} from "./edit.ts";
+export {
   CONFIG_FILES,
   HARNESS_DIR,
   MODEL_FILES,

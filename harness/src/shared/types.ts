@@ -24,13 +24,31 @@ export interface ArtifactType {
 }
 
 /** A Process of the process model. Inputs, controls, and outputs are Artifact type ids. */
+export interface ProcessActivity {
+  name: string;
+  tasks: string[];
+  supportsOutcomes?: string[];
+}
+
+export interface ModelWriteActivity {
+  name: string;
+  tasks?: string[];
+  supportsOutcomes?: string[];
+}
+
 export interface Process {
   id: string;
   name: string;
   purpose: string;
   outcomes: string[];
+  scope?: string;
+  activities?: ProcessActivity[];
+  tasks?: string[];
   constraints: string[];
   enablers: string[];
+  entryCriteria?: string[];
+  exitCriteria?: string[];
+  references?: string[];
   inputs: string[];
   controls: string[];
   outputs: string[];
@@ -38,7 +56,7 @@ export interface Process {
   skill: string | null;
 }
 
-/** The meaning of the work, read from process-model.yaml and never written by the harness. */
+/** The meaning of the work, read from process-model.yaml. */
 export interface ProcessModel {
   name: string;
   description: string;
@@ -101,15 +119,210 @@ export interface ModelDescription {
   modelPath: string;
   configPath: string | null;
   language: Language;
+  /** A file-state revision for optimistic writes to the model/configuration files. */
+  revision: string;
   name: string;
   description: string;
   processes: ProcessView[];
   artifacts: ArtifactType[];
 }
 
+/** A Process entry written to process-model.yaml through the local authoring API. */
+export interface ModelWriteProcess {
+  id?: string;
+  name: string;
+  purpose?: string;
+  outcomes?: string[];
+  scope?: string;
+  activities?: ModelWriteActivity[];
+  tasks?: string[];
+  constraints?: string[];
+  enablers?: string[];
+  entryCriteria?: string[];
+  exitCriteria?: string[];
+  references?: string[];
+  inputs?: string[];
+  controls?: string[];
+  outputs?: string[];
+  skill?: string | null;
+}
+
+/** An Artifact type entry written to process-model.yaml through the local authoring API. */
+export interface ModelWriteArtifact {
+  id?: string;
+  name: string;
+  description?: string;
+  kind?: ArtifactKind | null;
+  paths?: string[];
+}
+
+/** A full replacement of the model's meaning file, guarded by the model revision the UI read. */
+export interface ModelWriteRequest {
+  expectedRevision: string;
+  name: string;
+  description?: string;
+  draft?: boolean;
+  processes: ModelWriteProcess[];
+  artifacts?: ModelWriteArtifact[];
+}
+
 /** What `get_model` and `GET /api/model` return: the model with the agents that can run its Processes. */
 export interface ModelView extends ModelDescription {
   agents: AgentInfo[];
+}
+
+/* ---------- process description authoring ---------- */
+
+export type DesignStatus =
+  | "pending"
+  | "connected"
+  | "running"
+  | "needs-input"
+  | "ready"
+  | "failed"
+  | "canceled"
+  | "applied";
+
+export type DesignMethod = "desktop" | "cli";
+
+export interface DesignDesktopSession {
+  openedAt?: number;
+  connectedAt?: number;
+  provider: "claude" | "codex" | null;
+  prompt: string;
+  conversationUrl?: string;
+  sessionId?: string;
+  /** MCP session id of the provider connection that claimed this design session. */
+  mcpSession?: string;
+  client?: ClientInfo;
+  /** Working directory reported by the agent and matched to the ALPS workspace. */
+  workspace?: string;
+  workspaceConfirmedAt?: number;
+}
+
+export interface DesignReference {
+  path: string;
+  sha256: string | null;
+  bytes: number;
+  truncated: boolean;
+}
+
+export interface DesignSource {
+  id: string;
+  label: string;
+  path: string;
+  sha256: string | null;
+  bytes: number | null;
+  available: boolean;
+  reason: string | null;
+}
+
+export interface DesignSkillFileDraft {
+  /** Relative to the workspace; saved together with the model by the design bundle writer. */
+  path: string;
+  content: string;
+  expectedSha256?: string | null;
+}
+
+export interface DesignProposal {
+  /** Short explanation of the proposed Process Description changes. */
+  summary: string;
+  /** A full process-model.yaml replacement, guarded by the model revision used to make it. */
+  model: ModelWriteRequest;
+  /** Skill packages and their required supporting files, saved with the model. */
+  skillFiles?: DesignSkillFileDraft[];
+}
+
+export interface DesignMessage {
+  role: "user" | "agent" | "system";
+  text: string;
+  at: number;
+}
+
+export interface DesignSession {
+  id: string;
+  status: DesignStatus;
+  createdAt: number;
+  updatedAt: number;
+  request: string;
+  /** Idempotence key for the full create request scope. */
+  dedupeKey?: string;
+  process: string | null;
+  references: DesignReference[];
+  method: DesignMethod;
+  /** New creation requests save validated bundles automatically; absent on legacy proposals. */
+  autoSave?: boolean;
+  /** File hashes captured by the runtime, never supplied by the design agent. */
+  skillBaseline?: Record<string, string>;
+  /** Present when the model and Skill bundle have been saved, including an unchanged bundle. */
+  savedFiles?: string[];
+  appliedRevision?: string;
+  agent: AgentId;
+  selection?: AgentSelection;
+  expectedRevision: string;
+  messages: DesignMessage[];
+  proposal: DesignProposal | null;
+  error: string | null;
+  command: string | null;
+  sources: DesignSource[];
+  desktop?: DesignDesktopSession;
+  appliedAt?: number;
+}
+
+/** Small, read-only index; proposals, prompts, and file contents stay in the detail endpoint. */
+export type DesignSummary = Pick<
+  DesignSession,
+  | "id"
+  | "status"
+  | "createdAt"
+  | "updatedAt"
+  | "request"
+  | "process"
+  | "method"
+  | "agent"
+  | "appliedAt"
+>;
+
+export interface DesignsResponse {
+  ok: true;
+  designs: DesignSummary[];
+  next: number | null;
+}
+
+export interface DesignAgentCapability {
+  id: string;
+  label: string;
+  available: boolean;
+  version: string | null;
+  reason: string | null;
+  canDesign: boolean;
+  method: "cli";
+  methods: {
+    desktop: { available: boolean; reason: string | null };
+    cli: { available: boolean; reason: string | null };
+  };
+  readOnly: {
+    supported: boolean;
+    description: string;
+  };
+}
+
+export interface DesignCapabilitiesResponse {
+  ok: true;
+  workspace: string;
+  desktop: {
+    supported: boolean;
+    reason: string | null;
+    tools: {
+      claim: "claim_design";
+      context: "get_design_context";
+      questions: "submit_design_questions";
+      proposal: "submit_design_proposal";
+      available: boolean;
+    };
+  };
+  sources: DesignSource[];
+  agents: DesignAgentCapability[];
 }
 
 /* ---------- artifacts ---------- */
@@ -347,11 +560,22 @@ export interface LaunchRecord {
   runId: string | null;
   error: ErrorInfo | null;
 }
+export interface LaunchConversationLink {
+  provider: "claude" | "codex" | null;
+  sessionId?: string;
+  url: string | null;
+  canOpen: boolean;
+  reason: string | null;
+}
 export interface LaunchResponse {
   ok: true;
   launch: LaunchRecord;
   run?: RunView;
   prompt?: string;
+  /** Present when the launch is tied to, or could be tied to, a host conversation. */
+  conversation?: LaunchConversationLink;
+  /** Present on /open: true when a native viewer was actually opened. */
+  opened?: boolean;
 }
 export interface LaunchesResponse {
   ok: true;
@@ -385,6 +609,7 @@ export interface ExecutionMcpProbe {
   initialized: boolean;
   toolsListed: boolean;
   claimTool: boolean;
+  designTools: boolean;
   toolCount: number;
   error: string | null;
 }
@@ -393,6 +618,10 @@ export interface ExecutionDesktopStatus {
   installed: boolean;
   scheme: "claude" | "codex" | null;
   canOpen: boolean;
+  /** Desktop starts are prefilled handoffs; the run starts only after claim_launch succeeds. */
+  claimRequired?: boolean;
+  /** The runtime verifies project MCP config/tool shape, not a future desktop session. */
+  claimConnectionVerified?: boolean;
   canStartFromAlps: boolean;
   reason: string | null;
 }
@@ -403,6 +632,11 @@ export interface ExecutionAgentCapability {
   cli: { available: boolean; version: string | null; reason: string | null };
   desktopStatus: ExecutionDesktopStatus;
   mcp: { supported: boolean; claimTool: boolean; reason: string | null };
+  conversation: {
+    canOpenExisting: boolean;
+    source: "codex-url" | "unsupported" | "unavailable";
+    reason: string | null;
+  };
 }
 export interface ExecutionCapabilities {
   ok: true;
@@ -728,10 +962,19 @@ export interface Failure {
 
 /* ---------- HTTP API responses (the MCP tools return the same) ---------- */
 
-/** `GET /api/model` (`get_model`). */
+/** `GET /api/model` (`get_model`) and `POST /api/model` (local authoring). */
 export interface ModelResponse {
   ok: true;
   model: ModelView;
+}
+
+/** `GET /api/designs/:id`, `POST /api/designs`, and design follow-up routes. */
+export interface DesignResponse {
+  ok: true;
+  design: DesignSession;
+  model?: ModelView;
+  prompt?: string;
+  opened?: boolean;
 }
 
 /** `GET /api/artifacts` (`list_artifacts`): newest first. */

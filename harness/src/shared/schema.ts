@@ -36,6 +36,16 @@ const textList = z
     ),
   );
 
+/** One text or a list of texts for writes. Missing preserves the existing value; null clears it. */
+const optionalTextList = z
+  .union([text, z.array(text)])
+  .nullish()
+  .transform((value) => {
+    if (value === undefined) return undefined;
+    if (value === null) return [];
+    return (Array.isArray(value) ? value : [value]).filter(Boolean);
+  });
+
 /** ALPS output categories. The Japanese names of the existing format are accepted as aliases. */
 const KIND_ALIASES = {
   information: "information",
@@ -63,8 +73,23 @@ const processEntry = z
     name: text.optional(),
     purpose: text.optional(),
     outcomes: textList,
+    scope: text.optional(),
+    activities: z
+      .array(
+        z.looseObject({
+          name: text,
+          tasks: textList,
+          supportsOutcomes: textList,
+        }),
+      )
+      .nullish()
+      .transform((value) => value ?? []),
+    tasks: textList,
     constraints: textList,
     enablers: textList,
+    entryCriteria: textList,
+    exitCriteria: textList,
+    references: textList,
     inputs: textList,
     controls: textList,
     outputs: textList,
@@ -107,6 +132,159 @@ export const processModelFileSchema = z
   });
 
 export type ProcessModelFile = z.output<typeof processModelFileSchema>;
+
+/** A Process entry accepted by the local model authoring endpoint. */
+const modelWriteProcess = z
+  .looseObject({
+    id: text.optional(),
+    name: text,
+    purpose: text.optional(),
+    outcomes: optionalTextList,
+    scope: text.optional(),
+    activities: z
+      .array(
+        z.looseObject({
+          name: text,
+          tasks: optionalTextList,
+          supportsOutcomes: optionalTextList,
+        }),
+      )
+      .nullish()
+      .transform((value) => (value === undefined ? undefined : (value ?? []))),
+    tasks: optionalTextList,
+    constraints: optionalTextList,
+    enablers: optionalTextList,
+    entryCriteria: optionalTextList,
+    exitCriteria: optionalTextList,
+    references: optionalTextList,
+    inputs: optionalTextList,
+    controls: optionalTextList,
+    outputs: optionalTextList,
+    skill: text.nullish(),
+  })
+  .refine((entry) => Boolean(entry.name || entry.id), { error: "a process needs a name" });
+
+/** An Artifact type entry accepted by the local model authoring endpoint. */
+const modelWriteArtifact = z.preprocess(
+  (value) => (typeof value === "string" || typeof value === "number" ? { name: value } : value),
+  z
+    .looseObject({
+      id: text.optional(),
+      name: text,
+      description: text.optional(),
+      kind: artifactKind.nullish(),
+      paths: optionalTextList,
+    })
+    .refine((entry) => Boolean(entry.name || entry.id), { error: "an artifact type needs a name" }),
+);
+
+/** POST /api/model: replace the process-model.yaml meaning file through the local UI. */
+export const updateModelRequest = z
+  .looseObject({
+    expectedRevision: z.string().min(1, { error: "expectedRevision is required" }),
+    name: text.pipe(z.string().min(1, { error: "name the model" })),
+    description: text.optional(),
+    draft: z.boolean().optional(),
+    processes: z.array(modelWriteProcess),
+    artifacts: z
+      .array(modelWriteArtifact)
+      .nullish()
+      .transform((value) => value ?? []),
+  })
+  .superRefine((model, context) => {
+    if (model.processes.length === 0 && model.draft !== true)
+      context.addIssue({
+        code: "custom",
+        path: ["processes"],
+        message: "list at least one process under processes, or mark the model with draft: true",
+      });
+  });
+
+export type UpdateModelRequest = z.output<typeof updateModelRequest>;
+
+const designId = z.string().regex(/^[A-Za-z0-9_-]{8,80}$/, {
+  error: "use the id returned when the design session was created",
+});
+
+const designReferencePath = text.pipe(z.string().min(1).max(500));
+
+const designSkillFileDraft = z.looseObject({
+  path: text.pipe(z.string().min(1).max(500)),
+  content: z.string().max(300_000),
+  expectedSha256: z.string().nullable().optional(),
+});
+
+export const designProposalRequest = z.looseObject({
+  summary: text.pipe(z.string().min(1).max(4000)),
+  model: updateModelRequest,
+  skillFiles: z
+    .array(designSkillFileDraft)
+    .max(200)
+    .nullish()
+    .transform((value) => value ?? []),
+});
+
+/** `POST /api/designs`: start an AI-assisted Process Description design session. */
+export const createDesignRequest = z.looseObject({
+  id: designId.optional(),
+  method: z.enum(["desktop", "cli"]).default("desktop"),
+  autoSave: z.boolean().default(true),
+  request: text.pipe(z.string().min(1).max(MAX_REQUEST_LENGTH)),
+  process: text.optional(),
+  references: z
+    .array(designReferencePath)
+    .max(MAX_ATTACHMENTS)
+    .nullish()
+    .transform((value) => value ?? []),
+  agent: text.optional(),
+  model: z.string().min(1).optional(),
+  effort: z.string().min(1).optional(),
+});
+
+export type CreateDesignRequest = z.output<typeof createDesignRequest>;
+
+export const designOpenRequest = z.looseObject({});
+export type DesignOpenRequest = z.output<typeof designOpenRequest>;
+
+export const designClaimRequest = z.looseObject({
+  workspace: z.string().min(1).max(4000).optional(),
+  sessionId: z.string().min(1).max(500).optional(),
+  conversationUrl: z.string().min(1).max(2000).optional(),
+});
+
+export type DesignClaimRequest = z.output<typeof designClaimRequest>;
+
+export const designSubmitQuestionsRequest = z.looseObject({
+  message: text.pipe(z.string().min(1).max(MAX_REQUEST_LENGTH)),
+  questions: z
+    .array(text.pipe(z.string().min(1).max(1000)))
+    .max(20)
+    .optional(),
+});
+
+export type DesignSubmitQuestionsRequest = z.output<typeof designSubmitQuestionsRequest>;
+
+export const designSubmitProposalRequest = z.looseObject({
+  message: text.pipe(z.string().min(1).max(MAX_REQUEST_LENGTH)).optional(),
+  proposal: designProposalRequest,
+});
+
+export type DesignSubmitProposalRequest = z.output<typeof designSubmitProposalRequest>;
+
+/** `POST /api/designs/:id/messages`: add the person's answer or refinement and resume generation. */
+export const designMessageRequest = z.looseObject({
+  text: text.pipe(z.string().min(1).max(MAX_REQUEST_LENGTH)),
+  proposal: designProposalRequest.optional(),
+});
+
+export type DesignMessageRequest = z.output<typeof designMessageRequest>;
+
+/** `POST /api/designs/:id/apply`: apply the ready or edited model proposal. */
+export const designApplyRequest = z.looseObject({
+  proposal: designProposalRequest.optional(),
+});
+
+export type DesignApplyRequest = z.output<typeof designApplyRequest>;
 
 /* ---------- alps-harness.yaml ---------- */
 
@@ -852,6 +1030,7 @@ export const launchRequest = z
       });
   });
 export const claimLaunchRequest = z.strictObject({
+  workspace: z.string().min(1).max(4000).optional(),
   sessionId: z.string().min(1).max(500).optional(),
 });
 export const recordObservationRequest = z.strictObject({

@@ -86,6 +86,19 @@ const WORDS = {
     purpose: "Purpose",
     outcomes: "Outcomes (numbered from 0)",
     constraints: "Constraints",
+    description: "Process Description from the model",
+    scope: "Applicable scope",
+    enablers: "Enablers",
+    activities: "Activities & Tasks",
+    tasks: "Tasks",
+    supportsOutcomes: "Supports Outcomes",
+    entryCriteria: "Entry Criteria",
+    exitCriteria: "Exit Criteria",
+    references: "Source references",
+    taskOrder:
+      "Task numbering identifies items; it does not prescribe execution order. Required temporal dependencies are Constraints.",
+    criteriaConditions:
+      "Confirm required conditions before dependent actions. An unconfirmed condition prevents those actions; completing an Output does not replace evaluating Outcomes.",
     none: "None.",
     notYet: "none yet",
     notFound: "not found when the run started",
@@ -107,6 +120,19 @@ const WORDS = {
     purpose: "目的",
     outcomes: "成果（番号は 0 から）",
     constraints: "制約",
+    description: "モデルのプロセス記述",
+    scope: "適用範囲",
+    enablers: "実行支援要素",
+    activities: "活動とタスク",
+    tasks: "タスク",
+    supportsOutcomes: "支える成果",
+    entryCriteria: "開始基準",
+    exitCriteria: "完了基準",
+    references: "参照元",
+    taskOrder:
+      "タスクの番号は項目の識別に用い、実行順序は定めません。必要な時間的依存関係は制約として扱います。",
+    criteriaConditions:
+      "必須条件は依存する行為の前に確認します。未確認の条件はその行為を妨げ、出力の完成を成果の評価の代わりにはしません。",
     none: "なし",
     notYet: "まだない",
     notFound: "実行の開始時には見つからなかった",
@@ -128,6 +154,36 @@ export function buildPrompt(input: PromptInput): string {
   const words = WORDS[input.language];
   const { process, skill } = input;
 
+  const additionalDetail = [
+    process.scope && `${words.scope}: ${process.scope}`,
+    process.enablers.length > 0 && `${words.enablers}:\n${bullets(process.enablers)}`,
+    (process.activities?.length ?? 0) > 0 &&
+      `${words.activities}:\n${process
+        .activities!.map((activity) =>
+          [
+            activity.name,
+            numbered(activity.tasks),
+            (activity.supportsOutcomes?.length ?? 0) > 0 &&
+              `${words.supportsOutcomes}: ${activity.supportsOutcomes!.join(" / ")}`,
+          ]
+            .filter(Boolean)
+            .join("\n"),
+        )
+        .join("\n\n")}`,
+    (process.tasks?.length ?? 0) > 0 && `${words.tasks}:\n${numbered(process.tasks!)}`,
+    ((process.activities?.length ?? 0) > 0 || (process.tasks?.length ?? 0) > 0) && words.taskOrder,
+    (process.entryCriteria?.length ?? 0) > 0 &&
+      `${words.entryCriteria}:\n${bullets(process.entryCriteria!)}`,
+    (process.exitCriteria?.length ?? 0) > 0 &&
+      `${words.exitCriteria}:\n${bullets(process.exitCriteria!)}`,
+    ((process.entryCriteria?.length ?? 0) > 0 || (process.exitCriteria?.length ?? 0) > 0) &&
+      words.criteriaConditions,
+    (process.references?.length ?? 0) > 0 &&
+      `${words.references}:\n${bullets(process.references!)}`,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+
   let skillText: string;
   if (skill && "path" in skill) {
     const translation = skill.translations.find(
@@ -137,6 +193,16 @@ export function buildPrompt(input: PromptInput): string {
       words.readSkill,
       `- ${skill.path}`,
       ...(translation ? [words.translation(translation.path)] : []),
+      ...(additionalDetail
+        ? [
+            `${words.description}:`,
+            process.purpose && `${words.purpose}: ${process.purpose}`,
+            process.outcomes.length > 0 && `${words.outcomes}:\n${numbered(process.outcomes)}`,
+            process.constraints.length > 0 &&
+              `${words.constraints}:\n${bullets(process.constraints)}`,
+            additionalDetail,
+          ].filter(Boolean)
+        : []),
     ].join("\n");
   } else {
     skillText = [
@@ -144,6 +210,7 @@ export function buildPrompt(input: PromptInput): string {
       process.purpose && `${words.purpose}: ${process.purpose}`,
       process.outcomes.length > 0 && `${words.outcomes}:\n${numbered(process.outcomes)}`,
       process.constraints.length > 0 && `${words.constraints}:\n${bullets(process.constraints)}`,
+      additionalDetail,
     ]
       .filter(Boolean)
       .join("\n");

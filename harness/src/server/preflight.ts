@@ -8,7 +8,7 @@ import type {
 } from "../shared/types.ts";
 import { CLI_PATH } from "./daemon.ts";
 
-const PROBE_TIMEOUT_MS = 4000;
+const PROBE_TIMEOUT_MS = 10000;
 const MCP_PROTOCOL = "2026-07-28";
 
 const text = (bytes: Uint8Array): string =>
@@ -239,6 +239,7 @@ export async function probeMcpServer(root: string): Promise<ExecutionMcpProbe> {
   let initialized = false;
   let toolsListed = false;
   let claimTool = false;
+  let designTools = false;
   let toolCount = 0;
   let askedTools = false;
 
@@ -303,7 +304,13 @@ export async function probeMcpServer(root: string): Promise<ExecutionMcpProbe> {
             toolsListed = true;
             const tools = Array.isArray(message.result?.tools) ? message.result.tools : [];
             toolCount = tools.length;
-            claimTool = tools.some((tool) => tool.name === "claim_launch");
+            const names = new Set(tools.map((tool) => tool.name).filter(Boolean));
+            claimTool = names.has("claim_launch");
+            designTools =
+              names.has("claim_design") &&
+              names.has("get_design_context") &&
+              names.has("submit_design_questions") &&
+              names.has("submit_design_proposal");
             break;
           }
         } catch (error) {
@@ -324,7 +331,14 @@ export async function probeMcpServer(root: string): Promise<ExecutionMcpProbe> {
     initialized,
     toolsListed,
     claimTool,
+    designTools,
     toolCount,
-    error: errors[0] ?? (replies.has(2) && !claimTool ? "claim_launch is not listed." : null),
+    error:
+      errors[0] ??
+      (replies.has(2) && !claimTool
+        ? "claim_launch is not listed."
+        : replies.has(2) && !designTools
+          ? "design tools are not listed."
+          : null),
   };
 }

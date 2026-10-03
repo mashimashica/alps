@@ -11,12 +11,14 @@ import {
   type AgentSpec,
 } from "../agents/index.ts";
 import { HarnessError, refuse, type Caller, type Harness } from "../harness/index.ts";
+import { desktopProviderOpenArgs } from "../harness/designs.ts";
 import { loadWorkspace } from "../model/index.ts";
 import { wakeRequest, assessRequest, launchRequest } from "../shared/schema.ts";
 import type {
   ExecutionCapabilities,
   ExecutionDesktopStatus,
   ExecutionMcpConfigSave,
+  LaunchConversationLink,
   LaunchRecord,
   LaunchRequest,
   LaunchResponse,
@@ -49,6 +51,28 @@ const launchScope = ({
 > => scope;
 const sameLaunchScope = (left: LaunchRequest, right: LaunchRequest): boolean =>
   isDeepStrictEqual(launchScope(left), launchScope(right));
+const providerConversationSupport = (
+  provider: AgentSpec["format"],
+): ExecutionCapabilities["agents"][number]["conversation"] => {
+  if (provider === "codex")
+    return {
+      canOpenExisting: true,
+      source: "codex-url",
+      reason: null,
+    };
+  if (provider === "claude")
+    return {
+      canOpenExisting: false,
+      source: "unsupported",
+      reason:
+        "Opening an existing Claude Desktop session requires Claude Code desktop resume support and is not available from this runtime.",
+    };
+  return {
+    canOpenExisting: false,
+    source: "unavailable",
+    reason: "This agent has no host conversation link.",
+  };
+};
 
 export class Launches {
   readonly #records = new Map<string, LaunchRecord>();
@@ -138,6 +162,8 @@ export class Launches {
         installed: false,
         scheme,
         canOpen: false,
+        claimRequired: true,
+        claimConnectionVerified: false,
         canStartFromAlps: false,
         reason,
       });
@@ -174,6 +200,8 @@ export class Launches {
           installed: false,
           scheme,
           canOpen: false,
+          claimRequired: true,
+          claimConnectionVerified: false,
           canStartFromAlps: false,
           reason: "The desktop application is not installed or does not expose its URL scheme.",
         };
@@ -182,6 +210,8 @@ export class Launches {
         installed: true,
         scheme,
         canOpen: true,
+        claimRequired: true,
+        claimConnectionVerified: ready,
         canStartFromAlps: ready,
         reason: ready ? null : readyReason,
       };
@@ -233,6 +263,7 @@ export class Launches {
                   canStartFromAlps: false,
                   reason: "This agent has no supported desktop handoff.",
                 };
+        const conversation = providerConversationSupport(spec.format);
         return {
           id: spec.id,
           provider,
@@ -248,6 +279,7 @@ export class Launches {
             claimTool: probe.claimTool && connection.ready,
             reason: connection.reason,
           },
+          conversation,
         };
       }),
     };
@@ -287,7 +319,7 @@ export class Launches {
           this.#write(prior);
         }
       }
-      return this.#answer(prior);
+      return this.answer(prior);
     }
     if (request.method !== "cli") {
       if (request.model || request.effort) throw refuse("invalid-request", "error.launchModel", {});
@@ -328,7 +360,7 @@ export class Launches {
         this.#write(previous);
       }
     }
-    if (request.method !== "cli") return this.#answer(record);
+    if (request.method !== "cli") return this.answer(record);
     const starting = this.#start(record, { kind: "user" });
     this.#pending.set(record.id, starting);
     try {
@@ -337,23 +369,80 @@ export class Launches {
       this.#pending.delete(record.id);
     }
   }
-  async #answer(record: LaunchRecord): Promise<LaunchResponse> {
+  async answer(record: LaunchRecord | string): Promise<LaunchResponse> {
+    const launch = typeof record === "string" ? this.get(record) : record;
+    const run = launch.runId
+      ? (await this.harness.getRun(launch.runId, { tail: 0, wait: 0 })).run
+      : undefined;
     return {
       ok: true,
-      launch: record,
-      ...(record.runId
-        ? { run: (await this.harness.getRun(record.runId, { tail: 0, wait: 0 })).run }
-        : {}),
-      ...(record.status === "pending" ? { prompt: this.prompt(record) } : {}),
+      launch,
+      ...(run ? { run } : {}),
+      ...(launch.status === "pending" ? { prompt: this.prompt(launch) } : {}),
+      ...this.#conversation(launch, run),
+    };
+  }
+  #conversation(
+    record: LaunchRecord,
+    run: RunView | undefined,
+  ): { conversation?: LaunchConversationLink } {
+    const spec = this.#spec(record.request.agent);
+    const provider = spec.format === "claude" || spec.format === "codex" ? spec.format : null;
+    if (!provider) return {};
+    const sessionId = run?.execution?.sessionId;
+    if (!sessionId)
+      return {
+        conversation: {
+          provider,
+          url: null,
+          canOpen: false,
+          reason: "No host conversation id has been recorded for this launch.",
+        },
+      };
+    if (provider === "codex")
+      return {
+        conversation: {
+          provider,
+          sessionId,
+          url: `codex://threads/${encodeURIComponent(sessionId)}`,
+          canOpen: true,
+          reason: null,
+        },
+      };
+    return {
+      conversation: {
+        provider,
+        sessionId,
+        url: null,
+        canOpen: false,
+        reason:
+          "Opening an existing Claude Desktop session requires Claude Code desktop resume support and is not available from this runtime.",
+      },
     };
   }
   prompt(record: LaunchRecord): string {
-    return `Continue this ALPS request in workspace ${this.harness.root}.\nFirst call the ALPS MCP tool claim_launch with id ${record.id}. If the tool is unavailable, connect the ALPS plugin/MCP server for this workspace first; do not perform the work before claim_launch succeeds. The tool returns the current instructions and records the start. Follow those instructions and report with finish_run. The saved scope (${record.request.kind}${record.request.kind === "wake" ? `, ${record.request.runs ?? "plan"}` : ""}) applies; changing this composer does not authorize expanding it. If you know this application's opaque conversation id, pass it as sessionId; do not guess one.\n\nRequest:\n${record.request.request ?? "Read the instructions returned by claim_launch."}`;
+    return `Continue this ALPS request in workspace ${this.harness.root}.\nFirst check your actual working directory (pwd), then call the ALPS MCP tool claim_launch with id ${record.id} and workspace set to that observed absolute directory. If the tool is unavailable, connect the ALPS plugin/MCP server for this workspace first; do not perform the work before claim_launch succeeds. The tool returns the current instructions and records the start. Follow those instructions and report with finish_run. The saved scope (${record.request.kind}${record.request.kind === "wake" ? `, ${record.request.runs ?? "plan"}` : ""}) applies; changing this composer does not authorize expanding it. If you know this application's opaque conversation id, pass it as sessionId; do not guess one.\n\nRequest:\n${record.request.request ?? "Read the instructions returned by claim_launch."}`;
   }
-  async claim(id: string, caller: Caller, sessionId?: string): Promise<LaunchResponse> {
+  #assertWorkspace(workspace: string | undefined): void {
+    if (!workspace) return;
+    try {
+      if (!path.isAbsolute(workspace)) throw new Error("Relative workspace");
+      if (fs.realpathSync(workspace) !== fs.realpathSync(this.harness.root))
+        throw new Error("Workspace mismatch");
+    } catch {
+      throw refuse("invalid-request", "error.launchWorkspace", { workspace: this.harness.root });
+    }
+  }
+  async claim(
+    id: string,
+    caller: Caller,
+    sessionId?: string,
+    workspace?: string,
+  ): Promise<LaunchResponse> {
     if (caller.kind !== "agent" || !caller.session)
       throw refuse("invalid-request", "error.externalSession", {});
     const record = this.get(id);
+    this.#assertWorkspace(workspace);
     if (record.request.method === "cli") throw refuse("invalid-request", "error.launchClaim", {});
     const spec = this.#spec(record.request.agent);
     const expected = spec.format === "codex" ? /codex|chatgpt/i : /claude/i;
@@ -461,7 +550,7 @@ export class Launches {
         record.status = "started";
         record.error = null;
         this.#write(record);
-        return this.#answer(record);
+        return this.answer(record);
       }
       record.status = "failed";
       record.error =
@@ -519,20 +608,32 @@ export class Launches {
     });
     if ((await child.exited) !== 0) throw refuse("agent-unavailable", "error.nativeOpen", {});
   }
-  async open(id: string): Promise<void> {
+  async open(id: string): Promise<LaunchResponse> {
     const record = this.get(id);
-    if (record.status !== "pending") throw refuse("invalid-request", "error.launchClaim", {});
     const spec = this.#spec(record.request.agent);
+    if (record.status !== "pending") {
+      const answer = await this.answer(record);
+      if (answer.conversation?.canOpen && answer.conversation.url) {
+        const openArgs = desktopProviderOpenArgs(spec.format, answer.conversation.url);
+        if (!openArgs) return { ...answer, opened: false };
+        await this.#open("/usr/bin/open", openArgs);
+        return { ...answer, opened: true };
+      }
+      return { ...answer, opened: false };
+    }
     try {
       if (record.request.method === "desktop") {
         const params = new URLSearchParams(
           spec.format === "codex"
-            ? { path: this.harness.root, prompt: this.prompt(record) }
-            : { folder: this.harness.root, q: this.prompt(record) },
+            ? { path: fs.realpathSync(this.harness.root), prompt: this.prompt(record) }
+            : { folder: fs.realpathSync(this.harness.root), q: this.prompt(record) },
         );
-        await this.#open("/usr/bin/open", [
+        const openArgs = desktopProviderOpenArgs(
+          spec.format,
           spec.format === "codex" ? `codex://new?${params}` : `claude://code/new?${params}`,
-        ]);
+        );
+        if (!openArgs) throw refuse("agent-unavailable", "error.desktopUnavailable", {});
+        await this.#open("/usr/bin/open", openArgs);
       } else if (record.request.method === "terminal") {
         const source = await this.#resumeSource(record.request);
         const server = {
@@ -557,6 +658,7 @@ export class Launches {
       }
       record.error = null;
       this.#write(record);
+      return { ...(await this.answer(record)), opened: true };
     } catch (error) {
       record.error =
         error instanceof HarnessError

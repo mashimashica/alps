@@ -1,7 +1,8 @@
 /*
  * The harness of one workspace: instances, runs, provenance, evaluations, and assessments. While
  * its server runs it is the only writer of .alps-harness/. It reads the model and the
- * configuration again whenever their files change, and it never writes them. Runtime-agnostic:
+ * configuration again whenever their files change; the local authoring API may write the model
+ * file explicitly. Runtime-agnostic:
  * reading YAML, `git`, agent version checks, and starting agent processes are passed in by
  * src/server/.
  */
@@ -30,10 +31,36 @@ import {
   type VersionCheck,
 } from "../agents/index.ts";
 import {
+  buildDesignPrompt,
+  designCapabilities as designAgentCapabilities,
+  designCommand,
+  designSources,
+  desktopProviderInstalled,
+  desktopProviderOpenArgs,
+  isolatedCwd,
+  modelWriteFromWorkspace,
+  newDesignId,
+  parseDesignOutput,
+  proposalWithRevision,
+  readDesign,
+  readDesignReferences,
+  safeDesignSpec,
+  validateDesignInputs,
+  writeDesign,
+} from "./designs.ts";
+import {
+  claudeProjectConfig,
+  codexProjectConfig,
+  mcpServerForWorkspace,
+  probeMcpServer,
+} from "../server/preflight.ts";
+import {
   CONFIG_FILES,
   MODEL_FILES,
   ModelError,
+  ModelRevisionError,
   describeModel,
+  updateWorkspaceModel,
   fileState,
   isConcrete,
   loadWorkspace,
@@ -42,7 +69,13 @@ import {
   type LoadedWorkspace,
   type ParseYaml,
 } from "../model/index.ts";
+import {
+  saveDesignBundle,
+  saveMissingDesignSkills,
+  snapshotDesignSkills,
+} from "../model/design-bundle.ts";
 import { attachmentPath, dayOf, MAX_NAME_CANDIDATES, safeFileName } from "../shared/requests.ts";
+import { updateModelRequest } from "../shared/schema.ts";
 import type {
   AssessRequest,
   EvaluateRequest,
@@ -53,6 +86,14 @@ import type {
   ReviewRequest,
   RunRequest,
   WakeRequest,
+  UpdateModelRequest,
+  CreateDesignRequest,
+  DesignApplyRequest,
+  DesignMessageRequest,
+  DesignClaimRequest,
+  DesignOpenRequest,
+  DesignSubmitProposalRequest,
+  DesignSubmitQuestionsRequest,
 } from "../shared/schema.ts";
 import { spoken, type MessageArgs, type Spoken } from "../shared/strings.ts";
 import {
@@ -67,6 +108,10 @@ import type {
   AgentModel,
   AgentModelsResponse,
   AgentSelection,
+  DesignCapabilitiesResponse,
+  DesignProposal,
+  DesignResponse,
+  DesignSession,
   RunExecution,
   Artifact,
   ArtifactType,
@@ -150,6 +195,10 @@ const AGENT_CHECK_TTL_MS = 5 * 60_000;
 const STOP_WAIT_MS = 8000;
 /** The WebUI is given at most this much of a SKILL.md. */
 const MAX_SKILL_BYTES = 1024 * 1024;
+/** The design agent is stopped if it cannot return a bounded proposal in time. */
+const DESIGN_AGENT_TIMEOUT_MS = 10 * 60_000;
+/** The design agent's stdout and stderr are kept in memory only up to this many bytes. */
+const MAX_DESIGN_OUTPUT_BYTES = 2 * 1024 * 1024;
 /** The agent that a wake starts when none is named. */
 const WAKE_AGENT = "claude-code";
 /** The agent that an assessment starts when none is named. */
@@ -267,6 +316,18 @@ interface ActiveRun {
   reported: FinishRequest["status"] | null;
 }
 
+interface ActiveDesign {
+  release: () => void;
+  agent: AgentHandle;
+  cwd: string;
+  timer: ReturnType<typeof setTimeout> | null;
+}
+
+interface PendingDesign {
+  key: string;
+  promise: Promise<DesignResponse>;
+}
+
 /** The number in an id (`i12` → 12), which orders instances and runs by creation. */
 export const seqOf = (id: string): number => Number(/(\d+)$/.exec(id)?.[1] ?? 0);
 
@@ -355,6 +416,8 @@ export class Harness {
   /** state.json as it was read, to tell whether it changed before the server owned the workspace. */
   #readSignature: string;
   readonly #active = new Map<string, ActiveRun>();
+  readonly #activeDesigns = new Map<string, ActiveDesign>();
+  readonly #pendingDesigns = new Map<string, PendingDesign>();
   readonly #waiters = new Map<string, Set<() => void>>();
   #workspace: { loaded: LoadedWorkspace; signature: string } | null = null;
   #agentChecks: { key: string; at: number; info: Promise<AgentInfo[]> } | null = null;
@@ -464,6 +527,23 @@ export class Harness {
    */
   start(hooks: HarnessHooks): void {
     this.#hooks = hooks;
+    // Design children belong to this server process. A persisted "running" record from a
+    // previous owner cannot be resumed or claimed as active after a server restart.
+    const previousDesigns = path.join(recordPaths(this.root).dir, "designs");
+    if (fs.existsSync(previousDesigns)) {
+      for (const filename of fs.readdirSync(previousDesigns)) {
+        if (!/^[A-Za-z0-9_-]{8,80}\.json$/.test(filename)) continue;
+        const design = readDesign(this.root, filename.slice(0, -5));
+        if (design?.status !== "running") continue;
+        writeDesign(this.root, {
+          ...design,
+          status: "failed",
+          updatedAt: Date.now(),
+          error:
+            "The previous design generation was interrupted when the runtime stopped. The request and draft are preserved; continue the design or start again.",
+        });
+      }
+    }
     if (stateSignature(this.root) !== this.#readSignature) this.#records = loadRecords(this.root);
     if (this.#records.changes.convertedV1 !== null)
       this.#deps.log("converted state.json from version 1; the original is kept as state.v1.json");
@@ -511,6 +591,29 @@ export class Harness {
   close(): Promise<void> {
     this.#closing ??= (async () => {
       const waits: Promise<void>[] = [];
+      for (const [id, active] of this.#activeDesigns) {
+        active.agent.stop();
+        if (active.timer) clearTimeout(active.timer);
+        active.release();
+        this.#activeDesigns.delete(id);
+        fs.rmSync(active.cwd, { recursive: true, force: true });
+        try {
+          const session = readDesign(this.root, id);
+          if (session?.status === "running") {
+            const failed = {
+              ...session,
+              status: "failed" as const,
+              updatedAt: Date.now(),
+              error: "The harness server stopped before design generation ended.",
+            };
+            writeDesign(this.root, failed);
+          }
+        } catch (error) {
+          this.#deps.log(
+            `cannot record the end of design session ${id}: ${(error as Error).message}`,
+          );
+        }
+      }
       for (const [id, active] of this.#active) {
         const run = this.#records.runs.get(id);
         if (!run?.execution || run.execution.method === "cli") continue;
@@ -668,6 +771,17 @@ export class Harness {
     );
   }
 
+  externalDesignFor(session: string): DesignSession | undefined {
+    const designs = path.join(this.root, ".alps-harness", "designs");
+    if (!fs.existsSync(designs)) return undefined;
+    for (const file of fs.readdirSync(designs)) {
+      if (!file.endsWith(".json")) continue;
+      const design = readDesign(this.root, file.slice(0, -5));
+      if (design?.method === "desktop" && design.desktop?.mcpSession === session) return design;
+    }
+    return undefined;
+  }
+
   externalCaller(caller: Caller): Caller {
     if (caller.kind !== "agent" || !caller.session) return caller;
     const runs = [...this.#records.runs.values()].filter(
@@ -711,13 +825,16 @@ export class Harness {
     } catch (error) {
       if (error instanceof ModelError)
         throw refuse("no-model", "error.model", { detail: error.message }, error.files);
+      if (error instanceof ModelRevisionError)
+        throw refuse("invalid-request", "error.modelChanged", {});
       throw error;
     }
   }
 
-  #describe(): { loaded: LoadedWorkspace; description: ModelDescription } {
+  #describe(): { loaded: LoadedWorkspace; description: ModelDescription; revision: string } {
     const loaded = this.#loaded();
-    return { loaded, description: describeModel(loaded, this.#deps.parseYaml) };
+    const revision = this.#modelSignature(loaded.modelPath);
+    return { loaded, description: describeModel(loaded, this.#deps.parseYaml, revision), revision };
   }
 
   #checkAgents(specs: AgentSpec[]): Promise<AgentInfo[]> {
@@ -754,6 +871,985 @@ export class Harness {
   async model(): Promise<ModelView> {
     const { loaded, description } = this.#describe();
     return { ...description, agents: await this.#checkAgents(resolveAgents(loaded.config.agents)) };
+  }
+
+  /** `POST /api/model`: replaces the model meaning file after checking the revision the UI read. */
+  async updateModel(request: UpdateModelRequest): Promise<ModelView> {
+    const { loaded, revision } = this.#describe();
+    if (request.expectedRevision && request.expectedRevision !== revision)
+      throw refuse("invalid-request", "error.modelChanged", {});
+    try {
+      const next = updateWorkspaceModel({
+        root: this.root,
+        modelPath: loaded.modelPath,
+        request,
+        parseYaml: this.#deps.parseYaml,
+      });
+      this.#workspace = { loaded: next, signature: this.#modelSignature(next.modelPath) };
+      this.#agentChecks = null;
+      const model = await this.model();
+      this.#hooks.broadcast({ type: "model" });
+      return model;
+    } catch (error) {
+      this.#workspace = null;
+      if (error instanceof ModelRevisionError)
+        throw refuse("invalid-request", "error.modelChanged", {});
+      if (error instanceof ModelError)
+        throw refuse("no-model", "error.model", { detail: error.message }, error.files);
+      throw error;
+    }
+  }
+
+  async designCapabilities(): Promise<DesignCapabilitiesResponse> {
+    const loaded = this.#loaded();
+    const specs = resolveAgents(loaded.config.agents);
+    const agents = await this.#checkAgents(specs);
+    const probe = await probeMcpServer(this.root).catch(() => null);
+    return {
+      ok: true,
+      workspace: this.root,
+      desktop: {
+        supported: process.platform === "darwin",
+        reason:
+          process.platform === "darwin"
+            ? null
+            : "Desktop design handoff is currently supported on macOS.",
+        tools: {
+          claim: "claim_design",
+          context: "get_design_context",
+          questions: "submit_design_questions",
+          proposal: "submit_design_proposal",
+          available: probe?.designTools ?? false,
+        },
+      },
+      sources: designSources(),
+      agents: designAgentCapabilities(this.root, specs, agents, (spec) => {
+        if (spec.format !== "claude" && spec.format !== "codex")
+          return { available: false, reason: "This provider has no desktop design path." };
+        if (!desktopProviderInstalled(spec.format))
+          return {
+            available: false,
+            reason:
+              "The desktop application is not installed or does not expose the expected URL scheme.",
+          };
+        const server = mcpServerForWorkspace(this.root);
+        const config =
+          spec.format === "claude"
+            ? claudeProjectConfig(this.root, server)
+            : codexProjectConfig(this.root, server);
+        if (config.status !== "usable")
+          return {
+            available: false,
+            reason: config.reason ?? "Install the ALPS project MCP config.",
+          };
+        if (!probe?.designTools)
+          return {
+            available: false,
+            reason: probe?.error ?? "ALPS design MCP tools are not available.",
+          };
+        return { available: true, reason: null };
+      }),
+    };
+  }
+
+  #designSession(id: string): DesignSession {
+    const session = readDesign(this.root, id);
+    if (!session) throw refuse("not-found", "error.noDesign", { id });
+    return session;
+  }
+
+  async #designDesktopReady(
+    spec: AgentSpec,
+  ): Promise<{ available: boolean; reason: string | null }> {
+    if (spec.format !== "claude" && spec.format !== "codex")
+      return { available: false, reason: "This provider has no desktop design path." };
+    if (!desktopProviderInstalled(spec.format))
+      return {
+        available: false,
+        reason:
+          "The desktop application is not installed or does not expose the expected URL scheme.",
+      };
+    const server = mcpServerForWorkspace(this.root);
+    const config =
+      spec.format === "claude"
+        ? claudeProjectConfig(this.root, server)
+        : codexProjectConfig(this.root, server);
+    if (config.status !== "usable")
+      return { available: false, reason: config.reason ?? "Install the ALPS project MCP config." };
+    const probe = await probeMcpServer(this.root);
+    if (!probe.designTools)
+      return {
+        available: false,
+        reason: probe.error ?? "ALPS design MCP tools are not available.",
+      };
+    return { available: true, reason: null };
+  }
+
+  #designProviderMatches(session: DesignSession, caller: Extract<Caller, { kind: "agent" }>): void {
+    const spec = resolveAgents(this.#loaded().config.agents).find(
+      (item) => item.id === session.agent,
+    );
+    const expected = spec?.format === "codex" ? /codex|chatgpt/i : /claude/i;
+    if (!expected.test(caller.client.name))
+      throw refuse("invalid-request", "error.designClient", {
+        agent: spec?.label ?? session.agent,
+      });
+  }
+
+  #trustedConversationUrl(format: AgentSpec["format"], url: string): string {
+    let parsed: URL;
+    try {
+      parsed = new URL(url);
+    } catch (error) {
+      throw refuse("invalid-request", "error.designReference", {
+        path: "conversationUrl",
+        reason: (error as Error).message,
+      });
+    }
+    const ok =
+      format === "codex"
+        ? parsed.protocol === "codex:" &&
+          parsed.hostname === "threads" &&
+          /^\/[A-Za-z0-9_-]+$/.test(parsed.pathname) &&
+          parsed.pathname !== "/new" &&
+          !parsed.search &&
+          !parsed.hash
+        : format === "claude"
+          ? parsed.protocol === "claude:" &&
+            !parsed.search &&
+            !parsed.hash &&
+            ((parsed.hostname === "code" &&
+              /^\/[A-Za-z0-9_-]+$/.test(parsed.pathname) &&
+              parsed.pathname !== "/new") ||
+              (parsed.hostname === "claude.ai" && /^\/chat\/[A-Za-z0-9_-]+$/.test(parsed.pathname)))
+          : false;
+    if (!ok)
+      throw refuse("invalid-request", "error.designReference", {
+        path: "conversationUrl",
+        reason: "The conversation URL is not a supported desktop provider link.",
+      });
+    return url;
+  }
+
+  #conversationUrlForProvider(format: AgentSpec["format"], sessionId?: string): string | null {
+    if (format !== "codex" || !sessionId) return null;
+    return `codex://threads/${encodeURIComponent(sessionId)}`;
+  }
+
+  #designPrompt(session: DesignSession): string {
+    return [
+      `Build the ALPS Process Model and its usable Skills in this project: ${this.root}`,
+      `First check your actual working directory (pwd), then call claim_design with id ${session.id} and workspace set to the observed absolute directory. If it does not match this project, stop and explain the mismatch. Include the host-provided sessionId if available; never invent it.`,
+      session.autoSave
+        ? "The user requested construction: submit complete model and Skill file contents through submit_design_proposal. ALPS saves the validated bundle automatically, with no separate Apply step. Continue corrections in this same conversation."
+        : "Submit complete model and Skill file contents through submit_design_proposal for review.",
+      "Ask only necessary clarification. Do not execute business processes or use claim_launch, wake, run, assess, or finish_run. Check the returned save status before reporting completion.",
+      "",
+      "Request:",
+      session.request,
+    ].join("\n");
+  }
+
+  #designContextPrompt(session: DesignSession): string {
+    const { loaded, revision } = this.#describe();
+    if (revision !== session.expectedRevision)
+      throw refuse("invalid-request", "error.modelChanged", {});
+    const draftProposal = session.status === "applied" ? null : session.proposal;
+    try {
+      validateDesignInputs(this.root, session.references, session.sources);
+      return buildDesignPrompt({
+        delivery: "desktop",
+        autoSave: session.autoSave === true,
+        skillBaseline: session.skillBaseline ?? {},
+        language: loaded.language,
+        request: session.request,
+        process: session.process,
+        model: draftProposal?.model ?? modelWriteFromWorkspace(loaded, session.expectedRevision),
+        modelMeaning: loaded.model,
+        draftProposal,
+        references: session.references,
+        sources: session.sources,
+        messages: session.messages
+          .map((message) => ({ role: message.role, text: message.text }))
+          .filter(
+            (message): message is { role: "user" | "agent"; text: string } =>
+              message.role === "user" || message.role === "agent",
+          ),
+        root: this.root,
+      });
+    } catch (error) {
+      if (error instanceof HarnessError) throw error;
+      throw refuse("invalid-request", "error.designReference", {
+        path: "references",
+        reason: (error as Error).message,
+      });
+    }
+  }
+
+  #assertDesignAgent(
+    session: DesignSession,
+    caller: Caller,
+    claiming = false,
+  ): Extract<Caller, { kind: "agent" }> {
+    if (caller.kind !== "agent" || !caller.session)
+      throw refuse("invalid-request", "error.externalSession", {});
+    if (session.method !== "desktop") throw refuse("invalid-request", "error.designMethod", {});
+    this.#designProviderMatches(session, caller);
+    if (session.status === "canceled" || session.status === "failed")
+      throw refuse("invalid-request", "error.designEnded", {
+        id: session.id,
+        status: session.status,
+      });
+    const bound = session.desktop?.mcpSession;
+    if (!bound && !claiming) throw refuse("invalid-request", "error.externalSession", {});
+    if (bound && bound !== caller.session)
+      throw refuse("already-running", "error.externalConnected", {});
+    return caller;
+  }
+
+  #designDedupeKey(request: CreateDesignRequest): string {
+    return JSON.stringify({
+      request: request.request,
+      method: request.method,
+      process: request.process ?? null,
+      references: [...request.references],
+      agent: request.agent ?? null,
+      model: request.model ?? null,
+      effort: request.effort ?? null,
+      autoSave: request.autoSave ?? true,
+    });
+  }
+
+  async createDesign(request: CreateDesignRequest): Promise<DesignResponse> {
+    if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
+    const id = request.id ?? newDesignId();
+    const key = this.#designDedupeKey(request);
+    const pending = this.#pendingDesigns.get(id);
+    if (pending) {
+      if (pending.key !== key) throw refuse("invalid-request", "error.launchChanged", {});
+      return pending.promise;
+    }
+    const known = readDesign(this.root, id);
+    if (known) {
+      if (
+        (known.dedupeKey ??
+          this.#designDedupeKey({
+            id: known.id,
+            request: known.request,
+            method: known.method,
+            process: known.process ?? undefined,
+            references: known.references.map((reference) => reference.path),
+            agent: known.agent,
+            model: known.selection?.model,
+            effort: known.selection?.effort,
+            autoSave: known.autoSave ?? false,
+          })) === key
+      )
+        return { ok: true, design: known };
+      throw refuse("invalid-request", "error.launchChanged", {});
+    }
+    let promise!: Promise<DesignResponse>;
+    promise = this.#createDesignNow(id, key, request).finally(() => {
+      const latest = this.#pendingDesigns.get(id);
+      if (latest?.promise === promise) this.#pendingDesigns.delete(id);
+    });
+    this.#pendingDesigns.set(id, { key, promise });
+    return promise;
+  }
+
+  async #createDesignNow(
+    id: string,
+    dedupeKey: string,
+    request: CreateDesignRequest,
+  ): Promise<DesignResponse> {
+    const sources = designSources();
+    if (sources.some((source) => !source.available))
+      throw refuse("invalid-request", "error.designSources", {});
+    let references;
+    try {
+      references = readDesignReferences(this.root, request.references);
+      validateDesignInputs(this.root, references, sources);
+    } catch (error) {
+      throw refuse("invalid-request", "error.designReference", {
+        path: "references",
+        reason: (error as Error).message,
+      });
+    }
+    const { loaded, revision } = this.#describe();
+    if (request.process) this.#process(loaded.model, request.process);
+    const specs = resolveAgents(loaded.config.agents);
+    const infos = request.method === "cli" ? await this.#checkAgents(specs) : [];
+    const capable = specs.filter((spec) => {
+      const info = infos.find((agent) => agent.id === spec.id);
+      return Boolean(
+        (spec.format === "claude" || spec.format === "codex") &&
+        (request.method === "desktop" || (info?.available && spec.command)),
+      );
+    });
+    const name =
+      request.agent ??
+      capable.find((spec) => spec.id === "claude-code")?.id ??
+      capable.find((spec) => spec.id === "codex")?.id ??
+      "claude-code";
+    const spec = specs.find((item) => item.id === name);
+    if (
+      !spec ||
+      (spec.format !== "claude" && spec.format !== "codex") ||
+      (request.method === "cli" && !spec.command)
+    )
+      throw refuse("agent-unavailable", "error.designAgent", {
+        agents: capable.map((agent) => agent.id).join(", "),
+      });
+    if (request.method === "cli") {
+      const info = await this.#availability(spec, specs);
+      if (!info.available)
+        throw refuse("agent-unavailable", "error.agentUnavailable", {
+          agent: spec.label,
+          reason: info.reason ?? "it is not available",
+        });
+    }
+    const selection = {
+      ...(request.model ? { model: request.model } : {}),
+      ...(request.effort ? { effort: request.effort } : {}),
+    };
+    if (request.method === "desktop" && (request.model || request.effort))
+      throw refuse("invalid-request", "error.launchModel", {});
+    if (request.method === "desktop") {
+      const desktop = await this.#designDesktopReady(spec);
+      if (!desktop.available) throw refuse("agent-unavailable", "error.desktopUnavailable", {});
+    }
+    if (request.method === "cli") await this.#validateSelection(spec, selection);
+    const safeSpec = request.method === "cli" ? safeDesignSpec(spec, selection) : null;
+    if (request.method === "cli" && !safeSpec)
+      throw refuse("agent-unavailable", "error.designAgent", {
+        agents: capable.map((agent) => agent.id).join(", "),
+      });
+    const skillBaseline = snapshotDesignSkills(this.root, loaded);
+    let prompt: string;
+    try {
+      prompt = buildDesignPrompt({
+        autoSave: request.autoSave ?? true,
+        skillBaseline,
+        language: loaded.language,
+        request: request.request,
+        process: request.process ?? null,
+        model: modelWriteFromWorkspace(loaded, revision),
+        modelMeaning: loaded.model,
+        draftProposal: null,
+        references,
+        sources,
+        messages: [],
+        root: this.root,
+      });
+    } catch (error) {
+      throw refuse("invalid-request", "error.designReference", {
+        path: "references",
+        reason: (error as Error).message,
+      });
+    }
+    const now = Date.now();
+    const session: DesignSession = {
+      id,
+      status: request.method === "cli" ? "running" : "pending",
+      createdAt: now,
+      updatedAt: now,
+      request: request.request,
+      dedupeKey,
+      process: request.process ?? null,
+      method: request.method,
+      autoSave: request.autoSave ?? true,
+      skillBaseline,
+      references,
+      agent: spec.id,
+      ...(request.model || request.effort ? { selection } : {}),
+      expectedRevision: revision,
+      messages: [],
+      proposal: null,
+      error: null,
+      command: null,
+      sources,
+    };
+    if (request.method === "desktop")
+      session.desktop = { provider: spec.format, prompt: this.#designPrompt(session) };
+    writeDesign(this.root, session);
+    if (request.method === "desktop") return this.openDesign(id, {});
+    if (request.method === "cli" && safeSpec) this.#startDesignAgent(session, safeSpec, prompt);
+    return { ok: true, design: this.#designSession(id) };
+  }
+
+  #stopDesign(id: string): void {
+    const active = this.#activeDesigns.get(id);
+    if (!active) return;
+    active.agent.stop();
+    if (active.timer) clearTimeout(active.timer);
+    active.release();
+    this.#activeDesigns.delete(id);
+    fs.rmSync(active.cwd, { recursive: true, force: true });
+  }
+
+  #startDesignAgent(session: DesignSession, spec: AgentSpec, prompt: string): void {
+    const cwd = isolatedCwd();
+    const args = argsFor(spec, prompt);
+    const next = {
+      ...session,
+      command: designCommand(spec, prompt),
+      updatedAt: Date.now(),
+    };
+    writeDesign(this.root, next);
+    const stdout: string[] = [];
+    const stderr: string[] = [];
+    let outputBytes = 0;
+    let outputError: string | null = null;
+    let handle: AgentHandle | null = null;
+    const appendOutput = (target: string[], line: string): void => {
+      if (outputError) return;
+      outputBytes += Buffer.byteLength(line) + 1;
+      if (outputBytes > MAX_DESIGN_OUTPUT_BYTES) {
+        outputError = "The design agent returned too much output.";
+        try {
+          handle?.stop();
+        } catch {
+          // The process may already be stopping.
+        }
+        return;
+      }
+      target.push(line);
+    };
+    const release = this.#hooks.hold();
+    try {
+      handle = this.#deps.startAgent(
+        {
+          command: spec.command ?? "",
+          args,
+          cwd,
+          unset: envLeftOut(spec),
+          env: { ...spec.env, ALPS_DESIGN_ID: session.id, ALPS_WORKSPACE: this.root },
+          stdin: spec.stdin ? prompt : null,
+        },
+        {
+          stdout: (line) => appendOutput(stdout, line),
+          stderr: (line) => appendOutput(stderr, line),
+        },
+      );
+    } catch (error) {
+      release();
+      fs.rmSync(cwd, { recursive: true, force: true });
+      writeDesign(this.root, {
+        ...next,
+        status: "failed",
+        updatedAt: Date.now(),
+        error: (error as Error).message,
+      });
+      return;
+    }
+    const runningHandle = handle;
+    const active: ActiveDesign = {
+      release,
+      agent: runningHandle,
+      cwd,
+      timer: setTimeout(() => {
+        outputError = outputError ?? "The design agent timed out.";
+        runningHandle.stop();
+      }, DESIGN_AGENT_TIMEOUT_MS),
+    };
+    this.#activeDesigns.set(session.id, active);
+    const finish = async (): Promise<void> => {
+      let ended: { exitCode: number | null; signal: string | null } | null = null;
+      let rejected: Error | null = null;
+      try {
+        ended = await runningHandle.done;
+      } catch (error) {
+        rejected = error as Error;
+      }
+      if (this.#activeDesigns.get(session.id) !== active) return;
+      this.#activeDesigns.delete(session.id);
+      if (active.timer) clearTimeout(active.timer);
+      active.release();
+      fs.rmSync(active.cwd, { recursive: true, force: true });
+      const current = readDesign(this.root, session.id) ?? next;
+      if (current.status !== "running") return;
+      const endError =
+        outputError ??
+        rejected?.message ??
+        (ended && (ended.exitCode !== 0 || ended.signal)
+          ? `The design agent exited before returning a usable proposal (exit=${
+              ended.exitCode ?? ended.signal ?? "unknown"
+            }).`
+          : null);
+      if (endError) {
+        const detail = [endError, stderr.slice(-8).join("\n")].filter(Boolean).join("\n");
+        writeDesign(this.root, {
+          ...current,
+          status: "failed",
+          updatedAt: Date.now(),
+          messages: [
+            ...current.messages,
+            { role: "system", text: detail.slice(0, 4000), at: Date.now() },
+          ],
+          error: detail.slice(0, 4000),
+        });
+        return;
+      }
+      try {
+        const parsed = parseDesignOutput(spec.format, stdout, current.expectedRevision);
+        const text =
+          parsed.message ||
+          parsed.questions.join("\n") ||
+          parsed.proposal?.summary ||
+          "The design agent returned a proposal.";
+        const proposal = parsed.proposal
+          ? proposalWithRevision(parsed.proposal, current.expectedRevision)
+          : current.proposal;
+        const ready: DesignSession = {
+          ...current,
+          status: parsed.proposal ? "ready" : "needs-input",
+          updatedAt: Date.now(),
+          messages: [...current.messages, { role: "agent", text, at: Date.now() }],
+          proposal,
+          error: null,
+        };
+        writeDesign(this.root, ready);
+        if (parsed.proposal && proposal && ready.autoSave === true)
+          await this.#autoApplyDesign(ready, proposal);
+      } catch (error) {
+        const detail = [(error as Error).message, stderr.slice(-8).join("\n")]
+          .filter(Boolean)
+          .join("\n");
+        writeDesign(this.root, {
+          ...current,
+          status: "failed",
+          updatedAt: Date.now(),
+          messages: [
+            ...current.messages,
+            { role: "system", text: detail.slice(0, 4000), at: Date.now() },
+          ],
+          error: detail.slice(0, 4000),
+        });
+      }
+    };
+    void finish();
+  }
+
+  async design(id: string): Promise<DesignResponse> {
+    return { ok: true, design: this.#designSession(id) };
+  }
+
+  /** Authoring sessions remain separate from business runs and assessment records. */
+  designs(offset = 0): import("../shared/types.ts").DesignsResponse {
+    const directory = path.join(recordPaths(this.root).dir, "designs");
+    const entries = fs.existsSync(directory) ? fs.readdirSync(directory) : [];
+    const sessions = entries
+      .filter((file) => /^[A-Za-z0-9_-]{8,80}\.json$/.test(file))
+      .map((file) => readDesign(this.root, file.slice(0, -5)))
+      .filter((session): session is DesignSession => session !== null)
+      .sort((a, b) => b.createdAt - a.createdAt || a.id.localeCompare(b.id));
+    const designs = sessions.slice(offset, offset + 30).map((session) => {
+      const { id, status, createdAt, updatedAt, request, process, method, agent, appliedAt } =
+        session;
+      return { id, status, createdAt, updatedAt, request, process, method, agent, appliedAt };
+    });
+    return { ok: true, designs, next: offset + 30 < sessions.length ? offset + 30 : null };
+  }
+
+  async openDesign(id: string, _request: DesignOpenRequest): Promise<DesignResponse> {
+    const session = this.#designSession(id);
+    if (session.method !== "desktop" || !session.desktop)
+      throw refuse("invalid-request", "error.designMethod", {});
+    if (
+      session.status !== "pending" &&
+      session.status !== "connected" &&
+      session.status !== "needs-input" &&
+      session.status !== "ready" &&
+      session.status !== "applied"
+    )
+      throw refuse("invalid-request", "error.designEnded", { id, status: session.status });
+    const spec = resolveAgents(this.#loaded().config.agents).find(
+      (item) => item.id === session.agent,
+    );
+    if (!spec || (spec.format !== "claude" && spec.format !== "codex"))
+      throw refuse("agent-unavailable", "error.designAgent", { agents: session.agent });
+    const prompt = this.#designPrompt(session);
+    const conversationUrl = this.#conversationUrlForProvider(
+      spec.format,
+      session.desktop.sessionId,
+    );
+    const targetUrl =
+      conversationUrl ??
+      (session.desktop.connectedAt
+        ? undefined
+        : spec.format === "codex"
+          ? `codex://new?${new URLSearchParams({ path: fs.realpathSync(this.root), prompt })}`
+          : `claude://code/new?${new URLSearchParams({ folder: fs.realpathSync(this.root), q: prompt })}`);
+    const openArgs = desktopProviderOpenArgs(spec.format, targetUrl);
+    let opened = false;
+    try {
+      if (openArgs) {
+        const child = Bun.spawn(["/usr/bin/open", ...openArgs], {
+          stdin: "ignore",
+          stdout: "ignore",
+          stderr: "ignore",
+        });
+        opened = (await child.exited) === 0;
+      }
+    } catch {
+      opened = false;
+    }
+    const openedAt = Date.now();
+    const next: DesignSession = {
+      ...session,
+      updatedAt: openedAt,
+      desktop: {
+        ...session.desktop,
+        prompt,
+        ...(opened ? { openedAt } : {}),
+      },
+    };
+    writeDesign(this.root, next);
+    return { ok: true, design: next, prompt, opened };
+  }
+
+  async claimDesign(
+    id: string,
+    request: DesignClaimRequest,
+    caller: Caller,
+  ): Promise<DesignResponse> {
+    const session = this.#designSession(id);
+    const agent = this.#assertDesignAgent(session, caller, true);
+    if (agent.wake || agent.assess || this.externalRunFor(agent.session!))
+      throw refuse("invalid-request", "error.designMethod", {});
+    if (!session.desktop) throw refuse("invalid-request", "error.designMethod", {});
+    const provider = session.desktop.provider;
+    if (!provider) throw refuse("invalid-request", "error.designMethod", {});
+    if (request.conversationUrl) this.#trustedConversationUrl(provider, request.conversationUrl);
+    const conversationUrl = this.#conversationUrlForProvider(provider, request.sessionId);
+    let workspace: string | undefined;
+    if (request.workspace) {
+      try {
+        if (!path.isAbsolute(request.workspace)) throw new Error("Relative workspace");
+        workspace = fs.realpathSync(request.workspace);
+        if (workspace !== fs.realpathSync(this.root)) throw new Error("Workspace mismatch");
+      } catch {
+        throw refuse("invalid-request", "error.designWorkspace", { workspace: this.root });
+      }
+    } else if (session.autoSave) {
+      throw refuse("invalid-request", "error.designWorkspace", { workspace: this.root });
+    }
+    const next: DesignSession = {
+      ...session,
+      status: session.status === "pending" ? "connected" : session.status,
+      updatedAt: Date.now(),
+      desktop: {
+        ...session.desktop,
+        connectedAt: session.desktop.connectedAt ?? Date.now(),
+        mcpSession: agent.session ?? undefined,
+        client: agent.client,
+        ...(workspace ? { workspace, workspaceConfirmedAt: Date.now() } : {}),
+        ...(request.sessionId ? { sessionId: request.sessionId } : {}),
+        ...(conversationUrl ? { conversationUrl } : {}),
+      },
+    };
+    const prompt = this.#designContextPrompt(next);
+    writeDesign(this.root, next);
+    return { ok: true, design: next, prompt };
+  }
+
+  async designContext(id: string, caller: Caller): Promise<DesignResponse> {
+    const session = this.#designSession(id);
+    this.#assertDesignAgent(session, caller);
+    return { ok: true, design: session, prompt: this.#designContextPrompt(session) };
+  }
+
+  async submitDesignQuestions(
+    id: string,
+    request: DesignSubmitQuestionsRequest,
+    caller: Caller,
+  ): Promise<DesignResponse> {
+    const session = this.#designSession(id);
+    this.#assertDesignAgent(session, caller);
+    if (
+      session.status !== "pending" &&
+      session.status !== "connected" &&
+      session.status !== "needs-input" &&
+      session.status !== "ready" &&
+      session.status !== "applied"
+    )
+      throw refuse("invalid-request", "error.designEnded", { id, status: session.status });
+    const text = request.questions?.length
+      ? `${request.message}\n\n${request.questions.map((question) => `- ${question}`).join("\n")}`
+      : request.message;
+    const next: DesignSession = {
+      ...session,
+      status: "needs-input",
+      updatedAt: Date.now(),
+      messages: [...session.messages, { role: "agent", text, at: Date.now() }],
+      error: null,
+    };
+    writeDesign(this.root, next);
+    return { ok: true, design: next, prompt: next.desktop?.prompt };
+  }
+
+  async submitDesignProposal(
+    id: string,
+    request: DesignSubmitProposalRequest,
+    caller: Caller,
+  ): Promise<DesignResponse> {
+    const session = this.#designSession(id);
+    this.#assertDesignAgent(session, caller);
+    if (
+      session.status !== "pending" &&
+      session.status !== "connected" &&
+      session.status !== "needs-input" &&
+      session.status !== "ready" &&
+      session.status !== "applied"
+    )
+      throw refuse("invalid-request", "error.designEnded", { id, status: session.status });
+    const { revision } = this.#describe();
+    if (revision !== session.expectedRevision)
+      throw refuse("invalid-request", "error.modelChanged", {});
+    try {
+      validateDesignInputs(this.root, session.references, session.sources);
+    } catch (error) {
+      throw refuse("invalid-request", "error.designReference", {
+        path: "references",
+        reason: (error as Error).message,
+      });
+    }
+    const proposal = proposalWithRevision(request.proposal, session.expectedRevision);
+    const next: DesignSession = {
+      ...session,
+      status: "ready",
+      updatedAt: Date.now(),
+      messages: [
+        ...session.messages,
+        { role: "agent", text: request.message ?? proposal.summary, at: Date.now() },
+      ],
+      proposal,
+      error: null,
+    };
+    writeDesign(this.root, next);
+    if (next.autoSave === true) return this.#autoApplyDesign(next, proposal);
+    return { ok: true, design: next, prompt: next.desktop?.prompt };
+  }
+
+  async messageDesign(id: string, request: DesignMessageRequest): Promise<DesignResponse> {
+    if (this.#closing) throw refuse("server-unreachable", "error.stopping", {});
+    const session = this.#designSession(id);
+    if (session.method !== "cli") throw refuse("invalid-request", "error.designMethod", {});
+    if (session.status === "canceled")
+      throw refuse("invalid-request", "error.designEnded", { id, status: session.status });
+    if (session.status === "running")
+      throw refuse("already-running", "error.designRunning", { id });
+    let draftProposal =
+      request.proposal ?? (session.status === "applied" ? null : session.proposal);
+    if (draftProposal)
+      draftProposal = proposalWithRevision(draftProposal, session.expectedRevision);
+    let prompt: string;
+    const { loaded, revision } = this.#describe();
+    if (revision !== session.expectedRevision)
+      throw refuse("invalid-request", "error.modelChanged", {});
+    try {
+      validateDesignInputs(this.root, session.references, session.sources);
+      prompt = buildDesignPrompt({
+        autoSave: session.autoSave === true,
+        skillBaseline: session.skillBaseline ?? {},
+        language: loaded.language,
+        request: session.request,
+        process: session.process,
+        model: draftProposal?.model ?? modelWriteFromWorkspace(loaded, session.expectedRevision),
+        modelMeaning: loaded.model,
+        draftProposal,
+        references: session.references,
+        sources: session.sources,
+        messages: [
+          ...session.messages,
+          { role: "user" as const, text: request.text, at: Date.now() },
+        ]
+          .map((message) => ({ role: message.role, text: message.text }))
+          .filter(
+            (message): message is { role: "user" | "agent"; text: string } =>
+              message.role === "user" || message.role === "agent",
+          ),
+        root: this.root,
+      });
+    } catch (error) {
+      throw refuse("invalid-request", "error.designReference", {
+        path: "references",
+        reason: (error as Error).message,
+      });
+    }
+    const specs = resolveAgents(loaded.config.agents);
+    const spec = specs.find((item) => item.id === session.agent);
+    const safeSpec = spec && spec.command ? safeDesignSpec(spec, session.selection ?? {}) : null;
+    if (!safeSpec)
+      throw refuse("agent-unavailable", "error.designAgent", {
+        agents: specs
+          .filter((item) => item.command && (item.format === "claude" || item.format === "codex"))
+          .map((item) => item.id)
+          .join(", "),
+      });
+    const messages = [
+      ...session.messages,
+      { role: "user" as const, text: request.text, at: Date.now() },
+    ];
+    const next: DesignSession = {
+      ...session,
+      status: "running",
+      updatedAt: Date.now(),
+      messages,
+      proposal: draftProposal ?? session.proposal,
+      error: null,
+    };
+    writeDesign(this.root, next);
+    this.#startDesignAgent(next, safeSpec, prompt);
+    return { ok: true, design: this.#designSession(id) };
+  }
+
+  async cancelDesign(id: string): Promise<DesignResponse> {
+    const session = this.#designSession(id);
+    if (session.status === "running") this.#stopDesign(id);
+    const next: DesignSession = {
+      ...session,
+      status: "canceled",
+      updatedAt: Date.now(),
+      error: null,
+    };
+    writeDesign(this.root, next);
+    return { ok: true, design: next };
+  }
+
+  async #saveDesignBundle(
+    session: DesignSession,
+    proposal: DesignProposal,
+    mode: "full" | "skills-only",
+  ): Promise<{ model?: ModelView; savedFiles: string[]; appliedRevision: string }> {
+    const { loaded, revision } = this.#describe();
+    try {
+      validateDesignInputs(this.root, session.references, session.sources);
+    } catch (error) {
+      throw refuse("invalid-request", "error.designReference", {
+        path: "references",
+        reason: (error as Error).message,
+      });
+    }
+    if (mode === "full") {
+      try {
+        const saved = saveDesignBundle({
+          root: this.root,
+          loaded,
+          request: updateModelRequest.parse(proposal.model),
+          skillFiles: proposal.skillFiles ?? [],
+          skillBaseline: session.skillBaseline ?? {},
+          parseYaml: this.#deps.parseYaml,
+        });
+        this.#workspace = {
+          loaded: saved.loaded,
+          signature: this.#modelSignature(saved.loaded.modelPath),
+        };
+        this.#agentChecks = null;
+        const model = await this.model();
+        this.#hooks.broadcast({ type: "model" });
+        return { model, savedFiles: saved.savedFiles, appliedRevision: model.revision };
+      } catch (error) {
+        this.#workspace = null;
+        if (error instanceof ModelRevisionError)
+          throw refuse("invalid-request", "error.modelChanged", {});
+        if (error instanceof ModelError)
+          throw refuse("no-model", "error.model", { detail: error.message }, error.files);
+        throw refuse("invalid-request", "error.designReference", {
+          path: "skillFiles",
+          reason: (error as Error).message,
+        });
+      }
+    }
+    try {
+      const saved = saveMissingDesignSkills({
+        root: this.root,
+        loaded,
+        request: updateModelRequest.parse(proposal.model),
+        skillFiles: proposal.skillFiles ?? [],
+        parseYaml: this.#deps.parseYaml,
+      });
+      const model = await this.model();
+      this.#hooks.broadcast({ type: "model" });
+      return { model, savedFiles: saved.savedFiles, appliedRevision: revision };
+    } catch (error) {
+      if (error instanceof ModelError)
+        throw refuse("no-model", "error.model", { detail: error.message }, error.files);
+      throw refuse("invalid-request", "error.designReference", {
+        path: "skillFiles",
+        reason: (error as Error).message,
+      });
+    }
+  }
+
+  async #applyDesignProposal(
+    session: DesignSession,
+    proposal: DesignProposal,
+    mode: "full" | "skills-only" = "full",
+  ): Promise<DesignResponse> {
+    const saved = await this.#saveDesignBundle(session, proposal, mode);
+    const now = Date.now();
+    let skillBaseline = session.skillBaseline;
+    try {
+      skillBaseline = snapshotDesignSkills(this.root, this.#loaded());
+    } catch {
+      // Keep the previous baseline; the next operation will surface the model error.
+    }
+    const next: DesignSession = {
+      ...session,
+      status: "applied",
+      updatedAt: now,
+      appliedAt: session.appliedAt ?? now,
+      expectedRevision: saved.appliedRevision,
+      skillBaseline,
+      proposal: proposalWithRevision(proposal, saved.appliedRevision),
+      savedFiles: saved.savedFiles,
+      appliedRevision: saved.appliedRevision,
+      error: null,
+    };
+    writeDesign(this.root, next);
+    return { ok: true, design: next, ...(saved.model ? { model: saved.model } : {}) };
+  }
+
+  async #autoApplyDesign(
+    session: DesignSession,
+    proposal: DesignProposal,
+  ): Promise<DesignResponse> {
+    try {
+      return await this.#applyDesignProposal(session, proposal);
+    } catch (error) {
+      const detail = error instanceof HarnessError ? error.message : (error as Error).message;
+      const next: DesignSession = {
+        ...session,
+        status: "ready",
+        updatedAt: Date.now(),
+        proposal,
+        error: detail,
+      };
+      writeDesign(this.root, next);
+      return { ok: true, design: next, prompt: next.desktop?.prompt };
+    }
+  }
+
+  async applyDesign(id: string, request: DesignApplyRequest): Promise<DesignResponse> {
+    const session = this.#designSession(id);
+    if (session.status === "applied") {
+      if (session.savedFiles !== undefined) return { ok: true, design: session };
+      const repairProposal = request.proposal ?? session.proposal;
+      if (!repairProposal) return { ok: true, design: session };
+      return this.#applyDesignProposal(
+        session,
+        proposalWithRevision(repairProposal, session.expectedRevision),
+        "skills-only",
+      );
+    }
+    if (session.status === "running")
+      throw refuse("already-running", "error.designRunning", { id });
+    if (session.status !== "ready") throw refuse("invalid-request", "error.designNotReady", { id });
+    const proposal = request.proposal ?? session.proposal;
+    if (!proposal) throw refuse("invalid-request", "error.designNotReady", { id });
+    const nextProposal = proposalWithRevision(proposal, session.expectedRevision);
+    return this.#applyDesignProposal(session, nextProposal);
   }
 
   /** Metadata only; a short cache coalesces concurrent requests, and refresh bypasses completed entries. */

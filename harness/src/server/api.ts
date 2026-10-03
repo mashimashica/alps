@@ -6,6 +6,18 @@
  *
  *   (WebUI)            GET  /api/agents/:id/models?refresh
  *   get_model          GET  /api/model
+ *   (WebUI)            POST /api/model
+ *   (WebUI)            GET  /api/designs/capabilities
+ *   (WebUI)            POST /api/designs
+ *   (WebUI)            GET  /api/designs/:id
+ *   (WebUI)            POST /api/designs/:id/open
+ *   (WebUI/CLI)        POST /api/designs/:id/messages
+ *   (design MCP)       POST /api/designs/:id/claim
+ *   (design MCP)       GET  /api/designs/:id/context
+ *   (design MCP)       POST /api/designs/:id/questions
+ *   (design MCP)       POST /api/designs/:id/proposal
+ *   (WebUI)            POST /api/designs/:id/cancel
+ *   (WebUI)            POST /api/designs/:id/apply
  *   list_artifacts     GET  /api/artifacts?type&changedSince
  *   list_instances     GET  /api/instances?process&path&limit&cursor
  *   instantiate        POST /api/instances
@@ -75,6 +87,14 @@ import {
   skillQuery,
   statsQuery,
   updateInstanceRequest,
+  updateModelRequest,
+  createDesignRequest,
+  designApplyRequest,
+  designClaimRequest,
+  designMessageRequest,
+  designOpenRequest,
+  designSubmitProposalRequest,
+  designSubmitQuestionsRequest,
   wakeRequest,
   launchRequest,
   claimLaunchRequest,
@@ -93,6 +113,8 @@ import type {
   AssessmentResponse,
   AssessmentsResponse,
   CancelResponse,
+  DesignCapabilitiesResponse,
+  DesignResponse,
   Failure,
   FinishResponse,
   InstanceResponse,
@@ -347,15 +369,14 @@ function routes(harness: Harness, host: ApiHost, launches: Launches): Route[] {
     {
       method: "GET",
       pattern: new RegExp(`^/api/launches/${id}$`),
-      handle: ({ id }) =>
-        ok({ ok: true, launch: launches.get(id), prompt: launches.prompt(launches.get(id)) }),
+      handle: async ({ id }) => ok(await launches.answer(id)),
     },
     {
       method: "POST",
       pattern: new RegExp(`^/api/launches/${id}/claim$`),
       handle: async ({ id, request, caller }) => {
         const options = parse(claimLaunchRequest, await body(request));
-        return ok(await launches.claim(id, caller, options.sessionId));
+        return ok(await launches.claim(id, caller, options.sessionId, options.workspace));
       },
     },
     {
@@ -364,8 +385,7 @@ function routes(harness: Harness, host: ApiHost, launches: Launches): Route[] {
       handle: async ({ id, request, caller }) => {
         await body(request);
         if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
-        await launches.open(id);
-        return ok({ ok: true });
+        return ok(await launches.open(id));
       },
     },
     {
@@ -393,10 +413,153 @@ function routes(harness: Harness, host: ApiHost, launches: Launches): Route[] {
       handle: async () => ok({ ok: true, model: await harness.model() } satisfies ModelResponse),
     },
     {
+      method: "POST",
+      pattern: /^\/api\/model$/,
+      handle: async ({ request, caller }) => {
+        if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
+        return ok({
+          ok: true,
+          model: await harness.updateModel(parse(updateModelRequest, await body(request))),
+        } satisfies ModelResponse);
+      },
+    },
+    {
       method: "GET",
       pattern: new RegExp(`^/api/agents/${id}/models$`),
       handle: async ({ id: agent, url }) =>
         ok(await harness.agentModels(agent, url.searchParams.get("refresh") === "1")),
+    },
+    {
+      method: "GET",
+      pattern: /^\/api\/designs\/capabilities$/,
+      handle: async ({ caller }) => {
+        if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
+        return ok((await harness.designCapabilities()) satisfies DesignCapabilitiesResponse);
+      },
+    },
+    {
+      method: "GET",
+      pattern: /^\/api\/designs$/,
+      handle: async ({ caller, url }) => {
+        if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
+        const offset = Number(url.searchParams.get("offset") ?? "0");
+        if (!Number.isSafeInteger(offset) || offset < 0)
+          throw refuse("invalid-request", "error.request", {
+            detail: "offset must be a non-negative integer",
+          });
+        return ok(harness.designs(offset));
+      },
+    },
+    {
+      method: "POST",
+      pattern: /^\/api\/designs$/,
+      handle: async ({ request, caller }) => {
+        if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
+        return ok(
+          (await harness.createDesign(
+            parse(createDesignRequest, await body(request)),
+          )) satisfies DesignResponse,
+          201,
+        );
+      },
+    },
+    {
+      method: "GET",
+      pattern: new RegExp(`^/api/designs/${id}$`),
+      handle: async ({ id: design, caller }) => {
+        if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
+        return ok((await harness.design(design)) satisfies DesignResponse);
+      },
+    },
+    {
+      method: "POST",
+      pattern: new RegExp(`^/api/designs/${id}/open$`),
+      handle: async ({ id: design, request, caller }) => {
+        if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
+        return ok(
+          (await harness.openDesign(
+            design,
+            parse(designOpenRequest, await body(request)),
+          )) satisfies DesignResponse,
+        );
+      },
+    },
+    {
+      method: "POST",
+      pattern: new RegExp(`^/api/designs/${id}/claim$`),
+      handle: async ({ id: design, request, caller }) =>
+        ok(
+          (await harness.claimDesign(
+            design,
+            parse(designClaimRequest, await body(request)),
+            caller,
+          )) satisfies DesignResponse,
+        ),
+    },
+    {
+      method: "GET",
+      pattern: new RegExp(`^/api/designs/${id}/context$`),
+      handle: async ({ id: design, caller }) =>
+        ok((await harness.designContext(design, caller)) satisfies DesignResponse),
+    },
+    {
+      method: "POST",
+      pattern: new RegExp(`^/api/designs/${id}/questions$`),
+      handle: async ({ id: design, request, caller }) =>
+        ok(
+          (await harness.submitDesignQuestions(
+            design,
+            parse(designSubmitQuestionsRequest, await body(request)),
+            caller,
+          )) satisfies DesignResponse,
+        ),
+    },
+    {
+      method: "POST",
+      pattern: new RegExp(`^/api/designs/${id}/proposal$`),
+      handle: async ({ id: design, request, caller }) =>
+        ok(
+          (await harness.submitDesignProposal(
+            design,
+            parse(designSubmitProposalRequest, await body(request)),
+            caller,
+          )) satisfies DesignResponse,
+        ),
+    },
+    {
+      method: "POST",
+      pattern: new RegExp(`^/api/designs/${id}/messages$`),
+      handle: async ({ id: design, request, caller }) => {
+        if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
+        return ok(
+          (await harness.messageDesign(
+            design,
+            parse(designMessageRequest, await body(request)),
+          )) satisfies DesignResponse,
+        );
+      },
+    },
+    {
+      method: "POST",
+      pattern: new RegExp(`^/api/designs/${id}/cancel$`),
+      handle: async ({ id: design, request, caller }) => {
+        await body(request);
+        if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
+        return ok((await harness.cancelDesign(design)) satisfies DesignResponse);
+      },
+    },
+    {
+      method: "POST",
+      pattern: new RegExp(`^/api/designs/${id}/apply$`),
+      handle: async ({ id: design, request, caller }) => {
+        if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
+        return ok(
+          (await harness.applyDesign(
+            design,
+            parse(designApplyRequest, await body(request)),
+          )) satisfies DesignResponse,
+        );
+      },
     },
     {
       method: "GET",
@@ -651,6 +814,15 @@ function routes(harness: Harness, host: ApiHost, launches: Launches): Route[] {
 
 export type Api = (request: Request, url: URL, keepOpen: () => void) => Promise<ApiReply | null>;
 
+const designAllowedForAgent = (path: string, method: string): boolean => {
+  if (
+    method === "GET" &&
+    (path === "/api/model" || path === "/api/artifacts" || path === "/api/skill")
+  )
+    return true;
+  return /^\/api\/designs\/[^/]+\/(claim|context|questions|proposal)$/.test(path);
+};
+
 const failure = (error: HarnessError): ApiReply => ({
   status: HTTP_STATUS[error.code],
   body: { ok: false, error: error.info } satisfies Failure,
@@ -665,6 +837,13 @@ export function createApi(harness: Harness, host: ApiHost): Api {
       if (!match || route.method !== request.method) continue;
       const caller = harness.externalCaller(callerOf(request));
       try {
+        if (
+          caller.kind === "agent" &&
+          caller.session &&
+          harness.externalDesignFor(caller.session) &&
+          !designAllowedForAgent(url.pathname, request.method)
+        )
+          throw refuse("invalid-request", "error.designOnly", {});
         const reply = await route.handle({
           request,
           url,

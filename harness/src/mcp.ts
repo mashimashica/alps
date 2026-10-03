@@ -34,6 +34,7 @@ import type {
   AssessmentResponse,
   CancelResponse,
   ClientInfo,
+  DesignResponse,
   ErrorInfo,
   Failure,
   FinishResponse,
@@ -134,6 +135,30 @@ const instant = z
   .describe("Epoch milliseconds or an ISO 8601 date.");
 
 const ARGS = {
+  claim_design: z.strictObject({
+    id: z.string().min(8).max(80),
+    workspace: z
+      .string()
+      .min(1)
+      .max(4000)
+      .optional()
+      .describe(
+        "Your observed absolute working directory (run pwd first). Must match the ALPS project; do not copy a path without checking it.",
+      ),
+    sessionId: z.string().min(1).max(500).optional(),
+    conversationUrl: z.string().min(1).max(2000).optional(),
+  }),
+  get_design_context: z.strictObject({ id: z.string().min(8).max(80) }),
+  submit_design_questions: z.strictObject({
+    id: z.string().min(8).max(80),
+    message: z.string().min(1).max(20_000),
+    questions: z.array(z.string().min(1).max(1000)).max(20).optional(),
+  }),
+  submit_design_proposal: z.strictObject({
+    id: z.string().min(8).max(80),
+    message: z.string().min(1).max(20_000).optional(),
+    proposal: z.record(z.string(), z.unknown()),
+  }),
   get_model: z.strictObject({}),
   list_artifacts: z.strictObject({
     type: z.string().optional().describe("An Artifact type, by id or name."),
@@ -563,9 +588,17 @@ export function createMcpServer(options: McpOptions, link: DaemonLink | null): M
     {
       title: "Start an ALPS request in this conversation",
       description:
-        "Claim a pending desktop or terminal request by its saved id. Call this before doing its work. Returns the current prompt and a running attempt; opening the application alone starts no attempt. Requires this workspace's MCP connection. The connection is scoped to this active orchestration or assessment, so planning-only and assessment restrictions still apply. Only one such scope may be active on a connection. sessionId is this host's opaque conversation id if known; do not infer it from the MCP connection or guess it. Retrying on the same connection is safe. An ended attempt cannot be claimed again; request a new continuation from ALPS. A dropped connection is marked disconnected, not completed; reconnect the same known conversation to reclaim it. Finish using finish_run. This records an attempt but does not establish any Outcome achievement.",
+        "Claim a pending desktop or terminal request by its saved id. First check your actual working directory and pass it as workspace. Call this before doing its work. Returns the current prompt and a running attempt; opening the application alone starts no attempt. Requires this workspace's MCP connection. The connection is scoped to this active orchestration or assessment, so planning-only and assessment restrictions still apply. Only one such scope may be active on a connection. sessionId is this host's opaque conversation id if known; do not infer it from the MCP connection or guess it. Retrying on the same connection is safe. An ended attempt cannot be claimed again; request a new continuation from ALPS. A dropped connection is marked disconnected, not completed; reconnect the same known conversation to reclaim it. Finish using finish_run. This records an attempt but does not establish any Outcome achievement.",
       inputSchema: z.strictObject({
         id: z.string().uuid(),
+        workspace: z
+          .string()
+          .min(1)
+          .max(4000)
+          .optional()
+          .describe(
+            "Your observed absolute working directory (run pwd first). Must match the ALPS project; do not copy a path without checking it.",
+          ),
         sessionId: z.string().min(1).max(500).optional(),
       }),
       annotations: {
@@ -580,8 +613,108 @@ export function createMcpServer(options: McpOptions, link: DaemonLink | null): M
         ctx,
         "POST",
         `/api/launches/${segment(args.id)}/claim`,
-        given({ sessionId: args.sessionId }),
+        given({ workspace: args.workspace, sessionId: args.sessionId }),
         ({ run }, language) => say(language, "done.launch", { run: run?.id ?? "" }),
+      ),
+  );
+
+  server.registerTool(
+    "claim_design",
+    {
+      title: "Claim an ALPS Process Model design session",
+      description:
+        "Bind this desktop-app MCP connection to an ALPS design session. First check your working directory and pass it as workspace. Returns the current context and whether completed model/Skill bundles are saved automatically. This is model construction, not business execution.",
+      inputSchema: ARGS.claim_design,
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false,
+      },
+    },
+    (args, ctx) =>
+      relay.tool<DesignResponse>(
+        ctx,
+        "POST",
+        `/api/designs/${segment(args.id)}/claim`,
+        given({
+          workspace: args.workspace,
+          sessionId: args.sessionId,
+          conversationUrl: args.conversationUrl,
+        }),
+        ({ design }, _language) => `Connected to design session ${design.id}.`,
+      ),
+  );
+
+  server.registerTool(
+    "get_design_context",
+    {
+      title: "Read an ALPS design session context",
+      description:
+        "Return the bound ALPS design session, including the full current Process Model proposal context and messages. No effects.",
+      inputSchema: ARGS.get_design_context,
+      annotations: READ_ONLY,
+    },
+    (args, ctx) =>
+      relay.tool<DesignResponse>(
+        ctx,
+        "GET",
+        `/api/designs/${segment(args.id)}/context`,
+        undefined,
+        ({ design }, _language) => `Read design session ${design.id}.`,
+      ),
+  );
+
+  server.registerTool(
+    "submit_design_questions",
+    {
+      title: "Submit ALPS design clarification questions",
+      description:
+        "Use when a Process Model design cannot responsibly be proposed yet. Records the questions for the person. Does not apply any model change.",
+      inputSchema: ARGS.submit_design_questions,
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: false,
+      },
+    },
+    (args, ctx) =>
+      relay.tool<DesignResponse>(
+        ctx,
+        "POST",
+        `/api/designs/${segment(args.id)}/questions`,
+        given({ message: args.message, questions: args.questions }),
+        ({ design }, _language) => `Submitted questions for design session ${design.id}.`,
+      ),
+  );
+
+  server.registerTool(
+    "submit_design_proposal",
+    {
+      title: "Submit an ALPS Process Model design proposal",
+      description:
+        "Submit a complete coherent Process Model and actual Skill file contents, including required supporting files. For sessions with autoSave=true, validates and saves the model and Skill files together immediately; there is no additional apply click. For legacy review sessions, stores the proposal. The returned status and error determine whether saving succeeded. Never report completion just because submission returned. Does not execute business processes.",
+      inputSchema: ARGS.submit_design_proposal,
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: false,
+      },
+    },
+    (args, ctx) =>
+      relay.tool<DesignResponse>(
+        ctx,
+        "POST",
+        `/api/designs/${segment(args.id)}/proposal`,
+        given({ message: args.message, proposal: args.proposal }),
+        ({ design }, _language) =>
+          design.error
+            ? `Design saved as a proposal but could not be applied: ${design.error}`
+            : design.status === "applied"
+              ? `Saved the model and Skill bundle for design session ${design.id}.`
+              : `Submitted proposal for design session ${design.id}.`,
       ),
   );
 

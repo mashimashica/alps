@@ -5,7 +5,11 @@ import { rel, type ParseYaml } from "./files.ts";
 import type { LoadedWorkspace } from "./load.ts";
 import { findSkills, skillFor } from "./skills.ts";
 
-export function describeModel(workspace: LoadedWorkspace, parseYaml: ParseYaml): ModelDescription {
+export function describeModel(
+  workspace: LoadedWorkspace,
+  parseYaml: ParseYaml,
+  revision: string,
+): ModelDescription {
   const { root, model } = workspace;
   const index = findSkills(root, workspace.skillRoots, parseYaml);
   return {
@@ -13,6 +17,7 @@ export function describeModel(workspace: LoadedWorkspace, parseYaml: ParseYaml):
     modelPath: rel(root, workspace.modelPath),
     configPath: workspace.configPath ? rel(root, workspace.configPath) : null,
     language: workspace.language,
+    revision,
     name: model.name,
     description: model.description,
     processes: model.processes.map((process) => ({

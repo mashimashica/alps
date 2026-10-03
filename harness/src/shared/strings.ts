@@ -93,6 +93,8 @@ const en = {
     `Orchestration ${a.run} is still running. This request was not started.`,
   "error.launchFailed": () => "Could not start this request.",
   "error.launchUser": () => "Start or open this request from the ALPS interface.",
+  "error.launchWorkspace": (a: { workspace: string }) =>
+    `Check your working directory and reconnect from ${a.workspace}. The request has not confirmed this project.`,
   "error.resumeRunning": () => "Wait for the current run to end before resuming this conversation.",
   "error.resumeMissing": () => "No saved conversation id is available for this run.",
   "error.nativeOpen": () => "The application could not be opened. The saved request is kept.",
@@ -103,6 +105,29 @@ const en = {
 
   /* ---------- failures of the harness ---------- */
   "error.model": (a: { detail: string }) => a.detail,
+  "error.modelChanged": () =>
+    "The process model changed while this form was open. Review the latest model and save again.",
+  "error.noDesign": (a: { id: string }) => `No design session ${a.id}.`,
+  "error.designRunning": (a: { id: string }) =>
+    `Design session ${a.id} is still running. Wait for it or cancel it before continuing.`,
+  "error.designNotReady": (a: { id: string }) =>
+    `Design session ${a.id} has no proposal ready to apply.`,
+  "error.designEnded": (a: { id: string; status: string }) =>
+    `Design session ${a.id} already ended (${a.status}). Start a new design session.`,
+  "error.designAgent": (a: { agents: string }) =>
+    `Process design needs Claude Code or Codex. Available design agents: ${a.agents || "none"}.`,
+  "error.designClient": (a: { agent: string }) =>
+    `This design session is for ${a.agent}; connect from that provider's desktop app.`,
+  "error.designMethod": () =>
+    "This design session uses another conversation path. Start a new design session with the intended method.",
+  "error.designOnly": () =>
+    "This connection is for model construction. Submit the model and Skill bundle through the design tools. Business execution is not available in this conversation.",
+  "error.designWorkspace": (a: { workspace: string }) =>
+    `Check your working directory and reconnect from ${a.workspace}. The design connection has not confirmed this project.`,
+  "error.designReference": (a: { path: string; reason: string }) =>
+    `Reference ${a.path} cannot be used for design: ${a.reason}.`,
+  "error.designSources": () =>
+    "The required design-process-description, design-agent-work-system, and skill-creator sources are not all available.",
   "error.stopping": () => "The harness server is stopping. Call again once it has restarted.",
   "error.noProcess": (a: { name: string; processes: string }) =>
     `No Process "${a.name}" in the model. Its Processes are: ${a.processes}.`,
@@ -378,6 +403,8 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
     `オーケストレーション${a.run}が進行中です。この依頼は開始されませんでした。`,
   "error.launchFailed": () => "この依頼を開始できませんでした。",
   "error.launchUser": () => "この依頼の開始・表示はALPSの画面から行ってください。",
+  "error.launchWorkspace": (a) =>
+    `作業ディレクトリを確認し、${a.workspace} から接続してください。この依頼はまだこのプロジェクトを確認できていません。`,
   "error.resumeRunning": () => "この会話を再開するには、現在の実行が終わるまで待ってください。",
   "error.resumeMissing": () => "この実行には、再開できる会話IDが記録されていません。",
   "error.nativeOpen": () => "アプリを開けませんでした。保存した依頼は保持されています。",
@@ -387,6 +414,27 @@ const ja: { [K in MessageKey]: (typeof en)[K] } = {
     `この会話で実行${a.run}を開始しました。返された指示に従い、finish_runで報告してください。`,
 
   "error.model": (a) => `プロセスモデルか設定を読めない。${a.detail}`,
+  "error.modelChanged": () =>
+    "このフォームを開いている間にプロセスモデルが変わりました。最新のモデルを確認してから保存してください。",
+  "error.noDesign": (a) => `設計セッション ${a.id} はありません。`,
+  "error.designRunning": (a) =>
+    `設計セッション ${a.id} はまだ進行中です。続ける前に完了を待つか中止してください。`,
+  "error.designNotReady": (a) => `設計セッション ${a.id} には、適用できる提案がまだありません。`,
+  "error.designEnded": (a) =>
+    `設計セッション ${a.id} はすでに終了しています（${a.status}）。新しい設計セッションを開始してください。`,
+  "error.designAgent": (a) =>
+    `プロセス設計には Claude Code または Codex が必要です。利用できる設計エージェント: ${a.agents || "なし"}。`,
+  "error.designClient": (a) =>
+    `この設計セッションは ${a.agent} 用です。そのデスクトップアプリから接続してください。`,
+  "error.designMethod": () =>
+    "この設計セッションは別の会話経路を使っています。意図した方法で新しい設計セッションを開始してください。",
+  "error.designOnly": () =>
+    "この接続はモデル構築用です。設計用ツールからモデルとSkillファイルを提出してください。この会話から業務は実行できません。",
+  "error.designWorkspace": (a) =>
+    `作業フォルダーを確認し、${a.workspace} から接続し直してください。このプロジェクトへの接続はまだ確認できていません。`,
+  "error.designReference": (a) => `参照 ${a.path} は設計に使えません: ${a.reason}。`,
+  "error.designSources": () =>
+    "design-process-description、design-agent-work-system、skill-creator の参照元のいずれかが利用できません。",
   "error.stopping": () =>
     "ハーネスサーバーが停止しているところである。再起動してから呼び直すこと。",
   "error.noProcess": (a) =>

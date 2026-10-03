@@ -90,7 +90,13 @@ export interface LoadOptions {
   config?: string;
 }
 
-export function loadWorkspace(root: string, options: LoadOptions): LoadedWorkspace {
+interface WorkspaceConfig {
+  configPath: string | null;
+  config: HarnessConfig;
+  attachments: { ok: true; dir: string };
+}
+
+function readWorkspaceConfig(root: string, options: LoadOptions): WorkspaceConfig {
   const { parseYaml } = options;
   let configPath: string | null;
   if (options.config) {
@@ -138,6 +144,12 @@ export function loadWorkspace(root: string, options: LoadOptions): LoadedWorkspa
       `${path.basename(configPath ?? CONFIG_FILES[0])}: attachments: ${config.attachments} cannot hold the files attached to requests: ${blocked} is not a directory (a file, or a symlink that leads nowhere). Name a directory, or one that does not exist yet.`,
       configPath ? [configPath] : [],
     );
+  return { configPath, config, attachments };
+}
+
+export function loadWorkspace(root: string, options: LoadOptions): LoadedWorkspace {
+  const { parseYaml } = options;
+  const { configPath, config, attachments } = readWorkspaceConfig(root, options);
 
   const modelPath = config.model
     ? path.resolve(root, config.model)
@@ -181,6 +193,21 @@ export function loadWorkspace(root: string, options: LoadOptions): LoadedWorkspa
     },
     attachments: attachments.dir,
   };
+}
+
+/** Validates a candidate process model against the current workspace configuration without writing it. */
+export function validateWorkspaceModel(
+  root: string,
+  options: LoadOptions,
+  modelPath: string,
+  parsedModel: ProcessModelFile,
+): void {
+  const { configPath, config } = readWorkspaceConfig(root, options);
+  const files = [modelPath, ...(configPath ? [configPath] : [])];
+  const model = withFiles(files, () => normalizeModel(parsedModel, path.basename(modelPath)));
+  withFiles(files, () =>
+    applyConfig(model, config, configPath ? path.basename(configPath) : "configuration"),
+  );
 }
 
 /**
@@ -257,8 +284,21 @@ function normalizeModel(raw: ProcessModelFile, file: string): ProcessModel {
       name,
       purpose: entry.purpose ?? "",
       outcomes: entry.outcomes,
+      scope: entry.scope ?? "",
+      activities: entry.activities.map((activity) => {
+        const supportsOutcomes = activity.supportsOutcomes ?? [];
+        return {
+          name: activity.name,
+          tasks: activity.tasks,
+          ...(supportsOutcomes.length > 0 ? { supportsOutcomes } : {}),
+        };
+      }),
+      tasks: entry.tasks,
       constraints: entry.constraints,
       enablers: entry.enablers,
+      entryCriteria: entry.entryCriteria,
+      exitCriteria: entry.exitCriteria,
+      references: entry.references,
       inputs: refs(entry.inputs),
       controls: refs(entry.controls),
       outputs: refs(entry.outputs),
