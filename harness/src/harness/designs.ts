@@ -234,7 +234,8 @@ export function newDesignId(): string {
 
 export function readDesign(root: string, id: string): DesignSession | null {
   try {
-    return JSON.parse(fs.readFileSync(designFile(root, id), "utf8")) as DesignSession;
+    const session = JSON.parse(fs.readFileSync(designFile(root, id), "utf8")) as DesignSession;
+    return { ...session, method: session.method ?? "cli" };
   } catch {
     return null;
   }
