@@ -917,6 +917,13 @@ const instant = z.string().transform((value, context) => {
   return ms;
 });
 
+/** `GET /api/project-files`: bounded metadata for the user's material picker. */
+export const projectFilesQuery = z.object({
+  path: z.string().min(1).max(4096).default("."),
+  query: z.string().max(200).default(""),
+  offset: count.min(0).max(1_000_000).default(0),
+});
+
 /** `GET /api/artifacts` (`list_artifacts`). */
 export const artifactsQuery = z.object({
   type: z.string().min(1).optional(),

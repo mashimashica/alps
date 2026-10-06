@@ -53,6 +53,7 @@
 
 import type { z } from "zod";
 import { Launches } from "./launches.ts";
+import { projectFiles } from "../harness/project-files.ts";
 import { artifactContent } from "../harness/artifact-content.ts";
 import {
   HTTP_STATUS,
@@ -70,6 +71,7 @@ import {
 } from "../shared/requests.ts";
 import {
   artifactsQuery,
+  projectFilesQuery,
   assessmentQuery,
   assessRequest,
   clientHeader,
@@ -330,6 +332,14 @@ function routes(harness: Harness, host: ApiHost, launches: Launches): Route[] {
       method: "GET",
       pattern: /^\/api\/work-objects$/,
       handle: () => ok(harness.workObjects(launches.list())),
+    },
+    {
+      method: "GET",
+      pattern: /^\/api\/project-files$/,
+      handle: async ({ url, caller }) => {
+        if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
+        return ok(await projectFiles(harness.root, parse(projectFilesQuery, query(url))));
+      },
     },
     {
       method: "GET",

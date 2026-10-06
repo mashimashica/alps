@@ -29,6 +29,7 @@ export const RUNTIME_CONTRACT = {
     "work-object-views",
     "evaluation-context",
     "artifact-content",
+    "project-file-picker",
     "optional-observability",
     "observation-records",
     "single-workspace-writer",

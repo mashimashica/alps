@@ -891,6 +891,23 @@ export interface InstanceView extends Instance {
   evaluationBasis?: EvaluationBasis;
 }
 
+/** Local project materials, including files not declared as process Artifacts. */
+export interface ProjectFileEntry {
+  path: string;
+  name: string;
+  directory: boolean;
+  readable: boolean;
+}
+
+export interface ProjectFilesResponse {
+  ok: true;
+  path: string;
+  entries: ProjectFileEntry[];
+  next: number | null;
+  /** Search stopped at its scan bound or could not read a descendant directory. */
+  incomplete: boolean;
+}
+
 /** Bounded, read-only current workspace content. It is not a historical snapshot. */
 export interface ArtifactContent {
   path: string;
