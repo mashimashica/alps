@@ -204,6 +204,7 @@ export interface DesignReference {
   path: string;
   sha256: string | null;
   bytes: number;
+  /** Legacy inline-preview flag. New references supply the complete original file by path. */
   truncated: boolean;
 }
 

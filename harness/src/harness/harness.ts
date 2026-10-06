@@ -1223,7 +1223,7 @@ export class Harness {
       if (!desktop.available) throw refuse("agent-unavailable", "error.desktopUnavailable", {});
     }
     if (request.method === "cli") await this.#validateSelection(spec, selection);
-    const safeSpec = request.method === "cli" ? safeDesignSpec(spec, selection) : null;
+    const safeSpec = request.method === "cli" ? safeDesignSpec(spec, selection, this.root) : null;
     if (request.method === "cli" && !safeSpec)
       throw refuse("agent-unavailable", "error.designAgent", {
         agents: capable.map((agent) => agent.id).join(", "),
@@ -1711,7 +1711,8 @@ export class Harness {
     }
     const specs = resolveAgents(loaded.config.agents);
     const spec = specs.find((item) => item.id === session.agent);
-    const safeSpec = spec && spec.command ? safeDesignSpec(spec, session.selection ?? {}) : null;
+    const safeSpec =
+      spec && spec.command ? safeDesignSpec(spec, session.selection ?? {}, this.root) : null;
     if (!safeSpec)
       throw refuse("agent-unavailable", "error.designAgent", {
         agents: specs
