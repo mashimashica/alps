@@ -44,6 +44,11 @@ const TOOLS = [
   "record_assessment",
   "wake",
   "open_ui",
+  "claim_launch",
+  "claim_design",
+  "get_design_context",
+  "submit_design_questions",
+  "submit_design_proposal",
 ];
 
 let ws: TmpWorkspace;
@@ -97,7 +102,7 @@ describe("E2 MCP over stdio", () => {
     expect(client.getServerCapabilities()?.resources).toBeDefined();
   });
 
-  test("E2 the MCP server lists the fifteen tools, each with a description of its results", async () => {
+  test("E2 the MCP server lists the public tools, each with a description of its results", async () => {
     const { tools } = await session.client.listTools();
     expect(tools.map((tool) => tool.name).sort()).toEqual([...TOOLS].sort());
     for (const tool of tools) {

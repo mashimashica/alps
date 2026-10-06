@@ -241,6 +241,9 @@ export interface DesignMessage {
 
 export interface DesignSession {
   id: string;
+  provider?: "claude" | "codex";
+  /** Explicit work scopes continued by this design; never inferred from a shared conversation. */
+  workIds?: string[];
   status: DesignStatus;
   createdAt: number;
   updatedAt: number;
@@ -380,6 +383,22 @@ export interface Evaluation {
   note?: string;
   by: Judge;
   at: number;
+  /** The actual criteria displayed when judging; absent on older evaluations. */
+  basis?: EvaluationBasis;
+}
+
+export interface EvaluationBasis {
+  modelRevision: string;
+  process: Pick<Process, "id" | "name" | "purpose" | "outcomes">;
+  criteria: OutcomeCriterion[];
+  inputs: Instance["inputs"];
+  outputs: Instance["outputs"];
+}
+
+/** Optimistic guard: a form must not silently move to a newer run or changed criteria. */
+export interface EvaluationContext {
+  runId: string;
+  fingerprint: string;
 }
 
 /**
@@ -520,8 +539,12 @@ export interface RunClient extends ClientInfo {
 
 /** How an attempt was launched; a host conversation is separate from an MCP connection. */
 export interface RunExecution {
+  /** Captured at the start; current configuration is not evidence of a historical provider. */
+  provider?: "claude" | "codex";
   method: "cli" | "desktop" | "terminal";
   launchId?: string;
+  /** Bounded source references for continued work; distinct from the person's request. */
+  workContext?: string;
   sessionId?: string;
   session?: {
     id: string;
@@ -538,6 +561,7 @@ export interface RunExecution {
 export type LaunchMethod = RunExecution["method"];
 export interface LaunchRequest extends AgentSelection {
   id: string;
+  workIds?: string[];
   kind: RunKind;
   agent: string;
   method: LaunchMethod;
@@ -842,7 +866,8 @@ export type StaleReason =
    */
   | { kind: "input"; type: string; path: string; change: "modified" | "created" | "removed" }
   /** The Process's SKILL.md differs from the one the judged run used (`path` is the current one, if any). */
-  | { kind: "skill"; path: string | null };
+  | { kind: "skill"; path: string | null }
+  | { kind: "definition"; path: null };
 
 /** The facts of one instance, as `list_instances` and the assessment report them. */
 export interface InstanceFacts {
@@ -860,6 +885,102 @@ export interface InstanceFacts {
 /** An instance with its facts. */
 export interface InstanceView extends Instance {
   facts: InstanceFacts;
+  evaluationContext?: EvaluationContext | null;
+  /** Read together with the guard, so an older model response cannot mislabel the target. */
+  evaluationBasis?: EvaluationBasis;
+}
+
+/** Bounded, read-only current workspace content. It is not a historical snapshot. */
+export interface ArtifactContent {
+  path: string;
+  kind: "text" | "directory" | "binary";
+  observedAt: number;
+  size: number;
+  modifiedAt: number;
+  sha256: string | null;
+  truncated: boolean;
+  text?: string;
+  entries?: { path: string; name: string; directory: boolean; readable: boolean }[];
+}
+
+export interface ArtifactContentResponse {
+  ok: true;
+  artifact: ArtifactContent;
+}
+
+/* Object views preserve original records; they do not migrate or reclassify execution history. */
+export interface WorkObjectRef {
+  kind: "run" | "instance" | "design" | "launch";
+  id: string;
+}
+
+export interface WorkObject {
+  id: string;
+  origin: WorkObjectRef;
+  kind: "work" | "modeling" | "assessment" | "record";
+  title: string;
+  request: string | null;
+  scope: "plan" | "run" | null;
+  createdAt: number | null;
+  updatedAt: number | null;
+  /** Operational summary, never a judgment of achievement. */
+  status: "running" | "waiting" | "ended" | "empty";
+  applicationIds: string[];
+  participationIds: string[];
+  sessionIds: string[];
+  sources: WorkObjectRef[];
+  report: string;
+  reportSource: WorkObjectRef | null;
+}
+
+export interface ProcessApplicationObject {
+  id: string;
+  kind: "process" | "modeling" | "assessment";
+  source: WorkObjectRef;
+  processId: string | null;
+  descriptionSource: string | null;
+  title: string;
+  status: string;
+  workIds: string[];
+  participationIds: string[];
+  /** Present only for the runtime's actual Instance record; meta-work retains its source record. */
+  instance: InstanceView | null;
+}
+
+export interface WorkParticipation {
+  id: string;
+  source: WorkObjectRef;
+  applicationId: string | null;
+  /** Null when no provider conversation was actually identified. MCP connections are not sessions. */
+  sessionId: string | null;
+  workIds: string[];
+  role: "execution" | "coordination" | "modeling" | "assessment";
+  agent: string;
+  status: string;
+  startedAt: number | null;
+  endedAt: number | null;
+  coverage: "connected" | "reference-only" | "disconnected" | "unverified";
+}
+
+export interface AgentSessionObject {
+  id: string;
+  provider: "claude" | "codex" | null;
+  agents: string[];
+  providerSessionId: string;
+  workIds: string[];
+  applicationIds: string[];
+  participationIds: string[];
+  /** Only observed lineage, not guessed from time, agent name, or shared inputs. */
+  links: { sessionId: string; kind: "handoff" | "delegation" }[];
+}
+
+export interface WorkObjectsResponse {
+  ok: true;
+  works: WorkObject[];
+  applications: ProcessApplicationObject[];
+  sessions: AgentSessionObject[];
+  participations: WorkParticipation[];
+  coverage: { unidentifiedSessions: number; unreadableRecords: string[] };
 }
 
 /* ---------- server ---------- */

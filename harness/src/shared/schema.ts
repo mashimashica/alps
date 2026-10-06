@@ -227,6 +227,10 @@ export const designProposalRequest = z.looseObject({
 /** `POST /api/designs`: start an AI-assisted Process Description design session. */
 export const createDesignRequest = z.looseObject({
   id: designId.optional(),
+  workIds: z
+    .array(z.string().regex(/^(launch|run|instance|design)-[A-Za-z0-9_-]+$/))
+    .max(100)
+    .optional(),
   method: z.enum(["desktop", "cli"]).default("desktop"),
   autoSave: z.boolean().default(true),
   request: text.pipe(z.string().min(1).max(MAX_REQUEST_LENGTH)),
@@ -424,6 +428,22 @@ const evaluation: z.ZodType<Evaluation> = z.object({
   note: z.string().optional(),
   by: judge,
   at: epochMs,
+  basis: z
+    .object({
+      modelRevision: z.string(),
+      process: z.object({
+        id: z.string(),
+        name: z.string(),
+        purpose: z.string(),
+        outcomes: z.array(z.string()),
+      }),
+      criteria: z.array(
+        z.object({ outcome: z.int().min(0), statement: z.string(), checks: z.string().optional() }),
+      ),
+      inputs: z.record(z.string(), z.array(z.string())),
+      outputs: z.record(z.string(), z.string().nullable()),
+    })
+    .optional(),
 });
 
 const instance: z.ZodType<Instance> = z.object({
@@ -519,7 +539,9 @@ export const runRecordSchema: z.ZodType<Run, unknown> = z.object({
   execution: z
     .object({
       method: z.enum(["cli", "desktop", "terminal"]),
+      provider: z.enum(["claude", "codex"]).optional(),
       launchId: z.string().optional(),
+      workContext: z.string().optional(),
       sessionId: z.string().min(1).max(500).optional(),
       session: z
         .object({
@@ -751,6 +773,9 @@ export type RunRequest = z.output<typeof runRequest>;
  * the X-Harness-Client header names, or a user when there is none (the WebUI).
  */
 export const evaluateRequest = z.strictObject({
+  expected: z
+    .strictObject({ runId: z.string().min(1), fingerprint: z.string().regex(/^[a-f0-9]{64}$/) })
+    .optional(),
   judgments: z
     .array(
       z.strictObject({
@@ -970,6 +995,10 @@ export function formatIssues(file: string, error: z.ZodError): string {
 export const launchRequest = z
   .strictObject({
     id: z.string().uuid(),
+    workIds: z
+      .array(z.string().regex(/^(launch|run|instance|design)-[A-Za-z0-9_-]+$/))
+      .max(100)
+      .optional(),
     kind: z.enum(["process", "wake", "assess"]),
     agent: z.string().min(1),
     method: z.enum(["cli", "desktop", "terminal"]),

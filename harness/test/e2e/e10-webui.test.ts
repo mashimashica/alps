@@ -93,7 +93,7 @@ describe("E10 WebUI", () => {
         }
         // The bundle was made when the server started, before anything but /api/health was requested.
         expect(fs.readFileSync(serverLog(ws.root), "utf8")).toMatch(
-          /bundled the WebUI in \d+ ms \(\d+ files, [\d.]+ KiB\)/,
+          /bundled the WebUI from .+ in \d+ ms \(\d+ files, [\d.]+ KiB\)/,
         );
 
         // The page and every chunk it loads are served; the TSX source is not referenced.

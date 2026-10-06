@@ -72,6 +72,9 @@ const TOKEN_NOTE_EN =
 const TOKEN_NOTE_JA = "# の後ろは合い言葉なので、URL は求めた本人にだけ渡すこと。";
 
 const en = {
+  "error.evaluationChanged": () =>
+    "The run, criteria, or existing evaluation changed. Your draft was not saved to a different target. Reopen the evaluation after reviewing the change.",
+  "error.artifactRead": (a: { path: string }) => `Cannot read workspace content: ${a.path}`,
   "error.launchProcess": (a: { process: string }) => `Process ${a.process} is not in this model.`,
   "error.externalSession": () => "Connect the ALPS MCP server before starting this request.",
   "error.externalConnected": () =>
@@ -385,6 +388,9 @@ export type MessageArgs<K extends MessageKey> =
   Parameters<(typeof en)[K]> extends [infer A] ? A : Record<string, never>;
 
 const ja: { [K in MessageKey]: (typeof en)[K] } = {
+  "error.evaluationChanged": () =>
+    "実行・成功基準・既存の評価が変わりました。下書きは別の対象に保存していません。変更を確認してから評価を開き直してください。",
+  "error.artifactRead": (a) => `ワークスペースの内容を読めません：${a.path}`,
   "error.launchProcess": (a) => `プロセス${a.process}はこのモデルにありません。`,
   "error.externalSession": () => "この依頼を開始するには、ALPSのMCP接続が必要です。",
   "error.externalConnected": () =>

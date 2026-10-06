@@ -875,6 +875,7 @@ function RunPanel({ id, line }: { id: string; line?: number | undefined }) {
 }
 
 function staleText(t: Ui["t"], reason: StaleReason): string {
+  if (reason.kind === "definition") return t("stale.definition");
   if (reason.kind === "skill") return t("stale.skill", { path: reason.path ?? "SKILL.md" });
   return t(`stale.${reason.change}`, { path: reason.path });
 }

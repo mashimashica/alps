@@ -53,6 +53,7 @@
 
 import type { z } from "zod";
 import { Launches } from "./launches.ts";
+import { artifactContent } from "../harness/artifact-content.ts";
 import {
   HTTP_STATUS,
   HarnessError,
@@ -315,7 +316,32 @@ export function callerOf(request: Request): Caller {
 
 function routes(harness: Harness, host: ApiHost, launches: Launches): Route[] {
   const id = "([A-Za-z0-9_-]+)";
+  const validateWorks = (ids: string[] | undefined): void => {
+    if (!ids?.length) return;
+    const known = new Set(harness.workObjects(launches.list()).works.map((work) => work.id));
+    if (ids.some((value) => !known.has(value)))
+      throw refuse("invalid-request", "error.request", {
+        detail:
+          "A continued work scope no longer exists. Reopen its recorded work before continuing.",
+      });
+  };
   return [
+    {
+      method: "GET",
+      pattern: /^\/api\/work-objects$/,
+      handle: () => ok(harness.workObjects(launches.list())),
+    },
+    {
+      method: "GET",
+      pattern: /^\/api\/artifact-content$/,
+      handle: ({ url, caller }) => {
+        if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
+        return ok({
+          ok: true,
+          artifact: artifactContent(harness.root, url.searchParams.get("path") ?? ""),
+        });
+      },
+    },
     {
       method: "GET",
       pattern: /^\/api\/execution$/,
@@ -363,7 +389,9 @@ function routes(harness: Harness, host: ApiHost, launches: Launches): Route[] {
       pattern: /^\/api\/launches$/,
       handle: async ({ request, caller }) => {
         if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
-        return ok(await launches.submit(parse(launchRequest, await body(request))), 201);
+        const options = parse(launchRequest, await body(request));
+        validateWorks(options.workIds);
+        return ok(await launches.submit(options), 201);
       },
     },
     {
@@ -455,12 +483,9 @@ function routes(harness: Harness, host: ApiHost, launches: Launches): Route[] {
       pattern: /^\/api\/designs$/,
       handle: async ({ request, caller }) => {
         if (caller.kind !== "user") throw refuse("invalid-request", "error.launchUser", {});
-        return ok(
-          (await harness.createDesign(
-            parse(createDesignRequest, await body(request)),
-          )) satisfies DesignResponse,
-          201,
-        );
+        const options = parse(createDesignRequest, await body(request));
+        validateWorks(options.workIds);
+        return ok((await harness.createDesign(options)) satisfies DesignResponse, 201);
       },
     },
     {

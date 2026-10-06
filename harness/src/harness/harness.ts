@@ -8,6 +8,8 @@
  */
 
 import { externalTracking } from "../shared/schema.ts";
+import { definitionChanged, evaluationBasis, evaluationContext } from "./evaluation-basis.ts";
+import { buildWorkObjects } from "./work-objects.ts";
 import { withAgentSelection } from "../agents/models.ts";
 import fs from "node:fs";
 import path from "node:path";
@@ -158,7 +160,7 @@ import { DigestCache } from "./digest.ts";
 import { HarnessError, refuse } from "./errors.ts";
 import { INTERRUPTED_ERROR, runError } from "./migrate.ts";
 import { artifactPath, workspacePath } from "./paths.ts";
-import { buildPrompt } from "./prompt.ts";
+import { buildPrompt, workContextPrompt } from "./prompt.ts";
 import {
   attributeOutputs,
   diffOutputs,
@@ -1117,6 +1119,7 @@ export class Harness {
       model: request.model ?? null,
       effort: request.effort ?? null,
       autoSave: request.autoSave ?? true,
+      ...(request.workIds?.length ? { workIds: [...new Set(request.workIds)].sort() } : {}),
     });
   }
 
@@ -1143,6 +1146,7 @@ export class Harness {
             model: known.selection?.model,
             effort: known.selection?.effort,
             autoSave: known.autoSave ?? false,
+            workIds: known.workIds,
           })) === key
       )
         return { ok: true, design: known };
@@ -1250,6 +1254,8 @@ export class Harness {
     const now = Date.now();
     const session: DesignSession = {
       id,
+      provider: spec.format,
+      ...(request.workIds?.length ? { workIds: [...new Set(request.workIds)] } : {}),
       status: request.method === "cli" ? "running" : "pending",
       createdAt: now,
       updatedAt: now,
@@ -1432,6 +1438,32 @@ export class Harness {
 
   async design(id: string): Promise<DesignResponse> {
     return { ok: true, design: this.#designSession(id) };
+  }
+
+  workObjects(
+    launches: readonly import("../shared/types.ts").LaunchRecord[],
+  ): import("../shared/types.ts").WorkObjectsResponse {
+    const { description } = this.#describe();
+    const directory = path.join(recordPaths(this.root).dir, "designs");
+    const files = fs.existsSync(directory) ? fs.readdirSync(directory) : [];
+    const sourceDesigns = files
+      .filter((file) => /^[A-Za-z0-9_-]{8,80}\.json$/.test(file))
+      .map((file) => ({ id: file.slice(0, -5), design: readDesign(this.root, file.slice(0, -5)) }));
+    const designs = sourceDesigns.flatMap((source) => (source.design ? [source.design] : []));
+    return buildWorkObjects({
+      runs: [...this.#records.runs.values()],
+      instances: Object.values(this.#state.instances).map((instance) =>
+        this.#view(instance, description),
+      ),
+      designs,
+      launches,
+      processes: description.processes,
+      unreadableRecords: [...this.#records.unreadable, ...this.#records.unreadableAssessments]
+        .map((item) => item.id)
+        .concat(
+          sourceDesigns.filter((source) => !source.design).map((source) => `design-${source.id}`),
+        ),
+    });
   }
 
   /** Authoring sessions remain separate from business runs and assessment records. */
@@ -2013,6 +2045,7 @@ export class Harness {
           this.#current(instance, description.processes),
         )
       : [];
+    if (definitionChanged(instance, description)) reasons.push({ kind: "definition", path: null });
     return {
       instance: instance.id,
       process: instance.process,
@@ -2025,7 +2058,12 @@ export class Harness {
   }
 
   #view(instance: Instance, description: ModelDescription): InstanceView {
-    return { ...instance, facts: this.#facts(instance, description) };
+    return {
+      ...instance,
+      facts: this.#facts(instance, description),
+      evaluationContext: evaluationContext(instance, description),
+      evaluationBasis: evaluationBasis(instance, description),
+    };
   }
 
   /** Sends an instance to the WebUI, noting whether its evidence was stale then (for poll()). */
@@ -2478,14 +2516,18 @@ export class Harness {
       notes: instance.notes,
       ...(self ? { finishRun: id } : {}),
     });
-    const prompt = instruction
-      ? `${basePrompt}\n\nAdditional request from the person:\n${instruction}`
-      : basePrompt;
+    const prompt =
+      (instruction
+        ? `${basePrompt}\n\nAdditional request from the person:\n${instruction}`
+        : basePrompt) + workContextPrompt(execution.workContext, loaded.language);
     const args = !self && startsProcess(spec) ? argsFor(spec, prompt) : [];
     const run: Run = {
       id,
       kind: "process",
-      execution,
+      execution: {
+        ...execution,
+        ...(spec.format === "claude" || spec.format === "codex" ? { provider: spec.format } : {}),
+      },
       instance: instance.id,
       process: process.id,
       agent: spec.id,
@@ -3177,7 +3219,9 @@ export class Harness {
     const now = Date.now();
     const id = this.#nextId("r");
     const since = this.#state.lastWakeAt;
-    const prompt = this.#wakePrompt(id, since, loaded, description, agents, asked);
+    const prompt =
+      this.#wakePrompt(id, since, loaded, description, agents, asked) +
+      workContextPrompt(execution.workContext, loaded.language);
     // The agent's MCP server names this wake, so the runs it starts are listed in started.
     const server: McpServerLaunch = {
       name: WAKE_MCP_SERVER,
@@ -3193,7 +3237,10 @@ export class Harness {
     const run: Run = {
       id,
       kind: "wake",
-      execution,
+      execution: {
+        ...execution,
+        ...(spec.format === "claude" || spec.format === "codex" ? { provider: spec.format } : {}),
+      },
       instance: null,
       process: null,
       agent: spec.id,
@@ -3291,6 +3338,14 @@ export class Harness {
     const latestId = instance.runs.at(-1);
     const latest = latestId ? this.#state.runs[latestId] : undefined;
     if (!latest) throw refuse("not-found", "error.nothingToJudge", { instance: instance.id });
+    if (request.expected) {
+      const current = evaluationContext(instance, description);
+      if (
+        request.expected.runId !== current?.runId ||
+        request.expected.fingerprint !== current.fingerprint
+      )
+        throw refuse("invalid-request", "error.evaluationChanged", {});
+    }
     if (latest.status === "running")
       throw refuse("already-running", "error.judgeRunning", {
         run: latest.id,
@@ -3320,6 +3375,7 @@ export class Harness {
     }
     supersede(instance, {
       runId: latest.id,
+      basis: evaluationBasis(instance, description),
       judgments: [...request.judgments]
         .sort((a, b) => a.outcome - b.outcome)
         .map((j) => ({
@@ -3577,20 +3633,21 @@ export class Harness {
     const self = execution.method !== "cli" || spec.format === "self";
     const now = Date.now();
     const id = this.#nextId("r");
-    const prompt = buildAssessPrompt({
-      language: loaded.language,
-      root: this.root,
-      run: id,
-      server: self ? null : WAKE_MCP_SERVER,
-      scope,
-      processName: (process) =>
-        loaded.model.processes.find((p) => p.id === process)?.name ?? process,
-      modelPath: description.modelPath,
-      guidance: (loaded.config.guidance ?? []).map((file) => ({
-        path: file,
-        found: fs.existsSync(path.resolve(this.root, file)),
-      })),
-    });
+    const prompt =
+      buildAssessPrompt({
+        language: loaded.language,
+        root: this.root,
+        run: id,
+        server: self ? null : WAKE_MCP_SERVER,
+        scope,
+        processName: (process) =>
+          loaded.model.processes.find((p) => p.id === process)?.name ?? process,
+        modelPath: description.modelPath,
+        guidance: (loaded.config.guidance ?? []).map((file) => ({
+          path: file,
+          found: fs.existsSync(path.resolve(this.root, file)),
+        })),
+      }) + workContextPrompt(execution.workContext, loaded.language);
     // The agent's MCP server names this assessment, so what it records is the run's.
     const server: McpServerLaunch = {
       name: WAKE_MCP_SERVER,
@@ -3605,7 +3662,10 @@ export class Harness {
     const run: Run = {
       id,
       kind: "assess",
-      execution,
+      execution: {
+        ...execution,
+        ...(spec.format === "claude" || spec.format === "codex" ? { provider: spec.format } : {}),
+      },
       instance: null,
       process: null,
       agent: spec.id,

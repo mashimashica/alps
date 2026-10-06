@@ -235,7 +235,13 @@ export function buildWakePrompt(input: WakePromptInput): string {
   ].join("\n");
 
   const staleText = (reason: StaleReason): string =>
-    reason.kind === "skill" ? words.skillChanged : `${reason.path} ${reason.change}`;
+    reason.kind === "definition"
+      ? input.language === "ja"
+        ? "プロセス記述または成功基準が変わった"
+        : "Process description or criteria changed"
+      : reason.kind === "skill"
+        ? words.skillChanged
+        : `${reason.path} ${reason.change}`;
   const instances = [
     words.instances,
     ...(input.instances.listed.length === 0 ? [words.none] : []),

@@ -19,6 +19,8 @@ export function cleanEnv(extra: Record<string, string | undefined> = {}): Record
   const merged: Record<string, string | undefined> = {
     ...process.env,
     ALPS_WORKSPACE: undefined,
+    // Bun tests may default to UTC while the spawned CLI uses the host zone.
+    TZ: process.env.TZ ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
     ...extra,
   };
   return Object.fromEntries(

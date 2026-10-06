@@ -59,6 +59,11 @@ describe("E1 serve --daemon", () => {
         port: expect.any(Number),
         token: expect.stringMatching(/^[0-9a-f]{48}$/),
         startedAt: expect.any(Number),
+        ui: {
+          available: true,
+          mode: "reference",
+          entry: expect.stringContaining("src/ui/index.html"),
+        },
       });
       expect(fs.statSync(serverJson(ws.root)).mode & 0o777).toBe(0o600);
 

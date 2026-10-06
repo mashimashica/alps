@@ -588,7 +588,9 @@ export function createMcpServer(options: McpOptions, link: DaemonLink | null): M
     {
       title: "Start an ALPS request in this conversation",
       description:
-        "Claim a pending desktop or terminal request by its saved id. First check your actual working directory and pass it as workspace. Call this before doing its work. Returns the current prompt and a running attempt; opening the application alone starts no attempt. Requires this workspace's MCP connection. The connection is scoped to this active orchestration or assessment, so planning-only and assessment restrictions still apply. Only one such scope may be active on a connection. sessionId is this host's opaque conversation id if known; do not infer it from the MCP connection or guess it. Retrying on the same connection is safe. An ended attempt cannot be claimed again; request a new continuation from ALPS. A dropped connection is marked disconnected, not completed; reconnect the same known conversation to reclaim it. Finish using finish_run. This records an attempt but does not establish any Outcome achievement.",
+        "Claim a pending desktop or terminal request by its saved id. First check your actual working directory and pass it as workspace. Call this before doing its work. Returns the current prompt and a running attempt; opening the application alone starts no attempt. Requires this workspace's MCP connection. The connection is scoped to this active orchestration or assessment, so planning-only and assessment restrictions still apply. Only one such scope may be active on a connection. sessionId is this host's opaque conversation id if known; do not infer it from the MCP connection or guess it. Retrying on the same connection is safe. An ended attempt cannot be claimed again; request a new continuation from ALPS. A dropped connection is marked disconnected, not completed; reconnect the same known conversation to reclaim it. Finish using finish_run. This records an attempt but does not establish any Outcome achievement." +
+        " " +
+        RESULTS,
       inputSchema: z.strictObject({
         id: z.string().uuid(),
         workspace: z
@@ -623,7 +625,9 @@ export function createMcpServer(options: McpOptions, link: DaemonLink | null): M
     {
       title: "Claim an ALPS Process Model design session",
       description:
-        "Bind this desktop-app MCP connection to an ALPS design session. First check your working directory and pass it as workspace. Returns the current context and whether completed model/Skill bundles are saved automatically. This is model construction, not business execution.",
+        "Bind this desktop-app MCP connection to an ALPS design session. First check your working directory and pass it as workspace. Returns the current context and whether completed model/Skill bundles are saved automatically. This is model construction, not business execution." +
+        " " +
+        RESULTS,
       inputSchema: ARGS.claim_design,
       annotations: {
         readOnlyHint: false,
@@ -651,7 +655,9 @@ export function createMcpServer(options: McpOptions, link: DaemonLink | null): M
     {
       title: "Read an ALPS design session context",
       description:
-        "Return the bound ALPS design session, including the full current Process Model proposal context and messages. No effects.",
+        "Return the bound ALPS design session, including the full current Process Model proposal context and messages. No effects." +
+        " " +
+        RESULTS,
       inputSchema: ARGS.get_design_context,
       annotations: READ_ONLY,
     },
@@ -670,7 +676,9 @@ export function createMcpServer(options: McpOptions, link: DaemonLink | null): M
     {
       title: "Submit ALPS design clarification questions",
       description:
-        "Use when a Process Model design cannot responsibly be proposed yet. Records the questions for the person. Does not apply any model change.",
+        "Use when a Process Model design cannot responsibly be proposed yet. Records the questions for the person. Does not apply any model change." +
+        " " +
+        RESULTS,
       inputSchema: ARGS.submit_design_questions,
       annotations: {
         readOnlyHint: false,
@@ -694,7 +702,9 @@ export function createMcpServer(options: McpOptions, link: DaemonLink | null): M
     {
       title: "Submit an ALPS Process Model design proposal",
       description:
-        "Submit a complete coherent Process Model and actual Skill file contents, including required supporting files. For sessions with autoSave=true, validates and saves the model and Skill files together immediately; there is no additional apply click. For legacy review sessions, stores the proposal. The returned status and error determine whether saving succeeded. Never report completion just because submission returned. Does not execute business processes.",
+        "Submit a complete coherent Process Model and actual Skill file contents, including required supporting files. For sessions with autoSave=true, validates and saves the model and Skill files together immediately; there is no additional apply click. For legacy review sessions, stores the proposal. The returned status and error determine whether saving succeeded. Never report completion just because submission returned. Does not execute business processes." +
+        " " +
+        RESULTS,
       inputSchema: ARGS.submit_design_proposal,
       annotations: {
         readOnlyHint: false,

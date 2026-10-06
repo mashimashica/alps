@@ -485,9 +485,23 @@ export class Launches {
   }
   async #start(record: LaunchRecord, caller: Caller, sessionId?: string): Promise<LaunchResponse> {
     const request = record.request;
+    // Explicit work scopes carry provenance into the next agent's context, without replaying
+    // earlier requests as new authority or granting a wider execution scope.
+    const workContext = request.workIds?.length
+      ? this.harness
+          .workObjects(this.list())
+          .works.filter((work) => request.workIds!.includes(work.id))
+          .map((work) => ({
+            id: work.id,
+            origin: work.origin,
+            sources: work.sources.slice(-20),
+            totalSources: work.sources.length,
+          }))
+      : [];
     const execution: RunExecution = {
       method: request.method,
       launchId: record.id,
+      ...(workContext.length ? { workContext: JSON.stringify(workContext) } : {}),
       ...(sessionId ? { sessionId } : {}),
       ...(request.resumedFrom ? { resumedFrom: request.resumedFrom } : {}),
     };
