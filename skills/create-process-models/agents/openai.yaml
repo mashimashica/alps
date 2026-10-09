@@ -1,0 +1,4 @@
+interface:
+  display_name: "Process Model Creation"
+  short_description: "Create process models as self-contained Plugins"
+  default_prompt: "Use $create-process-models to organize this work into Processes and shared input/output definitions, and create its model Plugin."

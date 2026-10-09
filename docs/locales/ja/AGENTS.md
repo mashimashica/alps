@@ -12,6 +12,7 @@
 | エージェント・ツール・情報・環境の設計 | [エージェント作業システムの設計原則](../../../skills/design-agent-work-system/references/locales/ja/agent-work-system-design.md) |
 | Skill本文（各`SKILL.md`のプロセス記述）の書き方 | [プロセスフレームワーク](../../../skills/design-process-description/references/locales/ja/process-framework.md) |
 | 設計の仕事とAgent Skillへの適用 | [design-process-description](../../../skills/design-process-description/references/locales/ja/SKILL.ja.md)と[design-agent-work-system](../../../skills/design-agent-work-system/references/locales/ja/SKILL.ja.md) |
+| プロセスモデルのPlugin表現 | [モデル形式](../../../skills/create-process-models/references/locales/ja/model-format.md)。モデルパッケージに対する規範。 |
 | リポジトリ作業と配布 | 本ファイル |
 | 草案作成の補助 | [テンプレート](../../../skills/design-process-description/references/locales/ja/SKILL-template.md)と[具体例](../../../skills/design-process-description/references/locales/ja/examples.md)。いずれも参考情報。 |
 
@@ -21,7 +22,7 @@
 
 | パス | 役割 |
 | --- | --- |
-| `skills/design-process-description/`、`skills/design-agent-work-system/` | 配布Skill。各ルートの英語`SKILL.md`を、そのプロセスの基準とする。 |
+| `skills/design-process-description/`、`skills/design-agent-work-system/`、`skills/create-process-models/` | 配布Skill。各ルートの英語`SKILL.md`を、そのプロセスの基準とする。 |
 | `.agents/skills/<distributed-skill>` | リポジトリ内の発見用に`../../skills/<distributed-skill>`を指す相対symlink。 |
 | `.agents/skills/review-alps/` | リポジトリの意味と配布をレビューする実ディレクトリ。Plugin Skillではない。 |
 | `.agents/skills/sync-locales/` | 日英レビューの実ディレクトリ。Plugin Skillではない。 |
@@ -32,7 +33,7 @@
 | `CLAUDE.md` | このファイルを読み込む、リポジトリ開発用のClaude Codeの入口。独自の指示は持たず、Pluginの文脈ではない。 |
 | `assets/`およびSkillの`agents/`と`assets/` | 表示資源。 |
 
-`skills/`をPlugin Skillの配布元とする。Hostは各規約とmanifestにより発見する。`.agents/skills/`はリポジトリ内の統合ビューであり、普遍的なHost規約ではない。checkoutに開発用Skillを含めても、それをPlugin Skillとして公開することにはならない。各配布Skillは単体で機能する。その相対リンクは自身のディレクトリ内で解決し、ファイルや名前によって他方のSkillに依存しない。Skillを組み合わせる場合は、仕事の記述だけを受け渡す。Pluginは両Skillを、参照資料である`examples/`とともに配布する。Skillから`examples/`へはリンクしない。開発用Skillと例のSkillは`skills/`の外に置く。
+`skills/`をPlugin Skillの配布元とする。Hostは各規約とmanifestにより発見する。`.agents/skills/`はリポジトリ内の統合ビューであり、普遍的なHost規約ではない。checkoutに開発用Skillを含めても、それをPlugin Skillとして公開することにはならない。各配布Skillは単体で機能する。その相対リンクは自身のディレクトリ内で解決し、ファイルや名前によって別のSkillに依存しない。Skillを組み合わせる場合は、仕事の記述だけを受け渡す。PluginはこれらのSkillを、参照資料である`examples/`とともに配布する。Skillから`examples/`へはリンクしない。開発用Skillと例のSkillは`skills/`の外に置く。
 
 ## 変更とレビュー
 
