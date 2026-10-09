@@ -30,9 +30,11 @@ The following Tasks are required for this assessment. Their dependencies follow 
 
 ## Inputs
 
-The applicable pilot criteria in [pilot conditions](references/pilot-context.md) govern the assessment.
-
 Baseline and candidate request measurements and their measurement context.
+
+## Controls
+
+The applicable pilot criteria in [pilot conditions](references/pilot-context.md) govern the assessment.
 
 ## Constraints
 

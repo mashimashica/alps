@@ -36,7 +36,7 @@ The Tasks below are required within the requested scope, except where stated as 
 
 1. Formulate observable Outcomes that are individually necessary and collectively sufficient for the Purpose. Keep independently assessable results distinguishable.
 2. Include detail where its absence would impair understanding, application, or evaluation; remove or combine repetitions that add none of these. Where work detail is needed, organize related actions into Activities and Tasks at a useful granularity and check their contribution to the Outcomes.
-3. Describe necessary Inputs, Outputs, Constraints, Enablers, and Entry/Exit Criteria by their function. Preserve required methods and dependencies with their scope and leave other execution choices open.
+3. Describe necessary Inputs, Outputs, Controls, Constraints, Enablers, and Entry/Exit Criteria by their function. Preserve required methods and dependencies with their scope and leave other execution choices open.
 4. For Markdown, apply the Framework's writing rules. When the target is an Agent Skill, use the body for the Process Description and the frontmatter for its discovery identifier and summary of the work and when it applies. Keep the frontmatter and Host displays consistent with the description's meaning and scope.
 
 ### Source and relationship alignment
@@ -54,7 +54,7 @@ The Tasks below are required within the requested scope, except where stated as 
 4. Use findings to decide the further revision or review needed within the requested scope.
 5. Report findings with evidence and affected scope. Distinguish confirmed nonachievement from missing evidence and justified inapplicability; retain supported results and useful partial work without treating them as full success. In a review, assess these Outcomes in the supplied description; a finding qualifies an Outcome by identifying the unmet condition, but it does not make the description meet that condition.
 
-## Inputs
+## Controls
 
 Apply the [Process Framework](references/process-framework.md) for meaning and Markdown presentation. For Agent Skill targets, apply the [Agent Skills specification](https://agentskills.io/specification) to the physical format. These sources are required within their subjects.
 

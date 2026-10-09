@@ -25,12 +25,12 @@ The following Tasks are required within the requested scope. Revisit earlier dec
 
 1. Identify the model's purpose, applicable context, intended users, available source descriptions, and requested destination. Distinguish creating the model from performing the work it describes. Resolve material gaps from available sources; ask the requester where a gap would change scope or success conditions and cannot otherwise be resolved.
 2. Select Process boundaries by coherent responsibilities and intended results. Use enough Processes to cover the requested work without inventing phases, creating a Process for every tool call, or splitting work only because its performer changes. Identify what is outside the model and why.
-3. For each Process, establish a Name, Purpose, and one or more observable Outcomes. Each Outcome must be necessary for that Purpose, and together they must be sufficient within the stated scope. An Output's existence alone is not a success condition. Add Activities, Tasks, Constraints, Enablers, or Entry/Exit Criteria only where they affect understanding, application, or evaluation. Preserve applicable obligations and their sources.
+3. For each Process, establish a Name, Purpose, and one or more observable Outcomes. Each Outcome must be necessary for that Purpose, and together they must be sufficient within the stated scope. An Output's existence alone is not a success condition. Add Activities, Tasks, Controls, Constraints, Enablers, or Entry/Exit Criteria only where they affect understanding, application, or evaluation. Preserve applicable obligations and their sources.
 
 ### Defining relationships
 
 1. Identify information items, products, and services used or produced by each Process. Use one shared definition when occurrences have the same meaning; similar names do not establish identity. State necessary scope, properties, conditions of use, and effects of changes in the definition or the affected Process.
-2. Declare what the work uses as inputs and what it produces or updates as outputs. Criteria and policies used by the work are inputs too; preserve their force and scope in the descriptions. A type may be both an input and an output. Distinguish type definitions from concrete files or instances.
+2. Declare source material examined or transformed as inputs and what the work produces or updates as outputs. Describe governing criteria and policies as Controls, and execution limits as Constraints, preserving their sources and scope. Identify each role where the same resource serves more than one. A type may be both an input and an output. Distinguish type definitions from concrete files or instances.
 3. Trace each handoff through the shared type identifier. Account for externally supplied inputs and externally consumed outputs. Preserve justified cycles and repeated use of shared information. I/O relationships and document order do not grant authority, establish readiness, or prescribe an execution sequence; necessary approvals and order must be explicit conditions of the work.
 
 ### Creating the Plugin
@@ -43,13 +43,17 @@ The following Tasks are required within the requested scope. Revisit earlier dec
 ### Verifying the model
 
 1. Inspect the package as distributed: manifest membership, Skill frontmatter, process descriptions, string-encoded I/O arrays, shared definitions, identifier uniqueness, relative links, and resolved package boundaries. Every I/O reference must resolve to a definition; report a missing definition instead of inventing its meaning.
-2. Review coverage and boundary choices against the original work. Trace representative input/output relationships, including any cycle, external input, or shared policy present. Check whether all stated Outcomes could hold while a Process's Purpose remains unmet, and whether an Output could exist while an Outcome remains unconfirmed.
+2. Review coverage and boundary choices against the original work. Trace representative input/output relationships, including any cycle or external input present. Review shared Controls and their applicability in the source descriptions. Check whether all stated Outcomes could hold while a Process's Purpose remains unmet, and whether an Output could exist while an Outcome remains unconfirmed.
 3. When an applicable loader or validator is available, load the package and check that it preserves the intended members and relationships. Identify the tool and version used. Keep format validation, semantic review, and actual execution evidence distinct; a rendered graph does not demonstrate that the modeled work succeeds.
 4. Deliver the package location, its scope and sources, verification evidence, and unresolved matters. Identify affected judgments that need revalidation after a source or shared definition changes.
 
 ## Inputs
 
-The user's intended work, applicable requirements, and available source descriptions govern the model's meaning. The [model format](references/model-format.md) governs its canonical representation. This Skill contains the guidance needed for model creation and does not require another installed Skill.
+The intended work, its context, and available source descriptions are examined to construct the model.
+
+## Controls
+
+Applicable requirements govern the model's meaning and scope. The [model format](references/model-format.md) governs its canonical representation. This Skill contains the guidance needed for model creation and does not require another installed Skill.
 
 ## Constraints
 

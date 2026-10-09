@@ -41,9 +41,9 @@ The following Tasks are required within the requested scope.
 2. After confirming a counterpart's correspondence with its English source, update `reviewed_source_sha256` for that pair in the `manifest.yaml` of the counterpart's `locales/ja/` directory, registering new counterparts there.
 3. Report reviewed pairs, remaining mismatches and their effects, and unverified pairs. File existence, locale metadata, and format checks do not establish semantic equivalence.
 
-## Inputs
+## Controls
 
-The [Framework](../../../skills/design-process-description/references/process-framework.md) governs Process meaning and Markdown presentation. The [work-system principles](../../../skills/design-agent-work-system/references/agent-work-system-design.md) govern the supporting configuration. Preserve the meaning and normative force of each source and its application in the design Skills. The [model format](../../../skills/create-process-models/references/model-format.md) governs model Plugin representation. The localization configuration and AGENTS govern source roles and repository paths.
+The [Framework](../../../skills/design-process-description/references/process-framework.md) governs Process meaning and Markdown presentation. The [work-system principles](../../../skills/design-agent-work-system/references/agent-work-system-design.md) govern the supporting configuration. Preserve the meaning and normative force of each source and its application in the design Skills. The localization configuration and AGENTS govern source roles and repository paths.
 
 ## Constraints
 

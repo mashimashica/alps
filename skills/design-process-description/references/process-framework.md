@@ -40,7 +40,7 @@ A Task states an action; an Outcome states a result condition. An **Output** is 
 
 ## 3. Work content and necessary detail
 
-Activities, Tasks, Inputs, Outputs, Constraints, Enablers, and Entry/Exit Criteria are included according to the purpose of the description and the detail needed to understand, apply, or evaluate the work. Their inclusion is optional; their meanings and relationships follow this Framework when they are used. A description must include necessary detail and must not contain empty optional sections or completeness-driven fields. A description must clarify an otherwise ambiguous scope where the ambiguity affects understanding, application, or evaluation. The applicable context and the identity of any source description can be expressed in the description or associated information.
+Activities, Tasks, Inputs, Outputs, Controls, Constraints, Enablers, and Entry/Exit Criteria are included according to the purpose of the description and the detail needed to understand, apply, or evaluate the work. Their inclusion is optional; their meanings and relationships follow this Framework when they are used. A description must include necessary detail and must not contain empty optional sections or completeness-driven fields. A description must clarify an otherwise ambiguous scope where the ambiguity affects understanding, application, or evaluation. The applicable context and the identity of any source description can be expressed in the description or associated information.
 
 An **Activity** is a cohesive set of Tasks within a Process. It organizes related actions as a continuous or iterative function narrower than the Process as a whole, so that their contribution can be understood. Tasks within an Activity should relate more closely to one another than to Tasks outside it.
 
@@ -58,20 +58,21 @@ Each occurrence of an element must be classified by its function in the work, in
 
 | Element | Function |
 | --- | --- |
-| **Input** | An item used by the work, including source material, information examined or transformed, and criteria or policies applied in performing or judging the work. |
+| **Input** | An item acted on as source material for a result, including information examined or transformed by the work. |
 | **Output** | A product, information item, or service produced or updated by the work. |
+| **Control** | Directs execution or supplies the basis on which work or results are judged. |
 | **Constraint** | Limits permitted execution or conditions of application. |
 | **Enabler** | Supplies capability or resources that make execution possible or support it. |
 
-A policy used as a criterion and a policy being revised are both Inputs. The force and scope of applicable requirements and criteria follow their sources and the work description. People, Agents, tools, and execution environments used to perform the work are Enablers. A limitation on their use is a Constraint. The same resource can have different roles, and each role must be identifiable.
+A policy used as a criterion is a Control; a policy being revised is an Input. People, Agents, tools, and execution environments used to perform the work are Enablers. A limitation on their use is a Constraint. The same resource can have different roles, and each role must be identifiable.
 
 An **information item** is an identifiable body of information treated as a unit, independent of its storage medium or presentation. Naming an Output need not require a document or a fixed artifact. Outputs can include final results, intermediate work products, or information shared with other work.
 
-A representative transformation relates Inputs, Activities, and Outputs: Activities act on Inputs, Enablers support the work, and Constraints limit it. Representative Inputs and Outputs illustrate a possible manner of performance. They must not be read as the only permitted means or as a replacement for the complete description's requirements.
+A representative transformation relates Inputs, Activities, and Outputs: Activities act on Inputs, Enablers support the work, Controls direct it, and Constraints limit it. Representative Inputs and Outputs illustrate a possible manner of performance. They must not be read as the only permitted means or as a replacement for the complete description's requirements.
 
 **Entry Criteria** state the conditions under which the affected work can begin. **Exit Criteria** state the conditions under which it can be completed. They govern conditions, not positions on a schedule. Required conditions, including approvals, must be confirmed before the actions they govern; an unconfirmed condition prevents those dependent actions. Other work can proceed under its own applicable conditions. Completion of an Output must not replace evaluation of the Outcomes.
 
-Inputs, Constraints, and Enablers may be associated with individual elements or shared across descriptions. A shared element must identify its scope, any exceptions, and whether contextual changes are permitted, directly or by reference. Membership in a collection or reference to a document does not by itself make every element applicable to every Process. Elements common to a declared scope may be stated once and referenced where they apply.
+Controls, Constraints, and Enablers may be associated with individual elements or shared across descriptions. A shared element must identify its scope, any exceptions, and whether contextual changes are permitted, directly or by reference. Membership in a collection or reference to a document does not by itself make every element applicable to every Process. Elements common to a declared scope may be stated once and referenced where they apply.
 
 **Traceability** makes the relationships among Outcomes, Activities, Tasks, and information items identifiable so that their consistency and the effects of change can be examined. It should connect work and necessary Inputs and Outputs to the Outcomes they support, with enough detail for the intended use.
 
@@ -121,7 +122,7 @@ Instantiation makes an application concrete; Tailoring changes what applies. A t
 
 A change must be distinguished as a change to the description used as the reference point for meaning, a context-limited change to what applies, or a change in presentation. A change must identify the affected source and elements, scope, rationale, consequences, and necessary revalidation.
 
-Process selection and changes to Process meaning must be evaluated for their ability to satisfy the Purpose under applicable conditions. The evaluation must take account of affected requirements and stakeholder needs, relevant risks and risk tolerance, available capabilities and resources, and applicable Inputs and Constraints. Necessary information from affected parties must be obtained and considered, with its source and applicability clear. Existing information may be used while it remains applicable. Missing information must be reported with its effect on the judgment. The level of detail and rigor should be proportionate to the consequences, uncertainty, and complexity of the decision.
+Process selection and changes to Process meaning must be evaluated for their ability to satisfy the Purpose under applicable conditions. The evaluation must take account of affected requirements and stakeholder needs, relevant risks and risk tolerance, available capabilities and resources, and applicable Controls and Constraints. Necessary information from affected parties must be obtained and considered, with its source and applicability clear. Existing information may be used while it remains applicable. Missing information must be reported with its effect on the judgment. The level of detail and rigor should be proportionate to the consequences, uncertainty, and complexity of the decision.
 
 Authority and approval follow the applying environment's conditions. A context-limited change must not silently redefine the source, remove an externally imposed requirement, or imply authority to waive a prohibition. During application, the description in use, its applicable conditions, and the basis for selection or adaptation must remain identifiable. Revalidation must address affected Outcomes, work, conditions, references, shared information, and translations where relevant. Its results and unresolved limits must be explicit. The environment determines how the source, applicable description, changes, and supporting rationale are retained and versioned.
 

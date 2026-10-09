@@ -62,11 +62,11 @@ Make the agreed service change available for an informed release decision.
 - Relevant verification results and unresolved limitations are available for the release decision.
 ```
 
-The body contains an H1 Name, a `## Purpose`, and a `## Outcomes` list. Japanese documents can use `## 目的` and `## 成果`. Outcomes are observable success conditions; an Output's existence does not by itself establish them. Include other detail only as needed to understand, apply, or evaluate the work. Metadata does not repeat Purpose or Outcomes.
+The body contains an H1 Name, a `## Purpose`, and a `## Outcomes` list. Japanese documents can use `## 目的` and `## 成果`. Outcomes are observable success conditions; an Output's existence does not by itself establish them. Include other detail only as needed to understand, apply, or evaluate the work. Metadata does not repeat Purpose or Outcomes. Preserve necessary Controls, Constraints, Enablers, and Entry/Exit Criteria in the body with their sources and scope. Criteria or policies governing the work are Controls; their classification is not changed by the I/O metadata.
 
 A Skill's `name` is its stable process identifier and matches its directory. An ordinary process document uses its filename without `.md` as its identifier and can have the same `metadata` mapping without Skill discovery fields. Process identifiers follow the Agent Skill name syntax: lowercase ASCII letters, digits, and single hyphens, at most 64 characters, without a leading or trailing hyphen. They are unique within the model. Display names belong to the H1 and can change independently.
 
-Agent Skills metadata maps strings to strings. Each present `inputs` or `outputs` value must be a JSON array of unique type identifiers encoded as a string. An omitted field means no declared relationships for that role. There is no `alps.` prefix, duplicate `id`, per-document schema version, or controls role. The same type can appear in both roles when work uses and updates it. Conditions governing use belong in the body; do not maintain a second I/O list there.
+Agent Skills metadata maps strings to strings. Each present `inputs` or `outputs` value must be a JSON array of unique type identifiers encoded as a string. An omitted field means no declared relationships for that role. There is no `alps.` prefix, duplicate `id`, or per-document schema version. The same type can appear in both I/O roles when work examines and updates it. Conditions governing use belong in the body; do not maintain a second I/O list there.
 
 ## Shared definitions
 
