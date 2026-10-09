@@ -4,7 +4,7 @@ status: reviewed
 sources:
   SKILL.ja.md:
     source: ../../../SKILL.md
-    reviewed_source_sha256: 51659f7633bcdab76a70d3a609f0d75bbf0ca41e887b66c25bc5a896e1acf8fb
+    reviewed_source_sha256: 08943405e5d08316a990fdc1f04f5e6ad4487f602cde1207217295e3c72a9e15
   model-format.md:
     source: ../../model-format.md
-    reviewed_source_sha256: ed1c915444312d4084a538a884c627a5f94ae9fd6ed174ca2f87cac73ad789d2
+    reviewed_source_sha256: 6a74b95d6597d01bea7fb395a578832c2f721b6e8e16dce481261cdb262e4a22
