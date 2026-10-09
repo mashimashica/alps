@@ -4,6 +4,15 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+### Added
+
+- Add the self-contained `create-process-models` Skill and its Japanese translation for creating one process model as one Agent Plugin, with explicit membership, process Markdown, string-valued I/O metadata, and shared type definitions. Its format reference is the canonical source for the ALPS model profile.
+- Register the new Skill for repository discovery, distribution checks, and Agent Skill validation.
+
+### Changed
+
+- Treat criteria and policy resources as Inputs throughout the Framework, design Skills, repository-development Skills, and working example, preserving their normative force and scope. The model profile has no separate controls role or legacy loading path.
+
 ### Fixed
 
 - Point both READMEs to the current 0.8.0 release notes and check their release references against `VERSION`.

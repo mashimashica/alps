@@ -22,20 +22,21 @@
   "interface": {
     "displayName": "ALPS",
     "shortDescription": "Design the meaning of work and the agent work system that realizes it",
-    "longDescription": "ALPS helps clarify the purpose, observable success conditions, and necessary boundaries of work, and design the agents, tools, information resources, and environments that realize it. Create, revise, or review Process Descriptions and supporting configurations. Allocate judgment and processing, implement needed capabilities within the request, and assess both tool behavior and effectiveness through representative work.",
+    "longDescription": "ALPS helps clarify the purpose, observable success conditions, and necessary boundaries of work, and design the agents, tools, information resources, and environments that realize it. Create, revise, or review Process Descriptions and supporting configurations. Allocate judgment and processing, implement needed capabilities within the request, and assess both tool behavior and effectiveness through representative work. Create related Processes and shared I/O definitions as one model Plugin.",
     "developerName": "mashimashica",
     "category": "Developer Tools",
     "capabilities": [
       "Clarify purpose, Outcomes, and work boundaries",
       "Design agent and tool responsibilities and interfaces",
       "Implement and connect needed capabilities",
-      "Evaluate descriptions, tools, and work-system effectiveness"
+      "Evaluate descriptions, tools, and work-system effectiveness",
+      "Create process models as self-contained Plugins"
     ],
     "websiteURL": "https://github.com/mashimashica/alps",
     "defaultPrompt": [
       "Use $design-process-description to clarify this work and its observable success conditions.",
       "Use $design-agent-work-system to design and verify the capabilities and interfaces that realize this work.",
-      "Review this work description and supporting configuration; report findings without changing them."
+      "Use $create-process-models to organize this work into Processes and shared input/output definitions, and create its model Plugin."
     ],
     "brandColor": "#4DB2FF",
     "composerIcon": "./assets/icon.svg",

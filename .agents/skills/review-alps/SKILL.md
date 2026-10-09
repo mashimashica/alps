@@ -1,6 +1,6 @@
 ---
 name: review-alps
-description: Review ALPS repository changes for semantic consistency, source relationships, evaluation limits, and distribution integrity across the Process Framework, work-system design principles, design Skills, tools, examples, tests, and guidance. Repository-development Skill.
+description: Review ALPS repository changes for semantic consistency, source relationships, evaluation limits, and distribution integrity across the Process Framework, work-system design principles, distributed Skills, tools, examples, tests, and guidance. Repository-development Skill.
 ---
 
 # ALPS Repository Review
@@ -30,8 +30,8 @@ The following Tasks are required within the requested review scope.
 7. Follow required references and information relationships. Assess source identity, shared conditions, context-limited changes, and effects on related work.
 8. Check that description validity, execution results, satisfaction of requirements, and their supporting evidence remain distinguishable.
 9. Assess the basis for Process selection and changes, including necessary information from affected parties and the applicability of criteria and evidence. Check the effects of changed conditions on dependent judgments and the treatment of unresolved findings.
-10. Check the distinct design and evaluation subjects of both Skills, the common source of target work meaning, and resource roles. Assess the necessary correspondence between Tasks and tool operations, and between Process boundary information and tool interfaces.
-11. For rules or restrictions implemented by tools, examine their correspondence to applicable Controls and Constraints, their sources and scope, and evidence that implementation preserves them. Distinguish configuration limits from requirements of the work.
+10. Check the distinct design and evaluation subjects of the distributed Skills, the common source of target work meaning, and resource roles. Assess the necessary correspondence between Tasks and tool operations, and between Process boundary information and tool interfaces.
+11. For rules or restrictions implemented by tools, examine their correspondence to applicable Inputs and Constraints, their sources and scope, and evidence that implementation preserves them. Distinguish configuration limits from requirements of the work.
 
 ### Distribution assessment
 
@@ -51,9 +51,9 @@ The following Tasks are required within the requested review scope.
 1. Relate findings to their locations, evidence, effects, and coherent corrections.
 2. Report mechanical checks and semantic review separately, including failed or unperformed checks and unexamined scope. A passing format or path check does not establish Process meaning or Outcome achievement.
 
-## Controls
+## Inputs
 
-The Framework governs Process meaning and Markdown presentation, the work-system principles govern supporting configurations, and the design Skills apply these sources within their work. AGENTS governs repository layout.
+The Framework governs Process meaning and Markdown presentation, the work-system principles govern supporting configurations, and the design Skills apply these sources within their work. The [model format](../../../skills/create-process-models/references/model-format.md) governs model Plugin representation. AGENTS governs repository layout.
 
 ## Constraints
 

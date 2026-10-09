@@ -107,10 +107,6 @@ The following Tasks are required for this service's production release.
 
     > NOTE Production evidence concerns the resulting service state. It can reveal differences from the conditions under which the candidate was checked.
 
-#### Controls
-
-For this service, the production policy requires the service owner's approval of the exact checked candidate and use of the authorized release job. The acceptance criteria require a ready health endpoint and a completed test purchase.
-
 #### Constraints
 
 Candidate checks must precede approval; approval must precede deployment; production checks must follow deployment. A candidate change invalidates the earlier check and approval basis. Deployment must not occur while approval is missing or unconfirmed.
@@ -125,6 +121,8 @@ Production evidence supports achievement of both Outcomes, the production result
 
 #### Inputs
 
+For this service, the production policy requires the service owner's approval of the exact checked candidate and use of the authorized release job. The acceptance criteria require a ready health endpoint and a completed test purchase.
+
 The release candidate and change request.
 
 #### Outputs
@@ -135,7 +133,7 @@ The deployed service revision.
 
 Checking capability and the authorized release job.
 
-A policy directs the work; its approval condition limits deployment. The release job supplies an Enabler. The Entry Criteria allow candidate qualification to begin before deployment approval, while the deployment Constraint still applies to the action it governs. “The candidate revision” in the Outcomes identifies the specific revision intended for this release; it does not imply that qualification or approval has been completed. Qualification and approval remain mandatory under the Tasks, Controls, and Constraints, and the Exit Criteria require their satisfaction.
+A policy directs the work; its approval condition limits deployment. The release job supplies an Enabler. The Entry Criteria allow candidate qualification to begin before deployment approval, while the deployment Constraint still applies to the action it governs. “The candidate revision” in the Outcomes identifies the specific revision intended for this release; it does not imply that qualification or approval has been completed. Qualification and approval remain mandatory under the Tasks, Inputs, and Constraints, and the Exit Criteria require their satisfaction.
 
 The Activity headings group related work and the numbered Tasks state actions. The two Activities describe the release work as a whole and together cover both Outcomes: Candidate qualification establishes the checked and approved candidate that is to serve production users, and Production availability deploys it and checks the production result, including the test purchase. Both contribute to the Purpose and can be revisited as the candidate or production evidence changes. The NOTEs explain the adjacent Tasks; the obligations and necessary order are stated in the main text.
 
@@ -165,7 +163,7 @@ Determine whether candidate solutions can satisfy the clarified needs within the
 
 ### Shared information and application
 
-Both Processes consult and update the same ordinary **change brief**. It contains the needs, candidate assumptions, acceptance conditions, and supporting observations for this service change. Its needs and observations serve as Inputs when examined; its acceptance conditions act as Controls when judging a candidate. Updated information is an Output. These roles can be distinguished within the same document.
+Both Processes consult and update the same ordinary **change brief**. It contains the needs, candidate assumptions, acceptance conditions, and supporting observations for this service change. Its needs, observations, and acceptance conditions are Inputs to examining and judging a candidate. Updated information is an Output. The same document can be both Input and Output.
 
 | Work | Use of the shared information | Change effect |
 | --- | --- | --- |

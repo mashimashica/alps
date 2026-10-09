@@ -28,7 +28,7 @@ In Claude Code, you can also add this repository as a plugin marketplace and ins
 /plugin install alps@alps
 ```
 
-Reload affected clients after installation. Each Skill functions on its own; to combine them, pass the description of the work from one to the other. The Plugin distributes both Skills with their reference resources, together with the `examples/` reference material. Check that your client exposes `design-process-description` and `design-agent-work-system` and that their reference links open.
+Reload affected clients after installation. Each Skill functions on its own; to combine them, pass the description of the work between them. The Plugin distributes all three Skills with their reference resources, together with the `examples/` reference material. Check that your client exposes `design-process-description`, `design-agent-work-system`, and `create-process-models` and that their reference links open.
 
 ## Use the Skills
 
@@ -36,8 +36,9 @@ Reload affected clients after installation. Each Skill functions on its own; to 
 | --- | --- |
 | [design-process-description](skills/design-process-description/SKILL.md) | The meaning, relationships, and applicable conditions of a Process Description. |
 | [design-agent-work-system](skills/design-agent-work-system/SKILL.md) | The configuration and interaction of agents, tools, information resources, and execution environments, including implementation and verification within the request. |
+| [create-process-models](skills/create-process-models/SKILL.md) | Related Processes and shared I/O definitions packaged as one model Plugin, including source files and verification. |
 
-Both support creation, revision, and review, and each works on its own. Use either when its design basis is sufficient. To combine them, pass the description of the work between them: a Process Description can be the starting point for system design, and system design can report assumptions in that description that need reconsideration. A work description may include necessary methods and order. Ask in ordinary language or name the Skill explicitly as your Host requires.
+The two design Skills support creation, revision, and review, and each works on its own. Use either when its design basis is sufficient. To combine them, pass the description of the work between them: a Process Description can be the starting point for system design, and system design can report assumptions in that description that need reconsideration. A work description may include necessary methods and order. Ask in ordinary language or name the Skill explicitly as your Host requires.
 
 ```text
 Use design-process-description to describe this one-off task through its purpose, observable success conditions, and necessary boundaries.
@@ -47,11 +48,15 @@ Review this Process Description. Identify unclear Outcomes, unnecessary method c
 Use design-agent-work-system to design the capabilities and interfaces for this work. Reuse suitable tools, implement the missing processing, and verify the configuration on representative cases.
 
 Review this agent work system. Assess the allocation of judgment and processing, information supply, tool interfaces, and evidence of effectiveness. Return findings without changing it.
+
+Use create-process-models to organize this work into Processes and shared input/output definitions, and create one model Plugin.
 ```
 
 The [minimal template](skills/design-process-description/references/SKILL-template.md) starts with ordinary Agent Skill frontmatter and the three required Process elements. The [examples](skills/design-process-description/references/examples.md) cover minimal and one-off work, work without a fixed artifact, necessary approvals and order, shared information, views, missing references, and Outputs that fail to establish an Outcome.
 
 The [working example](examples/README.md) shows both design responsibilities on one service-assessment Skill. Its script validates measurements and calculates comparisons; the agent assesses the context and interprets the evidence. [System design examples](skills/design-agent-work-system/references/examples.md) also cover existing tools, state-changing operations, and adaptation to changed capabilities.
+
+A model Plugin has one canonical definition: `plugin.json` lists its members, process Markdown contains their meaning and I/O, and `references/artifacts/` defines shared types. The [model format](skills/create-process-models/references/model-format.md) keeps concrete artifact locations and execution settings in optional workspace configuration.
 
 ## Design philosophy
 
@@ -73,6 +78,7 @@ Specify methods and order where the work requires them, while leaving room for j
 | Work-system design | [Design principles](skills/design-agent-work-system/references/agent-work-system-design.md) | [エージェント作業システムの設計原則](skills/design-agent-work-system/references/locales/ja/agent-work-system-design.md) |
 | Process Description Design | [Skill](skills/design-process-description/SKILL.md) | [Skill](skills/design-process-description/references/locales/ja/SKILL.ja.md) |
 | Agent Work System Design | [Skill](skills/design-agent-work-system/SKILL.md) | [Skill](skills/design-agent-work-system/references/locales/ja/SKILL.ja.md) |
+| Process Model Creation | [Skill](skills/create-process-models/SKILL.md), [model format](skills/create-process-models/references/model-format.md) | [Skill](skills/create-process-models/references/locales/ja/SKILL.ja.md), [モデル形式](skills/create-process-models/references/locales/ja/model-format.md) |
 | Contribution and repository work | [CONTRIBUTING](CONTRIBUTING.md), [AGENTS](AGENTS.md) | [CONTRIBUTING](docs/locales/ja/CONTRIBUTING.md), [AGENTS](docs/locales/ja/AGENTS.md) |
 | Version policy and release notes | [Versioning](docs/versioning.md), [0.8.0](docs/releases/0.8.0.md) | [版管理](docs/locales/ja/versioning.md), [0.8.0](docs/locales/ja/releases/0.8.0.md) |
 

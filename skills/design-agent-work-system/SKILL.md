@@ -53,7 +53,7 @@ The following Tasks are required within the requested scope. Their relationships
 4. Reconsider instructions, information supply, exposed operations, and allocation where evidence or changed capabilities warrants it. Preserve work-specific knowledge and conditions while reviewing guidance that compensates for capability limits. Identify which changed dependencies affect previous evidence and judgments; retain evidence whose basis still applies and revalidate affected behavior.
 5. Report each judgment's subject, criteria, evidence, scope, unperformed checks, and unresolved findings. In a review, assess these Outcomes in the supplied design; a finding qualifies an Outcome by identifying the unmet condition, but it does not make the design meet that condition.
 
-## Controls
+## Inputs
 
 Apply [Design Principles for Agent Work Systems](references/agent-work-system-design.md) to the design subject. For Agent Skill targets, apply the [Agent Skills specification](https://agentskills.io/specification) to the physical format and its [script guidance](https://agentskills.io/skill-creation/using-scripts) when documenting bundled processing. These sources are required within their subjects. The target work description governs the meaning and success conditions the configuration serves.
 

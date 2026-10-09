@@ -1,0 +1,10 @@
+locale: ja
+source_locale: en
+status: reviewed
+sources:
+  SKILL.ja.md:
+    source: ../../../SKILL.md
+    reviewed_source_sha256: fc9e831c107e551bf6a1d67220cf47dfe68f1ac6177b0f30fd8ba8d5ef9d9ecc
+  model-format.md:
+    source: ../../model-format.md
+    reviewed_source_sha256: 51cca8255e6fd9a69f3af8f74e7085991062c2a7bbf2eccf4fff152e298febc0

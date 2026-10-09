@@ -2,7 +2,7 @@
 
 [Japanese translation](locales/ja/pilot-context.md)
 
-These conditions are illustrative Controls for the [Service Change Assessment](../SKILL.md). They are the source of the criteria for the supplied fixture pair.
+These conditions are illustrative Inputs for the [Service Change Assessment](../SKILL.md). They are the source of the criteria for the supplied fixture pair.
 
 The pilot concerns `GET /catalog` in an isolated staging environment, one concurrent client, a 60-second sampling window, and the same fixed request set and service dependencies. Both files below were constructed to represent that context. Their different latencies are the candidate's measured effect; all four requests completed without an application error.
 

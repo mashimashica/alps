@@ -7,13 +7,13 @@ status: reviewed
 sources:
   AGENTS.md:
     source: ../../../AGENTS.md
-    reviewed_source_sha256: 8d02dec29693f208ce23f6178fcc751434ff30dc471048c00ff688b6e3022255
+    reviewed_source_sha256: 211d0c54d7bfa8317989722c5ad1fc2ace30a590d98401fada9e8eb98d2329fa
   CONTRIBUTING.md:
     source: ../../../CONTRIBUTING.md
     reviewed_source_sha256: 9d46703b960c9f27e8269c5dabd96d55d01519b67564f5f68454998aedf140e2
   README.md:
     source: ../../../README.md
-    reviewed_source_sha256: dc3c5d22589cbd9a6407c90f109a0ef93a023a2a8fe04843b9a4aae35c23542d
+    reviewed_source_sha256: ba86cfc1598a215039a94ce347aa759417188fa85c4ed3e705046708839ec092
   versioning.md:
     source: ../../versioning.md
     reviewed_source_sha256: 2fd119249218765a7e0ac7e1f66998c068348f45c2041ce8ec4dc827bdd5c538
