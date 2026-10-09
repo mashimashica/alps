@@ -74,7 +74,7 @@ Specify methods and order where the work requires them, while leaving room for j
 | Process Description Design | [Skill](skills/design-process-description/SKILL.md) | [Skill](skills/design-process-description/references/locales/ja/SKILL.ja.md) |
 | Agent Work System Design | [Skill](skills/design-agent-work-system/SKILL.md) | [Skill](skills/design-agent-work-system/references/locales/ja/SKILL.ja.md) |
 | Contribution and repository work | [CONTRIBUTING](CONTRIBUTING.md), [AGENTS](AGENTS.md) | [CONTRIBUTING](docs/locales/ja/CONTRIBUTING.md), [AGENTS](docs/locales/ja/AGENTS.md) |
-| Version policy and release notes | [Versioning](docs/versioning.md), [0.7.0](docs/releases/0.7.0.md) | [版管理](docs/locales/ja/versioning.md), [0.7.0](docs/locales/ja/releases/0.7.0.md) |
+| Version policy and release notes | [Versioning](docs/versioning.md), [0.8.0](docs/releases/0.8.0.md) | [版管理](docs/locales/ja/versioning.md), [0.8.0](docs/locales/ja/releases/0.8.0.md) |
 
 ## Version and license
 

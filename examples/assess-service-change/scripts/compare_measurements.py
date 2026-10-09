@@ -11,6 +11,8 @@ import json
 import math
 import re
 import sys
+from decimal import Decimal
+from fractions import Fraction
 from pathlib import Path
 
 
@@ -23,13 +25,14 @@ def positive_integer(value: str) -> int:
     return int(value)
 
 
-def nonnegative_number(value: str) -> float:
+def nonnegative_number(value: str) -> Fraction:
     if not DECIMAL.fullmatch(value):
         raise ValueError("must be a nonnegative decimal number")
     number = float(value)
     if not math.isfinite(number) or number < 0:
         raise ValueError("must be finite and nonnegative")
-    return number
+    # Validate the supported range with float, but retain the exact input value.
+    return Fraction(Decimal(value))
 
 
 def read_measurements(path: Path) -> tuple[dict, frozenset[str]]:
@@ -124,11 +127,14 @@ def main(argv: list[str] | None = None) -> int:
             "baseline_sample_count": baseline["count"] >= args.min_samples,
             "candidate_sample_count": candidate["count"] >= args.min_samples,
             "candidate_p95": candidate["p95_ms"] <= args.max_p95_ms,
-            "candidate_error_rate": candidate["error_rate"] <= args.max_error_rate,
+            "candidate_error_rate": (
+                Fraction(candidate["errors"], candidate["count"]) <= args.max_error_rate
+            ),
             "p95_increase": increase <= args.max_p95_increase_ms,
         },
     }
-    print(json.dumps(result, ensure_ascii=False, allow_nan=False))
+    # Only the JSON representation is rounded; comparisons use exact values.
+    print(json.dumps(result, ensure_ascii=False, allow_nan=False, default=float))
     return 0
 
 

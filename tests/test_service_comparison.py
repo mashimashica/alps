@@ -174,6 +174,54 @@ class ServiceComparisonTests(unittest.TestCase):
                     self.assertMeasurementError(
                         self.invoke(CANDIDATE, baseline=path))
 
+    def test_decimal_duration_limits_preserve_exact_boundaries(self) -> None:
+        cases = (
+            ("14.4", "64.4", "200", "50", True, True),
+            ("14.4", "64.400000000000000000000000000000001",
+             "200", "50", True, False),
+            ("14.400000000000000000000000000000001", "64.4",
+             "200", "50", True, True),
+            ("64.4", "14.4", "200", "0", True, True),
+            ("0", "200.000000000000000000000000000000001",
+             "200", "300", False, True),
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            baseline = Path(directory) / "baseline.csv"
+            candidate = Path(directory) / "candidate.csv"
+            for base, cand, p95_limit, increase_limit, p95_ok, increase_ok in cases:
+                with self.subTest(baseline=base, candidate=cand):
+                    for path, duration in ((baseline, base), (candidate, cand)):
+                        path.write_text(
+                            HEADER + "".join(f"r{i},{duration},ok\n" for i in range(4)),
+                            encoding="utf-8",
+                        )
+                    result = self.invoke(
+                        candidate, "--max-p95-ms", p95_limit,
+                        "--max-p95-increase-ms", increase_limit, baseline=baseline,
+                    )
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    evidence = json.loads(result.stdout)
+                    self.assertEqual(evidence["checks"]["candidate_p95"], p95_ok)
+                    self.assertEqual(evidence["checks"]["p95_increase"], increase_ok)
+                    self.assertIsInstance(evidence["candidate"]["p95_ms"], (int, float))
+                    if base == "14.4" and cand == "64.4":
+                        self.assertEqual(evidence["p95_increase_ms"], 50)
+
+    def test_error_rate_limit_uses_exact_count_ratio(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            candidate = Path(directory) / "candidate.csv"
+            candidate.write_text(
+                HEADER + "r1,100,error\nr2,100,ok\nr3,100,ok\n",
+                encoding="utf-8",
+            )
+            for limit, expected in (("0.3333333333333333", False),
+                                    ("0.3333333333333334", True)):
+                with self.subTest(limit=limit):
+                    result = self.invoke(candidate, "--max-error-rate", limit)
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    evidence = json.loads(result.stdout)
+                    self.assertEqual(evidence["checks"]["candidate_error_rate"], expected)
+
     def test_whitespace_identifier_diagnostic(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "padded.csv"
