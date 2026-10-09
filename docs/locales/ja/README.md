@@ -74,7 +74,7 @@ ALPSは、**システムズ／ソフトウェア工学に由来するプロセ�
 | プロセス記述の設計 | [Skill](../../../skills/design-process-description/SKILL.md) | [Skill](../../../skills/design-process-description/references/locales/ja/SKILL.ja.md) |
 | エージェント作業システムの設計 | [Skill](../../../skills/design-agent-work-system/SKILL.md) | [Skill](../../../skills/design-agent-work-system/references/locales/ja/SKILL.ja.md) |
 | 貢献とリポジトリ作業 | [CONTRIBUTING](../../../CONTRIBUTING.md)、[AGENTS](../../../AGENTS.md) | [CONTRIBUTING](CONTRIBUTING.md)、[AGENTS](AGENTS.md) |
-| 版管理方針とリリースノート | [Versioning](../../../docs/versioning.md)、[0.7.0](../../../docs/releases/0.7.0.md) | [版管理](versioning.md)、[0.7.0](releases/0.7.0.md) |
+| 版管理方針とリリースノート | [Versioning](../../../docs/versioning.md)、[0.8.0](../../../docs/releases/0.8.0.md) | [版管理](versioning.md)、[0.8.0](releases/0.8.0.md) |
 
 ## 版とライセンス
 

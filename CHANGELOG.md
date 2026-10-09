@@ -4,6 +4,11 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+### Fixed
+
+- Point both READMEs to the current 0.8.0 release notes and check their release references against `VERSION`.
+- Compare the service-change example's decimal duration limits and error-count ratio exactly, so rounding cannot change an inclusive boundary judgment; document JSON number rounding in English and Japanese and add regression cases.
+
 ## [0.8.0] - 2026-09-14
 
 ### Added

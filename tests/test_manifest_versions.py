@@ -1,6 +1,7 @@
 """Keep native Plugin manifests aligned with the repository release version."""
 
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -30,6 +31,26 @@ def marketplace_entry() -> dict:
 
 
 class ManifestVersionTests(unittest.TestCase):
+    def test_readme_release_references_match_release_version(self) -> None:
+        version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+        for path in ("README.md", "docs/locales/ja/README.md"):
+            document = ROOT / path
+            links = [
+                (label, target)
+                for label, target in re.findall(
+                    r"\[([^\]]+)\]\(([^)\s]+)\)",
+                    document.read_text(encoding="utf-8"),
+                )
+                if re.search(r"(?:^|/)releases/[0-9][^/]*\.md$", target)
+            ]
+            with self.subTest(readme=path):
+                self.assertEqual(len(links), 2)
+            for label, target in links:
+                with self.subTest(readme=path, target=target):
+                    self.assertEqual(label, version)
+                    self.assertEqual(Path(target).name, f"{version}.md")
+                    self.assertTrue((document.parent / target).is_file())
+
     def test_versions_match_release_version(self) -> None:
         version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
         for path in MANIFESTS:
