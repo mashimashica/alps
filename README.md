@@ -9,9 +9,9 @@
   <img src="assets/icon.svg" alt="ALPS icon" width="160">
 </p>
 
-ALPS helps you design the meaning of work and the agent work system that realizes it. Describe why the work is done, what observable conditions count as success, and which boundaries and details are necessary. Where needed, design the agents, tools, information resources, and environment that can perform it effectively.
+ALPS helps you describe work, organize related Processes into a model, and design the agent work system that realizes it. Describe why the work is done, what observable conditions count as success, and which boundaries and details are necessary. Connect related work through shared information definitions, and design the agents, tools, information resources, and environment that can perform it effectively.
 
-Use it to clarify a one-off assignment, improve an existing Skill, or describe work shared across people and Agents. Start with **Name, Purpose, and Outcomes**; add detail when it changes how the work is understood, applied, or evaluated.
+Use it to clarify a one-off assignment, improve an existing Skill, or create a reusable process model for work shared across people and Agents. Start each Process Description with **Name, Purpose, and Outcomes**; add detail when it changes how the work is understood, applied, or evaluated.
 
 ## Install
 
@@ -48,15 +48,29 @@ Review this Process Description. Identify unclear Outcomes, unnecessary method c
 Use design-agent-work-system to design the capabilities and interfaces for this work. Reuse suitable tools, implement the missing processing, and verify the configuration on representative cases.
 
 Review this agent work system. Assess the allocation of judgment and processing, information supply, tool interfaces, and evidence of effectiveness. Return findings without changing it.
-
-Use create-process-models to organize this work into Processes and shared input/output definitions, and create one model Plugin.
 ```
 
 The [minimal template](skills/design-process-description/references/SKILL-template.md) starts with ordinary Agent Skill frontmatter and the three required Process elements. The [examples](skills/design-process-description/references/examples.md) cover minimal and one-off work, work without a fixed artifact, necessary approvals and order, shared information, views, missing references, and Outputs that fail to establish an Outcome.
 
 The [working example](examples/README.md) shows both design responsibilities on one service-assessment Skill. Its script validates measurements and calculates comparisons; the agent assesses the context and interprets the evidence. [System design examples](skills/design-agent-work-system/references/examples.md) also cover existing tools, state-changing operations, and adaptation to changed capabilities.
 
-A model Plugin has one canonical definition: `plugin.json` lists its members, process Markdown contains their meaning and I/O, and `references/artifacts/` defines shared types. The [model format](skills/create-process-models/references/model-format.md) keeps concrete artifact locations and execution settings in optional workspace configuration.
+### Create a process model
+
+Use [create-process-models](skills/create-process-models/SKILL.md) when you need to organize related work into a reusable model. Supply the intended work, context, and any existing Process Descriptions. The Skill designs Process boundaries, describes their purposes and observable success conditions, defines shared inputs and outputs, and creates and verifies **one Agent Plugin for one process model**. It works independently of the two design Skills.
+
+```text
+Use create-process-models to turn these service-change descriptions into one model Plugin. Include the work performed by people and Agents, define the shared information and artifacts, and verify the package. Report assumptions and unresolved matters.
+```
+
+The resulting Plugin keeps each definition in its source:
+
+| Source | Contents |
+| --- | --- |
+| `plugin.json` | Package identity and the explicit list of model members. |
+| `skills/<name>/SKILL.md` or ordinary process Markdown | The complete Process Description, an explicit `metadata.title`, and typed `metadata.inputs` / `metadata.outputs`. Agent Skills use `SKILL.md`; human work can use ordinary Markdown. |
+| `references/artifacts/<id>.md` | Shared definitions of information items, products, or services used in I/O relationships. |
+
+Relationships can include cycles; I/O alone does not prescribe execution order. Applicable criteria, policies, and requirements retain their meaning in the source descriptions. The [model format](skills/create-process-models/references/model-format.md) defines the canonical representation, including metadata encoding. Concrete artifact locations and execution settings belong in optional workspace configuration. Package checks and semantic review are distinct from evidence that the modeled work succeeds.
 
 ## Design philosophy
 
@@ -80,7 +94,7 @@ Specify methods and order where the work requires them, while leaving room for j
 | Agent Work System Design | [Skill](skills/design-agent-work-system/SKILL.md) | [Skill](skills/design-agent-work-system/references/locales/ja/SKILL.ja.md) |
 | Process Model Creation | [Skill](skills/create-process-models/SKILL.md), [model format](skills/create-process-models/references/model-format.md) | [Skill](skills/create-process-models/references/locales/ja/SKILL.ja.md), [モデル形式](skills/create-process-models/references/locales/ja/model-format.md) |
 | Contribution and repository work | [CONTRIBUTING](CONTRIBUTING.md), [AGENTS](AGENTS.md) | [CONTRIBUTING](docs/locales/ja/CONTRIBUTING.md), [AGENTS](docs/locales/ja/AGENTS.md) |
-| Version policy and release notes | [Versioning](docs/versioning.md), [0.8.0](docs/releases/0.8.0.md) | [版管理](docs/locales/ja/versioning.md), [0.8.0](docs/locales/ja/releases/0.8.0.md) |
+| Version policy and release notes | [Versioning](docs/versioning.md), [0.9.0](docs/releases/0.9.0.md) | [版管理](docs/locales/ja/versioning.md), [0.9.0](docs/locales/ja/releases/0.9.0.md) |
 
 ## Version and license
 

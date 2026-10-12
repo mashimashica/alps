@@ -9,9 +9,9 @@
   <img src="../../../assets/icon.svg" alt="ALPS icon" width="160">
 </p>
 
-ALPSは、仕事の意味と、それを実現するエージェント作業システムを設計するための体系です。なぜ行うのか、どの観察可能な状態を成功とするのか、どの境界と詳細が必要なのかを記述します。必要に応じて、その仕事を有効に遂行するエージェント・ツール・情報資源・環境を設計します。
+ALPSは、仕事を記述し、関係するプロセスをモデルにまとめ、それを実現するエージェント作業システムを設計するための体系です。なぜ行うのか、どの観察可能な状態を成功とするのか、どの境界と詳細が必要なのかを記述します。共有する情報の定義を通じて仕事をつなぎ、その仕事を有効に遂行するエージェント・ツール・情報資源・環境を設計します。
 
-一度限りの依頼の明確化、既存Skillの改善、人やAgentが共同で行う作業の記述に使えます。**名称、目的、成果**から始め、理解・適用・評価に影響する場合に詳細を加えます。
+一度限りの依頼の明確化、既存Skillの改善、人やAgentが共同で行う仕事の再利用可能なプロセスモデルの作成に使えます。各プロセス記述は**名称、目的、成果**から始め、理解・適用・評価に影響する場合に詳細を加えます。
 
 ## 導入
 
@@ -48,15 +48,29 @@ design-process-descriptionを使い、この一度限りの作業を、目的、
 design-agent-work-systemを使い、この仕事に必要な能力とインターフェースを設計してください。適切なツールを再利用し、不足する処理を実装し、代表例で構成を検証してください。
 
 このエージェント作業システムをレビューしてください。判断と処理の配分、情報供給、ツールのインターフェース、有効性の証拠を評価し、変更せずに指摘を返してください。
-
-create-process-modelsを使い、この仕事をプロセスと共有する入出力定義へ整理し、一つのモデルPluginを作成してください。
 ```
 
 [最小テンプレート](../../../skills/design-process-description/references/locales/ja/SKILL-template.md)は、通常のAgent Skill frontmatterと、プロセスの三つの必須要素から始めます。[具体例](../../../skills/design-process-description/references/locales/ja/examples.md)では、最小の作業、一度限りの作業、固定成果物のない作業、必要な承認と順序、共有情報、ビュー、参照不足、成果を満たさない出力を扱います。
 
 [実働例](../../../examples/locales/ja/README.md)では、一つのサービス評価Skillに対する二つの設計責務を示します。スクリプトが測定を検証して比較を計算し、エージェントが文脈を評価して証拠を解釈します。[システム設計の具体例](../../../skills/design-agent-work-system/references/locales/ja/examples.md)では、既存ツール、状態を変更する操作、能力変化への適応も扱います。
 
-モデルPluginの定義は一組の正本に置きます。`plugin.json`に構成員を列挙し、プロセスのMarkdownに意味と入出力、`references/artifacts/`に共有型を定義します。[モデル形式](../../../skills/create-process-models/references/locales/ja/model-format.md)では、具体的な成果物の配置と実行設定は任意のワークスペース設定で扱います。
+### プロセスモデルを作る
+
+関係する仕事を再利用可能なモデルにまとめたい場合は、[create-process-models](../../../skills/create-process-models/references/locales/ja/SKILL.ja.md)を使います。対象の仕事、文脈、既存のプロセス記述があればそれらを渡してください。Skillはプロセスの境界を設計し、目的と観察可能な成功条件を記述し、共有する入出力を定義して、**一つのプロセスモデルを一つのAgent Pluginとして作成・検証**します。二つの設計Skillとは独立して使えます。
+
+```text
+create-process-modelsを使い、これらのサービス変更の記述を一つのモデルPluginにしてください。人とAgentが行う仕事を含め、共有する情報と成果物を定義し、パッケージを検証してください。前提と未解決事項も示してください。
+```
+
+作成するPluginでは、それぞれの定義を次の正本に置きます。
+
+| 正本 | 内容 |
+| --- | --- |
+| `plugin.json` | パッケージの識別情報と、モデルの構成員の明示的な一覧。 |
+| `skills/<name>/SKILL.md`または通常のプロセスMarkdown | プロセス記述の全文、明示的な`metadata.title`、型付きの`metadata.inputs` / `metadata.outputs`。Agent Skillは`SKILL.md`に置き、人の仕事には通常のMarkdownを使えます。 |
+| `references/artifacts/<id>.md` | 入出力関係で使う情報項目・製品・サービスの共有定義。 |
+
+関係には循環も含められます。入出力だけでは実行順序を指定しません。適用される基準・方針・要求の意味は原記述に保持します。[モデル形式](../../../skills/create-process-models/references/locales/ja/model-format.md)は、メタデータの符号化を含む正本の形式を定めています。具体的な成果物の配置と実行設定は、任意のワークスペース設定で扱います。パッケージの検査と意味のレビューは、モデル化した仕事の成功を示す証拠とは区別します。
 
 ## 設計思想
 
@@ -80,7 +94,7 @@ ALPSは、**システムズ／ソフトウェア工学に由来するプロセ�
 | エージェント作業システムの設計 | [Skill](../../../skills/design-agent-work-system/SKILL.md) | [Skill](../../../skills/design-agent-work-system/references/locales/ja/SKILL.ja.md) |
 | プロセスモデルの作成 | [Skill](../../../skills/create-process-models/SKILL.md)、[model format](../../../skills/create-process-models/references/model-format.md) | [Skill](../../../skills/create-process-models/references/locales/ja/SKILL.ja.md)、[モデル形式](../../../skills/create-process-models/references/locales/ja/model-format.md) |
 | 貢献とリポジトリ作業 | [CONTRIBUTING](../../../CONTRIBUTING.md)、[AGENTS](../../../AGENTS.md) | [CONTRIBUTING](CONTRIBUTING.md)、[AGENTS](AGENTS.md) |
-| 版管理方針とリリースノート | [Versioning](../../../docs/versioning.md)、[0.8.0](../../../docs/releases/0.8.0.md) | [版管理](versioning.md)、[0.8.0](releases/0.8.0.md) |
+| 版管理方針とリリースノート | [Versioning](../../../docs/versioning.md)、[0.9.0](../../../docs/releases/0.9.0.md) | [版管理](versioning.md)、[0.9.0](releases/0.9.0.md) |
 
 ## 版とライセンス
 
