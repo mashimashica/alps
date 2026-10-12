@@ -9,6 +9,11 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 - Add the self-contained `create-process-models` Skill and its Japanese translation for creating one process model as one Agent Plugin, with explicit membership, process Markdown, string-valued I/O metadata, and shared type definitions. Its format reference is the canonical source for the ALPS model profile.
 - Register the new Skill for repository discovery, distribution checks, and Agent Skill validation.
 
+### Changed
+
+- Require a nonblank string `metadata.title` for each registered Skill or ordinary Process document in the unreleased model profile, with stable identifiers kept separate from display names and aligned English/Japanese examples.
+- Clarify how model I/O represents governing information while preserving its role and force as Controls. Keep model-authoring guidance separate from application display, instantiation, and evaluation implementation.
+
 ### Fixed
 
 - Point both READMEs to the current 0.8.0 release notes and check their release references against `VERSION`.
