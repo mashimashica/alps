@@ -9,7 +9,7 @@ One process model is one Agent Plugin. This reference defines the ALPS model pro
 | Source | Owns |
 | --- | --- |
 | `plugin.json` | Package identity, release version, and explicit model membership. |
-| A listed process Markdown document | Its complete Process Description and explicit identity/I/O metadata. |
+| A listed process Markdown document | Its complete Process Description, identifier, display title, and I/O declarations. |
 | `references/artifacts/<id>.md` | One shared information-item, product, or service definition. |
 | Optional workspace `alps-harness.yaml` | Concrete artifact locations and execution settings. |
 
@@ -46,6 +46,7 @@ For `skills/implement-change/SKILL.md`:
 name: implement-change
 description: Prepare a verifiable release candidate when implementing an agreed design.
 metadata:
+  title: "Change Implementation"
   inputs: '["design-description"]'
   outputs: '["release-candidate"]'
 ---
@@ -62,13 +63,15 @@ Make the agreed service change available for an informed release decision.
 - Relevant verification results and unresolved limitations are available for the release decision.
 ```
 
-The body contains an H1 Name, a `## Purpose`, and a `## Outcomes` list. Japanese documents can use `## 目的` and `## 成果`. Outcomes are observable success conditions; an Output's existence does not by itself establish them. Include other detail only as needed to understand, apply, or evaluate the work. Metadata does not repeat Purpose or Outcomes. Preserve necessary Controls, Constraints, Enablers, and Entry/Exit Criteria in the body with their sources and scope. Criteria or policies governing the work retain their meaning and normative force as Controls. No separate Controls heading, metadata field, or graph category is required by this profile.
+The body contains an H1 Name, a `## Purpose`, and a `## Outcomes` list. Japanese documents can use `## 目的` and `## 成果`. Outcomes are observable success conditions; an Output's existence does not by itself establish them. Include other detail only as needed to understand, apply, or evaluate the work. Metadata does not repeat Purpose or Outcomes. Preserve necessary Controls, Constraints, Enablers, and Entry/Exit Criteria in the body with their sources and scope. Criteria or policies governing the work retain their meaning and normative force as Controls. A separate Controls heading is not required by this profile.
 
-These are authoring conventions, not a body-parsing protocol. Consumers display the complete registered source, including frontmatter, in its original order. Machine readers validate explicit metadata and references; they do not extract Purpose, Outcomes, or other body sections into runtime fields. Semantic review reads the source and its required references.
+The complete Process Description and its necessary references are the sources of work meaning. The metadata declares the display title and I/O relationships; it does not replace the description. These body conventions guide authoring and semantic review; they do not specify a user interface or an execution/evaluation implementation.
 
-A Skill's `name` is its stable process identifier and matches its directory. An ordinary process document uses its filename without `.md` as its identifier and can have the same `metadata` mapping without Skill discovery fields. Process identifiers follow the Agent Skill name syntax: lowercase ASCII letters, digits, and single hyphens, at most 64 characters, without a leading or trailing hyphen. They are unique within the model. The H1 is a title within the displayed source, not another identifier or a required runtime field. Graphs can use the explicit Skill name or ordinary document filename; they do not need an extracted H1.
+A Skill's `name` is its stable process identifier and matches its directory. An ordinary process document uses its filename without `.md` as its identifier and uses the same `metadata` mapping without Skill discovery fields. Process identifiers follow the Agent Skill name syntax: lowercase ASCII letters, digits, and single hyphens, at most 64 characters, without a leading or trailing hyphen. They are unique within the model.
 
-Agent Skills metadata maps strings to strings. Each present `inputs` or `outputs` value must be a JSON array of unique type identifiers encoded as a string. An omitted field means no declared relationships for that direction. There is no `alps.` prefix, duplicate `id`, or per-document schema version. Here `inputs` declares typed information supplied to or consulted by the Process; `outputs` declares production or updates. A shared criterion or policy can use the same incoming relationship. This is an information connection, not a claim that every use has the Framework's Input role or that every supplied resource is authoritative. The same type can appear in both directions. Governing meaning, applicability, and force remain in the source descriptions; do not maintain a second I/O list there. Ordinary references need not all become typed graph relationships.
+Every process document listed in the manifest must declare `metadata.title` as a string containing at least one non-whitespace character. This is the process display name, in the document's language, for example `"Change Implementation"` or `"変更の実装"`. It names the same work as the body and can change without changing the stable identifier. The H1 remains part of the Process Description; neither it nor the identifier substitutes for a missing title. Missing, blank, or non-string titles are format errors. This requirement applies to both Skill and ordinary process documents registered in the model, not to unregistered helper Skills or artifact type definitions. The field holds one title, not a locale map.
+
+Agent Skills metadata maps strings to strings. Each present `inputs` or `outputs` value must be a JSON array of unique type identifiers encoded as a string. An omitted field means no declared relationships for that direction. There is no `alps.` prefix, duplicate `id`, or per-document schema version. Here `inputs` declares typed information supplied to or consulted by the Process; `outputs` declares production or updates. A shared criterion or policy can use the same incoming relationship; the profile defines no separate Controls metadata field or edge category. This is an information connection, not a claim that every use has the Framework's Input role or that every supplied resource is authoritative. The same type can appear in both directions. Governing meaning, applicability, and force remain in the source descriptions; do not maintain a second I/O list there. Ordinary references need not all become typed graph relationships.
 
 ## Shared definitions
 
@@ -95,12 +98,6 @@ The agreed change's scope, intended behavior, and applicable constraints used fo
 The filename is the identifier, the H1 is the display name, and the remaining body defines the meaning and necessary properties. Type identifiers contain Unicode letters and numbers, dots, underscores, or hyphens, start with a letter or number, and contain no path separators. References match identifiers exactly, not display text. Missing definitions are errors; readers must not invent types.
 
 `kind`, when needed, is `information`, `product`, or `service`. More detailed sections and links to machine-readable schemas can be included when the work needs them. Neither a schema nor a separate `INTERFACE.md` is mandatory. Referenced definitions form the model's artifact types; no manifest registry duplicates them.
-
-## Application and evaluation
-
-At instantiation, AI interprets the complete source, relevant references, the request, and concrete inputs to establish this application's achievement conditions and applicable requirements. Unread sources, assumptions, conflicts, and evidence limits remain explicit. Receiving a resource as input does not itself grant it authority.
-
-Save the adopted conditions with stable instance-local identifiers, source/version evidence, and an instance revision. Runs and evaluations identify that adopted revision and its conditions; they do not use source list positions or the current document's ordering. These are application records, not metadata to add to the model Plugin. Runtime/API changes that realize this behavior are separate from this authoring profile.
 
 ## Workspace and editing
 
