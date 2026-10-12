@@ -94,7 +94,7 @@ ALPSは、**システムズ／ソフトウェア工学に由来するプロセ�
 | エージェント作業システムの設計 | [Skill](../../../skills/design-agent-work-system/SKILL.md) | [Skill](../../../skills/design-agent-work-system/references/locales/ja/SKILL.ja.md) |
 | プロセスモデルの作成 | [Skill](../../../skills/create-process-models/SKILL.md)、[model format](../../../skills/create-process-models/references/model-format.md) | [Skill](../../../skills/create-process-models/references/locales/ja/SKILL.ja.md)、[モデル形式](../../../skills/create-process-models/references/locales/ja/model-format.md) |
 | 貢献とリポジトリ作業 | [CONTRIBUTING](../../../CONTRIBUTING.md)、[AGENTS](../../../AGENTS.md) | [CONTRIBUTING](CONTRIBUTING.md)、[AGENTS](AGENTS.md) |
-| 版管理方針とリリースノート | [Versioning](../../../docs/versioning.md)、[0.8.0](../../../docs/releases/0.8.0.md) | [版管理](versioning.md)、[0.8.0](releases/0.8.0.md) |
+| 版管理方針とリリースノート | [Versioning](../../../docs/versioning.md)、[0.9.0](../../../docs/releases/0.9.0.md) | [版管理](versioning.md)、[0.9.0](releases/0.9.0.md) |
 
 ## 版とライセンス
 
