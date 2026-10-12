@@ -13,7 +13,7 @@ sources:
     reviewed_source_sha256: 9d46703b960c9f27e8269c5dabd96d55d01519b67564f5f68454998aedf140e2
   README.md:
     source: ../../../README.md
-    reviewed_source_sha256: ba86cfc1598a215039a94ce347aa759417188fa85c4ed3e705046708839ec092
+    reviewed_source_sha256: d1b0914f01d9b2a7d062af0a5b4b8c093ae8d58c15f767bedad30ac59af95529
   versioning.md:
     source: ../../versioning.md
     reviewed_source_sha256: 2fd119249218765a7e0ac7e1f66998c068348f45c2041ce8ec4dc827bdd5c538

@@ -11,6 +11,7 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ### Changed
 
+- Expand both READMEs with process-model use cases, a creation request example, and the source layout produced by `create-process-models`.
 - Require a nonblank string `metadata.title` for each registered Skill or ordinary Process document in the unreleased model profile, with stable identifiers kept separate from display names and aligned English/Japanese examples.
 - Clarify how model I/O represents governing information while preserving its role and force as Controls. Keep model-authoring guidance separate from application display, instantiation, and evaluation implementation.
 
