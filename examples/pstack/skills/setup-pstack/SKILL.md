@@ -7,16 +7,18 @@ description: Configure which models pstack uses per role and at what reasoning b
 
 ## Purpose
 
-Configure which models pstack uses per role and at what reasoning budget, so that every role has a valid choice the user confirmed. This skill also gives the user the choice of having a verification skill and a formal verification skill generated for a project that lacks one.
+Configure which models pstack uses per role and at what reasoning budget, so that every role has a valid choice the user confirmed and the user is told which values of an existing rule were replaced or dropped and that the new rule applies to new sessions. It also lets the user have a project-local verification skill generated for a project with no way to drive the real app for proof, and a formal verification skill for a project without one.
 
 ## Outcomes
 
-- `~/.cursor/rules/pstack-models.mdc` has the shape of step 5 and holds the budget the user chose and, for every role, the value the user confirmed.
+- `~/.cursor/rules/pstack-models.mdc` has the shape of step 5.
+- The rule's `# budget` line holds the budget label the user chose and the effort that label names.
+- Each role line holds the value the user confirmed for that role, which is the value step 3(b) builds from the chosen budget and the current choices step 2 loads unless the user chose another.
 - Every real slug in the rule is in the detected set and at `xhigh` or below.
 - Where step 2 replaces a value or drops a line of an existing rule, the user is told which.
 - The user is told that the rule was written and that it applies to new sessions.
-- Where the project has no way to drive the real app for proof, whether `/create-verification-skill` is invoked follows the user's answer to one offer of a project-local verification skill.
-- Where the project has no formal verification skill, whether `/create-formal-verification-skill` is invoked follows the user's answer to one offer of a formal verification skill.
+- An offer of a project-local verification skill is made at most once and only where the project has no way to drive the real app for proof, and `/create-verification-skill` is invoked exactly when the user accepts that offer.
+- An offer of a formal verification skill is made at most once and only where the project has no formal verification skill, and `/create-formal-verification-skill` is invoked exactly when the user accepts that offer.
 
 ## Tasks
 
@@ -24,7 +26,7 @@ The following Tasks are required whenever this skill runs, each with the conditi
 
 ### 1. Detect available models
 
-Enumerate the model slugs you can pass to a `Task` subagent in this session. That is the dependable source. If Cursor also exposes a models API or CLI that lists the user's entitled models, prefer it for completeness. If you cannot detect any, ask the user to paste the slugs they have access to.
+Enumerate the model slugs you can pass to a `Task` subagent in this session. That is the dependable source. If Cursor also exposes a models API or CLI that lists the user's entitled models, prefer it for completeness. If you cannot detect any, ask the user to paste the slugs they have access to. Never write a real slug you have not confirmed is available. The aliases `inherit-parent` and `auto` are always valid even though they are not detected slugs.
 
 ### 2. Load current state
 
@@ -97,8 +99,6 @@ Check whether the project already has a formal verification skill (a project ski
 `~/.cursor/rules/pstack-models.mdc`, an always-applied rule that sets pstack's model per role. The rule overrides the skill defaults.
 
 ## Constraints
-
-Never write a real slug you have not confirmed is available. The aliases `inherit-parent` and `auto` are always valid even though they are not detected slugs.
 
 Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
 

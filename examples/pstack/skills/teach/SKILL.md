@@ -13,11 +13,11 @@ Explain what a thing is, how it works, and why it's built that way, in one plain
 ## Outcomes
 
 - The reply is the explanation itself, never a report about what you did or delivered.
-- The explanation covers the few things the person should walk away understanding, chosen from why they're asking and what they already know, and puts the depth where their question is.
+- The explanation is aimed at the few things the person should walk away understanding, chosen from why they're asking and what they already know, and puts the depth where their question is.
 - The explanation is one plain account that blends what real skill invocations of `how` and `why` found, run at the size the question needs.
 - `why`'s confidence language is intact in the explanation.
 - The explanation goes deeper when the person asks and follows their lead, or, running one-shot with no live human, puts any offer to go deeper at the end.
-- Every response is plain spoken English that follows the writing rules under Controls.
+- Every response is plain spoken English that follows the writing rules under Controls, except that `why`'s confidence language stays intact.
 
 ## Tasks
 
@@ -43,5 +43,5 @@ Teach sits on top of `how` and `why`. Get your bearings on what the work is and 
 
 Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
 
-- Steps 3 to 5 follow steps 1 and 2, because the explanation covers the things that step 1 decides and blends what the runs of step 2 find.
-- Steps 4 and 5 hold for the whole explanation that step 3 starts.
+- Steps 3 to 5 follow steps 1 and 2.
+- Steps 4 and 5 do not follow step 3. They hold for the whole explanation that step 3 starts.

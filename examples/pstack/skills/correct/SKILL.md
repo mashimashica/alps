@@ -8,11 +8,11 @@ disable-model-invocation: true
 
 ## Purpose
 
-The operator keeps correcting agents in this repo for the same mistakes. Change the repo so the next agent can't make them.
+Change this repo so the next agent can't make the same mistakes the operator keeps correcting agents for.
 
 ## Outcomes
 
-- Each mistake class has evidence that it happened twice.
+- Each mistake class has evidence that it happened at least twice.
 - Each fix is at the highest level that works for its class.
 - The most frequent classes are fixed, one commit each.
 - Each new check is shown to fail on a real past mistake.
@@ -62,7 +62,8 @@ Repeat this work each time the operator corrects you.
 
 Exceptions go on the offending line with a reason, an expiry date, and a human's approval.
 
-Unless a Task states otherwise, work the Activities and their Tasks in the order listed. These dependencies are required.
+Unless a Task states otherwise, work the Activities in the order listed. Within an Activity, Tasks may be worked in any order unless one states otherwise. These dependencies are required.
 
 - "Find the mistake classes" comes first, "Fix and prove" comes after it, and "Keep the rule table" comes last.
-- The steps under "Fix each class at the highest level that works" are the levels, highest first. Each class is fixed at the highest level that works. Try architecture first, then types, then a lint whose error names the fix, then a test, and write docs last.
+- Each class is fixed at the highest level that works. The steps under "Fix each class at the highest level that works" are the levels, highest first. Try architecture first, then types, then a lint whose error names the fix, then a test, and write docs last.
+- In "Fix and prove", step 2 comes after step 1, because it proves the new checks that the fixes of step 1 add.

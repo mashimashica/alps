@@ -12,10 +12,11 @@ Before you start or resume work, rebuild the user's recent working context and h
 
 ## Outcomes
 
-- The scope stated back names the window, the topic if named, and the workspace, and it does not quietly turn "all" into "recent N".
+- The scope searched is the scope stated back, which names the window, the topic if named, and the workspace, and a request for "all" is not quietly turned into "recent N".
 - The brief rests on the in-scope chats of your own chat history, or on the full state capsule where the user already gave one.
-- Whenever the topic names a feature, file, subsystem, area, or bug, the brief folds in what the sweep of the shared record returned, null results included, and says which MCP was unavailable and skipped.
-- The PRs, branches, and tickets that the mining and the sweep surfaced are checked against live state.
+- Whenever the topic names a feature, file, subsystem, area, or bug, the brief folds in what the sweep of the shared record returned, null results included.
+- Where an MCP was unavailable for the sweep, it is reported as skipped.
+- Each PR, branch, and ticket status that the brief states matches its live state.
 - The brief follows the output contract, from the capsule of where the work stands to the single most useful next action.
 
 ## Tasks
@@ -54,9 +55,11 @@ An adjacent feature or ticket stays out unless it blocks this one. When the caps
 
 Keep it tight and on-topic. Read only what the in-scope threads need, then stop.
 
+Steps 2 to 6 apply only to a request that step 1 does not route elsewhere.
+
 Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
 
-- Step 1 comes first, because it can route the request elsewhere or skip the mining.
+- Step 1 comes first.
 - Step 2 locks the scope before any searching in steps 3 and 4.
 - The sweep of step 4 runs in parallel with the chat-history mining of step 3.
 - Step 5 checks the PRs, branches, and tickets that steps 3 and 4 surface.

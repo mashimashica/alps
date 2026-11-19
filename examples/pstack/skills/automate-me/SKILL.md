@@ -13,11 +13,11 @@ Turn the user's working conventions into a skill agents will follow, through a g
 ## Outcomes
 
 - Where the run is in update mode, the existing file is edited in place and keeps the sections the user hasn't contradicted.
-- The skill follows every rule under Guardrails.
+- The skill meets the Guardrails, each with the force it states.
 - The skill's path and frontmatter follow the placement rules of step 4.
-- Every line of the skill follows the **unslop** skill and `create-skill`'s writing guidelines.
-- The user has vibe-checked the draft for whether it reads like them and whether it missed anything.
-- The skill is committed in a worktree off main and open as a PR, with nothing pushed to main directly.
+- The user judges that the skill reads like them and misses nothing.
+- Where the skill is placed in the project, it is committed in a worktree off main and open as a PR.
+- Nothing is pushed to main directly.
 
 ## Tasks
 
@@ -116,13 +116,13 @@ Run a description-optimization loop only if the skill's trigger accuracy turns o
 
 ## Constraints
 
-This skill drafts or revises a personal `-mode` skill via `create-skill` + unslop, optionally pulling fresh evidence from recent transcripts.
+This skill drafts or revises a personal -mode skill via create-skill + unslop, optionally pulling fresh evidence from recent transcripts.
 
 Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
 
 - Step 0 comes first, because update mode changes steps 1, 2, and 4.
-- Step 3 groups the combined signals of steps 1 and 2.
-- Step 4 drafts the skill from the sections of step 3, and step 5 works on the draft of step 4.
+- Step 3 comes after steps 1 and 2, because it groups their combined signals.
+- Step 4 comes after step 3, because it drafts the skill from the sections of step 3. Step 5 comes after step 4, because it works on the draft of step 4.
 - The vibe-check under Evaluation comes before the skill ships.
 
 ### When not to use

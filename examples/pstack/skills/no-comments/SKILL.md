@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 ## Purpose
 
-Clear the scope of comments that do not survive Comment Sicko's fresh perspective, and act on the accepted findings so that the code behind each accepted flag is fixed and each constraint a comment claimed is encoded or reported open.
+Clear the scope of comments that do not survive Comment Sicko's fresh perspective, with the code behind each accepted flag fixed and each constraint a comment claimed encoded or reported open.
 
 ## Outcomes
 
@@ -16,8 +16,13 @@ Clear the scope of comments that do not survive Comment Sicko's fresh perspectiv
 - No accepted flag misstates its `MUST KILL` reason or treats kept intentional code as guilty.
 - Every restored deletion has an exact exception and scoped proof.
 - Every keep that is refuted or still ambiguous is deleted.
-- Every accepted flag has its smallest root-cause fix in scope with every named workaround removed, or, where the root cause is out of scope, the smallest in-scope fix with the rest reported open.
-- Each constraint comment that is not a keep about things we cannot change is deleted, with its constraint encoded where approval was given and otherwise reported open with the out-of-scope work sketched.
+- Every correctness or safety suppression among the scope's lint and TypeScript suppressions, including any Comment Sicko missed, stays an actionable `MUST KILL`.
+- Every reshape flag on an our-code surprise stays actionable.
+- Every accepted flag has its smallest root-cause fix in scope, or, where the root cause is out of scope, the smallest in-scope fix with the rest reported open.
+- Every named workaround is removed.
+- Each constraint comment that is not a keep about things we cannot change is deleted.
+- Each constraint such a comment claimed has an offer of the cheapest in-scope type, runtime, test, or CI lint.
+- Each constraint such a comment claimed is encoded where approval was given, and otherwise reported open with the out-of-scope work sketched.
 - The report names the deletion count, restored comments, reruns, architect sketch, fixes, encoding offers, encodings, unenforced constraints, and other open work.
 
 ## Tasks
@@ -49,3 +54,7 @@ Unless a Task states otherwise, work the Tasks in the order listed. These depend
 - Step 2 comes before steps 3 to 5, which act on accepted findings.
 - Step 3 comes before step 4, which implements what step 3 sketches.
 - Step 6 comes last, because it reports what the other steps did.
+
+## Enablers
+
+`comment-sicko` is the subagent that `agents/comment-sicko.md` defines. Its rules are in that file.

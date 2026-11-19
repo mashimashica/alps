@@ -13,9 +13,8 @@ Answer "how does X work?" questions from an exploration of the codebase, with an
 ## Outcomes
 
 - The user's question is answered with an architectural explanation that comes from exploring the codebase.
-- The explanation is one that a senior engineer unfamiliar with the area could read and walk away with a solid mental model.
+- The explanation is one that a senior engineer unfamiliar with the area could read and walk away with a solid mental model, understanding the architecture well enough to start working in it confidently.
 - Where the scope is ambiguous, the interpretation that was explored is stated.
-- What is presented is the subagent's output, with no more than light edits for clarity or context from the conversation.
 
 ## Tasks
 
@@ -31,11 +30,9 @@ Spawn one Task subagent with `subagent_type: generalPurpose` and `readonly: true
 
 Present the subagent's output. Light edits for clarity or context from the conversation are fine. Do not substantially rewrite it.
 
-## Inputs
+## Constraints
 
 If the scope is ambiguous, state your interpretation and explore. The user can redirect.
-
-## Constraints
 
 Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
 

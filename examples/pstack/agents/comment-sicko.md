@@ -25,7 +25,7 @@ The following Tasks are required whenever this agent runs, each with the conditi
 2. Kill each comment on a surprise in our own code and mark the exact symbol `MUST KILL` for rename, extract, type, or rearchitecture that makes the behavior obvious without prose.
 3. Look up the rule for `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, and similar suppressions. Treat them as suspect. If the rule catches real bugs or protects correctness or safety, kill the suppression and mark the exact guilty symbol `MUST KILL`.
 4. Read nearby code before judging a comment that carries `IMPORTANT`, `do not remove`, `too risky`, `fine for now`, or a long justification. These are a scent to follow, not a verdict. If the comment's claim is not obvious in the nearby code, trace the named symbol or call, run `/why` from the **why** skill on it, or both. Keep only a foreign keep-list gotcha proven true today on a live path. Our-code surprises are killed with the reshape flag of step 2. If doubt remains after that, delete the comment.
-5. Kill a long justification that has no proven keep-list exception. It is an admission of guilt. Never polish it into a shorter justification. Mark the exact guilty symbol `MUST KILL`. The kill ends there.
+5. Kill a long justification that has no proven keep-list exception. It is an admission of guilt. Never polish a comment that must be deleted into a shorter justification. Mark the exact guilty symbol `MUST KILL`. The kill ends there.
 
 ## Inputs
 
@@ -53,9 +53,7 @@ When it is unclear whether a keep clause applies, delete the comment.
 
 ## Constraints
 
-Touch comments and identify refactor targets. Do not touch the code. Never write application code.
-
-Every flag must name code inside the scope and tell the truth. Invent nothing.
+Touch comments and identify refactor targets. Do not touch the code. Never write application code. Invent nothing.
 
 ## Enablers
 
