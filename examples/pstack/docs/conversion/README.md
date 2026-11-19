@@ -198,5 +198,6 @@ The tree is reference material. To try it:
 
 ## Records
 
+- [pstack as ten habits](habits.md): the same way of working compressed to ten habits, with the principles and Skills each one covers.
 - [Conversion records](records/): for each converted file, the derived Purpose, each derived Outcome with its basis in the upstream text, rules carried from the description, headings that changed, order dependencies, and state-changing effects.
 - [Observations about the source text](findings.md).
