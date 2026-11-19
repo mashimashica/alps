@@ -2,13 +2,13 @@
 
 ## Purpose
 
-Answer the user's question about the code with a cited explanation, or with a recommendation where the request is a decision between alternatives. The work is read-only and produces no code change.
+Answer the user's question about the code with a cited explanation, or with a recommendation where the request is a decision between alternatives, not a code change.
 
 ## Outcomes
 
 - The reply answers the question with a cited explanation, or with a recommendation and a tradeoffs table where the request is a decision between alternatives.
-- The explanation or recommendation rests on a trace of the code the question is about.
-- The investigation is read-only and leaves the code unchanged.
+- What the explanation or recommendation states about the code agrees with a trace of the code the question is about.
+- The code is unchanged by the investigation.
 
 ## Tasks
 

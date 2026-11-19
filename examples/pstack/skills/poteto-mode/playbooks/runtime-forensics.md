@@ -9,7 +9,7 @@ Diagnose a live symptom by instrumenting the running process, and deliver a cite
 - The diagnosis rests on a real artifact captured from the live process on the matching surface.
 - The mechanism in the diagnosis is proven on the running process.
 - The finding is mapped to its file, symbol, and the line that allocates or schedules.
-- No fix is made unless asked.
+- The deliverable is a cited diagnosis, with no fix unless one was asked for.
 
 ## Tasks
 
@@ -23,13 +23,11 @@ The following Tasks are required whenever this playbook runs, each with the cond
 
 ## Outputs
 
-**Reply:** the signal captured, the reduced finding, how you proved the mechanism, the source location, artifact paths.
+**Reply:** the signal captured, the reduced finding, how you proved the mechanism, the source location, artifact paths. No fix unless asked. Hand back to Bug fix or Perf once the cause is known.
 
 ## Constraints
 
 **You own the diagnosis. Instrument the live process, don't theorize from source.** The deliverable is a cited diagnosis, not a fix.
-
-No fix unless asked. Hand back to Bug fix or Perf once the cause is known.
 
 Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
 

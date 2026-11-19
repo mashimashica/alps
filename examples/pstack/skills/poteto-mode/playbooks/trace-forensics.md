@@ -2,14 +2,14 @@
 
 ## Purpose
 
-Diagnose the cause from a capture that already exists, and deliver a cited diagnosis attributed to source, not a fix.
+Diagnose the cause from a capture that already exists, and hand back a cited diagnosis, with no fix unless asked.
 
 ## Outcomes
 
 - The finding comes from the existing artifact, read and not re-run.
 - The cause is mapped to file, symbol, and line via the artifact's own symbols, or the reply says plainly that the artifact does not carry them.
-- The finding is confirmed by a diff of paired before and after artifacts, or it is marked as the strongest hypothesis the artifact supports, not a confirmed cause.
-- No fix is made unless asked.
+- Where a paired capture exists, whether the finding is confirmed rests on a diff of the before and after artifacts. Otherwise the finding is marked as the strongest hypothesis the artifact supports, not a confirmed cause.
+- The diagnosis handed back carries no fix unless one was asked for.
 
 ## Tasks
 

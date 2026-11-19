@@ -14,7 +14,8 @@ Give one Slack report a classification and one useful verdict in its source thre
 
 - The source thread holds exactly one verdict from the run, a reply under `SOURCE_THREAD_TS` that ends with exactly one configured marker line, unless a condition this skill states ended the run before the verdict.
 - Every Slack message from the run is a reply under the source thread's root. None is a root message, a broadcast reply, a DM, or a post in another channel or a replacement thread.
-- The verdict leads with the outcome that the thread's evidence and the cause trace support. What could not be established (an unreadable attachment, unavailable cause tracing, an unclear owner, an uncertain tracker match) is stated as such, not invented or guessed.
+- The verdict leads with the outcome that the thread's evidence and, where cause tracing was available, the cause trace support.
+- What could not be established (an unreadable attachment, unavailable cause tracing, an unclear owner, an uncertain tracker match) is stated as such, not invented or guessed.
 - A tracker issue from the run exists only for a bug or performance report whose behavior is clearly broken, that is still live or not known to be fixed, and that has no confident or plausible live match in the tracker.
 - A created issue is self-contained and links back to the source thread.
 - Where dedupe found a confident duplicate and no stop or fail-closed condition applied, the existing issue carries the source permalink and one short recurrence note.
@@ -216,13 +217,15 @@ Cause tracing shows that another configured destination owns the issue.
 
 Use only from the configured Benny triage automation. Create a tracker issue only for a clear, new bug. Do not reproduce or fix it here.
 
-Unless a Task states otherwise, work the Activities and their Tasks in the order listed. These dependencies are required.
+Unless a Task states otherwise, work the Activities in the order listed. Within an Activity, Tasks may be worked in any order unless one states otherwise. These dependencies are required.
 
 - Step 1 comes before making a work list or delegating.
+- The Tasks of step 1, and the numbered actions under a Task, are worked in the order listed.
 - The root and current replies are read in step 2 before deciding.
 - Cause tracing in step 3 comes before choosing an owner or destination in step 5.
+- In step 7 one outcome is chosen from the tracker search, and the update for a confident duplicate or the link for a possible match follows that choice.
 - Step 8 decides whether to create only after step 6 has resolved the tracker target fields and step 7 has deduped.
-- In step 9 the fresh source-parent preflight comes before the verdict post, and the read that verifies the verdict comes after it.
+- In step 9 the fresh source-parent preflight comes before the verdict post, the read that verifies the verdict comes after it, and compensation follows that read.
 
 Every source read and post after step 1 must use the stored `SOURCE_CHANNEL_ID` and `SOURCE_THREAD_TS`. Never replace them with a reply timestamp or an operations-thread timestamp.
 

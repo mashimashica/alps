@@ -7,7 +7,8 @@ Fix a perf issue with a one-off fix whose effect is measured against a baseline,
 ## Outcomes
 
 - Every fix is tied to a measurement, with a baseline trace captured before it and a post-fix trace captured after it.
-- The baseline and each later number are vetted with the **benchmark-checklist** skill.
+- No number the reply or the PR reports claims more than its vetting with the **benchmark-checklist** skill supports.
+- On the matching surface, the post-fix trace of the shipped fix improves on the baseline.
 - An inconclusive or wrong-surface comparison is flagged and not counted as a pass.
 - The PR cites the measurement.
 

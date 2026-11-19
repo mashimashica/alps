@@ -8,7 +8,7 @@ Establish whether an existing pull request or commit resolves the reported sympt
 
 - The run reports one verification outcome, Confirmed, Insufficient fix, or Inconclusive, and it matches what the baseline and the patched build showed.
 - A Confirmed outcome rests on the symptom reproducing twice on the baseline and on the broken state being gone, with the expected state in its place, twice on a running patched app.
-- The baseline and patched measurements use the same environment and data, the same UI path, and the same state check.
+- Where both builds were measured, the baseline and patched measurements use the same environment and data, the same UI path, and the same state check.
 - The existing artifact is unedited, and no competing patch and no other pull request exists from the run.
 - The repository is back in its prior state, with no user change overwritten and no user work discarded.
 
@@ -112,8 +112,10 @@ Use this mode when an open pull request or merged commit plausibly fixes the rep
 
 The existing artifact owns the fix. Verify it. Do not edit it, author a competing patch, or open another pull request.
 
-Unless a Task states otherwise, work the Activities and their Tasks in the order listed. These dependencies are required.
+Activities and Tasks may be worked in any order unless a Task or one of these dependencies states otherwise. These dependencies are required.
 
+- The numbered actions under a Task are worked in the order listed.
 - The artifact is qualified before either build is measured.
+- The working tree is protected before either build is measured.
 - The baseline is measured before the patched build, which repeats the same UI path and the same state check.
 - The verification outcome is chosen after the measurements and is reported before Cleanup.

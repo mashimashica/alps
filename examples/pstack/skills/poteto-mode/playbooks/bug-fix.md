@@ -7,8 +7,12 @@ Fix the bug at its cause with the smallest change that runtime evidence justifie
 ## Outcomes
 
 - On the matching surface, the original repro fails before the fix and passes after it.
-- The root cause the reply names is the one hypothesis that survived elimination, and runtime evidence confirms its mechanism.
-- Every shipped line traces to runtime evidence, and the shipped change is the smallest that evidence justifies.
+- An inconclusive or wrong-surface verification is flagged and not counted as a pass.
+- Runtime evidence confirms the mechanism of the root cause the reply names.
+- The fix addresses the mechanism of the root cause the reply names.
+- Every shipped line traces to runtime evidence.
+- The shipped change is the smallest that the evidence justifies.
+- The fix is open as a PR per **Opening a PR**.
 
 ## Tasks
 
@@ -26,15 +30,11 @@ The following Tasks are required whenever this playbook runs, each with the cond
 
 **Reply:** what was broken, root cause, fix, how you verified. Paste failing-then-passing repro output verbatim.
 
-## Controls
-
-Be scientific. Every shipped line traces to runtime evidence. Belt-and-suspenders that "might help" is a hypothesis, not a fix.
-
 ## Constraints
 
 **You own this task. Plan, review, verify.** Delegate investigation and the fix to subagents, stay in the lead. Pick each subagent's reasoning level for the job, per the Subagents section.
 
-Belt-and-suspenders that "might help" does not ship. When evidence refutes a hypothesis, revert what it motivated. The smallest change the evidence justifies ships, nothing more.
+Be scientific. Every shipped line traces to runtime evidence. Belt-and-suspenders that "might help" is a hypothesis, not a fix. It does not ship. When evidence refutes a hypothesis, revert what it motivated. The smallest change the evidence justifies ships, nothing more.
 
 Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
 

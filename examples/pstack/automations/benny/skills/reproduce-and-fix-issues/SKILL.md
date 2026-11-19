@@ -8,14 +8,15 @@ disable-model-invocation: true
 
 ## Purpose
 
-Carry a triaged Slack bug toward a proven fix, no further than evidence from the target app's real UI supports: a repro of the exact symptom once a trusted triage marker is in the source thread, verification of an existing fix when one exists, and a bounded fix only after a confirmed repro.
+Carry a triaged Slack bug toward a proven fix, no further than evidence from the target app's real UI supports.
 
 ## Outcomes
 
-- Where a verdict meets the triage contract with a `bug` or `performance` marker and no person owns the fix, the operations thread or the run output carries the run's result: a confirmed repro, `Could not reproduce`, `Blocked`, or the outcome of verifying an existing fix.
+- Where a verdict meets the triage contract with a `bug` or `performance` marker and no person owns the fix, the operations thread or the run output carries the run's result as its evidence supports it. The result is a confirmed repro, `Could not reproduce` when the symptom did not reproduce within the configured repro budget or the media review did not confirm it, `Blocked`, which states what was missing when the environment cannot provide a required capability, or the outcome of verifying an existing fix.
 - A repro reported as confirmed shows the exact discriminating symptom twice through real UI interaction, in two independent attempts, and a read-only media review confirms that the evidence visibly shows the discriminating broken state.
 - An existing fix reported as verified shows the symptom on the baseline and its absence on the patched build, each through the real UI twice.
-- Any pull request from the run is a draft backed by before-and-after proof: the baseline evidence, and on the patched build the broken state gone and the expected state in its place through the same real UI path, with no regression remaining.
+- Any pull request from the run is a draft.
+- Any pull request from the run rests on before-and-after proof. The original baseline evidence is kept, and on the patched build the same real UI path, run and repeated twice, shows the broken state gone and the expected state in its place, with no regression remaining.
 - Every source-channel message from the run is a reply under `SOURCE_THREAD_TS`.
 
 ## Activities & Tasks
@@ -53,7 +54,7 @@ The following Tasks are required whenever this skill runs, each with the conditi
 
 3. Proceed only for `bug` or `performance`. Capture the optional tracker URL. Stop silently for `other`, a missing verdict, an untrusted author, conflicting markers, or a timeout.
 
-    > NOTE This marker replaces private bot identities and free-form verdict matching.
+    This marker replaces private bot identities and free-form verdict matching.
 
 ### 3. Apply ownership and fix-artifact gates
 
@@ -290,16 +291,23 @@ The following Tasks are required whenever this skill runs, each with the conditi
 
 Use only from the configured Benny repro automation.
 
-Unless a Task states otherwise, work the Activities and their Tasks in the order listed. These dependencies are required.
+Unless a Task states otherwise, work the Activities in the order listed. Within an Activity, Tasks may be worked in any order unless one states otherwise. These dependencies are required.
 
 - Step 1 comes before making a work list or delegating.
+- The Tasks of step 1, and the numbered actions under a Task, are worked in the order listed.
+- In step 2 a verdict is accepted before its marker decides whether the run proceeds.
 - Nothing after step 2 starts unless step 2 accepts a `bug` or `performance` verdict.
+- In step 4 the root status message exists before its coordinates are stored.
+- In step 5 the completed map is read before its matching section is found.
 - The control adapter is loaded and checked in step 5 before the app is driven in step 7.
-- The media review of step 8 confirms a repro before step 9 reports it.
+- In step 7 the app is brought up before it is confirmed and driven.
+- In step 8 the evidence is captured before the media review, and the media review confirms a repro before step 9 reports it.
+- In step 9 the rejection window follows the repro report.
 - The fix phase does not start until the rejection window of step 9 closes without a valid rejection.
 - The gate of step 11 passes before any edit in step 12.
 - The baseline evidence of steps 7 and 8 exists before the fix, and step 13 keeps it and checks the patched build against it.
 - Step 14 comes only after the before-and-after proof of step 13.
+- In step 14 the handling of a failed or successful pull request creation follows the attempt to open it.
 
 Never replace the stored `SOURCE_CHANNEL_ID` and `SOURCE_THREAD_TS` with a reply timestamp, operations timestamp, or status-message timestamp.
 
