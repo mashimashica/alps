@@ -18,7 +18,7 @@ Ground the next fix in evidence about the premise that the failed fixes share.
 
 ## Tasks
 
-The following Tasks are required whenever this principle applies, each with the conditions it states. Numbers identify the Tasks and set no order.
+The following Tasks are required whenever this principle applies, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
 1. When two or more fixes that share one premise have failed the same gate, suspect the premise, not the fixes.
 2. Write the premise down: the one sentence every failed fix assumed.
@@ -29,4 +29,7 @@ The following Tasks are required whenever this principle applies, each with the 
 
 This principle applies when two or more fixes that share one premise have failed the same gate. When another description cites this principle, that description's own limits on it hold.
 
-Do not start the next fix before the premise is written down and tested.
+Tasks may be worked in any order unless one states otherwise. These dependencies are required.
+
+- Do not start the next fix before the premise is written down and tested.
+- Task 3 comes before Task 4, which acts on its evidence.

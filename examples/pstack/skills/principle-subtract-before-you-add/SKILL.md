@@ -14,7 +14,7 @@ Make each addition, refactor, or rewrite build on a simpler base than it found.
 
 - Complexity is removed before construction, and construction builds on the simpler base.
 - The design is left slightly simpler and more capable, behind the same or smaller surface, than it was found.
-- The design serves observed usage, not speculative edge cases, with no speculative validator, parser, or guard beyond what the spec demands.
+- What the work adds or changes serves observed usage, not speculative edge cases.
 
 ## Tasks
 

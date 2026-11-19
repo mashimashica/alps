@@ -17,9 +17,9 @@ Bring a project's formal verification back in line with the code after the code 
 - Each check's verification describes the current code, or the check is reported as blocked with exactly why.
 - Each changed property follows a promise that changed on purpose, and the evidence for that is cited.
 - Each updated check that passes has caught a break of the new code that its property guards against.
-- Each failure is named as drift in the verification or as a bug in the code, on a replay of its counterexample against the real code.
-- The verify skill records the code that each check covers, the commands, the bounds, the assumptions, and the sync commit as they stand at the commit that was checked, with the sync commit of a blocked check left where it was.
-- The verify skill's steps run when it is followed once as the next agent would.
+- Each failure is named for what it is: drift in the verification or a bug in the code.
+- Where a verify skill exists, it records the code that each check covers, the commands, the bounds, the assumptions, and the sync commit as they stand at the commit that was checked, with the sync commit of a blocked check left where it was.
+- Where a verify skill exists, its steps run when it is followed once as the next agent would, apart from those of a check reported as blocked.
 
 ## Activities & Tasks
 
@@ -76,12 +76,12 @@ Say outright which failures were drift in the verification and which were bugs i
 
 Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
 
-- Step 1 comes first. The later steps use the property, the covered code, the bounds and assumptions, the command, and the sync commit that it collects for each check.
+- Step 1 comes first. The later steps use what it collects for each check.
 - Step 2 runs each check before anything is changed, so it comes before the updates in steps 4 and 6.
 - Step 3 comes before step 4, which updates the verification for what step 3 decides each change is.
 - In step 4 the update is written before the rerun in step 5.
 - Whether a failure in step 2 is drift or a bug is not decided until step 5.
-- Step 5 comes before step 6, which sets the sync commit to the commit that was checked and does not move it for a blocked check.
+- Step 5 comes before step 6, which uses its results.
 
 ### Edit scope
 

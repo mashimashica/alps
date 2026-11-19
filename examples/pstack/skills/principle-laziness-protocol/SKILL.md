@@ -12,7 +12,7 @@ Solve the problem without building more than it needs.
 
 ## Outcomes
 
-- The same choice is not repeated in several places. It sits behind one source of truth, and its result is passed as a simple flag.
+- Each choice the work makes or touches sits behind one source of truth instead of being repeated in several places.
 - The change is the smallest that solves the problem.
 
 ## Tasks

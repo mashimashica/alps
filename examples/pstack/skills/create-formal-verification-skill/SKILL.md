@@ -12,15 +12,19 @@ Verify one property of the part of the repo where formal verification matters mo
 
 ## Outcomes
 
-- The target is a promise the code makes, where a break harms users and tests rarely reach the case that breaks it, chosen for its strength and not for ease of verification.
+- The target is a promise the code makes, where a break harms users and tests rarely reach the case that breaks it, and it is the strongest such target, not the one that is easiest to verify.
+- Every part of the model or proof points to code that a reviewer can open, and what the verification treats as one indivisible step is one indivisible step in the code.
 - The check of the chosen property passes within its stated bounds and assumptions, or fails only on findings that are reported with the counterexample in the code's terms.
 - Each property has been seen to fail on a broken variant of the code it guards.
+- The generated skill registers, through frontmatter that names the area and says when to use it.
+- From the generated skill alone, the next agent can tell whether a change touches the verified code, run the check, tell a real bug from a modeling error, and update the verification when a change is intended.
+- The generated skill records which files and functions each check covers and the sync commit at which the verification was last confirmed to describe them.
 - The generated skill, followed as the next agent would on a scratch change that breaks the property in the real code, runs every step and catches the break.
 - The user can trust the result and act on it without learning the verification language.
 
 ## Activities & Tasks
 
-The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks and set no order.
+The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
 ### Choose the target from the code
 
@@ -66,8 +70,8 @@ Tell the user what you verified, which tool you used and why, the bounds, what t
 
 These dependencies are required.
 
-- The target is chosen before the tool is picked, because the question that the tool answers comes from the target.
-- The tool is picked before the property is verified with it.
-- The property is verified before the verify skill is generated, because the skill holds the coverage record and the sync commit.
+- The target is chosen before the tool is picked.
+- The tool is picked before the verification of the property is written with it.
+- The verification of the property is written and run before the verify skill is generated.
 - The verify skill is generated before it is followed on the scratch change.
 - The verify skill is followed on the scratch change before the hand off.
