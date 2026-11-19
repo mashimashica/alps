@@ -28,6 +28,7 @@ Do not infer Process requirements from tests, templates, Host manifests, icons, 
 | Each Skill's `references/` | Principles and supporting material used by that Skill; each document's role determines its normative force. |
 | `docs/locales/ja/` and each Skill's `references/locales/ja/` | Supported translations of the corresponding English source files. A translated Skill body is named `SKILL.ja.md` and is not a Skill entry point. |
 | `examples/` | Bundled reference material, including a working target Skill; outside Plugin Skill discovery. The guide's translation is in `examples/locales/ja/`, and the target Skill's translations are in its `references/locales/ja/`. |
+| `examples/pstack/` | A third-party Plugin converted to ALPS form and kept as reference material under its own MIT License; outside Plugin Skill discovery. Its Skills, playbooks, tools, and upstream documents are English only. The conversion guide and records are in `examples/pstack/docs/conversion/`, and the guide's translation is in that directory's `locales/ja/`. |
 | `plugin.json`, `.claude-plugin/`, `.cursor-plugin/`, `.codex-plugin/` | Root Plugin format and distinct Host adapters. |
 | `CLAUDE.md` | Claude Code entry point for repository development that imports this file; it adds no instructions of its own and is not Plugin context. |
 | `assets/` and the Skill's `agents/` and `assets/` | Presentation resources. |

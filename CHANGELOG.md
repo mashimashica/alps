@@ -4,6 +4,11 @@ This file records notable changes to ALPS. ALPS is versioned as a single reposit
 
 ## [Unreleased]
 
+### Added
+
+- A conversion of the third-party pstack Plugin (0.15.44, MIT License) to ALPS form under `examples/pstack/`, as reference material outside Plugin Skill discovery: each Skill, playbook, and the reviewing agent definition rewritten as a Process Description with derived Purpose and Outcomes; tool-use references for its four bundled tools; and a conversion guide with records, evidence, and limits in English and Japanese. `NOTICE` identifies the directory as third-party material under its own license.
+- Repository tests for the converted tree's form (Skill frontmatter, Process Description presentation, link containment), and a layout test that accepts Skill entry points inside an example Plugin tree's own Skill roots.
+
 ### Fixed
 
 - Point both READMEs to the current 0.8.0 release notes and check their release references against `VERSION`.

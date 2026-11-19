@@ -48,3 +48,7 @@ The table gives criteria for evaluating the example, not a claim that every agen
 | Work system | Supply the normal measurements but state that the candidate used ten concurrent clients instead of one. | Numerical checks still hold, but comparable conditions have not been established. The affected assessment Outcome remains unconfirmed. Identify the additional evidence needed. |
 
 Repository tests exercise the script and CLI contract. An agent-mediated application of these cases is needed to evaluate the whole configuration. Record the actual agent/environment, cases, judgments, and limits when reporting that evaluation. Fixture calculations do not validate an operational service or the scientific adequacy of a production measurement plan.
+
+## A converted Plugin
+
+[pstack in ALPS form](pstack/docs/conversion/README.md) is a separate, larger example: an existing third-party Plugin whose Skills and playbooks were rewritten as Process Descriptions. It is independent of the service-assessment example above and is licensed separately. Its guide states the source, what changed, the evidence, and the limits.

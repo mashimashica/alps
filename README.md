@@ -53,6 +53,8 @@ The [minimal template](skills/design-process-description/references/SKILL-templa
 
 The [working example](examples/README.md) shows both design responsibilities on one service-assessment Skill. Its script validates measurements and calculates comparisons; the agent assesses the context and interprets the evidence. [System design examples](skills/design-agent-work-system/references/examples.md) also cover existing tools, state-changing operations, and adaptation to changed capabilities.
 
+The [pstack conversion](examples/pstack/docs/conversion/README.md) applies both Skills to an existing third-party Plugin. It rewrites each Skill and playbook as a Process Description, documents the bundled tools, and reports what the conversion could and could not establish.
+
 ## Design philosophy
 
 ALPS connects **process descriptions rooted in systems and software engineering** with the **Unix philosophy of composing small, clear tools**. Process descriptions state the purpose, outcomes, necessary work, and applicable conditions. Tools make established operations available for composition.
