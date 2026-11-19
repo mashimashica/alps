@@ -12,14 +12,16 @@ Find where a change or a design breaks its intent by having adversaries try to b
 
 ## Outcomes
 
+- The stated intent restates what the user's message, the commits, and the PR description show, and where the intent was unclear it rests on the user's answer.
 - Every reported finding is backed by a rerun of its command whose output shows a failure that breaks the intent.
-- The verdict holds every verified finding from every adversary.
+- The verdict holds every verified finding from every adversary, or the merged finding that contains it.
 - Findings that share a root cause are merged into one.
 - Each adversary's dropped findings are counted, with why they were dropped.
+- No fix is applied to the scope.
 
 ## Activities & Tasks
 
-The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks and set no order.
+The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
 ### Frame
 

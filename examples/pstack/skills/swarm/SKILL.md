@@ -8,15 +8,17 @@ disable-model-invocation: true
 
 ## Purpose
 
-Establish with N parallel workers where a job stands against its done predicate, and return that as one report. It serves parallel coverage, races, gauntlets, and exploration.
+Run a job across N parallel workers and return their results as one report. It serves parallel coverage, races, gauntlets, and exploration.
 
 ## Outcomes
 
-- Every worker result is a `PASS`, `ISSUES`, or `BLOCKED` with evidence.
+- Every counted result is a `PASS`, `ISSUES`, or `BLOCKED` with evidence.
 - Every counted result records the SHAs and method its brief names.
-- For coverage, every required slice has a result, or the report shows its gap or dropout.
+- For coverage, every required slice has a result.
 - For a race, the selection follows the rule declared up front.
 - No gap counts as a pass.
+- The report's result table and issue one-liners agree with the counted results.
+- Every gap and worker dropout is stated, and so is every rejected slug that the default replaced.
 
 ## Activities & Tasks
 
@@ -54,7 +56,7 @@ The following Tasks are required whenever this skill runs, each with the conditi
 
 ### Phase D: Report
 
-1. Return the report in chat.
+1. Return one consolidated in-chat report.
 
 ## Outputs
 
@@ -68,6 +70,6 @@ Unless a Task states otherwise, work the Activities and their Tasks in the order
 - For a race or mixed shape, the selection rule is declared before spawning.
 - For a model race, each arm's model is named up front.
 - Phase B spawns with the model that Phase A step 3 picks.
-- The workers are drained before Phase C reads their terminal results.
+- The workers are drained before the report is returned.
 - Phase C applies the selection rule that Phase A step 2 declares.
 - Phase D reports what Phase C aggregates.

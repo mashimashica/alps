@@ -12,11 +12,10 @@ Produce one synthesized artifact from parallel candidates at the same task, so t
 
 ## Outcomes
 
-- Each candidate that produced output has a score on every rubric criterion.
 - The base is the candidate a future maintainer can extend most easily without breaking invariants.
 - The synthesized artifact carries what is worth porting from each losing candidate, or is the consensus shape where the candidates converge on one shape.
 - The synthesized artifact stays coherent under one mental model.
-- Verification of the synthesized artifact, done as for any other output, leaves no problem papered over.
+- The synthesized artifact has been verified like any other output, and every problem that verification finds is taken back to a re-frame and re-run or to Phase E.
 - Every substituted slug, dropped seat, candidate dropout, skipped judge, and vendor check that did not run is stated.
 
 ## Activities & Tasks
@@ -28,6 +27,8 @@ The following Tasks are required whenever this skill runs, each with the conditi
 1. Open a todolist with one entry per phase (Frame, Fan out, Cross-judge, Pick, Graft, Verify) before launching anything.
 
 ### Phase A: Frame
+
+Every candidate gets the same prompt, so the prompt is the contract.
 
 1. State the artifact each candidate is producing.
 2. Derive the rubric, 3-6 concrete gradeable criteria for what success looks like on *this* task. It is the picker's tool in Phase D. Candidates only see the task.
@@ -65,15 +66,12 @@ One synthesized artifact, with a short synthesis note alongside naming the base 
 
 ## Constraints
 
-Every candidate gets the same prompt, so the prompt is the contract.
-
 Unless a Task states otherwise, work the Activities and their Tasks in the order listed. These dependencies are required.
 
 - The todolist is open before anything launches.
 - Phase B spawns the runners that Phase A step 3 picks and passes each the output location that step 4 gives it.
 - Phases C and D score against the rubric that Phase A step 2 derives.
 - Phase C starts after all Phase B candidates complete.
-- The Phase C judge scores while the candidates are read in Phase D.
 - In Phase D every candidate is read end to end before the base is picked.
 - Phase E grafts into the base that Phase D picks.
 - Phase F verifies the artifact that Phase E leaves.
