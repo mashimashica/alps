@@ -13,9 +13,10 @@ When fixing a bug with a clear, cheap test path, make the broken behavior execut
 ## Outcomes
 
 - Where the bug has a clear, cheap test path, a focused regression test fails for the intended reason before production code changes.
-- After the fix, the regression test that failed before it passes.
-- Where a failing test is impractical, the closest executable regression check is used instead of a new test.
-- The final response names the passing-after evidence and the failing-before evidence, or, where failing-before evidence could not be demonstrated, the reason and the closest regression check used instead.
+- Where the bug has a clear, cheap test path, the regression test that failed before the fix passes after it.
+- Where a failing test is impractical, the bug is checked by the closest executable regression check instead of a new test.
+- The final response names the passing-after test run and any nearby validation performed.
+- The final response names the failing-before test or executable check and the failure it produced, or, where failing-before evidence could not be demonstrated, states why and describes the closest regression check used instead.
 
 ## Activities & Tasks
 
@@ -47,8 +48,6 @@ Report the evidence, not just the outcome:
 
 ## Constraints
 
-Use this skill only when the user explicitly asks for TDD, a failing test, or a regression test, OR when the bug has an obvious cheap local test target. Skip it when the test path is unclear, expensive, integration-heavy, or not requested.
-
 Do not force a test when it would be impractical. If the available test would require broad harness setup, brittle mocks, slow end-to-end infrastructure, production-only state, vague reproduction steps, or large unrelated fixture churn, skip adding a new test and use the closest useful verification instead.
 
 Unless a Task states otherwise, work the Tasks under Workflow in the order listed. These dependencies are required.
@@ -63,3 +62,7 @@ Unless a Task states otherwise, work the Tasks under Workflow in the order liste
 - Keep the regression test focused on the bug. Avoid broad fixture churn or unrelated coverage expansion.
 - If the bug is flaky, make the test deterministic where possible and document the signal being locked down.
 - If the bug exposes a broader class of failures, first land the focused regression path, then consider additional sibling coverage.
+
+## Entry Criteria
+
+Use this skill only when the user explicitly asks for TDD, a failing test, or a regression test, OR when the bug has an obvious cheap local test target. Skip it when the test path is unclear, expensive, integration-heavy, or not requested.

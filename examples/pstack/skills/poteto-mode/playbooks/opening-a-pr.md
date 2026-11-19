@@ -2,15 +2,15 @@
 
 ## Purpose
 
-Put the change up for review as a ready PR, kept apart from unrelated work, in small, landable commits, with a title and a one-minute briefing for its reviewer.
+Put the change up for review as a ready PR.
 
 ## Outcomes
 
-- The PR is open and ready, not a draft.
-- The PR's commits are small and landable.
-- The worktree the PR comes from holds no unrelated work.
-- The PR's title follows the title format under Controls.
-- The PR's body is a one-minute briefing that follows the body format under Controls.
+- Every PR the run opens is open and ready, not a draft.
+- Each such PR's commits are small and landable.
+- The worktree each such PR comes from holds no unrelated work.
+- Each such PR's title follows the title format under Controls.
+- Each such PR's body is a one-minute briefing that follows the body format under Controls.
 - Where there are follow-ups, they are stacked by base branch.
 
 ## Tasks

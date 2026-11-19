@@ -7,15 +7,16 @@ Clear what blocks the merge frontier, as far as the declared mode goes, and stop
 ## Outcomes
 
 - The mode is declared in the first line, before any poll.
-- The run ended where its mode ends, at merge-ready for `drive`, with only review threads touched for `threads-only`, and after one status pass and a report for `check`, or earlier where the human's call begins.
+- The run ended at merge-ready in `drive` mode and after one status pass and a report in `check` mode, or earlier where the human's call begins.
+- Where the mode is `threads-only`, the run touched only review threads.
 - Where a PR has a conflict or a stale base, the run stopped there with a report that names the branch that needs the rebase and, for a conflict, the drift sweep.
-- Each Bugbot finding was verified against the code and then fixed as real, dismissed as noise with a concrete disproof, or escalated as billing, data, auth, or security.
+- Where the run reaches review threads in `drive` or `threads-only` mode, each Bugbot finding was verified against the code, each billing, data, auth, or security finding was escalated, and each other finding was fixed as real or dismissed as noise with a concrete disproof.
 - Each reply about a fix cites the commit that was pushed before it.
 - Every commit the run added for CI answers one of the diff's own failures.
 
 ## Tasks
 
-The following Tasks are required whenever this playbook runs, each with the conditions it states. Numbers identify the Tasks and set no order.
+The following Tasks are required whenever this playbook runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
 1. Declare the mode in your first line, before any poll.
 2. On GitHub, status comes from the mode's watcher at `scripts/watch-pr/watch-pr`. In `check` mode pass `--status-only`. The watcher covers GitHub only. On Origin, use `origin pr view <pr> --checks` and `origin pr checks <pr> --watch`.

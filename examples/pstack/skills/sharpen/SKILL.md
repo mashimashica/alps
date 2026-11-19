@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 ## Purpose
 
-Give the user a rewritten prompt that asks for a deeper version of their task, not a bigger one.
+Make the user's task deeper, not bigger, and give the user their prompt rewritten to ask for that deeper version.
 
 ## Outcomes
 
@@ -31,4 +31,4 @@ The following Tasks are required whenever this skill runs, each with the conditi
 
 Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
 
-- Steps 1 to 4 are the four things to do before rewriting. They come before step 5.
+- Steps 1 to 4 are the four things to do before rewriting. They come before step 5, which asks for what they state.

@@ -53,7 +53,7 @@ The launcher is an executable Bun script. It takes no positional arguments. Run 
 | `--interval <seconds>` | number above 0 | 60 | Sleep between polls. Also the base of the retry backoff. |
 | `--sweep-interval <seconds>` | number above 0 | 300 | Queued watch only. How often every unmerged PR of the queue is read again. Between sweeps only the lowest unmerged PR is polled. |
 | `--timeout <seconds>` | number, 0 or more | 0, no deadline | Deadline measured from start. |
-| `--max-query-errors <count>` | positive integer | 5 | Consecutive read failures tolerated before the run ends with exit 7. |
+| `--max-query-errors <count>` | positive integer | 5 | The count of consecutive read failures at which the run ends with exit 7. |
 | `--status-only` | flag | off | Emit one terminal `STATUS` verdict and apply no classification. |
 | `--allow-draft` | flag | off | Do not treat a draft as a merge gate. |
 | `--pretty` | flag | off | Human text in place of JSON. |
@@ -89,7 +89,7 @@ Every JSON verdict begins with the same fields.
 | `STATUS` | yes, with `reason` `status-only` | `rows` | By `--status-only`. |
 | `STATUS` | no, with `reason` `poll` or `whole-stack-sweep` | `rows` | On every `--stack` poll and after every completed queued sweep. |
 | `QUEUE` | no | `queue` | At the start of a queued watch. |
-| `WAITING` | no | `frontier`, and `reason` of kind `pending-checks` (with `pending`) or `merge-queue` (with `unmergedCount`) | On every waiting poll of a single or stack watch. In a queued watch, only when the frontier or its count changes. |
+| `WAITING` | no | `frontier`, and `reason` of kind `pending-checks` (with `pending`) or `merge-queue` (with `unmergedCount`) | On every waiting poll of a single or stack watch. In a queued watch, only when the frontier, the reason kind, or the reason's count (pending checks or unmerged PRs) changes. |
 | `ADVANCE` | no | `merged`, `frontier`, `remaining` | In a queued watch, when the lowest unmerged PR merged and the next one became the frontier. |
 | `RETRY` | no | `failure`, `consecutiveFailures`, `retryInSeconds` | When a read failed and will be tried again. |
 | `READY` | yes | `scope` of kind `single` (with `pr`) or `stack` (with `prs`). Each entry is a `ready-pr` with `proof` or a `merged-pr`. | By a single or stack watch. |
@@ -113,7 +113,7 @@ Derived fields mean the following.
 - `ci-github-rejected` means no check that was read failed, yet GitHub reports `BLOCKED` with a failing head rollup.
 - `source` `graphql-rollup` means `gh pr checks` returned nothing usable and the checks came from the GraphQL rollup. Its checks have empty `description` and `workflow`.
 
-`--pretty` prints a `STATUS` verdict as a Markdown table with the columns PR, CI, Review, and Merge, and every other verdict as lines that begin with its kind. The table leaves out thread ids, check names, and the head SHA. A pretty `BLOCKER` ends with an `action=` line for a conflict, a merge gate, and a failed status query, and a pretty `READY` for a draft that `--allow-draft` let through adds a `note=` line. Those lines are fixed text in the tool. They take no account of what the calling playbook permits. JSON output has none of them.
+`--pretty` prints a `STATUS` verdict as a Markdown table with the columns PR, CI, Review, and Merge, and every other verdict as lines that begin with its kind. The table leaves out thread ids, check names, and the head SHA. A pretty `BLOCKER` ends with an `action=` line for a conflict, a merge gate, and a failed status query, and a pretty single-PR `READY` for a draft that `--allow-draft` let through adds a `note=` line. Those lines are fixed text in the tool. They take no account of what the calling playbook permits. JSON output has none of them.
 
 Comment bodies, check names, and check descriptions come from GitHub. JSON carries them as string values. `--pretty` writes them into its lines unescaped.
 
@@ -144,7 +144,7 @@ The watcher reads no environment variables. `gh` and `git` inherit the environme
 | 64 | none | Usage error. The message is on stderr. |
 | 1 | none, or text that is not JSON | Uncaught error, such as `gh` or `git` missing from `PATH`, or a failed dependency install. |
 
-- **Processing succeeded** when the last stdout line has `terminal: true` and the exit status equals its `exitCode`. Exits 2 to 6 are successful observations of a PR that is blocked or undecided. They are not tool failures.
+- **Processing succeeded** when the last stdout line has `terminal: true` and the exit status equals its `exitCode` and is 0, 2, 3, 4, 5, or 6. Exits 2 to 6 are successful observations of a PR that is blocked or undecided. They are not tool failures.
 - **Processing failed** on exit 7, 64, or 1. After exit 7 nothing is known about the PR. Check the PR context, `gh` authentication, and the `failure` detail, then run again.
 - **The result is incomplete** when the stream ends without a `terminal: true` line, because the watcher was killed, crashed, or is still running. Earlier lines remain valid observations as of their `observedAt` and nothing more.
 - **Exit 5 is undecided.** `reason` holds the state at the deadline. Run again to keep waiting.

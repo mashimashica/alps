@@ -7,10 +7,11 @@ Land the contiguous verified run of a stack on trunk, and nothing that an indepe
 ## Outcomes
 
 - Every PR that landed has a `PASS` or `PASS+NOTES` verdict posted on it by an agent that did not write its code.
-- Each of those verdicts described the code that landed, as step 3's patch-id rule decides.
+- Each of those verdicts covers the patch that landed, as step 3's patch-id rule decides.
+- Where a landed patch differs from its verdict's only in tests, docs, or lint config, the change got fresh checks and a review.
 - Every PR of the verified run, from the bottom to the ceiling, reads merged with trunk as its base.
 - No PR above the ceiling landed, except one that was moved onto trunk on its own and got a fresh verdict first.
-- While the run landed, the only change to a branch or base was step 4's move of the next PR.
+- While the run landed, the run changed no branch or base except by step 4's move of the next PR, and a base that moved to trunk when its parent merged was left as it was.
 
 ## Tasks
 
