@@ -12,6 +12,11 @@ SKIPPED_DIRECTORIES = {".git", ".claude", "node_modules"}
 DISTRIBUTED_SKILLS = ("design-process-description", "design-agent-work-system")
 DEVELOPMENT_SKILLS = ("review-alps", "sync-locales")
 EXAMPLE_SKILLS = ("examples/assess-service-change",)
+# A converted third-party Plugin tree kept as reference material. Its Skill
+# entry points sit only where that Plugin places them.
+EXAMPLE_PLUGIN_TREES = {
+    "examples/pstack": ("skills", "automations/benny/skills"),
+}
 
 LINK_PATTERNS = (
     re.compile(r"\[[^\]]*\]\(\s*<?([^)\s>]+)>?(?:\s+\"[^\"]*\")?\s*\)"),
@@ -52,6 +57,19 @@ class DistributionLayoutTests(unittest.TestCase):
         expected = {f"skills/{name}/SKILL.md" for name in DISTRIBUTED_SKILLS}
         expected |= {f".agents/skills/{name}/SKILL.md" for name in DEVELOPMENT_SKILLS}
         expected |= {f"{path}/SKILL.md" for path in EXAMPLE_SKILLS}
+        for tree, skill_roots in EXAMPLE_PLUGIN_TREES.items():
+            in_tree = {path for path in found if path.startswith(f"{tree}/")}
+            found -= in_tree
+            with self.subTest(example_plugin_tree=tree):
+                self.assertTrue(in_tree, "example Plugin tree has no Skill")
+            for path in sorted(in_tree):
+                skill_directory = Path(path).parent
+                with self.subTest(example_plugin_tree=tree, skill=path):
+                    self.assertIn(
+                        skill_directory.parent.as_posix(),
+                        {f"{tree}/{root}" for root in skill_roots},
+                        "Skill entry point outside the tree's Skill roots",
+                    )
         self.assertEqual(found, expected)
         distributed = {entry.name for entry in (ROOT / "skills").iterdir() if entry.is_dir()}
         self.assertEqual(distributed, set(DISTRIBUTED_SKILLS))
