@@ -2,13 +2,12 @@
 
 ## Purpose
 
-Establish the resume point of a prior agent's work from the prior trail, without redoing that work. The routed playbook owns the remaining work.
+Take over a prior agent's in-flight work at its resume point from the prior trail, with the inherited claims verified. The routed playbook owns the remaining work.
 
 ## Outcomes
 
 - Where the prior agent stopped is established from the prior trail.
 - The resume point is named from a comparison of what shipped against what was planned.
-- No completed work is redone, the prior repro included.
 - The remaining work is routed to the matching playbook, with the verdict picked.
 - The inherited claims are verified against the original goal on the real artifact, not taken from a prior self-report.
 

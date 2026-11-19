@@ -2,13 +2,12 @@
 
 ## Purpose
 
-Bring each PR to verified and green under the Autopilot-full playbook, and hand the PRs to the operator unmerged.
+Bring each PR to verified and green under the Autopilot-full playbook, stacking a PR only when it builds on another PR, and hand the PRs to the operator unmerged.
 
 ## Outcomes
 
-- Each PR is verified and green at its current head when the PRs are handed to the operator.
-- No PR is merged.
-- After the handoff, nothing is pushed without the operator's go.
+- Each PR is verified and green at its current head when the PRs are handed to the operator, or stands at an open operator gate or the operator's stop.
+- The run merges no PR.
 - A PR is stacked only where it builds on another PR.
 
 ## Tasks

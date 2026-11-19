@@ -2,11 +2,12 @@
 
 ## Purpose
 
-Bring in-flight work to a clean stop that a cold-start agent can resume from.
+Bring in-flight work to a clean stop that a cold-start agent can resume from, only when the pause is explicit.
 
 ## Outcomes
 
-- The work stands at a safe boundary, with the current atomic step finished or backed out, nothing new started, and nested subagents cancelled.
+- The work stands at a safe boundary, with the current atomic step finished or backed out and nothing new started.
+- No nested subagent is left running.
 - No irreversible action is taken to pause, with no PR and no push unless one was already out.
 - Uncommitted edits are held in one clear `wip:` commit on the current branch, so nothing is lost.
 - A cold-start agent can resume from the checkpoint, with the resume note held off-context.

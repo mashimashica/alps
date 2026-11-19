@@ -2,13 +2,14 @@
 
 ## Purpose
 
-Drive a task to a defined exit condition without stopping, keeping only changes that verifiably advance it, or surface the genuine dead end that stops it.
+Drive a task to a defined exit condition without stopping, with each iteration keeping only the changes that verifiably advance it, and surface a genuine dead end rather than spinning.
 
 ## Outcomes
 
 - The exit condition is stated as a checkable predicate before the first iteration.
-- The run stops with the predicate met and never relaxed, or with a genuine dead end surfaced.
-- Every change an iteration keeps is verified against the predicate and advances it.
+- The run does not stop before the predicate is met, except at a genuine dead end it surfaces.
+- The predicate is not relaxed to declare victory.
+- Every change step 3 keeps was verified against the predicate and advanced it.
 - No reversible work is parked for the human.
 
 ## Tasks

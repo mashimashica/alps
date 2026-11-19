@@ -2,15 +2,16 @@
 
 ## Purpose
 
-Carry each PR of a queue from build to merge under one owner, inside the operator's grant, with nothing merged until a swarm that never wrote the code has proven the code that lands.
+Carry each PR of a queue from build to merge under one owner whose work a replacement can find, inside the operator's grant, with nothing merged until a swarm that never wrote the code has proven the code that lands.
 
 ## Outcomes
 
 - Each PR the grant covers lands on its own, or stands at an open operator gate or the operator's stop.
-- Items the operator names as theirs and PRs outside the queue go no further than merge-ready.
+- Items the operator names as theirs and PRs outside the queue stop at merge-ready, or earlier at the operator's stop.
 - Every merged PR lands code proven, before the merge, by a swarm that never wrote it.
-- Every merged PR is tested on the trunk it lands on, at a head with its own green CI.
-- Every loosened gate carries a verifier's proof and the root's fresh countersign, and none is a disabled or soft-failed check.
+- Every merged PR is tested on the trunk it lands on, as step 5's cases decide, at a head with its own green CI.
+- Every loosened gate carries a verifier's proof and then the root's fresh countersign.
+- No disabled or soft-failed check is left in place.
 - Each owner's work, heads, and agents are on record where a replacement can find them.
 
 ## Tasks
@@ -54,4 +55,5 @@ Unless a Task states otherwise, work the Tasks in the order listed. These depend
 - The verdict of step 4 is not clean before the root audits the receipts of the merge-ready report from step 2.
 - Merge prep in step 5 starts once the swarm's lanes of step 4 have started.
 - An owner merges once steps 4 and 5 clear its PR.
+- The first paragraph of step 6 holds throughout the run and does not wait for the steps listed before it.
 - The audit of step 6 runs from the operator's go until no delegated work is left, and step 7 applies at once on the operator's stop, so neither waits for the steps listed before it.
