@@ -7,7 +7,7 @@ status: reviewed
 sources:
   README.md:
     source: ../../README.md
-    reviewed_source_sha256: 4ad3d3323ac6473e167b34a8f51be018c860eceeaee4879c57be61a481e99322
+    reviewed_source_sha256: b9fd42a1f437c1eb848270cbe38a7d656f1cbda4250d759513f237aab55d1ff1
   habits.md:
     source: ../../habits.md
     reviewed_source_sha256: 859f9d94cb3ea624eeebc6730ece4daefe110f636f3dd5eed8a52a3d1810d846

@@ -3,7 +3,7 @@ Copyright 2026 mashimashica
 
 This product includes software, documentation, translations, diagrams, and
 visual assets developed for ALPS and licensed under the Apache License,
-Version 2.0.
+Version 2.0, except as stated below.
 
 The ALPS icon in assets/icon.svg was created by mashimashica.
 
@@ -11,13 +11,16 @@ The quoted English passage by John Dewey in the Process Framework is
 third-party material and is not relicensed by ALPS. The accompanying Japanese
 text is an independent translation created for ALPS.
 
-The directory examples/pstack/ is third-party material and is not licensed
-under the Apache License. It is derived from pstack 0.15.44, Copyright (c)
-2026 Lauren Tan, from https://github.com/cursor/plugins (path pstack/, commit
-e58dd043600587dbaf58ba315e7f2b38373eeb43), and is distributed under the MIT
-License in examples/pstack/LICENSE. The ALPS project rewrote its Skill and
-playbook descriptions and added the documents under
-examples/pstack/docs/conversion/ and the tool-use references. Those
-modifications and additions are provided under the same MIT License. The
+The directory examples/pstack/ is not licensed under the Apache License. It
+contains material derived from pstack 0.15.44, Copyright (c) 2026 Lauren Tan,
+from https://github.com/cursor/plugins (path pstack/, commit
+e58dd043600587dbaf58ba315e7f2b38373eeb43), together with modifications and
+additions by the ALPS contributors, Copyright 2026 mashimashica. All of it is
+distributed under the MIT License in examples/pstack/LICENSE.
+
+The modifications rewrite the Skill and playbook descriptions, the reviewing
+agent definition, and one Benny reference, change the two Plugin manifests,
+and repoint six image links in docs/guide/. The additions are the tool-use
+references and the documents under examples/pstack/docs/conversion/. The
 conversion is unofficial and is not affiliated with or endorsed by the
 original author.

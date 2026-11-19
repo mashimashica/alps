@@ -19,6 +19,12 @@ PLAYBOOKS = "skills/poteto-mode/playbooks"
 # The reviewing agent's definition describes work with results of its own. The
 # bootstrapping agent's definition configures a delegate and stays as upstream wrote it.
 AGENT_PROCESS_DESCRIPTIONS = ("agents/comment-sicko.md",)
+# A reference that prescribes work with a result of its own.
+REFERENCE_PROCESS_DESCRIPTIONS = (
+    "automations/benny/skills/reproduce-and-fix-issues/references/verify-existing-fix.md",
+)
+# Tools in the tree install their dependencies beside themselves on first use.
+SKIPPED_DIRECTORIES = {"node_modules"}
 
 SPEC_FIELDS = {
     "name",
@@ -37,6 +43,7 @@ FENCE = re.compile(r"^(```|~~~).*?^\1[^\n]*$", re.DOTALL | re.MULTILINE)
 LINK_PATTERNS = (
     re.compile(r"\[[^\]]*\]\(\s*<?([^)\s>]+)>?(?:\s+\"[^\"]*\")?\s*\)"),
     re.compile(r"^\s*\[[^\]]+\]:\s*<?(\S+?)>?(?:\s|$)", re.MULTILINE),
+    re.compile(r"\b(?:src|href)\s*=\s*[\"']([^\"']+)[\"']", re.IGNORECASE),
 )
 SCHEME = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
 
@@ -81,6 +88,7 @@ def process_descriptions():
     yield from skill_files()
     yield from sorted((TREE / PLAYBOOKS).glob("*.md"))
     yield from (TREE / path for path in AGENT_PROCESS_DESCRIPTIONS)
+    yield from (TREE / path for path in REFERENCE_PROCESS_DESCRIPTIONS)
 
 
 class PstackExampleFormTests(unittest.TestCase):
@@ -132,6 +140,8 @@ class PstackExampleFormTests(unittest.TestCase):
 
     def test_links_resolve_within_tree(self) -> None:
         for document in sorted(TREE.rglob("*.md")):
+            if SKIPPED_DIRECTORIES.intersection(document.relative_to(TREE).parts):
+                continue
             relative = document.relative_to(TREE).as_posix()
             text = FENCE.sub("", document.read_text(encoding="utf-8"))
             for pattern in LINK_PATTERNS:

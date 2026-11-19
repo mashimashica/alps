@@ -53,7 +53,7 @@ design-agent-work-systemを使い、この仕事に必要な能力とインタ�
 
 [実働例](../../../examples/locales/ja/README.md)では、一つのサービス評価Skillに対する二つの設計責務を示します。スクリプトが測定を検証して比較を計算し、エージェントが文脈を評価して証拠を解釈します。[システム設計の具体例](../../../skills/design-agent-work-system/references/locales/ja/examples.md)では、既存ツール、状態を変更する操作、能力変化への適応も扱います。
 
-[pstackの変換例](../../../examples/pstack/docs/conversion/locales/ja/README.md)では、既存の第三者Pluginに両Skillを適用します。各Skillとプレイブックをプロセス記述として書き直し、同梱ツールを文書化し、変換によって確認できたことと確認できなかったことを報告します。
+[pstackの変換例](../../../examples/pstack/docs/conversion/locales/ja/README.md)では、既存の第三者Pluginにプロセスフレームワークと作業システムの設計原則を適用します。各Skillとプレイブックをプロセス記述として書き直し、同梱ツールを文書化し、全体を十の習慣に圧縮し、変換によって確認できたことと確認できなかったことを報告します。
 
 ## 設計思想
 
@@ -82,4 +82,4 @@ ALPSは、**システムズ／ソフトウェア工学に由来するプロセ�
 
 リポジトリ全体を一つの単位として版管理します。リリースの範囲と互換性については、上記の版管理方針とリリースノートを参照してください。
 
-明示された第三者資料を除き、本リポジトリは[Apache License 2.0](../../../LICENSE)で提供します。[NOTICE](../../../NOTICE)も参照してください。
+明示された第三者資料と、MITライセンスで提供する`examples/pstack/`を除き、本リポジトリは[Apache License 2.0](../../../LICENSE)で提供します。[NOTICE](../../../NOTICE)も参照してください。

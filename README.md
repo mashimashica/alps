@@ -53,7 +53,7 @@ The [minimal template](skills/design-process-description/references/SKILL-templa
 
 The [working example](examples/README.md) shows both design responsibilities on one service-assessment Skill. Its script validates measurements and calculates comparisons; the agent assesses the context and interprets the evidence. [System design examples](skills/design-agent-work-system/references/examples.md) also cover existing tools, state-changing operations, and adaptation to changed capabilities.
 
-The [pstack conversion](examples/pstack/docs/conversion/README.md) applies both Skills to an existing third-party Plugin. It rewrites each Skill and playbook as a Process Description, documents the bundled tools, and reports what the conversion could and could not establish.
+The [pstack conversion](examples/pstack/docs/conversion/README.md) applies the Process Framework and the work-system design principles to an existing third-party Plugin. It rewrites each Skill and playbook as a Process Description, documents the bundled tools, compresses the whole to ten habits, and reports what the conversion could and could not establish.
 
 ## Design philosophy
 
@@ -82,4 +82,4 @@ Specify methods and order where the work requires them, while leaving room for j
 
 The repository is versioned as one unit. See the version policy and release notes linked above for release scope and compatibility information.
 
-Except for identified third-party material, this repository is licensed under the [Apache License 2.0](LICENSE). See also [NOTICE](NOTICE).
+Except for identified third-party material and `examples/pstack/`, which is under the MIT License, this repository is licensed under the [Apache License 2.0](LICENSE). See also [NOTICE](NOTICE).

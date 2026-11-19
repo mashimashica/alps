@@ -1,0 +1,2 @@
+# Kept byte-identical to its upstream source, which has lines that end in a space.
+examples/pstack/README.md -whitespace

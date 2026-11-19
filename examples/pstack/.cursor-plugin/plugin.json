@@ -1,10 +1,10 @@
 {
 	"name": "pstack",
 	"displayName": "pstack",
-	"version": "0.15.44",
+	"version": "0.15.44-alps.1",
 	"description": "Unofficial ALPS-form conversion of pstack 0.15.44 (cursor/plugins at commit e58dd04), kept as reference material in the ALPS repository. Not affiliated with or endorsed by the original author. Original description: if you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence.",
 	"author": {
-		"name": "Lauren Tan"
+		"name": "ALPS contributors (conversion of pstack by Lauren Tan)"
 	},
 	"homepage": "https://github.com/mashimashica/alps/tree/main/examples/pstack",
 	"repository": "https://github.com/mashimashica/alps",

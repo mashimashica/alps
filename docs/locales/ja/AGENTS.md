@@ -28,7 +28,7 @@
 | 各Skillの`references/` | そのSkillが用いる原則と付属資料。各文書の役割によって規範強度が決まる。 |
 | `docs/locales/ja/`、各Skillの`references/locales/ja/` | 対応する英語版の翻訳。翻訳したSkill本文は`SKILL.ja.md`とし、Skillの入口ではない。 |
 | `examples/` | 実働する対象Skillを含む、同梱する参照資料。Plugin Skillの発見対象外。ガイドの翻訳は`examples/locales/ja/`、対象Skillの翻訳はその`references/locales/ja/`に置く。 |
-| `examples/pstack/` | ALPS形式へ変換した第三者のPlugin。それ自体のMITライセンスのもとで参照資料として置く。Plugin Skillの発見対象外。そのSkill、プレイブック、ツール、上流の文書は英語のみとする。変換ガイドと変換記録は`examples/pstack/docs/conversion/`に、ガイドの翻訳はそのディレクトリの`locales/ja/`に置く。 |
+| `examples/pstack/` | ALPS形式へ変換した第三者のPlugin。それ自体のMITライセンスのもとで参照資料として置く。Plugin Skillの発見対象外。そのSkill、プレイブック、ツール、上流の文書は英語のみとする。変換ガイド、変換プロファイル、変換記録は`examples/pstack/docs/conversion/`に、ガイドと十か条への圧縮の翻訳はそのディレクトリの`locales/ja/`に置く。そのPlugin manifestは、変換元の版に`alps`の接尾辞を付けたものを持つ。これはALPSのリリース版ではない。 |
 | `plugin.json`、`.claude-plugin/`、`.cursor-plugin/`、`.codex-plugin/` | ルートPlugin形式と、それぞれのHostアダプター。 |
 | `CLAUDE.md` | このファイルを読み込む、リポジトリ開発用のClaude Codeの入口。独自の指示は持たず、Pluginの文脈ではない。 |
 | `assets/`およびSkillの`agents/`と`assets/` | 表示資源。 |
