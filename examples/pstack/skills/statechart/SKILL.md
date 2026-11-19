@@ -12,17 +12,20 @@ Support the decision whether a system that moves between states, such as a produ
 
 ## Outcomes
 
-- Each rule that the reader agrees to is an INVARIANT of the model, and no rule is weakened to make it hold.
-- Each chart that is shown or handed off comes from a `chart.mmd` that the command wrote for the spec and its config.
-- Each state label says what the reader can see or cares about, and each step label says the step as the user sees it happen.
-- The chart shows where each rule breaks, with each state of a bug path and each mark kept and no two states that break different rules merged.
+- Each rule that the reader agrees to is an INVARIANT of the model as the reader agreed to it, not weakened to make it hold.
+- Each chart that is shown or handed off comes from the `chart.mmd` of a run of the command on the spec, its config, and the view when one is given.
+- Each state label says what the reader can see or cares about.
+- Each step label says the step as the user sees it happen.
+- The view's labels keep each state of a bug path.
+- The view's labels keep each mark.
+- The view's labels merge no two states that break different rules.
 - The person who must decide has each chart with its Mermaid text and, for each bug, one line with the rule, the reader's sentence for that rule, and the path as the report numbers it.
-- The hand-off says what the model leaves out, which steps the chart hides where it hides any, and which state breaks which rule where the Legend names two rules on one mark.
-- Where the model describes code, each bug path has a replay against the real code, as a test or a live repro, with one step for each action, and where a bug does not occur, the model is taken to be wrong until it is shown not to be.
+- The hand-off says what the model leaves out, which steps the chart hides where it hides any, which state breaks which rule where the Legend names two rules on one mark, and gives the command that makes the files again, with a new `--out` folder.
+- Where the model describes code, each bug path has a replay against the real code, as a test or a live repro, with one step for each action.
 
 ## Activities & Tasks
 
-The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks and set no order.
+The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
 ### Run
 
@@ -50,10 +53,10 @@ The following Tasks are required whenever this skill runs, each with the conditi
     - An array gives parent states: `export const state = (v) => v.main.split(".");`
     - An object gives one parallel region for each key: `export const state = (v) => ({ Playback: v.playback, Volume: v.volume });`
 3. Label each state with what the reader can see or cares about, such as "Paying" or "Lease held, write pending". Keep variable names out of labels. In `vars`, a TLA+ sequence is an object with keys from 1, so `v.pc[1]` is `pc[1]`. A set is an array.
-4. The view can also export `step(action, from, to)`. It gets the TLC action name and the values before and after the step, and it returns the label of the arrow. Write each step label as the user sees it happen, such as "you press play" or "the connect fails". Do not name the code or the TLA+ action. Two actions that end the same in the chart get the same label, so that they share one arrow.
+4. The view may also export `step(action, from, to)`. It gets the TLC action name and the values before and after the step, and it returns the label of the arrow. Write each step label as the user sees it happen, such as "you press play" or "the connect fails". Do not name the code or the TLA+ action. Two actions that end the same in the chart get the same label, so that they share one arrow.
 5. When a step can occur only in some conditions, end its label with the condition in brackets, in the reader's words, such as `you press play [while the file loads]`. In a regions chart, the command writes the condition on the other regions on the arrow, in the words of their labels, such as `[when Offline]`. Your brackets replace it, and two arrows from one state can then look the same. So in a regions chart, do not write brackets for a condition on another region.
 6. When a value that no label shows decides where a step goes, name the result in the label, such as "the roster read fails".
-7. The view can also export these:
+7. The view may also export these:
     - `group(vars)` returns the name of a phase. Each chart state gets the color of its group. When the model states behind one chart state are in different groups, that state gets no color.
     - `colors` gives each group name a color class.
     - `title` is a string that the chart shows at the top.
@@ -94,7 +97,11 @@ Give each chart and its Mermaid text to the person who must decide. Add one line
 
 ## Constraints
 
-The spec and its config must be written before the command runs.
+These dependencies are required.
+
+- The spec and its config must be written before the command runs.
+- The view module must be written before a run that gives it with `--view`.
+- Showing the chart and replaying the bug paths must follow the run that writes the `chart.mmd` and the report they use.
 
 ## Enablers
 

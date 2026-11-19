@@ -14,7 +14,7 @@ The command does not render an image. It never changes the spec, the config, or 
 - The count that the command holds against the chart budget of 500 is the largest count of distinct states from any of its TLC runs. The reruns without the rules that break count too. So a model with more than 500 states gets only the bug paths, also when the run on the config as written stops at a break before it reaches 500 states.
 - The report gives one path for each rule that breaks. It is a shortest path to a state that breaks the rule. The other states that break the rule get no path. For a PROPERTY, the path is TLC's counterexample.
 - In a chart without regions, the chart draws a step on a bug path that stays in one chart state, as an arrow from that state to itself.
-- The command reads the config itself before TLC does. It reads only these section keywords: `CONSTANT`, `CONSTANTS`, `CHECK_DEADLOCK`, `INIT`, `NEXT`, `SPECIFICATION`, `VIEW`, `SYMMETRY`, `TYPE`, `TYPE_CONSTRAINT`, `INVARIANT`, `INVARIANTS`, `PROPERTY`, `PROPERTIES`, `CONSTRAINT`, `CONSTRAINTS`, `ACTION_CONSTRAINT`, and `ACTION_CONSTRAINTS`. It does not read `ALIAS` as a keyword. It stops, before TLC runs, on a config that it finds TLC would refuse or would read in another way than the config is written.
+- The command reads the config itself before TLC does. It reads only these section keywords: `CONSTANT`, `CONSTANTS`, `CHECK_DEADLOCK`, `INIT`, `NEXT`, `SPECIFICATION`, `VIEW`, `SYMMETRY`, `TYPE`, `TYPE_CONSTRAINT`, `INVARIANT`, `INVARIANTS`, `PROPERTY`, `PROPERTIES`, `CONSTRAINT`, `CONSTRAINTS`, `ACTION_CONSTRAINT`, and `ACTION_CONSTRAINTS`. Any other word where a section keyword must stand stops the command before TLC runs, `ALIAS` too. It also stops, before TLC runs, on a config that it finds TLC would refuse or would read in another way than the config is written.
 - The module name is the name of the spec file without `.tla`. The command finds the modules that the spec uses only in the folder of the spec and in `tla2tools.jar`.
 - The command adds modules named `ChartBound` and `ChartRun` that extend the spec. They define `ChartTLC`, `ChartNaturals`, `ChartBound`, `ChartBudget`, `ChartBroken`, and `ChartMark`. A spec that defines one of these names clashes with them. The command does not look for the clash.
 - The view is code. The command imports it and runs it with the permissions of the command.
@@ -60,7 +60,7 @@ The view has these rules:
 
 ## Returned information
 
-On exit 0 or 1, standard output holds the text of `report.md`, an empty line, and `Wrote DIR`. It does not hold the chart. On any other exit, standard error says why. An argument error adds the usage text.
+On exit 0 or 1, standard output holds the text of `report.md`, an empty line, and `Wrote DIR`. It does not hold the chart. On any other exit, standard error usually says why. An argument error adds the usage text.
 
 On exit 0 or 1, the output folder holds these files:
 
@@ -88,7 +88,7 @@ On exit 0 or 1, the output folder holds these files:
     - Without `TLA2TOOLS`, `mise` must be on `PATH` already. The command does not install mise. It asks mise for `tla2tools.jar` 1.7.4 and for `java@temurin-25`. When mise lacks one of them, the command runs `mise install` for both. That install needs the network. The command gives mise the URL `https://github.com/tlaplus/tlaplus/releases/download/v1.7.4/tla2tools.jar` and a sha256 for the jar.
 - Write access to `TMPDIR`, to the folder that will hold the output folder, and to the store of mise when mise installs.
 
-Each run starts Java once for SANY and once for each TLC run. TLC runs once on the config as written, again after each break while rules are left to check, and once more for the chart unless a run has already counted more than 500 states.
+Each run starts Java once for SANY, twice when SANY cannot read the spec, and once for each TLC run. TLC runs once on the config as written, again after each break while rules are left to check, and once more for the chart unless a run has already counted more than 500 states.
 
 The command reads TLC's `-tool` messages. It does not check the version of the jar that `TLA2TOOLS` names.
 
@@ -100,7 +100,7 @@ The command does not call Pele. Rendering a chart is a separate step, in `render
 | --- | --- | --- |
 | 0 | In the first TLC run, every rule of the config holds. | Written. |
 | 1 | In the first TLC run, a rule breaks. This is a result, not a failure of the command. | Written. |
-| 2 | The command has no result. Standard error says why. | Not written. |
+| 2 | The command has no result. Standard error usually says why. | Not written. |
 | 130 or 143 | SIGINT or SIGTERM stopped the command. | Not written. |
 | 127 | The launcher found no runtime that fits. | Not written. |
 
@@ -116,6 +116,7 @@ Exit 2 has these causes:
 - The first TLC run stops on an error, or the run for the chart writes no graph. The message starts with `TLC could not check`.
 - TLC prints something that the command cannot read.
 - A signal kills the check.
+- The check ends before it writes its files, for example when the view ends the process. Standard error can then be empty.
 
 Exit 0 and exit 1 tell only what the first TLC run found. The report says whether the result is whole. These lines in the report mark a result that is not whole:
 
@@ -142,7 +143,7 @@ After exit 2, 127, 130, or 143 the command wrote nothing. Fix the cause and run 
 
 - Every TLC run has the flags `-workers 1 -fp 0 -lncheck final`.
 - The same spec, modules, config, view, and jar give the same `report.md` and `chart.mmd`. That needs view functions that depend only on their arguments, and a spec that uses no random operator of TLC. The command does not set TLC's seed.
-- `tlc.out` and `tlc-RULE.out` differ from run to run. They hold the seed, times, a process id, a description of the machine, and absolute paths, and they can hold the Java settings of the machine. Read them before you give them to another person.
+- `tlc.out` and `tlc-RULE.out` differ from run to run. They hold the seed, times, a process id, a description of the machine, and absolute paths, and they can hold the Java settings of the machine. So they can show these details to a person who gets them.
 - With mise, the jar has a pinned version and sha256. With `TLA2TOOLS`, the jar is the one you name.
 
 ## What a result does not establish
