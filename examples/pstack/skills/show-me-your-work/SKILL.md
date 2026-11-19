@@ -12,14 +12,14 @@ Let a human who reviews long-running or unattended work after stepping away foll
 
 ## Outcomes
 
-- Each decision point and checkpoint of the run has a row in one canonical log, including each fork, pivot, or abandoned approach that shaped the work.
+- Each decision point and checkpoint of the run that is not trivial or self-evident has a row in one canonical log, including each fork, pivot, or abandoned approach that shaped the work.
 - Each row this run wrote records a real decision or action, with evidence that resolves and shows what the row claims, or a later row supersedes it with what actually happened and a pointer that resolves.
 - No row of the log's history is edited or deleted.
 - Every reply for a run that produced a trail ends with an "Attention" section that names the reviewer's model and gives the flags of a subagent on another vendor's model than the one that did the work, each pointing to specific rows or moments, or "No flags".
 
 ## Activities & Tasks
 
-The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks and set no order.
+The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
 ### Logging a row
 
@@ -47,7 +47,7 @@ The following Tasks are required whenever this skill runs, each with the conditi
 
 ### Reviewing the trail
 
-1. Read top to bottom, follow the evidence pointers, spot-check. GitHub renders a committed TSV as a table. `column -s$'\t' -t decisions.tsv` renders it in a terminal.
+1. When reviewing the trail, read top to bottom, follow the evidence pointers, spot-check. GitHub renders a committed TSV as a table. `column -s$'\t' -t decisions.tsv` renders it in a terminal.
 
 ## Outputs
 

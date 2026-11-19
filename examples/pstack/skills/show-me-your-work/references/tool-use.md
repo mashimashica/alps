@@ -12,6 +12,7 @@ Paths in this file are relative to the skill folder.
 - When the existing file does not end with a newline, the new row is joined to its last line.
 - Cleaning replaces each tab, line feed, and carriage return in a cell with one space. It then puts a single quote in front of a cell whose first character is `=`, `+`, `-`, or `@`. The quote is stored in the cell, so `-1 regression` is stored as `'-1 regression`. Nothing else is changed. A cell that starts with a space followed by `=` gets no quote. Double quotes and other control characters pass through.
 - The log path and the `ts` cell are not cleaned.
+- A log path that starts with `-` is passed to `dirname` as an option. `-dash.tsv` fails with exit status 1 and writes nothing. `-`, `--version`, and `--help` exit 0 and write the log at that name in the working directory. `--version` and `--help` also create directories named from the text `dirname` prints.
 - The script takes no lock. The test for a missing or empty file and the writes are separate steps, so a stray second header line is possible when callers race or when the test misreports an existing log. Rows are appended either way.
 - It does not write `start` rows, check that evidence resolves, or stop anyone from editing earlier rows.
 
@@ -35,7 +36,7 @@ The script prints nothing on stdout, on success or on failure. A wrong argument 
 | Exit status | Meaning |
 | --- | --- |
 | 0 | A row was appended. |
-| 1 | The argument count was not six, or a step failed. The failures checked were a log path that is a directory, is empty, or starts with `-`, a parent path component that is a file, and a failed write. |
+| 1 | The argument count was not six, or a step failed. The failures checked were a log path that is a directory or is empty, a log path such as `-dash.tsv` that `dirname` rejects as an option, a parent path component that is a file, and a failed write. |
 | 127 | `dirname` or `date` was not found, or `mkdir` was not found when the parent directory was missing. |
 | 2 | The script was run through `sh` where `sh` is dash. |
 
@@ -64,7 +65,7 @@ Read stderr as well as the exit status. When either leaves doubt, read the last 
 
 A call changes files in the caller's environment and nothing else. It can do these things, in this order:
 
-1. Create the missing parent directories of the log path.
+1. Create the missing parent directories of the log path, or, for a log path that starts with `-`, the directories described under Responsibility and limits.
 2. Create the log file when it is absent.
 3. Append the header line when the file is absent or empty.
 4. Append one row.

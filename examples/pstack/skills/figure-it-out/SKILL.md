@@ -12,11 +12,11 @@ Give a task that matches no playbook a workflow designed for it, and take the ta
 
 ## Outcomes
 
-- Before the run starts, its framing can be stated: the definition of done as a falsifiable predicate, the quantified scope, and the rigor level.
-- Before any code, the workflow exists as a written phase list that scales rigor to the task, runs the scientific method, and leaves a decision trail a human can audit after stepping away.
+- Before the run starts, the definition of done is a falsifiable predicate, the scope is quantified, and the rigor level is set.
+- The phase list written before any code scales rigor to the task, runs the scientific method, and leaves a decision trail a human can audit after stepping away.
 - Each unit that stays in the work advanced the predicate when measured on the real artifact.
 - The decision trail has a row for each step of the design, written as the step landed.
-- The whole is checked against the Phase A predicate on the real product, not just the harness.
+- The whole's standing against the Phase A predicate is established on the real product, not just the harness.
 - The reply's account of what is verified against the predicate and what is still open hides no negative and counts no inconclusive result as a pass.
 - Where a correction recurred, a gate, a lint rule, a check, or a script encodes it.
 
@@ -69,14 +69,14 @@ The deliverable before any code is the workflow itself: a sequence of phases tha
 
 ## Constraints
 
-This skill applies when the task matches no playbook, and when no narrower one fits: a large migration, an ambitious multi-part change, or work a human reviews after stepping away.
+This skill applies when the task matches no playbook. It applies when no narrower one fits: a large migration, an ambitious multi-part change, or work a human reviews after stepping away.
 
-Unless a Task states otherwise, work the Activities and their Tasks in the order listed. These dependencies are required.
+Unless a Task states otherwise, work the Activities in the order listed. Within an Activity, Tasks may be worked in any order unless one states otherwise. These dependencies are required.
 
 - The run does not start until the Phase A statements can be made.
 - The framing and tradeoffs are presented before committing to a long run.
 - The workflow is the deliverable before any code.
 - The verification harness is built before the work, with the baseline captured from the pre-change state.
-- The design is executed after it is designed. Its steps sit between the Phase C and Phase D entries of the todolist. Each step runs under the Phase C loop discipline, and the Phase D log gets a row as each step lands.
+- The design is executed after it is designed. Phase C and Phase D apply to each of its steps as it runs.
 - Each unit is verified before the next one starts.
 - Phase E checks the whole against the Phase A predicate, so it follows the executed work.
