@@ -6,24 +6,26 @@ disable-model-invocation: true
 
 # Maintain a formal verification skill
 
-A formal check proves a property of what it describes. When the code changes and the verification does not, the check can keep passing while it describes code that no longer exists. That pass is the dangerous case, because it looks like a proof. This skill is the upkeep loop for a verify skill that `/create-formal-verification-skill` generated, or for any project-local skill that runs a model checker, prover, or code-level verifier against named code. The project-local skill handles a change that an agent makes while it uses that skill. This skill handles the changes that skipped it: merges, edits made without the skill, and drift that builds up across many commits.
+## Purpose
+
+Bring a project's formal verification back in line with the code after the code changes, so that each check describes the code as it is now and each failure is known as drift in the verification or a bug in the code. This skill is the upkeep loop for a verify skill that `/create-formal-verification-skill` generated, or for any project-local skill that runs a model checker, prover, or code-level verifier against named code. The project-local skill handles a change that an agent makes while it uses that skill. This skill handles the changes that skipped it: merges, edits made without the skill, and drift that builds up across many commits.
+
+> NOTE A formal check proves a property of what it describes. When the code changes and the verification does not, the check can keep passing while it describes code that no longer exists. That pass is the dangerous case, because it looks like a proof.
 
 ## Outcomes
 
-Give each check one outcome, and say which:
+- Each check's verification describes the current code, or the check is reported as blocked with exactly why.
+- Each changed property follows a promise that changed on purpose, and the evidence for that is cited.
+- Each updated check that passes has caught a break of the new code that its property guards against.
+- Each failure is named as drift in the verification or as a bug in the code, on a replay of its counterexample against the real code.
+- The verify skill records the code that each check covers, the commands, the bounds, the assumptions, and the sync commit as they stand at the commit that was checked, with the sync commit of a blocked check left where it was.
+- The verify skill's steps run when it is followed once as the next agent would.
 
-- **in sync**: no change since the last sync alters what the check describes, and the check passes.
-- **updated**: the code changed, the verification now describes the new code, and the check passes.
-- **bug**: the verification describes the current code, and the code breaks the property. This is a finding about the code. It is not drift.
-- **blocked**: the check could not be brought back in line or could not run. Say exactly why.
+## Activities & Tasks
 
-A check can be both updated and bug: the update makes the verification describe the code again, and then the property fails on it.
+The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
-## Edit scope
-
-Edit only the verification: models, harnesses, property files, and the verify skill itself. Never edit product code during a run, unless the user asks you to. When a property fails on the current code, do not weaken the property or the model to make it pass. Report the failure.
-
-## Pass
+### Pass
 
 1. **Find the checks.** A verify skill has no fixed name, so find it by what it does: a project skill that runs a model checker, a prover, or another verifier against named code. Read each one you find, or the one the user named. For each check, collect the property, the code it covers, the bounds and assumptions, the command that runs it, and the commit where it was last confirmed to describe the code. If no verify skill exists, stop and point at `/create-formal-verification-skill`. If the skill does not record a sync commit, use the last commit that changed the verification files, and say that you did.
 
@@ -43,7 +45,22 @@ Edit only the verification: models, harnesses, property files, and the verify sk
 
 6. **Update the verify skill.** Update the code that each check covers, the commands, the bounds, the assumptions, and the sync commit. Set the sync commit to the commit that you checked. Do not move the sync commit for a blocked check, and say so in the report. Then follow the verify skill once as the next agent would, so that you know its steps still run.
 
-## Report
+## Outputs
+
+Put the verification updates in a change of their own, separate from any product fix.
+
+### Outcome of each check
+
+Give each check one outcome, and say which:
+
+- **in sync**: no change since the last sync alters what the check describes, and the check passes.
+- **updated**: the code changed, the verification now describes the new code, and the check passes.
+- **bug**: the verification describes the current code, and the code breaks the property. This is a finding about the code. It is not drift.
+- **blocked**: the check could not be brought back in line or could not run. Say exactly why.
+
+A check can be both updated and bug: the update makes the verification describe the code again, and then the property fails on it.
+
+### Report
 
 Tell the user, for each check:
 
@@ -55,4 +72,17 @@ Tell the user, for each check:
 
 Say outright which failures were drift in the verification and which were bugs in the code. For a check that passed before you updated it and fails after, say that the old pass was on a stale description.
 
-Put the verification updates in a change of their own, separate from any product fix.
+## Constraints
+
+Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
+
+- Step 1 comes first. The later steps use the property, the covered code, the bounds and assumptions, the command, and the sync commit that it collects for each check.
+- Step 2 runs each check before anything is changed, so it comes before the updates in steps 4 and 6.
+- Step 3 comes before step 4, which updates the verification for what step 3 decides each change is.
+- In step 4 the update is written before the rerun in step 5.
+- Whether a failure in step 2 is drift or a bug is not decided until step 5.
+- Step 5 comes before step 6, which sets the sync commit to the commit that was checked and does not move it for a blocked check.
+
+### Edit scope
+
+Edit only the verification: models, harnesses, property files, and the verify skill itself. Never edit product code during a run, unless the user asks you to. When a property fails on the current code, do not weaken the property or the model to make it pass. Report the failure.

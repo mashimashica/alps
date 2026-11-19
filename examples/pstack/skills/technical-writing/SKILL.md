@@ -6,6 +6,17 @@ disable-model-invocation: true
 
 # Technical writing
 
+## Purpose
+
+Enable a tired engineer to understand technical writing on the first read.
+
+## Outcomes
+
+- The writing this skill touches follows each rule under Controls that applies to it, except in a sentence that the rule makes worse.
+- No pattern from the slop-pattern catalog that the **unslop** skill owns remains in a doc this skill touches.
+
+## Controls
+
 Write so a tired engineer understands on the first read.
 
 - Cut every word that does no work.
@@ -14,13 +25,13 @@ Write so a tired engineer understands on the first read.
 - Write the real symbol, file, flag, or command name, not a synonym or a description of it.
 - Don't invent jargon. Use the words a developer would say out loud. Say what a named pattern means the first time.
 
-## Vary the rhythm
+### Vary the rhythm
 
 - Mix sentence lengths. Split the sentence that carries two thoughts. Keep the long sentence that carries one.
 - Have a view in explanation. Keep reference dry.
 - Be specific. Not "schema changes can cause issues" but "a column rename fails the build".
 
-## Pick the mode first (Diátaxis)
+### Pick the mode first (Diátaxis)
 
 One document, one mode. Don't mix modes. Split and link instead.
 
@@ -29,7 +40,7 @@ One document, one mode. Don't mix modes. Split and link instead.
 - **Reference: facts for lookup.** Only describe. Be dry, complete, and sure. Mirror the structure of the thing described.
 - **Explanation: understanding and why.** One bounded topic. Give context: design decisions, history, constraints, alternatives. Opinion is allowed here and nowhere else.
 
-## Write sentences to the reader (Google developer style)
+### Write sentences to the reader (Google developer style)
 
 - Talk to the reader as "you", in the present tense.
 - Say who does what. Passive is fine only when the actor is unknown or beside the point.
@@ -41,7 +52,7 @@ One document, one mode. Don't mix modes. Split and link instead.
 - Numbered lists for sequences, bullets for everything else. Introduce a list with a complete sentence. Keep items parallel.
 - Code goes in code font. UI elements go in bold. Use serial commas. Drop "etc.".
 
-## Make statements load one at a time (STE rules)
+### Make statements load one at a time (STE rules)
 
 - One instruction per sentence. One thought per sentence everywhere else.
 - Split instructions longer than about 20 words and other sentences longer than about 25.
@@ -51,7 +62,7 @@ One document, one mode. Don't mix modes. Split and link instead.
 - Write procedures as direct commands, never as narration and never in the passive.
 - Avoid "-ing" words where you can.
 
-## Leave no sentence open to two readings (Global English)
+### Leave no sentence open to two readings (Global English)
 
 - Keep words like "only" and "not" next to the word they change.
 - Break up long noun strings.
@@ -62,9 +73,13 @@ One document, one mode. Don't mix modes. Split and link instead.
 - Call each thing by one name, everywhere.
 - Skip idioms, colloquialisms, Latin abbreviations, and metaphors.
 
-## Voice and repo specifics
+### Voice and repo specifics
 
 - Apply the **unslop** skill to every doc this skill touches. That skill owns the slop-pattern catalog: AI vocabulary, filler, hedging, formatting tells.
 - PR descriptions and commit messages are writing too. Every layer except Diátaxis applies to them. A PR body is a briefing that a reviewer can read in under a minute. Do not paste swarm logs, SHA lists, or metric tables. Link them.
 - Product UI strings are not documentation. Use your product's copy guidelines for those.
 - Indent code snippets with tabs. Write real paths. Make every count or tree claim true at the commit that lands it, and include the command that regenerates it.
+
+## Constraints
+
+Where Diátaxis applies, pick the mode first.

@@ -1,8 +1,18 @@
-### Bug fix
+# Bug fix
 
-**You own this task. Plan, review, verify.** Delegate investigation and the fix to subagents, stay in the lead. Pick each subagent's reasoning level for the job, per the Subagents section.
+## Purpose
 
-Be scientific. Every shipped line traces to runtime evidence. Belt-and-suspenders that "might help" is a hypothesis, not a fix. It does not ship. When evidence refutes a hypothesis, revert what it motivated. The smallest change the evidence justifies ships, nothing more.
+Fix the bug at its cause with the smallest change that runtime evidence justifies.
+
+## Outcomes
+
+- On the matching surface, the original repro fails before the fix and passes after it.
+- The root cause the reply names is the one hypothesis that survived elimination, and runtime evidence confirms its mechanism.
+- Every shipped line traces to runtime evidence, and the shipped change is the smallest that evidence justifies.
+
+## Tasks
+
+The following Tasks are required whenever this playbook runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
 1. Reproduce it yourself on the matching surface via the control skill (Non-negotiables), even when a debug or instrumentation protocol says to ask the user to reproduce. Ask the user only with a stated, specific reason the control surface cannot reach the target, and only after driving it as far as it goes. If it won't reproduce directly, synthesize the trigger, tighten conditions, or instrument until it fires.
 2. Binary-search the cause. Form the candidate hypotheses, then rule them out until one survives. Seed them with a trace of the affected subsystem and the **why** skill for regression history. Each pass, take the split that cuts the most remaining problem space, get runtime evidence, eliminate. When program state is unclear, add instrumentation or logging and read it as the code runs. Don't guess. Drive a long or stubborn hunt with Cursor's `/loop` command. Confirm the surviving *mechanism* with runtime evidence before step 3's `architect` or an `interrogate` fan-out.
@@ -12,4 +22,23 @@ Be scientific. Every shipped line traces to runtime evidence. Belt-and-suspender
    This is the canonical **sequence-verifiable-units** principle skill, the failing test first and the fix on top.
 6. Run **Opening a PR**.
 
+## Outputs
+
 **Reply:** what was broken, root cause, fix, how you verified. Paste failing-then-passing repro output verbatim.
+
+## Controls
+
+Be scientific. Every shipped line traces to runtime evidence. Belt-and-suspenders that "might help" is a hypothesis, not a fix.
+
+## Constraints
+
+**You own this task. Plan, review, verify.** Delegate investigation and the fix to subagents, stay in the lead. Pick each subagent's reasoning level for the job, per the Subagents section.
+
+Belt-and-suspenders that "might help" does not ship. When evidence refutes a hypothesis, revert what it motivated. The smallest change the evidence justifies ships, nothing more.
+
+Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
+
+- Step 1 comes before the fix in step 3, because step 4 reruns the original repro.
+- Step 2 confirms the surviving mechanism with runtime evidence before step 3's `architect` or an `interrogate` fan-out.
+- Step 4 follows step 3, because it verifies the fix.
+- Step 6 follows step 5, because the PR carries the staged commits.

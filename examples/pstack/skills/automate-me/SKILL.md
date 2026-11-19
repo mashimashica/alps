@@ -6,11 +6,22 @@ disable-model-invocation: true
 
 # Automate me
 
-A guided flow for turning the user's working conventions into a skill agents will follow. The output is one `-mode` skill tailored to them (e.g. `jay-mode`, `priya-mode`).
+## Purpose
 
-This skill orchestrates three others: an inline mining pass (see step 1), Cursor's built-in `create-skill` (authoring), and the **unslop** skill (prose discipline). It sequences them. It doesn't replace them.
+Turn the user's working conventions into a skill agents will follow, through a guided flow.
 
-## Flow
+## Outcomes
+
+- Where the run is in update mode, the existing file is edited in place and keeps the sections the user hasn't contradicted.
+- The skill follows every rule under Guardrails.
+- The skill's path and frontmatter follow the placement rules of step 4.
+- Every line of the skill follows the **unslop** skill and `create-skill`'s writing guidelines.
+- The user has vibe-checked the draft for whether it reads like them and whether it missed anything.
+- The skill is committed in a worktree off main and open as a PR, with nothing pushed to main directly.
+
+## Tasks
+
+The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
 ### 0. Check for an existing skill
 
@@ -82,7 +93,13 @@ Show the draft to the user and take feedback. Expect multiple iterations. Cut ru
 
 Work in a worktree off main. Commit and open a PR. Don't push to main directly.
 
-## Guardrails
+## Outputs
+
+The output is one `-mode` skill tailored to the user (e.g. `jay-mode`, `priya-mode`).
+
+## Controls
+
+### Guardrails
 
 - **Don't overfit to one conversation.** A preference stated once and contradicted another time is noise. Require multiple instances before codifying it.
 - **Don't be clever.** Restating other skills' contents, inventing metaphors, or writing "poetic" prose for an agent reader is cost without benefit. Keep it operational.
@@ -91,14 +108,28 @@ Work in a worktree off main. Commit and open a PR. Don't push to main directly.
 - **Name conventions generic.** Use "the user" or "the human" in imperatives, not the author's first name.
 - **Don't force symmetry.** If a user has no process rules worth writing down, skip the Process section entirely.
 
-## Evaluation
+### Evaluation
 
 A `-mode` skill is subjective output. A `create-skill`-style test/iterate benchmark loop isn't useful here. Vibe-check with the user: does it read like them? Did it miss anything? Then ship.
 
 Run a description-optimization loop only if the skill's trigger accuracy turns out to be a problem in practice.
 
-## When not to use
+## Constraints
+
+This skill drafts or revises a personal `-mode` skill via `create-skill` + unslop, optionally pulling fresh evidence from recent transcripts.
+
+Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
+
+- Step 0 comes first, because update mode changes steps 1, 2, and 4.
+- Step 3 groups the combined signals of steps 1 and 2.
+- Step 4 drafts the skill from the sections of step 3, and step 5 works on the draft of step 4.
+- The vibe-check under Evaluation comes before the skill ships.
+
+### When not to use
 
 - User wants a task-specific skill (not working conventions): `create-skill` alone, no mining required.
 - User wants to capture one narrow workflow (e.g. "how I write commit messages"). That's a regular skill, not a mode skill.
 
+## Enablers
+
+This skill orchestrates three others: an inline mining pass (see step 1), Cursor's built-in `create-skill` (authoring), and the **unslop** skill (prose discipline). It sequences them. It doesn't replace them.

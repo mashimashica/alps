@@ -1,8 +1,21 @@
-### Refactoring
+# Refactoring
 
-**You own the contract. The structure changes. The behavior does not.** Distinct from Feature, which adds behavior, and Bug fix, which corrects it.
+## Purpose
 
-If the cleanup reveals a missing feature or a real bug, split it out and ship the structural change first against the pinned contract. A redesign is allowed, but name it and route to Feature. Large or cross-cutting structural work belongs to the **figure-it-out** skill. This playbook is the focused-to-medium change.
+Change the structure of the code so that reader load drops while the behavior holds against a pinned contract, and deliver the change for review.
+
+## Outcomes
+
+- A characterization test, snapshot, or equivalence harness pins the current behavior, captured before any structure moved.
+- The behavior is proven unchanged on the real artifact, and the pin is green after every step.
+- The shipped change carries no new behavior.
+- The shipped diff lowers reader load somewhere, and a diff that does not is reverted.
+- The shipped history is small ordered commits, a subtraction commit, then the reshape, then any follow-on cleanup.
+- The shipped change is open as a PR per **Opening a PR**.
+
+## Tasks
+
+The following Tasks are required whenever this playbook runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
 1. Pin the behavior contract first. Trace the affected subsystem to learn the contract, then write a characterization test, snapshot, or equivalence harness that captures current behavior before any structure moves. If the area has no coverage, write the pin before touching structure. Type check and lint are not a pin.
 2. Name the structure the code is missing per **principle-model-the-domain**. Boring code stays when the shape is already clear and local. The reshape must delete branches or invalid states, not add indirection.
@@ -13,4 +26,20 @@ If the cleanup reveals a missing feature or a real bug, split it out and ship th
 7. Confirm the change is worth keeping. The success measure is reduced reader load (**principle-minimize-reader-load**). If the diff does not lower reader load somewhere, revert it.
 8. Rebase into small ordered commits. A subtraction commit, then the reshape, then any follow-on cleanup. Shape them with the **sequence-verifiable-units** principle skill, so each behavior-preserving slice stays green before the next. Run **Opening a PR**.
 
+## Outputs
+
 **Reply:** the structure that changed, the pin you held it against, the equivalence proof, the reader-load delta, what shipped and what got reverted. No new behavior.
+
+## Constraints
+
+**You own the contract. The structure changes. The behavior does not.** Distinct from Feature, which adds behavior, and Bug fix, which corrects it.
+
+If the cleanup reveals a missing feature or a real bug, split it out and ship the structural change first against the pinned contract. A redesign is allowed, but name it and route to Feature. Large or cross-cutting structural work belongs to the **figure-it-out** skill. This playbook is the focused-to-medium change.
+
+Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
+
+- Step 1 comes before any structure moves, because the pin captures current behavior.
+- Step 3 comes before step 5, because the move needs the target shape.
+- Step 4 comes before step 5, because the subtraction comes before the new shape.
+- Step 6 follows step 5, because it proves the behavior of the moved code.
+- Step 7 comes before step 8, because it decides whether the diff is kept or reverted.

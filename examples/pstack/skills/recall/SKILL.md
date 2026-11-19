@@ -6,13 +6,21 @@ disable-model-invocation: true
 
 # Recall
 
-**Before you start or resume work, you rebuild the user's recent working context and hand back a tight capsule of where things stand now and what to do next.**
+## Purpose
 
-Keep it tight and on-topic. Read only what the in-scope threads need, then stop.
+Before you start or resume work, rebuild the user's recent working context and hand back a tight capsule of where things stand now and what to do next.
 
-Your context lives in two records. Your own chat history holds what you did and decided. The shared record holds everything that happened around the same code under other names: the symptoms users keep reporting, the fixes that shipped and got reverted, the errors still firing in prod. That second record lives in source control, the issue tracker, chat and issue channels, long-form docs, and error tracking. A feature with a long bug tail keeps most of its story there, so don't reconstruct it from your transcripts alone.
+## Outcomes
 
-Transcripts live at `~/.cursor/projects/<slug>/agent-transcripts/<uuid>/<uuid>.jsonl`, where `<slug>` is the workspace path with the leading slash dropped and each "/" turned into "-" (so `/Users/you/proj` becomes `Users-you-proj`). Every line is one chat message.
+- The scope stated back names the window, the topic if named, and the workspace, and it does not quietly turn "all" into "recent N".
+- The brief rests on the in-scope chats of your own chat history, or on the full state capsule where the user already gave one.
+- Whenever the topic names a feature, file, subsystem, area, or bug, the brief folds in what the sweep of the shared record returned, null results included, and says which MCP was unavailable and skipped.
+- The PRs, branches, and tickets that the mining and the sweep surfaced are checked against live state.
+- The brief follows the output contract, from the capsule of where the work stands to the single most useful next action.
+
+## Tasks
+
+The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
 1. Classify, then route. One specific prior chat to resume is the `session-pickup` playbook, not this. Turning habits into a durable skill is `automate-me`. A human-readable summary of your work is a different task. Recall loads working context across recent chats before you act. If the user already gave you a full state capsule (paths, branch, the change), use it and skip the mining.
 2. Lock the scope before searching. Pin the window ("recent" is a real range, default the last 7 days), the topic if named, and the workspace (default the active one. Never read another project's transcripts without being asked). State the scope back. Never quietly turn "all" into "recent N".
@@ -21,7 +29,15 @@ Transcripts live at `~/.cursor/projects/<slug>/agent-transcripts/<uuid>/<uuid>.j
 5. Verify against live state. Take the PRs, branches, and tickets that the mining and the sweep surfaced and check them with `git` and `gh`. When the answer hinges on what an agent actually did (the tools it ran, files it read, errors it hit), read the full transcript, not just a trimmed local copy.
 6. Write the brief to the contract below. Group by thread. Stay on the named topic.
 
-## Output contract
+## Inputs
+
+Your context lives in two records. Your own chat history holds what you did and decided. The shared record holds everything that happened around the same code under other names: the symptoms users keep reporting, the fixes that shipped and got reverted, the errors still firing in prod. That second record lives in source control, the issue tracker, chat and issue channels, long-form docs, and error tracking. A feature with a long bug tail keeps most of its story there, so don't reconstruct it from your transcripts alone.
+
+Transcripts live at `~/.cursor/projects/<slug>/agent-transcripts/<uuid>/<uuid>.jsonl`, where `<slug>` is the workspace path with the leading slash dropped and each "/" turned into "-" (so `/Users/you/proj` becomes `Users-you-proj`). Every line is one chat message.
+
+## Outputs
+
+### Output contract
 
 Lead with the capsule, then the thread status, then the problems, then the next move. Deeper detail goes below or gets cut.
 
@@ -33,3 +49,15 @@ Lead with the capsule, then the thread status, then the problems, then the next 
 An adjacent feature or ticket stays out unless it blocks this one. When the capsule and thread lines outgrow a screen, cut detail before you cut threads. Write the brief through the **unslop** skill, cite chat findings by UUID and shared-record findings by their source (PR #, ticket ID, chat permalink, error-tracker issue), and sanitize private context before any public output.
 
 **Reply:** the brief, to the contract above.
+
+## Constraints
+
+Keep it tight and on-topic. Read only what the in-scope threads need, then stop.
+
+Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
+
+- Step 1 comes first, because it can route the request elsewhere or skip the mining.
+- Step 2 locks the scope before any searching in steps 3 and 4.
+- The sweep of step 4 runs in parallel with the chat-history mining of step 3.
+- Step 5 checks the PRs, branches, and tickets that steps 3 and 4 surface.
+- Step 6 writes the brief from what steps 3, 4, and 5 return.

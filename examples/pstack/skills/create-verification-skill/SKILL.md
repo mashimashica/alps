@@ -6,9 +6,24 @@ disable-model-invocation: true
 
 # Create a verification skill
 
-Every serious project needs a scripted way to drive the real app and prove behavior: launch it, exercise a feature the way a user would, and capture evidence. This skill generates that as a project-local skill (`.cursor/skills/verify-<app>/`) tailored to the repo. You write the generator's output for the next agent, not for a human: it will be read cold, mid-task, by an agent that has never seen the app.
+## Purpose
 
-## 1. Interview the repo, not the user
+Give a project a scripted way to drive the real app and prove behavior, which every serious project needs: launch it, exercise a feature the way a user would, and capture evidence. This skill generates that as a project-local skill (`.cursor/skills/verify-<app>/`) tailored to the repo, for any language, framework, or platform.
+
+## Outcomes
+
+- The generated `SKILL.md` has the frontmatter and the sections step 2 lists, each section grounded in what the interview found, with no placeholders left.
+- The feature map has a README index and one file per feature, each answering from the user's point of view what the feature is, how to reach it, how to drive it with the harness, and what observable end state proves it works.
+- The generated skill's own instructions have run end to end once: launch, doctor, the drive of one mapped feature, evidence capture, and cleanup.
+- The evidence of that run still exists at the named location after cleanup.
+- Where the skill was proved in a stand-in for the real target, every setup step the stand-in did that the target will not is listed as unverified.
+- The user is pointed at `/maintain-verification-skill` for keeping the map honest as the app changes.
+
+## Tasks
+
+The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
+
+### 1. Interview the repo, not the user
 
 Answer these from the codebase and only ask the user what you cannot observe:
 
@@ -20,7 +35,7 @@ Answer these from the codebase and only ask the user what you cannot observe:
 
 If the checkout doesn't build or start as-is, fix that first (or report it precisely) before generating; a skill written against a broken base teaches wrong steps. When an irrelevant missing asset blocks startup (a static dir the API never serves, a sample config), the generated skill may create it, clearly marked as verification scaffolding, and remove it in cleanup.
 
-## 2. Generate the skill
+### 2. Generate the skill
 
 Write `.cursor/skills/verify-<app>/SKILL.md` with YAML frontmatter (`name: verify-<app>` and a `description` that names the app, the surface, and when to reach for it — without frontmatter the skill never registers) and these sections, each grounded in what the interview actually found (no placeholders left):
 
@@ -31,14 +46,27 @@ Write `.cursor/skills/verify-<app>/SKILL.md` with YAML frontmatter (`name: verif
 - **Cleanup:** how to tear down instances the run created. Never kill by process name; kill what you started. Cleanup removes instances and scratch state, never the evidence: proof artifacts survive the teardown, in a location the skill names.
 - **Helpers:** any script the skill ships is executable and its invocation is shown in the skill body. A helper the reader has to reverse-engineer is not a helper.
 
-## 3. Seed the feature map
+### 3. Seed the feature map
 
 Create `.cursor/skills/verify-<app>/features/README.md` plus one file per user-facing feature you can identify (aim for the top 3-5 to start, from routes, commands, menus, or docs). Follow the shape in [`references/feature-map-example/`](references/feature-map-example/), with a README index and one file per feature. Each file answers, from the user's point of view: what the feature is, how to reach it, how to drive it with the harness, and what observable end state proves it works. The four H2s are `Sub-features`, `How to get to it (user POV)`, `Driving it with <harness>`, and `Gotchas`. If the seed data lacks a precondition that a journey needs, the journey reports a failure and the reason goes in that feature's `Gotchas`. Never weaken the journey to make it pass. The map is the repo's maintained verification source; a proof that drives one convenient entry point is incomplete when the map lists others.
 
-## 4. Prove the generated skill before handing it over
+### 4. Prove the generated skill before handing it over
 
 Run its own instructions end to end once: launch, doctor, drive ONE mapped feature (one is enough; the map exists so later runs can cover the rest), capture evidence, clean up. After cleanup, confirm the evidence still exists at the named location — a cleanup that eats the proof fails this step. Fix what fails, and run the generated cleanup after every failed iteration too, so broken attempts don't strand processes and ports. A generated skill that was never executed is a draft, not a deliverable. If you proved it in a stand-in for the real target (a container in place of a fresh VM, a local stack in place of a remote one), list every setup step the stand-in did that the target will not. Those steps stay unverified until a run on the real target covers them.
 
-## 5. Offer the maintenance loop
+### 5. Offer the maintenance loop
 
 Point the user at `/maintain-verification-skill` for keeping the map honest as the app changes. Suggest a cadence only if they ask.
+
+## Controls
+
+Write the generator's output for the next agent, not for a human: it will be read cold, mid-task, by an agent that has never seen the app.
+
+## Constraints
+
+Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
+
+- Step 1 fixes a checkout that doesn't build or start, or reports it precisely, before step 2 generates.
+- Step 2 writes from what the interview of step 1 found.
+- Step 4 runs the instructions that step 2 wrote and drives a feature that step 3 mapped.
+- Step 4 comes before the skill is handed over.

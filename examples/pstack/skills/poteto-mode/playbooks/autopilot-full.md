@@ -1,8 +1,21 @@
-### Autopilot-full
+# Autopilot-full
 
-**You own the verdicts, never the PRs. One owner carries each PR from build to merge, and nothing merges until your swarm, which never wrote the code, has proven the code that lands.**
+## Purpose
 
-A verdict covers one patch and green CI covers one head. Step 4 runs a full swarm once, and again only for a major change. The patch-id rule in `playbooks/shipping.md` can carry a lane's result, and every new head needs its own green CI.
+Carry each PR of a queue from build to merge under one owner, inside the operator's grant, with nothing merged until a swarm that never wrote the code has proven the code that lands.
+
+## Outcomes
+
+- Each PR the grant covers lands on its own, or stands at an open operator gate or the operator's stop.
+- Items the operator names as theirs and PRs outside the queue go no further than merge-ready.
+- Every merged PR lands code proven, before the merge, by a swarm that never wrote it.
+- Every merged PR is tested on the trunk it lands on, at a head with its own green CI.
+- Every loosened gate carries a verifier's proof and the root's fresh countersign, and none is a disabled or soft-failed check.
+- Each owner's work, heads, and agents are on record where a replacement can find them.
+
+## Tasks
+
+The following Tasks are required whenever this playbook runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
 1. **The operator's gates come first.** The grant covers only the queue's items, so items the operator names as theirs and PRs outside the queue stop at merge-ready. A request to state the plan is not a go.
 2. **Spawn one owner per PR, and keep its work where a replacement can find it.** Resolve the forge once for the program. GitHub CLI (`gh`) is the default. If `command -v origin` succeeds and Origin can resolve the repository, use `origin pr` for every PR operation. Otherwise stay on `gh` and record the fallback. Never require Graphite (`gt`). Each owner is a Cursor cloud agent that builds, opens its PR per `playbooks/opening-a-pr.md`, proves the change on the real artifact, babysits to green per `playbooks/babysit.md`, and merges once steps 4 and 5 clear it. Where that playbook says to report a rebase, the owner rebases its own branch and publishes it with `git push --force-with-lease`.
@@ -22,4 +35,23 @@ A verdict covers one patch and green CI covers one head. Step 4 runs a full swar
    On the operator's go, arm `/loop 1h` to audit until no delegated work is left, because long runs drift and agents stall silently. Each tick re-reads this playbook from trunk and fixes drift, such as an unreported head or an unrecorded agent, by having its owner record it, because drift is a gap in the record, not a stall. It probes every agent, down to the leaf lanes, and judges each by its side effects, because status text and summaries can hide a stuck child. An agent is stuck when it errors, cannot start turns, or shows nothing new past its stuck-after runtime, and so is an owner that has neither pushed nor written a trail row by the first tick. One waiting on you or the operator is not stuck, so answer it. Replace a stuck agent at once, without waiting for its stop to land. A tick that changed something for the operator ends by catching them up per the **ketchup** skill, and one that changed nothing stays quiet.
 7. **Stand down at once on the operator's stop.** A hold reaches every owner as a zero-writes order. Each reports where it stands and keeps its brief until the operator releases it.
 
+## Outputs
+
 **Reply:** catch the operator up per the **ketchup** skill, covering each PR's state and verdict, what merged, countersigns and why, open operator gates, and parked follow-ups, with links to each PR and the trails.
+
+## Controls
+
+A verdict covers one patch and green CI covers one head. Step 4 runs a full swarm once, and again only for a major change. The patch-id rule in `playbooks/shipping.md` can carry a lane's result, and every new head needs its own green CI.
+
+## Constraints
+
+**You own the verdicts, never the PRs. One owner carries each PR from build to merge, and nothing merges until your swarm, which never wrote the code, has proven the code that lands.**
+
+Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
+
+- Step 1 comes first, because its gates decide which PRs may go past merge-ready.
+- The full swarm of step 4 runs at the code-ready head that the owner reports in step 2.
+- The verdict of step 4 is not clean before the root audits the receipts of the merge-ready report from step 2.
+- Merge prep in step 5 starts once the swarm's lanes of step 4 have started.
+- An owner merges once steps 4 and 5 clear its PR.
+- The audit of step 6 runs from the operator's go until no delegated work is left, and step 7 applies at once on the operator's stop, so neither waits for the steps listed before it.

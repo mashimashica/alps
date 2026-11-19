@@ -6,7 +6,23 @@ disable-model-invocation: true
 
 # Unslop
 
-Edit text to remove AI patterns. Scan for the patterns below, then rewrite. Preserve meaning and match the intended tone.
+## Purpose
+
+Leave text free of AI patterns, with its meaning preserved and the intended tone matched.
+
+## Outcomes
+
+- The edited text follows every numbered rule under Controls.
+- The edited text preserves the meaning of the text before the edit.
+- The edited text matches the intended tone.
+
+## Tasks
+
+The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks and set no order.
+
+1. Edit text to remove AI patterns. Scan for the patterns below, then rewrite. Preserve meaning and match the intended tone.
+
+## Controls
 
 Rule numbers are stable ids that other skills cite. A removed rule leaves a gap.
 

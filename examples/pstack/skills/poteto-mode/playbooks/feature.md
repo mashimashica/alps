@@ -1,6 +1,20 @@
-### Feature
+# Feature
 
-**You own the design. Plan, review, verify.** Delegate implementation. Stay in the lead.
+## Purpose
+
+Build a feature under a design and a plan the lead owns, and deliver it for review verified on the matching surface.
+
+## Outcomes
+
+- The data shape and its organizing structure are chosen before the delegate writes logic.
+- The throughput checkpoint keeps an item for each of its four dimensions, and a dimension that does not apply reads `n/a: <reason>`.
+- The feature passes verification on the matching surface, or an inconclusive or wrong-surface result is flagged and not counted as a pass.
+- The change is delivered as small, ordered commits, each small unit built, verified, and committed before the next.
+- The change is open as a PR per **Opening a PR**.
+
+## Tasks
+
+The following Tasks are required whenever this playbook runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
 1. Trace the affected subsystem.
 2. `architect` for the shape.
@@ -16,6 +30,20 @@
 7. If the design is contested, `interrogate` before shipping.
 8. Run **Opening a PR**.
 
-Code-coupled work (one feature, one migration) goes to a single owner with the checkpoint inline. That owner fans out internally after the blocking phase. Parent-level fan-out is for slices that produce independent artifacts (audits, cross-subsystem investigations, competing experiments). Rewrite the checkpoint at phase boundaries. Spawn a fresh owner rather than chaining interrupts.
+## Outputs
 
 **Reply:** what you built, what you chose and why, the throughput checkpoint, open decisions. Tables for design alternatives.
+
+## Constraints
+
+**You own the design. Plan, review, verify.** Delegate implementation. Stay in the lead.
+
+Code-coupled work (one feature, one migration) goes to a single owner with the checkpoint inline. That owner fans out internally after the blocking phase. Parent-level fan-out is for slices that produce independent artifacts (audits, cross-subsystem investigations, competing experiments). Rewrite the checkpoint at phase boundaries. Spawn a fresh owner rather than chaining interrupts.
+
+Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
+
+- Step 2 comes before step 4, because the shape is chosen before the delegate writes logic.
+- Step 3 comes before step 4, because the checkpoint sets which gates run before fan-out and what parallelizes.
+- Step 5 follows step 4, because it verifies what step 4 built.
+- When step 7 applies, it comes before shipping.
+- Step 8 follows step 6, because the PR carries the rebased commits.

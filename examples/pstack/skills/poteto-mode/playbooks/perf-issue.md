@@ -1,6 +1,19 @@
-### Perf issue
+# Perf issue
 
-**You own the measurement story. Plan, review, verify the numbers.** Tie every fix to a measurement, don't read source instead of measuring.
+## Purpose
+
+Fix a perf issue with a one-off fix whose effect is measured against a baseline, not read from source.
+
+## Outcomes
+
+- Every fix is tied to a measurement, with a baseline trace captured before it and a post-fix trace captured after it.
+- The baseline and each later number are vetted with the **benchmark-checklist** skill.
+- An inconclusive or wrong-surface comparison is flagged and not counted as a pass.
+- The PR cites the measurement.
+
+## Tasks
+
+The following Tasks are required whenever this playbook runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
 1. Capture a baseline trace via the matching control skill. Vet the baseline, and each later number, with the **benchmark-checklist** skill.
 2. Trace the code to ground hypotheses. Don't claim a perf ceiling without running it first.
@@ -20,6 +33,18 @@
 5. Cite the measurement in the PR.
 6. Run **Opening a PR**.
 
-For sustained improvement against a metric rather than a one-off fix, use the Hillclimb playbook (`playbooks/hillclimb.md`).
+## Outputs
 
 **Reply:** baseline number, post-fix number, delta, artifact path.
+
+## Constraints
+
+**You own the measurement story. Plan, review, verify the numbers.** Tie every fix to a measurement, don't read source instead of measuring.
+
+For sustained improvement against a metric rather than a one-off fix, use the Hillclimb playbook (`playbooks/hillclimb.md`).
+
+Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
+
+- Step 3 follows steps 1 and 2, because it plans the fix from the trace and changes the code the baseline measures.
+- Step 4 follows step 3, because it compares the baseline with the post-fix trace.
+- Step 5 follows step 4, because it cites the measurement step 4 compares.

@@ -5,13 +5,26 @@ description: Configure which models pstack uses per role and at what reasoning b
 
 # Setup pstack
 
-Write `~/.cursor/rules/pstack-models.mdc`, an always-applied rule that sets pstack's model per role.
+## Purpose
 
-## Steps
+Configure which models pstack uses per role and at what reasoning budget, so that every role has a valid choice the user confirmed. This skill also gives the user the choice of having a verification skill and a formal verification skill generated for a project that lacks one.
+
+## Outcomes
+
+- `~/.cursor/rules/pstack-models.mdc` has the shape of step 5 and holds the budget the user chose and, for every role, the value the user confirmed.
+- Every real slug in the rule is in the detected set and at `xhigh` or below.
+- Where step 2 replaces a value or drops a line of an existing rule, the user is told which.
+- The user is told that the rule was written and that it applies to new sessions.
+- Where the project has no way to drive the real app for proof, whether `/create-verification-skill` is invoked follows the user's answer to one offer of a project-local verification skill.
+- Where the project has no formal verification skill, whether `/create-formal-verification-skill` is invoked follows the user's answer to one offer of a formal verification skill.
+
+## Tasks
+
+The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
 ### 1. Detect available models
 
-Enumerate the model slugs you can pass to a `Task` subagent in this session. That is the dependable source. If Cursor also exposes a models API or CLI that lists the user's entitled models, prefer it for completeness. If you cannot detect any, ask the user to paste the slugs they have access to. Never write a real slug you have not confirmed is available. The aliases `inherit-parent` and `auto` are always valid even though they are not detected slugs.
+Enumerate the model slugs you can pass to a `Task` subagent in this session. That is the dependable source. If Cursor also exposes a models API or CLI that lists the user's entitled models, prefer it for completeness. If you cannot detect any, ask the user to paste the slugs they have access to.
 
 ### 2. Load current state
 
@@ -78,3 +91,20 @@ Check whether the project has a way to drive the real app for proof (a `verify-*
 ### 8. Offer a formal verification skill (optional)
 
 Check whether the project already has a formal verification skill (a project skill that runs a model checker, a proof, or another verifier against the code). If not, offer once: "want a formal verification skill, so agents can prove a key property of your code holds in every case in scope, not only the cases tests reach? I can generate one with /create-formal-verification-skill." On yes, invoke `/create-formal-verification-skill` (resolves wherever pstack is installed: workspace, user, or plugin). On no, move on without pushing.
+
+## Outputs
+
+`~/.cursor/rules/pstack-models.mdc`, an always-applied rule that sets pstack's model per role. The rule overrides the skill defaults.
+
+## Constraints
+
+Never write a real slug you have not confirmed is available. The aliases `inherit-parent` and `auto` are always valid even though they are not detected slugs.
+
+Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
+
+- Step 1 comes before steps 3 and 4, which use the detected set.
+- Step 2 comes before step 3, which uses the current choices step 2 loads and lists the lines step 2 dropped.
+- Step 2 reads the existing rule before step 5 overwrites it.
+- In step 3, (a) comes before (b), which applies the budget, and (b) comes before (c), which shows the result.
+- Steps 3 and 4 come before step 5, which writes the values that step 3 settles and step 4 passes.
+- Step 5 comes before step 6, which reports the write.

@@ -1,4 +1,34 @@
-### Eval
+# Eval
+
+## Purpose
+
+Establish whether a variant under test produces the behavior that counts as success, through an experiment whose candidates and judge are blinded. The result supports a recommendation for whether to promote the variant.
+
+## Outcomes
+
+- Every candidate stays blind, with nothing it sees breaking a non-negotiable for blinding or showing the rubric.
+- The judge sees outputs by sanitized label and the rubric, never a model name.
+- Where two variants are compared, one judge scores both sets in a single pass on one scale, blind to which set each came from.
+- Chain-following is graded from the files each candidate actually opened and the shape of its code, never from the candidate's own claims.
+- The synthesis and the recommendation for whether to promote the variant rest on every candidate output, read end to end by the agent running the playbook and compared with the judge's verdict.
+
+## Tasks
+
+The following Tasks are required whenever this playbook runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
+
+1. **Frame.** State what variant is under test and what behavior counts as success. Write the rubric (3-6 concrete criteria) for the judge only. Hold it back from candidates.
+2. **Set up sanitized environments.** Per-candidate working dir with the variant in place. Plant any context an organic task would have: a project skeleton, the skills the candidate would naturally read.
+3. **Author one organic prompt.** What a user would type. No leakage of what's being measured.
+4. **Spawn N parallel candidates** on different models per the **arena** skill's Phase B. Each works in its own sanitized dir. Same prompt to each. Pick each subagent's reasoning level for the job, per the Subagents section. An agent that only dispatches, polls, or packs results runs on `claude-opus-5-5-medium-fast`.
+5. **Spawn one blinded judge** on a different model family per the **arena** skill's Phase C. Judge sees outputs by sanitized label and the rubric, never a model name.
+6. **Verify the chain from transcripts, not self-report.** Read each candidate's local transcript under the active workspace's `agent-transcripts/` directory (the system prompt names this path). Do not glob across `~/.cursor/projects/*/`. That crosses workspace boundaries and reads private chats from unrelated projects. Look at which files each candidate actually opened. Grade chain-following from the files it really read plus the shape of the code, never from the candidate's own claims.
+7. **Read every candidate output yourself** end to end. Compare to the judge's verdict. Disagreement means a model is biased or the rubric is ambiguous. Synthesize.
+
+## Outputs
+
+**Reply:** variant under test, rubric, per-candidate notes, judge's verdict, your synthesis, and a recommendation for whether to promote the variant.
+
+## Constraints
 
 **You own the experiment design. Plan, blind, run, synthesize.**
 
@@ -12,14 +42,9 @@
 - The judge can know it's judging but sees outputs by sanitized label only, never by model name.
 - Comparing two variants: one judge scores both sets in a single pass on one scale, blind to which set each came from.
 
-**Steps:**
+Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
 
-1. **Frame.** State what variant is under test and what behavior counts as success. Write the rubric (3-6 concrete criteria) for the judge only. Hold it back from candidates.
-2. **Set up sanitized environments.** Per-candidate working dir with the variant in place. Plant any context an organic task would have: a project skeleton, the skills the candidate would naturally read.
-3. **Author one organic prompt.** What a user would type. No leakage of what's being measured.
-4. **Spawn N parallel candidates** on different models per the **arena** skill's Phase B. Each works in its own sanitized dir. Same prompt to each. Pick each subagent's reasoning level for the job, per the Subagents section. An agent that only dispatches, polls, or packs results runs on `claude-opus-5-5-medium-fast`.
-5. **Spawn one blinded judge** on a different model family per the **arena** skill's Phase C. Judge sees outputs by sanitized label and the rubric, never a model name.
-6. **Verify the chain from transcripts, not self-report.** Read each candidate's local transcript under the active workspace's `agent-transcripts/` directory (the system prompt names this path). Do not glob across `~/.cursor/projects/*/`. That crosses workspace boundaries and reads private chats from unrelated projects. Look at which files each candidate actually opened. Grade chain-following from the files it really read plus the shape of the code, never from the candidate's own claims.
-7. **Read every candidate output yourself** end to end. Compare to the judge's verdict. Disagreement means a model is biased or the rubric is ambiguous. Synthesize.
-
-**Reply:** variant under test, rubric, per-candidate notes, judge's verdict, your synthesis, and a recommendation for whether to promote the variant.
+- Step 4 uses the sanitized dirs from step 2 and the prompt from step 3.
+- Step 5 gives the judge the rubric from step 1 and the outputs from step 4.
+- Step 6 reads the transcripts of the candidates from step 4.
+- Step 7 compares with the judge's verdict from step 5.

@@ -1,8 +1,21 @@
-### Hillclimb
+# Hillclimb
 
-**You own the metric and the experiment's integrity. Supervise and review. Delegate the attempts.** For sustained, iterative improvement of one measurable thing against a target. A one-off fix is Bug fix or Perf issue. This is the loop.
+## Purpose
 
-Core discipline: one change, one measurement, keep or revert. Never stack untested changes, and never claim a win from code inspection (the **prove-it-works** principle skill).
+Improve one measurable thing against a target through sustained iteration, with the metric and the experiment's integrity intact.
+
+## Outcomes
+
+- The frozen harness reproduces the symptom on the target case and separates easier cases as expected.
+- Every change the run keeps is justified by its own before and after measurement on the frozen harness, as a move past noise or as a simplification that holds the number, with the regression gate green.
+- Every attempt the run does not keep is reverted in full.
+- The decision log has one row per attempt, kept or reverted.
+- The stop predicate is met without being relaxed, or the run stops because the remaining ideas are marginal and not worth their cost, or the run is stuck and surfaces that.
+- The accepted fixes are one commit each, stacked in the order they landed.
+
+## Tasks
+
+The following Tasks are required whenever this playbook runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
 1. Ground the workload and architecture before choosing the metric. Trace the target, name the realistic workload dimensions that can move the result (data size, history, state, concurrency), and select a case that reproduces the user's complaint. If no case reproduces it, fix the repro instead of hillclimbing. Then fix one metric, the direction that counts as better, and a checkable stop predicate that pairs a target with a floor on attempts so a lucky early win can't end the run (the example "at least 50% better than baseline and at least 10 iterations" is this shape). Use the user's numbers when given, otherwise agree them.
 2. Build the measurement harness, prove its sensitivity, then freeze it (the **build-the-lever** principle skill). Run contrasting realistic workloads and confirm the target case reproduces the symptom while easier cases separate as expected. If the harness cannot distinguish them, revise the workload or metric. Vet the harness with the **benchmark-checklist** skill before you freeze it, and make it print its error count and a count of the work done. Once frozen, one repeatable command emits the metric, sampled enough to clear the noise (median of N, not a single run). Record the baseline metric and a green run of the regression gate (the tests that must keep passing) before any change.
@@ -18,4 +31,24 @@ Core discipline: one change, one measurement, keep or revert. Never stack untest
 7. Stop when the predicate is met, or when the remaining ideas are marginal and not worth their cost. Don't relax the predicate to meet it, and don't quit while cheap untried hypotheses remain. If you are stuck, surface it instead of spinning.
 8. Run **Opening a PR** with the accepted commits stacked in the order they landed.
 
+## Outputs
+
 **Reply:** the metric and target, baseline to final with the percent delta, iterations run (kept vs reverted), each accepted fix on one line, the `decision.tsv` path, and the best idea you would try next if pushed further.
+
+## Controls
+
+Core discipline: one change, one measurement, keep or revert.
+
+## Constraints
+
+**You own the metric and the experiment's integrity. Supervise and review. Delegate the attempts.** For sustained, iterative improvement of one measurable thing against a target. A one-off fix is Bug fix or Perf issue. This is the loop.
+
+Never stack untested changes, and never claim a win from code inspection (the **prove-it-works** principle skill).
+
+Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
+
+- Step 1 comes before steps 2, 4, and 7. Step 2 measures its metric and case, step 4 uses its architecture model, and step 7 applies its stop predicate.
+- Step 2 freezes the harness and records the baseline metric and a green run of the regression gate before any change in step 5.
+- Step 3 opens the decision log before the first attempt in step 5.
+- On a stall, step 6 comes before step 7 concludes the hill is climbed.
+- Step 8 uses the commits that step 5 accepted.

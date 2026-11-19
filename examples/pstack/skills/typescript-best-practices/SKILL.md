@@ -7,7 +7,22 @@ disable-model-invocation: true
 
 # TypeScript best practices
 
-Apply the **type-system-discipline** principle skill first.
+## Purpose
+
+Make the TypeScript that the work writes or edits follow TypeScript best practices.
+
+## Outcomes
+
+- The TypeScript that the work writes or edits follows the **type-system-discipline** principle skill.
+- Every rule in the table under Controls holds for the TypeScript that the work writes or edits, as its Summary states it.
+
+## Tasks
+
+The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks and set no order.
+
+1. Apply the **type-system-discipline** principle skill first.
+
+## Controls
 
 | Rule | Summary |
 |------|---------|
@@ -27,5 +42,11 @@ Apply the **type-system-discipline** principle skill first.
 | Object args | Pass objects, not positional, so argument order is self-documenting. Skip on hot paths (per-frame render, tokenizers, parsers). |
 | Real tests | Don't mock what you can run. Prefer the framework's real test primitives with leak/disposable checks, and verify UI in a running build. Mock only what you can't run locally. |
 | Structured telemetry | Prefer structured logger diagnostics with enough context to debug from an id. No `console.log` in shipped code. |
+
+## Constraints
+
+Task 1 comes first.
+
+## Resources
 
 Examples: `references/patterns.md`.

@@ -6,16 +6,38 @@ disable-model-invocation: true
 
 # Outcome-Oriented Execution
 
-Optimize for the intended, verifiable end state rather than preserving smooth intermediate states.
+## Purpose
 
-**Why:** Keeping every intermediate step fully stable often creates temporary compatibility code that becomes long-lived debt. Converge on the target architecture and prove correctness at explicit verification boundaries.
+Bring a planned rewrite or migration to its intended, verifiable end state without throwaway compatibility code that preserves smooth intermediate states, and with any intermediate breakage planned, scoped, and reversible.
+
+## Outcomes
+
+- No throwaway compatibility code preserves a smooth intermediate state.
+- Any intermediate breakage is planned, scoped, and reversible, and falls where temporary breakage is declared acceptable.
+- High-signal checks for actively touched areas are kept while migrating.
+- Correctness is proven at the explicit verification boundaries, with full static and runtime verification of the target architecture at plan completion.
+
+## Tasks
+
+The following Tasks are required whenever this principle applies, each with the conditions it states. Numbers identify the Tasks and set no order.
+
+1. Optimize for the intended, verifiable end state rather than preserving smooth intermediate states.
+
+   > NOTE Keeping every intermediate step fully stable often creates temporary compatibility code that becomes long-lived debt.
+
+2. Converge on the target architecture and prove correctness at explicit verification boundaries.
+3. Declare where temporary breakage is acceptable
+4. Keep high-signal checks for actively touched areas while migrating
+5. Require full static and runtime verification at plan completion
+
+## Controls
 
 **Core rule:**
 - Prioritize end-state integrity over transitional stability
 - Intermediate breakage is acceptable when it is planned, scoped, and reversible
 
-**Guardrails:**
-- Use this for planned rewrites and migrations with explicit phase boundaries
-- Declare where temporary breakage is acceptable
-- Keep high-signal checks for actively touched areas while migrating
-- Require full static and runtime verification at plan completion
+## Constraints
+
+This principle applies during planned rewrites and migrations with explicit phase boundaries. When another description cites this principle, that description's own limits on it hold.
+
+Use this for planned rewrites and migrations with explicit phase boundaries. Don't preserve smooth intermediate states with throwaway compatibility code.
