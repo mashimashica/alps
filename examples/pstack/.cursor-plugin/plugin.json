@@ -2,14 +2,13 @@
 	"name": "pstack",
 	"displayName": "pstack",
 	"version": "0.15.44",
-	"description": "if you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence.",
+	"description": "Unofficial ALPS-form conversion of pstack 0.15.44 (cursor/plugins at commit e58dd04), kept as reference material in the ALPS repository. Not affiliated with or endorsed by the original author. Original description: if you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence.",
 	"author": {
 		"name": "Lauren Tan"
 	},
-	"homepage": "https://github.com/cursor/plugins/tree/main/pstack",
-	"repository": "https://github.com/cursor/plugins",
+	"homepage": "https://github.com/mashimashica/alps/tree/main/examples/pstack",
+	"repository": "https://github.com/mashimashica/alps",
 	"license": "MIT",
-	"logo": "assets/logo.png",
 	"keywords": [
 		"pstack",
 		"poteto-mode",

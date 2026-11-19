@@ -16,7 +16,9 @@ ROOT = Path(__file__).resolve().parents[1]
 TREE = ROOT / "examples" / "pstack"
 SKILL_ROOTS = ("skills", "automations/benny/skills")
 PLAYBOOKS = "skills/poteto-mode/playbooks"
-AGENTS = "agents"
+# The reviewing agent's definition describes work with results of its own. The
+# bootstrapping agent's definition configures a delegate and stays as upstream wrote it.
+AGENT_PROCESS_DESCRIPTIONS = ("agents/comment-sicko.md",)
 
 SPEC_FIELDS = {
     "name",
@@ -78,7 +80,7 @@ def process_descriptions():
     """Yield every file whose body the conversion presents as a Process Description."""
     yield from skill_files()
     yield from sorted((TREE / PLAYBOOKS).glob("*.md"))
-    yield from sorted((TREE / AGENTS).glob("*.md"))
+    yield from (TREE / path for path in AGENT_PROCESS_DESCRIPTIONS)
 
 
 class PstackExampleFormTests(unittest.TestCase):
@@ -118,11 +120,13 @@ class PstackExampleFormTests(unittest.TestCase):
                 )
                 empty = [
                     heading
-                    for heading, content in re.findall(
-                        r"^(#{2,6} [^\n]+)\n((?:[ \t]*\n)*)(?=#{1,6} |\Z)",
+                    for heading, following in re.findall(
+                        r"^(#{2,6} [^\n]+)\n(?:[ \t]*\n)*(?=(#{1,6}) |\Z)",
                         body,
                         re.MULTILINE,
                     )
+                    if not following
+                    or len(following) <= len(heading) - len(heading.lstrip("#"))
                 ]
                 self.assertEqual(empty, [], "section without content")
 
