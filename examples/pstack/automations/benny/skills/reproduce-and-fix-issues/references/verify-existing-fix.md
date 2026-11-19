@@ -117,5 +117,6 @@ Activities and Tasks may be worked in any order unless a Task or one of these de
 - The numbered actions under a Task are worked in the order listed.
 - The artifact is qualified before either build is measured.
 - The working tree is protected before either build is measured.
+- In Measure the baseline, the baseline revision is chosen before the baseline app is brought up.
 - The baseline is measured before the patched build, which repeats the same UI path and the same state check.
 - The verification outcome is chosen after the measurements and is reported before Cleanup.

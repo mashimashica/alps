@@ -12,7 +12,8 @@ Turn the user's working conventions into a skill agents will follow, through a g
 
 ## Outcomes
 
-- Where the run is in update mode, the existing file is edited in place and keeps the sections the user hasn't contradicted.
+- Where the run is in update mode, the existing file is edited in place.
+- Where the run is in update mode, the sections the user hasn't contradicted are kept.
 - The skill meets the Guardrails, each with the force it states.
 - The skill's path and frontmatter follow the placement rules of step 4.
 - The user judges that the skill reads like them and misses nothing.

@@ -7,7 +7,7 @@ Diagnose the cause from a capture that already exists, and hand back a cited dia
 ## Outcomes
 
 - The finding comes from the existing artifact, read and not re-run.
-- The cause is mapped to file, symbol, and line via the artifact's own symbols, or the reply says plainly that the artifact does not carry them.
+- The cause is mapped to file, symbol, and line, or the reply says plainly that the artifact does not carry the symbols.
 - Where a paired capture exists, whether the finding is confirmed rests on a diff of the before and after artifacts. Otherwise the finding is marked as the strongest hypothesis the artifact supports, not a confirmed cause.
 - The diagnosis handed back carries no fix unless one was asked for.
 
