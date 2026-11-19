@@ -16,7 +16,7 @@ Find what a change breaks somewhere else, before it ships, with the one fact it'
 - For each fact the change's safety depends on, the writeup says how far down the How sure are you list it got.
 - The writeup keeps the confirmed risks, each with how likely and how bad, apart from what was checked and cleared.
 - Every `file:line`, caller, and API the writeup cites is real.
-- The risks and the cleared items come from looking where grep stops, not from a list of callers.
+- The risks and the cleared items reach past where grep stops, not only to a list of callers.
 
 ## Tasks
 

@@ -12,9 +12,10 @@ Have data structures, not scattered conditionals, carry the domain, without forc
 
 ## Outcomes
 
-- Except where boring code is kept, the domain is encoded in a data structure that removes branches or invalid states, not scattered across conditionals.
+- Except where the shape is clear, local, and unlikely to grow, the domain is encoded in a data structure that removes branches or invalid states, not scattered across conditionals.
 - Boring code is kept where its shape is clear, local, and unlikely to grow.
-- No feature grows an if/else chain by one more branch, and no second boolean must stay in sync with the first.
+- No feature in the work grows an if/else chain by one more branch.
+- The work adds no second boolean that must stay in sync with the first.
 
 ## Tasks
 

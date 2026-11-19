@@ -8,25 +8,28 @@ disable-model-invocation: true
 
 ## Purpose
 
-Give a user who asks about pstack an answer they can act on themselves, whether the question is about setup, `/poteto-mode`, or picking the skill, playbook, or principle for a task. The work a help question is about is left for the user to start, and a message that asks for work is not a help question.
+Give a user who asks about pstack an answer they can act on themselves, leaving the work their question is about for them to start. A message that asks for work is not a help question, and its work is done under `poteto-mode`.
 
 ## Outcomes
 
-- The reply answers the user's question about pstack, for the need inferred from the message and the conversation or picked by the user.
-- What the reply takes from a file it routes to matches that file, also where this file disagrees with it.
-- The reply hands the user a prompt they can send.
-- The reply links the file the answer came from by its public copy, not by a path into the installed plugin.
-- For a help question no work has been started, and the prompt is left for the user to send.
+- For a help question, the reply answers the user's question about pstack, for the need inferred from the message and the conversation or picked by the user.
+- For a help question, what the reply states about a file it routes to matches that file, including where that file disagrees with this map.
+- For a help question, the reply hands the user a prompt they can send.
+- For a help question, the reply links the file the answer came from by its public copy.
+- For a help question, no work has been started.
+- Where the message asks for work, that work is done under `poteto-mode`.
+- Where the message asks for work, the reply mentions once that a Custom Mode keeps it on.
 
 ## Activities & Tasks
 
 The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks and set no order.
 
-### Answer the question
+### Respond to the message
 
 1. Answer the user's question about pstack, hand them a prompt they can send, and link the file the answer came from.
-2. Read the file you route to before you quote it, and trust it when it disagrees with this map.
-3. The links here point into the installed plugin, which the user may not be able to open, so give the user the file's public copy: `https://github.com/cursor/plugins/blob/main/pstack/` followed by its path.
+2. A message that asks for work, such as "use pstack to fix this bug", is not a help question. Read [`poteto-mode`](../poteto-mode/SKILL.md), do the work under it, and mention once that a Custom Mode keeps it on.
+3. Read the file you route to before you quote it, and trust it when it disagrees with this map.
+4. The links here point into the installed plugin, which the user may not be able to open, so give the user the file's public copy: `https://github.com/cursor/plugins/blob/main/pstack/` followed by its path.
 
 ### Find out what they need
 
@@ -181,5 +184,3 @@ For a run that drifts, [`references/prompting.md`](references/prompting.md) has 
 ## Constraints
 
 For a help question, don't start the work. The user asked how, and a pstack run spends real tokens, so let them send the prompt.
-
-A message that asks for work, such as "use pstack to fix this bug", is not a help question. Read [`poteto-mode`](../poteto-mode/SKILL.md), do the work under it, and mention once that a Custom Mode keeps it on.

@@ -8,14 +8,14 @@ disable-model-invocation: true
 
 ## Purpose
 
-Establish what a measured number shows, and whether it can change the decision it was measured for, before the number is trusted, reported, or acted on.
+Establish what limits a measured number, and that it measured the work you think and nothing else, before the number is trusted, reported, or acted on for the decision it was measured for.
 
 ## Outcomes
 
 - The decision is written before the run, with the result that would change it and the noise floor named.
-- The limiter named for the number is the resource or code path that bounds the result, taken from a profile or counters during a run.
-- Each other thing the number could be measuring is ruled out with evidence.
-- The run count, the spread, and the limiter are kept with the number.
+- Where the run-to-run spread is not larger than the effect, the limiter named for the number is the resource or code path that bounds the result, taken from a profile or counters during a run.
+- Where the run-to-run spread is not larger than the effect, each other thing the number could be measuring is ruled out with evidence.
+- Where the run-to-run spread is not larger than the effect, the run count, the spread, and the limiter are kept with the number.
 
 ## Tasks
 

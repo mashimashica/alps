@@ -8,12 +8,11 @@ disable-model-invocation: true
 
 ## Purpose
 
-Enable a tired engineer to understand technical writing on the first read.
+Enable a tired engineer to understand the writing this skill touches on the first read.
 
 ## Outcomes
 
 - The writing this skill touches follows each rule under Controls that applies to it, except in a sentence that the rule makes worse.
-- No pattern from the slop-pattern catalog that the **unslop** skill owns remains in a doc this skill touches.
 
 ## Controls
 

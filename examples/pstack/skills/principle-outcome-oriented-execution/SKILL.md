@@ -8,14 +8,14 @@ disable-model-invocation: true
 
 ## Purpose
 
-Bring a planned rewrite or migration to its intended, verifiable end state without throwaway compatibility code that preserves smooth intermediate states, and with any intermediate breakage planned, scoped, and reversible.
+Bring a planned rewrite or migration to its intended, verifiable end state without throwaway compatibility code that preserves smooth intermediate states, while keeping intermediate breakage planned, scoped, and reversible and actively touched areas checked.
 
 ## Outcomes
 
 - No throwaway compatibility code preserves a smooth intermediate state.
-- Any intermediate breakage is planned, scoped, and reversible, and falls where temporary breakage is declared acceptable.
+- Any intermediate breakage is planned, scoped, and reversible.
 - High-signal checks for actively touched areas are kept while migrating.
-- Correctness is proven at the explicit verification boundaries, with full static and runtime verification of the target architecture at plan completion.
+- At plan completion, full static and runtime verification establishes the correctness of the intended end state.
 
 ## Tasks
 

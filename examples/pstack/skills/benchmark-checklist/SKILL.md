@@ -15,12 +15,12 @@ Vet a performance number before it is reported or acted on, so that the verdict 
 - Each question is answered with evidence from a run, not a guess about the code, except a question that a quick ballpark skips or whose gap makes the verdict inconclusive.
 - The reported verdict and number claim nothing that an answer to a question contradicts.
 - Where a difference is claimed without a named limiter, a side ran untuned, or questions 4 and 7 could not be checked, the verdict is inconclusive and the gap is named.
-- Outside a quick ballpark, the reported number has its unit, the run count, the range, and the limiter with it, unless the limiter is the gap an inconclusive verdict names.
+- The reported number has its unit and the run count with it, and outside a quick ballpark also the range and the limiter, unless the limiter is the gap an inconclusive verdict names.
 - A quick ballpark is reported as one run.
 
 ## Activities & Tasks
 
-The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks and set no order.
+The following Tasks are required whenever this skill runs, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
 ### Before you run anything
 
@@ -57,7 +57,9 @@ Use this when you produce a performance number: a PR's before and after, a regre
 
 For a quick ballpark the user asked for, one run is enough. Still check questions 4 and 7, and say that it is one run. Skip the rest unless that run looks wrong. A choice between options is never a ballpark.
 
-The Tasks under Before you run anything come before any run.
+Unless a Task states otherwise, work the Tasks under The questions in the order listed. The Tasks under Before you run anything may be worked in any order. These dependencies are required.
+
+- The Tasks under Before you run anything come before any run.
 
 ### Other perf material
 

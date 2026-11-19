@@ -15,7 +15,7 @@ Keep bulk and oversized phases from overflowing the context window.
 ## Outcomes
 
 - The main thread holds summaries of the bulk, not raw payloads.
-- Each phase has a capped scope, with a limit on files, a turn budget, and mechanism costs accounted for.
+- Phases are sized and scope is capped, with files per phase limited, turn budgets set, and mechanism costs accounted for.
 
 ## Tasks
 

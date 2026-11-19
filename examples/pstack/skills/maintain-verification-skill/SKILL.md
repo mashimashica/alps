@@ -17,6 +17,7 @@ Keep a project's verification skill and feature map honest, or say exactly what 
 - Where the pass proved doc, harness, or map corrections, one PR ships them and holds nothing unproven, or the run is `blocked`.
 - Every product gap the pass found is recorded for the user and kept out of the run's PR.
 - The run states the one run outcome that holds: `clean`, `changed`, or `blocked`.
+- Where the run is `clean` or `blocked`, its report states the coverage the pass actually reached.
 - A `blocked` run says exactly what blocked it.
 
 ## Activities & Tasks
@@ -63,6 +64,9 @@ Unless a Task states otherwise, work the Tasks in the order listed. These depend
 
 - Step 0 comes first. The other steps work on the target it locates.
 - Step 3 reconciles what the children of step 2 return.
+- Step 4 drives the app states that step 3 merged.
+- Step 5 triages the drift and gaps that steps 2 to 4 found.
+- Step 6 ships or reports the results of the earlier steps.
 - A harness fix from the triage of step 5 is re-driven live before step 6 ships it.
 - Final teardown comes after the last drive of the run, including those re-proofs.
 

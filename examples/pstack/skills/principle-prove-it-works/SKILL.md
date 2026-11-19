@@ -12,7 +12,7 @@ Prove that a completed task works before it is declared done, by evidence from t
 
 ## Outcomes
 
-- Every output is verified by a direct check of the real thing, not by a proxy, before the task is declared done.
+- Before the task is declared done, a direct check of the real thing, not a proxy, shows that every output works.
 - Where the check can be scripted, it is scripted.
 - The output of a scripted check is where the human can see it.
 

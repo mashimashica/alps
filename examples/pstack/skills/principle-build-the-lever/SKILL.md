@@ -8,12 +8,13 @@ disable-model-invocation: true
 
 ## Purpose
 
-Have work that isn't trivial done or proven by a tool instead of by hand. The tool is the artifact a reviewer can rerun.
+Have work that isn't trivial done or proven by a tool, the smallest that does the job, instead of by hand. The tool is the artifact a reviewer can rerun.
 
 ## Outcomes
 
 - Work that isn't trivial is done or proven by a tool in the diff, not by hand.
-- The tool is safe to rerun, and a rerun on the first unit, which was done by hand, proves it.
+- The tool is safe to rerun.
+- A rerun of the tool on the first unit, which was done by hand, proves the tool.
 - The tool is the smallest script that does or proves the job, not a framework.
 - Where the work fans out, the recipe, the verification contract, and the fences are one skill that the delegates read and cannot edit.
 - Where the work outlives the session, the tool is committed.

@@ -12,12 +12,11 @@ Give a project a scripted way to drive the real app and prove behavior, which ev
 
 ## Outcomes
 
-- The generated `SKILL.md` has the frontmatter and the sections step 2 lists, each section grounded in what the interview found, with no placeholders left.
-- The feature map has a README index and one file per feature, each answering from the user's point of view what the feature is, how to reach it, how to drive it with the harness, and what observable end state proves it works.
-- The generated skill's own instructions have run end to end once: launch, doctor, the drive of one mapped feature, evidence capture, and cleanup.
+- The generated `SKILL.md` has the frontmatter and the sections step 2 lists, each section grounded in what the interview found and meeting what step 2 states for it, with no placeholders left.
+- The feature map has a README index and one file for each feature it lists, each answering from the user's point of view what the feature is, how to reach it, how to drive it with the harness, and what observable end state proves it works.
+- One run of the generated skill's own instructions has gone end to end with no part of them failing: launch, doctor, the drive of one mapped feature, evidence capture, and cleanup.
 - The evidence of that run still exists at the named location after cleanup.
 - Where the skill was proved in a stand-in for the real target, every setup step the stand-in did that the target will not is listed as unverified.
-- The user is pointed at `/maintain-verification-skill` for keeping the map honest as the app changes.
 
 ## Tasks
 

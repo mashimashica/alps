@@ -12,7 +12,7 @@ Make multi-step work a sequence of small units that each end in a verifiable sta
 
 ## Outcomes
 
-- Each small unit of the work ends in a state that is checked green before the next unit begins.
+- The work is a sequence of small units, each ending in a state that is checked green before the next begins.
 - The work is delivered in the order that proves it to a reviewer.
 
 ## Tasks

@@ -12,12 +12,13 @@ Eliminate the sharing between concurrent actors first, and serialize access stru
 
 ## Outcomes
 
-- Where one shared write target is not a real invariant, each concurrent actor writes its own file, key, branch, or state directory, and the state is merged only where it is read.
+- Where one shared write target is not a real invariant, each concurrent actor writes its own file, key, branch, or state directory.
+- Where one shared write target is not a real invariant, the state is merged only where it is read.
 - Where one shared write target is a real invariant, access to it is serialized structurally, not by instructions.
 
 ## Tasks
 
-The following Tasks are required whenever this principle applies, each with the conditions it states. Numbers identify the Tasks and set no order.
+The following Tasks are required whenever this principle applies, each with the conditions it states. Numbers identify the Tasks, and pstack text refers to them as steps. Required order is stated under Constraints.
 
 1. When concurrent actors might write the same file, branch, key, or object, first ask whether they need one shared object or are publishing independent facts.
 2. Default to giving each actor its own file, key, branch, or state directory, and merge only where the state is read. Two workers writing their own field into one `state.json` is still shared mutation.
@@ -27,4 +28,6 @@ The following Tasks are required whenever this principle applies, each with the 
 
 This principle applies when concurrent actors might write to the same file, branch, key, or state object. When another description cites this principle, that description's own limits on it hold.
 
-Task 1 comes first.
+Tasks may be worked in any order unless one states otherwise. These dependencies are required.
+
+- Task 1 comes first.

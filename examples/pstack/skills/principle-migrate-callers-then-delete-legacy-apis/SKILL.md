@@ -12,7 +12,8 @@ Complete the move to a new internal API in one wave, leaving no old API or compa
 
 ## Outcomes
 
-- Callers are migrated to the new API, and the old API is deleted in the same wave.
+- Callers are migrated to the new API.
+- The old API is deleted in the same wave as the caller migration.
 - No compatibility layer is preserved.
 - The tests assert the new contract.
 - No test remains that only protects pre-refactor implementation details.

@@ -2,15 +2,16 @@
 
 ## Purpose
 
-Reclaim disk space from worktrees, simulators, and other reclaimers, deleting a worktree that is in use or holds uncommitted work only on the user's decision.
+Reclaim disk space held by worktrees, simulators, and caches, deleting a worktree that is in use or holds tracked uncommitted edits only on the user's decision, and let the user see the space reclaimed, the worktrees pruned, and why each one held back was kept.
 
 ## Outcomes
 
 - A re-list of the worktrees no longer shows any worktree of the confirmed set.
 - No worktree that a pinned or active chat uses is pruned without the user's decision.
 - No tracked uncommitted edit is removed before the user has seen its diff and decided.
+- No cache the user has said to keep is cleared.
 - Every worktree held back has a one-line reason (in-use by which chat, or uncommitted work).
-- `df -h /` before and after shows the space reclaimed.
+- The space reported as reclaimed follows from a `df -h /` reading recorded before anything was deleted and one taken after.
 
 ## Tasks
 
@@ -31,9 +32,9 @@ The following Tasks are required whenever this playbook runs, each with the cond
 
 Unless a Task states otherwise, work the Tasks in the order listed. These dependencies are required.
 
-- Task 1 records `df -h /` before anything is deleted, because the Reply reports it before and after.
-- Tasks 2, 3, and 4 follow the audit of Task 1, because they work on the rows it prints.
-- Task 5 follows Tasks 2, 3, and 4, because it prunes only the set they confirm.
+- Step 1 records `df -h /` before anything is deleted, because the Reply reports it before and after.
+- The cross-check in step 2 and steps 3 and 4 follow the audit of step 1, because they work on the rows it prints.
+- Step 5 follows steps 2, 3, and 4, because it prunes only the set they confirm.
 
 This is the one playbook that deletes user state with no code review to catch a slip, so the gates above are the review.
 

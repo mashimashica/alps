@@ -2,14 +2,14 @@
 
 ## Purpose
 
-Build a feature under a design and a plan the lead owns, and deliver it for review verified on the matching surface.
+Build a feature under a design and a plan the lead owns, and deliver it for review.
 
 ## Outcomes
 
 - The data shape and its organizing structure are chosen before the delegate writes logic.
 - The throughput checkpoint keeps an item for each of its four dimensions, and a dimension that does not apply reads `n/a: <reason>`.
 - The feature passes verification on the matching surface, or an inconclusive or wrong-surface result is flagged and not counted as a pass.
-- The change is delivered as small, ordered commits, each small unit built, verified, and committed before the next.
+- The change is delivered as small, ordered commits, each a verifiable unit.
 - The change is open as a PR per **Opening a PR**.
 
 ## Tasks

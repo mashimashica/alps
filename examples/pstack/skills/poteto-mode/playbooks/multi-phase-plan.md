@@ -8,10 +8,10 @@ Give multi-phase or multi-PR work a plan that an owner can run box by box and th
 
 - The plan opens with what changes, the PR ids in landing order, and the dependency graph, and has one section of checkboxes per PR. Where the change is one or two files with an obvious approach, the plan is skipped instead and the skip is stated.
 - Each PR in the plan is one change with its own evidence.
-- Each PR's verification in the plan has unit, live, and perf boxes, and tests alone do not count as verification.
-- Every PR that changes an interaction is in the review-gated set, which waits for the operator's review before merge.
+- Each PR's verification in the plan has unit, live, and perf boxes.
+- The plan marks every PR that changes an interaction as waiting for the operator's review before merge.
 - The open questions that a run can settle are settled by prototype before the plan is written.
-- No part of the plan is implemented when the plan path is handed back.
+- No part of the plan is implemented in this run.
 
 ## Tasks
 

@@ -15,7 +15,8 @@ Keep guards at system boundaries and framework dependencies in a thin shell, so 
 - Validation, type narrowing, error handling, and the parse of raw data into domain types sit where data crosses a system boundary (CLI args, config files, external APIs, network).
 - Inside, the types are trusted, with no re-validation and no redundant nil check.
 - No transport or framework type is in the public surface.
-- Business logic lives in pure functions with no framework dependencies, and the shell that calls them is thin.
+- Business logic lives in pure functions with no framework dependencies.
+- The shell that calls the business logic is thin.
 
 ## Tasks
 

@@ -2,12 +2,13 @@
 
 ## Purpose
 
-Change the structure of the code so that reader load drops while the behavior holds against a pinned contract, and deliver the change for review.
+Change the structure of the code while its behavior holds against a pinned contract, keep only a change that lowers reader load, and deliver what is kept for review.
 
 ## Outcomes
 
 - A characterization test, snapshot, or equivalence harness pins the current behavior, captured before any structure moved.
-- The behavior is proven unchanged on the real artifact, and the pin is green after every step.
+- The behavior is proven unchanged on the real artifact.
+- The pin is green after every small behavior-preserving move and at every behavior-preserving slice.
 - The shipped change carries no new behavior.
 - The shipped diff lowers reader load somewhere, and a diff that does not is reverted.
 - The shipped history is small ordered commits, a subtraction commit, then the reshape, then any follow-on cleanup.

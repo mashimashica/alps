@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 ## Purpose
 
-Make a lesson that keeps recurring hold without another repetition, in structure wherever the rule can be encoded.
+Carry a lesson that keeps recurring in structure wherever it can be encoded, not in one more repetition of the instruction.
 
 ## Outcomes
 

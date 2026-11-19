@@ -2,15 +2,16 @@
 
 ## Purpose
 
-Improve one measurable thing against a target through sustained iteration, with the metric and the experiment's integrity intact.
+Improve one measurable thing against a target through sustained iteration rather than a one-off fix, with the metric and the experiment's integrity intact.
 
 ## Outcomes
 
-- The frozen harness reproduces the symptom on the target case and separates easier cases as expected.
-- Every change the run keeps is justified by its own before and after measurement on the frozen harness, as a move past noise or as a simplification that holds the number, with the regression gate green.
+- Where a case reproduces the user's complaint, the frozen harness reproduces the symptom on the target case and separates easier cases as expected.
+- Every change the run keeps has its own before and after measurement on the frozen harness, with the regression gate green.
+- No change the run keeps breaks behavior.
 - Every attempt the run does not keep is reverted in full.
-- The decision log has one row per attempt, kept or reverted.
-- The stop predicate is met without being relaxed, or the run stops because the remaining ideas are marginal and not worth their cost, or the run is stuck and surfaces that.
+- Where a case reproduces the user's complaint, the decision log has one row per attempt, kept or reverted.
+- Where a case reproduces the user's complaint, the stop predicate is met without being relaxed, or the run stops because the remaining ideas are marginal and not worth their cost while no cheap untried hypothesis remains, or the run is stuck and surfaces that.
 - The accepted fixes are one commit each, stacked in the order they landed.
 
 ## Tasks
@@ -50,5 +51,6 @@ Unless a Task states otherwise, work the Tasks in the order listed. These depend
 - Step 1 comes before steps 2, 4, and 7. Step 2 measures its metric and case, step 4 uses its architecture model, and step 7 applies its stop predicate.
 - Step 2 freezes the harness and records the baseline metric and a green run of the regression gate before any change in step 5.
 - Step 3 opens the decision log before the first attempt in step 5.
-- On a stall, step 6 comes before step 7 concludes the hill is climbed.
+- Step 5 repeats, one hypothesis per iteration, until step 7 stops the run.
+- On a stall, step 6 comes before step 7 concludes the hill is climbed, and the run goes on with step 5.
 - Step 8 uses the commits that step 5 accepted.

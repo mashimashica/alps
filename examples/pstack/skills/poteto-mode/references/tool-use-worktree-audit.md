@@ -9,9 +9,9 @@ It removes no worktree, no branch, and no entry of the worktree registry. What i
 It has these limits.
 
 - The bucket is computed from the other columns of the row by the rule under Returned information. The script does not read which chats are pinned or open.
-- A worktree path that contains whitespace is cut at the first whitespace. Its row shows the cut path, an empty SIZE, AGE `?`, MERGED `no`, DIRTY `clean`, and REMOTE `detached`, whatever the worktree holds. A worktree whose directory is gone prints the same values. When the path of the main worktree contains whitespace, a worktree whose cut path equals the cut main path gets no row.
+- A worktree path that contains whitespace is cut at the first whitespace, and every column of its row is computed from the cut path. When nothing exists at the cut path, the row shows an empty SIZE, AGE `?`, MERGED `no`, DIRTY `clean`, and REMOTE `detached`, whatever the worktree holds. Otherwise the row describes whatever is at the cut path. A worktree whose directory is gone prints the same values as a cut path with nothing at it. When the path of the main worktree contains whitespace, a worktree whose cut path equals the cut main path gets no row.
 - The worktree the caller stands in is listed like any other. A locked worktree is not marked.
-- MERGED is an ancestor test, so a squash-merged branch reads `no` and a worktree with no commit of its own reads `YES`.
+- MERGED is an ancestor test, so a squash-merged branch reads `no` and a worktree with no commit of its own reads `YES`. In a worktree whose branch has no commit yet, the test uses the HEAD of the directory the script audits from (`repo-path`, or the top level of the current repository) and can read `YES`.
 - Only the base ref is fetched. REMOTE is read from the local `refs/remotes/origin/<branch>` and is as fresh as the last fetch of that branch.
 - The PR lookup returns only PRs that the authenticated user authored, at most 1000 of them. For a branch with several PRs it uses the first one listed.
 - LAST_CHAT searches one directory, `$HOME/.cursor/projects/<slug>/agent-transcripts`, where `<slug>` is the path of the main worktree without its leading `/` and with every other `/` replaced by `-`. Transcripts stored anywhere else are not searched.
@@ -45,9 +45,9 @@ Stdout holds two header lines and then one tab-separated row per linked worktree
 
 | Column | Values | Meaning |
 | --- | --- | --- |
-| `SIZE` | a `du -sh` size such as `2.9M`, or empty | Disk use of the worktree directory, ignored and untracked files included. Empty when the directory could not be read. |
+| `SIZE` | a `du -sh` size such as `2.9M`, or empty | Disk use of the worktree directory, ignored and untracked files included. Empty when `du` prints nothing, as for a missing directory. A directory that is only partly readable shows a smaller size, with no sign. |
 | `AGE` | `<n>d` or `?` | Whole days since the committer date of the HEAD commit. It is not the age of the worktree. |
-| `MERGED` | `YES` or `no` | `YES` when HEAD is an ancestor of the base ref. `no` also covers a HEAD that could not be read. |
+| `MERGED` | `YES` or `no` | `YES` when HEAD is an ancestor of the base ref. A HEAD that could not be read gives `no`, except on a branch with no commit yet, as stated under Responsibility and limits. |
 | `DIRTY` | `clean`, `wip:N`, `scratch:N` | Counted from `git status --porcelain`. `wip:N` means N entries that are not untracked. Untracked entries beside them are not counted. `scratch:N` means N untracked entries and no other change. An untracked directory is one entry. Ignored files are never counted. No file name is printed. |
 | `REMOTE` | `detached`, `pushed`, `aheadN`, `no-remote` | `detached` means HEAD is on no branch. `pushed` means the local `origin/<branch>` equals HEAD. `aheadN` means the two differ, with N commits on HEAD that `origin/<branch>` lacks. N is 0 for a branch that is only behind. `no-remote` means there is no local `origin/<branch>`. |
 | `PR` | `#<number>/<state>` or `-` | The first listed PR whose head branch is the branch of the worktree. A state from `gh` is lower-cased to `open`, `closed`, or `merged`. A state from the `origin` CLI is printed as returned. |
@@ -85,7 +85,7 @@ The script writes these messages to stderr. Other text on stderr comes from bash
 | `jq` | PR | PR is `-` in every row, with no message. |
 | `rg` (ripgrep) | LAST_CHAT | LAST_CHAT is `-` in every row, with no message. |
 | the `origin` CLI or `gh`, signed in and with network access | PR | PR is `-` in every row, with no message. |
-| a remote named `origin`, reachable with git credentials | the default base, the fetch of the base, REMOTE | Without `-b` and without any of the three default refs the run fails. When the fetch fails the run warns and tests MERGED against the local ref. |
+| a remote named `origin`, reachable with git credentials | the default base, the fetch of the base, REMOTE | Without `-b` and without any of the three default refs the run fails. When the fetch fails the run warns and tests MERGED against the local ref, or fails when there is none. |
 | `HOME` | the transcripts directory | The run fails with exit status 1. |
 | the directory `$HOME/.cursor/projects/<slug>/agent-transcripts` | LAST_CHAT | LAST_CHAT is `-` in every row, with no message. |
 
@@ -109,7 +109,7 @@ A run with status 0 can be incomplete. These cases show a sign.
 
 - `warn: could not fetch <ref>; merged column may be stale` means MERGED was tested against the local copy of the base ref.
 - `warn: no -b given; MERGED checks against <ref>` means the base was picked by default.
-- A row with an empty SIZE and AGE `?` means the worktree could not be read. Its `clean` and `detached` are not findings.
+- A row with an empty SIZE and AGE `?` means nothing could be read at its path. Its `clean` and `detached` are not findings.
 
 These cases show no sign.
 
@@ -124,24 +124,19 @@ The output alone cannot tell a branch with no PR from a failed PR lookup, or a w
 
 - When the base ref starts with `origin/`, which every default base does, the script runs `git fetch origin` for that one branch with a forced refspec. The fetch moves `refs/remotes/origin/<branch>` to the tip of the remote, creates it when it is absent, rewrites `FETCH_HEAD`, and adds the fetched objects. A base that does not start with `origin/` is not fetched.
 - `git status` in each worktree can rewrite the index file of that worktree to refresh cached file data. No tracked file changes.
-- One temporary file is created with `mktemp` and removed at the end of the run. It holds the PR numbers, states, and head branches. A run that is interrupted can leave it behind.
+- One temporary file is created with `mktemp` and removed at the end of the run. It holds the PR numbers, states, and head branches. A run that is interrupted, or that stops because `HOME` is unset, can leave it behind.
 - The PR lookup only reads from the forge.
 
 The script keeps no state between runs and can be run again at any time, also after an interruption. Each run with an `origin/` base fetches it again.
 
 ## Reproducibility
 
-The script uses no randomness. Two runs on unchanged inputs print the same bytes. The output changes with the current time (AGE and the recent-chat window), the state of the remote at fetch time, the PR states on the forge, the modification times of the transcripts, the local time zone (LAST_CHAT), and the block accounting of the file system (SIZE).
+The script uses no randomness. Two runs on unchanged inputs print the same bytes. The output changes with the current time (AGE and the recent-chat window), the state of the remote at fetch time, the PR states on the forge, the modification times of the transcripts, the local time zone (LAST_CHAT), the block accounting of the file system (SIZE), and the locale for the order of rows with equal SIZE.
 
 ## What a result does not establish
 
 - Exit status 0 does not establish that the PR and LAST_CHAT columns were computed.
 - `safe` does not establish that the worktree is unused, that its branch was merged, or that removing it loses nothing. It reflects only the columns of its row.
-- PR `-` does not establish that the branch has no PR.
-- LAST_CHAT `-` does not establish that no chat used the worktree. A date in LAST_CHAT is the modification time of a transcript file. It does not establish that the chat is pinned, open, or ongoing.
+- A date in LAST_CHAT is the modification time of a transcript file. It does not establish that the chat is pinned, open, or ongoing.
 - MERGED `no` does not establish that the branch is unmerged, and MERGED `YES` does not establish that work of the worktree was merged.
-- `clean` in a row with an empty SIZE does not establish a clean worktree.
-- `pushed` reflects the last fetch of that branch, not the remote as it is now.
-- `detached` means HEAD is on no branch. Apart from the MERGED test against the base, the audit does not check whether any ref holds that commit.
-- `scratch:N` is a count of untracked entries. It does not name the files.
-- The table does not show whether a worktree is locked.
+- `detached` does not establish whether any ref still holds the HEAD commit. Apart from the MERGED test against the base, the audit does not check it.

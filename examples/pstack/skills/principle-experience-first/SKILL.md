@@ -8,13 +8,14 @@ disable-model-invocation: true
 
 ## Purpose
 
-Make user delight the target of the work, ahead of implementation convenience. Foundational thinking governs the *sequence* of work. This principle governs the *target*.
+Make the delight of whoever consumes the work, ahead of implementation convenience, the target of the work and the perspective from which its impact is explained.
 
 ## Outcomes
 
 - Where implementation convenience conflicts with user delight, the choice made is delight, for whoever consumes the work.
 - Every feature, control, and option is justified.
-- Fewer polished features ship rather than more rough ones, with the details right (transitions, alignment, spacing, feedback, error states).
+- Fewer polished features ship rather than more rough ones.
+- The details are right (transitions, alignment, spacing, feedback, error states).
 - Impact is explained from the user's perspective.
 
 ## Tasks
@@ -32,7 +33,7 @@ The following Tasks are required whenever this principle applies, each with the 
 
 The user is whoever consumes the work. For a UI that is the end user. For a library or an internal API it is the colleague who imports it. The engineer who maintains the code next is a user too. Weigh their experience the same way, and explain impact from their perspective.
 
-Foundations should serve the experience.
+Foundations should serve the experience. Foundational thinking governs the *sequence* of work. This principle governs the *target*.
 
 ## Constraints
 

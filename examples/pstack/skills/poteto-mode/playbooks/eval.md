@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Establish whether a variant under test produces the behavior that counts as success, through an experiment whose candidates and judge are blinded. The result supports a recommendation for whether to promote the variant.
+Establish whether a variant under test produces the behavior that counts as success, through an experiment whose candidates and judge are blinded, as the basis for a recommendation for whether to promote the variant.
 
 ## Outcomes
 

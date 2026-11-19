@@ -6,8 +6,10 @@ Author or modify a skill in a voice that keeps only prose that changes a decisio
 
 ## Outcomes
 
-- The skill's frontmatter has `name` and `description`, every file it references exists, and every cross-skill link resolves.
-- The skill keeps only prose that changes a decision.
+- The skill's frontmatter has `name` and `description`.
+- Every file the skill references exists.
+- Every cross-skill link in the skill resolves.
+- In the parts of the skill this run authors or changes, only prose that changes a decision remains.
 - The change is open as a PR per **Opening a PR**.
 
 ## Tasks

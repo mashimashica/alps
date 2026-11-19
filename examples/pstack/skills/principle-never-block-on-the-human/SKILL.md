@@ -8,11 +8,11 @@ disable-model-invocation: true
 
 ## Purpose
 
-Keep agents unblocked on reversible work, with the human supervising asynchronously and course-correcting after the fact.
+Keep agents unblocked on reversible work and the system self-healing, with the human supervising asynchronously and course-correcting after the fact.
 
 ## Outcomes
 
-- No reversible work waits on the human.
+- Reversible actions proceed without blocking on the human.
 - The result of the work is shown to the human with the reason for what was done.
 - Each problem noticed is logged and fixed in the next round.
 

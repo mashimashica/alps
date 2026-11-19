@@ -6,7 +6,7 @@ Hold pixel-exact equivalence through a migration, so that each migrated componen
 
 ## Outcomes
 
-- Every parity claim rests on a zero image diff of the component against its baseline on the matching surface.
+- Every component reported as migrated has a zero image diff against its baseline on the matching surface.
 - The baseline every diff runs against is the one established before any migration, untouched by the run.
 - No diff passes because of a harness modification or a component restructuring made to pass it.
 - Each component is reported either as migrated, with its diff result, or as part of what is left.

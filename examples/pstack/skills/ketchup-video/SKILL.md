@@ -13,11 +13,12 @@ Catch the user up as ketchup does, with what happened shown in a short subtitled
 ## Outcomes
 
 - Where the render succeeds, the video shows what came of each thing the user asked for, and whether it is done, still running, failed, or not checked.
-- Where the render succeeds, the video is drawn only from facts you have, with no invented number and no screen you did not capture.
+- Where the render succeeds, everything the video shows comes from facts the work has, with no invented number and no drawn screen that was not captured.
 - Where the render succeeds, each slide's subtitle is readable when the video plays at chat size and covers nothing.
 - Where the render succeeds, each slide's measured hold in the rendered file is long enough to read the words the slide adds, at least one second for each three words.
 - Where the render succeeds, the action items stand in the reply as text under the video.
 - Where the render fails, the reply says so in one line and gives only the calls.
+- On either path, the action items and calls in the reply meet ketchup's Outcomes for them.
 
 ## Activities & Tasks
 
@@ -38,7 +39,7 @@ The following Tasks are required whenever this skill runs, each with the conditi
 
 ### Render
 
-1. Render one silent landscape video, such as an mp4, with motion between slides. Every frame is the slide itself, edge to edge, above its subtitle strip. Make the frames from the slides, never by recording a screen, and burn each subtitle into its slide's frames so it stays on screen for the slide's whole hold. Hold each slide long enough to read the words it adds, at least one second for each three words.
+1. Render one silent landscape video, such as an mp4, with motion between slides. Every frame is the slide itself, edge to edge, above its subtitle strip. Make the frames from the slides, never by recording a screen, and burn each subtitle into its slide's frames so it stays on screen for the slide's whole hold. The hold is the time a slide is fully on screen, not counting the motion into or out of it. Hold each slide long enough to read the words it adds, at least one second for each three words. A slide adds its subtitle and each word that was not on the slide before it, including a label it changes. The first slide adds all its words. Words inside a screenshot do not count.
 2. Before you embed the video, check the rendered file. Look at one frame from each slide at chat size, and check that its subtitle is readable and covers nothing. Measure each hold by matching the file's frames to the slide, not with a still-frame detector, which counts the faint ends of a fade as still. Count the words each slide adds against its measured hold. Fix any slide you cannot read in that time, render again, and check again.
 
 ## Outputs
@@ -49,8 +50,6 @@ The reply is ketchup's opening sentence, the embedded video, one line naming any
 
 Follow [`/ketchup`](../ketchup/SKILL.md), but show what happened in a short subtitled video instead of its summary and visuals. Its window starts at the last message the user wrote before `/ketchup-video`, not before any earlier `/ketchup`.
 
-The hold is the time a slide is fully on screen, not counting the motion into or out of it. A slide adds its subtitle and each word that was not on the slide before it, including a label it changes. The first slide adds all its words. Words inside a screenshot do not count.
-
 ## Constraints
 
 Writing and rendering the video, outside the repo, is the one exception to ketchup's read-only rule.
@@ -58,5 +57,5 @@ Writing and rendering the video, outside the repo, is the one exception to ketch
 These dependencies are required.
 
 - The one sentence the user should leave with and the one line per slide are written before any slide is drawn.
-- The slides and their subtitles come before the render, because the frames are made from the slides and each subtitle is burned into its slide's frames.
+- The slides and their subtitles come before the render.
 - The rendered file is checked before the video is embedded, and a file rendered again after a fix is checked again.
